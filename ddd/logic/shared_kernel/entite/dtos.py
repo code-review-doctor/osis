@@ -39,3 +39,11 @@ class EntiteRepositoryDTO(interface.DTO):
     pays = attr.ib(type=str)
     telephone = attr.ib(type=str)
     fax = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class EntiteDTO(interface.DTO):
+    sigle = attr.ib(type=str)
+    intitule = attr.ib(type=str)
+    sigle_parent = attr.ib(type=str)
+    type = attr.ib(type=str)

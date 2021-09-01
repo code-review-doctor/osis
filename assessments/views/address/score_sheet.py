@@ -139,6 +139,11 @@ class FirstYearBachelorScoreSheetAddressView(ScoreSheetAddressView):
         })
         return initial
 
+    def get_form_kwargs(self):
+        form_kwargs = super().get_form_kwargs()
+        form_kwargs['adresse_bachelier'] = self.bachelor_score_sheet_address_dto
+        return form_kwargs
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 

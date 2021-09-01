@@ -25,8 +25,7 @@
 from ddd.logic.encodage_des_notes.soumission.builder.adresse_feuille_de_notes_identity_builder import \
     AdresseFeuilleDeNotesIdentityBuilder
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderAdresseFeuilleDeNotes
-from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_notes import AdresseFeuilleDeNotes, \
-    AdresseFeuilleDeNotesBaseeSurEntite
+from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_notes import AdresseFeuilleDeNotes
 from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import \
     AdressePremiereAnneeDeBachelierIdentiqueAuBachlierException
 from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_notes import \
@@ -59,6 +58,4 @@ class AdresseFeuilleDeNotesPremiereAnneeDeBachelierEstSpecifique(interface.Domai
             adresse_bachelier: AdresseFeuilleDeNotes,
             cmd: EncoderAdresseFeuilleDeNotes
     ) -> bool:
-        if isinstance(adresse_bachelier, AdresseFeuilleDeNotesBaseeSurEntite):
-            return adresse_bachelier.entite == cmd.entite
-        return False
+        return adresse_bachelier.sigle_entite == cmd.entite and cmd.entite

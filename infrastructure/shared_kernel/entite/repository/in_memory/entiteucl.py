@@ -25,15 +25,15 @@
 from typing import List, Optional, Dict
 
 from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
-from ddd.logic.shared_kernel.entite.domain.model.entite import Entite, IdentiteEntite
-from ddd.logic.shared_kernel.entite.repository.entite import IEntiteRepository
+from ddd.logic.shared_kernel.entite.domain.model.entiteucl import EntiteUCL, IdentiteUCLEntite
+from ddd.logic.shared_kernel.entite.repository.entiteucl import IEntiteUCLRepository
 
 
-class EntiteInMemoryRepository(InMemoryGenericRepository, IEntiteRepository):
-    entities = list()  # type: List[Entite]
+class EntiteUCLInMemoryRepository(InMemoryGenericRepository, IEntiteUCLRepository):
+    entities = list()  # type: List[EntiteUCL]
 
     @classmethod
-    def search_with_parents(cls, entity_ids: Optional[List['IdentiteEntite']] = None, **kwargs) -> List['Entite']:
+    def search_with_parents(cls, entity_ids: Optional[List['IdentiteUCLEntite']] = None, **kwargs) -> List['EntiteUCL']:
         entites = cls.search(entity_ids)
         result = entites.copy()
         for entite in entites:
@@ -41,7 +41,7 @@ class EntiteInMemoryRepository(InMemoryGenericRepository, IEntiteRepository):
         return result
 
     @classmethod
-    def _get_hierarchy(cls, entite: 'Entite', dict_sigle_entite: Dict[str, 'Entite'] = None) -> List['Entite']:
+    def _get_hierarchy(cls, entite: 'EntiteUCL', dict_sigle_entite: Dict[str, 'EntiteUCL'] = None) -> List['EntiteUCL']:
         if not dict_sigle_entite:
             dict_sigle_entite = {entity.sigle: entity for entity in cls.entities}
 
@@ -51,7 +51,7 @@ class EntiteInMemoryRepository(InMemoryGenericRepository, IEntiteRepository):
         return []
 
     @classmethod
-    def _get_parent(cls, entite: 'Entite', dict_sigle_entite: Dict[str, 'Entite']) -> Optional['Entite']:
+    def _get_parent(cls, entite: 'EntiteUCL', dict_sigle_entite: Dict[str, 'EntiteUCL']) -> Optional['EntiteUCL']:
         if entite.parent:
             return dict_sigle_entite.get(entite.parent.sigle)
         return None

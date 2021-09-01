@@ -29,9 +29,8 @@ from django.test import SimpleTestCase
 
 from ddd.logic.encodage_des_notes.soumission.commands import SearchAdressesFeuilleDeNotesCommand
 from ddd.logic.encodage_des_notes.soumission.dtos import DateDTO
-from ddd.logic.encodage_des_notes.tests.factory.adresse_feuille_de_notes import AdresseFeuilleDeNotesSpecifiqueFactory, \
-    AdresseFeuilleDeNotesBaseeSurEntiteFactory
-from ddd.logic.shared_kernel.entite.tests.factory.entite import EPLEntiteFactory
+from ddd.logic.encodage_des_notes.tests.factory.adresse_feuille_de_notes import \
+    AdresseFeuilleDeNotesSpecifiqueFactory
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.inscription_examen import \
     InscriptionExamenTranslatorInMemory
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.periode_encodage_notes import \
@@ -41,7 +40,6 @@ from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.delibe
 from infrastructure.encodage_de_notes.soumission.repository.in_memory.adresse_feuille_de_notes import \
     AdresseFeuilleDeNotesInMemoryRepository
 from infrastructure.messages_bus import message_bus_instance
-from infrastructure.shared_kernel.entite.repository.in_memory.entite import EntiteInMemoryRepository
 
 
 class SearchDonneesAdministrativesTest(SimpleTestCase):
@@ -62,8 +60,6 @@ class SearchDonneesAdministrativesTest(SimpleTestCase):
         self.adresse = AdresseFeuilleDeNotesSpecifiqueFactory()
         self.adresse_feuille_de_notes_repository.save(self.adresse)
 
-        self.entite_repository = EntiteInMemoryRepository()
-
         self.periode_encodage_translator = PeriodeEncodageNotesTranslatorInMemory()
         self.inscr_examen_translator = InscriptionExamenTranslatorInMemory()
         self.deliberation_translator = DeliberationTranslatorInMemory()
@@ -76,7 +72,6 @@ class SearchDonneesAdministrativesTest(SimpleTestCase):
             AdresseFeuilleDeNotesRepository=lambda: self.adresse_feuille_de_notes_repository,
             InscriptionExamenTranslator=lambda: self.inscr_examen_translator,
             DeliberationTranslator=lambda: self.deliberation_translator,
-            EntiteRepository=lambda: self.entite_repository,
         )
         message_bus_patcher.start()
         self.addCleanup(message_bus_patcher.stop)
@@ -116,23 +111,3 @@ class SearchDonneesAdministrativesTest(SimpleTestCase):
         self.assertEqual(dto.contact_feuille_de_notes.telephone, '0106601122')
         self.assertEqual(dto.contact_feuille_de_notes.fax, '0106601123')
         self.assertEqual(dto.contact_feuille_de_notes.email, 'email-fac-droit@email.be')
-
-    def test_should_charger_adresse_feuille_de_note_sur_base_de_entite(self):
-        self.adresse_feuille_de_notes_repository.delete(self.adresse.entity_id)
-
-        adresse_basee_sur_entite = AdresseFeuilleDeNotesBaseeSurEntiteFactory()
-        self.adresse_feuille_de_notes_repository.save(adresse_basee_sur_entite)
-
-        self.entite_repository.save(EPLEntiteFactory())
-
-        result = self.message_bus.invoke(self.cmd)
-        dto = list(result)[0]
-        self.assertEqual(dto.contact_feuille_de_notes.nom_cohorte, self.nom_cohorte)
-        self.assertEqual(dto.contact_feuille_de_notes.destinataire, 'EPL - Ecole Polytechnique')
-        self.assertEqual(dto.contact_feuille_de_notes.rue_numero, '')
-        self.assertEqual(dto.contact_feuille_de_notes.code_postal, '1348')
-        self.assertEqual(dto.contact_feuille_de_notes.ville, 'Louvain-la-Neuve')
-        self.assertEqual(dto.contact_feuille_de_notes.pays, 'Belgique')
-        self.assertEqual(dto.contact_feuille_de_notes.telephone, '')
-        self.assertEqual(dto.contact_feuille_de_notes.fax, '')
-        self.assertEqual(dto.contact_feuille_de_notes.email, 'temp@temp.com')

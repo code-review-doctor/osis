@@ -32,14 +32,14 @@ from osis_common.ddd import interface
 
 
 @attr.s(slots=True, frozen=True)
-class IdentiteEntite(interface.EntityIdentity):
+class IdentiteUCLEntite(interface.EntityIdentity):
     sigle = attr.ib(type=str)
 
 
 @attr.s(slots=True)
-class Entite(interface.RootEntity):
-    entity_id = attr.ib(type=IdentiteEntite)
-    parent = attr.ib(type=Optional[IdentiteEntite])
+class EntiteUCL(interface.RootEntity):
+    entity_id = attr.ib(type=IdentiteUCLEntite)
+    parent = attr.ib(type=Optional[IdentiteUCLEntite])
     intitule = attr.ib(type=str)
     type = attr.ib(type=EntityType)
     adresse = attr.ib(type=AdresseEntite)

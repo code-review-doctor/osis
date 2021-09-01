@@ -28,7 +28,8 @@ from django.utils.translation import gettext_lazy
 from base.forms.exceptions import InvalidFormException
 from base.models.entity_version import EntityVersion
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderAdresseFeuilleDeNotes, \
-    GetChoixEntitesAdresseFeuilleDeNotesCommand, SupprimerAdresseFeuilleDeNotes
+    GetChoixEntitesAdresseFeuilleDeNotesCommand
+from ddd.logic.encodage_des_notes.soumission.dtos import AdresseFeuilleDeNotesDTO
 from infrastructure.messages_bus import message_bus_instance
 from osis_common.ddd.interface import BusinessException
 from reference.models.country import Country
@@ -40,12 +41,9 @@ class EntityVersionModelChoiceField(forms.ModelChoiceField):
 
 
 class ScoreSheetAddressForm(forms.Form):
-    entity = EntityVersionModelChoiceField(
-        queryset=EntityVersion.objects.none(),
+    entity = forms.ChoiceField(
         required=False,
         label=gettext_lazy('Please select an address'),
-        empty_label=gettext_lazy('Customized'),
-        to_field_name="acronym"
     )
     recipient = forms.CharField(max_length=255, label=gettext_lazy('Recipient'), required=False)
     location = forms.CharField(max_length=255, label=gettext_lazy('Street and number'), required=False)
@@ -69,8 +67,14 @@ class ScoreSheetAddressForm(forms.Form):
     def _init_entity_field(self):
         cmd = GetChoixEntitesAdresseFeuilleDeNotesCommand(nom_cohorte=self.nom_cohorte)
         entite_dtos = message_bus_instance.invoke(cmd)
+        entity_choices = [
+            (entite_dto.sigle, "{} - {}".format(entite_dto.sigle, entite_dto.intitule))
+            for entite_dto in entite_dtos
+        ]
 
-        self.fields['entity'].queryset = EntityVersion.objects.filter(acronym__in=[dto.sigle for dto in entite_dtos])
+        empty_choice = (None, gettext_lazy('Customized'))
+
+        self.fields['entity'].choices = tuple([empty_choice] + entity_choices)
 
     def clean(self):
         cleaned_data = super().clean()
@@ -113,8 +117,23 @@ class FirstYearBachelorScoreSheetAddressForm(ScoreSheetAddressForm):
         required=False
     )
 
+    def __init__(self, *args, adresse_bachelier: 'AdresseFeuilleDeNotesDTO', **kwargs):
+        super().__init__(*args, **kwargs)
+        self.adresse_bachelier = adresse_bachelier
+
     def save(self):
         if not self.cleaned_data['specific_address']:
-            cmd = SupprimerAdresseFeuilleDeNotes(nom_cohorte=self.nom_cohorte)
+            cmd = EncoderAdresseFeuilleDeNotes(
+                nom_cohorte=self.nom_cohorte,
+                entite=self.adresse_bachelier.entite,
+                destinataire=self.adresse_bachelier.destinataire,
+                rue_numero=self.adresse_bachelier.rue_numero,
+                code_postal=self.adresse_bachelier.code_postal,
+                ville=self.adresse_bachelier.ville,
+                pays=self.adresse_bachelier.pays,
+                telephone=self.adresse_bachelier.telephone,
+                fax=self.adresse_bachelier.fax,
+                email=self.adresse_bachelier.email,
+            )
             return message_bus_instance.invoke(cmd)
         return super().save()

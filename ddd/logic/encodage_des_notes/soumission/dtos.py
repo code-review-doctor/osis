@@ -201,10 +201,3 @@ class AdresseFeuilleDeNotesDTO(interface.DTO):
         filter = attr.filters.exclude(attr.fields(AdresseFeuilleDeNotesDTO).nom_cohorte)
         return attr.astuple(self, filter=filter, retain_collection_types=True) == \
             attr.astuple(autre_adresse, filter=filter, retain_collection_types=True)
-
-
-@attr.s(frozen=True, slots=True)
-class EntiteDTO(interface.DTO):
-    sigle = attr.ib(type=str)
-    sigle_parent = attr.ib(type=str)
-    type = attr.ib(type=str)

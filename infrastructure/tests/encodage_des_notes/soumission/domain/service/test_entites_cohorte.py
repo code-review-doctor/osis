@@ -47,10 +47,19 @@ class TestEntitesCohorte(TestCase):
         self.translator = EntitesCohorteTranslator()
 
     def test_should_return_dtos_if_matching_nom_cohorte(self):
-        result = self.translator.search("SINF1BA")
+        result = self.translator.search_entite_administration_et_gestion("SINF1BA")
 
         expected = [
             IdentiteEntiteBuilder().build_from_sigle("INFO"),
             IdentiteEntiteBuilder().build_from_sigle("DRT"),
         ]
         self.assertCountEqual(result, expected)
+
+    def test_should_return_empty_list_if_no_matching_nom_cohorte(self):
+        EducationGroupYearFactory(
+            acronym="ECGE1BA",
+            academic_year__current=True,
+        )
+        result = self.translator.search_entite_administration_et_gestion("ECGE1BA")
+
+        self.assertListEqual(result, [])

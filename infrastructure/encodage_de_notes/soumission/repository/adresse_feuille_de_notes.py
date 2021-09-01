@@ -39,8 +39,8 @@ from ddd.logic.encodage_des_notes.soumission.builder.adresse_feuille_de_notes_bu
     AdresseFeuilleDeNotesBuilder
 from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_notes import \
     IdentiteAdresseFeuilleDeNotes, \
-    AdresseFeuilleDeNotes, AdresseFeuilleDeNotesBaseeSurEntite, AdresseFeuilleDeNotesSpecifique
-from ddd.logic.encodage_des_notes.soumission.dtos import AdresseFeuilleDeNotesFromRepositoryDTO
+    AdresseFeuilleDeNotes
+from ddd.logic.encodage_des_notes.soumission.dtos import AdresseFeuilleDeNotesDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_notes import \
     IAdresseFeuilleDeNotesRepository
 from education_group.models.cohort_year import CohortYear
@@ -56,17 +56,27 @@ class AdresseFeuilleDeNotesRepository(IAdresseFeuilleDeNotesRepository):
             entity_ids: Optional[List['IdentiteAdresseFeuilleDeNotes']] = None,
             **kwargs
     ) -> List['AdresseFeuilleDeNotes']:
+        dtos = cls.search_dtos(entity_ids, **kwargs)
+
+        builder = AdresseFeuilleDeNotesBuilder()
+        return [builder.build_from_repository_dto(dto) for dto in dtos]
+
+    @classmethod
+    def search_dtos(
+            cls,
+            entity_ids: Optional[List['IdentiteAdresseFeuilleDeNotes']] = None,
+            **kwargs
+    ) -> List['AdresseFeuilleDeNotesDTO']:
         cohortes = [entity_id.nom_cohorte for entity_id in entity_ids]
         if not cohortes:
             return []
         rows = get_queryset(cohortes)
 
-        builder = AdresseFeuilleDeNotesBuilder()
-        return [builder.build_from_repository_dto(cls._convert_row_to_dto(row)) for row in rows]
+        return [cls._convert_row_to_dto(row) for row in rows]
 
     @classmethod
-    def _convert_row_to_dto(cls, row) -> AdresseFeuilleDeNotesFromRepositoryDTO:
-        return AdresseFeuilleDeNotesFromRepositoryDTO(
+    def _convert_row_to_dto(cls, row) -> AdresseFeuilleDeNotesDTO:
+        return AdresseFeuilleDeNotesDTO(
             nom_cohorte=row["nom_cohorte"],
             entite=row["entite"] or "",
             destinataire=row["destinataire"] or "",
@@ -110,41 +120,23 @@ class AdresseFeuilleDeNotesRepository(IAdresseFeuilleDeNotesRepository):
                 educationgroupyear__acronym=entity.nom_cohorte
             ).first()
 
-        if isinstance(entity, AdresseFeuilleDeNotesBaseeSurEntite):
-            entity_db = Entity.objects.get(entityversion__acronym=entity.sigle_entite)
-            ScoreSheetAddress.objects.update_or_create(
-                education_group=education_group,
-                cohort_name=cohort_name,
-                defaults={
-                    "entity_address_choice": None,
-                    "entity": entity_db,
-                    "recipient": None,
-                    "location": None,
-                    "postal_code": None,
-                    "city": None,
-                    "country": None,
-                    "phone": None,
-                    "fax": None,
-                    "email": entity.email
-                }
-            )
-        elif isinstance(entity, AdresseFeuilleDeNotesSpecifique):
-            ScoreSheetAddress.objects.update_or_create(
-                education_group=education_group,
-                cohort_name=cohort_name,
-                defaults={
-                    "entity_address_choice": None,
-                    "entity": None,
-                    "recipient": entity.destinataire,
-                    "location": entity.rue_numero,
-                    "postal_code": entity.code_postal,
-                    "city": entity.ville,
-                    "country": Country.objects.get(name=entity.pays) if entity.pays else None,
-                    "phone": entity.telephone,
-                    "fax": entity.fax,
-                    "email": entity.email
-                }
-            )
+        entity_db = Entity.objects.get(entityversion__acronym=entity.sigle_entite) if entity.sigle_entite else None
+        ScoreSheetAddress.objects.update_or_create(
+            education_group=education_group,
+            cohort_name=cohort_name,
+            defaults={
+                "entity_address_choice": None,
+                "entity": entity_db,
+                "recipient": entity.destinataire,
+                "location": entity.rue_numero,
+                "postal_code": entity.code_postal,
+                "city": entity.ville,
+                "country": Country.objects.get(name=entity.pays) if entity.pays else None,
+                "phone": entity.telephone,
+                "fax": entity.fax,
+                "email": entity.email
+            }
+        )
 
     @classmethod
     def get_all_identities(cls) -> List['IdentiteAdresseFeuilleDeNotes']:

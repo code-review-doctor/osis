@@ -1,4 +1,3 @@
-##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -15,7 +14,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -24,52 +23,49 @@
 #
 ##############################################################################
 import abc
-from typing import List, Optional
+from typing import Optional, List
 
-from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_notes import \
-    IdentiteAdresseFeuilleDeNotes, \
-    AdresseFeuilleDeNotes
-from ddd.logic.encodage_des_notes.soumission.dtos import AdresseFeuilleDeNotesDTO
+from ddd.logic.shared_kernel.entite.domain.model.entiteucl import IdentiteUCLEntite, EntiteUCL
 from osis_common.ddd import interface
 from osis_common.ddd.interface import ApplicationService
 
 
-class IAdresseFeuilleDeNotesRepository(interface.AbstractRepository):
+class IEntiteUCLRepository(interface.AbstractRepository):
 
     @classmethod
     @abc.abstractmethod
     def search(
             cls,
-            entity_ids: Optional[List['IdentiteAdresseFeuilleDeNotes']] = None,
+            entity_ids: Optional[List['IdentiteUCLEntite']] = None,
             **kwargs
-    ) -> List['AdresseFeuilleDeNotes']:
+    ) -> List['EntiteUCL']:
         pass
 
     @classmethod
     @abc.abstractmethod
-    def search_dtos(
+    def search_with_parents(
             cls,
-            entity_ids: Optional[List['IdentiteAdresseFeuilleDeNotes']] = None,
+            entity_ids: Optional[List['IdentiteUCLEntite']] = None,
             **kwargs
-    ) -> List['AdresseFeuilleDeNotesDTO']:
+    ) -> List['EntiteUCL']:
         pass
 
     @classmethod
     @abc.abstractmethod
-    def delete(cls, entity_id: 'IdentiteAdresseFeuilleDeNotes', **kwargs: ApplicationService) -> None:
+    def delete(cls, entity_id: 'IdentiteUCLEntite', **kwargs: ApplicationService) -> None:
         pass
 
     @classmethod
     @abc.abstractmethod
-    def save(cls, entity: 'AdresseFeuilleDeNotes') -> None:
+    def save(cls, entity: 'EntiteUCL') -> None:
         pass
 
     @classmethod
     @abc.abstractmethod
-    def get_all_identities(cls) -> List['IdentiteAdresseFeuilleDeNotes']:
+    def get_all_identities(cls) -> List['IdentiteUCLEntite']:
         pass
 
     @classmethod
     @abc.abstractmethod
-    def get(cls, entity_id: 'IdentiteAdresseFeuilleDeNotes') -> 'AdresseFeuilleDeNotes':
+    def get(cls, entity_id: 'IdentiteUCLEntite') -> 'EntiteUCL':
         pass

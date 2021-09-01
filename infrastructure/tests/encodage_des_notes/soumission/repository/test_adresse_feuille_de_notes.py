@@ -27,10 +27,11 @@ from django.test import TestCase
 from base.tests.factories.cohort_year import CohortYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
+from ddd.logic.encodage_des_notes.soumission.builder.adresse_feuille_de_notes_builder import \
+    AdresseFeuilleDeNotesBuilder
 from ddd.logic.encodage_des_notes.soumission.builder.adresse_feuille_de_notes_identity_builder import \
     AdresseFeuilleDeNotesIdentityBuilder
-from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_notes import AdresseFeuilleDeNotes, \
-    AdresseFeuilleDeNotesBaseeSurEntite, AdresseFeuilleDeNotesSpecifique
+from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_notes import AdresseFeuilleDeNotes
 from ddd.logic.encodage_des_notes.tests.factory.adresse_feuille_de_notes import \
     AdresseFeuilleDeNotesSpecifiqueFactory, \
     PremiereAnneeBachelierAdresseFeuilleDeNotesSpecifiqueFactory, AdresseFeuilleDeNotesBaseeSurEntiteFactory
@@ -143,6 +144,20 @@ class TestAdresseFeuilleDeNotesRepository(TestCase):
             [adresse]
         )
 
+    def test_should_search_dtos(self):
+        adresse = AdresseFeuilleDeNotesSpecifiqueFactory()
+        adresse_premiere_annee_bachelier = PremiereAnneeBachelierAdresseFeuilleDeNotesSpecifiqueFactory()
+        self._create_necessary_data(adresse)
+        self._create_necessary_data(adresse_premiere_annee_bachelier)
+
+        self.repository.save(adresse)
+        self.repository.save(adresse_premiere_annee_bachelier)
+
+        result = AdresseFeuilleDeNotesBuilder().build_from_repository_dto(
+            self.repository.search_dtos([adresse.entity_id])[0]
+        )
+        assert_attrs_instances_are_equal(result, adresse)
+
     def _create_necessary_data(self, adresse: 'AdresseFeuilleDeNotes', with_cohort_year: bool = False):
         if "11BA" in adresse.nom_cohorte:
             CohortYearFactory(
@@ -155,8 +170,6 @@ class TestAdresseFeuilleDeNotesRepository(TestCase):
             if with_cohort_year:
                 CohortYearFactory(education_group_year=egy, first_year_bachelor=True)
 
-        if isinstance(adresse, AdresseFeuilleDeNotesSpecifique):
-            CountryFactory(name=adresse.pays)
-
-        if isinstance(adresse, AdresseFeuilleDeNotesBaseeSurEntite):
+        CountryFactory(name=adresse.pays)
+        if adresse.sigle_entite:
             EntityVersionFactory(acronym=adresse.sigle_entite)

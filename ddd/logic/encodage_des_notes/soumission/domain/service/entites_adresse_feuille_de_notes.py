@@ -22,53 +22,80 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Set
+from typing import List
 
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_entites_cohorte import IEntitesCohorteTranslator
 from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import EntiteNonValidePourAdresseException
-from ddd.logic.encodage_des_notes.soumission.dtos import EntiteDTO
-from ddd.logic.shared_kernel.entite.domain.model.entite import Entite
-from ddd.logic.shared_kernel.entite.repository.entite import IEntiteRepository
+from ddd.logic.shared_kernel.entite.domain.model.entiteucl import EntiteUCL
+from ddd.logic.shared_kernel.entite.dtos import EntiteDTO
+from ddd.logic.shared_kernel.entite.repository.entiteucl import IEntiteUCLRepository
 from osis_common.ddd import interface
 
 
 class EntiteAdresseFeuilleDeNotes(interface.DomainService):
 
     @classmethod
-    def get(
+    def search(
             cls,
             nom_cohorte: str,
-            entite_repository: 'IEntiteRepository',
+            entite_repository: 'IEntiteUCLRepository',
             entites_cohorte_translator: 'IEntitesCohorteTranslator'
-    ) -> Set['EntiteDTO']:
-        identites = entites_cohorte_translator.search(nom_cohorte)
-
-        entites_avec_hierarchie = entite_repository.search_with_parents(identites)
-
-        entite_de_type_faculte = [entite for entite in entites_avec_hierarchie if entite.est_faculte()]
-        return {cls._convert_entite_to_dto(entite) for entite in entite_de_type_faculte}.union(
-            {cls._convert_entite_to_dto(entite) for entite in entites_avec_hierarchie if entite.entity_id in identites}
+    ) -> List['EntiteDTO']:
+        entites_sur_laquelle_adresse_peut_se_baser = cls._search_entite_administration_et_gestion_avec_leur_faculte(
+            nom_cohorte,
+            entite_repository,
+            entites_cohorte_translator
         )
+        return list({cls._convert_entite_to_dto(entite) for entite in entites_sur_laquelle_adresse_peut_se_baser})
 
     @classmethod
     def verifier_est_valide(
             cls,
             nom_cohorte: str,
             sigle_entite: str,
-            entite_repository: 'IEntiteRepository',
+            entite_repository: 'IEntiteUCLRepository',
             entites_cohorte_translator: 'IEntitesCohorteTranslator'
     ):
         if not sigle_entite:
             return
-        entites_valides = cls.get(nom_cohorte, entite_repository, entites_cohorte_translator)
-        sigles_valides = [entite.sigle for entite in entites_valides]
-        if sigle_entite not in sigles_valides:
+
+        entites_sur_laquelle_adresse_peut_se_baser = cls.search(
+            nom_cohorte,
+            entite_repository,
+            entites_cohorte_translator
+        )
+        sigles_des_entites = [entite.sigle for entite in entites_sur_laquelle_adresse_peut_se_baser]
+        if sigle_entite not in sigles_des_entites:
             raise EntiteNonValidePourAdresseException()
 
     @classmethod
-    def _convert_entite_to_dto(cls, entite: 'Entite') -> 'EntiteDTO':
+    def _search_entite_administration_et_gestion_avec_leur_faculte(
+            cls,
+            nom_cohorte: str,
+            entite_repository: 'IEntiteUCLRepository',
+            entites_cohorte_translator: 'IEntitesCohorteTranslator'
+    ) -> List['EntiteUCL']:
+        identites_administration_et_gestion = entites_cohorte_translator.search_entite_administration_et_gestion(
+            nom_cohorte
+        )
+        entites_administration_et_gestion_avec_leur_hierarchie = entite_repository.search_with_parents(
+            identites_administration_et_gestion
+        )
+        entites_administration_et_gestion = [
+            entite
+            for entite in entites_administration_et_gestion_avec_leur_hierarchie
+            if entite.entity_id in identites_administration_et_gestion
+        ]
+        faculte_entites_administration_et_gestion = [
+            entite for entite in entites_administration_et_gestion_avec_leur_hierarchie if entite.est_faculte()
+        ]
+        return entites_administration_et_gestion + faculte_entites_administration_et_gestion
+
+    @classmethod
+    def _convert_entite_to_dto(cls, entite: 'EntiteUCL') -> 'EntiteDTO':
         return EntiteDTO(
             sigle=entite.sigle,
+            intitule=entite.intitule,
             sigle_parent=entite.sigle_du_parent,
             type=entite.type
         )

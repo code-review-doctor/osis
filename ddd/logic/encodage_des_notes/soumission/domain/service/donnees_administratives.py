@@ -35,7 +35,7 @@ from ddd.logic.encodage_des_notes.soumission.domain.service.i_deliberation impor
 from ddd.logic.encodage_des_notes.soumission.dtos import DonneesAdministrativesFeuilleDeNotesDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_notes import \
     IAdresseFeuilleDeNotesRepository
-from ddd.logic.shared_kernel.entite.repository.entite import IEntiteRepository
+from ddd.logic.shared_kernel.entite.repository.entiteucl import IEntiteUCLRepository
 from osis_common.ddd import interface
 
 
@@ -49,7 +49,6 @@ class DonneesAdministratives(interface.DomainService):
             inscr_exam_translator: 'IInscriptionExamenTranslator',
             deliberation_translator: 'IDeliberationTranslator',
             adresse_feuille_de_notes_repository: 'IAdresseFeuilleDeNotesRepository',
-            entite_repository: 'IEntiteRepository',
     ) -> List['DonneesAdministrativesFeuilleDeNotesDTO']:
         periode_soumission_ouverte = periode_soumission_note_translator.get()
 
@@ -68,7 +67,6 @@ class DonneesAdministratives(interface.DomainService):
 
         adresse_par_cohorte = _get_adresse_par_cohorte(
             adresse_feuille_de_notes_repository,
-            entite_repository,
             noms_cohortes
         )
 
@@ -99,13 +97,11 @@ def _get_responsable_de_notes(code, periode_soumission_ouverte, responsables_de_
 
 def _get_adresse_par_cohorte(
         adresse_feuille_de_notes_repository: 'IAdresseFeuilleDeNotesRepository',
-        entite_repository: 'IEntiteRepository',
         noms_cohortes: Set['str']
 ):
-    adresses_feuilles_de_notes = AdresseFeuilleDeNotesDomainService.get_dtos(
+    adresses_feuilles_de_notes = AdresseFeuilleDeNotesDomainService.search_dtos(
         list(noms_cohortes),
-        adresse_feuille_de_notes_repository,
-        entite_repository
+        adresse_feuille_de_notes_repository
     )
     return {adresse.nom_cohorte: adresse for adresse in adresses_feuilles_de_notes}
 

@@ -23,9 +23,9 @@
 #
 ##############################################################################
 import abc
-from typing import Set
+from typing import Set, List
 
-from ddd.logic.shared_kernel.entite.domain.model.entite import IdentiteEntite
+from ddd.logic.shared_kernel.entite.domain.model.entiteucl import IdentiteUCLEntite
 from osis_common.ddd import interface
 
 
@@ -33,5 +33,5 @@ class IEntitesCohorteTranslator(interface.DomainService):
 
     @classmethod
     @abc.abstractmethod
-    def search(cls, nom_cohorte: str) -> Set['IdentiteEntite']:
+    def search_entite_administration_et_gestion(cls, nom_cohorte: str) -> List['IdentiteUCLEntite']:
         raise NotImplementedError()

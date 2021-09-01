@@ -22,19 +22,3 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.encodage_des_notes.soumission.builder.adresse_feuille_de_notes_identity_builder import \
-    AdresseFeuilleDeNotesIdentityBuilder
-from ddd.logic.encodage_des_notes.soumission.commands import SupprimerAdresseFeuilleDeNotes
-from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_notes import IdentiteAdresseFeuilleDeNotes
-from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_notes import \
-    IAdresseFeuilleDeNotesRepository
-
-
-def supprimer_adresse_feuille_de_notes(
-        cmd: SupprimerAdresseFeuilleDeNotes,
-        repo: IAdresseFeuilleDeNotesRepository,
-) -> 'IdentiteAdresseFeuilleDeNotes':
-    identite = AdresseFeuilleDeNotesIdentityBuilder().build_from_nom_cohorte(cmd.nom_cohorte)
-    repo.delete(identite)
-
-    return identite

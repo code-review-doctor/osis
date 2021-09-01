@@ -27,20 +27,20 @@ from django.test import SimpleTestCase
 
 from base.models.enums.entity_type import EntityType
 from ddd.logic.encodage_des_notes.soumission.commands import GetChoixEntitesAdresseFeuilleDeNotesCommand
-from ddd.logic.encodage_des_notes.soumission.dtos import EntiteDTO
+from ddd.logic.shared_kernel.entite.dtos import EntiteDTO
 from ddd.logic.shared_kernel.entite.builder.identite_entite_builder import IdentiteEntiteBuilder
-from ddd.logic.shared_kernel.entite.tests.factory.entite import INFOEntiteFactory, EPLEntiteFactory, SSTEntiteFactory
+from ddd.logic.shared_kernel.entite.tests.factory.entiteucl import INFOEntiteFactory, EPLEntiteFactory, SSTEntiteFactory
 from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.entites_cohorte import \
     EntitesCohorteTranslatorInMemory
 from infrastructure.messages_bus import message_bus_instance
-from infrastructure.shared_kernel.entite.repository.in_memory.entite import EntiteInMemoryRepository
+from infrastructure.shared_kernel.entite.repository.in_memory.entiteucl import EntiteUCLInMemoryRepository
 
 
 class TestGetChoixEntitesAdresseFeuilleDeNotes(SimpleTestCase):
     def setUp(self) -> None:
         self.cmd = GetChoixEntitesAdresseFeuilleDeNotesCommand(nom_cohorte='OSIS1BA')
 
-        self.entite_repository = EntiteInMemoryRepository()
+        self.entite_repository = EntiteUCLInMemoryRepository()
         self.entite_repository.entities.clear()
         self.entite_repository.entities.append(INFOEntiteFactory())
         self.entite_repository.entities.append(EPLEntiteFactory())
@@ -54,7 +54,7 @@ class TestGetChoixEntitesAdresseFeuilleDeNotes(SimpleTestCase):
     def __mock_service_bus(self):
         message_bus_patcher = mock.patch.multiple(
             'infrastructure.messages_bus',
-            EntiteRepository=lambda: self.entite_repository,
+            EntiteUCLRepository=lambda: self.entite_repository,
             EntitesCohorteTranslator=lambda: self.entites_cohorte_translator
         )
         message_bus_patcher.start()
@@ -66,7 +66,7 @@ class TestGetChoixEntitesAdresseFeuilleDeNotes(SimpleTestCase):
 
         result = self.message_bus.invoke(self.cmd)
 
-        expected = [EntiteDTO(sigle="EPL", sigle_parent="SST", type=EntityType.FACULTY)]
+        expected = [EntiteDTO(sigle="EPL", intitule="Ecole Polytechnique", sigle_parent="SST", type=EntityType.FACULTY)]
         self.assertListEqual(result, expected)
 
     def test_should_return_entites_de_la_cohorte_avec_son_parent_de_type_de_faculte(self):
@@ -75,7 +75,7 @@ class TestGetChoixEntitesAdresseFeuilleDeNotes(SimpleTestCase):
         result = self.message_bus.invoke(self.cmd)
 
         expected = [
-            EntiteDTO(sigle="INFO", sigle_parent="EPL", type=EntityType.SCHOOL),
-            EntiteDTO(sigle="EPL", sigle_parent="SST", type=EntityType.FACULTY)
+            EntiteDTO(sigle="INFO", intitule="Ecole Informatique", sigle_parent="EPL", type=EntityType.SCHOOL),
+            EntiteDTO(sigle="EPL", intitule="Ecole Polytechnique", sigle_parent="SST", type=EntityType.FACULTY)
         ]
         self.assertCountEqual(result, expected)

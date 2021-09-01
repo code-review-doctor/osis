@@ -25,7 +25,7 @@
 from base.models.enums.entity_type import EntityType
 from ddd.logic.shared_kernel.entite.builder.identite_entite_builder import IdentiteEntiteBuilder
 from ddd.logic.shared_kernel.entite.domain.model._adresse_entite import AdresseEntite
-from ddd.logic.shared_kernel.entite.domain.model.entite import Entite
+from ddd.logic.shared_kernel.entite.domain.model.entiteucl import EntiteUCL
 from ddd.logic.shared_kernel.entite.dtos import EntiteRepositoryDTO
 from osis_common.ddd.interface import EntityIdentityBuilder
 
@@ -33,13 +33,13 @@ from osis_common.ddd.interface import EntityIdentityBuilder
 class EntiteBuilder(EntityIdentityBuilder):
 
     @classmethod
-    def build_from_command(cls, cmd: 'CommandRequest') -> 'Entite':
+    def build_from_command(cls, cmd: 'CommandRequest') -> 'EntiteUCL':
         pass
 
     @classmethod
-    def build_from_repository_dto(cls, dto_object: 'EntiteRepositoryDTO') -> 'Entite':
+    def build_from_repository_dto(cls, dto_object: 'EntiteRepositoryDTO') -> 'EntiteUCL':
         builder = IdentiteEntiteBuilder()
-        return Entite(
+        return EntiteUCL(
             entity_id=builder.build_from_repository_dto(dto_object),
             parent=builder.build_from_sigle(dto_object.parent_sigle) if dto_object.parent_sigle else None,
             type=EntityType[dto_object.type] if dto_object.type else None,

@@ -27,29 +27,19 @@ import mock
 from django.test import SimpleTestCase
 
 from ddd.logic.encodage_des_notes.soumission.commands import GetAdresseFeuilleDeNotesServiceCommand
-from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_notes import AdresseFeuilleDeNotes, \
-    AdresseFeuilleDeNotesSpecifique, AdresseFeuilleDeNotesBaseeSurEntite
+from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_notes import AdresseFeuilleDeNotes
 from ddd.logic.encodage_des_notes.soumission.dtos import AdresseFeuilleDeNotesDTO
 from ddd.logic.encodage_des_notes.tests.factory.adresse_feuille_de_notes import \
     AdresseFeuilleDeNotesSpecifiqueFactory, \
     AdresseFeuilleDeNotesBaseeSurEntiteFactory
-from ddd.logic.shared_kernel.entite.domain.model.entite import Entite
-from ddd.logic.shared_kernel.entite.tests.factory.entite import EPLEntiteFactory
 from infrastructure.encodage_de_notes.soumission.repository.in_memory.adresse_feuille_de_notes import \
     AdresseFeuilleDeNotesInMemoryRepository
 from infrastructure.messages_bus import message_bus_instance
-from infrastructure.shared_kernel.entite.repository.in_memory.entite import EntiteInMemoryRepository
 
 class TestGetAdresseFeuilleDeNotesService(SimpleTestCase):
     def setUp(self) -> None:
         self.repository = AdresseFeuilleDeNotesInMemoryRepository()
-        self.repository.entities.clear()
-
-        self.entite_repository = EntiteInMemoryRepository()
-        self.entite_repository.entities.clear()
-
-        self.entite = EPLEntiteFactory()
-        self.entite_repository.save(self.entite)
+        self.addCleanup(self.repository.reset)
 
         self.cmd = GetAdresseFeuilleDeNotesServiceCommand(
             nom_cohorte="SINF1BA"
@@ -60,7 +50,6 @@ class TestGetAdresseFeuilleDeNotesService(SimpleTestCase):
         message_bus_patcher = mock.patch.multiple(
             'infrastructure.messages_bus',
             AdresseFeuilleDeNotesRepository=lambda: self.repository,
-            EntiteRepository=lambda: self.entite_repository,
         )
         message_bus_patcher.start()
         self.addCleanup(message_bus_patcher.stop)
@@ -75,7 +64,6 @@ class TestGetAdresseFeuilleDeNotesService(SimpleTestCase):
         self.assert_dto_corresponds_to_adress(
             result,
             adresse,
-            self.entite
         )
 
     def test_should_base_value_on_entity_if_adresse_est_basee_sur_entite(self):
@@ -88,35 +76,20 @@ class TestGetAdresseFeuilleDeNotesService(SimpleTestCase):
         self.assert_dto_corresponds_to_adress(
             result,
             adresse,
-            self.entite
         )
 
     def assert_dto_corresponds_to_adress(
             self,
             dto_obj: AdresseFeuilleDeNotesDTO,
             adresse: AdresseFeuilleDeNotes,
-            entite: Entite
     ):
         self.assertEqual(dto_obj.nom_cohorte, adresse.nom_cohorte)
+        self.assertEqual(dto_obj.entite, adresse.sigle_entite)
+        self.assertEqual(dto_obj.destinataire, adresse.destinataire)
+        self.assertEqual(dto_obj.rue_numero, adresse.rue_numero)
+        self.assertEqual(dto_obj.code_postal, adresse.code_postal)
+        self.assertEqual(dto_obj.ville, adresse.ville)
+        self.assertEqual(dto_obj.pays, adresse.pays)
+        self.assertEqual(dto_obj.telephone, adresse.telephone)
+        self.assertEqual(dto_obj.fax, adresse.fax)
         self.assertEqual(dto_obj.email, adresse.email)
-
-        if isinstance(adresse, AdresseFeuilleDeNotesSpecifique):
-            self.assertEqual(dto_obj.destinataire, adresse.destinataire)
-            self.assertEqual(dto_obj.rue_numero, adresse.rue_numero)
-            self.assertEqual(dto_obj.code_postal, adresse.code_postal)
-            self.assertEqual(dto_obj.ville, adresse.ville)
-            self.assertEqual(dto_obj.pays, adresse.pays)
-            self.assertEqual(dto_obj.telephone, adresse.telephone)
-            self.assertEqual(dto_obj.fax, adresse.fax)
-
-        elif isinstance(adresse, AdresseFeuilleDeNotesBaseeSurEntite):
-            self.assertEqual(dto_obj.destinataire, "{} - {}".format(adresse.sigle_entite, entite.intitule))
-            self.assertEqual(dto_obj.rue_numero, entite.adresse.rue_numero)
-            self.assertEqual(dto_obj.code_postal, entite.adresse.code_postal)
-            self.assertEqual(dto_obj.ville, entite.adresse.ville)
-            self.assertEqual(dto_obj.pays, entite.adresse.pays)
-            self.assertEqual(dto_obj.telephone, entite.adresse.telephone)
-            self.assertEqual(dto_obj.fax, entite.adresse.fax)
-
-        else:
-            self.fail("Instance d'adresse non reconnue")

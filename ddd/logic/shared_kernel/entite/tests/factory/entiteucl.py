@@ -26,12 +26,12 @@ import factory
 
 from base.models.enums.entity_type import EntityType
 from ddd.logic.shared_kernel.entite.domain.model._adresse_entite import AdresseEntite
-from ddd.logic.shared_kernel.entite.domain.model.entite import IdentiteEntite, Entite
+from ddd.logic.shared_kernel.entite.domain.model.entiteucl import IdentiteUCLEntite, EntiteUCL
 
 
 class _IdentiteEntiteFactory(factory.Factory):
     class Meta:
-        model = IdentiteEntite
+        model = IdentiteUCLEntite
         abstract = False
 
     sigle = "EPL"
@@ -50,9 +50,9 @@ class _AdresseEntiteFactory(factory.Factory):
     fax = ""
 
 
-class _EntiteFactory(factory.Factory):
+class _EntiteUCLFactory(factory.Factory):
     class Meta:
-        model = Entite
+        model = EntiteUCL
         abstract = False
 
     entity_id = factory.SubFactory(_IdentiteEntiteFactory)
@@ -62,19 +62,19 @@ class _EntiteFactory(factory.Factory):
     adresse = factory.SubFactory(_AdresseEntiteFactory)
 
 
-class INFOEntiteFactory(_EntiteFactory):
+class INFOEntiteFactory(_EntiteUCLFactory):
     entity_id = factory.SubFactory(_IdentiteEntiteFactory, sigle='INFO')
     parent = factory.SubFactory(_IdentiteEntiteFactory, sigle='EPL')
     type = EntityType.SCHOOL
     intitule = "Ecole Informatique"
 
 
-class EPLEntiteFactory(_EntiteFactory):
+class EPLEntiteFactory(_EntiteUCLFactory):
     entity_id = factory.SubFactory(_IdentiteEntiteFactory)
     parent = factory.SubFactory(_IdentiteEntiteFactory, sigle='SST')
 
 
-class SSTEntiteFactory(_EntiteFactory):
+class SSTEntiteFactory(_EntiteUCLFactory):
     entity_id = factory.SubFactory(_IdentiteEntiteFactory, sigle='SST')
     parent = factory.SubFactory(_IdentiteEntiteFactory, sigle='UCL')
     type = EntityType.SECTOR

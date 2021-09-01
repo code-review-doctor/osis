@@ -22,7 +22,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.shared_kernel.entite.domain.model.entite import IdentiteEntite
+from ddd.logic.shared_kernel.entite.domain.model.entiteucl import IdentiteUCLEntite
 from ddd.logic.shared_kernel.entite.dtos import EntiteRepositoryDTO
 from osis_common.ddd.interface import EntityIdentityBuilder
 
@@ -34,9 +34,9 @@ class IdentiteEntiteBuilder(EntityIdentityBuilder):
         pass
 
     @classmethod
-    def build_from_repository_dto(cls, dto_object: 'EntiteRepositoryDTO') -> 'IdentiteEntite':
-        return IdentiteEntite(sigle=dto_object.sigle)
+    def build_from_repository_dto(cls, dto_object: 'EntiteRepositoryDTO') -> 'IdentiteUCLEntite':
+        return IdentiteUCLEntite(sigle=dto_object.sigle)
 
     @classmethod
-    def build_from_sigle(cls, sigle: str) -> 'IdentiteEntite':
-        return IdentiteEntite(sigle=sigle)
+    def build_from_sigle(cls, sigle: str) -> 'IdentiteUCLEntite':
+        return IdentiteUCLEntite(sigle=sigle)

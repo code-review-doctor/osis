@@ -26,19 +26,19 @@ from typing import List, Optional
 
 from base.models.entity_version import EntityVersion
 from ddd.logic.shared_kernel.entite.builder.entite_builder import EntiteBuilder
-from ddd.logic.shared_kernel.entite.domain.model.entite import Entite, IdentiteEntite
+from ddd.logic.shared_kernel.entite.domain.model.entiteucl import EntiteUCL, IdentiteUCLEntite
 from ddd.logic.shared_kernel.entite.dtos import EntiteRepositoryDTO
-from ddd.logic.shared_kernel.entite.repository.entite import IEntiteRepository
+from ddd.logic.shared_kernel.entite.repository.entiteucl import IEntiteUCLRepository
 from osis_common.ddd.interface import ApplicationService
 
 
-class EntiteRepository(IEntiteRepository):
+class EntiteUCLRepository(IEntiteUCLRepository):
     @classmethod
-    def search(cls, entity_ids: Optional[List['IdentiteEntite']] = None, **kwargs) -> List['Entite']:
+    def search(cls, entity_ids: Optional[List['IdentiteUCLEntite']] = None, **kwargs) -> List['EntiteUCL']:
         pass
 
     @classmethod
-    def search_with_parents(cls, entity_ids: Optional[List['IdentiteEntite']] = None, **kwargs) -> List['Entite']:
+    def search_with_parents(cls, entity_ids: Optional[List['IdentiteUCLEntite']] = None, **kwargs) -> List['EntiteUCL']:
         if not entity_ids:
             return []
         acronyms = [entity_id.sigle for entity_id in entity_ids]
@@ -78,18 +78,18 @@ class EntiteRepository(IEntiteRepository):
         )
 
     @classmethod
-    def delete(cls, entity_id: 'IdentiteEntite', **kwargs: ApplicationService) -> None:
+    def delete(cls, entity_id: 'IdentiteUCLEntite', **kwargs: ApplicationService) -> None:
         pass
 
     @classmethod
-    def save(cls, entity: 'Entite') -> None:
+    def save(cls, entity: 'EntiteUCL') -> None:
         pass
 
     @classmethod
-    def get_all_identities(cls) -> List['IdentiteEntite']:
+    def get_all_identities(cls) -> List['IdentiteUCLEntite']:
         pass
 
     @classmethod
-    def get(cls, entity_id: 'IdentiteEntite') -> 'Entite':
+    def get(cls, entity_id: 'IdentiteUCLEntite') -> 'EntiteUCL':
         entites = cls.search_with_parents([entity_id])
         return next(entite for entite in entites if entite.entity_id == entity_id)

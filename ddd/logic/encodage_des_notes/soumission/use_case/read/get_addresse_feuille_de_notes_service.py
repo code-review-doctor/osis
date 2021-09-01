@@ -28,12 +28,10 @@ from ddd.logic.encodage_des_notes.soumission.domain.service.adresse_feuille_de_n
 from ddd.logic.encodage_des_notes.soumission.dtos import AdresseFeuilleDeNotesDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_notes import \
     IAdresseFeuilleDeNotesRepository
-from ddd.logic.shared_kernel.entite.repository.entite import IEntiteRepository
 
 
 def get_adresse_feuille_de_notes(
         cmd: GetAdresseFeuilleDeNotesServiceCommand,
         repo: IAdresseFeuilleDeNotesRepository,
-        entite_repo: IEntiteRepository,
 ) -> 'AdresseFeuilleDeNotesDTO':
-    return AdresseFeuilleDeNotesDomainService().get_dto(cmd.nom_cohorte, repo, entite_repo)
+    return AdresseFeuilleDeNotesDomainService().get_dto(cmd.nom_cohorte, repo)

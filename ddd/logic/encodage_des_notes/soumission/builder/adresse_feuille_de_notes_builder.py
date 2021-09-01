@@ -26,9 +26,8 @@
 from ddd.logic.encodage_des_notes.soumission.builder.adresse_feuille_de_notes_identity_builder import \
     AdresseFeuilleDeNotesIdentityBuilder
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderAdresseFeuilleDeNotes
-from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_notes import AdresseFeuilleDeNotes, \
-    AdresseFeuilleDeNotesSpecifique, AdresseFeuilleDeNotesBaseeSurEntite
-from ddd.logic.encodage_des_notes.soumission.dtos import AdresseFeuilleDeNotesFromRepositoryDTO
+from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_notes import AdresseFeuilleDeNotes
+from ddd.logic.encodage_des_notes.soumission.dtos import AdresseFeuilleDeNotesDTO
 from ddd.logic.shared_kernel.entite.builder.identite_entite_builder import IdentiteEntiteBuilder
 from osis_common.ddd import interface
 
@@ -36,14 +35,9 @@ from osis_common.ddd import interface
 class AdresseFeuilleDeNotesBuilder(interface.RootEntityBuilder):
     @classmethod
     def build_from_command(cls, cmd: 'EncoderAdresseFeuilleDeNotes') -> 'AdresseFeuilleDeNotes':
-        if cmd.entite:
-            return AdresseFeuilleDeNotesBaseeSurEntite(
-                entity_id=AdresseFeuilleDeNotesIdentityBuilder().build_from_command(cmd),
-                entite=IdentiteEntiteBuilder().build_from_sigle(cmd.entite),
-                email=cmd.email
-            )
-        return AdresseFeuilleDeNotesSpecifique(
+        return AdresseFeuilleDeNotes(
             entity_id=AdresseFeuilleDeNotesIdentityBuilder().build_from_command(cmd),
+            entite=IdentiteEntiteBuilder().build_from_sigle(cmd.entite) if cmd.entite else None,
             destinataire=cmd.destinataire,
             rue_numero=cmd.rue_numero,
             code_postal=cmd.code_postal,
@@ -55,15 +49,10 @@ class AdresseFeuilleDeNotesBuilder(interface.RootEntityBuilder):
         )
 
     @classmethod
-    def build_from_repository_dto(cls, dto_object: 'AdresseFeuilleDeNotesFromRepositoryDTO') -> 'AdresseFeuilleDeNotes':
-        if dto_object.entite:
-            return AdresseFeuilleDeNotesBaseeSurEntite(
-                entity_id=AdresseFeuilleDeNotesIdentityBuilder().build_from_repository_dto(dto_object),
-                entite=IdentiteEntiteBuilder().build_from_sigle(dto_object.entite),
-                email=dto_object.email
-            )
-        return AdresseFeuilleDeNotesSpecifique(
+    def build_from_repository_dto(cls, dto_object: 'AdresseFeuilleDeNotesDTO') -> 'AdresseFeuilleDeNotes':
+        return AdresseFeuilleDeNotes(
             entity_id=AdresseFeuilleDeNotesIdentityBuilder().build_from_repository_dto(dto_object),
+            entite=IdentiteEntiteBuilder().build_from_sigle(dto_object.entite) if dto_object.entite else None,
             destinataire=dto_object.destinataire,
             rue_numero=dto_object.rue_numero,
             code_postal=dto_object.code_postal,

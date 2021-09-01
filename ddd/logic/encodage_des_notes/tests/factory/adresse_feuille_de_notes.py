@@ -27,8 +27,8 @@ import factory
 
 from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_notes import \
     IdentiteAdresseFeuilleDeNotes, \
-    AdresseFeuilleDeNotesBaseeSurEntite, AdresseFeuilleDeNotesSpecifique
-from ddd.logic.shared_kernel.entite.tests.factory.entite import _IdentiteEntiteFactory
+    AdresseFeuilleDeNotes
+from ddd.logic.shared_kernel.entite.tests.factory.entiteucl import _IdentiteEntiteFactory
 
 
 class _IdentiteAdresseFeuilleDeNotesFactory(factory.Factory):
@@ -41,10 +41,11 @@ class _IdentiteAdresseFeuilleDeNotesFactory(factory.Factory):
 
 class AdresseFeuilleDeNotesSpecifiqueFactory(factory.Factory):
     class Meta:
-        model = AdresseFeuilleDeNotesSpecifique
+        model = AdresseFeuilleDeNotes
         abstract = False
 
     entity_id = factory.SubFactory(_IdentiteAdresseFeuilleDeNotesFactory)
+    entite = None
     destinataire = "Faculté de Droit"
     rue_numero = "Rue de la Fac, 19"
     code_postal = "1321"
@@ -62,9 +63,16 @@ class PremiereAnneeBachelierAdresseFeuilleDeNotesSpecifiqueFactory(AdresseFeuill
 
 class AdresseFeuilleDeNotesBaseeSurEntiteFactory(factory.Factory):
     class Meta:
-        model = AdresseFeuilleDeNotesBaseeSurEntite
+        model = AdresseFeuilleDeNotes
         abstract = False
 
     entity_id = factory.SubFactory(_IdentiteAdresseFeuilleDeNotesFactory)
     entite = factory.SubFactory(_IdentiteEntiteFactory, sigle="EPL")
-    email = "temp@temp.com"
+    destinataire = "Faculté de EPL"
+    rue_numero = "Rue de EPL, 19"
+    code_postal = "1321"
+    ville = "Louvain-La-Neuve"
+    pays = "Belgique"
+    telephone = "0106605122"
+    fax = "0106601123"
+    email = "email-epl@email.be"

@@ -26,7 +26,7 @@ from django.test import TestCase
 
 from base.tests.factories.entity_version import EntityVersionFactory
 from ddd.logic.shared_kernel.entite.builder.identite_entite_builder import IdentiteEntiteBuilder
-from infrastructure.shared_kernel.entite.repository.entite import EntiteRepository
+from infrastructure.shared_kernel.entite.repository.entiteucl import EntiteUCLRepository
 
 
 class TestEntiteRepository(TestCase):
@@ -39,7 +39,7 @@ class TestEntiteRepository(TestCase):
         cls.identite_builder = IdentiteEntiteBuilder()
 
     def setUp(self) -> None:
-        self.repo = EntiteRepository()
+        self.repo = EntiteUCLRepository()
 
     def test_search_with_parents_should_return_empty_list_if_no_matching_entite(self):
         identite = self.identite_builder.build_from_sigle("INFO")

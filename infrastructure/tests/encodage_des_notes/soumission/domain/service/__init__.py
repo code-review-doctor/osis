@@ -22,19 +22,3 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
-
-from ddd.logic.encodage_des_notes.soumission.commands import GetChoixEntitesAdresseFeuilleDeNotesCommand
-from ddd.logic.encodage_des_notes.soumission.domain.service.entites_adresse_feuille_de_notes import \
-    EntiteAdresseFeuilleDeNotes
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_entites_cohorte import IEntitesCohorteTranslator
-from ddd.logic.shared_kernel.entite.dtos import EntiteDTO
-from ddd.logic.shared_kernel.entite.repository.entiteucl import IEntiteUCLRepository
-
-
-def get_choix_entites_adresse_feuille_de_notes(
-        cmd: GetChoixEntitesAdresseFeuilleDeNotesCommand,
-        entite_repository: 'IEntiteUCLRepository',
-        entites_cohorte_translator: 'IEntitesCohorteTranslator'
-) -> List['EntiteDTO']:
-    return EntiteAdresseFeuilleDeNotes().search(cmd.nom_cohorte, entite_repository, entites_cohorte_translator)

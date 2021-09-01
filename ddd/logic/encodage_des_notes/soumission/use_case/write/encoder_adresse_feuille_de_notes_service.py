@@ -29,18 +29,20 @@ from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_not
 from ddd.logic.encodage_des_notes.soumission.domain.service\
     .adresse_feuille_de_note_premiere_annee_de_bachelier_est_specifique import \
     AdresseFeuilleDeNotesPremiereAnneeDeBachelierEstSpecifique
+from ddd.logic.encodage_des_notes.soumission.domain.service.encoder_adresse_feuille_de_notes import \
+    EncoderAdresseFeuilleDeNotesDomainService
 from ddd.logic.encodage_des_notes.soumission.domain.service.entites_adresse_feuille_de_notes import \
     EntiteAdresseFeuilleDeNotes
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_entites_cohorte import IEntitesCohorteTranslator
 from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_notes import \
     IAdresseFeuilleDeNotesRepository
-from ddd.logic.shared_kernel.entite.repository.entite import IEntiteRepository
+from ddd.logic.shared_kernel.entite.repository.entiteucl import IEntiteUCLRepository
 
 
 def encoder_adresse_feuille_de_notes(
         cmd: EncoderAdresseFeuilleDeNotes,
         repo: IAdresseFeuilleDeNotesRepository,
-        entite_repository: 'IEntiteRepository',
+        entite_repository: 'IEntiteUCLRepository',
         entites_cohorte_translator: 'IEntitesCohorteTranslator'
 ) -> 'IdentiteAdresseFeuilleDeNotes':
     AdresseFeuilleDeNotesPremiereAnneeDeBachelierEstSpecifique().verifier(cmd, repo)
@@ -51,7 +53,4 @@ def encoder_adresse_feuille_de_notes(
         entites_cohorte_translator
     )
 
-    adresse_feuille_de_notes = AdresseFeuilleDeNotesBuilder().build_from_command(cmd)
-    repo.save(adresse_feuille_de_notes)
-
-    return adresse_feuille_de_notes.entity_id
+    return EncoderAdresseFeuilleDeNotesDomainService().encoder(cmd, repo, entite_repository)

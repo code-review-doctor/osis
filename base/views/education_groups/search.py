@@ -40,7 +40,7 @@ from education_group.models.cohort_year import CohortYear
 from education_group.models.enums.cohort_name import CohortName
 from osis_role.contrib.views import PermissionRequiredMixin
 
-
+#  FIXME Use a read service to fetch offers
 @attr.s(frozen=True, slots=True)
 class OfferSearchDTO:
     acronym = attr.ib(type=str)
@@ -127,7 +127,7 @@ def convert_queryset_to_dto(qs) -> List[OfferSearchDTO]:
     return result
 
 
-# fixme move to proper file
+# fixme will be solved by read service
 def convert_title_to_first_year_bachelor_title(title: str) -> str:
     uncapitalize_title = title[0].lower() + title[1:]
     return "Première année de {}".format(uncapitalize_title)

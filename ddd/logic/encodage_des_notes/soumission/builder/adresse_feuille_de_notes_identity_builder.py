@@ -26,7 +26,7 @@
 ##############################################################################
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderAdresseFeuilleDeNotes
 from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_notes import IdentiteAdresseFeuilleDeNotes
-from ddd.logic.encodage_des_notes.soumission.dtos import AdresseFeuilleDeNotesFromRepositoryDTO
+from ddd.logic.encodage_des_notes.soumission.dtos import AdresseFeuilleDeNotesDTO
 from osis_common.ddd.interface import EntityIdentityBuilder
 
 
@@ -38,7 +38,7 @@ class AdresseFeuilleDeNotesIdentityBuilder(EntityIdentityBuilder):
     @classmethod
     def build_from_repository_dto(
             cls,
-            dto_object: 'AdresseFeuilleDeNotesFromRepositoryDTO'
+            dto_object: 'AdresseFeuilleDeNotesDTO'
     ) -> 'IdentiteAdresseFeuilleDeNotes':
         return IdentiteAdresseFeuilleDeNotes(nom_cohorte=dto_object.nom_cohorte)
 

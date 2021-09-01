@@ -70,8 +70,7 @@ from ddd.logic.encodage_des_notes.encodage.use_case.read.get_progression_general
 from ddd.logic.encodage_des_notes.encodage.use_case.read.rechercher_notes_service import rechercher_notes
 from ddd.logic.encodage_des_notes.encodage.use_case.write.encoder_notes_service import encoder_notes
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderNoteCommand, SoumettreNoteCommand, \
-    EncoderAdresseFeuilleDeNotes, GetAdresseFeuilleDeNotesServiceCommand, GetChoixEntitesAdresseFeuilleDeNotesCommand, \
-    SupprimerAdresseFeuilleDeNotes
+    EncoderAdresseFeuilleDeNotes, GetAdresseFeuilleDeNotesServiceCommand, GetChoixEntitesAdresseFeuilleDeNotesCommand
 from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand, GetProgressionGeneraleCommand, \
     AssignerResponsableDeNotesCommand, \
     SearchAdressesFeuilleDeNotesCommand
@@ -93,8 +92,6 @@ from ddd.logic.encodage_des_notes.soumission.use_case.write.encoder_adresse_feui
     encoder_adresse_feuille_de_notes
 from ddd.logic.encodage_des_notes.soumission.use_case.write.soumettre_note_etudiant_service import \
     soumettre_note_etudiant
-from ddd.logic.encodage_des_notes.soumission.use_case.write.supprimer_adresse_feuille_de_notes_service import \
-    supprimer_adresse_feuille_de_notes
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, GetLearningUnitCommand, \
     CreateEffectiveClassCommand, CanCreateEffectiveClassCommand, GetEffectiveClassCommand, \
     UpdateEffectiveClassCommand, DeleteEffectiveClassCommand, CanDeleteEffectiveClassCommand, \
@@ -155,7 +152,7 @@ from infrastructure.learning_unit.repository.entity import UclEntityRepository
 from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
 from infrastructure.shared_kernel.academic_year.repository.academic_year import AcademicYearRepository
 from infrastructure.shared_kernel.campus.repository.uclouvain_campus import UclouvainCampusRepository
-from infrastructure.shared_kernel.entite.repository.entite import EntiteRepository
+from infrastructure.shared_kernel.entite.repository.entiteucl import EntiteUCLRepository
 from infrastructure.shared_kernel.language.repository.language import LanguageRepository
 from osis_common.ddd.interface import CommandRequest, ApplicationServiceResult
 from program_management.ddd.command import BulkUpdateLinkCommand, GetReportCommand
@@ -327,7 +324,6 @@ class MessageBus:
             InscriptionExamenTranslator(),
             DeliberationTranslator(),
             AdresseFeuilleDeNotesRepository(),
-            EntiteRepository(),
         ),
         EncoderNotesCommand: lambda cmd: encoder_notes(
             cmd,
@@ -363,21 +359,16 @@ class MessageBus:
         EncoderAdresseFeuilleDeNotes: lambda cmd: encoder_adresse_feuille_de_notes(
             cmd,
             AdresseFeuilleDeNotesRepository(),
-            EntiteRepository(),
+            EntiteUCLRepository(),
             EntitesCohorteTranslator()
-        ),
-        SupprimerAdresseFeuilleDeNotes: lambda cmd: supprimer_adresse_feuille_de_notes(
-            cmd,
-            AdresseFeuilleDeNotesRepository(),
         ),
         GetAdresseFeuilleDeNotesServiceCommand: lambda cmd: get_adresse_feuille_de_notes(
             cmd,
             AdresseFeuilleDeNotesRepository(),
-            EntiteRepository(),
         ),
         GetChoixEntitesAdresseFeuilleDeNotesCommand: lambda cmd: get_choix_entites_adresse_feuille_de_notes(
             cmd,
-            EntiteRepository(),
+            EntiteUCLRepository(),
             EntitesCohorteTranslator()
         )
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
