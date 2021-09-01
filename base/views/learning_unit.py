@@ -470,13 +470,14 @@ def get_learning_container_year_context(learning_unit_year):
 
 def get_learning_unit_context(learning_unit_year):
     learning_unit_year_fields = OrderedDict()
+    boolean_fields = ['stage_dimona', 'individual_loan', 'exchange_students', 'english_friendly', 'french_friendly']
     for field in FIELDS_FOR_LEARNING_UNIT_YR_COMPARISON:
         field_name = learning_unit_year._meta.get_field(field).verbose_name
         if field == 'periodicity':
             value = _get_value_from_enum(PERIODICITY_TYPES, getattr(learning_unit_year, field))
         elif field == 'attribution_procedure':
             value = _get_value_from_enum(ATTRIBUTION_PROCEDURES, getattr(learning_unit_year, field))
-        elif field == 'stage_dimona':
+        elif field in boolean_fields:
             value = _get_boolean_translation(getattr(learning_unit_year, field)).capitalize()
         else:
             value = getattr(learning_unit_year, field)

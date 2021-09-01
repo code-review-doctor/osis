@@ -10767,5 +10767,2805 @@
             ]
         },
         "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "individual_loan",
+            "context": "COURSE_FULL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "individual_loan",
+            "context": "COURSE_FULL_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "individual_loan",
+            "context": "COURSE_PARTIM",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "individual_loan",
+            "context": "COURSE_PARTIM_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "individual_loan",
+            "context": "INTERNSHIP_FULL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "individual_loan",
+            "context": "INTERNSHIP_FULL_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "individual_loan",
+            "context": "INTERNSHIP_PARTIM",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "individual_loan",
+            "context": "INTERNSHIP_PARTIM_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "individual_loan",
+            "context": "DISSERTATION_FULL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "individual_loan",
+            "context": "DISSERTATION_FULL_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "individual_loan",
+            "context": "DISSERTATION_PARTIM",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "individual_loan",
+            "context": "DISSERTATION_PARTIM_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "individual_loan",
+            "context": "OTHER_COLLECTIVE_FULL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "individual_loan",
+            "context": "OTHER_COLLECTIVE_FULL_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "individual_loan",
+            "context": "OTHER_COLLECTIVE_PARTIM",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "individual_loan",
+            "context": "OTHER_COLLECTIVE_PARTIM_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "individual_loan",
+            "context": "OTHER_INDIVIDUAL_FULL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "individual_loan",
+            "context": "OTHER_INDIVIDUAL_FULL_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "individual_loan",
+            "context": "OTHER_INDIVIDUAL_PARTIM",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "individual_loan",
+            "context": "OTHER_INDIVIDUAL_PARTIM_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "individual_loan",
+            "context": "MASTER_THESIS_FULL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "individual_loan",
+            "context": "MASTER_THESIS_FULL_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "individual_loan",
+            "context": "MASTER_THESIS_PARTIM",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "individual_loan",
+            "context": "MASTER_THESIS_PARTIM_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "individual_loan",
+            "context": "EXTERNAL_FULL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "individual_loan",
+            "context": "EXTERNAL_FULL_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "individual_loan",
+            "context": "EXTERNAL_PARTIM",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "individual_loan",
+            "context": "EXTERNAL_PARTIM_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "exchange_students",
+            "context": "COURSE_FULL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "exchange_students",
+            "context": "COURSE_FULL_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "exchange_students",
+            "context": "COURSE_PARTIM",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "exchange_students",
+            "context": "COURSE_PARTIM_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "exchange_students",
+            "context": "INTERNSHIP_FULL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "exchange_students",
+            "context": "INTERNSHIP_FULL_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "exchange_students",
+            "context": "INTERNSHIP_PARTIM",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "exchange_students",
+            "context": "INTERNSHIP_PARTIM_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "exchange_students",
+            "context": "DISSERTATION_FULL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "exchange_students",
+            "context": "DISSERTATION_FULL_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "exchange_students",
+            "context": "DISSERTATION_PARTIM",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "exchange_students",
+            "context": "DISSERTATION_PARTIM_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "exchange_students",
+            "context": "OTHER_COLLECTIVE_FULL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "exchange_students",
+            "context": "OTHER_COLLECTIVE_FULL_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "exchange_students",
+            "context": "OTHER_COLLECTIVE_PARTIM",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "exchange_students",
+            "context": "OTHER_COLLECTIVE_PARTIM_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "exchange_students",
+            "context": "OTHER_INDIVIDUAL_FULL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "exchange_students",
+            "context": "OTHER_INDIVIDUAL_FULL_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "exchange_students",
+            "context": "OTHER_INDIVIDUAL_PARTIM",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "exchange_students",
+            "context": "OTHER_INDIVIDUAL_PARTIM_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "exchange_students",
+            "context": "MASTER_THESIS_FULL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "exchange_students",
+            "context": "MASTER_THESIS_FULL_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "exchange_students",
+            "context": "MASTER_THESIS_PARTIM",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "exchange_students",
+            "context": "MASTER_THESIS_PARTIM_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "exchange_students",
+            "context": "EXTERNAL_FULL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "exchange_students",
+            "context": "EXTERNAL_FULL_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "exchange_students",
+            "context": "EXTERNAL_PARTIM",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "exchange_students",
+            "context": "EXTERNAL_PARTIM_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "english_friendly",
+            "context": "COURSE_FULL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "english_friendly",
+            "context": "COURSE_FULL_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "english_friendly",
+            "context": "COURSE_PARTIM",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "english_friendly",
+            "context": "COURSE_PARTIM_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "english_friendly",
+            "context": "INTERNSHIP_FULL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "english_friendly",
+            "context": "INTERNSHIP_FULL_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "english_friendly",
+            "context": "INTERNSHIP_PARTIM",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "english_friendly",
+            "context": "INTERNSHIP_PARTIM_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "english_friendly",
+            "context": "DISSERTATION_FULL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "english_friendly",
+            "context": "DISSERTATION_FULL_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "english_friendly",
+            "context": "DISSERTATION_PARTIM",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "english_friendly",
+            "context": "DISSERTATION_PARTIM_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "english_friendly",
+            "context": "OTHER_COLLECTIVE_FULL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "english_friendly",
+            "context": "OTHER_COLLECTIVE_FULL_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "english_friendly",
+            "context": "OTHER_COLLECTIVE_PARTIM",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "english_friendly",
+            "context": "OTHER_COLLECTIVE_PARTIM_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "english_friendly",
+            "context": "OTHER_INDIVIDUAL_FULL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "english_friendly",
+            "context": "OTHER_INDIVIDUAL_FULL_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "english_friendly",
+            "context": "OTHER_INDIVIDUAL_PARTIM",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "english_friendly",
+            "context": "OTHER_INDIVIDUAL_PARTIM_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "english_friendly",
+            "context": "MASTER_THESIS_FULL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "english_friendly",
+            "context": "MASTER_THESIS_FULL_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "english_friendly",
+            "context": "MASTER_THESIS_PARTIM",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "english_friendly",
+            "context": "MASTER_THESIS_PARTIM_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "english_friendly",
+            "context": "EXTERNAL_FULL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "english_friendly",
+            "context": "EXTERNAL_FULL_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "english_friendly",
+            "context": "EXTERNAL_PARTIM",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "english_friendly",
+            "context": "EXTERNAL_PARTIM_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "french_friendly",
+            "context": "COURSE_FULL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "french_friendly",
+            "context": "COURSE_FULL_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "french_friendly",
+            "context": "COURSE_PARTIM",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "french_friendly",
+            "context": "COURSE_PARTIM_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "french_friendly",
+            "context": "INTERNSHIP_FULL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "french_friendly",
+            "context": "INTERNSHIP_FULL_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "french_friendly",
+            "context": "INTERNSHIP_PARTIM",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "french_friendly",
+            "context": "INTERNSHIP_PARTIM_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "french_friendly",
+            "context": "DISSERTATION_FULL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "french_friendly",
+            "context": "DISSERTATION_FULL_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "french_friendly",
+            "context": "DISSERTATION_PARTIM",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "french_friendly",
+            "context": "DISSERTATION_PARTIM_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "french_friendly",
+            "context": "OTHER_COLLECTIVE_FULL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "french_friendly",
+            "context": "OTHER_COLLECTIVE_FULL_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "french_friendly",
+            "context": "OTHER_COLLECTIVE_PARTIM",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "french_friendly",
+            "context": "OTHER_COLLECTIVE_PARTIM_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "french_friendly",
+            "context": "OTHER_INDIVIDUAL_FULL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "french_friendly",
+            "context": "OTHER_INDIVIDUAL_FULL_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "french_friendly",
+            "context": "OTHER_INDIVIDUAL_PARTIM",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "french_friendly",
+            "context": "OTHER_INDIVIDUAL_PARTIM_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "french_friendly",
+            "context": "MASTER_THESIS_FULL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "french_friendly",
+            "context": "MASTER_THESIS_FULL_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "french_friendly",
+            "context": "MASTER_THESIS_PARTIM",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "french_friendly",
+            "context": "MASTER_THESIS_PARTIM_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "french_friendly",
+            "context": "EXTERNAL_FULL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "french_friendly",
+            "context": "EXTERNAL_FULL_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "french_friendly",
+            "context": "EXTERNAL_PARTIM",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "fields": {
+            "field_name": "french_friendly",
+            "context": "EXTERNAL_PARTIM_PROPOSAL",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ],
+            "groups": [
+                [
+                    "faculty_managers"
+                ],
+                [
+                    "faculty_managers_for_ue"
+                ],
+                [
+                    "central_managers"
+                ],
+                [
+                    "central_managers_for_ue"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
     }
 ]

@@ -46,6 +46,7 @@ from osis_common.ddd import interface
 
 @attr.s(frozen=True, slots=True)
 class LearningUnitIdentity(interface.EntityIdentity):
+
     academic_year = attr.ib(type=AcademicYearIdentity)
     code = attr.ib(type=str)
 

@@ -54,7 +54,7 @@ class LearningUnitDescriptionFicheFilter(LearningUnitFilter):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.form.fields['with_entity_subordinated'].initial = True
-        self.form.fields["academic_year"].required = True
+        self.form.fields["academic_year__year"].required = True
 
     def get_queryset(self):
         queryset = super().get_queryset().select_related(
@@ -76,7 +76,7 @@ class LearningUnitDescriptionFicheFilter(LearningUnitFilter):
     def _compute_summary_status(self, queryset):
         ac_calendar = academic_calendar.get_by_reference_and_data_year(
             AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name,
-            self.form.cleaned_data['academic_year']
+            self.form.cleaned_data['academic_year__year']
         )
 
         extra_query = """

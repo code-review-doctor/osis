@@ -1,5 +1,5 @@
 # SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# Copyright (C) 2015-2021 THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-13 13:48+0200\n"
+"POT-Creation-Date: 2021-08-12 13:40+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -309,6 +309,9 @@ msgstr ""
 msgid "Alert"
 msgstr ""
 
+msgid "All"
+msgstr ""
+
 msgctxt "female plural"
 msgid "All"
 msgstr ""
@@ -323,7 +326,7 @@ msgstr ""
 msgid "Alloc. Ent."
 msgstr ""
 
-msgid "Alloc. Entity"
+msgid "Alloc.Entity"
 msgstr ""
 
 msgid "Allocation entity"
@@ -349,9 +352,6 @@ msgid "Apply postponement on learning unit year"
 msgstr ""
 
 msgid "Are you certain that you want to delete the learning unit ?"
-msgstr ""
-
-msgid "Are you sure you want to delete the achievement?"
 msgstr ""
 
 msgid "Are you sure you want to delete the teaching material?"
@@ -687,6 +687,12 @@ msgstr ""
 msgid "Default learning unit enrollment"
 msgstr ""
 
+msgid "Delete"
+msgstr ""
+
+msgid "Delete achievement"
+msgstr ""
+
 msgid "Delete learning unit year definitively"
 msgstr ""
 
@@ -880,6 +886,9 @@ msgstr ""
 msgid "English title specific complement"
 msgstr ""
 
+msgid "English-friendly"
+msgstr ""
+
 msgid "Enrolled"
 msgstr ""
 
@@ -963,6 +972,9 @@ msgid "Exams Enrollments"
 msgstr ""
 
 msgid "Exceptional procedure"
+msgstr ""
+
+msgid "Exchange students"
 msgstr ""
 
 msgid "Execute"
@@ -1071,6 +1083,9 @@ msgid "French"
 msgstr ""
 
 msgid "French title proper"
+msgstr ""
+
+msgid "French-friendly"
 msgstr ""
 
 msgid "From"
@@ -1186,6 +1201,34 @@ msgid "Inactive"
 msgstr ""
 
 msgid "Include subordinate entities"
+msgstr ""
+
+msgid ""
+"Indicates if the UE can be accessible for a student, even if the UE is not "
+"included in the detailed program of his training"
+msgstr ""
+
+msgid ""
+"Indicates if the UE includes an internship, so that students enrolled in "
+"this UE must be declared to the DIMONA"
+msgstr ""
+
+msgid "Indicates if this UE is accessible to exchange students"
+msgstr ""
+
+msgid ""
+"Indicates, for the UE whose language of instruction is not French, if this "
+"UE is nevertheless accessible to French speaking students. If the language "
+"of instruction is French, the value of this field must be 'no'"
+msgstr ""
+
+msgid ""
+"Indicates, for the UE whose teaching language is not English, if this UE is "
+"however accessible to English speaking students. If the language of "
+"instruction is English, the value of this field must be 'no'"
+msgstr ""
+
+msgid "Individual loan"
 msgstr ""
 
 msgid "Initial data"
@@ -1714,7 +1757,10 @@ msgstr ""
 msgid "One of the partial volumes must have a value to 0."
 msgstr ""
 
-msgid "Only proposals"
+msgid "Only UE in proposal"
+msgstr ""
+
+msgid "Only UE with classes"
 msgstr ""
 
 msgid "Only the volume Q1 must have a value"
@@ -2132,6 +2178,9 @@ msgid "Req. Entities"
 msgstr ""
 
 msgid "Req. Entity"
+msgstr ""
+
+msgid "Req.Entity"
 msgstr ""
 
 msgid "Requesting entity"
@@ -2666,6 +2715,9 @@ msgstr ""
 msgid "This action will permanently cancel the selected proposal(s)"
 msgstr ""
 
+msgid "This action will permanently delete the achievement"
+msgstr ""
+
 msgid "This code already exists for this learning unit"
 msgstr ""
 
@@ -2884,7 +2936,18 @@ msgstr ""
 msgid "Volumes are inconsistent"
 msgstr ""
 
+msgid ""
+"Volumes are inconsistent: you can't delete volume on a component having "
+"classes."
+msgstr ""
+
 msgid "Volumes management"
+msgstr ""
+
+#, python-format
+msgid ""
+"Volumes of %(code_ue)s are inconsistent: you can't consolidate a learning "
+"unit whose volume has been deleted on a component having classes"
 msgstr ""
 
 msgid "Volumes of {} are inconsistent"

@@ -66,13 +66,14 @@ class ApplicationSerializerTest(TestCase):
 
         self.assertEqual(obj_serialized['operation'], 'delete')
         self.assertEqual(obj_serialized['remark'], self.application.remark)
+        self.assertEqual(obj_serialized['global_id'], self.application.applicant_id.global_id)
         self.assertEqual(obj_serialized['course_summary'], self.application.course_summary)
         self.assertEqual(obj_serialized['lecturing_allocation'], str(self.application.lecturing_volume))
         self.assertEqual(obj_serialized['practical_allocation'], str(self.application.practical_volume))
 
         self.assertEqual(obj_serialized['learning_container_year']['reference'], '428750')
         self.assertEqual(
-            obj_serialized['learning_container_year']['year'], str(self.application.vacant_course_id.year)
+            obj_serialized['learning_container_year']['year'], self.application.vacant_course_id.year
         )
         self.assertEqual(
             obj_serialized['learning_container_year']['acronym'], str(self.application.vacant_course_id.code)
@@ -84,12 +85,13 @@ class ApplicationSerializerTest(TestCase):
         self.assertEqual(obj_serialized['operation'], 'update')
         self.assertEqual(obj_serialized['remark'], self.application.remark)
         self.assertEqual(obj_serialized['course_summary'], self.application.course_summary)
+        self.assertEqual(obj_serialized['global_id'], self.application.applicant_id.global_id)
         self.assertEqual(obj_serialized['lecturing_allocation'], str(self.application.lecturing_volume))
         self.assertEqual(obj_serialized['practical_allocation'], str(self.application.practical_volume))
 
         self.assertEqual(obj_serialized['learning_container_year']['reference'], '428750')
         self.assertEqual(
-            obj_serialized['learning_container_year']['year'], str(self.application.vacant_course_id.year)
+            obj_serialized['learning_container_year']['year'], self.application.vacant_course_id.year
         )
         self.assertEqual(
             obj_serialized['learning_container_year']['acronym'], str(self.application.vacant_course_id.code)

@@ -96,7 +96,7 @@ class EffectiveClass(interface.RootEntity, abc.ABC):
         self.teaching_place = UclouvainCampusIdentity(uuid=cmd.teaching_place_uuid)
         quadri = cmd.derogation_quadrimester
         self.derogation_quadrimester = DerogationQuadrimester[quadri] if quadri else None
-        self.session_derogation = DerogationSession(cmd.session_derogation).name if cmd.session_derogation else None
+        self.session_derogation = DerogationSession(cmd.session_derogation) if cmd.session_derogation else None
         self.volumes = ClassVolumes(
             volume_first_quadrimester=cmd.volume_first_quadrimester,
             volume_second_quadrimester=cmd.volume_second_quadrimester
@@ -108,10 +108,24 @@ class EffectiveClass(interface.RootEntity, abc.ABC):
     def is_volume_second_quadrimester_greater_than(self, volume: DurationUnit) -> bool:
         return self.volumes.volume_second_quadrimester and self.volumes.volume_second_quadrimester > volume
 
+    @property
+    def is_practical(self):
+        return False
+
+    @property
+    def is_lecturing(self):
+        return False
+
 
 class PracticalEffectiveClass(EffectiveClass):
-    pass
+
+    @property
+    def is_practical(self):
+        return True
 
 
 class LecturingEffectiveClass(EffectiveClass):
-    pass
+
+    @property
+    def is_lecturing(self):
+        return True
