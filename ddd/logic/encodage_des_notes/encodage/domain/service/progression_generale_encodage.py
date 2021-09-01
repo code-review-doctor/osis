@@ -59,7 +59,7 @@ class ProgressionGeneraleEncodage(interface.DomainService):
             gestionnaire.verifier_gere_cohorte(nom_cohorte)
             noms_cohortes = [nom_cohorte]
 
-        notes = note_etudiant_repo.search(
+        notes_identites = note_etudiant_repo.search_notes_identites(
             noms_cohortes=noms_cohortes,
             annee_academique=periode_encodage.annee_concernee,
             numero_session=periode_encodage.session_concernee,
@@ -68,7 +68,7 @@ class ProgressionGeneraleEncodage(interface.DomainService):
         )
 
         return ProgressionGeneral().get(
-            [note.entity_id for note in notes],
+            notes_identites,
             note_etudiant_soumission_repo,
             responsable_notes_repo,
             periode_encodage,

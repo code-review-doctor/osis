@@ -24,7 +24,7 @@
 #
 ##############################################################################
 import abc
-from typing import List, Optional
+from typing import List, Optional, Set
 
 from base.models.enums.exam_enrollment_justification_type import JustificationTypes
 from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import IdentiteNoteEtudiant, NoteEtudiant
@@ -47,6 +47,19 @@ class INoteEtudiantRepository(interface.AbstractRepository):
             justification: JustificationTypes = None,
             **kwargs
     ) -> List['NoteEtudiant']:
+        pass
+
+    @classmethod
+    @abc.abstractmethod
+    def search_notes_identites(
+            cls,
+            noms_cohortes: List[str] = None,
+            annee_academique: int = None,
+            numero_session: int = None,
+            nomas: List[str] = None,
+            note_manquante: bool = False,
+            **kwargs
+    ) -> Set['IdentiteNoteEtudiant']:
         pass
 
     @classmethod

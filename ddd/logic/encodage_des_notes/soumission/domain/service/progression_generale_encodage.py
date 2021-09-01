@@ -65,7 +65,7 @@ class ProgressionGeneraleEncodage(interface.DomainService):
         )
 
         return ProgressionGeneral().get(
-            [note.entity_id for note in notes],
+            {note.entity_id for note in notes},
             note_etudiant_repo,
             responsable_notes_repo,
             periode_soumission,

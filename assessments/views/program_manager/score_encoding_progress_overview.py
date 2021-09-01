@@ -57,16 +57,14 @@ class ScoreEncodingProgressOverviewProgramManagerView(ScoreEncodingProgressOverv
     @cached_property
     def progression_generale(self):
         search_form = self.get_search_form()
+        cmd_kwargs = {'matricule_fgs_gestionnaire': self.person.global_id}
         if search_form.is_valid():
-            filter_kwargs = {
+            cmd_kwargs.update({
                 'nom_cohorte': search_form.cleaned_data['cohorte_name'],
                 'code_unite_enseignement': search_form.cleaned_data['learning_unit_code'],
                 'seulement_notes_manquantes': search_form.cleaned_data['incomplete_encodings_only'],
-            }
-        cmd = GetProgressionGeneraleGestionnaireCommand(
-            matricule_fgs_gestionnaire=self.person.global_id,
-            **filter_kwargs
-        )
+            })
+        cmd = GetProgressionGeneraleGestionnaireCommand(**cmd_kwargs)
         return message_bus_instance.invoke(cmd)
 
     def get_last_synchronization(self):

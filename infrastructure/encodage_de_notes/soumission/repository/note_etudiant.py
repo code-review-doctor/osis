@@ -25,7 +25,7 @@
 ##############################################################################
 import functools
 import operator
-from typing import Optional, List, Set
+from typing import Optional, List
 
 from django.db.models import F, Case, CharField, Value, When, BooleanField, ExpressionWrapper, DateField, Q, OuterRef, \
     Subquery
@@ -34,7 +34,6 @@ from django.db.models.functions import Coalesce, Cast, Concat
 from base.models.exam_enrollment import ExamEnrollment
 from base.models.session_exam_deadline import SessionExamDeadline
 from ddd.logic.encodage_des_notes.soumission.builder.note_etudiant_builder import NoteEtudiantBuilder
-from ddd.logic.encodage_des_notes.soumission.domain.model._unite_enseignement_identite import UniteEnseignementIdentite
 from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import NoteEtudiant, IdentiteNoteEtudiant
 from ddd.logic.encodage_des_notes.soumission.dtos import NoteEtudiantFromRepositoryDTO, \
     DateEcheanceNoteDTO
@@ -113,30 +112,54 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
     @classmethod
     def search_dates_echeances(
             cls,
-            criterias: List[SearchCriteria]
+            notes_identites: List[IdentiteNoteEtudiant]
     ) -> List[DateEcheanceNoteDTO]:
-        q_filters = functools.reduce(
-            operator.or_,
-            [
-                Q(
-                    acronym=criteria[0],
-                    year=criteria[1],
-                    number_session=criteria[2],
-                )
-                for criteria in criterias
-            ]
+        qs = ExamEnrollment.objects.raw(
+            '''
+            SELECT 
+                base_examenrollment.id AS id,
+                CONCAT(base_learningunityear.acronym, learning_unit_learningclassyear.acronym) AS code_unite_enseignement, 
+                base_academicyear.year AS annee_academique, 
+                base_sessionexam.number_session AS numero_session, 
+                base_student.registration_id AS noma,
+                CASE
+                    WHEN score_final IS NOT NULL THEN true
+                    WHEN justification_final IS NOT NULL THEN true
+                    ELSE false
+                END note_soumise,
+                (
+                    SELECT CASE
+                            WHEN deadline_tutor IS NULL THEN deadline
+                            ELSE deadline - deadline_tutor
+                        END echeance
+                    FROM base_sessionexamdeadline
+                    WHERE base_sessionexamdeadline.number_session = base_sessionexam.number_session 
+                          and base_sessionexamdeadline.offer_enrollment_id = base_learningunitenrollment.offer_enrollment_id
+                    LIMIT 1
+                ) AS echeance
+            FROM base_examenrollment
+            JOIN base_learningunitenrollment on base_learningunitenrollment.id = base_examenrollment.learning_unit_enrollment_id
+            JOIN base_learningunityear on base_learningunityear.id = base_learningunitenrollment.learning_unit_year_id
+            LEFT JOIN learning_unit_learningclassyear on learning_unit_learningclassyear.id = base_learningunitenrollment.learning_class_year_id
+            JOIN base_academicyear on base_academicyear.id = base_learningunityear.academic_year_id
+            JOIN base_sessionexam on base_sessionexam.id = base_examenrollment.session_exam_id       
+            JOIN base_offerenrollment on base_offerenrollment.id = base_learningunitenrollment.offer_enrollment_id
+            JOIN base_student on base_student.id = base_offerenrollment.student_id                 
+            WHERE {where_clause}
+            ORDER BY code_unite_enseignement, annee_academique, echeance
+            '''.format(where_clause=_build_filter_dates_echeances(notes_identites))
         )
-        rows = _fetch_session_exams().filter(q_filters)
         return [
             DateEcheanceNoteDTO(
-                code_unite_enseignement=row.acronym,
-                annee_unite_enseignement=row.year,
-                numero_session=row.number_session,
+                code_unite_enseignement=row.code_unite_enseignement,
+                annee_unite_enseignement=row.annee_academique,
+                numero_session=row.numero_session,
                 noma=row.noma,
-                jour=row.date_limite_de_remise.day,
-                mois=row.date_limite_de_remise.month,
-                annee=row.date_limite_de_remise.year,
-            ) for row in rows
+                jour=row.echeance.day,
+                mois=row.echeance.month,
+                annee=row.echeance.year,
+                note_soumise=row.note_soumise,
+            ) for row in qs
         ]
 
     @classmethod
@@ -179,11 +202,6 @@ def _save_note(note: 'NoteEtudiant'):
     db_obj.save()
 
 
-# qs = ExamEnrollment.objects
-# if number_sessions:
-#     qs = qs.filter(session_exam__number_session__in=number_sessions)
-# if years:
-#     qs = qs.filter(learning_unit_enrollment__learning_unit_year__academic_year__year__in=years)
 def _fetch_session_exams():
     subqs_deadline = SessionExamDeadline.objects.filter(
         number_session=OuterRef("session_exam__number_session"),
@@ -240,3 +258,19 @@ def _fetch_session_exams():
         'year',
         'number_session',
     )
+
+
+def _build_filter_dates_echeances(notes_identites: List[IdentiteNoteEtudiant]) -> str:
+    return "or ".join(["""
+        (
+            CONCAT(base_learningunityear.acronym, learning_unit_learningclassyear.acronym) = '{acronym}' 
+            and base_academicyear.year = {year} 
+            and base_student.registration_id = '{noma}'
+            and base_sessionexam.number_session = {numero_session}
+        )
+    """.format(
+        acronym=note_identite.code_unite_enseignement,
+        year=note_identite.annee_academique,
+        noma=note_identite.noma,
+        numero_session=note_identite.numero_session
+    ) for note_identite in notes_identites])

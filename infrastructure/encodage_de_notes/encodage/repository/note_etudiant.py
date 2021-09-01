@@ -25,7 +25,7 @@
 ##############################################################################
 import functools
 import operator
-from typing import List, Optional
+from typing import List, Optional, Set
 
 from django.db.models import CharField, Q, OuterRef, Case, When, F, DateField, Value, BooleanField, \
     Subquery
@@ -138,6 +138,66 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
                 Q(numero_session=numero_session)
             )
         return result
+
+    @classmethod
+    def search_notes_identites(
+            cls,
+            noms_cohortes: List[str] = None,
+            annee_academique: int = None,
+            numero_session: int = None,
+            nomas: List[str] = None,
+            note_manquante: bool = False,
+            **kwargs
+    ) -> Set['IdentiteNoteEtudiant']:
+        filter_qs = cls._build_filter(
+            noms_cohortes=noms_cohortes,
+            annee_academique=annee_academique,
+            numero_session=numero_session,
+            nomas=nomas,
+            note_manquante=note_manquante,
+        )
+
+        if not filter_qs:
+            return set()
+
+        qs = ExamEnrollment.objects.annotate(
+            code_unite_enseignement=Concat(
+                'learning_unit_enrollment__learning_unit_year__acronym',
+                'learning_unit_enrollment__learning_class_year__acronym',
+                output_field=CharField()
+            ),
+            annee_academique=F('learning_unit_enrollment__learning_unit_year__academic_year__year'),
+            numero_session=F('session_exam__number_session'),
+            noma=F('learning_unit_enrollment__offer_enrollment__student__registration_id'),
+            nom_cohorte=Case(
+                When(
+                    learning_unit_enrollment__offer_enrollment__cohort_year__name=CohortName.FIRST_YEAR.name,
+                    then=Replace(
+                        'learning_unit_enrollment__offer_enrollment__education_group_year__acronym',
+                        Value('1BA'),
+                        Value('11BA')
+                    )
+                ),
+                default=F('learning_unit_enrollment__offer_enrollment__education_group_year__acronym'),
+                output_field=CharField()
+            ),
+            note=Coalesce(
+                'justification_final',
+                Cast('score_final', output_field=CharField()),
+                'justification_reencoded',
+                Cast('score_reencoded', output_field=CharField()),
+                'justification_draft',
+                Cast('score_draft', output_field=CharField()),
+                Value(''),
+            )
+        ).filter(*filter_qs).values(
+            'noma',
+            'code_unite_enseignement',
+            'annee_academique',
+            'numero_session',
+        )
+
+        return {IdentiteNoteEtudiant(**row) for row in qs}
 
     @classmethod
     def delete(cls, entity_id: 'IdentiteNoteEtudiant', **kwargs: ApplicationService) -> None:
