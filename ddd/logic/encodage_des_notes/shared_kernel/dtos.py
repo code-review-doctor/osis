@@ -113,7 +113,7 @@ class FeuilleDeNotesDTO(interface.DTO):
 
     @property
     def encodage_est_complet(self) -> bool:
-        return self.quantite_notes_soumises / self.quantite_total_notes == 0
+        return self.quantite_notes_soumises == self.quantite_total_notes
 
     @property
     def quantite_notes_soumises(self) -> int:
@@ -183,7 +183,7 @@ class ProgressionEncodageNotesUniteEnseignementDTO(interface.DTO):
 
     @property
     def encodage_est_complet(self) -> bool:
-        return self.quantite_notes_soumises / self.quantite_totale_notes == 0
+        return self.quantite_notes_soumises == self.quantite_totale_notes
 
 
 @attr.s(frozen=True, slots=True)

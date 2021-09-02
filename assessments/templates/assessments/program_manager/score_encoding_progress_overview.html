@@ -139,7 +139,7 @@
                                         <tbody>
                                              {% for progression_encodage in progression_generale.progression_generale %}
                                                 <tr>
-                                                    <td headers="tab_online_complete">
+                                                    <td class="text-center" headers="tab_online_complete">
                                                         {% if progression_encodage.encodage_est_complet %}
                                                             <i class="fas fa-check-circle" style="color: green"></i>
                                                         {% else %}
@@ -154,11 +154,11 @@
                                                         </a>
                                                     </td>
                                                     <td headers="tab_online_responsible">
-                                                        {{ progression_encodage.responsable_note.nom }} {{ progression_encodage.responsable_note.prenom }}
+                                                        {{ progression_encodage.responsable_note.nom|upper }} {{ progression_encodage.responsable_note.prenom }}
                                                     </td>
                                                     <td headers="tab_online_tutor_deadline">
                                                         {% for echeance in progression_encodage.dates_echeance %}
-                                                            {% if not forloop.first %}
+                                                            {% if forloop.counter == 2 %}
                                                                 <div id="tutor_deadlines_collapse_{{ progression_encodage.code_unite_enseignement }}" class="collapse in">
                                                             {% endif %}
                                                             <div class="row row-score-encoding">
@@ -185,7 +185,7 @@
                                                                      </a>
                                                                 {% endif %}
                                                             </div>
-                                                            {% if not forloop.first %}
+                                                            {% if forloop.last and forloop.counter > 2 %}
                                                                 </div>
                                                             {% endif %}
                                                         {% endfor %}

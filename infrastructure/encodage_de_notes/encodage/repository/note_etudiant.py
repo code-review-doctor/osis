@@ -57,13 +57,13 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
             **kwargs
     ) -> List['NoteEtudiant']:
         filter_qs = cls._build_filter(
-            entity_ids,
-            noms_cohortes,
-            annee_academique,
-            numero_session,
-            nomas,
-            note_manquante,
-            justification
+            entity_ids=entity_ids,
+            noms_cohortes=noms_cohortes,
+            annee_academique=annee_academique,
+            numero_session=numero_session,
+            nomas=nomas,
+            note_manquante=note_manquante,
+            justification=justification
         )
 
         if not filter_qs:
@@ -94,6 +94,7 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
             annee_academique: int = None,
             numero_session: int = None,
             nomas: List[str] = None,
+            code_unite_enseignement: str = None,
             note_manquante: bool = False,
             justification: JustificationTypes = None,
     ) -> List[Q]:
@@ -137,6 +138,10 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
             result.append(
                 Q(numero_session=numero_session)
             )
+        if code_unite_enseignement:
+            result.append(
+                Q(code_unite_enseignement__icontains=code_unite_enseignement)
+            )
         return result
 
     @classmethod
@@ -146,6 +151,7 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
             annee_academique: int = None,
             numero_session: int = None,
             nomas: List[str] = None,
+            code_unite_enseignement: str = None,
             note_manquante: bool = False,
             **kwargs
     ) -> Set['IdentiteNoteEtudiant']:
@@ -154,6 +160,7 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
             annee_academique=annee_academique,
             numero_session=numero_session,
             nomas=nomas,
+            code_unite_enseignement=code_unite_enseignement,
             note_manquante=note_manquante,
         )
 

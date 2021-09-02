@@ -57,6 +57,7 @@ class INoteEtudiantRepository(interface.AbstractRepository):
             annee_academique: int = None,
             numero_session: int = None,
             nomas: List[str] = None,
+            code_unite_enseignement: str = None,
             note_manquante: bool = False,
             **kwargs
     ) -> Set['IdentiteNoteEtudiant']:

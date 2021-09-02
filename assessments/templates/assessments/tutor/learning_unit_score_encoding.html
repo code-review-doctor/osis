@@ -114,23 +114,12 @@
 
             <div class="row">
                 <div class="col-md-12">
-                    <div class="btn-group" role="group">
-                        <a id="lnk_encoding" class="btn btn-default" href="{{ learning_unit_encoding_url }}"
-                           data-toggle="tooltip"
-                           data-placement="bottom"
-                           title="{% trans 'Encode scores' %}">
-                            <em class="fa fa-hashtag"></em> {% trans 'Encode' %}
-                        </a>
-                         <a id="lnk_double_encoding" class="btn btn-default" href="{{ learning_unit_double_encoding_url }}"
-                           data-toggle="tooltip"
-                           data-placement="bottom"
-                           title="{% trans 'Double encode scores' %}">
-                            <em class="fa fa-hashtag"></em>
-                            <em class="fa fa-hashtag"></em>
-                             {% trans 'Double encoding' %}
-                        </a>
-                    </div>
-
+                    <a id="lnk_encoding" class="btn btn-default" href="{{ learning_unit_encoding_url }}"
+                       data-toggle="tooltip"
+                       data-placement="bottom"
+                       title="{% trans 'Encode scores' %}">
+                        <em class="fa fa-hashtag"></em> {% trans 'Encode' %}
+                    </a>
                     <a  id="lnk_score_printing" class="btn btn-default download"
                         href="{{ learning_unit_print_url }}"
                         data-toggle="tooltip" data-placement="bottom"
@@ -138,8 +127,6 @@
                         role="button">
                             <em class="fas fa-print"></em> {% trans 'Print' %}
                     </a>
-
-
                     <div class="btn-group" role="group">
                         <a id="lnk_xls_download" class="btn btn-default" href="{{ learning_unit_download_xls_url }}"
                            data-toggle="tooltip"

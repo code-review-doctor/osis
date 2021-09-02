@@ -24,7 +24,7 @@
 #
 ##############################################################################
 import abc
-from typing import List, Optional, Set, Tuple
+from typing import List, Optional, Set
 
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import EnseignantDTO
 from ddd.logic.encodage_des_notes.soumission.domain.model._unite_enseignement_identite import UniteEnseignementIdentite
