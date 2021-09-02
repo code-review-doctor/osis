@@ -95,7 +95,7 @@ class ScoreSheetAddressForm(forms.Form):
         try:
             cmd = EncoderAdresseFeuilleDeNotes(
                 nom_cohorte=self.nom_cohorte,
-                entite=self.cleaned_data['entity'].acronym if self.cleaned_data['entity'] else None,
+                entite=self.cleaned_data['entity'],
                 destinataire=self.cleaned_data['recipient'],
                 rue_numero=self.cleaned_data['location'],
                 code_postal=self.cleaned_data['postal_code'],

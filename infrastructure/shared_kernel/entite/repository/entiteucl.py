@@ -49,7 +49,7 @@ class EntiteUCLRepository(IEntiteUCLRepository):
             'entity__location',
             'entity__postal_code',
             'entity__city',
-            'entity__country',
+            'entity__country__name',
             'entity__phone',
             'entity__fax',
             acronym__in=acronyms
@@ -72,7 +72,7 @@ class EntiteUCLRepository(IEntiteUCLRepository):
             rue_numero=row['entity__location'],
             code_postal=row['entity__postal_code'],
             ville=row['entity__city'],
-            pays=row['entity__country'],
+            pays=row['entity__country__name'],
             telephone=row['entity__phone'],
             fax=row['entity__fax'],
         )
