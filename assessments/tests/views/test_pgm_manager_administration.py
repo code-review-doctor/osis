@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from collections import OrderedDict
 from unittest import mock
 
 from django.contrib.auth.models import Permission
@@ -31,6 +32,7 @@ from django.urls import reverse
 
 from assessments.views import pgm_manager_administration
 from base.auth.roles.program_manager import ProgramManager
+from base.models.education_group_year import EducationGroupYear
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, MiniTrainingFactory
 from base.tests.factories.entity_manager import EntityManagerFactory
@@ -39,6 +41,7 @@ from base.tests.factories.group import ProgramManagerGroupFactory, EntityManager
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
+from ddd.logic.encodage_des_notes.encodage.dtos import ProprietesGestionnaireCohorteDTO
 
 
 class PgmManagerAdministrationTest(TestCase):
@@ -57,7 +60,7 @@ class PgmManagerAdministrationTest(TestCase):
         cls.structure_child22 = EntityVersionFactory(acronym='COMU', parent=cls.structure_child2.entity)
 
         cls.entity_manager = EntityManagerFactory(entity=cls.structure_parent1.entity)
-        cls.academic_year_previous, cls.academic_year_current = AcademicYearFactory.produce_in_past(quantity=2)
+        cls.academic_year_current, cls.academic_year_previous = AcademicYearFactory.produce_in_past(quantity=2)
         cls.person = PersonFactory()
         SessionExamCalendarFactory.create_academic_event(cls.academic_year_current)
 
@@ -90,22 +93,22 @@ class PgmManagerAdministrationTest(TestCase):
         self.assertEqual(len(pgm_manager_administration.get_managed_entities(structures)), 3)
 
     def test_remove_pgm_manager(self):
-        educ_group_year1 = EducationGroupYearFactory(academic_year=self.academic_year_current)
-        educ_group_yaer2 = EducationGroupYearFactory(academic_year=self.academic_year_current)
+        educ_group_year1 = EducationGroupYearFactory(academic_year=self.academic_year_current, acronym="ENVI2M")
+        educ_group_year2 = EducationGroupYearFactory(academic_year=self.academic_year_current, acronym="ENVIST")
         pgm1 = ProgramManagerFactory(person=self.person, education_group=educ_group_year1.education_group)
-        pgm2 = ProgramManagerFactory(person=self.person, education_group=educ_group_yaer2.education_group)
+        pgm2 = ProgramManagerFactory(person=self.person, education_group=educ_group_year2.education_group)
         response = self.client.get(
-            reverse('delete_manager', args=[pgm1.pk]) + "?education_groups={},{}".format(
+            reverse('delete_manager', kwargs={'global_id': pgm1.person.global_id, 'acronym': "ENVI2M"}) + "?education_groups={},{}".format(
                 educ_group_year1.education_group_id,
-                educ_group_yaer2.education_group_id
+                educ_group_year2.education_group_id
             )
         )
         self.assertEqual(response.context['other_programs'].get(), pgm2)
         self.assertTrue(isinstance(response.context['other_programs'].get(), ProgramManager))
 
         self.client.post(
-            reverse('delete_manager', args=[pgm1.pk])
-            + "?education_groups={},{}".format(educ_group_year1.education_group_id, educ_group_yaer2.education_group_id)
+            reverse('delete_manager', kwargs={'global_id': pgm1.person.global_id, 'acronym': "ENVI2M"})
+            + "?education_groups={},{}".format(educ_group_year1.education_group_id, educ_group_year2.education_group_id)
         )
         self.assertFalse(ProgramManager.objects.filter(pk=pgm1.pk).exists())
         self.assertTrue(ProgramManager.objects.filter(pk=pgm2.pk).exists())
@@ -117,7 +120,7 @@ class PgmManagerAdministrationTest(TestCase):
         pgm2 = ProgramManagerFactory(person=self.person, education_group=educ_group_year2.education_group)
 
         response = self.client.get(
-            reverse('delete_manager_person', args=[self.person.pk]) + "?education_groups={},{}".format(
+            reverse('delete_manager_person', args=[self.person.global_id]) + "?education_groups={},{}".format(
                 educ_group_year1.education_group_id,
                 educ_group_year2.education_group_id
             )
@@ -125,7 +128,7 @@ class PgmManagerAdministrationTest(TestCase):
         self.assertFalse(response.context['other_programs'])
 
         self.client.post(
-            reverse('delete_manager_person', args=[self.person.pk]) + "?education_groups={},{}".format(
+            reverse('delete_manager_person', args=[self.person.global_id]) + "?education_groups={},{}".format(
                 educ_group_year1.education_group_id,
                 educ_group_year2.education_group_id
             )
@@ -148,7 +151,10 @@ class PgmManagerAdministrationTest(TestCase):
         )
 
         self.client.post(
-            reverse('update_main_person', args=[self.person.pk]) + "?education_groups={},{}".format(
+            reverse('update_main_person',
+                    kwargs={
+                        'global_id': pgm1.person.global_id
+                    }) + "?education_groups={},{}".format(
                 educ_group_year1.education_group_id,
                 educ_group_year2.education_group_id
             ), data={'is_main': 'true'}
@@ -159,7 +165,12 @@ class PgmManagerAdministrationTest(TestCase):
         self.assertTrue(pgm2.is_main)
 
         self.client.post(
-            reverse('update_main', args=[pgm1.pk]) + "?education_groups={},{}".format(
+            reverse('update_main',
+                    kwargs={
+                        'global_id': pgm1.person.global_id,
+                        'acronym': educ_group_year1.acronym
+                    }
+                    ) + "?education_groups={},{}".format(
                 educ_group_year1.education_group_id,
                 educ_group_year2.education_group_id
             ), data={'is_main': 'false'}
@@ -172,15 +183,26 @@ class PgmManagerAdministrationTest(TestCase):
     def test_list_pgm_manager(self):
         educ_group_year1 = EducationGroupYearFactory(academic_year=self.academic_year_current)
         educ_group_year2 = EducationGroupYearFactory(academic_year=self.academic_year_current)
-        pgm1 = ProgramManagerFactory(person=self.person, education_group=educ_group_year1.education_group)
-        pgm2 = ProgramManagerFactory(person=self.person, education_group=educ_group_year2.education_group)
+        ProgramManagerFactory(person=self.person, education_group=educ_group_year1.education_group)
+        ProgramManagerFactory(person=self.person, education_group=educ_group_year2.education_group)
 
         response = self.client.get(
             reverse('manager_list'),
             data={'education_groups': [educ_group_year1.education_group, educ_group_year2.education_group]}
         )
-        self.assertEqual(
-            response.context['by_person'], {self.person: [pgm1, pgm2]}
+
+        self.assertIsInstance(response.context['by_person'], OrderedDict)
+        dto_result = response.context['by_person'].get(self.person.global_id)
+        self.assertEqual(dto_result.matricule_gestionnaire, self.person.global_id)
+        self.assertEqual(dto_result.nom, self.person.last_name)
+        self.assertEqual(dto_result.prenom, self.person.first_name)
+
+        self.assertListEqual(
+            dto_result.cohortes_gerees,
+            [
+                build_proprietes_gestionnaire_cohorte_dto(educ_group_year1),
+                build_proprietes_gestionnaire_cohorte_dto(educ_group_year2)
+            ]
         )
 
     def test_offer_year_queried_by_academic_year(self):
@@ -356,3 +378,10 @@ def set_post_request(mock_decorators, data_dict, url):
     request = request_factory.post(url, data_dict)
     request.user = mock.Mock()
     return request
+
+
+def build_proprietes_gestionnaire_cohorte_dto(education_group_yr: EducationGroupYear):
+    return ProprietesGestionnaireCohorteDTO(
+        est_principal=False,
+        nom_cohorte=education_group_yr.acronym
+    )

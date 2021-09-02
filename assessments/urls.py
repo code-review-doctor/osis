@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -95,11 +95,13 @@ urlpatterns = [
         url(r'^$', pgm_manager_administration.pgm_manager_administration, name='pgm_manager'),
         url(r'^search$', pgm_manager_administration.pgm_manager_search, name='pgm_manager_search'),
         url(r'^manager_list/$', ProgramManagerListView.as_view(), name='manager_list'),
-        url(r'^update_main/(?P<pk>[0-9]+)/$', MainProgramManagerUpdateView.as_view(), name='update_main'),
-        url(r'^update_main_person/(?P<pk>[0-9]+)/$', MainProgramManagerPersonUpdateView.as_view(),
+        url(r'^update_main/(?P<global_id>[0-9]+)/(?P<acronym>[a-zA-Z0-9/ \-_]+)/$',
+            MainProgramManagerUpdateView.as_view(), name='update_main'),
+        url(r'^update_main_person/(?P<global_id>[0-9]+)/$', MainProgramManagerPersonUpdateView.as_view(),
             name='update_main_person'),
-        url(r'^delete_manager/(?P<pk>[0-9]+)/$', ProgramManagerDeleteView.as_view(), name='delete_manager'),
-        url(r'^delete_manager_person/(?P<pk>[0-9]+)/$', ProgramManagerPersonDeleteView.as_view(),
+        url(r'^delete_manager/(?P<global_id>[0-9]+)/(?P<acronym>[a-zA-Z0-9/ \-_]+)/$',
+            ProgramManagerDeleteView.as_view(), name='delete_manager'),
+        url(r'^delete_manager_person/(?P<global_id>[0-9]+)/$', ProgramManagerPersonDeleteView.as_view(),
             name='delete_manager_person'),
         url(r'^create$', ProgramManagerCreateView.as_view(), name='create_manager_person'),
         url(r'^person-autocomplete/$', PersonAutocomplete.as_view(), name='person-autocomplete'),

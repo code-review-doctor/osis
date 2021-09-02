@@ -37,7 +37,7 @@ from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
 from django.utils.functional import cached_property
 from django.views.generic import ListView, DeleteView, FormView
-from django.views.generic.edit import BaseUpdateView
+from django.views.generic.base import TemplateView
 
 from base.auth.roles import program_manager
 from base.auth.roles.entity_manager import EntityManager
@@ -53,6 +53,7 @@ from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import TrainingType
 from base.models.person import Person
 from base.views.mixins import AjaxTemplateMixin
+from ddd.logic.encodage_des_notes.encodage.dtos import GestionnaireCohortesDTO, ProprietesGestionnaireCohorteDTO
 
 ALL_OPTION_VALUE = "-"
 ALL_OPTION_VALUE_ENTITY = "all_"
@@ -60,21 +61,18 @@ ALL_OPTION_VALUE_ENTITY = "all_"
 EXCLUDE_OFFER_TYPE_SEARCH = TrainingType.finality_types()
 
 
-class ProgramManagerListView(ListView):
-    model = ProgramManager
+class ProgramManagerListView(TemplateView):
     template_name = "admin/programmanager_list.html"
 
     @cached_property
     def education_group_ids(self) -> List[int]:
         return self.request.GET.getlist('education_groups')
 
-    def get_queryset(self):
-        qs = super().get_queryset()
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
         education_group_ids = self.education_group_ids
-        if not education_group_ids:
-            return qs.none()
-
-        result = qs.filter(education_group_id__in=education_group_ids).annotate(
+        qs = ProgramManager.objects.all()
+        objects = qs.filter(education_group_id__in=education_group_ids).annotate(
             offer_acronym=Subquery(
                 EducationGroupYear.objects.filter(
                     education_group_id=OuterRef('education_group_id'),
@@ -88,17 +86,29 @@ class ProgramManagerListView(ListView):
             'person__first_name',
             'pk'
         )
-        return result
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
         context['education_groups'] = self.education_group_ids
 
-        result = OrderedDict()
-        for i in self.object_list:
-            result.setdefault(i.person, []).append(i)
-
-        context["by_person"] = result
+        mgrs_global_ids = []
+        mgrs_dto = OrderedDict()
+        for i in objects:
+            cohorte_geree = ProprietesGestionnaireCohorteDTO(
+                nom_cohorte=i.education_group_most_recent_acronym,
+                est_principal=i.is_main
+            )
+            if i.person.global_id not in mgrs_global_ids:
+                mgr = GestionnaireCohortesDTO(matricule_gestionnaire=i.person.global_id,
+                                              nom=i.person.last_name,
+                                              prenom=i.person.first_name,
+                                              cohortes_gerees=[cohorte_geree]
+                                              )
+                mgrs_global_ids.append(i.person.global_id)
+                mgrs_dto.update({i.person.global_id: mgr})
+            else:
+                data_to_update = mgrs_dto.get(i.person.global_id)
+                data_to_update.cohortes_gerees.append(cohorte_geree)
+                mgrs_dto.update({i.person.global_id: data_to_update})
+            mgrs_global_ids.append(i.person.global_id)
+        context["by_person"] = mgrs_dto
         return context
 
 
@@ -122,10 +132,20 @@ class ProgramManagerMixin(PermissionRequiredMixin, AjaxTemplateMixin):
 class ProgramManagerDeleteView(ProgramManagerMixin, DeleteView):
     template_name = 'admin/programmanager_confirm_delete_inner.html'
 
+    def get_object(self, queryset=None):
+        obj = self.model.objects.get(
+            person__global_id=self.kwargs['global_id'],
+            education_group__educationgroupyear__acronym=self.kwargs['acronym'],
+            education_group__educationgroupyear__academic_year=academic_year.current_academic_year(),
+        )
+        self.pk_delete_object = obj.pk
+        return obj
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['manager'] = self.object.person
-        context['other_programs'] = self.object.person.programmanager_set.exclude(pk=self.object.pk)
+        person = Person.objects.get(global_id=self.kwargs['global_id'])
+        context['manager'] = person
+        context['other_programs'] = person.programmanager_set.exclude(pk=self.pk_delete_object)
         return context
 
 
@@ -134,7 +154,7 @@ class ProgramManagerPersonDeleteView(ProgramManagerMixin, DeleteView):
 
     def get_object(self, queryset=None):
         return self.model.objects.filter(
-            person__pk=self.kwargs['pk'],
+            person__global_id=self.kwargs['global_id'],
             education_group_id__in=self.education_group_ids
         )
 
@@ -146,28 +166,38 @@ class ProgramManagerPersonDeleteView(ProgramManagerMixin, DeleteView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        manager = Person.objects.get(pk=self.kwargs['pk'])
+        manager = Person.objects.get(global_id=self.kwargs['global_id'])
         context['manager'] = manager
         context['other_programs'] = manager.programmanager_set.exclude(education_group_id__in=self.education_group_ids)
         return context
 
 
-class MainProgramManagerUpdateView(ProgramManagerMixin, BaseUpdateView):
-    fields = 'is_main',
-
-
-class MainProgramManagerPersonUpdateView(ProgramManagerMixin, ListView):
-    def get_queryset(self):
-        return self.model.objects.filter(
-            person=self.kwargs["pk"],
-            education_group_id__in=self.education_group_ids
-        )
+class MainProgramManagerUpdateCommonView(ProgramManagerMixin, ListView):
+    fields = 'is_main'
 
     def post(self, *args, **kwargs):
         """ Update column is_main for selected education_groups"""
         val = json.loads(self.request.POST.get('is_main'))
         self.get_queryset().update(is_main=val)
         return super()._ajax_response() or HttpResponseRedirect(self.get_success_url())
+
+
+class MainProgramManagerUpdateView(MainProgramManagerUpdateCommonView):
+
+    def get_queryset(self):
+        return self.model.objects.filter(
+            person__global_id=self.kwargs["global_id"],
+            education_group__educationgroupyear__acronym=self.kwargs['acronym'],
+            education_group__educationgroupyear__academic_year=academic_year.current_academic_year()
+        )
+
+
+class MainProgramManagerPersonUpdateView(MainProgramManagerUpdateCommonView):
+    def get_queryset(self):
+        return self.model.objects.filter(
+            person__global_id=self.kwargs["global_id"],
+            education_group_id__in=self.education_group_ids
+        )
 
 
 class PersonAutocomplete(autocomplete.Select2QuerySetView):
