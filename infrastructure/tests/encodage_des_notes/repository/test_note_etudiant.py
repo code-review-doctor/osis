@@ -149,3 +149,11 @@ class NoteEtudiantRepositoryTest(TestCase):
             deadline=note_etudiant_to_save.get_date_limite_de_remise(),
             deadline_tutor=0
         )
+
+
+class NoteEtudiantRepositorySearchDateEcheancesTest(TestCase):
+    def setUp(self) -> None:
+        self.note_etudiant_repository = NoteEtudiantRepository()
+
+    def test_should_return_echeances_etudiants_ordonee_par_code_ue_annee_ue_echeance(self):
+        pass
