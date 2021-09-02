@@ -32,7 +32,7 @@ from base.tests.factories.session_exam_calendar import SessionExamCalendarFactor
 from base.tests.factories.tutor import TutorFactory
 from ddd.logic.encodage_des_notes.soumission.commands import GetProgressionGeneraleCommand
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateEcheanceDTO, \
-    ProgressionEncodageNotesUniteEnseignementDTO, ProgressionGeneraleEncodageNotesDTO
+    ProgressionEncodageNotesUniteEnseignementDTO, ProgressionGeneraleEncodageNotesDTO, EnseignantDTO
 
 
 class ScoreEncodingProgressOverviewTutorViewTest(TestCase):
@@ -73,6 +73,7 @@ class ScoreEncodingProgressOverviewTutorViewTest(TestCase):
                             )
                         ],
                         a_etudiants_peps=True,
+                        responsable_note=EnseignantDTO(nom='', prenom='')
                     )
                 ]
             )

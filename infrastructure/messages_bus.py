@@ -25,6 +25,7 @@
 ##############################################################################
 from typing import Dict, Callable, List
 
+from ddd.logic.encodage_des_notes.encodage.use_case.read.get_periode_encodage_service import get_periode_encodage
 from ddd.logic.encodage_des_notes.encodage.use_case.read.get_progression_generale_encodage_service import \
     get_progression_generale_gestionnaire
 from ddd.logic.encodage_des_notes.encodage.use_case.read.rechercher_notes_service import rechercher_notes
@@ -63,7 +64,8 @@ from ddd.logic.effective_class_repartition.use_case.write.edit_class_volume_repa
     edit_class_volume_repartition_to_tutor
 from ddd.logic.effective_class_repartition.use_case.write.unassign_tutor_class_service import unassign_tutor_class
 from ddd.logic.encodage_des_notes.encodage.commands import GetFeuilleDeNotesGestionnaireCommand, EncoderNotesCommand, \
-    GetCohortesGestionnaireCommand, RechercherNotesCommand, GetProgressionGeneraleGestionnaireCommand
+    GetCohortesGestionnaireCommand, RechercherNotesCommand, GetProgressionGeneraleGestionnaireCommand, \
+    GetPeriodeEncodageCommand
 from ddd.logic.encodage_des_notes.encodage.use_case.read.get_cohortes_gestionnaire import get_cohortes_gestionnaire
 from ddd.logic.encodage_des_notes.encodage.use_case.read.get_feuille_de_notes_service import \
     get_feuille_de_notes_gestionnaire
@@ -337,6 +339,10 @@ class MessageBus:
             UniteEnseignementTranslator(),
             CohortesDuGestionnaireTranslator(),
         ),
+        GetPeriodeEncodageCommand: lambda cmd: get_periode_encodage(
+            cmd,
+            PeriodeEncodageNotesTranslator(),
+        )
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 
     def invoke(self, command: CommandRequest) -> ApplicationServiceResult:

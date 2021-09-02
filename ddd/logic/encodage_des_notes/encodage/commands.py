@@ -31,6 +31,11 @@ from osis_common.ddd import interface
 
 
 @attr.s(frozen=True, slots=True)
+class GetPeriodeEncodageCommand(interface.CommandRequest):
+    pass
+
+
+@attr.s(frozen=True, slots=True)
 class EncoderNoteCommand(interface.CommandRequest):
     noma = attr.ib(type=str)
     email = attr.ib(type=str)
