@@ -43,17 +43,9 @@ from osis_common.ddd.interface import ApplicationService
 class EffectiveClassRepository(IEffectiveClassRepository):
     @classmethod
     def get(cls, entity_id: 'EffectiveClassIdentity') -> 'EffectiveClass':
-        learning_unit_id = entity_id.learning_unit_identity
-        qs = _get_common_queryset().filter(
-            learning_component_year__learning_unit_year__acronym=learning_unit_id.code,
-            learning_component_year__learning_unit_year__academic_year__year=learning_unit_id.year,
-            acronym=entity_id.class_code,
+        return EffectiveClassBuilder.build_from_repository_dto(
+            cls.get_dto(code=entity_id.complete_class_code, annee=entity_id.learning_unit_identity.year)
         )
-        qs = _annotate_queryset(qs)
-        qs = _values_queryset(qs)
-        obj_as_dict = qs.get()
-        dto_from_database = EffectiveClassFromRepositoryDTO(**obj_as_dict)
-        return EffectiveClassBuilder.build_from_repository_dto(dto_from_database)
 
     @classmethod
     def search(cls, entity_ids: Optional[List['EffectiveClassIdentity']] = None, **kwargs) -> List['EffectiveClass']:
