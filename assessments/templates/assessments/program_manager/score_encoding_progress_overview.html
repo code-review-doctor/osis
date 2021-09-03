@@ -125,11 +125,11 @@
 
                                 <div class="tab-content">
                                     <div role="tabpanel" class="tab-pane fade in active" id="tab_online">
-                                        <table class="table table-hover">
+                                        <table id="table_online" class="table table-hover">
                                             <thead>
                                                 <tr>
                                                     <th id="tab_online_complete" class="col-md-1">{% trans 'Complete' %}</th>
-                                                    <th id="tab_online_acronym" class="col-md-1">{% trans 'Acronym' context 'UE acronym' %}</th>
+                                                    <th id="tab_online_acronym" class="col-md-1">{% trans 'Code' %}</th>
                                                     <th id="tab_online_title" class="col-md-4">{% trans 'Learning unit' %}</th>
                                                     <th id="tab_online_responsible" class="col-md-2">{% trans 'Scores responsible' %}</th>
                                                     <th id="tab_online_tutor_deadlines" class="col-md-2">{% trans 'Tutor deadlines' %}</th>
@@ -240,18 +240,17 @@
                                         <table class="table table-hover">
                                             <thead>
                                                 <tr>
-                                                    <th id="tab_paper_complete">{% trans 'Complete' %}</th>
-                                                    <th id="tab_paper_acronym">{% trans 'Acronym' context 'UE acronym' %}</th>
-                                                    <th id="tab_paper_title">{% trans 'Learning unit' %}</th>
-                                                    <th id="tab_paper_score_responsible">{% trans 'Scores responsible' %}</th>
-                                                    <th id="tab_paper_progress">{% trans 'Progress' %}</th>
+                                                    <th id="tab_paper_complete" class="col-md-1" >{% trans 'Complete' %}</th>
+                                                    <th id="tab_paper_acronym" class="col-md-1">{% trans 'Code' %}</th>
+                                                    <th id="tab_paper_title" class="col-md-4">{% trans 'Learning unit' %}</th>
+                                                    <th id="tab_paper_progress" class="col-md-4">{% trans 'Progress' %}</th>
                                                     <th id="tab_paper_download_action"></th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 {% for progression_encodage in progression_generale.progression_generale %}
                                                     <tr class="result_paper">
-                                                        <td headers="tab_paper_complete">
+                                                        <td class="text-center" headers="tab_paper_complete">
                                                              {% if progression_encodage.encodage_est_complet %}
                                                                 <i class="fas fa-check-circle" style="color: green"></i>
                                                             {% else %}
@@ -265,7 +264,6 @@
                                                                 {{ progression_encodage.intitule_complet_unite_enseignement }}
                                                             </a>
                                                         </td>
-                                                        <td headers="tab_online_responsible"></td>
                                                         <td headers="tab_paper_progress">
                                                             <div class="progress">
                                                                 <div
@@ -285,7 +283,7 @@
                                                                 </div>
                                                             </div>
                                                         </td>
-                                                        <td headers="tab_paper_download_action">
+                                                        <td headers="tab_paper_download_action" class="text-center">
                                                             <a class="btn btn-default download"
                                                                href="{% url 'score_sheet_pdf_export' progression_encodage.code_unite_enseignement %}"
                                                                role="button" id="lnk_notes_printing_{{progression_encodage.code_unite_enseignement}}"
@@ -303,18 +301,17 @@
                                         <table class="table table-hover">
                                             <thead>
                                                 <tr>
-                                                    <th id="tab_excel_complete">{% trans 'Complete' %}</th>
-                                                    <th id="tab_excel_acronym">{% trans 'Acronym' context 'UE acronym' %}</th>
-                                                    <th id="tab_excel_title">{% trans 'Learning unit' %}</th>
-                                                    <th id="tab_excel_score_responsible">{% trans 'Scores responsible' %}</th>
-                                                    <th id="tab_excel_progress">{% trans 'Progress' %}</th>
+                                                    <th id="tab_excel_complete" class="col-md-1">{% trans 'Complete' %}</th>
+                                                    <th id="tab_excel_acronym" class="col-md-1">{% trans 'Code' %}</th>
+                                                    <th id="tab_excel_title" class="col-md-4">{% trans 'Learning unit' %}</th>
+                                                    <th id="tab_excel_progress" class="col-md-4">{% trans 'Progress' %}</th>
                                                     <th id="tab_excel_links"></th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 {% for progression_encodage in progression_generale.progression_generale %}
                                                     <tr>
-                                                        <td headers="tab_excel_complete">
+                                                        <td class="text-center" headers="tab_excel_complete">
                                                             {% if progression_encodage.encodage_est_complet %}
                                                                 <i class="fas fa-check-circle" style="color: green"></i>
                                                             {% else %}
@@ -372,3 +369,24 @@
     </div>
 {% endblock %}
 
+
+{% block script %}
+    <script>
+      $('#table_online').DataTable({
+        paging: false,
+        searching: false,
+        info: false,
+        columnDefs: [
+            { orderable: false, targets: 0 },
+            { orderable: true, targets: 1 },
+            { orderable: false, targets: 2 },
+            { orderable: true, targets: 3 },
+            { orderable: false, targets: 4 },
+            { orderable: false, targets: 5 },
+            { orderable: false, targets: 6 },
+            { orderable: false, targets: 7 },
+        ],
+        order: [],
+      });
+    </script>
+{% endblock %}

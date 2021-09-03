@@ -70,6 +70,7 @@ class ScoreEncodingProgressOverviewProgramManagerView(ScoreEncodingProgressOverv
                 cmd_kwargs.update({
                     'nom_cohorte': search_form.cleaned_data['cohorte_name'],
                     'code_unite_enseignement': search_form.cleaned_data['learning_unit_code'],
+                    'enseignant': search_form.cleaned_data['tutor'],
                     'seulement_notes_manquantes': search_form.cleaned_data['incomplete_encodings_only'],
                 })
             cmd = GetProgressionGeneraleGestionnaireCommand(**cmd_kwargs)

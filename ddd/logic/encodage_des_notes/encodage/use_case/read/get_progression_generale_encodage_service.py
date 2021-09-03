@@ -67,5 +67,6 @@ def get_progression_generale_gestionnaire(
 
         nom_cohorte=cmd.nom_cohorte,
         code_unite_enseignement=cmd.code_unite_enseignement,
+        enseignant=cmd.enseignant,
         seulement_notes_manquantes=cmd.seulement_notes_manquantes
     )

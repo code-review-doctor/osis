@@ -52,6 +52,7 @@ class ProgressionGeneraleEncodage(interface.DomainService):
 
             nom_cohorte: Optional[str],
             code_unite_enseignement: Optional[str],
+            enseignant: Optional[str],
             seulement_notes_manquantes: bool = False
     ) -> 'ProgressionGeneraleEncodageNotesDTO':
         noms_cohortes = gestionnaire.cohortes_gerees
@@ -64,6 +65,7 @@ class ProgressionGeneraleEncodage(interface.DomainService):
             annee_academique=periode_encodage.annee_concernee,
             numero_session=periode_encodage.session_concernee,
             code_unite_enseignement=code_unite_enseignement,
+            enseignant=enseignant,
             note_manquante=seulement_notes_manquantes
         )
 
