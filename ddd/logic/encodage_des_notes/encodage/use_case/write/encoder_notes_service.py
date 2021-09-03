@@ -31,7 +31,8 @@ from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import Ide
 from ddd.logic.encodage_des_notes.encodage.domain.service.encoder_notes_en_lot import EncoderNotesEnLot
 from ddd.logic.encodage_des_notes.encodage.domain.service.i_cohortes_du_gestionnaire import ICohortesDuGestionnaire
 from ddd.logic.encodage_des_notes.encodage.repository.note_etudiant import INoteEtudiantRepository
-from ddd.logic.encodage_des_notes.shared_kernel.domain.service import IPeriodeEncodageNotesTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodage_notes import \
+    IPeriodeEncodageNotesTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.periode_encodage_ouverte import PeriodeEncodageOuverte
 
 NouvelleNote = str

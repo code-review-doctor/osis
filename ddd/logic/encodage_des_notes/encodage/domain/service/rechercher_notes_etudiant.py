@@ -29,8 +29,9 @@ from ddd.logic.encodage_des_notes.encodage.domain.model._note import NOTE_MANQUA
 from ddd.logic.encodage_des_notes.encodage.domain.model.gestionnaire_parcours import GestionnaireParcours
 from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import NoteEtudiant
 from ddd.logic.encodage_des_notes.encodage.repository.note_etudiant import INoteEtudiantRepository
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_etudiant import \
+    ISignaletiqueEtudiantTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import NoteEtudiantDTO
-from ddd.logic.encodage_des_notes.shared_kernel.domain.service import ISignaletiqueEtudiantTranslator
 from osis_common.ddd import interface
 
 

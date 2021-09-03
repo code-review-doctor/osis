@@ -23,14 +23,30 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from unittest import mock
+
+from django.test import SimpleTestCase
+
 from ddd.logic.encodage_des_notes.encodage.commands import GetPeriodeEncodageCommand
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodage_notes import \
     IPeriodeEncodageNotesTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.dtos import PeriodeEncodageNotesDTO
+from infrastructure.messages_bus import message_bus_instance
 
 
-def get_periode_encodage(
-        cmd: 'GetPeriodeEncodageCommand',
-        periode_encodage_note_translator: 'IPeriodeEncodageNotesTranslator',
-) -> 'PeriodeEncodageNotesDTO':
-    return periode_encodage_note_translator.get()
+class GetPeriodeEncodageTest(SimpleTestCase):
+
+    def setUp(self) -> None:
+        self.cmd = GetPeriodeEncodageCommand()
+
+        self.translator_mocked = mock.Mock(spec=IPeriodeEncodageNotesTranslator)
+        message_bus_patcher = mock.patch.multiple(
+            'infrastructure.messages_bus',
+            PeriodeEncodageNotesTranslator=self.translator_mocked
+        )
+        message_bus_patcher.start()
+        self.addCleanup(message_bus_patcher.stop)
+        self.message_bus = message_bus_instance
+
+    def test_should_call_get_method_translator(self):
+        self.message_bus.invoke(self.cmd)
+        self.assertTrue(self.translator_mocked.return_value.get.called)

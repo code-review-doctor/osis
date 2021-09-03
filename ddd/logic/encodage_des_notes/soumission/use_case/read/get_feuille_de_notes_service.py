@@ -23,14 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_attribution_enseignant import \
+    IAttributionEnseignantTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_inscription_examen import IInscriptionExamenTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodage_notes import \
+    IPeriodeEncodageNotesTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_etudiant import \
+    ISignaletiqueEtudiantTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_personne import \
+    ISignaletiquePersonneTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import FeuilleDeNotesDTO
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.feuille_de_notes_par_unite_enseignement import \
     FeuilleDeNotesParUniteEnseignement
-from ddd.logic.encodage_des_notes.shared_kernel.domain.service import IAttributionEnseignantTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.domain.service import IInscriptionExamenTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.domain.service import IPeriodeEncodageNotesTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.domain.service import ISignaletiqueEtudiantTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_personne import ISignaletiquePersonneTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_unite_enseignement import IUniteEnseignementTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.periode_encodage_ouverte import PeriodeEncodageOuverte
 from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand
