@@ -41,6 +41,7 @@ class CohorteGestionnaireDTO(interface.DTO):
 class ProprietesGestionnaireCohorteDTO(interface.DTO):
     est_principal = attr.ib(type=bool)
     nom_cohorte = attr.ib(type=str)
+    nom_cohorte_affiche = attr.ib(type=str)
 
 
 @attr.s(frozen=True, slots=True)

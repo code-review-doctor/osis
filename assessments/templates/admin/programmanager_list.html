@@ -45,7 +45,7 @@
         {% for offer in object_list %}
             <tr class="collapse {{ person|slugify }}" data-person="{{ person|slugify }}">
                 <td></td>
-                <td>&emsp;{{ offer.nom_cohorte }}</td>
+                <td>&emsp;{{ offer.nom_cohorte_affiche }}</td>
                 <td>
                     <input type="checkbox" class="{{ person|slugify }}_checkbox"
                            name="is_main" {% if offer.est_principal %}checked{% endif %}
