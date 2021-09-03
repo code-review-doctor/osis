@@ -29,7 +29,8 @@ from django.test import TestCase
 from ddd.logic.encodage_des_notes.soumission.dtos import UniteEnseignementDTO
 from ddd.logic.learning_unit.dtos import LearningUnitSearchDTO
 from infrastructure.encodage_de_notes.shared_kernel.service.unite_enseignement import UniteEnseignementTranslator
-from infrastructure.learning_unit.repository.in_memory.learning_unit import LearningUnitRepository
+from infrastructure.learning_unit.repository.in_memory.effective_class import EffectiveClassRepository \
+    as EffectiveClassInMemoryRepository
 
 
 class UniteEnseignementTest(TestCase):
@@ -39,8 +40,7 @@ class UniteEnseignementTest(TestCase):
         cls.code_unite_enseignement = "LDROI1001"
         cls.annee = 2020
         cls.translator = UniteEnseignementTranslator()
-        cls.unite_enseignement_repo = LearningUnitRepository()
-        cls.fake_dto = LearningUnitSearchDTO(
+        cls.unite_enseignement_dto = LearningUnitSearchDTO(
             year=cls.annee,
             code=cls.code_unite_enseignement,
             full_title="A title",
@@ -48,13 +48,14 @@ class UniteEnseignementTest(TestCase):
             responsible_entity_code="OSIS",
             responsible_entity_title="OSIS Entity"
         )
+        cls.classe_dto = EffectiveClassInMemoryRepository.dtos[0]
 
     @mock.patch('infrastructure.messages_bus.search_learning_units')
     def test_get_should_return_unite_enseignement_dto(self, mock_search):
-        mock_search.return_value = [self.fake_dto]
+        mock_search.return_value = [self.unite_enseignement_dto]
         result = self.translator.get(self.code_unite_enseignement, self.annee)
 
-        expected_result = self._convert_learning_unit_search_dto_to_unit_enseignement_dto(self.fake_dto)
+        expected_result = self._convert_learning_unit_search_dto_to_unit_enseignement_dto(self.unite_enseignement_dto)
         self.assertEqual(expected_result, result)
 
     @mock.patch('infrastructure.messages_bus.search_learning_units')
@@ -67,10 +68,24 @@ class UniteEnseignementTest(TestCase):
 
     @mock.patch('infrastructure.messages_bus.search_learning_units')
     def test_search_by_codes_should_return_set_of_unite_enseignement_dto(self, mock_search):
-        mock_search.return_value = [self.fake_dto]
+        mock_search.return_value = [self.unite_enseignement_dto]
         result = self.translator.search({(self.code_unite_enseignement, self.annee)})
 
-        expected_result = {self._convert_learning_unit_search_dto_to_unit_enseignement_dto(self.fake_dto)}
+        expected_result = {self._convert_learning_unit_search_dto_to_unit_enseignement_dto(self.unite_enseignement_dto)}
+        self.assertEqual(expected_result, result)
+
+    @mock.patch('infrastructure.messages_bus.search_detail_classes_effectives')
+    def test_search_by_codes_should_return_classe_dto(self, mock_search):
+        mock_search.return_value = [self.classe_dto]
+        result = self.translator.search({(self.classe_dto.code_complet_classe, self.annee)})
+
+        expected_result = {
+            UniteEnseignementDTO(
+                annee=self.classe_dto.learning_unit_year,
+                code=self.classe_dto.code_complet_classe,
+                intitule_complet=self.classe_dto.title_fr,
+            )
+        }
         self.assertEqual(expected_result, result)
 
     def _convert_learning_unit_search_dto_to_unit_enseignement_dto(self, learning_unit_dto):

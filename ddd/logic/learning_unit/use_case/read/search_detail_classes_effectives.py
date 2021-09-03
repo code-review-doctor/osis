@@ -23,21 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
-from ddd.logic.learning_unit.commands import GetEffectiveClassCommand
-from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
+from typing import List
+
+from ddd.logic.learning_unit.commands import SearchDetailClassesEffectivesCommand
+from ddd.logic.learning_unit.dtos import EffectiveClassFromRepositoryDTO
 from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
 
 
-# FIXME :: à tester unitairement + renvoyer EffectiveClassFromRepositoryDTO au lieu de l'objet du domaine
-def get_effective_class(
-        cmd: 'GetEffectiveClassCommand',
-        effective_class_repository: 'IEffectiveClassRepository'
-) -> 'EffectiveClass':
-
-    effective_class_identity = EffectiveClassIdentityBuilder.build_from_code_and_learning_unit_identity_data(
-        class_code=cmd.class_code,
-        learning_unit_code=cmd.learning_unit_code,
-        learning_unit_year=cmd.learning_unit_year
-    )
-    return effective_class_repository.get(entity_id=effective_class_identity)
+def search_detail_classes_effectives(
+        cmd: 'SearchDetailClassesEffectivesCommand',
+        repository: 'IEffectiveClassRepository'
+) -> List['EffectiveClassFromRepositoryDTO']:
+    return repository.search_dtos(codes=cmd.codes_classes, annee=cmd.annee)
