@@ -116,53 +116,54 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
             notes_identites: List[IdentiteNoteEtudiant]
     ) -> List[DateEcheanceNoteDTO]:
         dates_echeances_dto = []
-        with connection.cursor() as cursor:
-            raw_query = '''
-                SELECT 
-                    CONCAT(base_learningunityear.acronym, learning_unit_learningclassyear.acronym) AS code_unite_enseignement, 
-                    base_academicyear.year AS annee_academique, 
-                    base_sessionexam.number_session AS numero_session, 
-                    base_student.registration_id AS noma,
-                    CASE
-                        WHEN score_final IS NOT NULL THEN true
-                        WHEN justification_final IS NOT NULL THEN true
-                        ELSE false
-                    END note_soumise,
-                    (
-                        SELECT CASE
-                                WHEN deadline_tutor IS NULL THEN deadline
-                                ELSE deadline - deadline_tutor
-                            END echeance
-                        FROM base_sessionexamdeadline
-                        WHERE base_sessionexamdeadline.number_session = base_sessionexam.number_session 
-                              and base_sessionexamdeadline.offer_enrollment_id = base_learningunitenrollment.offer_enrollment_id
-                        LIMIT 1
-                    ) AS echeance
-                FROM base_examenrollment
-                JOIN base_learningunitenrollment on base_learningunitenrollment.id = base_examenrollment.learning_unit_enrollment_id
-                JOIN base_learningunityear on base_learningunityear.id = base_learningunitenrollment.learning_unit_year_id
-                LEFT JOIN learning_unit_learningclassyear on learning_unit_learningclassyear.id = base_learningunitenrollment.learning_class_year_id
-                JOIN base_academicyear on base_academicyear.id = base_learningunityear.academic_year_id
-                JOIN base_sessionexam on base_sessionexam.id = base_examenrollment.session_exam_id       
-                JOIN base_offerenrollment on base_offerenrollment.id = base_learningunitenrollment.offer_enrollment_id
-                JOIN base_student on base_student.id = base_offerenrollment.student_id                 
-                WHERE {where_clause}
-                ORDER BY code_unite_enseignement, annee_academique, echeance
-            '''.format(where_clause=_build_filter_dates_echeances(notes_identites))
-            cursor.execute(raw_query)
-            for row in cursor.fetchall():
-                dates_echeances_dto.append(
-                    DateEcheanceNoteDTO(
-                        code_unite_enseignement=row[0],
-                        annee_unite_enseignement=row[1],
-                        numero_session=row[2],
-                        noma=row[3],
-                        note_soumise=row[4],
-                        jour=row[5].day,
-                        mois=row[5].month,
-                        annee=row[5].year,
+        if notes_identites:
+            with connection.cursor() as cursor:
+                raw_query = '''
+                    SELECT 
+                        CONCAT(base_learningunityear.acronym, learning_unit_learningclassyear.acronym) AS code_unite_enseignement, 
+                        base_academicyear.year AS annee_academique, 
+                        base_sessionexam.number_session AS numero_session, 
+                        base_student.registration_id AS noma,
+                        CASE
+                            WHEN score_final IS NOT NULL THEN true
+                            WHEN justification_final IS NOT NULL THEN true
+                            ELSE false
+                        END note_soumise,
+                        (
+                            SELECT CASE
+                                    WHEN deadline_tutor IS NULL THEN deadline
+                                    ELSE deadline - deadline_tutor
+                                END echeance
+                            FROM base_sessionexamdeadline
+                            WHERE base_sessionexamdeadline.number_session = base_sessionexam.number_session 
+                                  and base_sessionexamdeadline.offer_enrollment_id = base_learningunitenrollment.offer_enrollment_id
+                            LIMIT 1
+                        ) AS echeance
+                    FROM base_examenrollment
+                    JOIN base_learningunitenrollment on base_learningunitenrollment.id = base_examenrollment.learning_unit_enrollment_id
+                    JOIN base_learningunityear on base_learningunityear.id = base_learningunitenrollment.learning_unit_year_id
+                    LEFT JOIN learning_unit_learningclassyear on learning_unit_learningclassyear.id = base_learningunitenrollment.learning_class_year_id
+                    JOIN base_academicyear on base_academicyear.id = base_learningunityear.academic_year_id
+                    JOIN base_sessionexam on base_sessionexam.id = base_examenrollment.session_exam_id       
+                    JOIN base_offerenrollment on base_offerenrollment.id = base_learningunitenrollment.offer_enrollment_id
+                    JOIN base_student on base_student.id = base_offerenrollment.student_id                 
+                    WHERE {where_clause}
+                    ORDER BY code_unite_enseignement, annee_academique, echeance
+                '''.format(where_clause=_build_filter_dates_echeances(notes_identites))
+                cursor.execute(raw_query)
+                for row in cursor.fetchall():
+                    dates_echeances_dto.append(
+                        DateEcheanceNoteDTO(
+                            code_unite_enseignement=row[0],
+                            annee_unite_enseignement=row[1],
+                            numero_session=row[2],
+                            noma=row[3],
+                            note_soumise=row[4],
+                            jour=row[5].day,
+                            mois=row[5].month,
+                            annee=row[5].year,
+                        )
                     )
-                )
         return dates_echeances_dto
 
     @classmethod
