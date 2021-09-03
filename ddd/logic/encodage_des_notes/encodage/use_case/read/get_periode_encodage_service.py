@@ -25,7 +25,7 @@
 ##############################################################################
 from ddd.logic.encodage_des_notes.encodage.commands import GetPeriodeEncodageCommand
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import PeriodeEncodageNotesDTO
-from ddd.logic.encodage_des_notes.shared_kernel.service.i_periode_encodage_notes import IPeriodeEncodageNotesTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service import IPeriodeEncodageNotesTranslator
 
 
 def get_periode_encodage(

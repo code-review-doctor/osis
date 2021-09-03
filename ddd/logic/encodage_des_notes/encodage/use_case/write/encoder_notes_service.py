@@ -23,18 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from collections import OrderedDict
-from typing import List, Tuple, Dict
+from typing import List
 
 from ddd.logic.encodage_des_notes.encodage.builder.gestionnaire_parcours_builder import GestionnaireParcoursBuilder
-from ddd.logic.encodage_des_notes.encodage.builder.identite_note_etudiant_builder import NoteEtudiantIdentityBuilder
 from ddd.logic.encodage_des_notes.encodage.commands import EncoderNotesCommand
 from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import IdentiteNoteEtudiant
 from ddd.logic.encodage_des_notes.encodage.domain.service.encoder_notes_en_lot import EncoderNotesEnLot
 from ddd.logic.encodage_des_notes.encodage.domain.service.i_cohortes_du_gestionnaire import ICohortesDuGestionnaire
 from ddd.logic.encodage_des_notes.encodage.repository.note_etudiant import INoteEtudiantRepository
-from ddd.logic.encodage_des_notes.shared_kernel.service.i_periode_encodage_notes import IPeriodeEncodageNotesTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.service.periode_encodage_ouverte import PeriodeEncodageOuverte
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service import IPeriodeEncodageNotesTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.periode_encodage_ouverte import PeriodeEncodageOuverte
 
 NouvelleNote = str
 EmailEtudiant = str

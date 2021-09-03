@@ -23,11 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.encodage_des_notes.shared_kernel.service.i_attribution_enseignant import \
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service import \
     IAttributionEnseignantTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.service.i_periode_encodage_notes import \
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service import \
     IPeriodeEncodageNotesTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.service.periode_encodage_ouverte import \
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.periode_encodage_ouverte import \
     PeriodeEncodageOuverte
 from ddd.logic.encodage_des_notes.soumission.builder.note_etudiant_identity_builder import NoteEtudiantIdentityBuilder
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderNoteCommand

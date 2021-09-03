@@ -29,9 +29,9 @@ from typing import List, Dict, Set, Tuple, Optional
 
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import PeriodeEncodageNotesDTO, DateEcheanceDTO, \
     ProgressionEncodageNotesUniteEnseignementDTO, ProgressionGeneraleEncodageNotesDTO, EnseignantDTO
-from ddd.logic.encodage_des_notes.shared_kernel.service.i_signaletique_etudiant import \
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_etudiant import \
     ISignaletiqueEtudiantTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.service.i_unite_enseignement import IUniteEnseignementTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_unite_enseignement import IUniteEnseignementTranslator
 from ddd.logic.encodage_des_notes.soumission.domain.model._unite_enseignement_identite import \
     UniteEnseignementIdentite, UniteEnseignementIdentiteBuilder
 from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import IdentiteNoteEtudiant

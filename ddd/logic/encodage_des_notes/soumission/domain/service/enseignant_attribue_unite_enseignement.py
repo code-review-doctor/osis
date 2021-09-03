@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.encodage_des_notes.shared_kernel.service.i_attribution_enseignant import IAttributionEnseignantTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service import IAttributionEnseignantTranslator
 from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import \
     EnseignantNonAttribueUniteEnseignementException
 from osis_common.ddd import interface

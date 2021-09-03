@@ -30,7 +30,7 @@ from ddd.logic.encodage_des_notes.soumission.commands import AssignerResponsable
 from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import IdentiteResponsableDeNotes
 from ddd.logic.encodage_des_notes.soumission.domain.service.enseignant_attribue_unite_enseignement import \
     EnseignantAttribueUniteEnseignement
-from ddd.logic.encodage_des_notes.shared_kernel.service.i_attribution_enseignant import \
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service import \
     IAttributionEnseignantTranslator
 from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
 

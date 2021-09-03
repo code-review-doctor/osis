@@ -23,29 +23,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
+import abc
+from typing import Set, List
 
-from ddd.logic.encodage_des_notes.shared_kernel.service.i_periode_encodage_notes import \
-    IPeriodeEncodageNotesTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.validator.exceptions import PeriodeEncodageNotesFermeeException
+from ddd.logic.encodage_des_notes.soumission.dtos import SignaletiqueEtudiantDTO
 from osis_common.ddd import interface
 
 
-class PeriodeEncodageOuverte(interface.DomainService):
+class ISignaletiqueEtudiantTranslator(interface.DomainService):
 
     @classmethod
-    def verifier(
+    @abc.abstractmethod
+    def search(
             cls,
-            periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator'
-    ) -> None:
-        periode = periode_soumission_note_translator.get()
-        if not periode:
-            raise PeriodeEncodageNotesFermeeException()
-
-        aujourdhui = datetime.date.today()
-        debut_periode = periode.debut_periode_soumission.to_date()
-        fin_periode = periode.fin_periode_soumission.to_date()
-        periode_est_ouverte = debut_periode <= aujourdhui <= fin_periode
-
-        if not periode_est_ouverte:
-            raise PeriodeEncodageNotesFermeeException()
+            nomas: List[str],
+            nom: str = None,
+            prenom: str = None,
+    ) -> Set['SignaletiqueEtudiantDTO']:
+        raise NotImplementedError

@@ -24,15 +24,15 @@
 #
 ##############################################################################
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import FeuilleDeNotesDTO
-from ddd.logic.encodage_des_notes.shared_kernel.service.feuille_de_notes_par_unite_enseignement import \
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.feuille_de_notes_par_unite_enseignement import \
     FeuilleDeNotesParUniteEnseignement
-from ddd.logic.encodage_des_notes.shared_kernel.service.i_attribution_enseignant import IAttributionEnseignantTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.service.i_inscription_examen import IInscriptionExamenTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.service.i_periode_encodage_notes import IPeriodeEncodageNotesTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.service.i_signaletique_etudiant import ISignaletiqueEtudiantTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.service.i_signaletique_personne import ISignaletiquePersonneTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.service.i_unite_enseignement import IUniteEnseignementTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.service.periode_encodage_ouverte import PeriodeEncodageOuverte
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service import IAttributionEnseignantTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service import IInscriptionExamenTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service import IPeriodeEncodageNotesTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service import ISignaletiqueEtudiantTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_personne import ISignaletiquePersonneTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_unite_enseignement import IUniteEnseignementTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.periode_encodage_ouverte import PeriodeEncodageOuverte
 from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand
 from ddd.logic.encodage_des_notes.soumission.repository.i_note_etudiant import INoteEtudiantRepository
 from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository

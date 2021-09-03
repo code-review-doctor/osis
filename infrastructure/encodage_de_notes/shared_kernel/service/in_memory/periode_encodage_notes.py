@@ -25,7 +25,7 @@
 ##############################################################################
 import datetime
 
-from ddd.logic.encodage_des_notes.shared_kernel.service.i_periode_encodage_notes import \
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service import \
     IPeriodeEncodageNotesTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO, PeriodeEncodageNotesDTO
 

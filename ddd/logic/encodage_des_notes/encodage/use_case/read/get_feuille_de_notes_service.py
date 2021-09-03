@@ -29,15 +29,15 @@ from ddd.logic.encodage_des_notes.encodage.domain.service.feuille_de_notes_par_c
     FeuilleDeNotesParCohorte
 from ddd.logic.encodage_des_notes.encodage.domain.service.i_cohortes_du_gestionnaire import ICohortesDuGestionnaire
 from ddd.logic.encodage_des_notes.encodage.dtos import FeuilleDeNotesParCohorteDTO
-from ddd.logic.encodage_des_notes.shared_kernel.service.i_attribution_enseignant import \
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service import \
     IAttributionEnseignantTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.service.i_inscription_examen import IInscriptionExamenTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.service.i_periode_encodage_notes import \
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service import IInscriptionExamenTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service import \
     IPeriodeEncodageNotesTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.service.i_signaletique_etudiant import \
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service import \
     ISignaletiqueEtudiantTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.service.i_unite_enseignement import IUniteEnseignementTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.service.periode_encodage_ouverte import PeriodeEncodageOuverte
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_unite_enseignement import IUniteEnseignementTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.periode_encodage_ouverte import PeriodeEncodageOuverte
 from ddd.logic.encodage_des_notes.soumission.repository.i_note_etudiant import INoteEtudiantRepository
 from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
 

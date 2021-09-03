@@ -31,12 +31,12 @@ from ddd.logic.encodage_des_notes.encodage.domain.service.progression_generale_e
 from ddd.logic.encodage_des_notes.encodage.repository.note_etudiant import INoteEtudiantRepository
 from ddd.logic.encodage_des_notes.soumission.repository.i_note_etudiant import INoteEtudiantRepository as \
     INoteEtudiantSoumissionRepository
-from ddd.logic.encodage_des_notes.shared_kernel.service.periode_encodage_ouverte import PeriodeEncodageOuverte
-from ddd.logic.encodage_des_notes.shared_kernel.service.i_periode_encodage_notes import \
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.periode_encodage_ouverte import PeriodeEncodageOuverte
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service import \
     IPeriodeEncodageNotesTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.service.i_signaletique_etudiant import \
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service import \
     ISignaletiqueEtudiantTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.service.i_unite_enseignement import IUniteEnseignementTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_unite_enseignement import IUniteEnseignementTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import ProgressionGeneraleEncodageNotesDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
 

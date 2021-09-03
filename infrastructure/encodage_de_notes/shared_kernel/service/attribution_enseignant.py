@@ -27,7 +27,7 @@ from typing import Set
 
 from ddd.logic.effective_class_repartition.commands import SearchTutorsDistributedToClassCommand, \
     SearchAttributionsToLearningUnitCommand, SearchClassesEnseignantCommand, SearchAttributionsEnseignantCommand
-from ddd.logic.encodage_des_notes.shared_kernel.service.i_attribution_enseignant import \
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service import \
     IAttributionEnseignantTranslator
 from ddd.logic.encodage_des_notes.soumission.dtos import AttributionEnseignantDTO
 

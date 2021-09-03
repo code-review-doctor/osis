@@ -24,14 +24,14 @@
 #
 ##############################################################################
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import ProgressionGeneraleEncodageNotesDTO
-from ddd.logic.encodage_des_notes.shared_kernel.service.i_attribution_enseignant import \
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service import \
     IAttributionEnseignantTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.service.i_periode_encodage_notes import \
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service import \
     IPeriodeEncodageNotesTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.service.i_signaletique_etudiant import \
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service import \
     ISignaletiqueEtudiantTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.service.i_unite_enseignement import IUniteEnseignementTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.service.periode_encodage_ouverte import PeriodeEncodageOuverte
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_unite_enseignement import IUniteEnseignementTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.periode_encodage_ouverte import PeriodeEncodageOuverte
 from ddd.logic.encodage_des_notes.soumission.commands import GetProgressionGeneraleCommand
 from ddd.logic.encodage_des_notes.soumission.domain.service.progression_generale_encodage import \
     ProgressionGeneraleEncodage
