@@ -111,7 +111,8 @@ class LearningUnitRepository(ILearningUnitRepository):
         )
         result = []
         for data_dict in qs:
-            result.append(LearningUnitSearchDTO(**data_dict))
+            if code_annee_values is None or (data_dict['code'], data_dict['year'],) in code_annee_values:
+                result.append(LearningUnitSearchDTO(**data_dict))
         return result
 
     @classmethod
