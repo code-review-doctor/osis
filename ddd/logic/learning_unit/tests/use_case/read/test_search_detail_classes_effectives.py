@@ -23,21 +23,33 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
-from ddd.logic.learning_unit.commands import GetEffectiveClassCommand
-from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
-from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
+from unittest import mock
+
+from django.test import SimpleTestCase
+
+from ddd.logic.learning_unit.commands import SearchDetailClassesEffectivesCommand
+from infrastructure.learning_unit.repository.in_memory.effective_class import EffectiveClassRepository
+from infrastructure.messages_bus import message_bus_instance
 
 
-# FIXME :: à tester unitairement + renvoyer EffectiveClassFromRepositoryDTO au lieu de l'objet du domaine
-def get_effective_class(
-        cmd: 'GetEffectiveClassCommand',
-        effective_class_repository: 'IEffectiveClassRepository'
-) -> 'EffectiveClass':
+class SearchDetailClassesEffectivesTest(SimpleTestCase):
 
-    effective_class_identity = EffectiveClassIdentityBuilder.build_from_code_and_learning_unit_identity_data(
-        class_code=cmd.class_code,
-        learning_unit_code=cmd.learning_unit_code,
-        learning_unit_year=cmd.learning_unit_year
-    )
-    return effective_class_repository.get(entity_id=effective_class_identity)
+    def setUp(self) -> None:
+        self.annee = 2020
+        self.code_unite_enseignement = 'LDROI1001'
+        self.lettre_classe = 'A'
+        self.repository = EffectiveClassRepository()
+        self.cmd = SearchDetailClassesEffectivesCommand(
+            codes_classes={self.code_unite_enseignement + self.lettre_classe},
+            annee=self.annee,
+        )
+
+    @mock.patch('infrastructure.messages_bus.EffectiveClassRepository.search_dtos')
+    def test_should_tester_via_repository(self, mock_search_dtos):
+        """
+        Pas de unit test sur le use case car appel direct au repository, sans logique métier.
+        Tous les tests sont donc implémentés sur le repository.
+        """
+        mock_search_dtos.return_value = []
+        message_bus_instance.invoke(self.cmd)
+        self.assertTrue(mock_search_dtos.called)

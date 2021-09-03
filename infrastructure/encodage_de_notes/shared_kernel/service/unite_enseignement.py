@@ -27,7 +27,7 @@ from typing import Set, Tuple
 
 from ddd.logic.encodage_des_notes.shared_kernel.service.i_unite_enseignement import IUniteEnseignementTranslator
 from ddd.logic.encodage_des_notes.soumission.dtos import UniteEnseignementDTO
-from ddd.logic.learning_unit.commands import LearningUnitSearchCommand
+from ddd.logic.learning_unit.commands import LearningUnitSearchCommand, SearchDetailClassesEffectivesCommand
 
 
 class UniteEnseignementTranslator(IUniteEnseignementTranslator):
@@ -48,11 +48,37 @@ class UniteEnseignementTranslator(IUniteEnseignementTranslator):
             code_annee_values: Set[Tuple[str, int]],
     ) -> Set['UniteEnseignementDTO']:
         from infrastructure.messages_bus import message_bus_instance
-        results = message_bus_instance.invoke(LearningUnitSearchCommand(code_annee_values=code_annee_values))
-        return {
-            UniteEnseignementDTO(
-                annee=dto.year,
-                code=dto.code,
-                intitule_complet=dto.full_title,
-            ) for dto in results
-        }
+        result = set()
+        result |= _search_unites_enseignement(code_annee_values, message_bus_instance)
+        result |= _search_classes_effectives(code_annee_values, message_bus_instance)
+        return result
+
+
+def _search_classes_effectives(code_annee_values, message_bus_instance):
+    codes = {code for code, _ in code_annee_values}
+    annees = {annee for _, annee in code_annee_values}
+    classes = list()
+    for annee in annees:
+        classes += message_bus_instance.invoke(
+            SearchDetailClassesEffectivesCommand(codes_classes=codes, annee=annee),
+        )
+    return {
+        UniteEnseignementDTO(
+            annee=dto.learning_unit_year,
+            code=dto.code_complet_classe,
+            intitule_complet=dto.title_fr,
+        ) for dto in classes
+    }
+
+
+def _search_unites_enseignement(code_annee_values, message_bus_instance):
+    unites_enseignement = message_bus_instance.invoke(
+        LearningUnitSearchCommand(code_annee_values=code_annee_values)
+    )
+    return {
+        UniteEnseignementDTO(
+            annee=dto.year,
+            code=dto.code,
+            intitule_complet=dto.full_title,
+        ) for dto in unites_enseignement
+    }

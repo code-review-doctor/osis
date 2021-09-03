@@ -23,13 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Optional, List
+from typing import Optional, List, Set
 
 from django.db.models import F, QuerySet
 
 from base.models.campus import Campus
 from base.models.enums import learning_component_year_type
-from base.models.enums.learning_unit_year_session import DerogationSession
 from base.models.learning_component_year import LearningComponentYear as LearningComponentYearDb
 from ddd.logic.learning_unit.builder.effective_class_builder import EffectiveClassBuilder
 from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
@@ -110,6 +109,32 @@ class EffectiveClassRepository(IEffectiveClassRepository):
             )
             for learning_class in all_classes
         ]
+
+    @classmethod
+    def search_dtos(cls, codes: Set[str], annee: int) -> List['EffectiveClassFromRepositoryDTO']:
+        codes_unites_enseignement = {code[:-1] for code in codes}
+        lettres_classes = {code[-1] for code in codes}
+        qs = _get_common_queryset().filter(
+            # Préfiltre sur année pour performances
+            learning_component_year__learning_unit_year__academic_year__year=annee,
+        ).filter(
+            learning_component_year__learning_unit_year__acronym__in=codes_unites_enseignement,
+            acronym__in=lettres_classes,
+        )
+        qs = _annotate_queryset(qs)
+        qs = _values_queryset(qs)
+
+        result = list()
+        for values in qs:
+            if values['class_code'] in lettres_classes and values['learning_unit_code'] in codes_unites_enseignement:
+                result.append(EffectiveClassFromRepositoryDTO(**values))
+        return result
+
+    @classmethod
+    def get_dto(cls, code: str, annee: int) -> 'EffectiveClassFromRepositoryDTO':
+        result = cls.search_dtos({code}, annee)
+        if result:
+            return result[0]
 
 
 def _get_learning_component_year_id_from_entity(entity: 'EffectiveClass') -> int:

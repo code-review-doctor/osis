@@ -25,11 +25,6 @@
 ##############################################################################
 from typing import Dict, Callable, List
 
-from ddd.logic.encodage_des_notes.encodage.use_case.read.get_periode_encodage_service import get_periode_encodage
-from ddd.logic.encodage_des_notes.encodage.use_case.read.get_progression_generale_encodage_service import \
-    get_progression_generale_gestionnaire
-from ddd.logic.encodage_des_notes.encodage.use_case.read.rechercher_notes_service import rechercher_notes
-
 from ddd.logic.application.commands import ApplyOnVacantCourseCommand, UpdateApplicationCommand, \
     DeleteApplicationCommand, SearchApplicationByApplicantCommand, SearchVacantCoursesCommand, \
     RenewMultipleAttributionsCommand, GetAttributionsAboutToExpireCommand, SendApplicationsSummaryCommand, \
@@ -69,6 +64,10 @@ from ddd.logic.encodage_des_notes.encodage.commands import GetFeuilleDeNotesGest
 from ddd.logic.encodage_des_notes.encodage.use_case.read.get_cohortes_gestionnaire import get_cohortes_gestionnaire
 from ddd.logic.encodage_des_notes.encodage.use_case.read.get_feuille_de_notes_service import \
     get_feuille_de_notes_gestionnaire
+from ddd.logic.encodage_des_notes.encodage.use_case.read.get_periode_encodage_service import get_periode_encodage
+from ddd.logic.encodage_des_notes.encodage.use_case.read.get_progression_generale_encodage_service import \
+    get_progression_generale_gestionnaire
+from ddd.logic.encodage_des_notes.encodage.use_case.read.rechercher_notes_service import rechercher_notes
 from ddd.logic.encodage_des_notes.encodage.use_case.write.encoder_notes_service import encoder_notes
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderNoteCommand, SoumettreNoteCommand
 from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand, GetProgressionGeneraleCommand, \
@@ -89,12 +88,13 @@ from ddd.logic.encodage_des_notes.soumission.use_case.write.soumettre_note_etudi
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, GetLearningUnitCommand, \
     CreateEffectiveClassCommand, CanCreateEffectiveClassCommand, GetEffectiveClassCommand, \
     UpdateEffectiveClassCommand, DeleteEffectiveClassCommand, CanDeleteEffectiveClassCommand, \
-    GetEffectiveClassWarningsCommand, LearningUnitSearchCommand
+    GetEffectiveClassWarningsCommand, LearningUnitSearchCommand, SearchDetailClassesEffectivesCommand
 from ddd.logic.learning_unit.use_case.read.check_can_create_class_service import check_can_create_effective_class
 from ddd.logic.learning_unit.use_case.read.check_can_delete_class_service import check_can_delete_effective_class
 from ddd.logic.learning_unit.use_case.read.get_effective_class_service import get_effective_class
 from ddd.logic.learning_unit.use_case.read.get_effective_class_warnings_service import get_effective_class_warnings
 from ddd.logic.learning_unit.use_case.read.get_learning_unit_service import get_learning_unit
+from ddd.logic.learning_unit.use_case.read.search_detail_classes_effectives import search_detail_classes_effectives
 from ddd.logic.learning_unit.use_case.read.search_learning_units_service import search_learning_units
 from ddd.logic.learning_unit.use_case.write.create_effective_class_service import create_effective_class
 from ddd.logic.learning_unit.use_case.write.create_learning_unit_service import create_learning_unit
@@ -248,6 +248,10 @@ class MessageBus:
         DistributeClassToTutorCommand: lambda cmd: distribute_class_to_tutor(
             cmd,
             TutorRepository(),
+            EffectiveClassRepository(),
+        ),
+        SearchDetailClassesEffectivesCommand: lambda cmd: search_detail_classes_effectives(
+            cmd,
             EffectiveClassRepository(),
         ),
         UnassignTutorClassCommand: lambda cmd: unassign_tutor_class(cmd, TutorRepository()),
