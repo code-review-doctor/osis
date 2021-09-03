@@ -43,13 +43,14 @@ class ScoreEncodingProgressOverviewProgramManagerView(ScoreEncodingProgressOverv
             **super().get_context_data(**kwargs),
             'progression_generale': self.progression_generale,
             'periode_encodage': self.periode_encodage,
-            'search_form': self.get_search_form(),
+            'search_form': self.get_search_form,
             'score_search_url': self.get_score_search_url(),
             'last_synchronization': self.get_last_synchronization(),
             'learning_unit_count': self.get_learning_unit_count(),
             'cohorte_count': self.get_cohorte_count()
         }
 
+    @cached_property
     def get_search_form(self):
         return ScoreEncodingProgressFilterForm(
             matricule_fgs_gestionnaire=self.person.global_id,
@@ -63,7 +64,7 @@ class ScoreEncodingProgressOverviewProgramManagerView(ScoreEncodingProgressOverv
 
     @cached_property
     def progression_generale(self):
-        search_form = self.get_search_form()
+        search_form = self.get_search_form
         if search_form.is_bound:
             cmd_kwargs = {'matricule_fgs_gestionnaire': self.person.global_id}
             if search_form.is_valid():
@@ -84,7 +85,7 @@ class ScoreEncodingProgressOverviewProgramManagerView(ScoreEncodingProgressOverv
         return len(self.progression_generale.progression_generale) if self.progression_generale else None
 
     def get_cohorte_count(self):
-        search_form = self.get_search_form()
+        search_form = self.get_search_form
         if search_form.is_valid() and search_form.cleaned_data['cohorte_name']:
             return 1
         return len(search_form.fields['cohorte_name'].choices) - 1
