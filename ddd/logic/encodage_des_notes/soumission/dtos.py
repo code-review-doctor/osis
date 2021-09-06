@@ -168,3 +168,36 @@ class DateEcheanceNoteDTO(interface.DTO):
 
     def to_date(self) -> date:
         return date(day=self.jour, month=self.mois, year=self.annee)
+
+
+@attr.s(frozen=True, slots=True)
+class AdresseFeuilleDeNotesFromRepositoryDTO(interface.DTO):
+    nom_cohorte = attr.ib(type=str)
+    entite = attr.ib(type=str)
+    destinataire = attr.ib(type=str)
+    rue_numero = attr.ib(type=str)
+    code_postal = attr.ib(type=str)
+    ville = attr.ib(type=str)
+    pays = attr.ib(type=str)
+    telephone = attr.ib(type=str)
+    fax = attr.ib(type=str)
+    email = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class AdresseFeuilleDeNotesDTO(interface.DTO):
+    nom_cohorte = attr.ib(type=str)
+    entite = attr.ib(type=str)
+    destinataire = attr.ib(type=str)
+    rue_numero = attr.ib(type=str)
+    code_postal = attr.ib(type=str)
+    ville = attr.ib(type=str)
+    pays = attr.ib(type=str)
+    telephone = attr.ib(type=str)
+    fax = attr.ib(type=str)
+    email = attr.ib(type=str)
+
+    def identique_a(self, autre_adresse: 'AdresseFeuilleDeNotesDTO') -> bool:
+        filter = attr.filters.exclude(attr.fields(AdresseFeuilleDeNotesDTO).nom_cohorte)
+        return attr.astuple(self, filter=filter, retain_collection_types=True) == \
+            attr.astuple(autre_adresse, filter=filter, retain_collection_types=True)

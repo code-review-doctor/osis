@@ -69,10 +69,17 @@ from ddd.logic.encodage_des_notes.encodage.use_case.read.get_progression_general
     get_progression_generale_gestionnaire
 from ddd.logic.encodage_des_notes.encodage.use_case.read.rechercher_notes_service import rechercher_notes
 from ddd.logic.encodage_des_notes.encodage.use_case.write.encoder_notes_service import encoder_notes
-from ddd.logic.encodage_des_notes.soumission.commands import EncoderNoteCommand, SoumettreNoteCommand
+from ddd.logic.encodage_des_notes.soumission.commands import EncoderNoteCommand, SoumettreNoteCommand, \
+    GetAdresseFeuilleDeNotesServiceCommand, GetChoixEntitesAdresseFeuilleDeNotesCommand, \
+    EncoderAdresseFeuilleDeNotesSpecifique, EncoderAdresseEntiteCommeAdresseFeuilleDeNotes, \
+    EcraserAdresseFeuilleDeNotesPremiereAnneeDeBachelier
 from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand, GetProgressionGeneraleCommand, \
     AssignerResponsableDeNotesCommand, \
     SearchAdressesFeuilleDeNotesCommand
+from ddd.logic.encodage_des_notes.soumission.use_case.read.get_addresse_feuille_de_notes_service import \
+    get_adresse_feuille_de_notes
+from ddd.logic.encodage_des_notes.soumission.use_case.read.get_choix_entites_adresse_feuille_de_notes_service import \
+    get_choix_entites_adresse_feuille_de_notes
 from ddd.logic.encodage_des_notes.soumission.use_case.read.get_feuille_de_notes_service import get_feuille_de_notes
 from ddd.logic.encodage_des_notes.soumission.use_case.read.get_progression_generale_encodage_service import \
     get_progression_generale
@@ -81,8 +88,16 @@ from ddd.logic.encodage_des_notes.soumission.use_case.read.search_donnees_admini
     search_donnees_administratives_feuille_de_notes
 from ddd.logic.encodage_des_notes.soumission.use_case.write.assigner_responsable_de_notes_service import \
     assigner_responsable_de_notes
+from ddd.logic.encodage_des_notes.soumission.use_case.write\
+    .ecraser_adresse_feuille_de_note_premiere_annee_de_bachelier_par_adresse_du_bachelier_service import \
+    ecraser_adresse_feuille_de_note_premiere_annee_de_bachelier_par_adresse_du_bachelier
 from ddd.logic.encodage_des_notes.soumission.use_case.write.encode_note_etudiant_service import \
     encoder_note_etudiant
+from ddd.logic.encodage_des_notes.soumission.use_case.write \
+    .encoder_adresse_entite_comme_adresse_feuille_de_notes_service import \
+    encoder_adresse_entite_comme_adresse_feuille_de_notes
+from ddd.logic.encodage_des_notes.soumission.use_case.write.encoder_adresse_feuille_de_notes_specifique_service import \
+    encoder_adresse_feuille_de_notes_specifique
 from ddd.logic.encodage_des_notes.soumission.use_case.write.soumettre_note_etudiant_service import \
     soumettre_note_etudiant
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, GetLearningUnitCommand, \
@@ -129,11 +144,12 @@ from infrastructure.encodage_de_notes.shared_kernel.service.periode_encodage_not
 from infrastructure.encodage_de_notes.shared_kernel.service.signaletique_etudiant import \
     SignaletiqueEtudiantTranslator
 from infrastructure.encodage_de_notes.shared_kernel.service.unite_enseignement import UniteEnseignementTranslator
-from infrastructure.encodage_de_notes.soumission.domain.service.adresse_feuille_de_notes import \
-    AdresseFeuilleDeNotesTranslator
 from infrastructure.encodage_de_notes.soumission.domain.service.deliberation import DeliberationTranslator
+from infrastructure.encodage_de_notes.soumission.domain.service.entites_cohorte import EntitesCohorteTranslator
 from infrastructure.encodage_de_notes.soumission.domain.service.signaletique_personne import \
     SignaletiquePersonneTranslator
+from infrastructure.encodage_de_notes.soumission.repository.adresse_feuille_de_notes import \
+    AdresseFeuilleDeNotesRepository
 from infrastructure.encodage_de_notes.soumission.repository.note_etudiant import NoteEtudiantRepository
 from infrastructure.encodage_de_notes.soumission.repository.responsable_de_notes import ResponsableDeNotesRepository
 from infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class import \
@@ -144,6 +160,7 @@ from infrastructure.learning_unit.repository.entity import UclEntityRepository
 from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
 from infrastructure.shared_kernel.academic_year.repository.academic_year import AcademicYearRepository
 from infrastructure.shared_kernel.campus.repository.uclouvain_campus import UclouvainCampusRepository
+from infrastructure.shared_kernel.entite.repository.entiteucl import EntiteUCLRepository
 from infrastructure.shared_kernel.language.repository.language import LanguageRepository
 from osis_common.ddd.interface import CommandRequest, ApplicationServiceResult
 from program_management.ddd.command import BulkUpdateLinkCommand, GetReportCommand
@@ -312,9 +329,9 @@ class MessageBus:
         SearchAdressesFeuilleDeNotesCommand: lambda cmd: search_donnees_administratives_feuille_de_notes(
             cmd,
             PeriodeEncodageNotesTranslator(),
-            AdresseFeuilleDeNotesTranslator(),
             InscriptionExamenTranslator(),
             DeliberationTranslator(),
+            AdresseFeuilleDeNotesRepository(),
         ),
         EncoderNotesCommand: lambda cmd: encoder_notes(
             cmd,
@@ -346,6 +363,31 @@ class MessageBus:
         GetPeriodeEncodageCommand: lambda cmd: get_periode_encodage(
             cmd,
             PeriodeEncodageNotesTranslator(),
+        ),
+        EncoderAdresseEntiteCommeAdresseFeuilleDeNotes: lambda cmd:
+            encoder_adresse_entite_comme_adresse_feuille_de_notes(
+                cmd,
+                AdresseFeuilleDeNotesRepository(),
+                EntiteUCLRepository(),
+                EntitesCohorteTranslator()
+        ),
+        EncoderAdresseFeuilleDeNotesSpecifique: lambda cmd: encoder_adresse_feuille_de_notes_specifique(
+            cmd,
+            AdresseFeuilleDeNotesRepository(),
+        ),
+        EcraserAdresseFeuilleDeNotesPremiereAnneeDeBachelier: lambda cmd:
+            ecraser_adresse_feuille_de_note_premiere_annee_de_bachelier_par_adresse_du_bachelier(
+                cmd,
+                AdresseFeuilleDeNotesRepository(),
+        ),
+        GetAdresseFeuilleDeNotesServiceCommand: lambda cmd: get_adresse_feuille_de_notes(
+            cmd,
+            AdresseFeuilleDeNotesRepository(),
+        ),
+        GetChoixEntitesAdresseFeuilleDeNotesCommand: lambda cmd: get_choix_entites_adresse_feuille_de_notes(
+            cmd,
+            EntiteUCLRepository(),
+            EntitesCohorteTranslator()
         )
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 

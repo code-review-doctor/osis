@@ -86,8 +86,9 @@ class ScoreSheetXLSSerializerTest(SimpleTestCase):
             date_deliberation=DateDTO.build_from_date(datetime.date.today() + datetime.timedelta(days=10)),
             contact_feuille_de_notes=AdresseFeuilleDeNotesDTO(
                 nom_cohorte='DROI2M',
+                entite="",
                 destinataire='Durant Thomas',
-                rue_et_numero='Chemin de lasne',
+                rue_numero='Chemin de lasne',
                 code_postal=1200,
                 ville="Bruxelles",
                 pays="Belgique",

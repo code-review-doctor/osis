@@ -1,4 +1,3 @@
-##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -15,7 +14,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,19 +22,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import abc
-from typing import Set
+from typing import Set, List
 
-from ddd.logic.encodage_des_notes.soumission.dtos import AdresseFeuilleDeNotesDTO
-from osis_common.ddd import interface
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_entites_cohorte import IEntitesCohorteTranslator
+from ddd.logic.shared_kernel.entite.domain.model.entiteucl import IdentiteUCLEntite
 
 
-class IAdresseFeuilleDeNotesTranslator(interface.DomainService):
+class EntitesCohorteTranslatorInMemory(IEntitesCohorteTranslator):
+    datas = []
 
     @classmethod
-    @abc.abstractmethod
-    def search(
-            cls,
-            noms_cohortes: Set[str]
-    ) -> Set['AdresseFeuilleDeNotesDTO']:
-        raise NotImplementedError
+    def search_entite_administration_et_gestion(cls, nom_cohorte: str) -> List['IdentiteUCLEntite']:
+        return cls.datas

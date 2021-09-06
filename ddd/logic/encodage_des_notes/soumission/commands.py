@@ -78,3 +78,38 @@ class GetFeuilleDeNotesCommand(interface.CommandRequest):
 @attr.s(frozen=True, slots=True)
 class SearchAdressesFeuilleDeNotesCommand(interface.CommandRequest):
     codes_unite_enseignement = attr.ib(type=List[str])
+
+
+@attr.s(frozen=True, slots=True)
+class EncoderAdresseEntiteCommeAdresseFeuilleDeNotes(interface.CommandRequest):
+    nom_cohorte = attr.ib(type=str)
+    email = attr.ib(type=str)
+    entite = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class EncoderAdresseFeuilleDeNotesSpecifique(interface.CommandRequest):
+    nom_cohorte = attr.ib(type=str)
+    email = attr.ib(type=str)
+    destinataire = attr.ib(type=str)
+    rue_numero = attr.ib(type=str)
+    code_postal = attr.ib(type=str)
+    ville = attr.ib(type=str)
+    pays = attr.ib(type=str)
+    telephone = attr.ib(type=str)
+    fax = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class EcraserAdresseFeuilleDeNotesPremiereAnneeDeBachelier(interface.CommandRequest):
+    nom_cohorte = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class GetAdresseFeuilleDeNotesServiceCommand(interface.CommandRequest):
+    nom_cohorte = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class GetChoixEntitesAdresseFeuilleDeNotesCommand(interface.CommandRequest):
+    nom_cohorte = attr.ib(type=str)

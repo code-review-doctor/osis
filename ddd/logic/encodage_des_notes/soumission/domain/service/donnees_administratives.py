@@ -24,15 +24,17 @@
 #
 ##############################################################################
 import itertools
-from typing import List
+from typing import List, Set
 
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_inscription_examen import IInscriptionExamenTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodage_notes import \
     IPeriodeEncodageNotesTranslator
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_contact_feuille_de_notes import \
-    IAdresseFeuilleDeNotesTranslator
+from ddd.logic.encodage_des_notes.soumission.builder.adresse_feuille_de_notes_identity_builder import \
+    AdresseFeuilleDeNotesIdentityBuilder
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_deliberation import IDeliberationTranslator
 from ddd.logic.encodage_des_notes.soumission.dtos import DonneesAdministrativesFeuilleDeNotesDTO
+from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_notes import \
+    IAdresseFeuilleDeNotesRepository
 from osis_common.ddd import interface
 
 
@@ -43,9 +45,9 @@ class DonneesAdministratives(interface.DomainService):
             cls,
             codes_unites_enseignement: List['str'],
             periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
-            contact_feuille_notes_translator: 'IAdresseFeuilleDeNotesTranslator',
             inscr_exam_translator: 'IInscriptionExamenTranslator',
             deliberation_translator: 'IDeliberationTranslator',
+            adresse_feuille_de_notes_repository: 'IAdresseFeuilleDeNotesRepository',
     ) -> List['DonneesAdministrativesFeuilleDeNotesDTO']:
         periode_soumission_ouverte = periode_soumission_note_translator.get()
 
@@ -62,7 +64,10 @@ class DonneesAdministratives(interface.DomainService):
             periode_soumission_ouverte,
         )
 
-        adresse_par_cohorte = _get_adresse_par_cohorte(contact_feuille_notes_translator, noms_cohortes)
+        adresse_par_cohorte = _get_adresse_par_cohorte(
+            adresse_feuille_de_notes_repository,
+            noms_cohortes
+        )
 
         result = []
         for code in codes_unites_enseignement:
@@ -89,8 +94,13 @@ def _get_responsable_de_notes(code, periode_soumission_ouverte, responsables_de_
     return matric_fgs_responsable
 
 
-def _get_adresse_par_cohorte(contact_feuille_notes_translator, noms_cohortes):
-    adresses_feuilles_de_notes = contact_feuille_notes_translator.search(noms_cohortes)
+def _get_adresse_par_cohorte(
+        adresse_feuille_de_notes_repository: 'IAdresseFeuilleDeNotesRepository',
+        noms_cohortes: Set['str']
+):
+    identity_builder = AdresseFeuilleDeNotesIdentityBuilder()
+    identites_adresse = [identity_builder.build_from_nom_cohorte(nom_cohorte) for nom_cohorte in noms_cohortes]
+    adresses_feuilles_de_notes = adresse_feuille_de_notes_repository.search_dtos(identites_adresse)
     return {adresse.nom_cohorte: adresse for adresse in adresses_feuilles_de_notes}
 
 

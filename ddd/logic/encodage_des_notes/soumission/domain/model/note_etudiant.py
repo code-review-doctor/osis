@@ -78,7 +78,7 @@ class NoteEtudiant(interface.Entity):
 
     @property
     def is_manquant(self) -> bool:
-        return not bool(self.note.value)
+        return self.note.is_manquant
 
     @property
     def is_justification(self) -> bool:

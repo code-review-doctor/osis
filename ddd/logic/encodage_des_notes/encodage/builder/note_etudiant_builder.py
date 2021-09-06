@@ -44,7 +44,7 @@ class NoteEtudiantBuilder(interface.RootEntityBuilder):
         return NoteEtudiant(
             entity_id=NoteEtudiantIdentityBuilder().build_from_repository_dto(dto_object),
             email=dto_object.email,
-            note=dto_object.note,
+            note=NoteBuilder.build(dto_object.note),
             echeance_gestionnaire=dto_object.echeance_gestionnaire,
             nom_cohorte=dto_object.nom_cohorte,
             note_decimale_autorisee=dto_object.note_decimale_autorisee

@@ -22,3 +22,28 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import attr
+
+from osis_common.ddd import interface
+
+
+@attr.s(frozen=True, slots=True)
+class EntiteRepositoryDTO(interface.DTO):
+    sigle = attr.ib(type=str)
+    parent_sigle = attr.ib(type=str)
+    intitule = attr.ib(type=str)
+    type = attr.ib(type=str)
+    rue_numero = attr.ib(type=str)
+    code_postal = attr.ib(type=str)
+    ville = attr.ib(type=str)
+    pays = attr.ib(type=str)
+    telephone = attr.ib(type=str)
+    fax = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class EntiteDTO(interface.DTO):
+    sigle = attr.ib(type=str)
+    intitule = attr.ib(type=str)
+    sigle_parent = attr.ib(type=str)
+    type = attr.ib(type=str)
