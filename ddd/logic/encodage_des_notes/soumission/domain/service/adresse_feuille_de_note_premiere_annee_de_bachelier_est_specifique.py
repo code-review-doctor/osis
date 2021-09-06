@@ -24,7 +24,7 @@
 ##############################################################################
 from ddd.logic.encodage_des_notes.soumission.builder.adresse_feuille_de_notes_identity_builder import \
     AdresseFeuilleDeNotesIdentityBuilder
-from ddd.logic.encodage_des_notes.soumission.commands import EncoderAdresseFeuilleDeNotes
+from ddd.logic.encodage_des_notes.soumission.commands import EncoderAdresseEntiteCommeAdresseFeuilleDeNotes
 from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_notes import AdresseFeuilleDeNotes
 from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import \
     AdressePremiereAnneeDeBachelierIdentiqueAuBachlierException
@@ -33,11 +33,11 @@ from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_not
 from osis_common.ddd import interface
 
 
-class AdresseFeuilleDeNotesPremiereAnneeDeBachelierEstSpecifique(interface.DomainService):
+class EntiteAdresseFeuilleDeNotesPremiereAnneeDeBachelierEstDifferenteDeCelleDuBachelier(interface.DomainService):
     @classmethod
     def verifier(
             cls,
-            cmd: EncoderAdresseFeuilleDeNotes,
+            cmd: EncoderAdresseEntiteCommeAdresseFeuilleDeNotes,
             repo: IAdresseFeuilleDeNotesRepository
     ) -> None:
         if "11BA" not in cmd.nom_cohorte:
@@ -49,13 +49,13 @@ class AdresseFeuilleDeNotesPremiereAnneeDeBachelierEstSpecifique(interface.Domai
         )
         adresse_bachelier = repo.get(identite_adresse_bachelier)
 
-        if cls._is_adresse_bachelier_identique_a_la_nouvelle_adresse_du_11ba(adresse_bachelier, cmd):
+        if cls._is_entite_adresse_bachelier_identique_a_celle_de_la_premiere_annee_de_bachelier(adresse_bachelier, cmd):
             raise AdressePremiereAnneeDeBachelierIdentiqueAuBachlierException()
 
     @classmethod
-    def _is_adresse_bachelier_identique_a_la_nouvelle_adresse_du_11ba(
+    def _is_entite_adresse_bachelier_identique_a_celle_de_la_premiere_annee_de_bachelier(
             cls,
             adresse_bachelier: AdresseFeuilleDeNotes,
-            cmd: EncoderAdresseFeuilleDeNotes
+            cmd: EncoderAdresseEntiteCommeAdresseFeuilleDeNotes
     ) -> bool:
         return adresse_bachelier.sigle_entite == cmd.entite and cmd.entite

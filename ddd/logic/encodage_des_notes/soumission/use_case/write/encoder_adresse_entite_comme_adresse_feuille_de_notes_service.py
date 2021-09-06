@@ -22,13 +22,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.encodage_des_notes.soumission.builder.adresse_feuille_de_notes_builder import \
-    AdresseFeuilleDeNotesBuilder
-from ddd.logic.encodage_des_notes.soumission.commands import EncoderAdresseFeuilleDeNotes
+from ddd.logic.encodage_des_notes.soumission.commands import EncoderAdresseEntiteCommeAdresseFeuilleDeNotes
 from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_notes import IdentiteAdresseFeuilleDeNotes
 from ddd.logic.encodage_des_notes.soumission.domain.service\
     .adresse_feuille_de_note_premiere_annee_de_bachelier_est_specifique import \
-    AdresseFeuilleDeNotesPremiereAnneeDeBachelierEstSpecifique
+    EntiteAdresseFeuilleDeNotesPremiereAnneeDeBachelierEstDifferenteDeCelleDuBachelier
 from ddd.logic.encodage_des_notes.soumission.domain.service.encoder_adresse_feuille_de_notes import \
     EncoderAdresseFeuilleDeNotesDomainService
 from ddd.logic.encodage_des_notes.soumission.domain.service.entites_adresse_feuille_de_notes import \
@@ -39,13 +37,13 @@ from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_not
 from ddd.logic.shared_kernel.entite.repository.entiteucl import IEntiteUCLRepository
 
 
-def encoder_adresse_feuille_de_notes(
-        cmd: EncoderAdresseFeuilleDeNotes,
+def encoder_adresse_entite_comme_adresse_feuille_de_notes(
+        cmd: EncoderAdresseEntiteCommeAdresseFeuilleDeNotes,
         repo: IAdresseFeuilleDeNotesRepository,
         entite_repository: 'IEntiteUCLRepository',
         entites_cohorte_translator: 'IEntitesCohorteTranslator'
 ) -> 'IdentiteAdresseFeuilleDeNotes':
-    AdresseFeuilleDeNotesPremiereAnneeDeBachelierEstSpecifique().verifier(cmd, repo)
+    EntiteAdresseFeuilleDeNotesPremiereAnneeDeBachelierEstDifferenteDeCelleDuBachelier().verifier(cmd, repo)
     EntiteAdresseFeuilleDeNotes().verifier_est_valide(
         cmd.nom_cohorte,
         cmd.entite,
@@ -53,4 +51,4 @@ def encoder_adresse_feuille_de_notes(
         entites_cohorte_translator
     )
 
-    return EncoderAdresseFeuilleDeNotesDomainService().encoder(cmd, repo, entite_repository)
+    return EncoderAdresseFeuilleDeNotesDomainService().encoder_adresse_entite_comme_adresse(cmd, repo, entite_repository)

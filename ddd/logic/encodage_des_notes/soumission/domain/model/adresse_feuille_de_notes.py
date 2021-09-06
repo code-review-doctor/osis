@@ -26,7 +26,6 @@ from typing import Optional
 
 import attr
 
-from ddd.logic.encodage_des_notes.soumission.commands import EncoderAdresseFeuilleDeNotes
 from ddd.logic.shared_kernel.entite.domain.model.entiteucl import IdentiteUCLEntite
 from osis_common.ddd import interface
 

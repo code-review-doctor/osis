@@ -25,28 +25,17 @@
 ##############################################################################
 from ddd.logic.encodage_des_notes.soumission.builder.adresse_feuille_de_notes_identity_builder import \
     AdresseFeuilleDeNotesIdentityBuilder
-from ddd.logic.encodage_des_notes.soumission.commands import EncoderAdresseFeuilleDeNotes
 from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_notes import AdresseFeuilleDeNotes
 from ddd.logic.encodage_des_notes.soumission.dtos import AdresseFeuilleDeNotesDTO
 from ddd.logic.shared_kernel.entite.builder.identite_entite_builder import IdentiteEntiteBuilder
 from osis_common.ddd import interface
+from osis_common.ddd.interface import CommandRequest
 
 
 class AdresseFeuilleDeNotesBuilder(interface.RootEntityBuilder):
     @classmethod
-    def build_from_command(cls, cmd: 'EncoderAdresseFeuilleDeNotes') -> 'AdresseFeuilleDeNotes':
-        return AdresseFeuilleDeNotes(
-            entity_id=AdresseFeuilleDeNotesIdentityBuilder().build_from_command(cmd),
-            entite=IdentiteEntiteBuilder().build_from_sigle(cmd.entite) if cmd.entite else None,
-            destinataire=cmd.destinataire,
-            rue_numero=cmd.rue_numero,
-            code_postal=cmd.code_postal,
-            ville=cmd.ville,
-            pays=cmd.pays,
-            telephone=cmd.telephone,
-            fax=cmd.fax,
-            email=cmd.email
-        )
+    def build_from_command(cls, cmd: 'CommandRequest') -> 'AdresseFeuilleDeNotes':
+        pass
 
     @classmethod
     def build_from_repository_dto(cls, dto_object: 'AdresseFeuilleDeNotesDTO') -> 'AdresseFeuilleDeNotes':

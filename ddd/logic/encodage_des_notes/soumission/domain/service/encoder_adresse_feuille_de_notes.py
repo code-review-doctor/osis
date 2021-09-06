@@ -29,7 +29,8 @@ from ddd.logic.encodage_des_notes.soumission.builder.adresse_feuille_de_notes_bu
     AdresseFeuilleDeNotesBuilder
 from ddd.logic.encodage_des_notes.soumission.builder.adresse_feuille_de_notes_identity_builder import \
     AdresseFeuilleDeNotesIdentityBuilder
-from ddd.logic.encodage_des_notes.soumission.commands import EncoderAdresseFeuilleDeNotes
+from ddd.logic.encodage_des_notes.soumission.commands import EncoderAdresseFeuilleDeNotesSpecifique, \
+    EncoderAdresseEntiteCommeAdresseFeuilleDeNotes
 from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_notes import IdentiteAdresseFeuilleDeNotes
 from ddd.logic.encodage_des_notes.soumission.dtos import AdresseFeuilleDeNotesDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_notes import \
@@ -42,20 +43,9 @@ from osis_common.ddd import interface
 class EncoderAdresseFeuilleDeNotesDomainService(interface.DomainService):
 
     @classmethod
-    def encoder(
+    def encoder_adresse_entite_comme_adresse(
             cls,
-            cmd: EncoderAdresseFeuilleDeNotes,
-            repo: IAdresseFeuilleDeNotesRepository,
-            entite_repository: 'IEntiteUCLRepository',
-    ) -> 'IdentiteAdresseFeuilleDeNotes':
-        if cmd.entite:
-            return cls._encoder_adresse_basee_sur_entite(cmd, repo, entite_repository)
-        return cls._encoder_adresse_specifique(cmd, repo)
-
-    @classmethod
-    def _encoder_adresse_basee_sur_entite(
-            cls,
-            cmd: EncoderAdresseFeuilleDeNotes,
+            cmd: EncoderAdresseEntiteCommeAdresseFeuilleDeNotes,
             repo: IAdresseFeuilleDeNotesRepository,
             entite_repository: 'IEntiteUCLRepository',
     ) -> 'IdentiteAdresseFeuilleDeNotes':
@@ -78,14 +68,14 @@ class EncoderAdresseFeuilleDeNotesDomainService(interface.DomainService):
         return cls._encoder_adresse(dto, repo)
 
     @classmethod
-    def _encoder_adresse_specifique(
+    def encoder_adresse_specifique(
             cls,
-            cmd: EncoderAdresseFeuilleDeNotes,
+            cmd: EncoderAdresseFeuilleDeNotesSpecifique,
             repo: IAdresseFeuilleDeNotesRepository,
     ) -> 'IdentiteAdresseFeuilleDeNotes':
         dto = AdresseFeuilleDeNotesDTO(
             nom_cohorte=cmd.nom_cohorte,
-            entite=cmd.entite,
+            entite="",
             destinataire=cmd.destinataire,
             rue_numero=cmd.rue_numero,
             code_postal=cmd.code_postal,

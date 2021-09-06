@@ -70,7 +70,8 @@ from ddd.logic.encodage_des_notes.encodage.use_case.read.get_progression_general
 from ddd.logic.encodage_des_notes.encodage.use_case.read.rechercher_notes_service import rechercher_notes
 from ddd.logic.encodage_des_notes.encodage.use_case.write.encoder_notes_service import encoder_notes
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderNoteCommand, SoumettreNoteCommand, \
-    EncoderAdresseFeuilleDeNotes, GetAdresseFeuilleDeNotesServiceCommand, GetChoixEntitesAdresseFeuilleDeNotesCommand
+    GetAdresseFeuilleDeNotesServiceCommand, GetChoixEntitesAdresseFeuilleDeNotesCommand, \
+    EncoderAdresseFeuilleDeNotesSpecifique, EncoderAdresseEntiteCommeAdresseFeuilleDeNotes
 from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand, GetProgressionGeneraleCommand, \
     AssignerResponsableDeNotesCommand, \
     SearchAdressesFeuilleDeNotesCommand
@@ -88,8 +89,11 @@ from ddd.logic.encodage_des_notes.soumission.use_case.write.assigner_responsable
     assigner_responsable_de_notes
 from ddd.logic.encodage_des_notes.soumission.use_case.write.encode_note_etudiant_service import \
     encoder_note_etudiant
-from ddd.logic.encodage_des_notes.soumission.use_case.write.encoder_adresse_feuille_de_notes_service import \
-    encoder_adresse_feuille_de_notes
+from ddd.logic.encodage_des_notes.soumission.use_case.write \
+    .encoder_adresse_entite_comme_adresse_feuille_de_notes_service import \
+    encoder_adresse_entite_comme_adresse_feuille_de_notes
+from ddd.logic.encodage_des_notes.soumission.use_case.write.encoder_adresse_feuille_de_notes_specifique_service import \
+    encoder_adresse_feuille_de_notes_specifique
 from ddd.logic.encodage_des_notes.soumission.use_case.write.soumettre_note_etudiant_service import \
     soumettre_note_etudiant
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, GetLearningUnitCommand, \
@@ -356,11 +360,16 @@ class MessageBus:
             cmd,
             PeriodeEncodageNotesTranslator(),
         ),
-        EncoderAdresseFeuilleDeNotes: lambda cmd: encoder_adresse_feuille_de_notes(
+        EncoderAdresseEntiteCommeAdresseFeuilleDeNotes: lambda cmd:
+            encoder_adresse_entite_comme_adresse_feuille_de_notes(
+                cmd,
+                AdresseFeuilleDeNotesRepository(),
+                EntiteUCLRepository(),
+                EntitesCohorteTranslator()
+        ),
+        EncoderAdresseFeuilleDeNotesSpecifique: lambda cmd: encoder_adresse_feuille_de_notes_specifique(
             cmd,
             AdresseFeuilleDeNotesRepository(),
-            EntiteUCLRepository(),
-            EntitesCohorteTranslator()
         ),
         GetAdresseFeuilleDeNotesServiceCommand: lambda cmd: get_adresse_feuille_de_notes(
             cmd,

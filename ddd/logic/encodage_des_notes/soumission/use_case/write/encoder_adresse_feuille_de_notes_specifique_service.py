@@ -1,5 +1,3 @@
-
-##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -16,7 +14,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -24,23 +22,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from ddd.logic.encodage_des_notes.soumission.commands import EncoderAdresseFeuilleDeNotesSpecifique
 from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_notes import IdentiteAdresseFeuilleDeNotes
-from ddd.logic.encodage_des_notes.soumission.dtos import AdresseFeuilleDeNotesDTO
-from osis_common.ddd.interface import EntityIdentityBuilder, CommandRequest
+from ddd.logic.encodage_des_notes.soumission.domain.service.encoder_adresse_feuille_de_notes import \
+    EncoderAdresseFeuilleDeNotesDomainService
+from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_notes import \
+    IAdresseFeuilleDeNotesRepository
 
 
-class AdresseFeuilleDeNotesIdentityBuilder(EntityIdentityBuilder):
-    @classmethod
-    def build_from_command(cls, cmd: 'CommandRequest') -> 'IdentiteAdresseFeuilleDeNotes':
-        pass
-
-    @classmethod
-    def build_from_repository_dto(
-            cls,
-            dto_object: 'AdresseFeuilleDeNotesDTO'
-    ) -> 'IdentiteAdresseFeuilleDeNotes':
-        return IdentiteAdresseFeuilleDeNotes(nom_cohorte=dto_object.nom_cohorte)
-
-    @classmethod
-    def build_from_nom_cohorte(cls, nom_cohorte: str) -> 'IdentiteAdresseFeuilleDeNotes':
-        return IdentiteAdresseFeuilleDeNotes(nom_cohorte=nom_cohorte)
+def encoder_adresse_feuille_de_notes_specifique(
+        cmd: EncoderAdresseFeuilleDeNotesSpecifique,
+        repo: IAdresseFeuilleDeNotesRepository,
+) -> 'IdentiteAdresseFeuilleDeNotes':
+    return EncoderAdresseFeuilleDeNotesDomainService().encoder_adresse_specifique(cmd, repo)

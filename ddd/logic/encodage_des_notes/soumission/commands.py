@@ -81,17 +81,23 @@ class SearchAdressesFeuilleDeNotesCommand(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
-class EncoderAdresseFeuilleDeNotes(interface.CommandRequest):
+class EncoderAdresseEntiteCommeAdresseFeuilleDeNotes(interface.CommandRequest):
     nom_cohorte = attr.ib(type=str)
     email = attr.ib(type=str)
-    entite = attr.ib(type=str, default="")
-    destinataire = attr.ib(type=str, default="")
-    rue_numero = attr.ib(type=str, default="")
-    code_postal = attr.ib(type=str, default="")
-    ville = attr.ib(type=str, default="")
-    pays = attr.ib(type=str, default="")
-    telephone = attr.ib(type=str, default="")
-    fax = attr.ib(type=str, default="")
+    entite = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class EncoderAdresseFeuilleDeNotesSpecifique(interface.CommandRequest):
+    nom_cohorte = attr.ib(type=str)
+    email = attr.ib(type=str)
+    destinataire = attr.ib(type=str)
+    rue_numero = attr.ib(type=str)
+    code_postal = attr.ib(type=str)
+    ville = attr.ib(type=str)
+    pays = attr.ib(type=str)
+    telephone = attr.ib(type=str)
+    fax = attr.ib(type=str)
 
 
 @attr.s(frozen=True, slots=True)

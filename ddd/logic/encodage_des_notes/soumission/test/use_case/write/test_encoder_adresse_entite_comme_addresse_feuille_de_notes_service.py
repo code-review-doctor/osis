@@ -26,8 +26,7 @@ import attr
 import mock
 from django.test import SimpleTestCase
 
-from ddd.logic.encodage_des_notes.soumission.commands import EncoderAdresseFeuilleDeNotes
-from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_notes import IdentiteAdresseFeuilleDeNotes
+from ddd.logic.encodage_des_notes.soumission.commands import EncoderAdresseEntiteCommeAdresseFeuilleDeNotes
 from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import \
     AdressePremiereAnneeDeBachelierIdentiqueAuBachlierException, EntiteNonValidePourAdresseException
 from ddd.logic.encodage_des_notes.tests.factory.adresse_feuille_de_notes import \
@@ -42,18 +41,11 @@ from infrastructure.messages_bus import message_bus_instance
 from infrastructure.shared_kernel.entite.repository.in_memory.entiteucl import EntiteUCLInMemoryRepository
 
 
-class TestEncoderAddressFeuilleDeNotes(SimpleTestCase):
+class TestEncoderAddressEntiteCommeAdresseFeuilleDeNotes(SimpleTestCase):
     def setUp(self) -> None:
-        self.cmd = EncoderAdresseFeuilleDeNotes(
+        self.cmd = EncoderAdresseEntiteCommeAdresseFeuilleDeNotes(
             nom_cohorte="SINF1BA",
-            entite="",
-            destinataire="Destination",
-            rue_numero="Rue de l'Empereur",
-            code_postal="1452",
-            ville="",
-            pays="",
-            telephone="",
-            fax="",
+            entite="EPL",
             email="temp@temp.com",
         )
 
@@ -95,38 +87,27 @@ class TestEncoderAddressFeuilleDeNotes(SimpleTestCase):
         with self.assertRaises(AdressePremiereAnneeDeBachelierIdentiqueAuBachlierException):
             message_bus_instance.invoke(cmd)
 
-    def test_encode_adresse_de_la_commande(self):
-        result = message_bus_instance.invoke(self.cmd)
-
-        self.assertIsInstance(result, IdentiteAdresseFeuilleDeNotes)
-        self.assertEqual(result.nom_cohorte, self.cmd.nom_cohorte)
-        self.assertTrue(
-            self.repo.get(result)
-        )
-
-    def test_ne_peut_pas_encoder_une_entite_ne_faisant_pas_partie_des_choix_possibles(self):
+    def test_ne_peut_pas_encoder_une_entite_ne_faisant_pas_partie_de_la_cohorte(self):
         cmd = attr.evolve(self.cmd, entite="OSIS")
 
         with self.assertRaises(EntiteNonValidePourAdresseException):
             message_bus_instance.invoke(cmd)
 
-    def test_encoder_bachelier_encode_aussi_premiere_annee_de_bachelier(self):
+    def test_should_enregistrer_adresse_de_entite_when_entite_est_donnee_est_donne(self):
         result = message_bus_instance.invoke(self.cmd)
 
-        identite_11ba = attr.evolve(result, nom_cohorte=self.cmd.nom_cohorte.replace("1BA", "11BA"))
-        self.assertTrue(self.repo.get(identite_11ba))
-
-    def test_should_enregistrer_adresse_de_entite_when_entite_est_donnee_est_donne(self):
-        cmd = attr.evolve(self.cmd, entite="EPL")
-
-        result = message_bus_instance.invoke(cmd)
-
         adresse = self.repo.get(result)
-        self.assertEqual(adresse.email, cmd.email)
-        self.assertEqual(adresse.sigle_entite, cmd.entite)
+        self.assertEqual(adresse.email, self.cmd.email)
+        self.assertEqual(adresse.sigle_entite, self.cmd.entite)
         self.assertEqual(adresse.rue_numero, self.epl_entite.adresse.rue_numero)
         self.assertEqual(adresse.code_postal, self.epl_entite.adresse.code_postal)
         self.assertEqual(adresse.ville, self.epl_entite.adresse.ville)
         self.assertEqual(adresse.pays, self.epl_entite.adresse.pays)
         self.assertEqual(adresse.telephone, self.epl_entite.adresse.telephone)
         self.assertEqual(adresse.fax, self.epl_entite.adresse.fax)
+
+    def test_encoder_bachelier_encode_aussi_premiere_annee_de_bachelier(self):
+        result = message_bus_instance.invoke(self.cmd)
+
+        identite_11ba = attr.evolve(result, nom_cohorte=self.cmd.nom_cohorte.replace("1BA", "11BA"))
+        self.assertTrue(self.repo.get(identite_11ba))

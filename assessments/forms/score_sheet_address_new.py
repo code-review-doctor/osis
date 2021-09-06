@@ -27,8 +27,9 @@ from django.utils.translation import gettext_lazy
 
 from base.forms.exceptions import InvalidFormException
 from base.models.entity_version import EntityVersion
-from ddd.logic.encodage_des_notes.soumission.commands import EncoderAdresseFeuilleDeNotes, \
-    GetChoixEntitesAdresseFeuilleDeNotesCommand
+from ddd.logic.encodage_des_notes.soumission.commands import GetChoixEntitesAdresseFeuilleDeNotesCommand, \
+    EncoderAdresseFeuilleDeNotesSpecifique, \
+    EncoderAdresseEntiteCommeAdresseFeuilleDeNotes
 from ddd.logic.encodage_des_notes.soumission.dtos import AdresseFeuilleDeNotesDTO
 from infrastructure.messages_bus import message_bus_instance
 from osis_common.ddd.interface import BusinessException
@@ -93,22 +94,34 @@ class ScoreSheetAddressForm(forms.Form):
 
     def save(self):
         try:
-            cmd = EncoderAdresseFeuilleDeNotes(
-                nom_cohorte=self.nom_cohorte,
-                entite=self.cleaned_data['entity'],
-                destinataire=self.cleaned_data['recipient'],
-                rue_numero=self.cleaned_data['location'],
-                code_postal=self.cleaned_data['postal_code'],
-                ville=self.cleaned_data['city'],
-                pays=self.cleaned_data['country'].name if self.cleaned_data['country'] else '',
-                telephone=self.cleaned_data['phone'],
-                fax=self.cleaned_data['fax'],
-                email=self.cleaned_data['email']
-            )
-            return message_bus_instance.invoke(cmd)
+            if self.cleaned_data['entity']:
+                return self._encoder_adresse_entite_comme_adresse()
+            return self._encoder_adresse_entite_comme_adresse()
         except BusinessException as e:
             self.add_error("entity", e.message)
             raise InvalidFormException()
+
+    def _encoder_adresse_specifique(self):
+        cmd = EncoderAdresseFeuilleDeNotesSpecifique(
+            nom_cohorte=self.nom_cohorte,
+            destinataire=self.cleaned_data['recipient'],
+            rue_numero=self.cleaned_data['location'],
+            code_postal=self.cleaned_data['postal_code'],
+            ville=self.cleaned_data['city'],
+            pays=self.cleaned_data['country'].name if self.cleaned_data['country'] else '',
+            telephone=self.cleaned_data['phone'],
+            fax=self.cleaned_data['fax'],
+            email=self.cleaned_data['email']
+        )
+        return message_bus_instance.invoke(cmd)
+
+    def _encoder_adresse_entite_comme_adresse(self):
+        cmd = EncoderAdresseEntiteCommeAdresseFeuilleDeNotes(
+            nom_cohorte=self.nom_cohorte,
+            entite=self.cleaned_data['entity'],
+            email=self.cleaned_data['email']
+        )
+        return message_bus_instance.invoke(cmd)
 
 
 class FirstYearBachelorScoreSheetAddressForm(ScoreSheetAddressForm):
@@ -123,9 +136,19 @@ class FirstYearBachelorScoreSheetAddressForm(ScoreSheetAddressForm):
 
     def save(self):
         if not self.cleaned_data['specific_address']:
-            cmd = EncoderAdresseFeuilleDeNotes(
+            return self._ecraser_adresse_par_adresse_bachelier()
+        return super().save()
+
+    def _ecraser_adresse_par_adresse_bachelier(self):
+        if self.adresse_bachelier.entite:
+            cmd = EncoderAdresseEntiteCommeAdresseFeuilleDeNotes(
                 nom_cohorte=self.nom_cohorte,
                 entite=self.adresse_bachelier.entite,
+                email=self.adresse_bachelier.email,
+            )
+        else:
+            cmd = EncoderAdresseFeuilleDeNotesSpecifique(
+                nom_cohorte=self.nom_cohorte,
                 destinataire=self.adresse_bachelier.destinataire,
                 rue_numero=self.adresse_bachelier.rue_numero,
                 code_postal=self.adresse_bachelier.code_postal,
@@ -135,5 +158,4 @@ class FirstYearBachelorScoreSheetAddressForm(ScoreSheetAddressForm):
                 fax=self.adresse_bachelier.fax,
                 email=self.adresse_bachelier.email,
             )
-            return message_bus_instance.invoke(cmd)
-        return super().save()
+        return message_bus_instance.invoke(cmd)
