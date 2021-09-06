@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List, Optional
+from typing import List, Optional, Set
 
 from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
 from base.models.enums.exam_enrollment_justification_type import JustificationTypes
@@ -64,3 +64,28 @@ class NoteEtudiantInMemoryRepository(InMemoryGenericRepository, INoteEtudiantRep
             result = (note for note in result if note.note.value == justification)
 
         return list(result)
+
+    @classmethod
+    def search_notes_identites(
+            cls,
+            noms_cohortes: List[str] = None,
+            annee_academique: int = None,
+            numero_session: int = None,
+            nomas: List[str] = None,
+            code_unite_enseignement: str = None,
+            enseignant: str = None,
+            note_manquante: bool = False,
+            **kwargs
+    ) -> Set['IdentiteNoteEtudiant']:
+        if not (noms_cohortes or annee_academique or numero_session or nomas
+                or note_manquante or code_unite_enseignement):
+            return set()
+
+        result = cls.search(noms_cohortes=noms_cohortes, nomas=nomas, note_manquante=note_manquante)
+        if code_unite_enseignement:
+            result = (note for note in result if note.entity_id.code_unite_enseignement in code_unite_enseignement)
+        if annee_academique:
+            result = (note for note in result if note.entity_id.annee_academique == annee_academique)
+        if numero_session:
+            result = (note for note in result if note.entity_id.numero_session == numero_session)
+        return {note.entity_id for note in result}

@@ -113,7 +113,7 @@ class FeuilleDeNotesDTO(interface.DTO):
 
     @property
     def encodage_est_complet(self) -> bool:
-        return self.quantite_notes_soumises / self.quantite_total_notes == 0
+        return self.quantite_notes_soumises == self.quantite_total_notes
 
     @property
     def quantite_notes_soumises(self) -> int:
@@ -138,3 +138,56 @@ class PeriodeEncodageNotesDTO(interface.DTO):
     session_concernee = attr.ib(type=int)
     debut_periode_soumission = attr.ib(type=DateDTO)
     fin_periode_soumission = attr.ib(type=DateDTO)
+
+
+@attr.s(frozen=True, slots=True)
+class DateEcheanceDTO(interface.DTO):
+    jour = attr.ib(type=int)
+    mois = attr.ib(type=int)
+    annee = attr.ib(type=int)
+    quantite_notes_soumises = attr.ib(type=int)
+    quantite_total_notes = attr.ib(type=int)
+
+    def to_date(self) -> date:
+        return date(day=self.jour, month=self.mois, year=self.annee)
+
+    @property
+    def est_atteinte(self) -> bool:
+        aujourdhui = datetime.date.today()
+        return aujourdhui > self.to_date()
+
+    @property
+    def quantite_notes_manquantes(self) -> int:
+        return self.quantite_total_notes - self.quantite_notes_soumises
+
+    @property
+    def encodage_est_complet(self) -> bool:
+        return self.quantite_notes_manquantes == 0
+
+
+@attr.s(frozen=True, slots=True)
+class ProgressionEncodageNotesUniteEnseignementDTO(interface.DTO):
+    code_unite_enseignement = attr.ib(type=str)
+    intitule_complet_unite_enseignement = attr.ib(type=str)  # unite enseignement
+    dates_echeance = attr.ib(type=List[DateEcheanceDTO])
+    responsable_note = attr.ib(type=EnseignantDTO)  # responsables notes
+    a_etudiants_peps = attr.ib(type=bool)  # signaletique
+
+    @property
+    def quantite_notes_soumises(self) -> int:
+        return sum(date.quantite_notes_soumises for date in self.dates_echeance)
+
+    @property
+    def quantite_totale_notes(self) -> int:
+        return sum(date.quantite_total_notes for date in self.dates_echeance)
+
+    @property
+    def encodage_est_complet(self) -> bool:
+        return self.quantite_notes_soumises == self.quantite_totale_notes
+
+
+@attr.s(frozen=True, slots=True)
+class ProgressionGeneraleEncodageNotesDTO(interface.DTO):
+    annee_academique = attr.ib(type=int)
+    numero_session = attr.ib(type=int)
+    progression_generale = attr.ib(type=List[ProgressionEncodageNotesUniteEnseignementDTO])

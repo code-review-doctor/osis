@@ -23,19 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+from typing import Optional
 
-from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_attribution_enseignant import \
-    IAttributionEnseignantTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodage_notes import \
-    IPeriodeEncodageNotesTranslator
+from ddd.logic.encodage_des_notes.encodage.domain.model.gestionnaire_parcours import GestionnaireParcours
+from ddd.logic.encodage_des_notes.encodage.repository.note_etudiant import INoteEtudiantRepository
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_etudiant import \
     ISignaletiqueEtudiantTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_unite_enseignement import IUniteEnseignementTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.progression_generale import ProgressionGeneral
-from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import NoteEtudiant
-from ddd.logic.encodage_des_notes.shared_kernel.dtos import ProgressionGeneraleEncodageNotesDTO
-from ddd.logic.encodage_des_notes.soumission.repository.i_note_etudiant import INoteEtudiantRepository
+from ddd.logic.encodage_des_notes.soumission.repository.i_note_etudiant import INoteEtudiantRepository as \
+    INoteEtudiantSoumissionRepository
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_unite_enseignement import IUniteEnseignementTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import ProgressionGeneraleEncodageNotesDTO, PeriodeEncodageNotesDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
 from osis_common.ddd import interface
 
@@ -45,46 +43,38 @@ class ProgressionGeneraleEncodage(interface.DomainService):
     @classmethod
     def get(
             cls,
-            matricule_fgs_enseignant: str,
+            gestionnaire: GestionnaireParcours,
+            periode_encodage: PeriodeEncodageNotesDTO,
             note_etudiant_repo: 'INoteEtudiantRepository',
+            note_etudiant_soumission_repo: 'INoteEtudiantSoumissionRepository',
             responsable_notes_repo: 'IResponsableDeNotesRepository',
-            attribution_translator: 'IAttributionEnseignantTranslator',
-            periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
             signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
             unite_enseignement_translator: 'IUniteEnseignementTranslator',
-    ) -> 'ProgressionGeneraleEncodageNotesDTO':
-        periode_soumission = periode_soumission_note_translator.get()
-        annee_academique = periode_soumission.annee_concernee
-        numero_session = periode_soumission.session_concernee
 
-        notes = _search_notes(
-            attribution_translator,
-            note_etudiant_repo,
-            matricule_fgs_enseignant,
-            numero_session,
-            annee_academique
+            nom_cohorte: Optional[str],
+            code_unite_enseignement: Optional[str],
+            enseignant: Optional[str],
+            seulement_notes_manquantes: bool = False
+    ) -> 'ProgressionGeneraleEncodageNotesDTO':
+        noms_cohortes = gestionnaire.cohortes_gerees
+        if nom_cohorte:
+            gestionnaire.verifier_gere_cohorte(nom_cohorte)
+            noms_cohortes = [nom_cohorte]
+
+        notes_identites = note_etudiant_repo.search_notes_identites(
+            noms_cohortes=noms_cohortes,
+            annee_academique=periode_encodage.annee_concernee,
+            numero_session=periode_encodage.session_concernee,
+            code_unite_enseignement=code_unite_enseignement,
+            enseignant=enseignant,
+            note_manquante=seulement_notes_manquantes
         )
 
         return ProgressionGeneral().get(
-            {note.entity_id for note in notes},
-            note_etudiant_repo,
+            notes_identites,
+            note_etudiant_soumission_repo,
             responsable_notes_repo,
-            periode_soumission,
+            periode_encodage,
             signaletique_etudiant_translator,
             unite_enseignement_translator
         )
-
-
-def _search_notes(
-        attribution_translator: 'IAttributionEnseignantTranslator',
-        note_etudiant_repo: 'INoteEtudiantRepository',
-        matricule_fgs_enseignant: str,
-        session_concerne: int,
-        annee_concerne: int
-) -> List['NoteEtudiant']:
-    attributions = attribution_translator.search_attributions_enseignant_par_matricule(
-        annee_concerne,
-        matricule_fgs_enseignant
-    )
-    search_criterias = [(attrib.code_unite_enseignement, annee_concerne, session_concerne) for attrib in attributions]
-    return note_etudiant_repo.search_by_code_unite_enseignement_annee_session(criterias=search_criterias)

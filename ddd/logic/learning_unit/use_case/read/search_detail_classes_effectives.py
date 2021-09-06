@@ -23,22 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
+from typing import List
 
-from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodage_notes import \
-    IPeriodeEncodageNotesTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO, PeriodeEncodageNotesDTO
+from ddd.logic.learning_unit.commands import SearchDetailClassesEffectivesCommand
+from ddd.logic.learning_unit.dtos import EffectiveClassFromRepositoryDTO
+from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
 
 
-class PeriodeEncodageNotesTranslatorInMemory(IPeriodeEncodageNotesTranslator):
-
-    periode_soumission_ouverte = PeriodeEncodageNotesDTO(
-        annee_concernee=2020,
-        session_concernee=2,
-        debut_periode_soumission=DateDTO(jour=1, mois=1, annee=datetime.date.today().year),
-        fin_periode_soumission=DateDTO(jour=31, mois=12, annee=datetime.date.today().year),
-    )
-
-    @classmethod
-    def get(cls) -> 'PeriodeEncodageNotesDTO':
-        return cls.periode_soumission_ouverte
+def search_detail_classes_effectives(
+        cmd: 'SearchDetailClassesEffectivesCommand',
+        repository: 'IEffectiveClassRepository'
+) -> List['EffectiveClassFromRepositoryDTO']:
+    return repository.search_dtos(codes=cmd.codes_classes, annee=cmd.annee)

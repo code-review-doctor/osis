@@ -25,7 +25,7 @@
 ##############################################################################
 from typing import Set, Tuple
 
-from ddd.logic.encodage_des_notes.shared_kernel.service.i_unite_enseignement import IUniteEnseignementTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_unite_enseignement import IUniteEnseignementTranslator
 from ddd.logic.encodage_des_notes.soumission.dtos import UniteEnseignementDTO
 
 

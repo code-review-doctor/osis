@@ -23,22 +23,30 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
+from unittest import mock
 
+from django.test import SimpleTestCase
+
+from ddd.logic.encodage_des_notes.encodage.commands import GetPeriodeEncodageCommand
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodage_notes import \
     IPeriodeEncodageNotesTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO, PeriodeEncodageNotesDTO
+from infrastructure.messages_bus import message_bus_instance
 
 
-class PeriodeEncodageNotesTranslatorInMemory(IPeriodeEncodageNotesTranslator):
+class GetPeriodeEncodageTest(SimpleTestCase):
 
-    periode_soumission_ouverte = PeriodeEncodageNotesDTO(
-        annee_concernee=2020,
-        session_concernee=2,
-        debut_periode_soumission=DateDTO(jour=1, mois=1, annee=datetime.date.today().year),
-        fin_periode_soumission=DateDTO(jour=31, mois=12, annee=datetime.date.today().year),
-    )
+    def setUp(self) -> None:
+        self.cmd = GetPeriodeEncodageCommand()
 
-    @classmethod
-    def get(cls) -> 'PeriodeEncodageNotesDTO':
-        return cls.periode_soumission_ouverte
+        self.translator_mocked = mock.Mock(spec=IPeriodeEncodageNotesTranslator)
+        message_bus_patcher = mock.patch.multiple(
+            'infrastructure.messages_bus',
+            PeriodeEncodageNotesTranslator=self.translator_mocked
+        )
+        message_bus_patcher.start()
+        self.addCleanup(message_bus_patcher.stop)
+        self.message_bus = message_bus_instance
+
+    def test_should_call_get_method_translator(self):
+        self.message_bus.invoke(self.cmd)
+        self.assertTrue(self.translator_mocked.return_value.get.called)

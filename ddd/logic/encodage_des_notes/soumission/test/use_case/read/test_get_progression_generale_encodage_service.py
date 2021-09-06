@@ -27,10 +27,13 @@ from unittest import mock
 
 from django.test import SimpleTestCase
 
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import EnseignantDTO
 from ddd.logic.encodage_des_notes.soumission.commands import GetProgressionGeneraleCommand
 from ddd.logic.encodage_des_notes.soumission.dtos import SignaletiqueEtudiantDTO, AttributionEnseignantDTO
 from ddd.logic.encodage_des_notes.soumission.test.factory.note_etudiant import NoteManquanteEtudiantFactory, \
     NoteDejaSoumise
+from ddd.logic.encodage_des_notes.soumission.test.factory.responsable_de_notes import \
+    ResponsableDeNotesPourMultipleUniteEnseignements, _UniteEnseignementIdentiteFactory
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.attribution_enseignant import \
     AttributionEnseignantTranslatorInMemory
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.periode_encodage_notes import \
@@ -41,6 +44,8 @@ from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.unite_ense
     UniteEnseignementTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.repository.in_memory.note_etudiant import \
     NoteEtudiantInMemoryRepository
+from infrastructure.encodage_de_notes.soumission.repository.in_memory.responsable_de_notes import \
+    ResponsableDeNotesInMemoryRepository
 from infrastructure.messages_bus import message_bus_instance
 
 
@@ -61,8 +66,17 @@ class GetProgressionGeneraleEncodageTest(SimpleTestCase):
         self.repository = NoteEtudiantInMemoryRepository()
         self.repository.save(self.note_etudiant)
 
-        self.cmd = GetProgressionGeneraleCommand(matricule_fgs_enseignant=self.matricule_enseignant)
+        responsable_de_notes = ResponsableDeNotesPourMultipleUniteEnseignements(
+            unites_enseignements=[
+                _UniteEnseignementIdentiteFactory(code_unite_enseignement="LDROI1003"),
+                _UniteEnseignementIdentiteFactory(code_unite_enseignement="LDROI1001"),
+                _UniteEnseignementIdentiteFactory(code_unite_enseignement="LDROI1002"),
+            ]
+        )
+        self.responsable_note_repository = ResponsableDeNotesInMemoryRepository()
+        self.responsable_note_repository.save(responsable_de_notes)
 
+        self.cmd = GetProgressionGeneraleCommand(matricule_fgs_enseignant=self.matricule_enseignant)
         self.periode_soumission_translator = PeriodeEncodageNotesTranslatorInMemory()
         self.attribution_translator = AttributionEnseignantTranslatorInMemory()
         self.signaletique_translator = SignaletiqueEtudiantTranslatorInMemory()
@@ -74,6 +88,7 @@ class GetProgressionGeneraleEncodageTest(SimpleTestCase):
         message_bus_patcher = mock.patch.multiple(
             'infrastructure.messages_bus',
             NoteEtudiantRepository=lambda: self.repository,
+            ResponsableDeNotesRepository=lambda: self.responsable_note_repository,
             PeriodeEncodageNotesTranslator=lambda: self.periode_soumission_translator,
             SignaletiqueEtudiantTranslator=lambda: self.signaletique_translator,
             AttributionEnseignantTranslator=lambda: self.attribution_translator,
@@ -102,6 +117,12 @@ class GetProgressionGeneraleEncodageTest(SimpleTestCase):
         result = self.message_bus.invoke(self.cmd)
         progression_premiere_unite_enseign = result.progression_generale[0]
         self.assertTrue(progression_premiere_unite_enseign.a_etudiants_peps)
+
+    def test_should_retourner_responsable_de_notes(self):
+        result = self.message_bus.invoke(self.cmd)
+        progression_premiere_unite_enseignement = result.progression_generale[0]
+
+        self.assertIsInstance(progression_premiere_unite_enseignement.responsable_note, EnseignantDTO)
 
     @mock.patch("infrastructure.messages_bus.SignaletiqueEtudiantTranslator")
     def test_should_calculer_si_possede_aucun_etudiant_peps(self, mock_translator):

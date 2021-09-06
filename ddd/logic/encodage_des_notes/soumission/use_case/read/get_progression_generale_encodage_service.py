@@ -23,24 +23,27 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.encodage_des_notes.shared_kernel.service.i_attribution_enseignant import \
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.service.i_periode_encodage_notes import \
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodage_notes import \
     IPeriodeEncodageNotesTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.service.i_signaletique_etudiant import \
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_etudiant import \
     ISignaletiqueEtudiantTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.service.i_unite_enseignement import IUniteEnseignementTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.service.periode_encodage_ouverte import PeriodeEncodageOuverte
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import ProgressionGeneraleEncodageNotesDTO
+
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_unite_enseignement import IUniteEnseignementTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.periode_encodage_ouverte import PeriodeEncodageOuverte
 from ddd.logic.encodage_des_notes.soumission.commands import GetProgressionGeneraleCommand
 from ddd.logic.encodage_des_notes.soumission.domain.service.progression_generale_encodage import \
     ProgressionGeneraleEncodage
-from ddd.logic.encodage_des_notes.soumission.dtos import ProgressionGeneraleEncodageNotesDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_note_etudiant import INoteEtudiantRepository
+from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
 
 
 def get_progression_generale(
         cmd: 'GetProgressionGeneraleCommand',
         note_etudiant_repo: 'INoteEtudiantRepository',
+        responsable_notes_repo: 'IResponsableDeNotesRepository',
         periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
         signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
         attribution_translator: 'IAttributionEnseignantTranslator',
@@ -53,6 +56,7 @@ def get_progression_generale(
     progression_dto = ProgressionGeneraleEncodage().get(
         matricule_fgs_enseignant=cmd.matricule_fgs_enseignant,
         note_etudiant_repo=note_etudiant_repo,
+        responsable_notes_repo=responsable_notes_repo,
         attribution_translator=attribution_translator,
         periode_soumission_note_translator=periode_soumission_note_translator,
         signaletique_etudiant_translator=signaletique_etudiant_translator,

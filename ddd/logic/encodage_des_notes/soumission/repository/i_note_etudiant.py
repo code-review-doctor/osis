@@ -24,9 +24,10 @@
 #
 ##############################################################################
 import abc
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Set
 
 from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import IdentiteNoteEtudiant, NoteEtudiant
+from ddd.logic.encodage_des_notes.soumission.dtos import DateEcheanceNoteDTO
 from osis_common.ddd import interface
 from osis_common.ddd.interface import ApplicationService
 
@@ -47,6 +48,14 @@ class INoteEtudiantRepository(interface.AbstractRepository):
             cls,
             criterias: List[SearchCriteria]
     ) -> List['NoteEtudiant']:
+        pass
+
+    @classmethod
+    @abc.abstractmethod
+    def search_dates_echeances(
+            cls,
+            notes_identites: Set[IdentiteNoteEtudiant]
+    ) -> List[DateEcheanceNoteDTO]:
         pass
 
     @classmethod

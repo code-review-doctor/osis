@@ -25,7 +25,7 @@
 ##############################################################################
 from typing import Set
 
-from ddd.logic.encodage_des_notes.shared_kernel.service.i_attribution_enseignant import \
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
 from ddd.logic.encodage_des_notes.soumission.dtos import AttributionEnseignantDTO
 

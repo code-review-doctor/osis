@@ -23,22 +23,33 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
+from unittest import mock
 
-from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodage_notes import \
-    IPeriodeEncodageNotesTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO, PeriodeEncodageNotesDTO
+from django.test import SimpleTestCase
+
+from ddd.logic.learning_unit.commands import SearchDetailClassesEffectivesCommand
+from infrastructure.learning_unit.repository.in_memory.effective_class import EffectiveClassRepository
+from infrastructure.messages_bus import message_bus_instance
 
 
-class PeriodeEncodageNotesTranslatorInMemory(IPeriodeEncodageNotesTranslator):
+class SearchDetailClassesEffectivesTest(SimpleTestCase):
 
-    periode_soumission_ouverte = PeriodeEncodageNotesDTO(
-        annee_concernee=2020,
-        session_concernee=2,
-        debut_periode_soumission=DateDTO(jour=1, mois=1, annee=datetime.date.today().year),
-        fin_periode_soumission=DateDTO(jour=31, mois=12, annee=datetime.date.today().year),
-    )
+    def setUp(self) -> None:
+        self.annee = 2020
+        self.code_unite_enseignement = 'LDROI1001'
+        self.lettre_classe = 'A'
+        self.repository = EffectiveClassRepository()
+        self.cmd = SearchDetailClassesEffectivesCommand(
+            codes_classes={self.code_unite_enseignement + self.lettre_classe},
+            annee=self.annee,
+        )
 
-    @classmethod
-    def get(cls) -> 'PeriodeEncodageNotesDTO':
-        return cls.periode_soumission_ouverte
+    @mock.patch('infrastructure.messages_bus.EffectiveClassRepository.search_dtos')
+    def test_should_tester_via_repository(self, mock_search_dtos):
+        """
+        Pas de unit test sur le use case car appel direct au repository, sans logique métier.
+        Tous les tests sont donc implémentés sur le repository.
+        """
+        mock_search_dtos.return_value = []
+        message_bus_instance.invoke(self.cmd)
+        self.assertTrue(mock_search_dtos.called)

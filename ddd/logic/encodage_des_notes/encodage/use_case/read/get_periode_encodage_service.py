@@ -23,29 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
-
-from ddd.logic.encodage_des_notes.shared_kernel.service.i_periode_encodage_notes import \
+from ddd.logic.encodage_des_notes.encodage.commands import GetPeriodeEncodageCommand
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodage_notes import \
     IPeriodeEncodageNotesTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.validator.exceptions import PeriodeEncodageNotesFermeeException
-from osis_common.ddd import interface
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import PeriodeEncodageNotesDTO
 
 
-class PeriodeEncodageOuverte(interface.DomainService):
-
-    @classmethod
-    def verifier(
-            cls,
-            periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator'
-    ) -> None:
-        periode = periode_soumission_note_translator.get()
-        if not periode:
-            raise PeriodeEncodageNotesFermeeException()
-
-        aujourdhui = datetime.date.today()
-        debut_periode = periode.debut_periode_soumission.to_date()
-        fin_periode = periode.fin_periode_soumission.to_date()
-        periode_est_ouverte = debut_periode <= aujourdhui <= fin_periode
-
-        if not periode_est_ouverte:
-            raise PeriodeEncodageNotesFermeeException()
+def get_periode_encodage(
+        cmd: 'GetPeriodeEncodageCommand',
+        periode_encodage_note_translator: 'IPeriodeEncodageNotesTranslator',
+) -> 'PeriodeEncodageNotesDTO':
+    return periode_encodage_note_translator.get()

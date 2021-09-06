@@ -23,32 +23,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_attribution_enseignant import \
-    IAttributionEnseignantTranslator
-from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import \
-    EnseignantNonAttribueUniteEnseignementException
+import abc
+from typing import Set, List
+
+from ddd.logic.encodage_des_notes.soumission.dtos import SignaletiqueEtudiantDTO
 from osis_common.ddd import interface
 
 
-class EnseignantAttribueUniteEnseignement(interface.DomainService):
+class ISignaletiqueEtudiantTranslator(interface.DomainService):
 
     @classmethod
-    def verifier(
+    @abc.abstractmethod
+    def search(
             cls,
-            code_unite_enseignement: str,
-            annee_unite_enseignement: int,
-            matricule_fgs_enseignant: str,
-            attribution_translator: 'IAttributionEnseignantTranslator'
-    ) -> None:
-        attributions = attribution_translator.search_attributions_enseignant(
-            code_unite_enseignement=code_unite_enseignement,
-            annee=annee_unite_enseignement,
-        )
-        est_attribue_unite_enseignement = any(
-            attribution for attribution in attributions
-            if attribution.matricule_fgs_enseignant == matricule_fgs_enseignant
-            and attribution.code_unite_enseignement == code_unite_enseignement
-            and attribution.annee == annee_unite_enseignement
-        )
-        if not est_attribue_unite_enseignement:
-            raise EnseignantNonAttribueUniteEnseignementException(code_unite_enseignement)
+            nomas: List[str],
+            nom: str = None,
+            prenom: str = None,
+    ) -> Set['SignaletiqueEtudiantDTO']:
+        raise NotImplementedError

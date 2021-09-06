@@ -23,8 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import functools
-import operator
 from typing import Optional, List, Set, Tuple
 
 from django.db.models import F, OuterRef, Subquery, Case, When, Q, CharField, Value, QuerySet
@@ -71,17 +69,10 @@ class LearningUnitRepository(ILearningUnitRepository):
         qs = _get_common_queryset()
         # FIXME :: reuse Django filter
         if code_annee_values is not None:
-            q_filters = functools.reduce(
-                operator.or_,
-                [
-                    Q(
-                        acronym__icontains=code,
-                        academic_year__year=year,
-                    )
-                    for code, year in code_annee_values
-                ]
+            qs = qs.filter(
+                academic_year__year__in={annee for _, annee in code_annee_values},
+                acronym__in={code for code, _ in code_annee_values}
             )
-            qs = qs.filter(q_filters)
 
         qs = qs.annotate(
             code=F('acronym'),
@@ -120,7 +111,8 @@ class LearningUnitRepository(ILearningUnitRepository):
         )
         result = []
         for data_dict in qs:
-            result.append(LearningUnitSearchDTO(**data_dict))
+            if code_annee_values is None or (data_dict['code'], data_dict['year'],) in code_annee_values:
+                result.append(LearningUnitSearchDTO(**data_dict))
         return result
 
     @classmethod

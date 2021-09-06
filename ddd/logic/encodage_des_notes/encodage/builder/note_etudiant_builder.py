@@ -23,10 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from ddd.logic.encodage_des_notes.encodage.builder.identite_note_etudiant_builder import NoteEtudiantIdentityBuilder
 from ddd.logic.encodage_des_notes.encodage.domain.model._note import NoteBuilder
 from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import NoteEtudiant
 from ddd.logic.encodage_des_notes.encodage.domain.validator.validators_by_business_action import \
     EncoderNotesValidatorList
+from ddd.logic.encodage_des_notes.encodage.dtos import NoteEtudiantFromRepositoryDTO
 
 from osis_common.ddd import interface
 from osis_common.ddd.interface import CommandRequest
@@ -38,8 +40,15 @@ class NoteEtudiantBuilder(interface.RootEntityBuilder):
         raise NotImplementedError
 
     @classmethod
-    def build_from_repository_dto(cls, dto_object: 'interface.DTO') -> 'NoteEtudiant':
-        raise NotImplementedError
+    def build_from_repository_dto(cls, dto_object: 'NoteEtudiantFromRepositoryDTO') -> 'NoteEtudiant':
+        return NoteEtudiant(
+            entity_id=NoteEtudiantIdentityBuilder().build_from_repository_dto(dto_object),
+            email=dto_object.email,
+            note=dto_object.note,
+            echeance_gestionnaire=dto_object.echeance_gestionnaire,
+            nom_cohorte=dto_object.nom_cohorte,
+            note_decimale_autorisee=dto_object.note_decimale_autorisee
+        )
 
     @classmethod
     def build_from_ancienne_note(

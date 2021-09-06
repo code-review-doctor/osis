@@ -23,14 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List, Optional
+from typing import List, Optional, Set
 
 from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import EnseignantDTO
 from ddd.logic.encodage_des_notes.soumission.domain.model._unite_enseignement_identite import \
-    UniteEnseignementIdentiteBuilder
+    UniteEnseignementIdentiteBuilder, UniteEnseignementIdentite
 from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import IdentiteResponsableDeNotes
 from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import ResponsableDeNotes
+from ddd.logic.encodage_des_notes.soumission.dtos import ResponsableDeNotesDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
 
 
@@ -66,6 +67,23 @@ class ResponsableDeNotesInMemoryRepository(InMemoryGenericRepository, IResponsab
                 cls.entities
             )
         )
+
+    @classmethod
+    def search_dto(
+            cls,
+            unite_enseignement_identities: Set[UniteEnseignementIdentite],
+    ) -> List['ResponsableDeNotesDTO']:
+        responsable_notes = []
+        for unite_enseignement_identity in unite_enseignement_identities:
+            responsable_notes.extend([
+                ResponsableDeNotesDTO(
+                    nom='Chileng',
+                    prenom='Jean-Michel',
+                    code_unite_enseignement=unite_enseignement_identity.code_unite_enseignement,
+                    annee_unite_enseignement=unite_enseignement_identity.annee_academique
+                ) for entity in cls.entities if unite_enseignement_identity in entity.unites_enseignements
+            ])
+        return responsable_notes
 
 
 def _filter(entity, codes_unites_enseignement, annee_academique):

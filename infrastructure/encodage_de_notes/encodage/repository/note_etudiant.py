@@ -25,7 +25,7 @@
 ##############################################################################
 import functools
 import operator
-from typing import List, Optional
+from typing import List, Optional, Set
 
 from django.db.models import CharField, Q, OuterRef, Case, When, F, DateField, Value, BooleanField, \
     Subquery
@@ -49,12 +49,22 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
             cls,
             entity_ids: Optional[List['IdentiteNoteEtudiant']] = None,
             noms_cohortes: List[str] = None,
+            annee_academique: int = None,
+            numero_session: int = None,
             nomas: List[str] = None,
             note_manquante: bool = False,
             justification: JustificationTypes = None,
             **kwargs
     ) -> List['NoteEtudiant']:
-        filter_qs = cls._build_filter(entity_ids, noms_cohortes, nomas, note_manquante, justification)
+        filter_qs = cls._build_filter(
+            entity_ids=entity_ids,
+            noms_cohortes=noms_cohortes,
+            annee_academique=annee_academique,
+            numero_session=numero_session,
+            nomas=nomas,
+            note_manquante=note_manquante,
+            justification=justification
+        )
 
         if not filter_qs:
             return []
@@ -81,7 +91,10 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
             cls,
             entity_ids: Optional[List['IdentiteNoteEtudiant']] = None,
             noms_cohortes: List[str] = None,
+            annee_academique: int = None,
+            numero_session: int = None,
             nomas: List[str] = None,
+            code_unite_enseignement: str = None,
             note_manquante: bool = False,
             justification: JustificationTypes = None,
     ) -> List[Q]:
@@ -117,7 +130,111 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
             result.append(
                 Q(note=justification.name)
             )
+        if annee_academique:
+            result.append(
+                Q(annee_academique=annee_academique)
+            )
+        if numero_session:
+            result.append(
+                Q(numero_session=numero_session)
+            )
+        if code_unite_enseignement:
+            result.append(
+                Q(code_unite_enseignement__icontains=code_unite_enseignement)
+            )
         return result
+
+    @classmethod
+    def search_notes_identites(
+            cls,
+            noms_cohortes: List[str] = None,
+            annee_academique: int = None,
+            numero_session: int = None,
+            nomas: List[str] = None,
+            code_unite_enseignement: str = None,
+            enseignant: str = None,
+            note_manquante: bool = False,
+            **kwargs
+    ) -> Set['IdentiteNoteEtudiant']:
+        qs = ExamEnrollment.objects.all()
+
+        if annee_academique:
+            qs = qs.filter(learning_unit_enrollment__learning_unit_year__academic_year__year=annee_academique)
+        if numero_session:
+            qs = qs.filter(session_exam__number_session=numero_session)
+        if noms_cohortes:
+            # qs = qs.filter(learning_unit_enrollment__offer_enrollment__education_group_year__acronym__in=noms_cohortes)
+            qs = qs.annotate(
+                nom_cohorte=Case(
+                    When(
+                        learning_unit_enrollment__offer_enrollment__cohort_year__name=CohortName.FIRST_YEAR.name,
+                        then=Replace(
+                            'learning_unit_enrollment__offer_enrollment__education_group_year__acronym',
+                            Value('1BA'),
+                            Value('11BA')
+                        )
+                    ),
+                    default=F('learning_unit_enrollment__offer_enrollment__education_group_year__acronym'),
+                    output_field=CharField()
+                ),
+            ).filter(nom_cohorte__in=noms_cohortes)
+            # cohortes_11ba = {nom for nom in noms_cohortes if '11BA' in nom}
+            # cohortes_1ba = {nom for nom in noms_cohortes if '11BA' not in nom}
+            # if cohortes_1ba and cohortes_11ba:
+            #     equivalent_1ba = {nom.replace('11BA', '1BA') for nom in cohortes_11ba}
+            #     cohort_ids = CohortYear.objects.filter(
+            #         education_group_year__acronym__in=equivalent_1ba
+            #     ).values_list('pk', flat=True).distinct()
+            #     qs = qs.filter(
+            #         Q(learning_unit_enrollment__offer_enrollment__education_group_year__acronym__in=cohortes_1ba)
+            #         | Q(learning_unit_enrollment__offer_enrollment__cohort_year_id__in=cohort_ids)
+            #     )
+            # elif cohortes_1ba:
+            #     qs = qs.filter(learning_unit_enrollment__offer_enrollment__education_group_year__acronym__in=cohortes_1ba)
+            # elif cohortes_11ba:
+            #     equivalent_1ba = {nom.replace('11BA', '1BA') for nom in cohortes_11ba}
+            #     cohort_ids = CohortYear.objects.filter(
+            #         education_group_year__acronym__in=equivalent_1ba
+            #     ).values_list('pk', flat=True).distinct()
+            #     qs = qs.filter(learning_unit_enrollment__offer_enrollment__cohort_year_id__in=cohort_ids)
+            # if cohortes_11ba:
+            #     equivalent_1ba = {nom.replace('11BA', '1BA') for nom in cohortes_11ba}
+            #     qs = qs.filter(learning_unit_enrollment__offer_enrollment__cohort_year__education_group_year__acronym__in=equivalent_1ba)
+        if nomas:
+            qs = qs.filter(learning_unit_enrollment__offer_enrollment__student__registration_id__in=nomas)
+        if note_manquante:
+            qs = qs.filter(score_final__isnull=True, justification_final_isnull=True)
+
+        qs = qs.annotate(
+            code_unite_enseignement=Concat(
+                'learning_unit_enrollment__learning_unit_year__acronym',
+                'learning_unit_enrollment__learning_class_year__acronym',
+                output_field=CharField()
+            ),
+        )
+        if code_unite_enseignement:
+            qs = qs.filter(code_unite_enseignement__icontains=code_unite_enseignement)
+
+        qs = qs.annotate(
+            annee_academique=F('learning_unit_enrollment__learning_unit_year__academic_year__year'),
+            numero_session=F('session_exam__number_session'),
+            noma=F('learning_unit_enrollment__offer_enrollment__student__registration_id'),
+        ).values(
+            'noma',
+            'code_unite_enseignement',
+            'annee_academique',
+            'numero_session',
+        )
+
+        # TODO: Remove filtering to enseignement and use translator to get all code_unite_enseignement + annee_academic
+        # managed by tutor name searched
+        if enseignant:
+            qs = qs.filter(
+                Q(learning_unit_enrollment__learning_unit_year__learningcomponentyear__attributionchargenew__attribution__tutor__person__first_name__icontains=enseignant)
+                | Q(learning_unit_enrollment__learning_unit_year__learningcomponentyear__attributionchargenew__attribution__tutor__person__last_name__icontains=enseignant)
+            )
+
+        return {IdentiteNoteEtudiant(**row) for row in qs}
 
     @classmethod
     def delete(cls, entity_id: 'IdentiteNoteEtudiant', **kwargs: ApplicationService) -> None:

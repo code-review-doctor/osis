@@ -80,12 +80,13 @@
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
-                                        <th id="tab_online_acronym">{% trans 'Acronym' context 'UE acronym' %}</th>
-                                        <th id="tab_online_title">{% trans 'Learning unit' %}</th>
-                                        <th id="tab_online_tutor_deadline">{% trans 'Tutor deadlines' %}</th>
-                                        <th id="tab_online_progress">{% trans 'Progress' %}</th>
-                                        <th id="tab_online_peps"></th>
-                                        <th id="tab_online_links"></th>
+                                        <th id="tab_online_acronym" class="col-md-1">{% trans 'Code' %}</th>
+                                        <th id="tab_online_title" class="col-md-3">{% trans 'Learning unit' %}</th>
+                                        <th id="tab_online_responsible" class="col-md-2">{% trans 'Scores responsible' %}</th>
+                                        <th id="tab_online_tutor_deadline" class="col-md-2">{% trans 'Tutor deadlines' %}</th>
+                                        <th id="tab_online_progress" class="col-md-2">{% trans 'Progress' %}</th>
+                                        <th id="tab_online_peps" class="col-md-1"></th>
+                                        <th id="tab_online_links" class="col-md-1"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -98,9 +99,12 @@
                                                     {{ progression_encodage.intitule_complet_unite_enseignement }}
                                                 </a>
                                             </td>
+                                            <td headers="tab_online_responsible">
+                                                 {{ progression_encodage.responsable_note.nom|upper }} {{ progression_encodage.responsable_note.prenom }}
+                                            </td>
                                             <td headers="tab_online_tutor_deadline">
                                                 {% for echeance in progression_encodage.dates_echeance %}
-                                                    {% if not forloop.first %}
+                                                    {% if forloop.counter == 2 %}
                                                         <div id="tutor_deadlines_collapse_{{ progression_encodage.code_unite_enseignement }}" class="collapse in">
                                                     {% endif %}
                                                     <div class="row row-score-encoding">
@@ -127,7 +131,7 @@
                                                              </a>
                                                         {% endif %}
                                                     </div>
-                                                    {% if not forloop.first %}
+                                                    {% if forloop.last and forloop.counter > 2 %}
                                                         </div>
                                                     {% endif %}
                                                 {% endfor %}
@@ -184,7 +188,7 @@
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
-                                        <th id="tab_paper_acronym">{% trans 'Acronym' context 'UE acronym' %}</th>
+                                        <th id="tab_paper_acronym">{% trans 'Code' %}</th>
                                         <th id="tab_paper_title">{% trans 'Learning unit' %}</th>
                                         <th id="tab_paper_progress">{% trans 'Progress' %}</th>
                                         <th id="download_action"></th>
@@ -230,7 +234,7 @@
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
-                                        <th id="tab_excel_acronym">{% trans 'Acronym' context 'UE acronym' %}</th>
+                                        <th id="tab_excel_acronym">{% trans 'Code' %}</th>
                                         <th id="tab_excel_title">{% trans 'Learning unit' %}</th>
                                         <th id="tab_excel_progress">{% trans 'Progress' %}</th>
                                         <th id="tab_excel_links"></th>
