@@ -28,6 +28,7 @@ import operator
 
 from rest_framework import serializers
 
+from base.models.enums.exam_enrollment_justification_type import TutorJustificationTypes, JustificationTypes
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import NoteEtudiantDTO
 from education_group.templatetags.academic_year_display import display_as_academic_year
 
@@ -36,7 +37,7 @@ class _NoteEtudiantRowSerializer(serializers.Serializer):
     noma = serializers.CharField(read_only=True, default='')
     nom = serializers.CharField(read_only=True, default='')
     prenom = serializers.CharField(read_only=True, default='')
-    note = serializers.CharField(read_only=True, default='')
+    note = serializers.SerializerMethodField()
     nom_cohorte = serializers.CharField(read_only=True, default='')
     email = serializers.CharField(read_only=True, default='')
     date_remise_de_notes = serializers.DateField(
@@ -53,6 +54,21 @@ class _NoteEtudiantRowSerializer(serializers.Serializer):
     details_autre_amenagement = serializers.SerializerMethodField()
     accompagnateur = serializers.SerializerMethodField()
     enrollment_state_color = serializers.SerializerMethodField()
+
+    def get_note(self, note_etudiant: NoteEtudiantDTO) -> str:
+        note = note_etudiant.note
+        if isinstance(note, TutorJustificationTypes):
+            return {
+                TutorJustificationTypes.ABSENCE_UNJUSTIFIED.name: 'A',
+                TutorJustificationTypes.CHEATING.name: 'T',
+            }[note.name]
+        elif isinstance(note, JustificationTypes):
+            return {
+                JustificationTypes.ABSENCE_UNJUSTIFIED.name: 'S',
+                JustificationTypes.ABSENCE_JUSTIFIED.name: 'M',
+                JustificationTypes.CHEATING.name: 'T',
+            }[note.name]
+        return str(note)
 
     def get_type_peps(self, note_etudiant: NoteEtudiantDTO):
         try:

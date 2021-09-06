@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from django import forms
-from django.forms import HiddenInput
+from django.forms import HiddenInput, BaseFormSet
 from django.utils.translation import pgettext_lazy, gettext_lazy as _
 
 
@@ -32,6 +32,11 @@ from base.forms.utils import choice_field
 from base.models.enums.exam_enrollment_justification_type import JustificationTypes
 from ddd.logic.encodage_des_notes.encodage.commands import GetCohortesGestionnaireCommand
 from infrastructure.messages_bus import message_bus_instance
+
+
+class ScoreEncodingFormSet(BaseFormSet):
+    def is_valid(self):
+        return not any(form.is_bound and form.has_changed() and not form.is_valid() for form in self.forms)
 
 
 class ScoreEncodingForm(forms.Form):

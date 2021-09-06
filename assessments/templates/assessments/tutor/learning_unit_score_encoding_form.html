@@ -117,13 +117,13 @@
                 <table class="table table-hover">
                     <thead>
                         <tr>
-                            <th id="status">{% trans 'Status' %}</th>
-                            <th id="program">{% trans 'Program' context 'encoding' %}</th>
-                            <th id="registration_number">{% trans 'Registration number' %}</th>
-                            <th id="lastname">{% trans 'Lastname' %}</th>
-                            <th id="firstname">{% trans 'Firstname' %}</th>
-                            <th id="score">{% trans 'Score' %}</th>
-                            <th id="deadline">{% trans 'Teacher deadline' %}</th>
+                            <th id="status" class="col-md-1">{% trans 'Status' %}</th>
+                            <th id="program" class="col-md-1">{% trans 'Program' context 'encoding' %}</th>
+                            <th id="registration_number" class="col-md-1">{% trans 'Registration number' %}</th>
+                            <th id="lastname" class="col-md-2">{% trans 'Lastname' %}</th>
+                            <th id="firstname" class="col-md-2">{% trans 'Firstname' %}</th>
+                            <th id="score" class="col-md-2">{% trans 'Score' %}</th>
+                            <th id="deadline" class="col-md-2">{% trans 'Teacher deadline' %}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -142,13 +142,13 @@
                                 <td headers="lastname">{{ note_etudiant.nom }}</td>
                                 <td headers="firstname">{{ note_etudiant.prenom }}</td>
                                 <td id="enrollment_note_{{ forloop.counter0 }}" headers="score">
-                                    {% if not note_etudiant.est_soumise %}
+                                    {% if not note_etudiant.est_soumise and not note_etudiant.date_echeance_atteinte %}
                                         {% with score_encoding_form=form|index:forloop.counter0 %}
                                             {% bootstrap_field score_encoding_form.note show_label=False %}
                                             {% bootstrap_field score_encoding_form.noma %}
                                         {% endwith %}
                                     {% else %}
-                                        {{ note_etudiant.note }}
+                                        {{ note_etudiant.note|default:"-" }}
                                     {% endif %}
                                 </td>
                                 <td headers="deadline">

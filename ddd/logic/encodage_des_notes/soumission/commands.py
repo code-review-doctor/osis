@@ -78,3 +78,9 @@ class GetFeuilleDeNotesCommand(interface.CommandRequest):
 @attr.s(frozen=True, slots=True)
 class SearchAdressesFeuilleDeNotesCommand(interface.CommandRequest):
     codes_unite_enseignement = attr.ib(type=List[str])
+
+
+@attr.s(frozen=True, slots=True)
+class GetResponsableDeNotesCommand(interface.CommandRequest):
+    code_unite_enseignement = attr.ib(type=str)
+    annee_unite_enseignement = attr.ib(type=int)

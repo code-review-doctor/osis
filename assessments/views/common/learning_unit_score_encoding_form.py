@@ -31,7 +31,8 @@ from django.utils.functional import cached_property
 from django.views.generic import FormView
 
 from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmissionCalendar
-from assessments.forms.score_encoding import ScoreEncodingForm
+from assessments.forms.score_encoding import ScoreEncodingForm, ScoreEncodingFormSet
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderNoteCommand
 from infrastructure.messages_bus import message_bus_instance
 from osis_role.contrib.views import PermissionRequiredMixin
@@ -61,14 +62,15 @@ class LearningUnitScoreEncodingBaseFormView(PermissionRequiredMixin, FormView):
                     email_etudiant=self.feuille_de_notes.get_email_for_noma(form.cleaned_data['noma']),
                     note=form.cleaned_data['note'],
                 )
+                try:
+                    message_bus_instance.invoke(cmd)
+                except MultipleBusinessExceptions as e:
+                    for exception in e.exceptions:
+                        form.add_error('note', exception.message)
 
-                message_bus_instance.invoke(cmd)
-
-        redirect_url = reverse(
-            'learning_unit_score_encoding',
-            kwargs={'learning_unit_code': self.kwargs['learning_unit_code']}
-        )
-        return redirect(redirect_url)
+        if formset.is_valid():
+            return self.get_success_url()
+        return self.render_to_response(self.get_context_data(form=formset))
 
     def dispatch(self, request, *args, **kwargs):
         opened_calendars = ScoresExamSubmissionCalendar().get_opened_academic_events()
@@ -78,15 +80,7 @@ class LearningUnitScoreEncodingBaseFormView(PermissionRequiredMixin, FormView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_form_class(self):
-        return formset_factory(ScoreEncodingForm, extra=0)
-
-    def get_initial(self):
-        return [
-            {
-                'note': note_etudiant.note,
-                'noma': note_etudiant.noma
-            } for note_etudiant in self.feuille_de_notes.notes_etudiants
-        ]
+        return formset_factory(ScoreEncodingForm, formset=ScoreEncodingFormSet, extra=0)
 
     def get_context_data(self, **kwargs):
         context = {
@@ -95,6 +89,13 @@ class LearningUnitScoreEncodingBaseFormView(PermissionRequiredMixin, FormView):
             'cancel_url': self.get_cancel_url()
         }
         return context
+
+    def get_success_url(self):
+        redirect_url = reverse(
+            'learning_unit_score_encoding',
+            kwargs={'learning_unit_code': self.kwargs['learning_unit_code']}
+        )
+        return redirect(redirect_url)
 
     def get_cancel_url(self):
         return reverse('learning_unit_score_encoding', kwargs={

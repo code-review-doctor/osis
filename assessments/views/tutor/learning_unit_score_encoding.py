@@ -24,9 +24,10 @@
 #
 ##############################################################################
 from django.urls import reverse
+from django.utils.functional import cached_property
 
 from assessments.views.common.learning_unit_score_encoding import LearningUnitScoreEncodingBaseView
-from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand
+from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand, GetResponsableDeNotesCommand
 from infrastructure.messages_bus import message_bus_instance
 
 
@@ -37,11 +38,13 @@ class LearningUnitScoreEncodingTutorView(LearningUnitScoreEncodingBaseView):
     def get_context_data(self, **kwargs):
         return {
             **super().get_context_data(),
-            'feuille_de_notes': self.get_feuille_de_notes(),
+            'feuille_de_notes': self.feuille_de_notes,
             'learning_unit_submit_url': self.get_learning_unit_submit_url(),
+            'can_submit_scores': self.can_submit_scores()
         }
 
-    def get_feuille_de_notes(self):
+    @cached_property
+    def feuille_de_notes(self):
         cmd = GetFeuilleDeNotesCommand(
             matricule_fgs_enseignant=self.person.global_id,
             code_unite_enseignement=self.kwargs['learning_unit_code'].upper()
@@ -52,3 +55,14 @@ class LearningUnitScoreEncodingTutorView(LearningUnitScoreEncodingBaseView):
         return reverse('learning_unit_score_encoding_submit', kwargs={
             'learning_unit_code': self.kwargs['learning_unit_code']
         })
+
+    def can_submit_scores(self) -> bool:
+        return self.feuille_de_notes.quantite_notes_en_attente_de_soumission > 0 and self.is_score_responsible()
+
+    def is_score_responsible(self) -> bool:
+        cmd = GetResponsableDeNotesCommand(
+            code_unite_enseignement=self.feuille_de_notes.code_unite_enseignement,
+            annee_unite_enseignement=self.feuille_de_notes.annee_academique
+        )
+        score_responsible_dto = message_bus_instance.invoke(cmd)
+        return score_responsible_dto and score_responsible_dto.matricule == self.person.global_id

@@ -50,7 +50,7 @@ class _XLSNoteEtudiantRowImportSerializer(serializers.Serializer):
 
     def get_note(self, obj: tuple):
         col_note = HEADER.index(_('Numbered scores'))
-        return obj[col_note].value
+        return str(obj[col_note].value) if obj[col_note].value else ''
 
     def get_email(self, obj: tuple):
         col_email = HEADER.index(_('Email'))
@@ -70,7 +70,8 @@ class ScoreSheetXLSImportSerializer(serializers.Serializer):
         col_session = HEADER.index(_('Session'))
         session_found = set()
         for count, row in enumerate(self.__get_student_rows(worksheet)):
-            session_cleaned = self.__extract_integer_cell(row, col_session)
+            raw_session_value = row[col_session].value
+            session_cleaned = self.__convert_to_integer(raw_session_value)
             session_found.add(session_cleaned)
 
         if len(session_found) == 0:
@@ -88,7 +89,8 @@ class ScoreSheetXLSImportSerializer(serializers.Serializer):
         academic_year_found = set()
 
         for count, row in enumerate(self.__get_student_rows(worksheet)):
-            academic_year_cleaned = self.__extract_integer_cell(row, col_academic_year)
+            raw_academic_year_value = row[col_academic_year].value[:4]
+            academic_year_cleaned = self.__convert_to_integer(raw_academic_year_value)
             academic_year_found.add(academic_year_cleaned)
 
         # TODO: Make translation as normal
@@ -110,10 +112,8 @@ class ScoreSheetXLSImportSerializer(serializers.Serializer):
     def __get_student_rows(self, worksheet: Worksheet):
         return filter(self.__is_student_score_row, worksheet.rows)
 
-    def __extract_integer_cell(self, row, column_number) -> int:
-        raw_session_value = row[column_number].value
-        return int(raw_session_value) \
-            if isinstance(raw_session_value, str) and raw_session_value.isdigit() else raw_session_value
+    def __convert_to_integer(self, raw_cell_value) -> int:
+        return int(raw_cell_value) if isinstance(raw_cell_value, str) and raw_cell_value.isdigit() else raw_cell_value
 
     def get_notes_etudiants(self, worksheet: Worksheet):
         notes_etudiants = []

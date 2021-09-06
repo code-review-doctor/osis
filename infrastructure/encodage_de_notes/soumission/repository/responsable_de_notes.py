@@ -199,6 +199,7 @@ class ResponsableDeNotesRepository(IResponsableDeNotesRepository):
         responsables_notes_as_values = ScoreResponsible.objects.annotate(
             nom=F('tutor__person__last_name'),
             prenom=F('tutor__person__first_name'),
+            matricule=F('tutor__person__global_id'),
             code_unite_enseignement=Concat(
                 'learning_unit_year__acronym',
                 'learning_class_year__acronym',
@@ -208,8 +209,9 @@ class ResponsableDeNotesRepository(IResponsableDeNotesRepository):
         ).values(
             'nom',
             'prenom',
+            'matricule',
             'code_unite_enseignement',
-            'annee_unite_enseignement'
+            'annee_unite_enseignement',
         ).filter(
             annee_unite_enseignement__in={id_ue.annee_academique for id_ue in unite_enseignement_identities},
             code_unite_enseignement__in={id_ue.code_unite_enseignement for id_ue in unite_enseignement_identities}

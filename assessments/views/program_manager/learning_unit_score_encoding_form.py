@@ -41,3 +41,11 @@ class LearningUnitScoreEncodingProgramManagerFormView(LearningUnitScoreEncodingB
             code_unite_enseignement=self.kwargs['learning_unit_code'].upper()
         )
         return message_bus_instance.invoke(cmd)
+
+    def get_initial(self):
+        return [
+            {
+                'note': note_etudiant.note,
+                'noma': note_etudiant.noma
+            } for note_etudiant in self.feuille_de_notes.notes_etudiants
+        ]
