@@ -30,7 +30,7 @@ from ddd.logic.encodage_des_notes.soumission.builder.adresse_feuille_de_notes_bu
 from ddd.logic.encodage_des_notes.soumission.builder.adresse_feuille_de_notes_identity_builder import \
     AdresseFeuilleDeNotesIdentityBuilder
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderAdresseFeuilleDeNotesSpecifique, \
-    EncoderAdresseEntiteCommeAdresseFeuilleDeNotes
+    EncoderAdresseEntiteCommeAdresseFeuilleDeNotes, EcraserAdresseFeuilleDeNotesPremiereAnneeDeBachelier
 from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_notes import IdentiteAdresseFeuilleDeNotes
 from ddd.logic.encodage_des_notes.soumission.dtos import AdresseFeuilleDeNotesDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_notes import \
@@ -41,6 +41,21 @@ from osis_common.ddd import interface
 
 
 class EncoderAdresseFeuilleDeNotesDomainService(interface.DomainService):
+    @classmethod
+    def ecraser_adresse_premiere_annee_de_bachelier(
+            cls,
+            cmd: EcraserAdresseFeuilleDeNotesPremiereAnneeDeBachelier,
+            repo: IAdresseFeuilleDeNotesRepository,
+    ) -> 'IdentiteAdresseFeuilleDeNotes':
+        nom_cohorte_bachelier = cmd.nom_cohorte.replace("11BA", "1BA")
+        identite_adresse_bachelier = AdresseFeuilleDeNotesIdentityBuilder().build_from_nom_cohorte(
+            nom_cohorte_bachelier
+        )
+        dto_adresse_bachelier = repo.search_dtos([identite_adresse_bachelier])[0]
+
+        dto_adresse_premiere_annee_de_bachelier = attr.evolve(dto_adresse_bachelier, nom_cohorte=cmd.nom_cohorte)
+
+        return cls._encoder_adresse(dto_adresse_premiere_annee_de_bachelier, repo)
 
     @classmethod
     def encoder_adresse_entite_comme_adresse(

@@ -101,6 +101,11 @@ class EncoderAdresseFeuilleDeNotesSpecifique(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
+class EcraserAdresseFeuilleDeNotesPremiereAnneeDeBachelier(interface.CommandRequest):
+    nom_cohorte = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
 class GetAdresseFeuilleDeNotesServiceCommand(interface.CommandRequest):
     nom_cohorte = attr.ib(type=str)
 

@@ -22,19 +22,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import attr
+from ddd.logic.encodage_des_notes.soumission.commands import EncoderAdresseFeuilleDeNotesSpecifique, \
+    EcraserAdresseFeuilleDeNotesPremiereAnneeDeBachelier
+from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_notes import IdentiteAdresseFeuilleDeNotes
+from ddd.logic.encodage_des_notes.soumission.domain.service.encoder_adresse_feuille_de_notes import \
+    EncoderAdresseFeuilleDeNotesDomainService
+from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_notes import \
+    IAdresseFeuilleDeNotesRepository
 
 
-def assert_attrs_instances_are_equal(inst1, inst2, exclude=None):
-    """
-    Assert that two instances of a same class have same values for their attributes
-
-    :param inst1:  Instance of an attrs-decoracted class
-    :param inst2: Instance of an attrs-decoracted class
-    """
-    exclude = exclude or []
-    attr_fields = attr.fields(type(inst1))
-    fields_to_exclude = [getattr(attr_fields, field) for field in exclude if getattr(attr_fields, field, None)]
-    filter_exclude = attr.filters.exclude(*fields_to_exclude)
-    assert attr.astuple(inst1, filter=filter_exclude, retain_collection_types=True) ==\
-        attr.astuple(inst2, filter=filter_exclude, retain_collection_types=True)
+def ecraser_adresse_feuille_de_note_premiere_annee_de_bachelier_par_adresse_du_bachelier(
+        cmd: EcraserAdresseFeuilleDeNotesPremiereAnneeDeBachelier,
+        repo: IAdresseFeuilleDeNotesRepository,
+) -> 'IdentiteAdresseFeuilleDeNotes':
+    return EncoderAdresseFeuilleDeNotesDomainService().ecraser_adresse_premiere_annee_de_bachelier(cmd, repo)

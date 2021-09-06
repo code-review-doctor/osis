@@ -29,7 +29,7 @@ from base.forms.exceptions import InvalidFormException
 from base.models.entity_version import EntityVersion
 from ddd.logic.encodage_des_notes.soumission.commands import GetChoixEntitesAdresseFeuilleDeNotesCommand, \
     EncoderAdresseFeuilleDeNotesSpecifique, \
-    EncoderAdresseEntiteCommeAdresseFeuilleDeNotes
+    EncoderAdresseEntiteCommeAdresseFeuilleDeNotes, EcraserAdresseFeuilleDeNotesPremiereAnneeDeBachelier
 from ddd.logic.encodage_des_notes.soumission.dtos import AdresseFeuilleDeNotesDTO
 from infrastructure.messages_bus import message_bus_instance
 from osis_common.ddd.interface import BusinessException
@@ -96,7 +96,7 @@ class ScoreSheetAddressForm(forms.Form):
         try:
             if self.cleaned_data['entity']:
                 return self._encoder_adresse_entite_comme_adresse()
-            return self._encoder_adresse_entite_comme_adresse()
+            return self._encoder_adresse_specifique()
         except BusinessException as e:
             self.add_error("entity", e.message)
             raise InvalidFormException()
@@ -140,22 +140,5 @@ class FirstYearBachelorScoreSheetAddressForm(ScoreSheetAddressForm):
         return super().save()
 
     def _ecraser_adresse_par_adresse_bachelier(self):
-        if self.adresse_bachelier.entite:
-            cmd = EncoderAdresseEntiteCommeAdresseFeuilleDeNotes(
-                nom_cohorte=self.nom_cohorte,
-                entite=self.adresse_bachelier.entite,
-                email=self.adresse_bachelier.email,
-            )
-        else:
-            cmd = EncoderAdresseFeuilleDeNotesSpecifique(
-                nom_cohorte=self.nom_cohorte,
-                destinataire=self.adresse_bachelier.destinataire,
-                rue_numero=self.adresse_bachelier.rue_numero,
-                code_postal=self.adresse_bachelier.code_postal,
-                ville=self.adresse_bachelier.ville,
-                pays=self.adresse_bachelier.pays,
-                telephone=self.adresse_bachelier.telephone,
-                fax=self.adresse_bachelier.fax,
-                email=self.adresse_bachelier.email,
-            )
+        cmd = EcraserAdresseFeuilleDeNotesPremiereAnneeDeBachelier(nom_cohorte=self.nom_cohorte)
         return message_bus_instance.invoke(cmd)

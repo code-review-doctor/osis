@@ -71,7 +71,8 @@ from ddd.logic.encodage_des_notes.encodage.use_case.read.rechercher_notes_servic
 from ddd.logic.encodage_des_notes.encodage.use_case.write.encoder_notes_service import encoder_notes
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderNoteCommand, SoumettreNoteCommand, \
     GetAdresseFeuilleDeNotesServiceCommand, GetChoixEntitesAdresseFeuilleDeNotesCommand, \
-    EncoderAdresseFeuilleDeNotesSpecifique, EncoderAdresseEntiteCommeAdresseFeuilleDeNotes
+    EncoderAdresseFeuilleDeNotesSpecifique, EncoderAdresseEntiteCommeAdresseFeuilleDeNotes, \
+    EcraserAdresseFeuilleDeNotesPremiereAnneeDeBachelier
 from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand, GetProgressionGeneraleCommand, \
     AssignerResponsableDeNotesCommand, \
     SearchAdressesFeuilleDeNotesCommand
@@ -87,6 +88,9 @@ from ddd.logic.encodage_des_notes.soumission.use_case.read.search_donnees_admini
     search_donnees_administratives_feuille_de_notes
 from ddd.logic.encodage_des_notes.soumission.use_case.write.assigner_responsable_de_notes_service import \
     assigner_responsable_de_notes
+from ddd.logic.encodage_des_notes.soumission.use_case.write\
+    .ecraser_adresse_feuille_de_note_premiere_annee_de_bachelier_par_adresse_du_bachelier_service import \
+    ecraser_adresse_feuille_de_note_premiere_annee_de_bachelier_par_adresse_du_bachelier
 from ddd.logic.encodage_des_notes.soumission.use_case.write.encode_note_etudiant_service import \
     encoder_note_etudiant
 from ddd.logic.encodage_des_notes.soumission.use_case.write \
@@ -370,6 +374,11 @@ class MessageBus:
         EncoderAdresseFeuilleDeNotesSpecifique: lambda cmd: encoder_adresse_feuille_de_notes_specifique(
             cmd,
             AdresseFeuilleDeNotesRepository(),
+        ),
+        EcraserAdresseFeuilleDeNotesPremiereAnneeDeBachelier: lambda cmd:
+            ecraser_adresse_feuille_de_note_premiere_annee_de_bachelier_par_adresse_du_bachelier(
+                cmd,
+                AdresseFeuilleDeNotesRepository(),
         ),
         GetAdresseFeuilleDeNotesServiceCommand: lambda cmd: get_adresse_feuille_de_notes(
             cmd,
