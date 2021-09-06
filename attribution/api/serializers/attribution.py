@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from decimal import Decimal
+
 from django.conf import settings
 from rest_framework import serializers
 
@@ -64,8 +66,8 @@ class AttributionSerializer(serializers.Serializer):
         return ""
 
     @staticmethod
-    def get_total_learning_unit_charge(obj):
-        return obj.lecturing_charge or 0 + obj.practical_charge or 0
+    def get_total_learning_unit_charge(obj) -> Decimal:
+        return obj.lecturing_charge or 0.0 + obj.practical_charge or 0.0
 
     def get_links(self, obj) -> dict:
         return {
@@ -74,11 +76,11 @@ class AttributionSerializer(serializers.Serializer):
         }
 
     @staticmethod
-    def __get_catalog_url(obj):
+    def __get_catalog_url(obj) -> str:
         if settings.LEARNING_UNIT_PORTAL_URL:
             return settings.LEARNING_UNIT_PORTAL_URL.format(year=obj.year, code=obj.code)
 
-    def __get_schedule_url(self, obj):
+    def __get_schedule_url(self, obj) -> str:
         if settings.SCHEDULE_APP_URL and "access_schedule_calendar" in self.context and \
                 obj.year in self.context["access_schedule_calendar"].get_target_years_opened():
             return settings.SCHEDULE_APP_URL.format(code=obj.code)
