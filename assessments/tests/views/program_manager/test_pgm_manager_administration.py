@@ -188,7 +188,7 @@ class PgmManagerAdministrationTest(TestCase):
         ProgramManagerFactory(person=self.person, education_group=educ_group_year2.education_group)
 
         response = self.client.get(
-            reverse('manager_list'),
+            reverse('program_manager_list'),
             data={'education_groups': [educ_group_year1.education_group, educ_group_year2.education_group]}
         )
 

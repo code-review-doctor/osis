@@ -144,7 +144,7 @@ class PgmManagerAdministrationTest(TestCase):
         pgm2 = ProgramManagerFactory(
             person=self.person,
             education_group=educ_group_year2.education_group,
-            is_main=False,
+            is_main=True,
         )
 
         self.client.post(
@@ -155,7 +155,7 @@ class PgmManagerAdministrationTest(TestCase):
         )
         pgm1.refresh_from_db()
         pgm2.refresh_from_db()
-        self.assertTrue(pgm1.is_main)
+        self.assertFalse(pgm1.is_main)
         self.assertTrue(pgm2.is_main)
 
         self.client.post(
