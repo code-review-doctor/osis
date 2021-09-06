@@ -76,12 +76,12 @@ class AttributionSerializer(serializers.Serializer):
         }
 
     @staticmethod
-    def __get_catalog_url(obj) -> str:
+    def __get_catalog_url(obj):
         if settings.LEARNING_UNIT_PORTAL_URL:
             return settings.LEARNING_UNIT_PORTAL_URL.format(year=obj.year, code=obj.code)
 
-    def __get_schedule_url(self, obj) -> str:
-        has_access_schedule_calendar = "access_schedule_calendar" in self.context
-        is_in_target_years = obj.year in self.context["access_schedule_calendar"].get_target_years_opened()
-        if settings.SCHEDULE_APP_URL and has_access_schedule_calendar and is_in_target_years:
+    def __get_schedule_url(self, obj):
+        has_access_schedule_calendar = obj.year in self.context["access_schedule_calendar"].get_target_years_opened() \
+            if "access_schedule_calendar" in self.context else False
+        if settings.SCHEDULE_APP_URL and has_access_schedule_calendar:
             return settings.SCHEDULE_APP_URL.format(code=obj.code)
