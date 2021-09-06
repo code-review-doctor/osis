@@ -98,32 +98,24 @@ class ProgramManagerListView(TemplateView):
 
         context['education_groups'] = self.education_group_ids
 
-        mgrs_global_ids = []
         mgrs_dto = OrderedDict()
         for values_dict in qs:
-            cohorte_geree = _construire_proprietes_gestionnaire_cohorte(values_dict)
             matricule_gestionnaire = values_dict['matricule_gestionnaire']
-            if matricule_gestionnaire not in mgrs_global_ids:
-                mgrs_global_ids.append(matricule_gestionnaire)
-                mgrs_dto.update(
-                    {matricule_gestionnaire: _construire_gestionnaire_cohortes_dto(cohorte_geree, values_dict)}
-                )
-            else:
-                data_to_update = mgrs_dto.get(matricule_gestionnaire)
-                data_to_update.cohortes_gerees.append(cohorte_geree)
-                mgrs_dto.update({matricule_gestionnaire: data_to_update})
+            if matricule_gestionnaire not in mgrs_dto:
+                mgrs_dto[matricule_gestionnaire] = _construire_gestionnaire_cohortes_dto(values_dict)
+            mgrs_dto[matricule_gestionnaire].cohortes_gerees.append(
+                _construire_proprietes_gestionnaire_cohorte(values_dict))
 
         context["by_person"] = mgrs_dto
         return context
 
 
-def _construire_gestionnaire_cohortes_dto(cohorte_geree: ProprietesGestionnaireCohorteDTO, values_dict: Dict) \
-        -> GestionnaireCohortesDTO:
+def _construire_gestionnaire_cohortes_dto(values_dict: Dict) -> GestionnaireCohortesDTO:
     return GestionnaireCohortesDTO(
         matricule_gestionnaire=values_dict['matricule_gestionnaire'],
         nom=values_dict['nom'],
         prenom=values_dict['prenom'],
-        cohortes_gerees=[cohorte_geree]
+        cohortes_gerees=[]
     )
 
 
