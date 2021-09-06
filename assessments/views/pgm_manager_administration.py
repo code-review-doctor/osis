@@ -254,7 +254,6 @@ class ProgramManagerCreateView(ProgramManagerMixin, FormView):
         return context
 
     def form_valid(self, form):
-        print(self.education_group_ids)
         education_groups = EducationGroup.objects.filter(pk__in=self.education_group_ids).distinct()
 
         person = form.cleaned_data['person']
