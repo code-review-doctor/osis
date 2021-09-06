@@ -70,6 +70,10 @@ class NoteBuilder:
 class Note(interface.ValueObject, abc.ABC):
     value = attr.ib(type=Any)
 
+    @property
+    def is_manquant(self) -> bool:
+        return False
+
 
 @attr.s(slots=True, frozen=True)
 class NoteChiffree(Note):
@@ -79,6 +83,10 @@ class NoteChiffree(Note):
 @attr.s(slots=True, frozen=True)
 class NoteManquante(Note):
     value = attr.ib(init=False, default='', type=str)
+
+    @property
+    def is_manquant(self) -> bool:
+        return True
 
 
 @attr.s(slots=True, frozen=True)

@@ -68,7 +68,7 @@ class NoteEtudiant(interface.RootEntity):
 
     @property
     def is_manquant(self) -> bool:
-        return not bool(self.note.value)
+        return self.note.is_manquant
 
     @property
     def is_chiffree(self) -> bool:
