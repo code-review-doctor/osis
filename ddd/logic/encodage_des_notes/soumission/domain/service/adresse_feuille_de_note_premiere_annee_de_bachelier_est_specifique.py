@@ -49,11 +49,11 @@ class AdresseFeuilleDeNotesPremiereAnneeDeBachelierEstSpecifique(interface.Domai
         )
         adresse_bachelier = repo.get(identite_adresse_bachelier)
 
-        if cls._is_adresse_bachelier_identique_a_la_commande(adresse_bachelier, cmd):
+        if cls._is_adresse_bachelier_identique_a_la_nouvelle_adresse_du_11ba(adresse_bachelier, cmd):
             raise AdressePremiereAnneeDeBachelierIdentiqueAuBachlierException()
 
     @classmethod
-    def _is_adresse_bachelier_identique_a_la_commande(
+    def _is_adresse_bachelier_identique_a_la_nouvelle_adresse_du_11ba(
             cls,
             adresse_bachelier: AdresseFeuilleDeNotes,
             cmd: EncoderAdresseFeuilleDeNotes

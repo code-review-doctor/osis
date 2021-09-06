@@ -22,9 +22,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from ddd.logic.encodage_des_notes.soumission.builder.adresse_feuille_de_notes_identity_builder import \
+    AdresseFeuilleDeNotesIdentityBuilder
 from ddd.logic.encodage_des_notes.soumission.commands import GetAdresseFeuilleDeNotesServiceCommand
-from ddd.logic.encodage_des_notes.soumission.domain.service.adresse_feuille_de_notes import \
-    AdresseFeuilleDeNotesDomainService
 from ddd.logic.encodage_des_notes.soumission.dtos import AdresseFeuilleDeNotesDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_notes import \
     IAdresseFeuilleDeNotesRepository
@@ -34,4 +34,5 @@ def get_adresse_feuille_de_notes(
         cmd: GetAdresseFeuilleDeNotesServiceCommand,
         repo: IAdresseFeuilleDeNotesRepository,
 ) -> 'AdresseFeuilleDeNotesDTO':
-    return AdresseFeuilleDeNotesDomainService().get_dto(cmd.nom_cohorte, repo)
+    identite = AdresseFeuilleDeNotesIdentityBuilder().build_from_nom_cohorte(cmd.nom_cohorte)
+    return repo.search_dtos([identite])[0]

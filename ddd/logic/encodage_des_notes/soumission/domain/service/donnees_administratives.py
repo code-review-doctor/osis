@@ -29,13 +29,12 @@ from typing import List, Set
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_inscription_examen import IInscriptionExamenTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodage_notes import \
     IPeriodeEncodageNotesTranslator
-from ddd.logic.encodage_des_notes.soumission.domain.service.adresse_feuille_de_notes import \
-    AdresseFeuilleDeNotesDomainService
+from ddd.logic.encodage_des_notes.soumission.builder.adresse_feuille_de_notes_identity_builder import \
+    AdresseFeuilleDeNotesIdentityBuilder
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_deliberation import IDeliberationTranslator
 from ddd.logic.encodage_des_notes.soumission.dtos import DonneesAdministrativesFeuilleDeNotesDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_notes import \
     IAdresseFeuilleDeNotesRepository
-from ddd.logic.shared_kernel.entite.repository.entiteucl import IEntiteUCLRepository
 from osis_common.ddd import interface
 
 
@@ -99,10 +98,9 @@ def _get_adresse_par_cohorte(
         adresse_feuille_de_notes_repository: 'IAdresseFeuilleDeNotesRepository',
         noms_cohortes: Set['str']
 ):
-    adresses_feuilles_de_notes = AdresseFeuilleDeNotesDomainService.search_dtos(
-        list(noms_cohortes),
-        adresse_feuille_de_notes_repository
-    )
+    identity_builder = AdresseFeuilleDeNotesIdentityBuilder()
+    identites_adresse = [identity_builder.build_from_nom_cohorte(nom_cohorte) for nom_cohorte in noms_cohortes]
+    adresses_feuilles_de_notes = adresse_feuille_de_notes_repository.search_dtos(identites_adresse)
     return {adresse.nom_cohorte: adresse for adresse in adresses_feuilles_de_notes}
 
 
