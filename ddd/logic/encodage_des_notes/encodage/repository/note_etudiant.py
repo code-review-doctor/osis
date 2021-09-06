@@ -38,7 +38,7 @@ class INoteEtudiantRepository(interface.AbstractRepository):
     @abc.abstractmethod
     def search(
             cls,
-            entity_ids: Optional[List['IdentiteNoteEtudiant']] = None,
+            entity_ids: Optional[List['IdentiteNoteEtudiant']] = None,  # FIXME :: pas utilisé ?!
             noms_cohortes: List[str] = None,
             annee_academique: int = None,
             numero_session: int = None,

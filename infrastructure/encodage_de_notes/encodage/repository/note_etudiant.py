@@ -156,49 +156,70 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
             note_manquante: bool = False,
             **kwargs
     ) -> Set['IdentiteNoteEtudiant']:
-        filter_qs = cls._build_filter(
-            noms_cohortes=noms_cohortes,
-            annee_academique=annee_academique,
-            numero_session=numero_session,
-            nomas=nomas,
-            code_unite_enseignement=code_unite_enseignement,
-            note_manquante=note_manquante,
-        )
+        qs = ExamEnrollment.objects.all()
 
-        if not filter_qs:
-            return set()
+        if annee_academique:
+            qs = qs.filter(learning_unit_enrollment__learning_unit_year__academic_year__year=annee_academique)
+        if numero_session:
+            qs = qs.filter(session_exam__number_session=numero_session)
+        if noms_cohortes:
+            # qs = qs.filter(learning_unit_enrollment__offer_enrollment__education_group_year__acronym__in=noms_cohortes)
+            qs = qs.annotate(
+                nom_cohorte=Case(
+                    When(
+                        learning_unit_enrollment__offer_enrollment__cohort_year__name=CohortName.FIRST_YEAR.name,
+                        then=Replace(
+                            'learning_unit_enrollment__offer_enrollment__education_group_year__acronym',
+                            Value('1BA'),
+                            Value('11BA')
+                        )
+                    ),
+                    default=F('learning_unit_enrollment__offer_enrollment__education_group_year__acronym'),
+                    output_field=CharField()
+                ),
+            ).filter(nom_cohorte__in=noms_cohortes)
+            # cohortes_11ba = {nom for nom in noms_cohortes if '11BA' in nom}
+            # cohortes_1ba = {nom for nom in noms_cohortes if '11BA' not in nom}
+            # if cohortes_1ba and cohortes_11ba:
+            #     equivalent_1ba = {nom.replace('11BA', '1BA') for nom in cohortes_11ba}
+            #     cohort_ids = CohortYear.objects.filter(
+            #         education_group_year__acronym__in=equivalent_1ba
+            #     ).values_list('pk', flat=True).distinct()
+            #     qs = qs.filter(
+            #         Q(learning_unit_enrollment__offer_enrollment__education_group_year__acronym__in=cohortes_1ba)
+            #         | Q(learning_unit_enrollment__offer_enrollment__cohort_year_id__in=cohort_ids)
+            #     )
+            # elif cohortes_1ba:
+            #     qs = qs.filter(learning_unit_enrollment__offer_enrollment__education_group_year__acronym__in=cohortes_1ba)
+            # elif cohortes_11ba:
+            #     equivalent_1ba = {nom.replace('11BA', '1BA') for nom in cohortes_11ba}
+            #     cohort_ids = CohortYear.objects.filter(
+            #         education_group_year__acronym__in=equivalent_1ba
+            #     ).values_list('pk', flat=True).distinct()
+            #     qs = qs.filter(learning_unit_enrollment__offer_enrollment__cohort_year_id__in=cohort_ids)
+            # if cohortes_11ba:
+            #     equivalent_1ba = {nom.replace('11BA', '1BA') for nom in cohortes_11ba}
+            #     qs = qs.filter(learning_unit_enrollment__offer_enrollment__cohort_year__education_group_year__acronym__in=equivalent_1ba)
+        if nomas:
+            qs = qs.filter(learning_unit_enrollment__offer_enrollment__student__registration_id__in=nomas)
+        if note_manquante:
+            qs = qs.filter(score_final__isnull=True, justification_final_isnull=True)
 
-        qs = ExamEnrollment.objects.annotate(
+        qs = qs.annotate(
             code_unite_enseignement=Concat(
                 'learning_unit_enrollment__learning_unit_year__acronym',
                 'learning_unit_enrollment__learning_class_year__acronym',
                 output_field=CharField()
             ),
+        )
+        if code_unite_enseignement:
+            qs = qs.filter(code_unite_enseignement__icontains=code_unite_enseignement)
+
+        qs = qs.annotate(
             annee_academique=F('learning_unit_enrollment__learning_unit_year__academic_year__year'),
             numero_session=F('session_exam__number_session'),
             noma=F('learning_unit_enrollment__offer_enrollment__student__registration_id'),
-            nom_cohorte=Case(
-                When(
-                    learning_unit_enrollment__offer_enrollment__cohort_year__name=CohortName.FIRST_YEAR.name,
-                    then=Replace(
-                        'learning_unit_enrollment__offer_enrollment__education_group_year__acronym',
-                        Value('1BA'),
-                        Value('11BA')
-                    )
-                ),
-                default=F('learning_unit_enrollment__offer_enrollment__education_group_year__acronym'),
-                output_field=CharField()
-            ),
-            note=Coalesce(
-                'justification_final',
-                Cast('score_final', output_field=CharField()),
-                'justification_reencoded',
-                Cast('score_reencoded', output_field=CharField()),
-                'justification_draft',
-                Cast('score_draft', output_field=CharField()),
-                Value(''),
-            )
-        ).filter(*filter_qs).values(
+        ).values(
             'noma',
             'code_unite_enseignement',
             'annee_academique',
