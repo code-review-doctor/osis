@@ -194,20 +194,13 @@ class PgmManagerAdministrationTest(TestCase):
 
         self.assertIsInstance(response.context['by_person'], OrderedDict)
         dto_result = response.context['by_person'].get(self.person.global_id)
-        print('***')
-        for d in dto_result.cohortes_gerees:
-            print(d)
-        print('***')
         self.assertEqual(dto_result.matricule_gestionnaire, self.person.global_id)
         self.assertEqual(dto_result.nom, self.person.last_name)
         self.assertEqual(dto_result.prenom, self.person.first_name)
 
         expected_dto_1 = build_proprietes_gestionnaire_cohorte_dto(educ_group_year1)
         expected_dto_2 = build_proprietes_gestionnaire_cohorte_dto(educ_group_year2)
-        print('---')
-        print(expected_dto_1)
-        print(expected_dto_2)
-        print('---')
+
         self.assertListEqual(
             dto_result.cohortes_gerees,
             [
