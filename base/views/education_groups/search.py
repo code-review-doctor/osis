@@ -40,6 +40,7 @@ from education_group.models.cohort_year import CohortYear
 from education_group.models.enums.cohort_name import CohortName
 from osis_role.contrib.views import PermissionRequiredMixin
 
+
 #  FIXME Use a read service to fetch offers
 @attr.s(frozen=True, slots=True)
 class OfferSearchDTO:

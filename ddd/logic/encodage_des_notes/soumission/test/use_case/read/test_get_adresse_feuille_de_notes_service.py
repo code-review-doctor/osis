@@ -36,6 +36,7 @@ from infrastructure.encodage_de_notes.soumission.repository.in_memory.adresse_fe
     AdresseFeuilleDeNotesInMemoryRepository
 from infrastructure.messages_bus import message_bus_instance
 
+
 class TestGetAdresseFeuilleDeNotesService(SimpleTestCase):
     def setUp(self) -> None:
         self.repository = AdresseFeuilleDeNotesInMemoryRepository()

@@ -51,4 +51,8 @@ def encoder_adresse_entite_comme_adresse_feuille_de_notes(
         entites_cohorte_translator
     )
 
-    return EncoderAdresseFeuilleDeNotesDomainService().encoder_adresse_entite_comme_adresse(cmd, repo, entite_repository)
+    return EncoderAdresseFeuilleDeNotesDomainService().encoder_adresse_entite_comme_adresse(
+        cmd,
+        repo,
+        entite_repository
+    )

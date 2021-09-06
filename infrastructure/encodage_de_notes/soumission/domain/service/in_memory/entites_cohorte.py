@@ -34,4 +34,3 @@ class EntitesCohorteTranslatorInMemory(IEntitesCohorteTranslator):
     @classmethod
     def search_entite_administration_et_gestion(cls, nom_cohorte: str) -> List['IdentiteUCLEntite']:
         return cls.datas
-
