@@ -24,11 +24,9 @@
 #
 ##############################################################################
 import logging
-import traceback
 
-import requests
 from django.conf import settings
-from django.db.models import F, Case, When, Q, Value, CharField
+from django.db.models import F, Case, When, Q, Value, CharField, Exists, OuterRef
 from django.db.models.functions import Concat, Replace
 from django.utils.functional import cached_property
 from rest_framework import generics
@@ -36,9 +34,11 @@ from rest_framework.response import Response
 
 from attribution.api.serializers.attribution import AttributionSerializer
 from attribution.calendar.access_schedule_calendar import AccessScheduleCalendar
-from attribution.models.attribution import Attribution
 from attribution.models.attribution_charge_new import AttributionChargeNew
+from attribution.models.attribution_class import AttributionClass
+from base.models.enums import learning_component_year_type
 from base.models.person import Person
+from base.models.student import Student
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
@@ -51,7 +51,7 @@ class AttributionListView(generics.ListAPIView):
 
     def list(self, request, *args, **kwargs):
         attributions = self._get_attributions_charge_new()
-        if self.request.query_params.get('with_classes') == "True":
+        if self.request.query_params.get('with_effective_class_repartition') == "True":
             # quick fix to be modified with the correct implementation of classes
             attributions = list(attributions) + list(self._get_classes_attributions())
         serializer = AttributionSerializer(
@@ -77,6 +77,20 @@ class AttributionListView(generics.ListAPIView):
 
             code=F('learning_component_year__learning_unit_year__acronym'),
             type=F('learning_component_year__learning_unit_year__learning_container_year__container_type'),
+            lecturing_charge=Case(
+                When(
+                    Q(learning_component_year__type=learning_component_year_type.LECTURING),
+                    then='allocation_charge',
+                ),
+                default=None
+            ),
+            practical_charge=Case(
+                When(
+                    Q(learning_component_year__type=learning_component_year_type.PRACTICAL_EXERCISES),
+                    then='allocation_charge',
+                ),
+                default=None
+            ),
             title_fr=Case(
                 When(
                     Q(learning_component_year__learning_unit_year__learning_container_year__common_title__isnull=True) |
@@ -98,7 +112,7 @@ class AttributionListView(generics.ListAPIView):
             title_en=Case(
                 When(
                     Q(learning_component_year__learning_unit_year__learning_container_year__common_title_english__isnull=True) |  # noqa
-                    Q(learning_component_year__learning_unit_year__learning_container_year__common_title_english__exact=''),  # noqa
+                    Q(learning_component_year__learning_unit_year__learning_container_year__common_title_english__exact=''),# noqa
                     then='learning_component_year__learning_unit_year__specific_title_english'
                 ),
                 When(
@@ -116,60 +130,78 @@ class AttributionListView(generics.ListAPIView):
             year=F('learning_component_year__learning_unit_year__academic_year__year'),
             credits=F('learning_component_year__learning_unit_year__credits'),
             start_year=F('attribution__start_year'),
-            function=F('attribution__function')
+            function=F('attribution__function'),
+            has_peps=Exists(
+                Student.objects.filter(
+                    studentspecificprofile__isnull=False,
+                    offerenrollment__learningunitenrollment__learning_unit_year__acronym=OuterRef(
+                        'learning_component_year__learning_unit_year__acronym'),
+                    offerenrollment__learningunitenrollment__learning_unit_year__academic_year=OuterRef(
+                        'learning_component_year__learning_unit_year__academic_year')
+                )
+            )
         )
 
     def _get_classes_attributions(self):
-        return Attribution.objects.select_related(
-            'learning_unit_year__academic_year'
+        return AttributionClass.objects.select_related(
+            'learning_class_year__learning_component_year__learning_unit_year__academic_year'
         ).filter(
-            learning_unit_year__academic_year__year=self.kwargs['year'],
-            tutor__person=self.person,
-            learning_unit_year__learning_container_year__isnull=True
+            learning_class_year__learning_component_year__learning_unit_year__academic_year__year=self.kwargs['year'],
+            attribution_charge__attribution__tutor__person=self.person,
+            attribution_charge__attribution__decision_making=''  # NEEDED ?
         ).annotate(
-            # Technical ID for making a match with data in EPC. Remove after refactoring...
-            allocation_id=Replace('external_id', Value('osis.attribution_'), Value('')),
-
-            code=F('learning_unit_year__acronym'),
-            type=Value('COURSE', output_field=CharField()),
+            code=F('learning_class_year__learning_component_year__learning_unit_year__acronym'),
             title_fr=Case(
                 When(
-                    Q(learning_unit_year__learning_container_year__common_title__isnull=True) |
-                    Q(learning_unit_year__learning_container_year__common_title__exact=''),
-                    then='learning_unit_year__specific_title'
+                    Q(learning_class_year__learning_component_year__learning_unit_year__learning_container_year__common_title__isnull=True) |  # noqa
+                    Q(learning_class_year__learning_component_year__learning_unit_year__learning_container_year__common_title__exact=''),# noqa
+                    then='learning_class_year__title_fr'
                 ),
                 When(
-                    Q(learning_unit_year__specific_title__isnull=True) |
-                    Q(learning_unit_year__specific_title__exact=''),
-                    then='learning_unit_year__learning_container_year__common_title'
+                    Q(learning_class_year__title_fr__isnull=True) |
+                    Q(learning_class_year__title_fr__exact=''),
+                    then='learning_class_year__learning_component_year__learning_unit_year__learning_container_year__common_title'# noqa
                 ),
                 default=Concat(
-                    'learning_unit_year__learning_container_year__common_title',
+                    'learning_class_year__learning_component_year__learning_unit_year__learning_container_year__common_title',# noqa
                     Value(' - '),
-                    'learning_unit_year__specific_title'
+                    'learning_class_year__title_fr'
                 ),
                 output_field=CharField(),
             ),
             title_en=Case(
                 When(
-                    Q(learning_unit_year__learning_container_year__common_title_english__isnull=True) |  # noqa
-                    Q(learning_unit_year__learning_container_year__common_title_english__exact=''),  # noqa
-                    then='learning_unit_year__specific_title_english'
+                    Q(learning_class_year__learning_component_year__learning_unit_year__learning_container_year__common_title_english__isnull=True) |  # noqa
+                    Q(learning_class_year__learning_component_year__learning_unit_year__learning_container_year__common_title_english__exact=''),# noqa
+                    then='learning_class_year__title_en'
                 ),
                 When(
-                    Q(learning_unit_year__specific_title_english__isnull=True) |
-                    Q(learning_unit_year__specific_title_english__exact=''),
-                    then='learning_unit_year__learning_container_year__common_title_english'
+                    Q(learning_class_year__title_en__isnull=True) |
+                    Q(learning_class_year__title_en__exact=''),
+                    then='learning_class_year__learning_component_year__learning_unit_year__learning_container_year__common_title_english'# noqa
                 ),
                 default=Concat(
-                    'learning_unit_year__learning_container_year__common_title_english',
+                    'learning_class_year__learning_component_year__learning_unit_year__learning_container_year__common_title_english',# noqa
                     Value(' - '),
-                    'learning_unit_year__specific_title_english'
+                    'learning_class_year__title_en'
                 ),
                 output_field=CharField(),
             ),
-            year=F('learning_unit_year__academic_year__year'),
-            credits=F('learning_unit_year__credits'),
+            year=F('learning_class_year__learning_component_year__learning_unit_year__academic_year__year'),
+            credits=F('learning_class_year__learning_component_year__learning_unit_year__credits'),
+            start_year=F('attribution_charge__attribution__start_year'),
+            function=F('attribution_charge__attribution__function'),
+            has_peps=Exists(
+                Student.objects.filter(
+                    studentspecificprofile__isnull=False,
+                    offerenrollment__learningunitenrollment__learning_class_year__acronym=OuterRef(
+                        'learning_class_year__acronym'
+                    ),
+                    offerenrollment__learningunitenrollment__learning_class_year__learning_component_year=OuterRef(
+                        'learning_class_year__learning_component_year'
+                    ),
+                )
+            )
         )
 
     @cached_property
@@ -180,42 +212,7 @@ class AttributionListView(generics.ListAPIView):
         return {
             **super().get_serializer_context(),
             'access_schedule_calendar': AccessScheduleCalendar(),
-            'attribution_charges': self.get_attribution_charges()
         }
-
-    # TODO: Remove after find synchronization solution because make a remote call to EPC to get right value
-    def get_attribution_charges(self):
-        attribution_charges = []
-        if not all([
-            settings.EPC_API_URL, settings.EPC_API_USER, settings.EPC_API_PASSWORD,
-            settings.EPC_ATTRIBUTIONS_TUTOR_ENDPOINT
-        ]):
-            logger.error("[Attribution API] Missing at least one env. settings (EPC_API_URL, EPC_API_USER, "
-                         "EPC_API_PASSWORD, EPC_ATTRIBUTIONS_TUTOR_ENDPOINT)  ) ")
-            return attribution_charges
-
-        try:
-            url = "{base_url}{endpoint}".format(
-                base_url=settings.EPC_API_URL,
-                endpoint=settings.EPC_ATTRIBUTIONS_TUTOR_ENDPOINT.format(
-                    global_id=self.person.global_id,
-                    year=self.kwargs['year']
-                )
-            )
-            response = requests.get(url, auth=(settings.EPC_API_USER, settings.EPC_API_PASSWORD,), timeout=100)
-            response.raise_for_status()
-            response_data = response.json() or {}
-            attribution_charges = response_data.get("tutorAllocations", [])
-            # Fix when the webservice return a dictionnary in place of a list.
-            # Occur when the tutor has a single attribution.
-            if type(attribution_charges) is dict:
-                attribution_charges = [attribution_charges]
-            return attribution_charges
-        except Exception:
-            log_trace = traceback.format_exc()
-            logger.warning('Error when returning attributions charge duration: \n {}'.format(log_trace))
-        finally:
-            return attribution_charges
 
 
 class MyAttributionListView(AttributionListView):

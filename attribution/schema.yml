@@ -11,7 +11,7 @@ servers:
  - url: https://osis.uclouvain.be/api/v1/attribution/
    description: 'Production server'
 info:
-  version: '1.14'
+  version: '1.15'
   title: 'Attribution Service'
   description: |-
     A set of API endpoints that allow you to get information about attribution
@@ -310,9 +310,9 @@ paths:
             description: ''
             type: string
         - in: query
-          name: with_classes
+          name: with_effective_class_repartition
           schema:
-            description: 'Query parameter to add classes to attributions results'
+            description: 'Query parameter to add classes repartition to attributions results'
             type: boolean
       responses:
         '200':
@@ -753,6 +753,8 @@ components:
           description: 'Total charge for learning unit year'
           example: '55.5'
           nullable: true
+        has_peps:
+          type: boolean
         start_year:
           type: integer
           example: 2018
