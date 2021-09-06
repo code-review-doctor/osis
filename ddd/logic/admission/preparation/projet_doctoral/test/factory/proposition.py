@@ -91,3 +91,7 @@ class PropositionAdmissionSC3DPMinimaleAnnuleeFactory(PropositionAdmissionSC3DPM
 class PropositionPreAdmissionSC3DPMinimaleFactory(_PropositionFactory):
     type_admission = ChoixTypeAdmission.PRE_ADMISSION
     doctorat_id = factory.SubFactory(_DoctoratIdentityFactory, sigle='SC3DP', annee=2020)
+
+
+class PropositionAdmissionSC3DPAvecMembresFactory(PropositionAdmissionSC3DPMinimaleFactory):
+    entity_id = factory.SubFactory(_PropositionIdentityFactory, uuid='uuid-SC3DP-promoteur-membre')

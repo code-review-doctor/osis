@@ -26,6 +26,7 @@
 from typing import Callable, Dict, List
 
 from ddd.logic.admission.preparation.projet_doctoral.commands import (
+    ApprouverPropositionCommand,
     CompleterPropositionCommand,
     IdentifierPromoteurCommand,
     InitierPropositionCommand,
@@ -35,6 +36,8 @@ from ddd.logic.admission.preparation.projet_doctoral.commands import (
 )
 from ddd.logic.admission.preparation.projet_doctoral.use_case.read.rechercher_doctorats_service import \
     rechercher_doctorats
+from ddd.logic.admission.preparation.projet_doctoral.use_case.write.approuver_proposition_service import \
+    approuver_proposition
 from ddd.logic.admission.preparation.projet_doctoral.use_case.write.completer_proposition_service import \
     completer_proposition
 from ddd.logic.admission.preparation.projet_doctoral.use_case.write.identifier_promoteur_service import \
@@ -266,6 +269,10 @@ class MessageBus:
             PropositionRepository(),
             GroupeDeSupervisionRepository(),
         ),
+        ApprouverPropositionCommand: lambda cmd: approuver_proposition(
+            cmd,
+            PropositionRepository(),
+            GroupeDeSupervisionRepository(),
         ),
         SearchFormationsCommand: lambda cmd: search_formations(
             cmd,

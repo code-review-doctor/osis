@@ -89,6 +89,12 @@ class MembreCANonTrouveException(BusinessException):
         super().__init__(message, **kwargs)
 
 
+class SignataireNonTrouveException(BusinessException):
+    def __init__(self, **kwargs):
+        message = _("Member of supervision group not found.")
+        super().__init__(message, **kwargs)
+
+
 class DejaPromoteurException(BusinessException):
     def __init__(self, **kwargs):
         message = _("Already a promoter.")

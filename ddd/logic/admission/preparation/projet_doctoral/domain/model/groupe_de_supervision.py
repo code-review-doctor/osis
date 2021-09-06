@@ -40,6 +40,7 @@ from ddd.logic.admission.preparation.projet_doctoral.domain.model.proposition im
 from ddd.logic.admission.preparation.projet_doctoral.domain.validator.exceptions import \
     MembreGroupeDeSupervisionNonTrouveException
 from ddd.logic.admission.preparation.projet_doctoral.domain.validator.validator_by_business_action import (
+    ApprouverValidatorList,
     IdentifierMembreCAValidatorList,
     IdentifierPromoteurValidatorList,
     SupprimerMembreCAValidatorList,
@@ -109,9 +110,20 @@ class GroupeDeSupervision(interface.Entity):
         self.signatures_membres_CA = [s for s in self.signatures_membres_CA if s.membre_CA_id != membre_CA_id]
 
     def approuver(self, signataire_id: Union['PromoteurIdentity', 'MembreCAIdentity']) -> None:
-        # TODO :: verifier si signataire dans membres_CA ou promoteurs
-        # TODO :: appeler ValidatorList
-        raise NotImplementedError
+        ApprouverValidatorList(
+            groupe_de_supervision=self,
+            signataire_id=signataire_id,
+        ).validate()
+        if isinstance(signataire_id, PromoteurIdentity):
+            self.signatures_promoteurs = [s for s in self.signatures_promoteurs if s.promoteur_id != signataire_id]
+            self.signatures_promoteurs.append(
+                SignaturePromoteur(promoteur_id=signataire_id, etat=ChoixEtatSignature.APPROVED)
+            )
+        elif isinstance(signataire_id, MembreCAIdentity):
+            self.signatures_membres_CA = [s for s in self.signatures_membres_CA if s.membre_CA_id != signataire_id]
+            self.signatures_membres_CA.append(
+                SignatureMembreCA(membre_CA_id=signataire_id, etat=ChoixEtatSignature.APPROVED)
+            )
 
     def verifier_tout_le_monde_a_approuve(self):
         raise NotImplementedError

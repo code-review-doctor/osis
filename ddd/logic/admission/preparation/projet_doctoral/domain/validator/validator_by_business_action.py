@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 # ##############################################################################
-from typing import Optional, List
+from typing import Optional, List, Union
 
 import attr
 
@@ -43,6 +43,8 @@ from ddd.logic.admission.preparation.projet_doctoral.domain.validator._should_pr
     ShouldPromoteurEtreDansGroupeDeSupervision
 from ddd.logic.admission.preparation.projet_doctoral.domain.validator._should_promoteur_pas_deja_present_dans_groupe_de_supervision import \
     ShouldPromoteurPasDejaPresentDansGroupeDeSupervision
+from ddd.logic.admission.preparation.projet_doctoral.domain.validator._should_signataire_etre_dans_groupe_de_supervision import \
+    ShouldSignataireEtreDansGroupeDeSupervision
 from ddd.logic.admission.preparation.projet_doctoral.domain.validator._should_type_contrat_travail_dependre_type_financement import \
     ShouldTypeContratTravailDependreTypeFinancement
 
@@ -149,4 +151,18 @@ class SupprimerMembreCAValidatorList(TwoStepsMultipleBusinessExceptionListValida
     def get_invariants_validators(self) -> List[BusinessValidator]:
         return [
             ShouldMembreCAEtreDansGroupeDeSupervision(self.groupe_de_supervision, self.membre_CA_id),
+        ]
+
+
+@attr.s(frozen=True, slots=True)
+class ApprouverValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
+    groupe_de_supervision = attr.ib(type='GroupeDeSupervision')  # type: GroupeDeSupervision
+    signataire_id = attr.ib(type="Union['PromoteurIdentity', 'MembreCAIdentity']")  # type: Union['PromoteurIdentity', 'MembreCAIdentity']
+
+    def get_data_contract_validators(self) -> List[BusinessValidator]:
+        return []
+
+    def get_invariants_validators(self) -> List[BusinessValidator]:
+        return [
+            ShouldSignataireEtreDansGroupeDeSupervision(self.groupe_de_supervision, self.signataire_id),
         ]
