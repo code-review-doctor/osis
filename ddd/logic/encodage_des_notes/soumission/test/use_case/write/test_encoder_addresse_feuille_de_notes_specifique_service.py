@@ -60,7 +60,7 @@ class TestEncoderAddressFeuilleDeNotesSpecifique(SimpleTestCase):
         self.addCleanup(message_bus_patcher.stop)
         self.message_bus = message_bus_instance
 
-    def test_encode_adresse_de_la_commande(self):
+    def test_should_encoder_valeurs_de_la_commande_pour_adresse(self):
         result = message_bus_instance.invoke(self.cmd)
 
         adresse_sauvegardee = self.repo.get(result)
@@ -76,7 +76,7 @@ class TestEncoderAddressFeuilleDeNotesSpecifique(SimpleTestCase):
         self.assertEqual(adresse_sauvegardee.email, self.cmd.email)
         self.assertIsNone(adresse_sauvegardee.entite)
 
-    def test_encoder_bachelier_encode_aussi_premiere_annee_de_bachelier(self):
+    def test_should_aussi_encoder_pour_la_premiere_annee_de_bachelier_when_encode_adresse_de_bachelier(self):
         result = message_bus_instance.invoke(self.cmd)
 
         identite_11ba = attr.evolve(result, nom_cohorte=self.cmd.nom_cohorte.replace("1BA", "11BA"))

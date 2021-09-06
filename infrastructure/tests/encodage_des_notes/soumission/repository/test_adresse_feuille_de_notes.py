@@ -45,7 +45,7 @@ class TestAdresseFeuilleDeNotesRepository(TestCase):
     def setUp(self) -> None:
         self.repository = AdresseFeuilleDeNotesRepository()
 
-    def test_should_create_adresse_feuille_de_notes(self):
+    def test_should_save_adresse_feuille_de_notes(self):
         adresse = AdresseFeuilleDeNotesSpecifiqueFactory()
         self._create_necessary_data(adresse)
 
@@ -56,7 +56,7 @@ class TestAdresseFeuilleDeNotesRepository(TestCase):
             self.repository.get(adresse.entity_id)
         )
 
-    def test_should_charger_adresse_feuille_de_notes_de_1ba_si_non_definie_pour_11ba(self):
+    def test_should_get_adresse_feuille_de_notes_de_1ba_si_non_definie_pour_11ba(self):
         adresse = AdresseFeuilleDeNotesSpecifiqueFactory()
         self._create_necessary_data(adresse, with_cohort_year=True)
 
@@ -68,7 +68,7 @@ class TestAdresseFeuilleDeNotesRepository(TestCase):
 
         self.assertTrue(self.repository.get(entity_11ba))
 
-    def test_should_charger_adresse_feuille_de_notes_sur_base_de_entite_si_definie(self):
+    def test_should_get_adresse_feuille_de_notes_sur_base_de_entite_si_definie(self):
         adresse = AdresseFeuilleDeNotesBaseeSurEntiteFactory()
         self._create_necessary_data(adresse)
 
@@ -79,7 +79,7 @@ class TestAdresseFeuilleDeNotesRepository(TestCase):
             self.repository.get(adresse.entity_id)
         )
 
-    def test_should_create_adresse_feuille_de_notes_pour_premiere_annee_de_bachelier(self):
+    def test_should_save_adresse_feuille_de_notes_pour_premiere_annee_de_bachelier(self):
         adresse = PremiereAnneeBachelierAdresseFeuilleDeNotesSpecifiqueFactory()
         self._create_necessary_data(adresse)
 
@@ -90,7 +90,7 @@ class TestAdresseFeuilleDeNotesRepository(TestCase):
             self.repository.get(adresse.entity_id)
         )
 
-    def test_should_update_feuille_de_notes(self):
+    def test_should_update_adresse_feuille_de_notes(self):
         adresse = AdresseFeuilleDeNotesSpecifiqueFactory()
         self._create_necessary_data(adresse)
 

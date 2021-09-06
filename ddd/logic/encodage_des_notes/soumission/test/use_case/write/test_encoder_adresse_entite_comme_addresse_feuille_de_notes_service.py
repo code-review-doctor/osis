@@ -74,7 +74,7 @@ class TestEncoderAddressEntiteCommeAdresseFeuilleDeNotes(SimpleTestCase):
         self.addCleanup(message_bus_patcher.stop)
         self.message_bus = message_bus_instance
 
-    def test_ne_peut_pas_encoder_la_meme_entite_que_le_bachelier_pour_la_premiere_annee_de_bachelier(self):
+    def test_cannot_encoder_la_meme_entite_que_le_bachelier_pour_la_premiere_annee_de_bachelier(self):
         adresse_bachelier = AdresseFeuilleDeNotesBaseeSurEntiteFactory()
         self.repo.save(adresse_bachelier)
 
@@ -87,13 +87,13 @@ class TestEncoderAddressEntiteCommeAdresseFeuilleDeNotes(SimpleTestCase):
         with self.assertRaises(AdressePremiereAnneeDeBachelierIdentiqueAuBachlierException):
             message_bus_instance.invoke(cmd)
 
-    def test_ne_peut_pas_encoder_une_entite_ne_faisant_pas_partie_de_la_cohorte(self):
+    def test_cannot_encoder_une_entite_ne_faisant_pas_partie_de_la_cohorte(self):
         cmd = attr.evolve(self.cmd, entite="OSIS")
 
         with self.assertRaises(EntiteNonValidePourAdresseException):
             message_bus_instance.invoke(cmd)
 
-    def test_should_enregistrer_adresse_de_entite_when_entite_est_donnee_est_donne(self):
+    def test_should_encoder_valeur_adresse_de_entite(self):
         result = message_bus_instance.invoke(self.cmd)
 
         adresse = self.repo.get(result)
@@ -106,7 +106,7 @@ class TestEncoderAddressEntiteCommeAdresseFeuilleDeNotes(SimpleTestCase):
         self.assertEqual(adresse.telephone, self.epl_entite.adresse.telephone)
         self.assertEqual(adresse.fax, self.epl_entite.adresse.fax)
 
-    def test_encoder_bachelier_encode_aussi_premiere_annee_de_bachelier(self):
+    def test_should_encoder_aussi_pour_la_premiere_annee_de_bachelier_when_encode_pour_bachelier(self):
         result = message_bus_instance.invoke(self.cmd)
 
         identite_11ba = attr.evolve(result, nom_cohorte=self.cmd.nom_cohorte.replace("1BA", "11BA"))
