@@ -41,6 +41,7 @@ from infrastructure.messages_bus import message_bus_instance
 from osis_role.contrib.views import PermissionRequiredMixin
 
 
+#  FIXME utiliser service de lecture pour recuperer informations sur la cohorte (intitule, etc)
 class ScoreSheetAddressView(PermissionRequiredMixin, FormView):
     form_class = ScoreSheetAddressForm
     permission_required = "assessments.can_access_scoreencoding"  # also base.can_access_education_group

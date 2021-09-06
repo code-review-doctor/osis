@@ -289,7 +289,7 @@ urlpatterns = [
         url(r'^search$', offer.offers_search, name='offers_search'),
 
         # New URL's
-        url(r'^new/$', OffersSearch.as_view(), name='offers_new'),
+        url(r'^new/$', OffersSearch.as_view(), name='offers_search_new'),
     ])),
 
     url(r'^educationgroups/', include(education_group_urls.urlpatterns)),
