@@ -36,11 +36,19 @@ from attribution.api.serializers.attribution import AttributionSerializer
 from attribution.calendar.access_schedule_calendar import AccessScheduleCalendar
 from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.attribution_class import AttributionClass
-from base.models.enums import learning_component_year_type
+from base.models.enums import learning_component_year_type, offer_enrollment_state, learning_unit_enrollment_state
 from base.models.person import Person
 from base.models.student import Student
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
+
+COMMON_LEARNING_UNIT_ENROLLMENT_CLAUSE = {
+    'offerenrollment__enrollment_state__in': [
+        offer_enrollment_state.PROVISORY,
+        offer_enrollment_state.SUBSCRIBED
+    ],
+    'offerenrollment__learningunitenrollment__enrollment_state': learning_unit_enrollment_state.ENROLLED
+}
 
 
 class AttributionListView(generics.ListAPIView):
@@ -112,7 +120,7 @@ class AttributionListView(generics.ListAPIView):
             title_en=Case(
                 When(
                     Q(learning_component_year__learning_unit_year__learning_container_year__common_title_english__isnull=True) |  # noqa
-                    Q(learning_component_year__learning_unit_year__learning_container_year__common_title_english__exact=''),# noqa
+                    Q(learning_component_year__learning_unit_year__learning_container_year__common_title_english__exact=''),
                     then='learning_component_year__learning_unit_year__specific_title_english'
                 ),
                 When(
@@ -135,16 +143,22 @@ class AttributionListView(generics.ListAPIView):
                 Student.objects.filter(
                     studentspecificprofile__isnull=False,
                     offerenrollment__learningunitenrollment__learning_unit_year__acronym=OuterRef(
-                        'learning_component_year__learning_unit_year__acronym'),
+                        'learning_component_year__learning_unit_year__acronym'
+                    ),
                     offerenrollment__learningunitenrollment__learning_unit_year__academic_year=OuterRef(
-                        'learning_component_year__learning_unit_year__academic_year')
+                        'learning_component_year__learning_unit_year__academic_year'
+                    ),
+                    **COMMON_LEARNING_UNIT_ENROLLMENT_CLAUSE
                 )
             )
         )
 
     def _get_classes_attributions(self):
         return AttributionClass.objects.select_related(
+            'attribution_charge__attribution',
             'learning_class_year__learning_component_year__learning_unit_year__academic_year'
+        ).prefetch_related(
+
         ).filter(
             learning_class_year__learning_component_year__learning_unit_year__academic_year__year=self.kwargs['year'],
             attribution_charge__attribution__tutor__person=self.person,
@@ -154,16 +168,16 @@ class AttributionListView(generics.ListAPIView):
             title_fr=Case(
                 When(
                     Q(learning_class_year__learning_component_year__learning_unit_year__learning_container_year__common_title__isnull=True) |  # noqa
-                    Q(learning_class_year__learning_component_year__learning_unit_year__learning_container_year__common_title__exact=''),# noqa
+                    Q(learning_class_year__learning_component_year__learning_unit_year__learning_container_year__common_title__exact=''),
                     then='learning_class_year__title_fr'
                 ),
                 When(
                     Q(learning_class_year__title_fr__isnull=True) |
                     Q(learning_class_year__title_fr__exact=''),
-                    then='learning_class_year__learning_component_year__learning_unit_year__learning_container_year__common_title'# noqa
+                    then='learning_class_year__learning_component_year__learning_unit_year__learning_container_year__common_title'
                 ),
                 default=Concat(
-                    'learning_class_year__learning_component_year__learning_unit_year__learning_container_year__common_title',# noqa
+                    'learning_class_year__learning_component_year__learning_unit_year__learning_container_year__common_title',
                     Value(' - '),
                     'learning_class_year__title_fr'
                 ),
@@ -172,16 +186,16 @@ class AttributionListView(generics.ListAPIView):
             title_en=Case(
                 When(
                     Q(learning_class_year__learning_component_year__learning_unit_year__learning_container_year__common_title_english__isnull=True) |  # noqa
-                    Q(learning_class_year__learning_component_year__learning_unit_year__learning_container_year__common_title_english__exact=''),# noqa
+                    Q(learning_class_year__learning_component_year__learning_unit_year__learning_container_year__common_title_english__exact=''),
                     then='learning_class_year__title_en'
                 ),
                 When(
                     Q(learning_class_year__title_en__isnull=True) |
                     Q(learning_class_year__title_en__exact=''),
-                    then='learning_class_year__learning_component_year__learning_unit_year__learning_container_year__common_title_english'# noqa
+                    then='learning_class_year__learning_component_year__learning_unit_year__learning_container_year__common_title_english'
                 ),
                 default=Concat(
-                    'learning_class_year__learning_component_year__learning_unit_year__learning_container_year__common_title_english',# noqa
+                    'learning_class_year__learning_component_year__learning_unit_year__learning_container_year__common_title_english',
                     Value(' - '),
                     'learning_class_year__title_en'
                 ),
@@ -200,6 +214,7 @@ class AttributionListView(generics.ListAPIView):
                     offerenrollment__learningunitenrollment__learning_class_year__learning_component_year=OuterRef(
                         'learning_class_year__learning_component_year'
                     ),
+                    **COMMON_LEARNING_UNIT_ENROLLMENT_CLAUSE
                 )
             )
         )
