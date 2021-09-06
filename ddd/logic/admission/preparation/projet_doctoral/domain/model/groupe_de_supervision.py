@@ -33,15 +33,17 @@ from ddd.logic.admission.preparation.projet_doctoral.domain.model._membre_CA imp
 from ddd.logic.admission.preparation.projet_doctoral.domain.model._promoteur import PromoteurIdentity
 from ddd.logic.admission.preparation.projet_doctoral.domain.model._signature_membre_CA import SignatureMembreCA
 from ddd.logic.admission.preparation.projet_doctoral.domain.model._signature_promoteur import (
-    SignaturePromoteur,
     ChoixEtatSignature,
+    SignaturePromoteur,
 )
 from ddd.logic.admission.preparation.projet_doctoral.domain.model.proposition import PropositionIdentity
 from ddd.logic.admission.preparation.projet_doctoral.domain.validator.exceptions import \
     MembreGroupeDeSupervisionNonTrouveException
 from ddd.logic.admission.preparation.projet_doctoral.domain.validator.validator_by_business_action import (
+    IdentifierMembreCAValidatorList,
     IdentifierPromoteurValidatorList,
-    IdentifierMembreCAValidatorList, SupprimerPromoteurValidatorList,
+    SupprimerMembreCAValidatorList,
+    SupprimerPromoteurValidatorList,
 )
 from osis_common.ddd import interface
 
@@ -55,8 +57,8 @@ class GroupeDeSupervisionIdentity(interface.EntityIdentity):
 class GroupeDeSupervision(interface.Entity):
     entity_id = attr.ib(type=GroupeDeSupervisionIdentity)
     proposition_id = attr.ib(type=PropositionIdentity)
-    signatures_promoteurs = attr.ib(type=List[SignaturePromoteur], factory=list)
-    signatures_membres_CA = attr.ib(type=List[SignatureMembreCA], factory=list)
+    signatures_promoteurs = attr.ib(type=List[SignaturePromoteur], factory=list)  # type: List[SignaturePromoteur]
+    signatures_membres_CA = attr.ib(type=List[SignatureMembreCA], factory=list)  # type: List[SignatureMembreCA]
     cotutelle = attr.ib(type=Cotutelle, default=pas_de_cotutelle)
 
     def identifier_promoteur(self, promoteur_id: 'PromoteurIdentity') -> None:
@@ -79,9 +81,11 @@ class GroupeDeSupervision(interface.Entity):
 
     def get_signataire(self, matricule_signataire: str) -> Union['PromoteurIdentity', 'MembreCAIdentity']:
         with contextlib.suppress(StopIteration):
-            return next(s.promoteur_id for s in self.signatures_promoteurs if s.promoteur_id.matricule == matricule_signataire)
+            return next(s.promoteur_id for s in self.signatures_promoteurs
+                        if s.promoteur_id.matricule == matricule_signataire)
         with contextlib.suppress(StopIteration):
-            return next(s.membre_CA_id for s in self.signatures_membres_CA if s.membre_CA_id.matricule == matricule_signataire)
+            return next(s.membre_CA_id for s in self.signatures_membres_CA
+                        if s.membre_CA_id.matricule == matricule_signataire)
         raise MembreGroupeDeSupervisionNonTrouveException
 
     def inviter_a_signer(self, signataire_id: Union['PromoteurIdentity', 'MembreCAIdentity']) -> None:
@@ -98,9 +102,11 @@ class GroupeDeSupervision(interface.Entity):
         self.signatures_promoteurs = [s for s in self.signatures_promoteurs if s.promoteur_id != promoteur_id]
 
     def supprimer_membre_CA(self, membre_CA_id: 'MembreCAIdentity') -> None:
-        # TODO :: verifier si signataire dans membres_CA
-        # TODO :: appeler ValidatorList
-        raise NotImplementedError
+        SupprimerMembreCAValidatorList(
+            groupe_de_supervision=self,
+            membre_CA_id=membre_CA_id,
+        ).validate()
+        self.signatures_membres_CA = [s for s in self.signatures_membres_CA if s.membre_CA_id != membre_CA_id]
 
     def approuver(self, signataire_id: Union['PromoteurIdentity', 'MembreCAIdentity']) -> None:
         # TODO :: verifier si signataire dans membres_CA ou promoteurs

@@ -1,3 +1,4 @@
+
 # ##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
@@ -23,29 +24,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 # ##############################################################################
-from typing import List
+import attr
 
-from ddd.logic.admission.preparation.projet_doctoral.domain.model._membre_CA import MembreCAIdentity
-from ddd.logic.admission.preparation.projet_doctoral.domain.service.i_membre_CA import IMembreCATranslator
-from ddd.logic.admission.preparation.projet_doctoral.dtos import MembreCADTO
-from ddd.logic.shared_kernel.personne_connue_ucl.domain.service.personne_connue_ucl import IPersonneConnueUclTranslator
+from base.ddd.utils.business_validator import BusinessValidator
+from ddd.logic.admission.preparation.projet_doctoral.business_types import *
+from ddd.logic.admission.preparation.projet_doctoral.domain.validator.exceptions import (
+    MembreCANonTrouveException,
+)
 
 
-class MembreCATranslator(IMembreCATranslator):
-    @classmethod
-    def get(cls, matricule: str) -> 'MembreCAIdentity':
-        pass
+@attr.s(frozen=True, slots=True)
+class ShouldMembreCAEtreDansGroupeDeSupervision(BusinessValidator):
+    groupe_de_supervision = attr.ib(type='GroupeDeSupervision')  # type: GroupeDeSupervision
+    membre_CA_id = attr.ib(type='MembreCAIdentity')  # type: MembreCAIdentity
 
-    @classmethod
-    def search(cls, matricules: List[str]) -> List['MembreCAIdentity']:
-        pass
-
-    @classmethod
-    def search_dto(
-            cls,
-            terme_de_recherche: str,
-            personne_connue_ucl_translator: 'IPersonneConnueUclTranslator',
-    ) -> List['MembreCADTO']:
-        # TODO :: 1. signaletiques_dto = signaletique_translator.search(terme_de_recherche)
-        # TODO :: 2. call cls.seacrh(matricules=signaletiques_dto)
-        pass
+    def validate(self, *args, **kwargs):
+        if not any(s for s in self.groupe_de_supervision.signatures_membres_CA if s.membre_CA_id == self.membre_CA_id):
+            raise MembreCANonTrouveException

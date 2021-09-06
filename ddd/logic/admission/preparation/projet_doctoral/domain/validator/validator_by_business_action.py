@@ -35,6 +35,8 @@ from ddd.logic.admission.preparation.projet_doctoral.domain.model._promoteur imp
 from ddd.logic.admission.preparation.projet_doctoral.domain.model._membre_CA import MembreCAIdentity
 from ddd.logic.admission.preparation.projet_doctoral.domain.validator._should_institution_dependre_doctorat_realise import \
     ShouldInstitutionDependreDoctoratRealise
+from ddd.logic.admission.preparation.projet_doctoral.domain.validator._should_membre_CA_etre_dans_groupe_de_supervision import \
+    ShouldMembreCAEtreDansGroupeDeSupervision
 from ddd.logic.admission.preparation.projet_doctoral.domain.validator._should_membre_CA_pas_deja_present_dans_groupe_de_supervision import \
     ShouldMembreCAPasDejaPresentDansGroupeDeSupervision
 from ddd.logic.admission.preparation.projet_doctoral.domain.validator._should_promoteur_etre_dans_groupe_de_supervision import \
@@ -133,4 +135,18 @@ class SupprimerPromoteurValidatorList(TwoStepsMultipleBusinessExceptionListValid
     def get_invariants_validators(self) -> List[BusinessValidator]:
         return [
             ShouldPromoteurEtreDansGroupeDeSupervision(self.groupe_de_supervision, self.promoteur_id),
+        ]
+
+
+@attr.s(frozen=True, slots=True)
+class SupprimerMembreCAValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
+    groupe_de_supervision = attr.ib(type='GroupeDeSupervision')  # type: GroupeDeSupervision
+    membre_CA_id = attr.ib(type='MembreCAIdentity')  # type: MembreCAIdentity
+
+    def get_data_contract_validators(self) -> List[BusinessValidator]:
+        return []
+
+    def get_invariants_validators(self) -> List[BusinessValidator]:
+        return [
+            ShouldMembreCAEtreDansGroupeDeSupervision(self.groupe_de_supervision, self.membre_CA_id),
         ]

@@ -26,7 +26,6 @@
 from ddd.logic.admission.preparation.projet_doctoral.builder.proposition_identity_builder import PropositionIdentityBuilder
 from ddd.logic.admission.preparation.projet_doctoral.commands import SupprimerPromoteurCommand
 from ddd.logic.admission.preparation.projet_doctoral.domain.model.proposition import PropositionIdentity
-from ddd.logic.admission.preparation.projet_doctoral.domain.service.i_promoteur import IPromoteurTranslator
 from ddd.logic.admission.preparation.projet_doctoral.repository.i_groupe_de_supervision import IGroupeDeSupervisionRepository
 from ddd.logic.admission.preparation.projet_doctoral.repository.i_proposition import IPropositionRepository
 
@@ -35,7 +34,6 @@ def supprimer_promoteur(
         cmd: 'SupprimerPromoteurCommand',
         proposition_repository: 'IPropositionRepository',
         groupe_supervision_repository: 'IGroupeDeSupervisionRepository',
-        promoteur_translator: 'IPromoteurTranslator',
 ) -> 'PropositionIdentity':
     # GIVEN
     proposition_id = PropositionIdentityBuilder.build_from_uuid(cmd.uuid_proposition)

@@ -23,11 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Dict, Callable, List
+from typing import Callable, Dict, List
 
 from ddd.logic.admission.preparation.projet_doctoral.commands import (
-    InitierPropositionCommand, SearchDoctoratCommand,
-    CompleterPropositionCommand, IdentifierPromoteurCommand, SupprimerPromoteurCommand,
+    CompleterPropositionCommand,
+    IdentifierPromoteurCommand,
+    InitierPropositionCommand,
+    SearchDoctoratCommand,
+    SupprimerMembreCACommand,
+    SupprimerPromoteurCommand,
 )
 from ddd.logic.admission.preparation.projet_doctoral.use_case.read.rechercher_doctorats_service import \
     rechercher_doctorats
@@ -37,12 +41,21 @@ from ddd.logic.admission.preparation.projet_doctoral.use_case.write.identifier_p
     identifier_promoteur
 from ddd.logic.admission.preparation.projet_doctoral.use_case.write.initier_proposition_service import \
     initier_proposition
+from ddd.logic.admission.preparation.projet_doctoral.use_case.write.supprimer_membre_CA_service import \
+    supprimer_membre_CA
 from ddd.logic.admission.preparation.projet_doctoral.use_case.write.supprimer_promoteur_service import \
     supprimer_promoteur
-from ddd.logic.application.commands import ApplyOnVacantCourseCommand, UpdateApplicationCommand, \
-    DeleteApplicationCommand, SearchApplicationByApplicantCommand, SearchVacantCoursesCommand, \
-    RenewMultipleAttributionsCommand, GetAttributionsAboutToExpireCommand, SendApplicationsSummaryCommand, \
-    GetChargeSummaryCommand
+from ddd.logic.application.commands import (
+    ApplyOnVacantCourseCommand,
+    DeleteApplicationCommand,
+    GetAttributionsAboutToExpireCommand,
+    GetChargeSummaryCommand,
+    RenewMultipleAttributionsCommand,
+    SearchApplicationByApplicantCommand,
+    SearchVacantCoursesCommand,
+    SendApplicationsSummaryCommand,
+    UpdateApplicationCommand,
+)
 from ddd.logic.application.use_case.read.get_attributions_about_to_expire_service import \
     get_attributions_about_to_expire
 from ddd.logic.application.use_case.read.get_charge_summary_service import get_charge_summary
@@ -54,9 +67,14 @@ from ddd.logic.application.use_case.write.delete_application_service import dele
 from ddd.logic.application.use_case.write.renew_multiple_attributions_service import renew_multiple_attributions
 from ddd.logic.application.use_case.write.send_applications_summary import send_applications_summary
 from ddd.logic.application.use_case.write.update_application_service import update_application
-from ddd.logic.effective_class_repartition.commands import SearchAttributionsToLearningUnitCommand, \
-    SearchTutorsDistributedToClassCommand, SearchAttributionCommand, DistributeClassToTutorCommand, \
-    UnassignTutorClassCommand, EditClassVolumeRepartitionToTutorCommand
+from ddd.logic.effective_class_repartition.commands import (
+    DistributeClassToTutorCommand,
+    EditClassVolumeRepartitionToTutorCommand,
+    SearchAttributionCommand,
+    SearchAttributionsToLearningUnitCommand,
+    SearchTutorsDistributedToClassCommand,
+    UnassignTutorClassCommand,
+)
 from ddd.logic.effective_class_repartition.use_case.read.get_attribution_service import get_attribution
 from ddd.logic.effective_class_repartition.use_case.read.search_attributions_to_learning_unit_service import \
     search_attributions_to_learning_unit
@@ -69,10 +87,17 @@ from ddd.logic.effective_class_repartition.use_case.write.edit_class_volume_repa
 from ddd.logic.effective_class_repartition.use_case.write.unassign_tutor_class_service import unassign_tutor_class
 from ddd.logic.formation_catalogue.commands import SearchFormationsCommand
 from ddd.logic.formation_catalogue.use_case.read.search_formation_service import search_formations
-from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, GetLearningUnitCommand, \
-    CreateEffectiveClassCommand, CanCreateEffectiveClassCommand, GetEffectiveClassCommand, \
-    UpdateEffectiveClassCommand, DeleteEffectiveClassCommand, CanDeleteEffectiveClassCommand, \
-    GetEffectiveClassWarningsCommand
+from ddd.logic.learning_unit.commands import (
+    CanCreateEffectiveClassCommand,
+    CanDeleteEffectiveClassCommand,
+    CreateEffectiveClassCommand,
+    CreateLearningUnitCommand,
+    DeleteEffectiveClassCommand,
+    GetEffectiveClassCommand,
+    GetEffectiveClassWarningsCommand,
+    GetLearningUnitCommand,
+    UpdateEffectiveClassCommand,
+)
 from ddd.logic.learning_unit.use_case.read.check_can_create_class_service import check_can_create_effective_class
 from ddd.logic.learning_unit.use_case.read.check_can_delete_class_service import check_can_delete_effective_class
 from ddd.logic.learning_unit.use_case.read.get_effective_class_service import get_effective_class
@@ -84,10 +109,10 @@ from ddd.logic.learning_unit.use_case.write.delete_effective_class_service impor
 from ddd.logic.learning_unit.use_case.write.update_effective_class_service import update_effective_class
 from ddd.logic.shared_kernel.academic_year.commands import SearchAcademicYearCommand
 from ddd.logic.shared_kernel.academic_year.use_case.read.search_academic_years_service import search_academic_years
-from ddd.logic.shared_kernel.campus.commands import SearchUclouvainCampusesCommand, GetCampusCommand
+from ddd.logic.shared_kernel.campus.commands import GetCampusCommand, SearchUclouvainCampusesCommand
 from ddd.logic.shared_kernel.campus.use_case.read.get_campus_service import get_campus
 from ddd.logic.shared_kernel.campus.use_case.read.search_uclouvain_campuses_service import search_uclouvain_campuses
-from ddd.logic.shared_kernel.language.commands import SearchLanguagesCommand, GetLanguageCommand
+from ddd.logic.shared_kernel.language.commands import GetLanguageCommand, SearchLanguagesCommand
 from ddd.logic.shared_kernel.language.use_case.read.get_language_service import get_language
 from ddd.logic.shared_kernel.language.use_case.read.search_languages_service import search_languages
 from education_group.ddd.repository.training import TrainingRepository
@@ -114,7 +139,7 @@ from infrastructure.learning_unit.repository.learning_unit import LearningUnitRe
 from infrastructure.shared_kernel.academic_year.repository.academic_year import AcademicYearRepository
 from infrastructure.shared_kernel.campus.repository.uclouvain_campus import UclouvainCampusRepository
 from infrastructure.shared_kernel.language.repository.language import LanguageRepository
-from osis_common.ddd.interface import CommandRequest, ApplicationServiceResult
+from osis_common.ddd.interface import ApplicationServiceResult, CommandRequest
 from program_management.ddd.command import BulkUpdateLinkCommand, GetReportCommand
 from program_management.ddd.repositories import program_tree as program_tree_repo
 from program_management.ddd.repositories.report import ReportRepository
@@ -235,7 +260,12 @@ class MessageBus:
             cmd,
             PropositionRepository(),
             GroupeDeSupervisionRepository(),
-            PromoteurTranslator(),
+        ),
+        SupprimerMembreCACommand: lambda cmd: supprimer_membre_CA(
+            cmd,
+            PropositionRepository(),
+            GroupeDeSupervisionRepository(),
+        ),
         ),
         SearchFormationsCommand: lambda cmd: search_formations(
             cmd,
