@@ -23,31 +23,24 @@
 #    see http://www.gnu.org/licenses/.
 #
 # ##############################################################################
-from abc import abstractmethod
-from typing import List
+import attr
 
-from ddd.logic.admission.preparation.projet_doctoral.domain.model._membre_CA import MembreCAIdentity
-from ddd.logic.admission.preparation.projet_doctoral.dtos import MembreCADTO
-from ddd.logic.shared_kernel.personne_connue_ucl.domain.service.personne_connue_ucl import IPersonneConnueUclTranslator
-from osis_common.ddd import interface
+from base.ddd.utils.business_validator import BusinessValidator
+from ddd.logic.admission.preparation.projet_doctoral.business_types import *
+from ddd.logic.admission.preparation.projet_doctoral.domain.model._signature_promoteur import ChoixEtatSignature
+from ddd.logic.admission.preparation.projet_doctoral.domain.validator.exceptions import SignatairePasInviteException
 
 
-class IMembreCATranslator(interface.DomainService):
-    @classmethod
-    @abstractmethod
-    def get(cls, matricule: str) -> 'MembreCAIdentity':
-        pass
+@attr.s(frozen=True, slots=True)
+class ShouldSignataireEtreInvite(BusinessValidator):
+    groupe_de_supervision = attr.ib(type='GroupeDeSupervision')  # type: GroupeDeSupervision
+    signataire_id = attr.ib(type="Union['PromoteurIdentity', 'MembreCAIdentity']")  # type: Union['PromoteurIdentity', 'MembreCAIdentity']
 
-    @classmethod
-    @abstractmethod
-    def search(cls, matricules: List[str]) -> List['MembreCAIdentity']:
-        pass
-
-    @classmethod
-    @abstractmethod
-    def search_dto(
-            cls,
-            terme_de_recherche: str,
-            personne_connue_ucl_translator: 'IPersonneConnueUclTranslator',
-    ) -> List['MembreCADTO']:
-        pass
+    def validate(self, *args, **kwargs):
+        if (
+                not any(s for s in self.groupe_de_supervision.signatures_promoteurs
+                        if s.promoteur_id == self.signataire_id and s.etat == ChoixEtatSignature.INVITED)
+                and not any(s for s in self.groupe_de_supervision.signatures_membres_CA
+                            if s.membre_CA_id == self.signataire_id and s.etat == ChoixEtatSignature.INVITED)
+        ):
+            raise SignatairePasInviteException

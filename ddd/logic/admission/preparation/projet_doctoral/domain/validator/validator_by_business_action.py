@@ -45,6 +45,10 @@ from ddd.logic.admission.preparation.projet_doctoral.domain.validator._should_pr
     ShouldPromoteurPasDejaPresentDansGroupeDeSupervision
 from ddd.logic.admission.preparation.projet_doctoral.domain.validator._should_signataire_etre_dans_groupe_de_supervision import \
     ShouldSignataireEtreDansGroupeDeSupervision
+from ddd.logic.admission.preparation.projet_doctoral.domain.validator._should_signataire_etre_invite import \
+    ShouldSignataireEtreInvite
+from ddd.logic.admission.preparation.projet_doctoral.domain.validator._should_signataire_pas_invite import \
+    ShouldSignatairePasDejaInvite
 from ddd.logic.admission.preparation.projet_doctoral.domain.validator._should_type_contrat_travail_dependre_type_financement import \
     ShouldTypeContratTravailDependreTypeFinancement
 
@@ -155,6 +159,21 @@ class SupprimerMembreCAValidatorList(TwoStepsMultipleBusinessExceptionListValida
 
 
 @attr.s(frozen=True, slots=True)
+class InviterASignerValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
+    groupe_de_supervision = attr.ib(type='GroupeDeSupervision')  # type: GroupeDeSupervision
+    signataire_id = attr.ib(type="Union['PromoteurIdentity', 'MembreCAIdentity']")  # type: Union['PromoteurIdentity', 'MembreCAIdentity']
+
+    def get_data_contract_validators(self) -> List[BusinessValidator]:
+        return []
+
+    def get_invariants_validators(self) -> List[BusinessValidator]:
+        return [
+            ShouldSignataireEtreDansGroupeDeSupervision(self.groupe_de_supervision, self.signataire_id),
+            ShouldSignatairePasDejaInvite(self.groupe_de_supervision, self.signataire_id),
+        ]
+
+
+@attr.s(frozen=True, slots=True)
 class ApprouverValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
     groupe_de_supervision = attr.ib(type='GroupeDeSupervision')  # type: GroupeDeSupervision
     signataire_id = attr.ib(type="Union['PromoteurIdentity', 'MembreCAIdentity']")  # type: Union['PromoteurIdentity', 'MembreCAIdentity']
@@ -165,4 +184,5 @@ class ApprouverValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
     def get_invariants_validators(self) -> List[BusinessValidator]:
         return [
             ShouldSignataireEtreDansGroupeDeSupervision(self.groupe_de_supervision, self.signataire_id),
+            ShouldSignataireEtreInvite(self.groupe_de_supervision, self.signataire_id),
         ]

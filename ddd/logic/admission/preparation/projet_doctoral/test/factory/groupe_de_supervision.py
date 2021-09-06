@@ -31,7 +31,10 @@ from ddd.logic.admission.preparation.projet_doctoral.domain.model._cotutelle imp
 from ddd.logic.admission.preparation.projet_doctoral.domain.model._membre_CA import MembreCAIdentity
 from ddd.logic.admission.preparation.projet_doctoral.domain.model._promoteur import PromoteurIdentity
 from ddd.logic.admission.preparation.projet_doctoral.domain.model._signature_membre_CA import SignatureMembreCA
-from ddd.logic.admission.preparation.projet_doctoral.domain.model._signature_promoteur import SignaturePromoteur
+from ddd.logic.admission.preparation.projet_doctoral.domain.model._signature_promoteur import (
+    ChoixEtatSignature,
+    SignaturePromoteur,
+)
 from ddd.logic.admission.preparation.projet_doctoral.domain.model.groupe_de_supervision import (
     GroupeDeSupervisionIdentity, GroupeDeSupervision,
 )
@@ -100,6 +103,16 @@ class GroupeDeSupervisionSC3DPAvecPromoteurEtMembreFactory(_GroupeDeSupervisionF
     proposition_id = factory.SubFactory(_PropositionIdentityFactory, uuid='uuid-SC3DP-promoteur-membre')
     signatures_promoteurs = factory.LazyFunction(lambda: [
         _SignaturePromoteurFactory(promoteur_id__matricule='promoteur-SC3DP')
+    ])
+    signatures_membres_CA = factory.LazyFunction(lambda: [
+        _SignatureMembreCAFactory(membre_CA_id__matricule='membre-ca-SC3DP', etat=ChoixEtatSignature.INVITED)
+    ])
+
+
+class GroupeDeSupervisionSC3DPAvecMembresInvitesFactory(_GroupeDeSupervisionFactory):
+    proposition_id = factory.SubFactory(_PropositionIdentityFactory, uuid='uuid-SC3DP-membres-invites')
+    signatures_promoteurs = factory.LazyFunction(lambda: [
+        _SignaturePromoteurFactory(promoteur_id__matricule='promoteur-SC3DP', etat=ChoixEtatSignature.INVITED)
     ])
     signatures_membres_CA = factory.LazyFunction(lambda: [
         _SignatureMembreCAFactory(membre_CA_id__matricule='membre-ca-SC3DP')

@@ -31,14 +31,14 @@ from django.test import SimpleTestCase
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from ddd.logic.admission.preparation.projet_doctoral.builder.proposition_identity_builder import \
     PropositionIdentityBuilder
-from ddd.logic.admission.preparation.projet_doctoral.commands import ApprouverPropositionCommand
+from ddd.logic.admission.preparation.projet_doctoral.commands import DemanderSignatureCommand
 from ddd.logic.admission.preparation.projet_doctoral.domain.model._signature_promoteur import (
     ChoixEtatSignature,
     SignaturePromoteur,
 )
 from ddd.logic.admission.preparation.projet_doctoral.domain.validator.exceptions import (
     GroupeDeSupervisionNonTrouveException,
-    MembreGroupeDeSupervisionNonTrouveException, SignatairePasInviteException,
+    MembreGroupeDeSupervisionNonTrouveException, SignataireDejaInviteException,
 )
 from infrastructure.admission.preparation.projet_doctoral.repository.in_memory.groupe_de_supervision import \
     GroupeDeSupervisionInMemoryRepository
@@ -47,10 +47,10 @@ from infrastructure.admission.preparation.projet_doctoral.repository.in_memory.p
 from infrastructure.message_bus_in_memory import message_bus_in_memory_instance
 
 
-class TestApprouverPropositionService(SimpleTestCase):
+class TestDemanderSignatureService(SimpleTestCase):
     def setUp(self) -> None:
         self.matricule_promoteur = 'promoteur-SC3DP'
-        self.uuid_proposition = 'uuid-SC3DP-membres-invites'
+        self.uuid_proposition = 'uuid-SC3DP-promoteur-membre'
 
         self.proposition_repository = PropositionInMemoryRepository()
         self.groupe_de_supervision_repository = GroupeDeSupervisionInMemoryRepository()
@@ -59,12 +59,12 @@ class TestApprouverPropositionService(SimpleTestCase):
         self.addCleanup(self.proposition_repository.reset)
 
         self.message_bus = message_bus_in_memory_instance
-        self.cmd = ApprouverPropositionCommand(
+        self.cmd = DemanderSignatureCommand(
             uuid_proposition=self.uuid_proposition,
-            matricule=self.matricule_promoteur,
+            matricule_signataire=self.matricule_promoteur,
         )
 
-    def test_should_approuver(self):
+    def test_should_demander_signature(self):
         proposition_id = self.message_bus.invoke(self.cmd)
         self.assertEqual(proposition_id.uuid, self.uuid_proposition)
         groupe = self.groupe_de_supervision_repository.get_by_proposition_id(proposition_id)
@@ -72,20 +72,20 @@ class TestApprouverPropositionService(SimpleTestCase):
         self.assertEqual(len(signatures), 1)
         self.assertEqual(len(groupe.signatures_membres_CA), 1)
         self.assertEqual(signatures[0].promoteur_id.matricule, self.matricule_promoteur)
-        self.assertEqual(signatures[0].etat, ChoixEtatSignature.APPROVED)
+        self.assertEqual(signatures[0].etat, ChoixEtatSignature.INVITED)
 
-    def test_should_pas_approuve_si_pas_dans_groupe(self):
-        cmd = attr.evolve(self.cmd, matricule='paspromoteur')
+    def test_should_pas_demander_si_pas_dans_groupe(self):
+        cmd = attr.evolve(self.cmd, matricule_signataire='paspromoteur')
         with self.assertRaises(MembreGroupeDeSupervisionNonTrouveException):
             self.message_bus.invoke(cmd)
 
-    def test_should_pas_approuve_si_pas_invite(self):
-        cmd = attr.evolve(self.cmd, matricule='membre-ca-SC3DP')
+    def test_should_pas_demander_si_deja_invite(self):
+        cmd = attr.evolve(self.cmd, matricule_signataire='membre-ca-SC3DP')
         with self.assertRaises(MultipleBusinessExceptions) as e:
             self.message_bus.invoke(cmd)
-        self.assertIsInstance(e.exception.exceptions.pop(), SignatairePasInviteException)
+        self.assertIsInstance(e.exception.exceptions.pop(), SignataireDejaInviteException)
 
-    def test_should_pas_approuver_si_groupe_proposition_non_trouve(self):
+    def test_should_pas_demander_si_groupe_proposition_non_trouve(self):
         cmd = attr.evolve(self.cmd, uuid_proposition='propositioninconnue')
         with self.assertRaises(GroupeDeSupervisionNonTrouveException):
             self.message_bus.invoke(cmd)

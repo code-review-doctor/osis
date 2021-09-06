@@ -26,14 +26,23 @@
 import attr
 
 from base.ddd.utils.business_validator import BusinessValidator
-from ddd.logic.admission.preparation.projet_doctoral.domain.model.groupe_de_supervision import GroupeDeSupervision
+from ddd.logic.admission.preparation.projet_doctoral.business_types import *
+from ddd.logic.admission.preparation.projet_doctoral.domain.model._signature_promoteur import ChoixEtatSignature
+from ddd.logic.admission.preparation.projet_doctoral.domain.validator.exceptions import (
+    SignataireDejaInviteException,
+)
 
 
 @attr.s(frozen=True, slots=True)
-class ShouldSignatairePasInvite(BusinessValidator):
-    groupe_de_supervision = attr.ib(type=GroupeDeSupervision)
-    matricule = attr.ib(type=str)
+class ShouldSignatairePasDejaInvite(BusinessValidator):
+    groupe_de_supervision = attr.ib(type='GroupeDeSupervision')  # type: GroupeDeSupervision
+    signataire_id = attr.ib(type="Union['PromoteurIdentity', 'MembreCAIdentity']")  # type: Union['PromoteurIdentity', 'MembreCAIdentity']
 
     def validate(self, *args, **kwargs):
-        # TODO :: verifier si le signataire a été invité
-        pass
+        if (
+                any(s for s in self.groupe_de_supervision.signatures_promoteurs
+                    if s.promoteur_id == self.signataire_id and s.etat != ChoixEtatSignature.NOT_INVITED)
+                or any(s for s in self.groupe_de_supervision.signatures_membres_CA
+                       if s.membre_CA_id == self.signataire_id and s.etat != ChoixEtatSignature.NOT_INVITED)
+        ):
+            raise SignataireDejaInviteException

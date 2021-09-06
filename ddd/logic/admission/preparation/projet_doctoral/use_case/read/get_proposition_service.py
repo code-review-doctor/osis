@@ -42,5 +42,4 @@ def get_proposition(
         repository=proposition_repository,
         doctorat_translator=doctorat_translator,
         secteur_ucl_translator=secteur_ucl_translator,
-
     )

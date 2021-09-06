@@ -31,6 +31,7 @@ from ddd.logic.admission.preparation.projet_doctoral.dtos import PropositionDTO
 from ddd.logic.admission.preparation.projet_doctoral.repository.i_proposition import IPropositionRepository
 from ddd.logic.admission.preparation.projet_doctoral.test.factory.proposition import (
     PropositionAdmissionSC3DPAvecMembresFactory,
+    PropositionAdmissionSC3DPAvecMembresInvitesFactory,
     PropositionAdmissionSC3DPMinimaleFactory,
 )
 
@@ -43,6 +44,7 @@ class PropositionInMemoryRepository(InMemoryGenericRepository, IPropositionRepos
         cls.entities = [
             PropositionAdmissionSC3DPMinimaleFactory(),
             PropositionAdmissionSC3DPAvecMembresFactory(),
+            PropositionAdmissionSC3DPAvecMembresInvitesFactory(),
         ]
 
     @classmethod

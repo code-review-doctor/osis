@@ -95,6 +95,18 @@ class SignataireNonTrouveException(BusinessException):
         super().__init__(message, **kwargs)
 
 
+class SignataireDejaInviteException(BusinessException):
+    def __init__(self, **kwargs):
+        message = _("Member of supervision group already invited.")
+        super().__init__(message, **kwargs)
+
+
+class SignatairePasInviteException(BusinessException):
+    def __init__(self, **kwargs):
+        message = _("Member of supervision group not invited.")
+        super().__init__(message, **kwargs)
+
+
 class DejaPromoteurException(BusinessException):
     def __init__(self, **kwargs):
         message = _("Already a promoter.")

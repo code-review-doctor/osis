@@ -23,31 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 # ##############################################################################
-from abc import abstractmethod
-from typing import List
-
-from ddd.logic.admission.preparation.projet_doctoral.domain.model._membre_CA import MembreCAIdentity
-from ddd.logic.admission.preparation.projet_doctoral.dtos import MembreCADTO
-from ddd.logic.shared_kernel.personne_connue_ucl.domain.service.personne_connue_ucl import IPersonneConnueUclTranslator
-from osis_common.ddd import interface
+from ddd.logic.admission.preparation.projet_doctoral.domain.model.proposition import Proposition
+from ddd.logic.admission.preparation.projet_doctoral.domain.service.i_constitution_supervision import \
+    IConstitutionSupervision
 
 
-class IMembreCATranslator(interface.DomainService):
+class ConstitutionSupervisionInMemoryService(IConstitutionSupervision):
     @classmethod
-    @abstractmethod
-    def get(cls, matricule: str) -> 'MembreCAIdentity':
-        pass
-
-    @classmethod
-    @abstractmethod
-    def search(cls, matricules: List[str]) -> List['MembreCAIdentity']:
-        pass
-
-    @classmethod
-    @abstractmethod
-    def search_dto(
-            cls,
-            terme_de_recherche: str,
-            personne_connue_ucl_translator: 'IPersonneConnueUclTranslator',
-    ) -> List['MembreCADTO']:
+    def notifier(cls, proposition: 'Proposition', matricule_candidat: str) -> None:
         pass

@@ -36,13 +36,13 @@ from ddd.logic.admission.preparation.projet_doctoral.domain.model._signature_pro
     ChoixEtatSignature,
     SignaturePromoteur,
 )
-from ddd.logic.admission.preparation.projet_doctoral.domain.model.proposition import PropositionIdentity
 from ddd.logic.admission.preparation.projet_doctoral.domain.validator.exceptions import \
     MembreGroupeDeSupervisionNonTrouveException
 from ddd.logic.admission.preparation.projet_doctoral.domain.validator.validator_by_business_action import (
     ApprouverValidatorList,
     IdentifierMembreCAValidatorList,
     IdentifierPromoteurValidatorList,
+    InviterASignerValidatorList,
     SupprimerMembreCAValidatorList,
     SupprimerPromoteurValidatorList,
 )
@@ -57,7 +57,7 @@ class GroupeDeSupervisionIdentity(interface.EntityIdentity):
 @attr.s(slots=True)
 class GroupeDeSupervision(interface.Entity):
     entity_id = attr.ib(type=GroupeDeSupervisionIdentity)
-    proposition_id = attr.ib(type=PropositionIdentity)
+    proposition_id = attr.ib(type='PropositionIdentity')  # type: PropositionIdentity
     signatures_promoteurs = attr.ib(type=List[SignaturePromoteur], factory=list)  # type: List[SignaturePromoteur]
     signatures_membres_CA = attr.ib(type=List[SignatureMembreCA], factory=list)  # type: List[SignatureMembreCA]
     cotutelle = attr.ib(type=Cotutelle, default=pas_de_cotutelle)
@@ -90,10 +90,20 @@ class GroupeDeSupervision(interface.Entity):
         raise MembreGroupeDeSupervisionNonTrouveException
 
     def inviter_a_signer(self, signataire_id: Union['PromoteurIdentity', 'MembreCAIdentity']) -> None:
-        # TODO :: verifier si signataire dans membres_CA ou promoteurs
-        # TODO :: appeler ValidatorList
-        # TODO set etat to ChoixEtatSignature.INVITED
-        raise NotImplementedError
+        InviterASignerValidatorList(
+            groupe_de_supervision=self,
+            signataire_id=signataire_id,
+        ).validate()
+        if isinstance(signataire_id, PromoteurIdentity):
+            self.signatures_promoteurs = [s for s in self.signatures_promoteurs if s.promoteur_id != signataire_id]
+            self.signatures_promoteurs.append(
+                SignaturePromoteur(promoteur_id=signataire_id, etat=ChoixEtatSignature.INVITED)
+            )
+        elif isinstance(signataire_id, MembreCAIdentity):
+            self.signatures_membres_CA = [s for s in self.signatures_membres_CA if s.membre_CA_id != signataire_id]
+            self.signatures_membres_CA.append(
+                SignatureMembreCA(membre_CA_id=signataire_id, etat=ChoixEtatSignature.INVITED)
+            )
 
     def supprimer_promoteur(self, promoteur_id: 'PromoteurIdentity') -> None:
         SupprimerPromoteurValidatorList(

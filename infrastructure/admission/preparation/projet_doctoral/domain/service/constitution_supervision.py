@@ -23,17 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 # ##############################################################################
-import attr
+from ddd.logic.admission.preparation.projet_doctoral.domain.model.proposition import Proposition
+from ddd.logic.admission.preparation.projet_doctoral.domain.service.i_constitution_supervision import \
+    IConstitutionSupervision
 
-from base.ddd.utils.business_validator import BusinessValidator
-from ddd.logic.admission.preparation.projet_doctoral.domain.model.groupe_de_supervision import GroupeDeSupervision
 
-
-@attr.s(frozen=True, slots=True)
-class ShouldAucunSignataireInvite(BusinessValidator):
-    groupe_de_supervision = attr.ib(type=GroupeDeSupervision)
-    matricule = attr.ib(type=str)
-
-    def validate(self, *args, **kwargs):
-        # TODO :: verifier si aucun signataire a été invité
-        pass
+class ConstitutionSupervisionService(IConstitutionSupervision):
+    @classmethod
+    def notifier(cls, proposition: 'Proposition', matricule_candidat: str) -> None:
+        raise NotImplementedError

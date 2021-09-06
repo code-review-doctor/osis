@@ -40,7 +40,7 @@ from ddd.logic.admission.preparation.projet_doctoral.dtos import CotutelleDTO
 from ddd.logic.admission.preparation.projet_doctoral.repository.i_groupe_de_supervision import \
     IGroupeDeSupervisionRepository
 from ddd.logic.admission.preparation.projet_doctoral.test.factory.groupe_de_supervision import (
-    GroupeDeSupervisionSC3DPFactory,
+    GroupeDeSupervisionSC3DPAvecMembresInvitesFactory, GroupeDeSupervisionSC3DPFactory,
     GroupeDeSupervisionSC3DPAvecPromoteurEtMembreFactory,
 )
 
@@ -53,6 +53,7 @@ class GroupeDeSupervisionInMemoryRepository(InMemoryGenericRepository, IGroupeDe
         cls.entities = [
             GroupeDeSupervisionSC3DPFactory(),
             GroupeDeSupervisionSC3DPAvecPromoteurEtMembreFactory(),
+            GroupeDeSupervisionSC3DPAvecMembresInvitesFactory(),
         ]
 
     @classmethod

@@ -31,7 +31,6 @@ from ddd.logic.admission.preparation.projet_doctoral.repository.i_groupe_de_supe
 from ddd.logic.admission.preparation.projet_doctoral.repository.i_proposition import IPropositionRepository
 
 
-# TODO :: unit tests
 def identifier_membre_CA(
         cmd: 'IdentifierMembreCACommand',
         proposition_repository: 'IPropositionRepository',
