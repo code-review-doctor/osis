@@ -62,3 +62,7 @@ class AdresseFeuilleDeNotesInMemoryRepository(InMemoryGenericRepository, IAdress
             fax=adresse.fax,
             email=adresse.email,
         )
+
+    @classmethod
+    def reset(cls):
+        cls.entities.clear()
