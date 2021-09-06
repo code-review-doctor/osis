@@ -29,14 +29,16 @@ from django.test import SimpleTestCase
 
 from ddd.logic.encodage_des_notes.soumission.commands import SearchAdressesFeuilleDeNotesCommand
 from ddd.logic.encodage_des_notes.soumission.dtos import DateDTO
+from ddd.logic.encodage_des_notes.tests.factory.adresse_feuille_de_notes import \
+    AdresseFeuilleDeNotesSpecifiqueFactory
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.inscription_examen import \
     InscriptionExamenTranslatorInMemory
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.periode_encodage_notes import \
     PeriodeEncodageNotesTranslatorInMemory
-from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.adresse_feuille_de_notes import \
-    AdresseFeuilleDeNotesTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.deliberation import \
     DeliberationTranslatorInMemory
+from infrastructure.encodage_de_notes.soumission.repository.in_memory.adresse_feuille_de_notes import \
+    AdresseFeuilleDeNotesInMemoryRepository
 from infrastructure.messages_bus import message_bus_instance
 
 
@@ -53,9 +55,13 @@ class SearchDonneesAdministrativesTest(SimpleTestCase):
             codes_unite_enseignement=[self.code_unite_enseignement],
         )
 
+        self.adresse_feuille_de_notes_repository = AdresseFeuilleDeNotesInMemoryRepository()
+        self.adresse_feuille_de_notes_repository.entities.clear()
+        self.adresse = AdresseFeuilleDeNotesSpecifiqueFactory()
+        self.adresse_feuille_de_notes_repository.save(self.adresse)
+
         self.periode_encodage_translator = PeriodeEncodageNotesTranslatorInMemory()
         self.inscr_examen_translator = InscriptionExamenTranslatorInMemory()
-        self.adresse_feuille_notes_translator = AdresseFeuilleDeNotesTranslatorInMemory()
         self.deliberation_translator = DeliberationTranslatorInMemory()
         self.__mock_service_bus()
 
@@ -63,7 +69,7 @@ class SearchDonneesAdministrativesTest(SimpleTestCase):
         message_bus_patcher = mock.patch.multiple(
             'infrastructure.messages_bus',
             PeriodeEncodageNotesTranslator=lambda: self.periode_encodage_translator,
-            AdresseFeuilleDeNotesTranslator=lambda: self.adresse_feuille_notes_translator,
+            AdresseFeuilleDeNotesRepository=lambda: self.adresse_feuille_de_notes_repository,
             InscriptionExamenTranslator=lambda: self.inscr_examen_translator,
             DeliberationTranslator=lambda: self.deliberation_translator,
         )
@@ -98,7 +104,7 @@ class SearchDonneesAdministrativesTest(SimpleTestCase):
         dto = list(result)[0]
         self.assertEqual(dto.contact_feuille_de_notes.nom_cohorte, self.nom_cohorte)
         self.assertEqual(dto.contact_feuille_de_notes.destinataire, 'Faculté de Droit')
-        self.assertEqual(dto.contact_feuille_de_notes.rue_et_numero, 'Rue de la Fac, 19')
+        self.assertEqual(dto.contact_feuille_de_notes.rue_numero, 'Rue de la Fac, 19')
         self.assertEqual(dto.contact_feuille_de_notes.code_postal, '1321')
         self.assertEqual(dto.contact_feuille_de_notes.ville, 'Louvain-La-Neuve')
         self.assertEqual(dto.contact_feuille_de_notes.pays, 'Belgique')

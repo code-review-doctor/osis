@@ -1,4 +1,3 @@
-##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -15,7 +14,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,41 +22,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Set
-
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_contact_feuille_de_notes import \
-    IAdresseFeuilleDeNotesTranslator
+from ddd.logic.encodage_des_notes.soumission.builder.adresse_feuille_de_notes_identity_builder import \
+    AdresseFeuilleDeNotesIdentityBuilder
+from ddd.logic.encodage_des_notes.soumission.commands import GetAdresseFeuilleDeNotesServiceCommand
 from ddd.logic.encodage_des_notes.soumission.dtos import AdresseFeuilleDeNotesDTO
+from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_notes import \
+    IAdresseFeuilleDeNotesRepository
 
 
-class AdresseFeuilleDeNotesTranslatorInMemory(IAdresseFeuilleDeNotesTranslator):
-
-    contacts = {
-        AdresseFeuilleDeNotesDTO(
-            nom_cohorte='DROI1BA',
-            destinataire='Faculté de Droit',
-            rue_et_numero='Rue de la Fac, 19',
-            code_postal='1321',
-            ville='Louvain-La-Neuve',
-            pays='Belgique',
-            telephone='0106601122',
-            fax='0106601123',
-            email='email-fac-droit@email.be',
-        ),
-    }
-
-    @classmethod
-    def search(
-            cls,
-            noms_cohortes: Set[str]
-    ) -> Set['AdresseFeuilleDeNotesDTO']:
-        return set(
-            filter(
-                lambda dto: _filter(dto, noms_cohortes),
-                cls.contacts,
-            )
-        )
-
-
-def _filter(dto, cohortes: Set[str]):
-    return dto.nom_cohorte in cohortes
+def get_adresse_feuille_de_notes(
+        cmd: GetAdresseFeuilleDeNotesServiceCommand,
+        repo: IAdresseFeuilleDeNotesRepository,
+) -> 'AdresseFeuilleDeNotesDTO':
+    identite = AdresseFeuilleDeNotesIdentityBuilder().build_from_nom_cohorte(cmd.nom_cohorte)
+    return repo.search_dtos([identite])[0]

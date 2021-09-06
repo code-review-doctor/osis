@@ -25,11 +25,16 @@
 import attr
 
 
-def assert_attrs_instances_are_equal(inst1, inst2):
+def assert_attrs_instances_are_equal(inst1, inst2, exclude=None):
     """
     Assert that two instances of a same class have same values for their attributes
 
     :param inst1:  Instance of an attrs-decoracted class
     :param inst2: Instance of an attrs-decoracted class
     """
-    assert attr.astuple(inst1, retain_collection_types=True) == attr.astuple(inst2, retain_collection_types=True)
+    exclude = exclude or []
+    attr_fields = attr.fields(type(inst1))
+    fields_to_exclude = [getattr(attr_fields, field) for field in exclude if getattr(attr_fields, field, None)]
+    filter_exclude = attr.filters.exclude(*fields_to_exclude)
+    assert attr.astuple(inst1, filter=filter_exclude, retain_collection_types=True) ==\
+        attr.astuple(inst2, filter=filter_exclude, retain_collection_types=True)

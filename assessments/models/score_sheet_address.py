@@ -30,6 +30,7 @@ from django.utils.translation import gettext_lazy
 
 from assessments.models.enums import score_sheet_address_choices
 from base.models.education_group_year import EducationGroupYear
+from education_group.models.enums.cohort_name import CohortName
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
@@ -51,13 +52,32 @@ class ScoreSheetAddressAdmin(OsisModelAdmin):
 class ScoreSheetAddress(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-    education_group = models.OneToOneField(
+    education_group = models.ForeignKey(
         'base.EducationGroup',
         on_delete=models.CASCADE,
     )
+    cohort_name = models.CharField(
+        blank=True,
+        null=True,
+        max_length=25,
+        choices=CohortName.choices(),
+        verbose_name=gettext_lazy('Name')
+    )
+
     # Info to find the address
-    entity_address_choice = models.CharField(max_length=50, blank=True, null=True,
-                                             choices=score_sheet_address_choices.CHOICES)
+    entity_address_choice = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True,
+        choices=score_sheet_address_choices.CHOICES
+    )
+    entity = models.ForeignKey(
+        "base.Entity",
+        blank=True,
+        null=True,
+        verbose_name=gettext_lazy('Entity of reference'),
+        on_delete=models.PROTECT
+    )
     # Address fields
     recipient = models.CharField(max_length=255, blank=True, null=True)
     location = models.CharField(max_length=255, blank=True, null=True)  # Address for scores sheets
@@ -72,6 +92,11 @@ class ScoreSheetAddress(models.Model):
     fax = models.CharField(max_length=30, blank=True, null=True, verbose_name=gettext_lazy("Fax"))
     email = models.EmailField(null=True, blank=True, verbose_name=gettext_lazy("Email"))
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['education_group', 'cohort_name'], name='unique_score_sheet_address')
+        ]
+
     @property
     def offer_acronym(self):
         return self.education_group.most_recent_acronym
@@ -81,7 +106,7 @@ class ScoreSheetAddress(models.Model):
         return self.location and self.postal_code and self.city and not self.entity_address_choice
 
     def save(self, *args, **kwargs):
-        if self.customized or self.entity_address_choice:
+        if self.customized or self.entity_address_choice or self.entity:
             super(ScoreSheetAddress, self).save(*args, **kwargs)
         else:
             raise Exception(

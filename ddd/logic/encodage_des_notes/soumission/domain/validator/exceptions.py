@@ -76,3 +76,15 @@ class PasGestionnaireParcoursCohorteException(BusinessException):
     def __init__(self, cohortes_non_geres: Set[str], **kwargs):
         message = _("You're not a program manager of {}").format(','.join(cohortes_non_geres))
         super().__init__(message, **kwargs)
+
+
+class AdressePremiereAnneeDeBachelierIdentiqueAuBachlierException(BusinessException):
+    def __init__(self, **kwargs):
+        message = _("The entity cannot be the same between bachelor and first year bachelor")
+        super().__init__(message, **kwargs)
+
+
+class EntiteNonValidePourAdresseException(BusinessException):
+    def __init__(self, **kwargs):
+        message = _("The entity is not valid for the score sheet address")
+        super().__init__(message, **kwargs)
