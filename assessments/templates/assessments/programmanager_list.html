@@ -12,7 +12,8 @@
 
     <tbody>
 
-    {% for person, object_list  in by_person.items %}
+    {% for person, dto  in by_person.items %}
+        {% with object_list=dto.cohortes_gerees %}
         <tr>
             <td>
                 <span aria-hidden="true" data-toggle="collapse"
@@ -21,47 +22,47 @@
             </td>
             <td>
                 {% if education_groups|length == object_list|length %}
-                    <strong>{{ person }}</strong>
+                    <strong>{{ dto.nom|upper }}, {{ dto.prenom }}</strong>
                 {% else %}
-                    {{ person }}
+                    {{ dto.nom|upper }}, {{ dto.prenom }}
                 {% endif %}
             </td>
             <td>
                 <input type="checkbox" name="all_main"
-                       data-url="{% url 'update_main_person' person.pk %}?education_groups={{ education_groups|join:',' }}"
+                       data-url="{% url 'update_main_person' global_id=person %}?education_groups={{ education_groups|join:',' }}"
                        data-target=".{{ person|slugify }}_checkbox"
                 {% if not perms.base.change_programmanager %} disabled {% endif %}>
             </td>
             <td>
                 {% if perms.base.change_programmanager %}
                     <a class="btn btn-default pull-right trigger_modal"
-                       data-url="{% url 'delete_manager_person' person.pk %}?education_groups={{ education_groups|join:',' }}">
+                       data-url="{% url 'delete_manager_person' global_id=person %}?education_groups={{ education_groups|join:',' }}">
                         <span class="fa fa-minus"></span>
                     </a>
                 {% endif %}
             </td>
         </tr>
-        {% for obj in object_list %}
+        {% for offer in object_list %}
             <tr class="collapse {{ person|slugify }}" data-person="{{ person|slugify }}">
                 <td></td>
-                <td>&emsp;{{ obj.offer_acronym }}</td>
+                <td>&emsp;{{ offer.nom_cohorte_affiche }}</td>
                 <td>
                     <input type="checkbox" class="{{ person|slugify }}_checkbox"
-                           name="is_main" {% if obj.is_main %}checked{% endif %}
-                           data-url="{% url 'update_main' obj.pk %}?education_groups={{ education_groups|join:',' }}"
+                           name="is_main" {% if offer.est_principal %}checked{% endif %}
+                           data-url="{% url 'update_main' global_id=person acronym=offer.nom_cohorte %}?education_groups={{ education_groups|join:',' }}"
                         {% if not perms.base.change_programmanager %} disabled {% endif %}>
                 </td>
                 <td>
                     {% if perms.base.change_programmanager %}
                         <a class="btn btn-default btn-sm pull-right trigger_modal"
-                           data-url="{% url 'delete_manager' obj.pk %}?education_groups={{ education_groups|join:',' }}">
+                           data-url="{% url 'delete_manager' global_id=person acronym=offer.nom_cohorte %}?education_groups={{ education_groups|join:',' }}">
                             <span class="fa fa-minus"></span>
                         </a>
                     {% endif %}
                 </td>
             </tr>
         {% endfor %}
-
+        {% endwith %}
     {% endfor %}
 
     </tbody>
@@ -70,7 +71,7 @@
 {% if education_groups and perms.base.change_programmanager  %}
     <a class="btn btn-primary pull-right trigger_modal"
        title="{% trans 'Add manager' %}"
-       data-url="{% url 'create_manager_person' %}?education_groups={{ education_groups|join:',' }}">
+       data-url="{% url 'create_program_manager_person' %}?education_groups={{ education_groups|join:',' }}">
         <span class="fa fa-plus"></span>
     </a>
 {% endif %}

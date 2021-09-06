@@ -40,7 +40,7 @@
             <div class="panel-body">
                 <br>
                 <div class="row">
-                    <form method="get" action="{% url 'pgm_manager_search' %}">
+                    <form method="get" action="{% url 'program_manager_search' %}">
                         <div class="col-md-3">
                             <label for="slt_entity">{% trans 'Entity' %}</label>
                             <select class="form-control" id="slt_entity" name="entity">
@@ -101,7 +101,7 @@
                 {% endif %}
                 <div>
                     <div class="row">
-                        <form action="{% url 'manager_list' %}" method="get" id="form_offer_year">
+                        <form action="{% url 'program_manager_list' %}" method="get" id="form_offer_year">
                             <div class="col-md-6">
                                 {% if pgms|length == 0 and init != "1" %}
                                     <div class="alert alert-info" style="margin:5px">{% trans 'No result!' %}</div>
@@ -128,7 +128,7 @@
                                                     <input name="education_groups" type="checkbox" value="{{ pgm.education_group_id }}"
                                                            onclick="load_managers()">
                                                 </td>
-                                                <td>{{ pgm.acronym }}</td>
+                                                <td>{{ pgm.nom_formation }}</td>
                                                 <td>{{ pgm.education_group_type }}</td>
                                                 <td>{{ pgm.management_entity }}</td>
                                             </tr>
