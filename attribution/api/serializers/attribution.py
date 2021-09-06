@@ -76,7 +76,7 @@ class AttributionSerializer(serializers.Serializer):
         }
 
     @staticmethod
-    def __get_catalog_url(obj):
+    def __get_catalog_url(obj) -> str:
         if settings.LEARNING_UNIT_PORTAL_URL:
             return settings.LEARNING_UNIT_PORTAL_URL.format(year=obj.year, code=obj.code)
 
