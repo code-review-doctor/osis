@@ -31,8 +31,8 @@ from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
 from base.tests.factories.tutor import TutorFactory
 from ddd.logic.encodage_des_notes.soumission.commands import GetProgressionGeneraleCommand
-from ddd.logic.encodage_des_notes.soumission.dtos import ProgressionGeneraleEncodageNotesDTO, \
-    ProgressionEncodageNotesUniteEnseignementDTO, DateEcheanceDTO
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateEcheanceDTO, \
+    ProgressionEncodageNotesUniteEnseignementDTO, ProgressionGeneraleEncodageNotesDTO, EnseignantDTO
 
 
 class ScoreEncodingProgressOverviewTutorViewTest(TestCase):
@@ -73,6 +73,7 @@ class ScoreEncodingProgressOverviewTutorViewTest(TestCase):
                             )
                         ],
                         a_etudiants_peps=True,
+                        responsable_note=EnseignantDTO(nom='', prenom='')
                     )
                 ]
             )

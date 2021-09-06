@@ -24,10 +24,10 @@
 #
 ##############################################################################
 import collections
-from _decimal import Decimal
 from typing import List, Set, Optional, Iterator, Tuple, Generator, Dict
 
 import attr
+from _decimal import Decimal
 
 from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.ddd.utils.converters import to_upper_case_converter
@@ -97,7 +97,8 @@ class NodeFactory:
             return next_year
         return copy_from_node.end_year
 
-    def get_node(self, type: NodeType, **node_attrs) -> 'Node':
+    @staticmethod
+    def get_node(type: NodeType, **node_attrs) -> 'Node':
         node_cls = {
             NodeType.GROUP: NodeGroupYear,
             NodeType.LEARNING_UNIT: NodeLearningUnitYear,
@@ -113,8 +114,8 @@ class NodeFactory:
 
         return node_cls(**node_attrs)
 
+    @staticmethod
     def create_and_fill_from_node(
-            self,
             create_from: 'Node',
             new_code: str,
             override_end_year_to: int = DO_NOT_OVERRIDE,
@@ -622,6 +623,10 @@ class NodeLearningUnitYear(Node):
     quadrimester = attr.ib(type=DerogationQuadrimester, default=None)
     volume_total_lecturing = attr.ib(type=Decimal, default=None)
     volume_total_practical = attr.ib(type=Decimal, default=None)
+    language_code = attr.ib(type=str, default=None)
+    english_friendly = attr.ib(type=bool, default=False)
+    french_friendly = attr.ib(type=bool, default=False)
+    exchange_students = attr.ib(type=bool, default=True)
 
     def equals(self, learning_unit_year) -> bool:
         return learning_unit_year.entity_id.code == self.entity_id.code \
@@ -641,8 +646,13 @@ class NodeLearningUnitYear(Node):
 
 
 def _get_full_title(common_title, specific_title):
-    specific_title = "{}{}".format(" - " if common_title else '',
-                                   specific_title) if specific_title else ''
+    if not specific_title:
+        specific_title = ''
+    else:
+        specific_title = "{}{}".format(
+            " - " if common_title else '',
+            specific_title
+        )
     return "{}{}".format(
         common_title if common_title else '',
         specific_title

@@ -23,70 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
 from datetime import date
-from typing import List, Set, Optional
+from typing import Set, Optional, List
 
 import attr
 
-from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO, EtudiantPepsDTO
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO, EtudiantPepsDTO, DateEcheanceDTO
 from osis_common.ddd import interface
 
 
 def none2emptystr(value) -> str:
     return value or ''
-
-
-@attr.s(frozen=True, slots=True)
-class DateEcheanceDTO(interface.DTO):
-    jour = attr.ib(type=int)
-    mois = attr.ib(type=int)
-    annee = attr.ib(type=int)
-    quantite_notes_soumises = attr.ib(type=int)
-    quantite_total_notes = attr.ib(type=int)
-
-    def to_date(self) -> date:
-        return date(day=self.jour, month=self.mois, year=self.annee)
-
-    @property
-    def est_atteinte(self) -> bool:
-        aujourdhui = datetime.date.today()
-        return aujourdhui > self.to_date()
-
-    @property
-    def quantite_notes_manquantes(self) -> int:
-        return self.quantite_total_notes - self.quantite_notes_soumises
-
-    @property
-    def encodage_est_complet(self) -> bool:
-        return self.quantite_notes_manquantes == 0
-
-
-@attr.s(frozen=True, slots=True)
-class ProgressionEncodageNotesUniteEnseignementDTO(interface.DTO):
-    code_unite_enseignement = attr.ib(type=str)
-    intitule_complet_unite_enseignement = attr.ib(type=str)  # unite enseignement
-    dates_echeance = attr.ib(type=List[DateEcheanceDTO])
-    a_etudiants_peps = attr.ib(type=bool)  # signaletique
-
-    @property
-    def quantite_notes_soumises(self) -> int:
-        return sum(date.quantite_notes_soumises for date in self.dates_echeance)
-
-    @property
-    def quantite_totale_notes(self) -> int:
-        return sum(date.quantite_total_notes for date in self.dates_echeance)
-
-    @property
-    def encodage_est_complet(self) -> bool:
-        return self.quantite_notes_soumises / self.quantite_totale_notes == 0
-
-
-@attr.s(frozen=True, slots=True)
-class ProgressionGeneraleEncodageNotesDTO(interface.DTO):
-    annee_academique = attr.ib(type=int)
-    numero_session = attr.ib(type=int)
-    progression_generale = attr.ib(type=List[ProgressionEncodageNotesUniteEnseignementDTO])
 
 
 @attr.s(frozen=True, slots=True)
@@ -198,3 +145,26 @@ class UniteEnseignementIdentiteFromRepositoryDTO(interface.DTO):
 class ResponsableDeNotesFromRepositoryDTO(interface.DTO):
     matricule_fgs_enseignant = attr.ib(type=str)
     unites_enseignements = attr.ib(type=Set[UniteEnseignementIdentiteFromRepositoryDTO])
+
+
+@attr.s(frozen=True, slots=True)
+class ResponsableDeNotesDTO(interface.DTO):
+    nom = attr.ib(type=str)
+    prenom = attr.ib(type=str)
+    code_unite_enseignement = attr.ib(type=str)
+    annee_unite_enseignement = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class DateEcheanceNoteDTO(interface.DTO):
+    code_unite_enseignement = attr.ib(type=str)
+    annee_unite_enseignement = attr.ib(type=int)
+    numero_session = attr.ib(type=int)
+    noma = attr.ib(type=str)
+    jour = attr.ib(type=int)
+    mois = attr.ib(type=int)
+    annee = attr.ib(type=int)
+    note_soumise = attr.ib(type=bool)
+
+    def to_date(self) -> date:
+        return date(day=self.jour, month=self.mois, year=self.annee)

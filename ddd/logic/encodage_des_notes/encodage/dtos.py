@@ -65,7 +65,7 @@ class FeuilleDeNotesParCohorteDTO(interface.DTO):
 
     @property
     def encodage_est_complet(self) -> bool:
-        return self.quantite_notes_soumises / self.quantite_total_notes == 0
+        return self.quantite_notes_soumises == self.quantite_total_notes
 
     @property
     def quantite_notes_soumises(self) -> int:
@@ -78,3 +78,16 @@ class FeuilleDeNotesParCohorteDTO(interface.DTO):
     @property
     def nombre_inscriptions(self) -> int:
         return self.quantite_total_notes
+
+
+@attr.s(frozen=True, slots=True)
+class NoteEtudiantFromRepositoryDTO(interface.DTO):
+    noma = attr.ib(type=str)
+    email = attr.ib(type=str)
+    note = attr.ib(type=str)
+    echeance_gestionnaire = attr.ib(type=str)
+    numero_session = attr.ib(type=int)
+    code_unite_enseignement = attr.ib(type=str)
+    annee_academique = attr.ib(type=int)
+    note_decimale_autorisee = attr.ib(type=bool)
+    nom_cohorte = attr.ib(type=str)

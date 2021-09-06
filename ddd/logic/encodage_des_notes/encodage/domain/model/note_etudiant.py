@@ -65,3 +65,7 @@ class NoteEtudiant(interface.RootEntity):
     @property
     def numero_session(self):
         return self.entity_id.numero_session
+
+    @property
+    def is_manquant(self) -> bool:
+        return not bool(self.note.value)

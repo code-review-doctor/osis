@@ -27,7 +27,7 @@ import random
 
 import factory
 
-from base.models.enums.exam_enrollment_justification_type import TutorJustificationTypes
+from base.models.enums.exam_enrollment_justification_type import JustificationTypes
 from ddd.logic.encodage_des_notes.encodage.domain.model._note import NoteChiffree, Justification, NoteManquante
 from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import IdentiteNoteEtudiant, NoteEtudiant
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO
@@ -47,7 +47,7 @@ def generate_note_chiffree() -> 'NoteChiffree':
 
 def generate_note_justification() -> 'Justification':
     return Justification(
-        value=random.choice(TutorJustificationTypes.all())
+        value=random.choice(JustificationTypes.all())
     )
 
 
@@ -91,6 +91,14 @@ class NoteManquanteEtudiantFactory(factory.Factory):
 
 class NoteManquanteEtudiantDateLimiteDepasseeFactory(NoteManquanteEtudiantFactory):
     date_limite_de_remise = DateDTO.build_from_date(datetime.date.today() - datetime.timedelta(days=1))
+
+
+class NoteEtudiantChiffreeFactory(NoteManquanteEtudiantFactory):
+    note = generate_note_chiffree()
+
+
+class NoteEtudiantJustificationFactory(NoteManquanteEtudiantFactory):
+    note = generate_note_justification()
 
 
 class NoteDecimalesAuthorisees(NoteManquanteEtudiantFactory):

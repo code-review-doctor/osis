@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
+
 import mock
 from django.test import TestCase
 from django.urls import reverse
@@ -31,7 +33,8 @@ from assessments.forms.score_encoding import ScoreEncodingProgressFilterForm
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
-from ddd.logic.encodage_des_notes.encodage.commands import GetCohortesGestionnaireCommand
+from ddd.logic.encodage_des_notes.encodage.commands import GetCohortesGestionnaireCommand, GetPeriodeEncodageCommand
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import PeriodeEncodageNotesDTO, DateDTO
 
 
 class ScoreEncodingProgressOverviewProgramManagerViewTest(TestCase):
@@ -56,6 +59,13 @@ class ScoreEncodingProgressOverviewProgramManagerViewTest(TestCase):
     def __mock_message_bus_invoke(self, cmd):
         if isinstance(cmd, GetCohortesGestionnaireCommand):
             return []
+        if isinstance(cmd, GetPeriodeEncodageCommand):
+            return PeriodeEncodageNotesDTO(
+                annee_concernee=2020,
+                session_concernee=2,
+                debut_periode_soumission=DateDTO.build_from_date(datetime.date.today() - datetime.timedelta(days=5)),
+                fin_periode_soumission=DateDTO.build_from_date(datetime.date.today() + datetime.timedelta(days=16)),
+            )
         raise Exception('Bus Command not mocked in test')
 
     def test_case_user_not_logged(self):
@@ -83,6 +93,7 @@ class ScoreEncodingProgressOverviewProgramManagerViewTest(TestCase):
         self.assertTrue('progression_generale' in response.context)
         self.assertTrue('last_synchronization' in response.context)
         self.assertEqual(response.context['person'], self.program_manager.person)
+        self.assertIsInstance(response.context['periode_encodage'], PeriodeEncodageNotesDTO)
         self.assertIsInstance(response.context['search_form'], ScoreEncodingProgressFilterForm)
 
         expected_score_search_url = reverse('score_search')

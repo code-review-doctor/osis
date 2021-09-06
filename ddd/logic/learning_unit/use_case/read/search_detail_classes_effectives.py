@@ -25,16 +25,13 @@
 ##############################################################################
 from typing import List
 
-from ddd.logic.encodage_des_notes.encodage.commands import SearchNotesCommand
-from ddd.logic.encodage_des_notes.shared_kernel.dtos import NoteEtudiantDTO
+from ddd.logic.learning_unit.commands import SearchDetailClassesEffectivesCommand
+from ddd.logic.learning_unit.dtos import EffectiveClassFromRepositoryDTO
+from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
 
 
-def search_notes(
-        cmd: 'SearchNotesCommand',
-) -> List['NoteEtudiantDTO']:
-    # GIVEN
-    # PeriodeSoumissionOuverte().verifier(periode_soumission_note_translator)
-
-    # WHEN
-
-    return
+def search_detail_classes_effectives(
+        cmd: 'SearchDetailClassesEffectivesCommand',
+        repository: 'IEffectiveClassRepository'
+) -> List['EffectiveClassFromRepositoryDTO']:
+    return repository.search_dtos(codes=cmd.codes_classes, annee=cmd.annee)

@@ -449,6 +449,10 @@ def _check_postponement_conflict_on_learning_unit_year(luy, next_luy):
         'campus': _('Campus'),
         'language': _('Language'),
         'stage_dimona': _('Stage-Dimona'),
+        'individual_loan': _('Individual loan'),
+        'exchange_students': _('Exchange students'),
+        'english_friendly': _('English-friendly'),
+        'french_friendly': _('French-friendly')
     }
     return _get_differences(luy, next_luy, fields_to_compare)
 

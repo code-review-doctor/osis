@@ -26,7 +26,7 @@
 from typing import Set, List
 
 from base.models.enums.peps_type import PepsTypes
-from ddd.logic.encodage_des_notes.shared_kernel.service.i_signaletique_etudiant import \
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_etudiant import \
     ISignaletiqueEtudiantTranslator
 from ddd.logic.encodage_des_notes.soumission.dtos import SignaletiqueEtudiantDTO
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import EtudiantPepsDTO
@@ -69,11 +69,19 @@ class SignaletiqueEtudiantTranslatorInMemory(ISignaletiqueEtudiantTranslator):
     def search(
             cls,
             nomas: List[str],
+            nom: str = None,
+            prenom: str = None,
     ) -> Set['SignaletiqueEtudiantDTO']:
         nomas_as_set = set(nomas)
-        return set(
-            filter(
-                lambda dto: dto.noma in nomas_as_set,
-                cls.signaletique_dtos,
-            )
-        )
+        if not (nomas_as_set or nom or prenom):
+            return set()
+
+        result = cls.signaletique_dtos
+
+        if nomas_as_set:
+            result = {signaletique for signaletique in result if signaletique.noma in nomas_as_set}
+        if nom:
+            result = {signaletique for signaletique in result if nom in signaletique.nom}
+        if prenom:
+            result = {signaletique for signaletique in result if prenom in signaletique.prenom}
+        return result

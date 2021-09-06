@@ -51,7 +51,6 @@ class LearningUnitScoreEncodingBaseView(PermissionRequiredMixin, TemplateView):
         return {
             **super().get_context_data(**kwargs),
             'learning_unit_encoding_url': self.get_learning_unit_encoding_url(),
-            'learning_unit_double_encoding_url': self.get_learning_unit_double_encoding_url(),
             'learning_unit_print_url': self.get_learning_unit_print_url(),
             'learning_unit_download_xls_url': self.get_learning_unit_download_xls_url(),
             'learning_unit_upload_xls_url': self.get_learning_unit_upload_xls_url(),
@@ -61,9 +60,6 @@ class LearningUnitScoreEncodingBaseView(PermissionRequiredMixin, TemplateView):
         return reverse('learning_unit_score_encoding_form', kwargs={
             'learning_unit_code': self.kwargs['learning_unit_code']
         })
-
-    def get_learning_unit_double_encoding_url(self):
-        return ""
 
     def get_learning_unit_print_url(self):
         return reverse('score_sheet_pdf_export', kwargs={

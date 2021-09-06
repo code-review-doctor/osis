@@ -130,6 +130,12 @@ class GetLearningUnitCommand(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
+class SearchDetailClassesEffectivesCommand(interface.CommandRequest):
+    codes_classes = attr.ib(type=Set[str])
+    annee = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
 class CanCreateEffectiveClassCommand(interface.CommandRequest):
     learning_unit_code = attr.ib(type=str)
     learning_unit_year = attr.ib(type=int)

@@ -23,11 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
+
 from django.test import TestCase
 
 from base.tests.factories.exam_enrollment import ExamEnrollmentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.session_exam_deadline import SessionExamDeadlineFactory
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO
+from ddd.logic.encodage_des_notes.soumission.dtos import DateEcheanceNoteDTO
 from ddd.logic.encodage_des_notes.soumission.test.factory.note_etudiant import NoteManquanteEtudiantFactory, \
     NoteChiffreEtudiantFactory, NoteJustificationEtudiantFactory
 from infrastructure.encodage_de_notes.soumission.repository.note_etudiant import NoteEtudiantRepository
@@ -116,6 +120,67 @@ class NoteEtudiantRepositoryTest(TestCase):
 
         for note in notes_etudiant:
             self.assertIn(note, notes_retrieved)
+
+    def test_should_return_echeances_etudiants_dto(self):
+        note_etudiant = NoteChiffreEtudiantFactory()
+        self._create_save_necessary_data(note_etudiant)
+        self.note_etudiant_repository.save(note_etudiant)
+
+        dates_echeances = self.note_etudiant_repository.search_dates_echeances([note_etudiant.entity_id])
+        self.assertIsInstance(dates_echeances, list)
+        self.assertEqual(len(dates_echeances), 1)
+
+        self.assertEqual(
+            dates_echeances[0],
+            DateEcheanceNoteDTO(
+                code_unite_enseignement=note_etudiant.entity_id.code_unite_enseignement,
+                annee_unite_enseignement=note_etudiant.entity_id.annee_academique,
+                numero_session=note_etudiant.entity_id.numero_session,
+                noma=note_etudiant.entity_id.noma,
+                note_soumise=note_etudiant.est_soumise,
+                jour=note_etudiant.date_limite_de_remise.jour,
+                mois=note_etudiant.date_limite_de_remise.mois,
+                annee=note_etudiant.date_limite_de_remise.annee,
+            )
+        )
+
+    def test_should_return_echeances_etudiants_vide(self):
+        dates_echeances = self.note_etudiant_repository.search_dates_echeances([])
+        self.assertListEqual(dates_echeances, [])
+
+    def test_should_return_echeances_etudiants_ordonee_par_code_ue_annee_ue_echeance(self):
+        notes_etudiant = [
+            NoteChiffreEtudiantFactory(
+                entity_id__noma="123456789",
+                entity_id__code_unite_enseignement='LDROI1200',
+                entity_id__annee_academique=2020,
+                date_limite_de_remise=DateDTO.build_from_date(datetime.date.today() + datetime.timedelta(days=5))
+            ), NoteChiffreEtudiantFactory(
+                entity_id__noma="654987321",
+                entity_id__code_unite_enseignement='LDROI1200',
+                entity_id__annee_academique=2020,
+                date_limite_de_remise=DateDTO.build_from_date(datetime.date.today() - datetime.timedelta(days=2))
+            ),
+            NoteChiffreEtudiantFactory(
+                entity_id__noma="321654987",
+                entity_id__code_unite_enseignement='LDROI1500',
+                entity_id__annee_academique=2020,
+                date_limite_de_remise=DateDTO.build_from_date(datetime.date.today() - datetime.timedelta(days=10))
+            )
+        ]
+        for note in notes_etudiant:
+            self._create_save_necessary_data(note)
+            self.note_etudiant_repository.save(note)
+
+        dates_echeances = self.note_etudiant_repository.search_dates_echeances(
+            [note.entity_id for note in notes_etudiant]
+        )
+        self.assertIsInstance(dates_echeances, list)
+        self.assertEqual(len(dates_echeances), len(notes_etudiant))
+
+        self.assertEqual(dates_echeances[0].noma, "654987321")  # LDROI1200 - 2020 - today-2days
+        self.assertEqual(dates_echeances[1].noma, "123456789")  # LDROI1200 - 2020 - today+5days
+        self.assertEqual(dates_echeances[2].noma, "321654987")  # LDROI1500 - 2020 - today-10days
 
     def _create_save_necessary_data(self, note_etudiant_to_save, for_class: bool = False):
         luy_acronym = note_etudiant_to_save.code_unite_enseignement

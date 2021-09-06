@@ -11,7 +11,7 @@ servers:
  - url: https://osis.uclouvain.be/api/v1/learning_unit/
    description: 'Production server'
 info:
-  version: '1.05'
+  version: '1.06'
   title: 'Learning Unit Service'
   description: |-
     A set of API endpoints that allow you to get information about learning unit
@@ -565,6 +565,12 @@ components:
               type: string
               description: |
                 The language code according to ISO 639-1 specification (https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)
+            french_friendly:
+              type: boolean
+            english_friendly:
+              type: boolean
+            exchange_students:
+              type: boolean
             proposal:
               type: object
               properties:
@@ -582,12 +588,6 @@ components:
               type: string
             remark_en:
               type: string
-            is_french_friendly:
-              type: boolean
-            is_english_friendly:
-              type: boolean
-            student_exchange:
-              type: boolean
     ExternalLearningUnit:
       allOf:
         - $ref: '#/components/schemas/LearningUnitDetailed'

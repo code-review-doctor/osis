@@ -341,6 +341,11 @@ class LearningUnitYear(SerializableModel):
 
     stage_dimona = models.BooleanField(default=False, verbose_name=_('Stage-Dimona'))
 
+    english_friendly = models.BooleanField(default=False, verbose_name=_('English-friendly'))
+    french_friendly = models.BooleanField(default=False, verbose_name=_('French-friendly'))
+    exchange_students = models.BooleanField(default=True, verbose_name=_('Exchange students'))
+    individual_loan = models.BooleanField(default=True, verbose_name=_('Individual loan'))
+
     campus = models.ForeignKey('Campus', null=True, verbose_name=_("Learning location"), on_delete=models.PROTECT)
 
     language = models.ForeignKey('reference.Language', null=True, verbose_name=_('Language'), on_delete=models.PROTECT)

@@ -23,19 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import abc
-from typing import Set, List
+from ddd.logic.encodage_des_notes.encodage.commands import GetPeriodeEncodageCommand
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodage_notes import \
+    IPeriodeEncodageNotesTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import PeriodeEncodageNotesDTO
 
-from ddd.logic.encodage_des_notes.soumission.dtos import AttributionEnseignantDTO, SignaletiqueEtudiantDTO
-from osis_common.ddd import interface
 
-
-class ISignaletiqueEtudiantTranslator(interface.DomainService):
-
-    @classmethod
-    @abc.abstractmethod
-    def search(
-            cls,
-            nomas: List[str],
-    ) -> Set['SignaletiqueEtudiantDTO']:
-        raise NotImplementedError
+def get_periode_encodage(
+        cmd: 'GetPeriodeEncodageCommand',
+        periode_encodage_note_translator: 'IPeriodeEncodageNotesTranslator',
+) -> 'PeriodeEncodageNotesDTO':
+    return periode_encodage_note_translator.get()

@@ -23,20 +23,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import collections
-from typing import List, Dict, Set, Tuple, Any, Callable, Iterable
+from typing import List
 
-from ddd.logic.encodage_des_notes.shared_kernel.service.i_attribution_enseignant import \
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.service.i_periode_encodage_notes import \
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodage_notes import \
     IPeriodeEncodageNotesTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.service.i_signaletique_etudiant import \
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_etudiant import \
     ISignaletiqueEtudiantTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.service.i_unite_enseignement import IUniteEnseignementTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_unite_enseignement import IUniteEnseignementTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.progression_generale import ProgressionGeneral
 from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import NoteEtudiant
-from ddd.logic.encodage_des_notes.soumission.dtos import ProgressionGeneraleEncodageNotesDTO, \
-    ProgressionEncodageNotesUniteEnseignementDTO, DateEcheanceDTO, UniteEnseignementDTO
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import ProgressionGeneraleEncodageNotesDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_note_etudiant import INoteEtudiantRepository
+from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
 from osis_common.ddd import interface
 
 
@@ -47,6 +47,7 @@ class ProgressionGeneraleEncodage(interface.DomainService):
             cls,
             matricule_fgs_enseignant: str,
             note_etudiant_repo: 'INoteEtudiantRepository',
+            responsable_notes_repo: 'IResponsableDeNotesRepository',
             attribution_translator: 'IAttributionEnseignantTranslator',
             periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
             signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
@@ -64,66 +65,14 @@ class ProgressionGeneraleEncodage(interface.DomainService):
             annee_academique
         )
 
-        nomas_concernes = [note.noma for note in notes]
-        nomas_avec_peps = _get_nomas_avec_peps(nomas_concernes, signaletique_etudiant_translator)
-
-        detail_unite_enseignement_par_code = _get_detail_unite_enseignement_par_code(
-            {(note.code_unite_enseignement, note.annee) for note in notes},
-            unite_enseignement_translator,
+        return ProgressionGeneral().get(
+            {note.entity_id for note in notes},
+            note_etudiant_repo,
+            responsable_notes_repo,
+            periode_soumission,
+            signaletique_etudiant_translator,
+            unite_enseignement_translator
         )
-
-        notes_grouped_by_code_unite_enseignement = group_by(notes, lambda note: note.code_unite_enseignement)
-
-        progressions = [
-            cls._compute_progression_pour_notes_de_meme_unite_enseignement(
-                notes,
-                nomas_avec_peps,
-                detail_unite_enseignement_par_code[code_unite_enseignement]
-            ) for code_unite_enseignement, notes in notes_grouped_by_code_unite_enseignement.items()
-        ]
-
-        return ProgressionGeneraleEncodageNotesDTO(
-            annee_academique=annee_academique,
-            numero_session=numero_session,
-            progression_generale=sorted(progressions, key=lambda progression: progression.code_unite_enseignement),
-        )
-
-    @classmethod
-    def _compute_progression_pour_notes_de_meme_unite_enseignement(
-            cls,
-            notes: List['NoteEtudiant'],
-            nomas_avec_peps: Set[str],
-            detail_unite_enseignement: UniteEnseignementDTO
-    ):
-        notes_grouped_by_echeance = group_by(notes, lambda note: note.date_limite_de_remise)
-        list_tuple_echeance_notes = sorted(
-            notes_grouped_by_echeance.items(),
-            key=lambda tuple_echeance_notes: tuple_echeance_notes[0]
-        )
-        return ProgressionEncodageNotesUniteEnseignementDTO(
-            code_unite_enseignement=detail_unite_enseignement.code,
-            intitule_complet_unite_enseignement=detail_unite_enseignement.intitule_complet,
-            dates_echeance=[
-                DateEcheanceDTO(
-                    jour=echeance.jour,
-                    mois=echeance.mois,
-                    annee=echeance.annee,
-                    quantite_notes_soumises=len([note for note in notes if note.est_soumise]),
-                    quantite_total_notes=len(notes),
-                ) for echeance, notes in list_tuple_echeance_notes
-            ],
-            a_etudiants_peps=any(note.noma in nomas_avec_peps for note in notes),
-        )
-
-
-#  TODO to move
-def group_by(iterable: Iterable[Any], key_func: Callable) -> Dict:
-    result = collections.defaultdict(list)
-
-    for element in iterable:
-        result[key_func(element)].append(element)
-
-    return result
 
 
 def _search_notes(
@@ -139,19 +88,3 @@ def _search_notes(
     )
     search_criterias = [(attrib.code_unite_enseignement, annee_concerne, session_concerne) for attrib in attributions]
     return note_etudiant_repo.search_by_code_unite_enseignement_annee_session(criterias=search_criterias)
-
-
-def _get_nomas_avec_peps(
-        nomas_concernes: List[str],
-        signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator'
-) -> Set[str]:
-    signaletiques_etds = signaletique_etudiant_translator.search(nomas=nomas_concernes)
-    return {signal.noma for signal in signaletiques_etds if bool(signal.peps)}
-
-
-def _get_detail_unite_enseignement_par_code(
-        code_annee_valeurs: Set[Tuple[str, int]],
-        unite_enseignement_translator: 'IUniteEnseignementTranslator',
-) -> Dict[str, UniteEnseignementDTO]:
-    unites_enseignement = unite_enseignement_translator.search(code_annee_valeurs)
-    return {ue.code: ue for ue in unites_enseignement}

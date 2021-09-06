@@ -76,7 +76,6 @@ class LearningUnitScoreEncodingProgramManagerViewTest(TestCase):
         response = self.client.get(self.url)
 
         self.assertIsInstance(response.context['learning_unit_encoding_url'], str)
-        self.assertIsInstance(response.context['learning_unit_double_encoding_url'], str)
         self.assertIsInstance(response.context['learning_unit_print_url'], str)
         self.assertIsInstance(response.context['learning_unit_download_xls_url'], str)
         self.assertIsInstance(response.context['learning_unit_upload_xls_url'], str)

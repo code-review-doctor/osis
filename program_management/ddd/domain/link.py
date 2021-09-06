@@ -84,7 +84,8 @@ class Link(interface.Entity):
     def __str__(self):
         return self.__format_node(self.parent) + " - " + self.__format_node(self.child)
 
-    def __format_node(self, node: 'Node') -> str:
+    @staticmethod
+    def __format_node(node: 'Node') -> str:
         node_str = "{node.code} ({node.academic_year})"
         if node.is_group_or_mini_or_training() and node.version_name:
             node_str = "{node.code}[{node.version_name}] ({node.academic_year})"
@@ -169,7 +170,8 @@ class LinkWithChildBranch(Link):
 
 
 class LinkBuilder:
-    def from_link(self, from_link: 'Link', parent: 'Node', child: 'Node'):
+    @staticmethod
+    def from_link(from_link: 'Link', parent: 'Node', child: 'Node'):
         new_link = attr.evolve(from_link, parent=parent, child=child)
         new_link._has_changed = True
         return new_link
@@ -177,7 +179,8 @@ class LinkBuilder:
 
 class LinkFactory:
 
-    def copy_to_next_year(self, copy_from_link: 'Link', parent_next_year: 'Node', child_next_year: 'Node') -> 'Link':
+    @staticmethod
+    def copy_to_next_year(copy_from_link: 'Link', parent_next_year: 'Node', child_next_year: 'Node') -> 'Link':
         link_next_year = attr.evolve(
             copy_from_link,
             parent=parent_next_year,
@@ -186,7 +189,8 @@ class LinkFactory:
         link_next_year._has_changed = True
         return link_next_year
 
-    def get_link(self, parent: 'Node', child: 'Node', **kwargs) -> Link:
+    @staticmethod
+    def get_link(parent: 'Node', child: 'Node', **kwargs) -> Link:
         if parent and parent.node_type == NodeType.LEARNING_UNIT.name:
             return LinkWithChildLeaf(parent, child, **kwargs)
         else:

@@ -120,3 +120,7 @@ class EffectiveClassFromRepositoryDTO(DTO):
     volume_q1 = attr.ib(type=DurationUnit)
     volume_q2 = attr.ib(type=DurationUnit)
     class_type = attr.ib(type=str)
+
+    @property
+    def code_complet_classe(self) -> str:
+        return self.learning_unit_code + self.class_code

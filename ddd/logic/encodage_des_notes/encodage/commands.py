@@ -31,6 +31,11 @@ from osis_common.ddd import interface
 
 
 @attr.s(frozen=True, slots=True)
+class GetPeriodeEncodageCommand(interface.CommandRequest):
+    pass
+
+
+@attr.s(frozen=True, slots=True)
 class EncoderNoteCommand(interface.CommandRequest):
     noma = attr.ib(type=str)
     email = attr.ib(type=str)
@@ -56,9 +61,19 @@ class GetCohortesGestionnaireCommand(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
-class SearchNotesCommand(interface.CommandRequest):
+class RechercherNotesCommand(interface.CommandRequest):
     noma = attr.ib(type=str)
     nom = attr.ib(type=str)
     prenom = attr.ib(type=str)
     etat = attr.ib(type=str)  # absence justifiee, injustifiee, tricherie, note manquante  TODO :: renommer ?
     nom_cohorte = attr.ib(type=str)
+    matricule_fgs_gestionnaire = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class GetProgressionGeneraleGestionnaireCommand(interface.CommandRequest):
+    matricule_fgs_gestionnaire = attr.ib(type=str)
+    nom_cohorte = attr.ib(type=str, default='')
+    code_unite_enseignement = attr.ib(type=str, default='')
+    enseignant = attr.ib(type=str, default='')
+    seulement_notes_manquantes = attr.ib(type=bool, default=False)

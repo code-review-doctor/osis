@@ -27,7 +27,7 @@ import functools
 import itertools
 import operator
 import string
-from typing import Optional, List
+from typing import Optional, List, Set
 
 from django.db.models import F, Q, CharField
 from django.db.models.functions import Concat
@@ -37,11 +37,12 @@ from base.auth.roles.tutor import Tutor
 from base.models.learning_unit_year import LearningUnitYear
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import EnseignantDTO
 from ddd.logic.encodage_des_notes.soumission.builder.responsable_de_notes_builder import ResponsableDeNotesBuilder
-from ddd.logic.encodage_des_notes.soumission.domain.model._unite_enseignement_identite import UniteEnseignementIdentite
+from ddd.logic.encodage_des_notes.soumission.domain.model._unite_enseignement_identite import \
+    UniteEnseignementIdentite, UniteEnseignementIdentiteBuilder
 from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import IdentiteResponsableDeNotes, \
     ResponsableDeNotes
 from ddd.logic.encodage_des_notes.soumission.dtos import ResponsableDeNotesFromRepositoryDTO, \
-    UniteEnseignementIdentiteFromRepositoryDTO
+    UniteEnseignementIdentiteFromRepositoryDTO, ResponsableDeNotesDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
 from learning_unit.models.learning_class_year import LearningClassYear
 from osis_common.ddd.interface import ApplicationService
@@ -189,6 +190,38 @@ class ResponsableDeNotesRepository(IResponsableDeNotesRepository):
             'prenom',
         ).get()
         return EnseignantDTO(**detail_enseignant_as_values)
+
+    @classmethod
+    def search_dto(
+            cls,
+            unite_enseignement_identities: Set[UniteEnseignementIdentite],
+    ) -> List['ResponsableDeNotesDTO']:
+        responsables_notes_as_values = ScoreResponsible.objects.annotate(
+            nom=F('tutor__person__last_name'),
+            prenom=F('tutor__person__first_name'),
+            code_unite_enseignement=Concat(
+                'learning_unit_year__acronym',
+                'learning_class_year__acronym',
+                output_field=CharField()
+            ),
+            annee_unite_enseignement=F('learning_unit_year__academic_year__year'),
+        ).values(
+            'nom',
+            'prenom',
+            'code_unite_enseignement',
+            'annee_unite_enseignement'
+        ).filter(
+            annee_unite_enseignement__in={id_ue.annee_academique for id_ue in unite_enseignement_identities},
+            code_unite_enseignement__in={id_ue.code_unite_enseignement for id_ue in unite_enseignement_identities}
+        )
+
+        return [
+            ResponsableDeNotesDTO(**row) for row in responsables_notes_as_values
+            if UniteEnseignementIdentiteBuilder.build_from_code_and_annee(
+                code_unite_enseignement=row['code_unite_enseignement'],
+                annee_academique=row['annee_unite_enseignement'],
+            ) in unite_enseignement_identities
+        ]
 
 
 def _fetch_responsable_de_notes():

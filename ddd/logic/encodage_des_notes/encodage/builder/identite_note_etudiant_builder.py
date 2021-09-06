@@ -25,7 +25,8 @@
 ##############################################################################
 from ddd.logic.encodage_des_notes.encodage.commands import EncoderNoteCommand
 from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import IdentiteNoteEtudiant
-from osis_common.ddd.interface import EntityIdentityBuilder, DTO
+from ddd.logic.encodage_des_notes.encodage.dtos import NoteEtudiantFromRepositoryDTO
+from osis_common.ddd.interface import EntityIdentityBuilder
 
 
 class NoteEtudiantIdentityBuilder(EntityIdentityBuilder):
@@ -36,9 +37,14 @@ class NoteEtudiantIdentityBuilder(EntityIdentityBuilder):
     @classmethod
     def build_from_repository_dto(
             cls,
-            dto_object: 'DTO'
+            dto_object: 'NoteEtudiantFromRepositoryDTO'
     ) -> 'IdentiteNoteEtudiant':
-        raise NotImplementedError
+        return IdentiteNoteEtudiant(
+            noma=dto_object.noma,
+            code_unite_enseignement=dto_object.code_unite_enseignement,
+            annee_academique=dto_object.annee_academique,
+            numero_session=dto_object.numero_session,
+        )
 
     @classmethod
     def build(
