@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Optional
+
 from ddd.logic.encodage_des_notes.soumission.commands import GetResponsableDeNotesCommand
 from ddd.logic.encodage_des_notes.soumission.domain.model._unite_enseignement_identite import \
     UniteEnseignementIdentiteBuilder
@@ -33,7 +35,7 @@ from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes i
 def get_responsable_de_notes(
         cmd: 'GetResponsableDeNotesCommand',
         responsable_notes_repo: 'IResponsableDeNotesRepository',
-) -> 'ResponsableDeNotesDTO':
+) -> Optional['ResponsableDeNotesDTO']:
     unite_enseignement_id = UniteEnseignementIdentiteBuilder.build_from_code_and_annee(
         code_unite_enseignement=cmd.code_unite_enseignement,
         annee_academique=cmd.annee_unite_enseignement
