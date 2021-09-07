@@ -22,11 +22,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import abc
 from typing import List
 
 from ddd.logic.encodage_des_notes.encodage.domain.model.gestionnaire_parcours import GestionnaireParcours
 from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import IdentiteNoteEtudiant
+from ddd.logic.encodage_des_notes.encodage.domain.service.i_notifier_encodage_notes import INotifierEncodageNotes
 from ddd.logic.encodage_des_notes.encodage.repository.note_etudiant import INoteEtudiantRepository
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
@@ -36,13 +36,12 @@ from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_pe
     ISignaletiquePersonneTranslator
 from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_notes import \
     IAdresseFeuilleDeNotesRepository
-from osis_common.ddd import interface
 
 
-class INotifierNotes(interface.DomainService):
+class NotifierEncodageNotesInMemory(INotifierEncodageNotes):
+    notifications = []
 
     @classmethod
-    @abc.abstractmethod
     def notifier(
             cls,
             notes_encodees: List['IdentiteNoteEtudiant'],
@@ -53,4 +52,9 @@ class INotifierNotes(interface.DomainService):
             signaletique_etudiant_repo: 'ISignaletiqueEtudiantTranslator',
             adresse_feuille_de_notes_repo: 'IAdresseFeuilleDeNotesRepository',
     ) -> None:
-        raise NotImplementedError
+        cls.notifications.append(
+            {
+                "notes_encodees": notes_encodees,
+                "gestionnaire_parcours": gestionnaire_parcours,
+            }
+        )

@@ -139,7 +139,7 @@ from infrastructure.effective_class_repartition.domain.service.tutor_attribution
 from infrastructure.effective_class_repartition.repository.tutor import TutorRepository
 from infrastructure.encodage_de_notes.encodage.domain.service.cohortes_du_gestionnaire import \
     CohortesDuGestionnaireTranslator
-from infrastructure.encodage_de_notes.encodage.domain.service.notifier_notes import NotifierNotes
+from infrastructure.encodage_de_notes.encodage.domain.service.notifier_encodage_notes import NotifierEncodageNotes
 from infrastructure.encodage_de_notes.encodage.repository.note_etudiant import NoteEtudiantRepository as \
     NoteEtudiantGestionnaireRepository
 from infrastructure.encodage_de_notes.shared_kernel.service.attribution_enseignant import \
@@ -152,7 +152,7 @@ from infrastructure.encodage_de_notes.shared_kernel.service.signaletique_etudian
 from infrastructure.encodage_de_notes.shared_kernel.service.unite_enseignement import UniteEnseignementTranslator
 from infrastructure.encodage_de_notes.soumission.domain.service.deliberation import DeliberationTranslator
 from infrastructure.encodage_de_notes.soumission.domain.service.entites_cohorte import EntitesCohorteTranslator
-from infrastructure.encodage_de_notes.soumission.domain.service.notifier_notes import NotifierSoumissionNotes
+from infrastructure.encodage_de_notes.soumission.domain.service.notifier_soumission_notes import NotifierSoumissionNotes
 from infrastructure.encodage_de_notes.soumission.domain.service.signaletique_personne import \
     SignaletiquePersonneTranslator
 from infrastructure.encodage_de_notes.soumission.repository.adresse_feuille_de_notes import \
@@ -355,7 +355,7 @@ class MessageBus:
             NoteEtudiantGestionnaireRepository(),
             PeriodeEncodageNotesTranslator(),
             CohortesDuGestionnaireTranslator(),
-            NotifierNotes(),
+            NotifierEncodageNotes(),
             AttributionEnseignantTranslator(),
             SignaletiquePersonneTranslator(),
             SignaletiqueEtudiantTranslator(),

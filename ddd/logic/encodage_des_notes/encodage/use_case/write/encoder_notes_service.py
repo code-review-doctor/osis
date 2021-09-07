@@ -30,7 +30,7 @@ from ddd.logic.encodage_des_notes.encodage.commands import EncoderNotesCommand
 from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import IdentiteNoteEtudiant
 from ddd.logic.encodage_des_notes.encodage.domain.service.encoder_notes_en_lot import EncoderNotesEnLot
 from ddd.logic.encodage_des_notes.encodage.domain.service.i_cohortes_du_gestionnaire import ICohortesDuGestionnaire
-from ddd.logic.encodage_des_notes.encodage.domain.service.i_notifier_notes import INotifierNotes
+from ddd.logic.encodage_des_notes.encodage.domain.service.i_notifier_encodage_notes import INotifierEncodageNotes
 from ddd.logic.encodage_des_notes.encodage.repository.note_etudiant import INoteEtudiantRepository
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
@@ -53,7 +53,7 @@ def encoder_notes(
         note_etudiant_repo: 'INoteEtudiantRepository',
         periode_encodage_note_translator: 'IPeriodeEncodageNotesTranslator',
         cohortes_gestionnaire_translator: 'ICohortesDuGestionnaire',
-        notifier_notes_domaine_service: 'INotifierNotes',
+        notifier_notes_domaine_service: 'INotifierEncodageNotes',
         translator: 'IAttributionEnseignantTranslator',
         signaletique_repo: 'ISignaletiquePersonneTranslator',
         signaletique_etudiant_repo: 'ISignaletiqueEtudiantTranslator',

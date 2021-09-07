@@ -46,7 +46,7 @@ from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import 
     PasGestionnaireParcoursCohorteException
 from infrastructure.encodage_de_notes.encodage.domain.service.in_memory.cohortes_du_gestionnaire import \
     CohortesDuGestionnaireInMemory
-from infrastructure.encodage_de_notes.encodage.domain.service.in_memory.notifier_notes import NotifierNotesInMemory
+from infrastructure.encodage_de_notes.encodage.domain.service.in_memory.notifier_encodage_notes import NotifierEncodageNotesInMemory
 from infrastructure.encodage_de_notes.encodage.repository.in_memory.note_etudiant import NoteEtudiantInMemoryRepository
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.periode_encodage_notes import \
     PeriodeEncodageNotesTranslatorInMemory
@@ -76,7 +76,7 @@ class EncoderNoteTest(SimpleTestCase):
 
         self.periode_encodage_notes_translator = PeriodeEncodageNotesTranslatorInMemory()
         self.cohortes_gestionnaire_trans = CohortesDuGestionnaireInMemory()
-        self.notifier_notes_domain_service = NotifierNotesInMemory()
+        self.notifier_notes_domain_service = NotifierEncodageNotesInMemory()
         self.notifier_notes_domain_service.notifications.clear()
         self.__mock_service_bus()
 

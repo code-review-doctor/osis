@@ -36,7 +36,7 @@ from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_pe
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.periode_encodage_ouverte import PeriodeEncodageOuverte
 from ddd.logic.encodage_des_notes.soumission.commands import SoumettreNotesCommand
 from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import IdentiteNoteEtudiant
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_notifier_notes import INotifierSoumissionNotes
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_notifier_soumission_notes import INotifierSoumissionNotes
 from ddd.logic.encodage_des_notes.soumission.domain.service.responsable_de_notes import ResponsableDeNotes
 from ddd.logic.encodage_des_notes.soumission.domain.service.soumettre_notes_en_lot import SoumettreNotesEnLot
 from ddd.logic.encodage_des_notes.soumission.repository.i_note_etudiant import INoteEtudiantRepository

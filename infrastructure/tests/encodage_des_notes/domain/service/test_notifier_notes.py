@@ -30,7 +30,7 @@ from ddd.logic.encodage_des_notes.encodage.test.factory.note_etudiant import Not
     NoteEtudiantJustificationFactory
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_personne import \
     ISignaletiquePersonneTranslator
-from infrastructure.encodage_de_notes.encodage.domain.service.notifier_notes import NotifierNotes
+from infrastructure.encodage_de_notes.encodage.domain.service.notifier_encodage_notes import NotifierEncodageNotes
 from infrastructure.encodage_de_notes.encodage.repository.in_memory.note_etudiant import NoteEtudiantInMemoryRepository
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.attribution_enseignant import \
     AttributionEnseignantTranslatorInMemory
@@ -100,7 +100,7 @@ class TestNotifierNotes(TestCase):
     def test_cannot_envoyer_notifications_if_aucune_notes_encodees(self):
         notes_encodees = []
 
-        result = NotifierNotes().generer_mail(
+        result = NotifierEncodageNotes().notifier(
             notes_encodees,
             self.gestionnaire_parcours_droi1ba,
             self.note_etudiant_repo,
@@ -115,7 +115,7 @@ class TestNotifierNotes(TestCase):
     def test_when_note_est_encodee_should_envoyer_notification_pour_la_meme_cohorte_et_meme_unite_enseignement(self):
         notes_encodees = [self.notes_ldroi1001[0].entity_id]
 
-        result = NotifierNotes().generer_mail(
+        result = NotifierEncodageNotes().notifier(
             notes_encodees,
             self.gestionnaire_parcours_droi1ba,
             self.note_etudiant_repo,
