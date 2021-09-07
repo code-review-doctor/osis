@@ -28,6 +28,7 @@ from decimal import Decimal
 from django.conf import settings
 from rest_framework import serializers
 
+from attribution.api.serializers.effective_class_repartition import EffectiveClassRepartitionSerializer
 from attribution.models.enums.function import Functions
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 
@@ -47,10 +48,7 @@ class AttributionSerializer(serializers.Serializer):
     practical_charge = serializers.DecimalField(max_digits=5, decimal_places=2)
     total_learning_unit_charge = serializers.SerializerMethodField()
     links = serializers.SerializerMethodField()
-    # effective_class_repartition = serializers.ListField(
-    #     child=ClassRepartitionSerializer
-    # )
-    # effective_class_repartition = EffectiveClassRepartitionListSerializer()
+    effective_class_repartition = EffectiveClassRepartitionSerializer(many=True)
     has_peps = serializers.BooleanField()
 
     @staticmethod
@@ -66,8 +64,8 @@ class AttributionSerializer(serializers.Serializer):
         return ""
 
     @staticmethod
-    def get_total_learning_unit_charge(obj) -> Decimal:
-        return obj.lecturing_charge or 0.0 + obj.practical_charge or 0.0
+    def get_total_learning_unit_charge(obj) -> str:
+        return str((obj.lecturing_charge or Decimal(0.0)) + (obj.practical_charge or Decimal(0.0)))
 
     def get_links(self, obj) -> dict:
         return {

@@ -42,8 +42,10 @@ from ddd.logic.application.use_case.write.send_applications_summary import send_
 from ddd.logic.application.use_case.write.update_application_service import update_application
 from ddd.logic.effective_class_repartition.commands import SearchAttributionsToLearningUnitCommand, \
     SearchTutorsDistributedToClassCommand, SearchAttributionCommand, DistributeClassToTutorCommand, \
-    UnassignTutorClassCommand, EditClassVolumeRepartitionToTutorCommand
+    UnassignTutorClassCommand, EditClassVolumeRepartitionToTutorCommand, GetTutorRepartitionClassesCommand
 from ddd.logic.effective_class_repartition.use_case.read.get_attribution_service import get_attribution
+from ddd.logic.effective_class_repartition.use_case.read.get_tutor_repartition_classes_service import \
+    get_tutor_repartition_classes
 from ddd.logic.effective_class_repartition.use_case.read.search_attributions_to_learning_unit_service import \
     search_attributions_to_learning_unit
 from ddd.logic.effective_class_repartition.use_case.read.search_effective_classes_distributed_service import \
@@ -193,6 +195,7 @@ class MessageBus:
             TutorRepository(),
             EffectiveClassRepository()
         ),
+        GetTutorRepartitionClassesCommand: lambda cmd: get_tutor_repartition_classes(cmd, TutorRepository())
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 
     def invoke(self, command: CommandRequest) -> ApplicationServiceResult:

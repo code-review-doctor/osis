@@ -33,6 +33,7 @@ from ddd.logic.effective_class_repartition.domain.model._learning_unit_attributi
     LearningUnitAttributionIdentity
 from ddd.logic.effective_class_repartition.domain.validator.validators_by_business_action import \
     DistributeClassToTutorValidatorList
+from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
 from osis_common.ddd import interface
 
@@ -85,3 +86,17 @@ class Tutor(interface.RootEntity):
             effective_class_code = class_volume.effective_class.class_code
             if attribution_uuid == learning_unit_attribution_uuid and class_code == effective_class_code:
                 self.distributed_effective_classes.remove(class_volume)
+
+    def get_classes_repartition_on_learning_unit(
+            self,
+            learning_unit_code: str,
+            learning_unit_year: int
+    ) -> List['ClassVolumeRepartition']:
+        learning_unit_identity = LearningUnitIdentityBuilder.build_from_code_and_year(
+            code=learning_unit_code,
+            year=learning_unit_year
+        )
+        return [
+            class_repartition for class_repartition in self.distributed_effective_classes
+            if class_repartition.effective_class.learning_unit_identity == learning_unit_identity
+        ]
