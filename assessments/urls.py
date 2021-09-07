@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -27,11 +27,18 @@ from django.conf.urls import url, include
 from django.urls import path, register_converter
 
 from assessments.views import score_encoding, upload_xls_utils, pgm_manager_administration, score_sheet
+from assessments.views.program_manager import pgm_manager_administration as pgm_manager_administration_new
 from assessments.views import scores_responsible
 from assessments.views.address.score_sheet import ScoreSheetAddressView, FirstYearBachelorScoreSheetAddressView
 from assessments.views.pgm_manager_administration import ProgramManagerListView, ProgramManagerDeleteView, \
     ProgramManagerCreateView, PersonAutocomplete, MainProgramManagerUpdateView, MainProgramManagerPersonUpdateView, \
     ProgramManagerPersonDeleteView
+from assessments.views.program_manager.pgm_manager_administration import \
+    ProgramManagerListView as ProgramManagerListViewNew, ProgramManagerDeleteView as ProgramManagerDeleteViewNew, \
+    ProgramManagerCreateView as ProgramManagerCreateViewNew, \
+    MainProgramManagerUpdateView as MainProgramManagerUpdateViewNew, \
+    MainProgramManagerPersonUpdateView as MainProgramManagerPersonUpdateViewNew, \
+    ProgramManagerPersonDeleteView as ProgramManagerPersonDeleteViewNew
 from assessments.views.program_manager.score_search import ScoreSearchFormView
 from assessments.views.score_encoding import LearningUnitScoreEncodingView, LearningUnitScoreEncodingFormView, \
     ScoreSheetPDFExportView, ScoreSheetXLSExportView, ScoreSheetXLSImportView, ScoreEncodingProgressOverviewView
@@ -113,9 +120,23 @@ urlpatterns = [
         url(r'^update_main_person/(?P<pk>[0-9]+)/$', MainProgramManagerPersonUpdateView.as_view(),
             name='update_main_person'),
         url(r'^delete_manager/(?P<pk>[0-9]+)/$', ProgramManagerDeleteView.as_view(), name='delete_manager'),
-        url(r'^delete_manager_person/(?P<pk>[0-9]+)/$', ProgramManagerPersonDeleteView.as_view(),
-            name='delete_manager_person'),
+        url(r'^delete_manager_person/(?P<pk>[0-9]+)/$', ProgramManagerPersonDeleteView.as_view()),
         url(r'^create$', ProgramManagerCreateView.as_view(), name='create_manager_person'),
+        url(r'^person-autocomplete/$', PersonAutocomplete.as_view(), name='person-autocomplete'),
+    ])),
+    url(r'^program_manager/', include([
+        url(r'^$', pgm_manager_administration_new.pgm_manager_administration, name='program_manager'),
+        url(r'^search$', pgm_manager_administration_new.pgm_manager_search, name='program_manager_search'),
+        url(r'^manager_list/$', ProgramManagerListViewNew.as_view(), name='program_manager_list'),
+        url(r'^update_main/(?P<global_id>[0-9]+)/(?P<acronym>[a-zA-Z0-9/ \-_]+)/$',
+            MainProgramManagerUpdateViewNew.as_view(), name='update_main'),
+        url(r'^update_main_person/(?P<global_id>[0-9]+)/$', MainProgramManagerPersonUpdateViewNew.as_view(),
+            name='update_main_person'),
+        url(r'^delete_manager/(?P<global_id>[0-9]+)/(?P<acronym>[a-zA-Z0-9/ \-_]+)/$',
+            ProgramManagerDeleteViewNew.as_view(), name='delete_manager'),
+        url(r'^delete_manager_person/(?P<global_id>[0-9]+)/$', ProgramManagerPersonDeleteViewNew.as_view(),
+            name='delete_manager_person'),
+        url(r'^create$', ProgramManagerCreateViewNew.as_view(), name='create_program_manager_person'),
         url(r'^person-autocomplete/$', PersonAutocomplete.as_view(), name='person-autocomplete'),
     ])),
 

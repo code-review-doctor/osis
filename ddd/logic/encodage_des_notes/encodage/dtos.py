@@ -38,6 +38,21 @@ class CohorteGestionnaireDTO(interface.DTO):
 
 
 @attr.s(frozen=True, slots=True)
+class ProprietesGestionnaireCohorteDTO(interface.DTO):
+    est_principal = attr.ib(type=bool)
+    nom_cohorte = attr.ib(type=str)
+    nom_cohorte_affiche = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class GestionnaireCohortesDTO(interface.DTO):
+    matricule_gestionnaire = attr.ib(type=str)
+    nom = attr.ib(type=str)
+    prenom = attr.ib(type=str)
+    cohortes_gerees = attr.ib(type=List[ProprietesGestionnaireCohorteDTO], default=[])
+
+
+@attr.s(frozen=True, slots=True)
 class FeuilleDeNotesParCohorteDTO(interface.DTO):
     code_unite_enseignement = attr.ib(type=str)
     intitule_complet_unite_enseignement = attr.ib(type=str)  # unite enseignement

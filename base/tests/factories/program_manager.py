@@ -40,4 +40,5 @@ class ProgramManagerFactory(EducationGroupRoleModelFactory):
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))
     education_group = factory.SubFactory(EducationGroupFactory)
+    is_main = False
     cohort = None
