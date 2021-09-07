@@ -25,7 +25,8 @@
 ##############################################################################
 from typing import Set
 
-from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_personne import ISignaletiquePersonneTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_personne import \
+    ISignaletiquePersonneTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import DetailContactDTO, AdresseDTO
 
 
@@ -40,6 +41,7 @@ class SignaletiquePersonneTranslatorInMemory(ISignaletiquePersonneTranslator):
                 ville='Waterloo',
                 rue_numero_boite='Rue de Waterloo, 123',
             ),
+            langue="fr-be"
         ),
     }
 

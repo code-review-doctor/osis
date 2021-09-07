@@ -135,6 +135,7 @@ from infrastructure.effective_class_repartition.domain.service.tutor_attribution
 from infrastructure.effective_class_repartition.repository.tutor import TutorRepository
 from infrastructure.encodage_de_notes.encodage.domain.service.cohortes_du_gestionnaire import \
     CohortesDuGestionnaireTranslator
+from infrastructure.encodage_de_notes.encodage.domain.service.notifier_notes import NotifierNotes
 from infrastructure.encodage_de_notes.encodage.repository.note_etudiant import NoteEtudiantRepository as \
     NoteEtudiantGestionnaireRepository
 from infrastructure.encodage_de_notes.shared_kernel.service.attribution_enseignant import \
@@ -339,6 +340,11 @@ class MessageBus:
             NoteEtudiantGestionnaireRepository(),
             PeriodeEncodageNotesTranslator(),
             CohortesDuGestionnaireTranslator(),
+            NotifierNotes(),
+            AttributionEnseignantTranslator(),
+            SignaletiquePersonneTranslator(),
+            SignaletiqueEtudiantTranslator(),
+            AdresseFeuilleDeNotesRepository()
         ),
         GetCohortesGestionnaireCommand: lambda cmd: get_cohortes_gestionnaire(
             cmd,

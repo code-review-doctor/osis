@@ -30,10 +30,19 @@ from ddd.logic.encodage_des_notes.encodage.commands import EncoderNotesCommand
 from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import IdentiteNoteEtudiant
 from ddd.logic.encodage_des_notes.encodage.domain.service.encoder_notes_en_lot import EncoderNotesEnLot
 from ddd.logic.encodage_des_notes.encodage.domain.service.i_cohortes_du_gestionnaire import ICohortesDuGestionnaire
+from ddd.logic.encodage_des_notes.encodage.domain.service.i_notifier_notes import INotifierNotes
 from ddd.logic.encodage_des_notes.encodage.repository.note_etudiant import INoteEtudiantRepository
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_attribution_enseignant import \
+    IAttributionEnseignantTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodage_notes import \
     IPeriodeEncodageNotesTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_etudiant import \
+    ISignaletiqueEtudiantTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_personne import \
+    ISignaletiquePersonneTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.periode_encodage_ouverte import PeriodeEncodageOuverte
+from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_notes import \
+    IAdresseFeuilleDeNotesRepository
 
 NouvelleNote = str
 EmailEtudiant = str
@@ -44,6 +53,11 @@ def encoder_notes(
         note_etudiant_repo: 'INoteEtudiantRepository',
         periode_encodage_note_translator: 'IPeriodeEncodageNotesTranslator',
         cohortes_gestionnaire_translator: 'ICohortesDuGestionnaire',
+        notifier_notes_domaine_service: 'INotifierNotes',
+        translator: 'IAttributionEnseignantTranslator',
+        signaletique_repo: 'ISignaletiquePersonneTranslator',
+        signaletique_etudiant_repo: 'ISignaletiqueEtudiantTranslator',
+        adresse_feuille_de_notes_repo: 'IAdresseFeuilleDeNotesRepository',
 ) -> List['IdentiteNoteEtudiant']:
     # Given
     PeriodeEncodageOuverte().verifier(periode_encodage_note_translator)
@@ -55,5 +69,14 @@ def encoder_notes(
 
     # WHEN
     notes = EncoderNotesEnLot().execute(cmd.notes_encodees, gestionnaire_parcours, note_etudiant_repo, periode_ouverte)
+    notifier_notes_domaine_service.notifier(
+        notes,
+        gestionnaire_parcours,
+        note_etudiant_repo,
+        translator,
+        signaletique_repo,
+        signaletique_etudiant_repo,
+        adresse_feuille_de_notes_repo
+    )
 
     return notes

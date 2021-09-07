@@ -74,6 +74,9 @@ class Note(interface.ValueObject, abc.ABC):
     def is_manquant(self) -> bool:
         return False
 
+    def __str__(self) -> str:
+        return str(self.value)
+
 
 @attr.s(slots=True, frozen=True)
 class NoteChiffree(Note):

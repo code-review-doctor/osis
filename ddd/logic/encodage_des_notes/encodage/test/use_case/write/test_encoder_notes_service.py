@@ -46,6 +46,7 @@ from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import 
     PasGestionnaireParcoursCohorteException
 from infrastructure.encodage_de_notes.encodage.domain.service.in_memory.cohortes_du_gestionnaire import \
     CohortesDuGestionnaireInMemory
+from infrastructure.encodage_de_notes.encodage.domain.service.in_memory.notifier_notes import NotifierNotesInMemory
 from infrastructure.encodage_de_notes.encodage.repository.in_memory.note_etudiant import NoteEtudiantInMemoryRepository
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.periode_encodage_notes import \
     PeriodeEncodageNotesTranslatorInMemory
@@ -75,6 +76,8 @@ class EncoderNoteTest(SimpleTestCase):
 
         self.periode_encodage_notes_translator = PeriodeEncodageNotesTranslatorInMemory()
         self.cohortes_gestionnaire_trans = CohortesDuGestionnaireInMemory()
+        self.notifier_notes_domain_service = NotifierNotesInMemory()
+        self.notifier_notes_domain_service.notifications.clear()
         self.__mock_service_bus()
 
     def __mock_service_bus(self):
@@ -83,6 +86,7 @@ class EncoderNoteTest(SimpleTestCase):
             NoteEtudiantGestionnaireRepository=lambda: self.repository,
             PeriodeEncodageNotesTranslator=lambda: self.periode_encodage_notes_translator,
             CohortesDuGestionnaireTranslator=lambda: self.cohortes_gestionnaire_trans,
+            NotifierNotes=lambda: self.notifier_notes_domain_service,
         )
         message_bus_patcher.start()
         self.addCleanup(message_bus_patcher.stop)
@@ -306,6 +310,12 @@ class EncoderNoteTest(SimpleTestCase):
 
                 expected_result = Justification(value=JustificationTypes.CHEATING)
                 self.assertEqual(self.repository.get(entity_id).note, expected_result)
+
+    def test_should_notifier(self):
+        result = self.message_bus.invoke(self.cmd)
+
+        notification_kwargs = self.notifier_notes_domain_service.notifications[0]
+        self.assertEqual(notification_kwargs['notes_encodees'], result)
 
     def test_should_afficher_rapport_plusieurs_notes_erreurs(self):
         note1 = NoteManquanteEtudiantFactory()

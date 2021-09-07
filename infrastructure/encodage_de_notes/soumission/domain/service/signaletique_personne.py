@@ -30,7 +30,8 @@ from django.db.models import F, Prefetch
 from base.models.enums.person_address_type import PersonAddressType
 from base.models.person import Person
 from base.models.person_address import PersonAddress
-from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_personne import ISignaletiquePersonneTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_personne import \
+    ISignaletiquePersonneTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import DetailContactDTO, AdresseDTO
 
 
@@ -43,6 +44,8 @@ class SignaletiquePersonneTranslator(ISignaletiquePersonneTranslator):
     ) -> Set['DetailContactDTO']:
         qs = Person.objects.filter(
             global_id__in=matricules_fgs,
+        ).select_related(
+            "user"
         ).prefetch_related(
             Prefetch(
                 'personaddress_set',
@@ -66,7 +69,8 @@ class SignaletiquePersonneTranslator(ISignaletiquePersonneTranslator):
                     code_postal=adresse.postal_code,
                     ville=adresse.city,
                     rue_numero_boite=adresse.location,
-                ) if adresse else None
+                ) if adresse else None,
+                langue=obj.language
             )
             result.add(dto)
         return result
