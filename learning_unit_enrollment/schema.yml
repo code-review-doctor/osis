@@ -111,9 +111,12 @@ components:
         enrollment_state:
           type: string
           example: "ENROLLED"
-        student_name:
+        student_last_name:
           type: string
-          example: "Doe, John"
+          example: "Doe"
+        student_first_name:
+          type: string
+          example: "John"
         student_email:
           type: string
           example: "john.doe@mail.xyz"
@@ -122,8 +125,10 @@ components:
           example: "12345678"
         type_peps:
           $ref: '#/components/schemas/TypePepsEnum'
-        subtype_peps:
-          $ref: '#/components/schemas/SubtypePepsEnum'
+        sport_subtype_peps:
+          $ref: '#/components/schemas/SportSubtypePepsEnum'
+        disability_subtype_peps:
+          $ref: '#/components/schemas/DisabilitySubtypePepsEnum'
         program:
           type: string
           example: "PRGM1BA"
@@ -139,13 +144,16 @@ components:
         - 'ARTIST'
         - 'ENTREPRENEUR'
         - 'ARRANGEMENT_JURY'
-    SubtypePepsEnum:
+    SportSubtypePepsEnum:
+      type: string
+      enum:
+        - 'PROMISING_ATHLETE_HL'
+        - 'PROMISING_ATHLETE'
+    DisabilitySubtypePepsEnum:
       type: string
       enum:
         - 'REDUCED_MOBILITY'
         - 'OTHER_DISABILITY'
-        - 'PROMISING_ATHLETE_HL'
-        - 'PROMISING_ATHLETE'
     AcceptedLanguageEnum:
       type: string
       enum:
