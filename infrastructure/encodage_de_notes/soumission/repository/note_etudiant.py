@@ -72,7 +72,8 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
                 numero_session=row.number_session,
                 code_unite_enseignement=row.acronym,
                 annee_academique=row.year,
-                credits_unite_enseignement=row.credits_unite_enseignement
+                credits_unite_enseignement=row.credits_unite_enseignement,
+                nom_cohorte=row.acronym
             )
             result.append(NoteEtudiantBuilder.build_from_repository_dto(dto_object))
         return result
@@ -105,7 +106,8 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
                 numero_session=row.number_session,
                 code_unite_enseignement=row.acronym,
                 annee_academique=row.year,
-                credits_unite_enseignement=row.credits_unite_enseignement
+                credits_unite_enseignement=row.credits_unite_enseignement,
+                nom_cohorte=row.acronym
             )
             result.append(NoteEtudiantBuilder.build_from_repository_dto(dto_object))
         return result
@@ -245,7 +247,7 @@ def _fetch_session_exams():
         date_limite_de_remise=Subquery(
             subqs_deadline[:1],
             output_field=DateField()
-        )
+        ),
     ).values_list(
         'acronym',
         'year',

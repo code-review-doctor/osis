@@ -51,6 +51,15 @@ class SoumettreNoteCommand(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
+class SoumettreNotesCommand(interface.CommandRequest):
+    matricule_fgs_enseignant = attr.ib(type=str)
+    code_unite_enseignement = attr.ib(type=str)
+    annee_unite_enseignement = attr.ib(type=int)
+    numero_session = attr.ib(type=int)
+    notes = attr.ib(type=List[SoumettreNoteCommand])
+
+
+@attr.s(frozen=True, slots=True)
 class AssignerResponsableDeNotesCommand(interface.CommandRequest):
     code_unite_enseignement = attr.ib(type=str)
     annee_unite_enseignement = attr.ib(type=int)

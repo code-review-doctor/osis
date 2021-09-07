@@ -51,6 +51,7 @@ class IdentiteNoteEtudiant(interface.EntityIdentity):
 class NoteEtudiant(interface.Entity):
     entity_id = attr.ib(type=IdentiteNoteEtudiant)
     note = attr.ib(type=Note)
+    nom_cohorte = attr.ib(type=str)
     credits_unite_enseignement = attr.ib(type=float)
     date_limite_de_remise = attr.ib(type=DateDTO)
     email = attr.ib(type=str)
