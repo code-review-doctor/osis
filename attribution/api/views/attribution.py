@@ -128,7 +128,7 @@ class AttributionListView(generics.ListAPIView):
             title_en=Case(
                 When(
                     Q(learning_component_year__learning_unit_year__learning_container_year__common_title_english__isnull=True) |  # noqa
-                    Q(learning_component_year__learning_unit_year__learning_container_year__common_title_english__exact=''), # noqa
+                    Q(learning_component_year__learning_unit_year__learning_container_year__common_title_english__exact=''),  # noqa
                     then='learning_component_year__learning_unit_year__specific_title_english'
                 ),
                 When(
