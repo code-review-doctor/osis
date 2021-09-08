@@ -22,7 +22,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List, Tuple
+from collections import defaultdict
+from typing import List, Tuple, Iterable, Callable, Dict, Any
 
 from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import NoteEtudiant
 from ddd.logic.encodage_des_notes.encodage.repository.note_etudiant import INoteEtudiantRepository

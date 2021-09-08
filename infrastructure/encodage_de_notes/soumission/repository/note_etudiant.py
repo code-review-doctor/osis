@@ -44,23 +44,24 @@ from osis_common.ddd.interface import ApplicationService
 
 class NoteEtudiantRepository(INoteEtudiantRepository):
     @classmethod
-    def search(cls, entity_ids: Optional[List['IdentiteNoteEtudiant']] = None, **kwargs) -> List['NoteEtudiant']:
-        if not entity_ids:
+    def search(
+            cls,
+            entity_ids: Optional[List['IdentiteNoteEtudiant']] = None,
+            annee_academique: int = None,
+            numero_session: int = None,
+            code_unite_enseignement: str = None,
+            **kwargs
+    ) -> List['NoteEtudiant']:
+        filter_qs = cls._build_filter(
+            entity_ids=entity_ids,
+            annee_academique=annee_academique,
+            numero_session=numero_session,
+            code_unite_enseignement=code_unite_enseignement,
+        )
+        if not filter_qs:
             return []
 
-        q_filters = functools.reduce(
-            operator.or_,
-            [
-                Q(
-                    acronym=entity_id.code_unite_enseignement,
-                    year=entity_id.annee_academique,
-                    number_session=entity_id.numero_session,
-                    noma=entity_id.noma
-                )
-                for entity_id in entity_ids
-            ]
-        )
-        rows = _fetch_session_exams().filter(q_filters)
+        rows = _fetch_session_exams().filter(*filter_qs)
         result = []
         for row in rows:
             dto_object = NoteEtudiantFromRepositoryDTO(
@@ -76,6 +77,44 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
                 nom_cohorte=row.acronym
             )
             result.append(NoteEtudiantBuilder.build_from_repository_dto(dto_object))
+        return result
+
+    @classmethod
+    def _build_filter(
+            cls,
+            entity_ids: Optional[List['IdentiteNoteEtudiant']] = None,
+            annee_academique: int = None,
+            numero_session: int = None,
+            code_unite_enseignement: str = None,
+    ) -> List[Q]:
+        result = []
+        if entity_ids:
+            result.append(
+                functools.reduce(
+                    operator.or_,
+                    [
+                        Q(
+                            acronym=entity_id.code_unite_enseignement,
+                            year=entity_id.annee_academique,
+                            number_session=entity_id.numero_session,
+                            noma=entity_id.noma
+                        )
+                        for entity_id in entity_ids
+                    ]
+                )
+            )
+        if annee_academique:
+            result.append(
+                Q(year=annee_academique)
+            )
+        if numero_session:
+            result.append(
+                Q(number_session=numero_session)
+            )
+        if code_unite_enseignement:
+            result.append(
+                Q(acronym__icontains=code_unite_enseignement)
+            )
         return result
 
     @classmethod
