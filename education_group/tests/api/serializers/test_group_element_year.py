@@ -178,13 +178,17 @@ class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
             'code',
             'remark',
             'remark_en',
+            'language',
+            'exchange_students',
+            'french_friendly',
+            'english_friendly',
             'lecturing_volume',
             'practical_exercise_volume',
             'with_prerequisite',
             'periodicity',
             'quadrimester',
             'status',
-            'proposal_type'
+            'proposal_type',
         ]
         self.assertListEqual(list(self.serializer.data['children'][0]['children'][0].keys()), expected_fields)
 

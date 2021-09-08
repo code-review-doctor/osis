@@ -77,6 +77,13 @@ class VolumeEditionStrategy(metaclass=abc.ABCMeta):
                     if self.raw_volume_additional_requirement_entity_2 is not None:
                         self.obj.add_error(self.input_names['volume_additional_requirement_entity_2'], '')
 
+        is_proposal = getattr(self.obj, 'proposal', False)
+        if not is_proposal and self.obj.has_effective_classes and self.volume_total in [None, 0]:
+            self.obj.add_error(
+                self.input_names['volume_total'],
+                _("Volumes are inconsistent: you can't delete volume on a component having classes.")
+            )
+
 
 class SimpleVolumeEditionFacultyStrategy(VolumeEditionStrategy):
     def __init__(self, obj, input_names):

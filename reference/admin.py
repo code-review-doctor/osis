@@ -47,3 +47,6 @@ admin.site.register(domain_isced.DomainIsced,
 
 admin.site.register(language.Language,
                     language.LanguageAdmin)
+
+admin.site.register(zipcode.ZipCode,
+                    zipcode.ZipCodeAdmin)

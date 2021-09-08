@@ -449,6 +449,10 @@ class TestLearningUnitXls(TestCase):
             luy.get_quadrimester_display() or '',
             luy.get_session_display() or '',
             "",
+            str(_('yes')) if luy.english_friendly else str(_('no')),
+            str(_('yes')) if luy.french_friendly else str(_('no')),
+            str(_('yes')) if luy.exchange_students else str(_('no')),
+            str(_('yes')) if luy.individual_loan else str(_('no')),
             str(_('yes')) if luy.stage_dimona else str(_('no')),
         ]
         self.assertEqual(
@@ -601,6 +605,10 @@ class TestLearningUnitXls(TestCase):
             luy.get_quadrimester_display() or '',
             luy.get_session_display() or '',
             luy.language or "",
+            str(_('yes')) if luy.english_friendly else str(_('no')),
+            str(_('yes')) if luy.french_friendly else str(_('no')),
+            str(_('yes')) if luy.exchange_students else str(_('no')),
+            str(_('yes')) if luy.individual_loan else str(_('no')),
             str(_('yes')) if luy.stage_dimona else str(_('no')),
             "{} ({}) - {} - {}".format(
                 self.a_group_year_parent.partial_acronym,
@@ -661,19 +669,20 @@ class TestLearningUnitXls(TestCase):
         self.assertCountEqual(result.get('cells_with_white_font'),
                               [
                                   'A3', 'B3', 'C3', 'D3', 'E3', 'F3', 'G3', 'H3', 'I3', 'J3', 'K3', 'L3', 'M3', 'N3',
-                                  'O3', 'P3', 'Q3', 'R3', 'S3', 'T3', 'U3', 'V3', 'W3', 'X3', 'Y3'
+                                  'O3', 'P3', 'Q3', 'R3', 'S3', 'T3', 'U3', 'V3', 'W3', 'X3', 'Y3', 'Z3', 'AA3', 'AB3',
+                                  'AC3'
                               ]
                               )
         first_attribution = result.get('data')[0]
-        self.assertEqual(first_attribution[24], _('no'))
-        self.assertEqual(first_attribution[25], 'Dupuis Tom')
-        self.assertEqual(first_attribution[26], 'dupuis@gmail.com')
-        self.assertEqual(first_attribution[27], _("Coordinator"))
-        self.assertEqual(first_attribution[28], "")
-        self.assertEqual(first_attribution[29], 2017)
-        self.assertEqual(first_attribution[30], '')
-        self.assertEqual(first_attribution[31], 15)
-        self.assertEqual(first_attribution[32], 5)
+        attribution_first_column = 29
+        self.assertEqual(first_attribution[attribution_first_column], 'Dupuis Tom')
+        self.assertEqual(first_attribution[attribution_first_column+1], 'dupuis@gmail.com')
+        self.assertEqual(first_attribution[attribution_first_column+2], _("Coordinator"))
+        self.assertEqual(first_attribution[attribution_first_column+3], "")
+        self.assertEqual(first_attribution[attribution_first_column+4], 2017)
+        self.assertEqual(first_attribution[attribution_first_column+5], '')
+        self.assertEqual(first_attribution[attribution_first_column+6], 15)
+        self.assertEqual(first_attribution[attribution_first_column+7], 5)
 
     def test_add_training_data_for_version(self):
         luy = LearningUnitYear.objects.filter(pk=self.learning_unit_yr_version.pk).annotate(
@@ -801,6 +810,10 @@ class TestLearningUnitXlsClassesDetail(TestCase):
             effective_class.get_quadrimester_display() or '',
             effective_class.get_session_display() or '',
             luy.language,
+            yesno(luy.english_friendly).strip(),
+            yesno(luy.french_friendly).strip(),
+            yesno(luy.exchange_students).strip(),
+            yesno(luy.individual_loan).strip(),
             yesno(luy.stage_dimona).strip(),
         ]
 
@@ -853,8 +866,7 @@ class TestLearningUnitXlsClassesDetail(TestCase):
 
         expected = _build_cells_ref(
             ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
-             'V', 'W', 'X', 'Y'], [3, 4, 5, 7])
-        expected.remove('Y7')
+             'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC'], [3, 4, 5, 7])
 
         self.assertSetEqual(
             cells_with_white_font,
@@ -862,8 +874,8 @@ class TestLearningUnitXlsClassesDetail(TestCase):
         )
 
     def _assert_class_attribution_volumes(self, class_attribution_line_data, attribution_class):
-        self.assertEqual(class_attribution_line_data[30], '')
-        self.assertEqual(class_attribution_line_data[31], attribution_class.allocation_charge)
+        self.assertEqual(class_attribution_line_data[34], '')
+        self.assertEqual(class_attribution_line_data[35], attribution_class.allocation_charge)
 
     def test_get_class_score_responsibles(self):
         score_responsibles = _get_class_score_responsibles(self.class_a)
@@ -924,6 +936,10 @@ def _expected_titles_common_part2_b() -> List[str]:
         str(_('Quadrimester')),
         str(_('Session derogation')),
         str(_('Language')),
+        str(_('English-friendly')),
+        str(_('French-friendly')),
+        str(_('Exchange students')),
+        str(_('Individual loan')),
         str(_('Stage-Dimona')),
     ]
 

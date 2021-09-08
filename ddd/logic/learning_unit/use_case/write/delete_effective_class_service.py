@@ -25,18 +25,19 @@
 ##############################################################################
 
 from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
-from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from ddd.logic.learning_unit.commands import DeleteEffectiveClassCommand
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
 from ddd.logic.learning_unit.domain.service.can_effective_class_be_deleted import CanEffectiveClassBeDeleted
+from ddd.logic.learning_unit.domain.service.i_student_enrollments import IStudentEnrollmentsTranslator
+from ddd.logic.learning_unit.domain.service.i_tutor_assigned_to_class import ITutorAssignedToClassTranslator
 from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
-from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepository
 
 
 def delete_effective_class(
         cmd: DeleteEffectiveClassCommand,
         effective_class_repository: IEffectiveClassRepository,
-        learning_unit_repository: ILearningUnitRepository
+        has_assigned_tutor_service: 'ITutorAssignedToClassTranslator',
+        has_enrollments_service: 'IStudentEnrollmentsTranslator'
 ) -> EffectiveClassIdentity:
 
     # GIVEN
@@ -45,13 +46,13 @@ def delete_effective_class(
             cmd
         )
     )
-    learning_unit = learning_unit_repository.get(
-        entity_id=LearningUnitIdentityBuilder.build_from_code_and_year(cmd.learning_unit_code, cmd.year)
-    )
+
     # WHEN
-    if effective_class:
+    if effective_class:  # FIXME :: What is the pertinence of this "if" ?
         CanEffectiveClassBeDeleted().verify(
-            effective_class=effective_class
+            effective_class=effective_class,
+            has_assigned_tutor_service=has_assigned_tutor_service,
+            has_enrollments_service=has_enrollments_service,
         )
     # THEN
         effective_class_repository.delete(effective_class.entity_id)
