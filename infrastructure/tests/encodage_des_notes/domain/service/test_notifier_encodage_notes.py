@@ -26,7 +26,7 @@ from django.test import TestCase
 
 from ddd.logic.encodage_des_notes.encodage.test.factory.gestionnaire_parcours import GestionnaireParcoursDROI1BAFactory
 from ddd.logic.encodage_des_notes.encodage.test.factory.note_etudiant import NoteEtudiantChiffreeFactory, \
-    NoteEtudiantJustificationFactory
+    NoteEtudiantJustificationFactory, NoteManquanteEtudiantFactory
 from infrastructure.encodage_de_notes.encodage.domain.service.notifier_encodage_notes import NotifierEncodageNotes
 from infrastructure.encodage_de_notes.encodage.repository.in_memory.note_etudiant import NoteEtudiantInMemoryRepository
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.attribution_enseignant import \
@@ -105,6 +105,29 @@ class TestNotifierEncodageNotes(TestCase):
         )
 
         self.assertListEqual(result, [])
+
+    def test_should_not_envoyer_email_si_la_cohorte_n_est_pas_complete(self):
+        note_manquante = NoteManquanteEtudiantFactory(
+            entity_id__code_unite_enseignement="LDROI1001",
+            entity_id__noma="55555555",
+            nom_cohorte="DROI1BA"
+        )
+        self.note_etudiant_repo.save(note_manquante)
+
+        notes_encodees = [self.notes_ldroi1001[0].entity_id]
+
+        result = NotifierEncodageNotes()._get_donnees_email(
+            notes_encodees,
+            [],
+            self.gestionnaire_parcours_droi1ba,
+            self.note_etudiant_repo,
+            self.attribution_translator,
+            self.signaletique_personne_repo,
+            self.signaletique_etudiant_repo,
+            self.adresse_feuille_de_notes_repo
+        )
+
+        self.assertEqual(result, [])
 
     def test_when_note_est_encodee_should_envoyer_notification_pour_la_meme_cohorte_et_meme_unite_enseignement(self):
         notes_encodees = [self.notes_ldroi1001[0].entity_id]

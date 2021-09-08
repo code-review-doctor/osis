@@ -200,6 +200,9 @@ class NotifierEncodageNotes(INotifierEncodageNotes):
             signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
             adresse_feuille_de_notes_repository: 'IAdresseFeuilleDeNotesRepository',
     ) -> List['DonneesEmail']:
+        if not identites_notes_encodees:
+            return []
+
         annee_academique = identites_notes_encodees[0].annee_academique
         numero_session = identites_notes_encodees[0].numero_session
         codes_unite_enseignement = {identite.code_unite_enseignement for identite in identites_notes_encodees}

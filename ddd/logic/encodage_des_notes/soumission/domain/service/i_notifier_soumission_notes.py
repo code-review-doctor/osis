@@ -42,7 +42,7 @@ class INotifierSoumissionNotes(interface.DomainService):
     @abc.abstractmethod
     def notifier(
             cls,
-            notes_encodees: List['IdentiteNoteEtudiant'],
+            identites_notes_soumises: List['IdentiteNoteEtudiant'],
             note_etudiant_repo: 'INoteEtudiantRepository',
             translator: 'IAttributionEnseignantTranslator',
             signaletique_repo: 'ISignaletiquePersonneTranslator',

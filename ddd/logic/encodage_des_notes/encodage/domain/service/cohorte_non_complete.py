@@ -51,7 +51,7 @@ class CohorteNonCompleteDomainService(interface.DomainService):
         )
         result = []
         for key, ensemble_de_notes in notes_groupees_par_unite_enseignement_et_cohorte.items():
-            if cls._ensemble_de_notes_est_complet(ensemble_de_notes):
+            if not cls._ensemble_de_notes_est_complet(ensemble_de_notes):
                 result.append(key)
         return result
 
