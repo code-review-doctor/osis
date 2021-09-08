@@ -16,11 +16,25 @@ info:
   description: |-
     A set of API endpoints that allow you to get information about learning unit enrollment
 paths:
-  /enrollments/:
+  /enrollments/{acronym}/{year}/:
     get:
       description: 'Return all enrollments of a given learning unit year'
       operationId: enrollments_list
       parameters:
+        - in: path
+          name: acronym
+          required: true
+          description: The learning unit acronym
+          schema:
+            type: string
+            example: "LABCD1234"
+        - in: path
+          name: year
+          required: true
+          description: The learning unit academic year
+          schema:
+            type: integer
+            example: 2021
         - $ref: '#/components/parameters/Accept-Language'
         - $ref: '#/components/parameters/X-User-FirstName'
         - $ref: '#/components/parameters/X-User-LastName'
@@ -101,7 +115,29 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
   schemas:
+    Paging:
+      type: object
+      properties:
+        count:
+          type: integer
+        next:
+          type: string
+          format: uri
+          nullable: true
+        previous:
+          type: string
+          format: uri
+          nullable: true
     EnrollmentList:
+      allOf:
+        - $ref: '#/components/schemas/Paging'
+        - type: object
+          properties:
+            results:
+              type: array
+              items:
+                $ref: '#/components/schemas/Enrollment'
+    Enrollment:
       type: object
       properties:
         date_enrollment:
@@ -137,23 +173,29 @@ components:
           example: "LABCD1234"
     TypePepsEnum:
       type: string
+      nullable: true
       enum:
-        - 'NOT_DEFINED'
-        - 'DISABILITY'
-        - 'SPORT'
-        - 'ARTIST'
-        - 'ENTREPRENEUR'
-        - 'ARRANGEMENT_JURY'
+        - NOT_DEFINED
+        - DISABILITY
+        - SPORT
+        - ARTIST
+        - ENTREPRENEUR
+        - ARRANGEMENT_JURY
+        - ""
     SportSubtypePepsEnum:
       type: string
+      nullable: true
       enum:
-        - 'PROMISING_ATHLETE_HL'
-        - 'PROMISING_ATHLETE'
+        - PROMISING_ATHLETE_HL
+        - PROMISING_ATHLETE
+        - ""
     DisabilitySubtypePepsEnum:
       type: string
+      nullable: true
       enum:
-        - 'REDUCED_MOBILITY'
-        - 'OTHER_DISABILITY'
+        - REDUCED_MOBILITY
+        - OTHER_DISABILITY
+        - ""
     AcceptedLanguageEnum:
       type: string
       enum:
