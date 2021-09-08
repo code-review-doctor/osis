@@ -148,11 +148,7 @@
                                             {% bootstrap_field score_encoding_form.noma %}
                                         {% endwith %}
                                     {% else %}
-                                         {% if note_etudiant.note.value %}
-                                            {{ note_etudiant.note.value }}
-                                        {% else %}
-                                            {{ note_etudiant.note|default:"-"  }}
-                                        {% endif %}
+                                        {{ note_etudiant.note }}
                                     {% endif %}
                                 </td>
                                 <td headers="deadline">
