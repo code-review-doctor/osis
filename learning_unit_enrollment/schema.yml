@@ -55,6 +55,37 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
         - enrollment
+  /specific_profile/{student_uuid}/:
+    get:
+      description: 'Return the specific profile of a student'
+      operationId: specific_profile
+      parameters:
+        - in: path
+          name: student_uuid
+          required: true
+          description: The student uuid
+          schema:
+            $ref: '#/components/responses/Uuid'
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentSpecificProfile'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - enrollment
 components:
   securitySchemes:
     Token:
@@ -115,6 +146,29 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
   schemas:
+    StudentSpecificProfile:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/TypePepsEnum'
+        subtype_sport:
+          $ref: '#/components/schemas/SportSubtypePepsEnum'
+        subtype_disability:
+          $ref: '#/components/schemas/DisabilitySubtypePepsEnum'
+        guide:
+          type: string
+          example: "John Doe"
+        arrangement_additional_time:
+          type: boolean
+        arrangement_appropriate_copy:
+          type: boolean
+        arrangement_other:
+          type: boolean
+        arrangement_specific_locale:
+          type: boolean
+        arrangement_comment:
+          type: string
+          example: "comment"
     Paging:
       type: object
       properties:
@@ -159,12 +213,8 @@ components:
         student_registration_id:
           type: string
           example: "12345678"
-        type_peps:
-          $ref: '#/components/schemas/TypePepsEnum'
-        sport_subtype_peps:
-          $ref: '#/components/schemas/SportSubtypePepsEnum'
-        disability_subtype_peps:
-          $ref: '#/components/schemas/DisabilitySubtypePepsEnum'
+        has_peps:
+          type: boolean
         program:
           type: string
           example: "PRGM1BA"
