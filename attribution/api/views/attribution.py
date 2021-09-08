@@ -51,6 +51,14 @@ logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 EffectiveClassRepartitionDict = Dict[str, Union[str, bool]]
 
+COMMON_LEARNING_UNIT_ENROLLMENT_CLAUSE = {
+    'offerenrollment__enrollment_state__in': [
+        offer_enrollment_state.PROVISORY,
+        offer_enrollment_state.SUBSCRIBED
+    ],
+    'offerenrollment__learningunitenrollment__enrollment_state': learning_unit_enrollment_state.ENROLLED
+}
+
 
 class AttributionListView(generics.ListAPIView):
     """
@@ -139,6 +147,18 @@ class AttributionListView(generics.ListAPIView):
             credits=F('learning_component_year__learning_unit_year__credits'),
             start_year=F('attribution__start_year'),
             function=F('attribution__function'),
+            has_peps=Exists(
+                Student.objects.filter(
+                    studentspecificprofile__isnull=False,
+                    offerenrollment__learningunitenrollment__learning_unit_year__acronym=OuterRef(
+                        'learning_component_year__learning_unit_year__acronym'
+                    ),
+                    offerenrollment__learningunitenrollment__learning_unit_year__academic_year=OuterRef(
+                        'learning_component_year__learning_unit_year__academic_year'
+                    ),
+                    **COMMON_LEARNING_UNIT_ENROLLMENT_CLAUSE
+                )
+            )
         )
 
     def _get_class_repartition(self):
@@ -179,11 +199,7 @@ class AttributionListView(generics.ListAPIView):
                         'learning_component_year__learning_unit_year__academic_year'
                     ),
                     offerenrollment__learningunitenrollment__learning_class_year__acronym=OuterRef('acronym'),
-                    offerenrollment__enrollment_state__in=[
-                        offer_enrollment_state.PROVISORY,
-                        offer_enrollment_state.SUBSCRIBED
-                    ],
-                    offerenrollment__learningunitenrollment__enrollment_state=learning_unit_enrollment_state.ENROLLED
+                    **COMMON_LEARNING_UNIT_ENROLLMENT_CLAUSE
                 )
             )
         ).values_list(

@@ -772,6 +772,8 @@ components:
           nullable: true
         links:
           $ref: '#/components/schemas/AttributionLinks'
+        has_peps:
+          type: boolean
         effective_class_repartition:
           type: array
           items:
