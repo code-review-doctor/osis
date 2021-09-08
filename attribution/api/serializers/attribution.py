@@ -48,6 +48,7 @@ class AttributionSerializer(serializers.Serializer):
     practical_charge = serializers.DecimalField(max_digits=5, decimal_places=2)
     total_learning_unit_charge = serializers.SerializerMethodField()
     links = serializers.SerializerMethodField()
+    has_peps = serializers.BooleanField()
     effective_class_repartition = EffectiveClassRepartitionSerializer(many=True)
 
     @staticmethod
