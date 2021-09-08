@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from collections import OrderedDict
-from typing import List, Tuple, Dict
+from typing import List, Dict
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from ddd.logic.encodage_des_notes.encodage.builder.identite_note_etudiant_builder import NoteEtudiantIdentityBuilder
@@ -32,6 +32,7 @@ from ddd.logic.encodage_des_notes.encodage.builder.note_etudiant_builder import 
 from ddd.logic.encodage_des_notes.encodage.commands import EncoderNoteCommand
 from ddd.logic.encodage_des_notes.encodage.domain.model.gestionnaire_parcours import GestionnaireParcours
 from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import IdentiteNoteEtudiant
+from ddd.logic.encodage_des_notes.encodage.domain.validator.exceptions import EncoderNotesEnLotLigneBusinessExceptions
 from ddd.logic.encodage_des_notes.encodage.repository.note_etudiant import INoteEtudiantRepository
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import PeriodeEncodageNotesDTO
 from osis_common.ddd import interface
@@ -71,7 +72,10 @@ class EncoderNotesEnLot(interface.DomainService):
                     )
                     notes_a_persister.append(nouvelle_note)
                 except MultipleBusinessExceptions as e:
-                    exceptions += list(e.exceptions)
+                    exceptions += [
+                        EncoderNotesEnLotLigneBusinessExceptions(note_id=identite, exception=business_exception)
+                        for business_exception in e.exceptions
+                    ]
 
         for note in notes_a_persister:
             note_etudiant_repo.save(note)

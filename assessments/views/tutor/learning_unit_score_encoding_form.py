@@ -26,7 +26,8 @@
 from django.utils.functional import cached_property
 
 from assessments.views.common.learning_unit_score_encoding_form import LearningUnitScoreEncodingBaseFormView
-from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
+from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand, EncoderNoteCommand
 from infrastructure.messages_bus import message_bus_instance
 
 
@@ -41,6 +42,28 @@ class LearningUnitScoreEncodingTutorFormView(LearningUnitScoreEncodingBaseFormVi
             code_unite_enseignement=self.kwargs['learning_unit_code'].upper()
         )
         return message_bus_instance.invoke(cmd)
+
+    def form_valid(self, formset):
+        for form in formset:
+            if form.has_changed():
+                cmd = EncoderNoteCommand(
+                    code_unite_enseignement=self.feuille_de_notes.code_unite_enseignement,
+                    annee_unite_enseignement=self.feuille_de_notes.annee_academique,
+                    numero_session=self.feuille_de_notes.numero_session,
+                    matricule_fgs_enseignant=self.person.global_id,
+                    noma_etudiant=form.cleaned_data['noma'],
+                    email_etudiant=self.feuille_de_notes.get_email_for_noma(form.cleaned_data['noma']),
+                    note=form.cleaned_data['note'],
+                )
+                try:
+                    message_bus_instance.invoke(cmd)
+                except MultipleBusinessExceptions as e:
+                    for exception in e.exceptions:
+                        form.add_error('note', exception.message)
+
+        if formset.is_valid():
+            return self.get_success_url()
+        return self.render_to_response(self.get_context_data(form=formset))
 
     def get_initial(self):
         formeset_initial = []

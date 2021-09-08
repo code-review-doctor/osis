@@ -22,16 +22,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List, Optional
+from typing import List, Optional, Dict, Set
 
 from base.models.enums.exam_enrollment_justification_type import JustificationTypes
 from ddd.logic.encodage_des_notes.encodage.domain.model._note import NOTE_MANQUANTE
 from ddd.logic.encodage_des_notes.encodage.domain.model.gestionnaire_parcours import GestionnaireParcours
-from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import NoteEtudiant
+from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import Noma
 from ddd.logic.encodage_des_notes.encodage.repository.note_etudiant import INoteEtudiantRepository
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_inscription_examen import IInscriptionExamenTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_etudiant import \
     ISignaletiqueEtudiantTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.dtos import NoteEtudiantDTO
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_unite_enseignement import IUniteEnseignementTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import NoteEtudiantDTO, DateDTO, PeriodeEncodageNotesDTO
+from ddd.logic.encodage_des_notes.soumission.dtos import UniteEnseignementDTO, InscriptionExamenDTO, \
+    DesinscriptionExamenDTO, SignaletiqueEtudiantDTO
 from osis_common.ddd import interface
 
 
@@ -46,9 +50,89 @@ class RechercheNotesEtudiant(interface.DomainService):
             prenom: str,
             etat: str,
             gestionnaire_parcours: 'GestionnaireParcours',
+            periode_encodage: 'PeriodeEncodageNotesDTO',
+
             note_etudiant_repo: 'INoteEtudiantRepository',
-            signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator'
+            signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
+            unite_enseignement_translator: 'IUniteEnseignementTranslator',
+            inscription_examen_translator: 'IInscriptionExamenTranslator',
     ) -> List['NoteEtudiantDTO']:
+        note_etudiant_filtered = cls._get_notes_etudiants_filtered(
+            nom_cohorte=nom_cohorte,
+            noma=noma,
+            nom=nom,
+            prenom=prenom,
+            etat=etat,
+            gestionnaire_parcours=gestionnaire_parcours,
+            note_etudiant_repo=note_etudiant_repo,
+            signaletique_etudiant_translator=signaletique_etudiant_translator,
+        )
+
+        codes_unites_enseignement = {note.code_unite_enseignement for note in note_etudiant_filtered}
+        inscr_examen_par_noma = _get_inscriptions_examens_par_noma(
+            codes_unites_enseignement,
+            periode_encodage.annee_concernee,
+            periode_encodage.session_concernee,
+            inscription_examen_translator
+        )
+        desinscr_exam_par_noma = _get_desinscriptions_examens_par_noma(
+            codes_unites_enseignement,
+            periode_encodage.annee_concernee,
+            periode_encodage.session_concernee,
+            inscription_examen_translator
+        )
+        unites_enseignements = _get_unites_enseignements_par_code(
+            codes_unites_enseignement,
+            periode_encodage.annee_concernee,
+            unite_enseignement_translator
+        )
+
+        nomas_concernes = [note.noma for note in note_etudiant_filtered]
+        signaletique_par_noma = _get_signaletique_etudiant_par_noma(nomas_concernes, signaletique_etudiant_translator)
+
+        notes_etudiants_dto = []
+        for note_etudiant in note_etudiant_filtered:
+            unite_enseignement_dto = unites_enseignements[note_etudiant.code_unite_enseignement]
+            signaletique_etudiant_dto = signaletique_par_noma[note_etudiant.noma]
+            desinscription_exmen_dto = desinscr_exam_par_noma.get(note_etudiant.noma)
+
+            inscription_exmen_dto = inscr_examen_par_noma.get(note_etudiant.noma)
+            ouverture_periode_soumission = periode_encodage.debut_periode_soumission.to_date()
+            inscrit_tardivement = inscription_exmen_dto and \
+                inscription_exmen_dto.date_inscription.to_date() > ouverture_periode_soumission
+
+            notes_etudiants_dto.append(
+                NoteEtudiantDTO(
+                    code_unite_enseignement=unite_enseignement_dto.code,
+                    intitule_complet_unite_enseignement=unite_enseignement_dto.intitule_complet,
+                    annee_unite_enseignement=unite_enseignement_dto.annee,
+                    est_soumise=None,
+                    date_remise_de_notes=DateDTO.build_from_date(note_etudiant.echeance_gestionnaire),
+                    nom_cohorte=note_etudiant.nom_cohorte,
+                    noma=note_etudiant.noma,
+                    nom=signaletique_etudiant_dto.nom,
+                    prenom=signaletique_etudiant_dto.prenom,
+                    peps=signaletique_etudiant_dto.peps,
+                    email=note_etudiant.email,
+                    note=str(note_etudiant.note),
+                    inscrit_tardivement=inscrit_tardivement,
+                    desinscrit_tardivement=bool(desinscription_exmen_dto)
+                )
+            )
+        return notes_etudiants_dto
+
+    @classmethod
+    def _get_notes_etudiants_filtered(
+            cls,
+            nom_cohorte: str,
+            noma: str,
+            nom: str,
+            prenom: str,
+            etat: str,
+            gestionnaire_parcours: 'GestionnaireParcours',
+            note_etudiant_repo: 'INoteEtudiantRepository',
+            signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
+    ):
         noms_cohortes = gestionnaire_parcours.cohortes_gerees
         if nom_cohorte:
             gestionnaire_parcours.verifier_gere_cohorte(nom_cohorte)
@@ -59,35 +143,19 @@ class RechercheNotesEtudiant(interface.DomainService):
         if etat and etat != NOTE_MANQUANTE:
             justification = cls._convert_etat_to_justification_enum(etat)
 
-        return [
-            cls._convert_note_etudiant_to_dto(note_etudiant)
-            for note_etudiant
-            in note_etudiant_repo.search(
-                noms_cohortes=noms_cohortes,
-                nomas=[noma] if noma else cls._search_nomas_from_nom_prenom(
-                    nom,
-                    prenom,
-                    signaletique_etudiant_translator
-                ),
-                note_manquante=note_manquante,
-                justification=justification,
+        nomas_searched = None
+        if any([noma, nom, prenom]):
+            nomas_searched = [noma] if noma else cls._search_nomas_from_nom_prenom(
+                nom,
+                prenom,
+                signaletique_etudiant_translator
             )
-        ]
 
-    @classmethod
-    def _convert_note_etudiant_to_dto(cls, note_etudiant: 'NoteEtudiant') -> 'NoteEtudiantDTO':
-        return NoteEtudiantDTO(
-            est_soumise=None,
-            date_remise_de_notes=note_etudiant.echeance_gestionnaire,
-            nom_cohorte=note_etudiant.nom_cohorte,
-            noma=note_etudiant.noma,
-            nom="",
-            prenom="",
-            peps=[],
-            email=note_etudiant.email,
-            note=str(note_etudiant.note.value),
-            inscrit_tardivement=None,
-            desinscrit_tardivement=None
+        return note_etudiant_repo.search(
+            noms_cohortes=noms_cohortes,
+            nomas=nomas_searched,
+            note_manquante=note_manquante,
+            justification=justification,
         )
 
     @classmethod
@@ -103,3 +171,50 @@ class RechercheNotesEtudiant(interface.DomainService):
     ) -> List[str]:
         signaletiques_etudiant = signaletique_etudiant_translator.search([], nom=nom, prenom=prenom)
         return [signaletique.noma for signaletique in signaletiques_etudiant]
+
+
+def _get_signaletique_etudiant_par_noma(
+        nomas_concernes: List['Noma'],
+        signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator'
+) -> Dict['Noma', 'SignaletiqueEtudiantDTO']:
+    signaletiques_etds = signaletique_etudiant_translator.search(nomas=nomas_concernes)
+    return {signal.noma: signal for signal in signaletiques_etds}
+
+
+def _get_desinscriptions_examens_par_noma(
+        codes_unites_enseignement: Set[str],
+        annee: int,
+        numero_session: int,
+        inscription_examen_translator: 'IInscriptionExamenTranslator'
+) -> Dict['Noma', 'DesinscriptionExamenDTO']:
+    desinscriptions_examens = inscription_examen_translator.search_desinscrits_pour_plusieurs_unites_enseignement(
+        codes_unites_enseignement=codes_unites_enseignement,
+        annee=annee,
+        numero_session=numero_session,
+    )
+    return {desinscr.noma: desinscr for desinscr in desinscriptions_examens}
+
+
+def _get_inscriptions_examens_par_noma(
+        codes_unites_enseignement: Set[str],
+        annee: int,
+        numero_session: int,
+        inscription_examen_translator: 'IInscriptionExamenTranslator'
+) -> Dict['Noma', 'InscriptionExamenDTO']:
+    inscr_examens = inscription_examen_translator.search_inscrits_pour_plusieurs_unites_enseignement(
+        codes_unites_enseignement=codes_unites_enseignement,
+        annee=annee,
+        numero_session=numero_session,
+    )
+    return {insc_exam.noma: insc_exam for insc_exam in inscr_examens}
+
+
+def _get_unites_enseignements_par_code(
+        codes_unites_enseignement: Set[str],
+        annee: int,
+        unite_enseignement_translator: 'IUniteEnseignementTranslator',
+) -> Dict[str, 'UniteEnseignementDTO']:
+    unites_enseignements = unite_enseignement_translator.search(
+        {(code_unite_enseignement, annee,) for code_unite_enseignement in codes_unites_enseignement}
+    )
+    return {unite_enseignement.code: unite_enseignement for unite_enseignement in unites_enseignements}

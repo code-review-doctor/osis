@@ -44,34 +44,11 @@ class InscriptionExamenTranslator(IInscriptionExamenTranslator):
             numero_session: int,
             annee: int
     ) -> Set['DesinscriptionExamenDTO']:
-        qs_as_values = _get_common_queryset(
-            codes_unites_enseignement={code_unite_enseignement},
-            numero_session=numero_session,
-            annee=annee,
-        ).exclude(
-            enrollment_state=exam_enrollment_state.ENROLLED,
-        ).annotate(
-            annee=F('learning_unit_enrollment__learning_unit_year__academic_year__year'),
-            noma=F('learning_unit_enrollment__offer_enrollment__student__registration_id'),
-            nom_cohorte=Case(
-                When(
-                    learning_unit_enrollment__offer_enrollment__cohort_year__isnull=False,
-                    then=Replace(
-                        'learning_unit_enrollment__offer_enrollment__education_group_year__acronym',
-                        Value('1BA'),
-                        Value('11BA')
-                    ),
-                ),
-                default='learning_unit_enrollment__offer_enrollment__education_group_year__acronym',
-                output_field=CharField(),
-            ),
-        ).values(
-            'annee',
-            'noma',
-            'code_unite_enseignement',
-            'nom_cohorte',
+        return cls.search_desinscrits_pour_plusieurs_unites_enseignement(
+            {code_unite_enseignement},
+            numero_session,
+            annee
         )
-        return {DesinscriptionExamenDTO(**values) for values in qs_as_values}
 
     @classmethod
     def search_inscrits(
@@ -132,6 +109,42 @@ class InscriptionExamenTranslator(IInscriptionExamenTranslator):
                 if values['date_inscription'] else None
             ) for values in qs_as_values
         }
+
+    @classmethod
+    def search_desinscrits_pour_plusieurs_unites_enseignement(
+            cls,
+            codes_unites_enseignement: Set[str],
+            numero_session: int,
+            annee: int,
+    ) -> Set['DesinscriptionExamenDTO']:
+        qs_as_values = _get_common_queryset(
+            codes_unites_enseignement=codes_unites_enseignement,
+            numero_session=numero_session,
+            annee=annee,
+        ).exclude(
+            enrollment_state=exam_enrollment_state.ENROLLED,
+        ).annotate(
+            annee=F('learning_unit_enrollment__learning_unit_year__academic_year__year'),
+            noma=F('learning_unit_enrollment__offer_enrollment__student__registration_id'),
+            nom_cohorte=Case(
+                When(
+                    learning_unit_enrollment__offer_enrollment__cohort_year__isnull=False,
+                    then=Replace(
+                        'learning_unit_enrollment__offer_enrollment__education_group_year__acronym',
+                        Value('1BA'),
+                        Value('11BA')
+                    ),
+                ),
+                default='learning_unit_enrollment__offer_enrollment__education_group_year__acronym',
+                output_field=CharField(),
+            ),
+        ).values(
+            'annee',
+            'noma',
+            'code_unite_enseignement',
+            'nom_cohorte',
+        )
+        return {DesinscriptionExamenDTO(**values) for values in qs_as_values}
 
 
 def _get_common_queryset(

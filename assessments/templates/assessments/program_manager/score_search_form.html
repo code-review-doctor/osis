@@ -92,13 +92,13 @@
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
-                                        <th id="status">{% trans 'Status' %}</th>
-                                        <th id="program">{% trans 'Program' context 'encoding' %}</th>
-                                        <th id="learning_unit">{% trans 'Learning unit' %}</th>
-                                        <th id="registration_number">{% trans 'Registration number' %}</th>
-                                        <th id="lastname">{% trans 'Lastname' %}</th>
-                                        <th id="firstname">{% trans 'Firstname' %}</th>
-                                        <th id="score">{% trans 'Score' %}</th>
+                                        <th id="status" class="col-md-1">{% trans 'Status' %}</th>
+                                        <th id="program" class="col-md-1">{% trans 'Program' context 'encoding' %}</th>
+                                        <th id="learning_unit" class="col-md-3">{% trans 'Learning unit' %}</th>
+                                        <th id="registration_number" class="col-md-1">{% trans 'Registration number' %}</th>
+                                        <th id="lastname" class="col-md-2">{% trans 'Lastname' %}</th>
+                                        <th id="firstname" class="col-md-2">{% trans 'Firstname' %}</th>
+                                        <th id="score" class="col-md-2">{% trans 'Score' %}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -113,7 +113,9 @@
                                                 {% endif %}
                                             </td>
                                             <td headers="program">{{ note_etudiant.nom_cohorte }}</td>
-                                            <td headers="learning_unit">{{ note_etudiant.nom_cohorte }}</td>
+                                            <td headers="learning_unit" data-container="body" data-toggle="tooltip" title="{{ note_etudiant.intitule_complet_unite_enseignement }}">
+                                                {{ note_etudiant.code_unite_enseignement |add:" - " |add:note_etudiant.intitule_complet_unite_enseignement| truncatechars:30}}
+                                            </td>
                                             <td headers="registration_number">{{ note_etudiant.noma }}</td>
                                             <td headers="lastname">{{ note_etudiant.nom }}</td>
                                             <td headers="firstname">{{ note_etudiant.prenom }}</td>
@@ -122,6 +124,7 @@
                                                     {% with score_encoding_form=form|index:forloop.counter0 %}
                                                         {% bootstrap_field score_encoding_form.note show_label=False %}
                                                         {% bootstrap_field score_encoding_form.noma %}
+                                                        {% bootstrap_field score_encoding_form.code_unite_enseignement %}
                                                     {% endwith %}
                                                 {% else %}
                                                     {{ note_etudiant.note }}

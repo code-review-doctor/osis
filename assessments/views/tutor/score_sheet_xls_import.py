@@ -36,7 +36,7 @@ class ScoreSheetXLSImportTutorView(ScoreSheetXLSImportBaseView):
     def call_command(self, matricule, score_sheet_serialized):
         injected_notes_counter = 0
 
-        for index, note_etudiant in enumerate(score_sheet_serialized['notes_etudiants']):
+        for note_etudiant in score_sheet_serialized['notes_etudiants']:
             cmd = EncoderNoteCommand(
                 code_unite_enseignement=note_etudiant['code_unite_enseignement'],
                 annee_unite_enseignement=score_sheet_serialized['annee_academique'],
@@ -51,7 +51,7 @@ class ScoreSheetXLSImportTutorView(ScoreSheetXLSImportBaseView):
                 injected_notes_counter += 1
             except MultipleBusinessExceptions as e:
                 for exception in e.exceptions:
-                    error_message = "{} : {} {}".format(exception.message, _('Row'), str(index + 1))
+                    error_message = "{} : {} {}".format(exception.message, _('Row'), str(note_etudiant['row_number']))
                     messages.error(self.request, error_message)
 
         if injected_notes_counter:

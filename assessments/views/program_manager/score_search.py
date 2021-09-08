@@ -33,8 +33,10 @@ from django.utils.functional import cached_property
 from django.views.generic import FormView
 
 from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmissionCalendar
-from assessments.forms.score_encoding import ScoreSearchForm, ScoreEncodingForm
-from ddd.logic.encodage_des_notes.encodage.commands import RechercherNotesCommand
+from assessments.forms.score_encoding import ScoreSearchForm, ScoreSearchEncodingForm, ScoreEncodingFormSet
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
+from ddd.logic.encodage_des_notes.encodage.commands import RechercherNotesCommand, EncoderNotesCommand, \
+    EncoderNoteCommand
 from infrastructure.messages_bus import message_bus_instance
 from osis_role.contrib.views import PermissionRequiredMixin
 
@@ -61,22 +63,53 @@ class ScoreSearchFormView(PermissionRequiredMixin, FormView):
         return ScoreSearchForm(data=self.request.GET or None, matricule_fgs_gestionnaire=self.person.global_id)
 
     def get_form_class(self):
-        return formset_factory(ScoreEncodingForm, extra=0)
+        return formset_factory(ScoreSearchEncodingForm, formset=ScoreEncodingFormSet, extra=0)
 
     def get_initial(self):
-        return [
-            {
-                'note': note_etudiant.note,
-                'noma': note_etudiant.noma
-            } for note_etudiant in self.get_notes_etudiant_filtered()
-        ]
+        formeset_initial = []
+        for note_etudiant in self.notes_etudiant_filtered:
+            if not note_etudiant.date_echeance_atteinte:
+                formeset_initial.append({
+                    'note': note_etudiant.note,
+                    'noma': note_etudiant.noma,
+                    'code_unite_enseignement': note_etudiant.code_unite_enseignement
+                })
+            else:
+                formeset_initial.append({})
+        return formeset_initial
 
     def form_valid(self, formset):
-        for form in formset:
-            if form.has_changed():
-                # Call message bus
-                pass
+        cmd = EncoderNotesCommand(
+            matricule_fgs_gestionnaire=self.person.global_id,
+            notes_encodees=[
+                EncoderNoteCommand(
+                    noma=form.cleaned_data['noma'],
+                    email=next(
+                        note.email for note in self.notes_etudiant_filtered if note.noma == form.cleaned_data['noma']
+                    ),
+                    code_unite_enseignement=form.cleaned_data['code_unite_enseignement'],
+                    note=form.cleaned_data['note']
+                ) for form in formset if form.has_changed()
+            ]
+        )
 
+        if cmd.notes_encodees:
+            try:
+                message_bus_instance.invoke(cmd)
+            except MultipleBusinessExceptions as e:
+                for exception in e.exceptions:
+                    form = next(
+                        form for form in formset
+                        if form.has_changed() and form.cleaned_data['noma'] == exception.note_id.noma and
+                        form.cleaned_data['code_unite_enseignement'] == exception.note_id.code_unite_enseignement
+                    )
+                    form.add_error('note', exception.message)
+
+        if formset.is_valid():
+            return self.get_success_url()
+        return self.render_to_response(self.get_context_data(form=formset))
+
+    def get_success_url(self):
         redirect_url = reverse('score_search') + "?" + urllib.parse.urlencode(self.request.GET)
         return redirect(redirect_url)
 
@@ -84,11 +117,12 @@ class ScoreSearchFormView(PermissionRequiredMixin, FormView):
         return {
             **super().get_context_data(**kwargs),
             'search_form': self.get_search_form(),
-            'notes_etudiant_filtered': self.get_notes_etudiant_filtered(),
+            'notes_etudiant_filtered': self.notes_etudiant_filtered,
             'score_encoding_progress_overview_url': self.get_score_encoding_progress_overview_url()
         }
 
-    def get_notes_etudiant_filtered(self):
+    @cached_property
+    def notes_etudiant_filtered(self):
         search_form = self.get_search_form()
         if search_form.is_valid():
             cmd = RechercherNotesCommand(
@@ -97,8 +131,9 @@ class ScoreSearchFormView(PermissionRequiredMixin, FormView):
                 prenom=search_form.cleaned_data['prenom'],
                 etat=search_form.cleaned_data['justification'],
                 nom_cohorte=search_form.cleaned_data['nom_cohorte'],
+                matricule_fgs_gestionnaire=self.person.global_id
             )
-            # return message_bus_instance.invoke(cmd)
+            return message_bus_instance.invoke(cmd)
         return []
 
     def get_score_encoding_progress_overview_url(self):

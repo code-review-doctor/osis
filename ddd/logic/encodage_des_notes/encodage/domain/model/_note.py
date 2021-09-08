@@ -79,6 +79,11 @@ class Note(interface.ValueObject, abc.ABC):
 class NoteChiffree(Note):
     value = attr.ib(type=float)
 
+    def __str__(self):
+        if self.value:
+            return str(self.value)
+        return ""
+
 
 @attr.s(slots=True, frozen=True)
 class NoteManquante(Note):
@@ -88,7 +93,19 @@ class NoteManquante(Note):
     def is_manquant(self) -> bool:
         return True
 
+    def __str__(self):
+        return ""
+
 
 @attr.s(slots=True, frozen=True)
 class Justification(Note):
     value = attr.ib(type=JustificationTypes)
+
+    def __str__(self) -> str:
+        if self.value:
+            return {
+                JustificationTypes.ABSENCE_UNJUSTIFIED.name: ABSENCE_INJUSTIFIEE,
+                JustificationTypes.CHEATING.name: TRICHERIE,
+                JustificationTypes.ABSENCE_JUSTIFIED.name: ABSENCE_JUSTIFIEE
+            }[self.value.name]
+        return ""

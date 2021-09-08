@@ -203,7 +203,7 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
         if nomas:
             qs = qs.filter(learning_unit_enrollment__offer_enrollment__student__registration_id__in=nomas)
         if note_manquante:
-            qs = qs.filter(score_final__isnull=True, justification_final_isnull=True)
+            qs = qs.filter(score_final__isnull=True, justification_final__isnull=True)
 
         qs = qs.annotate(
             code_unite_enseignement=Concat(

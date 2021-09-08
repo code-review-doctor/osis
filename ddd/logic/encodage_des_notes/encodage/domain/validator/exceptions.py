@@ -23,9 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
 from django.utils.translation import gettext_lazy as _
 
+from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import IdentiteNoteEtudiant
 from osis_common.ddd.interface import BusinessException
 
 
@@ -42,3 +42,9 @@ class NoteIncorrecteException(BusinessException):
             "(0=Score of presence), A=Absent, T=Cheating, M=Absence justified"
         ).format(note=note_incorrecte)
         super().__init__(message, **kwargs)
+
+
+class EncoderNotesEnLotLigneBusinessExceptions(BusinessException):
+    def __init__(self, note_id: IdentiteNoteEtudiant, exception: BusinessException):
+        self.note_id = note_id
+        super().__init__(exception.message)
