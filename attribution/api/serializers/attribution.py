@@ -49,7 +49,6 @@ class AttributionSerializer(serializers.Serializer):
     total_learning_unit_charge = serializers.SerializerMethodField()
     links = serializers.SerializerMethodField()
     effective_class_repartition = EffectiveClassRepartitionSerializer(many=True)
-    has_peps = serializers.BooleanField()
 
     @staticmethod
     def get_type_text(obj) -> str:
