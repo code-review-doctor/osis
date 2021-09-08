@@ -40,14 +40,14 @@ class SoumettreNotesEnLot(interface.DomainService):
             note_etudiant_repo: 'INoteEtudiantRepository',
     ) -> List['IdentiteNoteEtudiant']:
         identite_builder = NoteEtudiantIdentityBuilder()
-        identites = [identite_builder.build_from_command(cmd_note) for cmd_note in cmd.notes]
+        identites = [identite_builder.build_from_soumettre_note_command(cmd, cmd_note) for cmd_note in cmd.notes]
 
         notes = note_etudiant_repo.search(entity_ids=identites)
         notes_by_identite = {note.entity_id: note for note in notes}  # type: Dict[IdentiteNoteEtudiant, NoteEtudiant]
 
         notes_soumises = []
         for cmd_note in cmd.notes:
-            identite = identite_builder.build_from_command(cmd_note)
+            identite = identite_builder.build_from_soumettre_note_command(cmd, cmd_note)
             note_a_soumettre = notes_by_identite[identite]
 
             note_a_soumettre.soumettre()

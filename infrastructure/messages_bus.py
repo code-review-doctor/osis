@@ -69,8 +69,9 @@ from ddd.logic.encodage_des_notes.encodage.use_case.read.get_progression_general
     get_progression_generale_gestionnaire
 from ddd.logic.encodage_des_notes.encodage.use_case.read.rechercher_notes_service import rechercher_notes
 from ddd.logic.encodage_des_notes.encodage.use_case.write.encoder_notes_service import encoder_notes
-from ddd.logic.encodage_des_notes.soumission.commands import EncoderNoteCommand, SoumettreNoteCommand, \
-    GetAdresseFeuilleDeNotesServiceCommand, GetChoixEntitesAdresseFeuilleDeNotesCommand, \
+from ddd.logic.encodage_des_notes.soumission.commands import EncoderNoteCommand, \
+    GetAdresseFeuilleDeNotesServiceCommand, \
+    GetChoixEntitesAdresseFeuilleDeNotesCommand, \
     EncoderAdresseFeuilleDeNotesSpecifique, EncoderAdresseEntiteCommeAdresseFeuilleDeNotes, \
     GetResponsableDeNotesCommand, \
     EcraserAdresseFeuilleDeNotesPremiereAnneeDeBachelier, SoumettreNotesCommand
@@ -101,8 +102,6 @@ from ddd.logic.encodage_des_notes.soumission.use_case.write \
     encoder_adresse_entite_comme_adresse_feuille_de_notes
 from ddd.logic.encodage_des_notes.soumission.use_case.write.encoder_adresse_feuille_de_notes_specifique_service import \
     encoder_adresse_feuille_de_notes_specifique
-from ddd.logic.encodage_des_notes.soumission.use_case.write.soumettre_note_etudiant_service import \
-    soumettre_note_etudiant
 from ddd.logic.encodage_des_notes.soumission.use_case.write.soumettre_notes_etudiant_service import \
     soumettre_notes_etudiant
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, GetLearningUnitCommand, \
@@ -300,12 +299,6 @@ class MessageBus:
             NoteEtudiantRepository(),
             PeriodeEncodageNotesTranslator(),
             AttributionEnseignantTranslator(),
-        ),
-        SoumettreNoteCommand: lambda cmd: soumettre_note_etudiant(
-            cmd,
-            NoteEtudiantRepository(),
-            ResponsableDeNotesRepository(),
-            PeriodeEncodageNotesTranslator(),
         ),
         SoumettreNotesCommand: lambda cmd: soumettre_notes_etudiant(
             cmd,

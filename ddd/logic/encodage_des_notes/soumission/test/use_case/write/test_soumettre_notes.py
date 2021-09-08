@@ -75,10 +75,6 @@ class SoumettreNoteTest(SimpleTestCase):
             numero_session=self.note_etudiant.numero_session,
             notes=[
                 SoumettreNoteCommand(
-                    code_unite_enseignement=self.note_etudiant.code_unite_enseignement,
-                    annee_unite_enseignement=self.note_etudiant.annee,
-                    numero_session=self.note_etudiant.numero_session,
-                    matricule_fgs_enseignant=self.matricule_enseignant,
                     noma_etudiant=self.note_etudiant.noma
                 )
             ]
@@ -116,12 +112,11 @@ class SoumettreNoteTest(SimpleTestCase):
         note_etudiant = NoteManquanteEtudiantFactory(entity_id__code_unite_enseignement='LDROI1001')
         self.note_etudiant_repo.save(note_etudiant)
 
-        cmd = SoumettreNoteCommand(
-            code_unite_enseignement=note_etudiant.code_unite_enseignement,
-            annee_unite_enseignement=note_etudiant.annee,
-            numero_session=note_etudiant.numero_session,
-            noma_etudiant=note_etudiant.noma,
-            matricule_fgs_enseignant=self.matricule_enseignant,
+        cmd = attr.evolve(
+            self.cmd,
+            notes=[SoumettreNoteCommand(
+                noma_etudiant=note_etudiant.noma,
+            )]
         )
 
         self.message_bus.invoke(cmd)

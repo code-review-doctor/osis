@@ -22,7 +22,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+from typing import List, Tuple
 
 from ddd.logic.encodage_des_notes.encodage.domain.model.gestionnaire_parcours import GestionnaireParcours
 from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import IdentiteNoteEtudiant
@@ -45,6 +45,7 @@ class NotifierEncodageNotesInMemory(INotifierEncodageNotes):
     def notifier(
             cls,
             notes_encodees: List['IdentiteNoteEtudiant'],
+            cohortes_non_entierement_encodees_avant_encodage: List[Tuple[str, str]],
             gestionnaire_parcours: 'GestionnaireParcours',
             note_etudiant_repo: 'INoteEtudiantRepository',
             translator: 'IAttributionEnseignantTranslator',
