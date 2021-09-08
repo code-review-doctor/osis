@@ -143,6 +143,8 @@ class NotifierSoumissionNotes(INotifierSoumissionNotes):
             signaletique_personne_translator: 'ISignaletiquePersonneTranslator',
             signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
     ) -> List['DonneesEmail']:
+        if not identites_notes_soumises:
+            return []
         code_unite_enseignement = identites_notes_soumises[0].code_unite_enseignement
         annee_academique = identites_notes_soumises[0].annee_academique
         numero_session = identites_notes_soumises[0].numero_session

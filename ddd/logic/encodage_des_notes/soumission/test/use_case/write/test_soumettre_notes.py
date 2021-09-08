@@ -85,7 +85,7 @@ class SoumettreNoteTest(SimpleTestCase):
         )
 
         self.notifier_soumission_service = InMemoryNotifierSoumissionNotes()
-        self.addCleanup(lambda: self.notifier_soumission_service.identites_notes_soumises.clear())
+        self.addCleanup(lambda: self.notifier_soumission_service.appels.clear())
         self.attribution_enseignant_translator = AttributionEnseignantTranslatorInMemory()
         self.signaletique_personne_translator = SignaletiquePersonneTranslatorInMemory()
         self.signaletique_etudiant_translator = SignaletiqueEtudiantTranslatorInMemory()
@@ -175,6 +175,6 @@ class SoumettreNoteTest(SimpleTestCase):
         identites_notes_soumises = self.message_bus.invoke(self.cmd)
 
         self.assertEqual(
-            self.notifier_soumission_service.identites_notes_soumises[0],
+            self.notifier_soumission_service.appels[0]["identites_notes_soumises"],
             identites_notes_soumises
         )

@@ -36,7 +36,7 @@ from ddd.logic.encodage_des_notes.soumission.repository.i_note_etudiant import I
 
 
 class InMemoryNotifierSoumissionNotes(INotifierSoumissionNotes):
-    identites_notes_soumises = []
+    appels = []
 
     @classmethod
     def notifier(
@@ -47,4 +47,4 @@ class InMemoryNotifierSoumissionNotes(INotifierSoumissionNotes):
             signaletique_personne_translator: 'ISignaletiquePersonneTranslator',
             signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
     ) -> None:
-        cls.identites_notes_soumises.append(identites_notes_soumises)
+        cls.appels.append(locals())
