@@ -61,7 +61,7 @@ class AttributionListView(generics.ListAPIView):
     def list(self, request, *args, **kwargs):
         if self.request.query_params.get('with_effective_class_repartition') == "True":
             # quick fix to be modified with the correct implementation of classes
-            self._get_class_repartition()
+            self._fill_classes_repartition()
         serializer = AttributionSerializer(
             self.attributions_charge_new,
             many=True,
@@ -141,7 +141,7 @@ class AttributionListView(generics.ListAPIView):
             function=F('attribution__function'),
         )
 
-    def _get_class_repartition(self):
+    def _fill_classes_repartition(self):
         tutor_class_repartition = message_bus_instance.invoke(
             GetTutorRepartitionClassesCommand(
                 tutor_personal_id_number=self.attributions_charge_new[0].tutor_personal_id
@@ -160,7 +160,7 @@ class AttributionListView(generics.ListAPIView):
                 learning_unit_code=learning_unit_year.acronym,
                 learning_unit_year=learning_unit_year.academic_year.year
             )
-            attrib.effective_class_repartition = self._fill_classes_repartition(classes_repartition, classes_peps)
+            attrib.effective_class_repartition = self._get_classes_repartition(classes_repartition, classes_peps)
 
     @staticmethod
     def _get_classes_peps(class_codes: List[str]) -> List[Tuple[str, bool]]:
@@ -192,7 +192,7 @@ class AttributionListView(generics.ListAPIView):
         return list(classes_peps)
 
     @staticmethod
-    def _fill_classes_repartition(
+    def _get_classes_repartition(
             classes_repartition: List[ClassVolumeRepartition],
             classes_peps: List[Tuple[str, bool]]
     ) -> List[EffectiveClassRepartitionDict]:
