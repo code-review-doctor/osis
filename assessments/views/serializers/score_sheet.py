@@ -32,7 +32,6 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from base.models import exam_enrollment
-from base.models.enums.exam_enrollment_justification_type import TutorJustificationTypes, JustificationTypes
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import NoteEtudiantDTO
 from education_group.templatetags.academic_year_display import display_as_academic_year
 
@@ -60,18 +59,8 @@ class _EnrollmentSerializer(serializers.Serializer):
             return ""
 
     def get_justification(self, note_etudiant) -> str:
-        note = note_etudiant.note
-        if isinstance(note, TutorJustificationTypes):
-            return {
-                TutorJustificationTypes.ABSENCE_UNJUSTIFIED.name: 'A',
-                TutorJustificationTypes.CHEATING.name: 'T',
-            }[note.name]
-        elif isinstance(note, JustificationTypes):
-            return {
-                JustificationTypes.ABSENCE_UNJUSTIFIED.name: 'S',
-                JustificationTypes.ABSENCE_JUSTIFIED.name: 'M',
-                JustificationTypes.CHEATING.name: 'T',
-            }[note.name]
+        if note_etudiant.note in ('A', 'T', 'M', 'S'):
+            return note_etudiant.note
         return ""
 
 

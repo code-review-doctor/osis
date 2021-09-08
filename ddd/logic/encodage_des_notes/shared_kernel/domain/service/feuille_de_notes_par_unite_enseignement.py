@@ -105,7 +105,7 @@ class FeuilleDeNotesParUniteEnseignement(interface.DomainService):  # TODO :: d√
                     prenom=signaletique.prenom,
                     peps=signaletique.peps,
                     email=note.email,
-                    note=note.note.value,
+                    note=str(note.note),
                     inscrit_tardivement=inscrit_tardivement,
                     desinscrit_tardivement=bool(desinscription),
                 )
