@@ -30,7 +30,7 @@ from django.views.generic import TemplateView
 
 from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmissionCalendar
 from base.views.mixins import AjaxTemplateMixin
-from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand
+from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand, SoumettreNoteCommand
 from infrastructure.messages_bus import message_bus_instance
 from osis_role.contrib.views import AjaxPermissionRequiredMixin
 
@@ -54,7 +54,15 @@ class LearningUnitScoreEncodingTutorSubmitView(AjaxPermissionRequiredMixin, Ajax
         return super().dispatch(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        #  TODO Invoke submit command message_bus
+        for note in self.feuille_de_notes.get_notes_en_attente_de_soumission():
+            cmd = SoumettreNoteCommand(
+                code_unite_enseignement=self.feuille_de_notes.code_unite_enseignement,
+                annee_unite_enseignement=self.feuille_de_notes.annee_academique,
+                numero_session=self.feuille_de_notes.numero_session,
+                noma_etudiant=note.noma,
+                matricule_fgs_enseignant=self.person.global_id,
+            )
+            message_bus_instance.invoke(cmd)
         return self._ajax_response()
 
     def get_success_url(self):
@@ -64,13 +72,13 @@ class LearningUnitScoreEncodingTutorSubmitView(AjaxPermissionRequiredMixin, Ajax
         )
 
     def get_context_data(self, **kwargs):
-        feuille_de_notes = self.get_feuille_de_notes()
         return {
             **super().get_context_data(**kwargs),
-            'draft_scores_not_submitted': feuille_de_notes.quantite_notes_en_attente_de_soumission,
+            'draft_scores_not_submitted': self.feuille_de_notes.quantite_notes_en_attente_de_soumission,
         }
 
-    def get_feuille_de_notes(self):
+    @cached_property
+    def feuille_de_notes(self):
         cmd = GetFeuilleDeNotesCommand(
             matricule_fgs_enseignant=self.person.global_id,
             code_unite_enseignement=self.kwargs['learning_unit_code'].upper()

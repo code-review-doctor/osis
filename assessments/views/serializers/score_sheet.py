@@ -40,8 +40,8 @@ class _EnrollmentSerializer(serializers.Serializer):
     registration_id = serializers.CharField(read_only=True, source='noma')
     last_name = serializers.CharField(read_only=True, source='nom')
     first_name = serializers.CharField(read_only=True, source='prenom')
-    score = serializers.CharField(read_only=True, source='note')
-    justification = serializers.CharField(read_only=True, source='note')
+    score = serializers.SerializerMethodField()
+    justification = serializers.SerializerMethodField()
     deadline = serializers.DateField(read_only=True, source='date_remise_de_notes.to_date', format="%d/%m/%Y")
     enrollment_state_color = serializers.SerializerMethodField()
 
@@ -51,6 +51,17 @@ class _EnrollmentSerializer(serializers.Serializer):
         elif note_etudiant.desinscrit_tardivement:
             return '#f2dede'
         return ''
+
+    def get_score(self, note_etudiant) -> str:
+        try:
+            return str(float(note_etudiant.note))
+        except (ValueError, TypeError,):
+            return ""
+
+    def get_justification(self, note_etudiant) -> str:
+        if note_etudiant.note in ('A', 'T', 'M', 'S'):
+            return note_etudiant.note
+        return ""
 
 
 class _ProgramAddressSerializer(serializers.Serializer):

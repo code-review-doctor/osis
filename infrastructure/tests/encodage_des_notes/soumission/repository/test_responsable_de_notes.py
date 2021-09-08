@@ -161,6 +161,7 @@ class ResponsableDeNotesRepositoryTest(TestCase):
                 ResponsableDeNotesDTO(
                     nom=person.last_name,
                     prenom=person.first_name,
+                    matricule=person.global_id,
                     code_unite_enseignement=unite_enseignement_identity.code_unite_enseignement,
                     annee_unite_enseignement=unite_enseignement_identity.annee_academique,
                 )

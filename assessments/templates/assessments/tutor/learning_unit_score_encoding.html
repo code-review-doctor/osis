@@ -102,7 +102,7 @@
                     <div class="form-group">
                         <label>{% trans 'Progress' %}</label>
                         <div class="progress">
-                            <div class="progress-bar {% if feuille_de_notes.encodage_est_complet %} progress-bar-success {% else %} progress-bar-warning {% endif %}" role="progressbar" style="width: {% widthratio feuille_de_notes.quantite_notes_soumises feuille_de_notes.quantite_total_notes 1 %}%;">
+                            <div class="progress-bar {% if feuille_de_notes.encodage_est_complet %} progress-bar-success {% else %} progress-bar-warning {% endif %}" role="progressbar" style="width: {% widthratio feuille_de_notes.quantite_notes_soumises feuille_de_notes.quantite_total_notes 100 %}%;">
                                 <span>
                                     <strong id="luy_progression"> {{ feuille_de_notes.quantite_notes_soumises }} / {{ feuille_de_notes.quantite_total_notes }} </strong>
                                 </span>
@@ -149,6 +149,9 @@
                         data-url="{{ learning_unit_submit_url }}"
                         data-toggle="tooltip" data-placement="bottom"
                         title="{% trans 'Definitive submission (Submit to faculty)' %}"
+                        {% if not can_submit_scores %}
+                            disabled
+                        {% endif %}
                         role="button">
                             <em class="fas fa-paper-plane"></em> {% trans 'Submission' %}
                     </a>
@@ -156,16 +159,31 @@
                 </div>
             </div>
 
+            {% if feuille_de_notes.quantite_notes_en_attente_de_soumission > 0 %}
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <div class="alert alert-dismissible alert-warning">
+                          <button type="button" class="close" data-dismiss="alert">&times;</button>
+                          <p>
+                            <span class="glyphicon glyphicon-warning-sign"
+                                  style="font-size: 150%; margin-right: 5px" aria-hidden="true">
+                            </span>  {% trans 'Warning : some registered scores have not been submitted yet!' %}
+                          </p>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
             <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th id="status">{% trans 'Status' %}</th>
-                        <th id="program">{% trans 'Program' context 'encoding' %}</th>
-                        <th id="registration_number">{% trans 'Registration number' %}</th>
-                        <th id="lastname">{% trans 'Lastname' %}</th>
-                        <th id="firstname">{% trans 'Firstname' %}</th>
-                        <th id="score">{% trans 'Score' %}</th>
-                        <th id="deadline">{% trans 'Teacher deadline' %}</th>
+                        <th id="status" class="col-md-1">{% trans 'Status' %}</th>
+                        <th id="program" class="col-md-1">{% trans 'Program' context 'encoding' %}</th>
+                        <th id="registration_number" class="col-md-1">{% trans 'Registration number' %}</th>
+                        <th id="lastname" class="col-md-2">{% trans 'Lastname' %}</th>
+                        <th id="firstname" class="col-md-2">{% trans 'Firstname' %}</th>
+                        <th id="score" class="col-md-2">{% trans 'Score' %}</th>
+                        <th id="deadline" class="col-md-2">{% trans 'Teacher deadline' %}</th>
                     </tr>
                 </thead>
                 <tbody>

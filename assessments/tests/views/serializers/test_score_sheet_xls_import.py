@@ -49,7 +49,7 @@ class ScoreSheetXLSImportViewTest(SimpleTestCase):
     def test_serialize_worksheet(self):
         score_sheet_serialized = ScoreSheetXLSImportSerializer(self.workbook.active).data
 
-        self.assertEqual(score_sheet_serialized['annee_academique'], "2020-21")
+        self.assertEqual(score_sheet_serialized['annee_academique'], 2020)
         self.assertEqual(score_sheet_serialized['numero_session'], 2)
 
         self.assertEqual(len(score_sheet_serialized['notes_etudiants']), 1)

@@ -98,6 +98,9 @@ class NoteEtudiantDTO(interface.DTO):
         aujourdhui = datetime.date.today()
         return aujourdhui > date_de_remise
 
+    def est_en_attente_de_soumission(self) -> bool:
+        return self.note != '' and not self.est_soumise
+
 
 @attr.s(frozen=True, slots=True)
 class FeuilleDeNotesDTO(interface.DTO):
@@ -121,7 +124,7 @@ class FeuilleDeNotesDTO(interface.DTO):
 
     @property
     def quantite_notes_en_attente_de_soumission(self) -> int:
-        return sum(1 for note in self.notes_etudiants if note.note != '' and not note.est_soumise)
+        return sum(1 for note in self.notes_etudiants if note.est_en_attente_de_soumission())
 
     @property
     def quantite_total_notes(self) -> int:
@@ -130,6 +133,12 @@ class FeuilleDeNotesDTO(interface.DTO):
     @property
     def nombre_inscriptions(self) -> int:
         return self.quantite_total_notes
+
+    def get_email_for_noma(self, noma: str) -> str:
+        return next(note_etudiant.email for note_etudiant in self.notes_etudiants if note_etudiant.noma == noma)
+
+    def get_notes_en_attente_de_soumission(self) -> List[NoteEtudiantDTO]:
+        return [note for note in self.notes_etudiants if note.est_en_attente_de_soumission()]
 
 
 @attr.s(frozen=True, slots=True)

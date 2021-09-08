@@ -151,6 +151,7 @@ class ResponsableDeNotesFromRepositoryDTO(interface.DTO):
 class ResponsableDeNotesDTO(interface.DTO):
     nom = attr.ib(type=str)
     prenom = attr.ib(type=str)
+    matricule = attr.ib(type=str)
     code_unite_enseignement = attr.ib(type=str)
     annee_unite_enseignement = attr.ib(type=int)
 

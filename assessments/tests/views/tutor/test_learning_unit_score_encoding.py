@@ -30,6 +30,9 @@ from django.urls import reverse
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
 from base.tests.factories.tutor import TutorFactory
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import FeuilleDeNotesDTO, EnseignantDTO, DetailContactDTO
+from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand, GetResponsableDeNotesCommand
+from ddd.logic.encodage_des_notes.soumission.dtos import ResponsableDeNotesDTO
 
 
 class LearningUnitScoreEncodingTutorViewTest(TestCase):
@@ -48,10 +51,37 @@ class LearningUnitScoreEncodingTutorViewTest(TestCase):
 
         self.patch_message_bus = mock.patch(
             "assessments.views.tutor.learning_unit_score_encoding.message_bus_instance.invoke",
-            return_value=None
+            side_effect=self.__mock_message_bus_invoke
         )
         self.message_bus_mocked = self.patch_message_bus.start()
         self.addCleanup(self.patch_message_bus.stop)
+
+    def __mock_message_bus_invoke(self, cmd):
+        if isinstance(cmd, GetFeuilleDeNotesCommand):
+            return FeuilleDeNotesDTO(
+                code_unite_enseignement='LEPL1509',
+                intitule_complet_unite_enseignement='Introduction au data-mining',
+                note_decimale_est_autorisee=True,
+                responsable_note=EnseignantDTO(nom="Durant", prenom="Thomas"),
+                contact_responsable_notes=DetailContactDTO(
+                    matricule_fgs="987654321",
+                    email="thomas.durant@email.be",
+                    adresse_professionnelle=None
+                ),
+                autres_enseignants=[],
+                annee_academique=2020,
+                numero_session=2,
+                notes_etudiants=[],
+            )
+        if isinstance(cmd, GetResponsableDeNotesCommand):
+            return ResponsableDeNotesDTO(
+                nom="Durant",
+                prenom="Thomas",
+                matricule='78965432',
+                code_unite_enseignement='LEPL1509',
+                annee_unite_enseignement=2020,
+            )
+        raise Exception('Bus Command not mocked in test')
 
     def test_case_user_not_logged(self):
         self.client.logout()
@@ -80,3 +110,5 @@ class LearningUnitScoreEncodingTutorViewTest(TestCase):
         self.assertIsInstance(response.context['learning_unit_download_xls_url'], str)
         self.assertIsInstance(response.context['learning_unit_upload_xls_url'], str)
         self.assertIsInstance(response.context['learning_unit_submit_url'], str)
+        self.assertIsInstance(response.context['can_submit_scores'], bool)
+        self.assertIsInstance(response.context['feuille_de_notes'], FeuilleDeNotesDTO)

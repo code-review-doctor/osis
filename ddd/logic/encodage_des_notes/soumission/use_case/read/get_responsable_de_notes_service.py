@@ -23,9 +23,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from assessments.views.common.score_sheet_xls_import import ScoreSheetXLSImportBaseView
+from typing import Optional
+
+from ddd.logic.encodage_des_notes.soumission.commands import GetResponsableDeNotesCommand
+from ddd.logic.encodage_des_notes.soumission.domain.model._unite_enseignement_identite import \
+    UniteEnseignementIdentiteBuilder
+from ddd.logic.encodage_des_notes.soumission.dtos import ResponsableDeNotesDTO
+from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
 
 
-class ScoreSheetXLSImportProgramManagerView(ScoreSheetXLSImportBaseView):
-    def call_command(self, matricule, score_sheet_serialized):
-        pass
+def get_responsable_de_notes(
+        cmd: 'GetResponsableDeNotesCommand',
+        responsable_notes_repo: 'IResponsableDeNotesRepository',
+) -> Optional['ResponsableDeNotesDTO']:
+    unite_enseignement_id = UniteEnseignementIdentiteBuilder.build_from_code_and_annee(
+        code_unite_enseignement=cmd.code_unite_enseignement,
+        annee_academique=cmd.annee_unite_enseignement
+    )
+    results = responsable_notes_repo.search_dto({unite_enseignement_id})
+    if results:
+        return results[0]

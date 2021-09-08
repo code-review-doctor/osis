@@ -41,11 +41,13 @@
 
 <div class="modal-footer">
     <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Cancel' %}</button>
-    <button id="submit_btn" class="btn btn-primary"
-            type="submit"
-            onclick="$('#submission_scores_modal_form').submit();"
-            data-container="body"
-            data-toggle="tooltip" data-placement="left" title="{% trans 'Definitive submission (Submit to faculty)' %}">
-        {% trans 'Submission' %}
-    </button>
+    {% if draft_scores_not_submitted > 0 %}
+        <button id="submit_btn" class="btn btn-primary"
+                type="submit"
+                onclick="$('#submission_scores_modal_form').submit();"
+                data-container="body"
+                data-toggle="tooltip" data-placement="left" title="{% trans 'Definitive submission (Submit to faculty)' %}">
+            {% trans 'Submission' %}
+        </button>
+    {% endif %}
 </div>

@@ -72,7 +72,7 @@ from ddd.logic.encodage_des_notes.encodage.use_case.write.encoder_notes_service 
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderNoteCommand, SoumettreNoteCommand, \
     GetAdresseFeuilleDeNotesServiceCommand, GetChoixEntitesAdresseFeuilleDeNotesCommand, \
     EncoderAdresseFeuilleDeNotesSpecifique, EncoderAdresseEntiteCommeAdresseFeuilleDeNotes, \
-    EcraserAdresseFeuilleDeNotesPremiereAnneeDeBachelier
+    EcraserAdresseFeuilleDeNotesPremiereAnneeDeBachelier, GetResponsableDeNotesCommand
 from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand, GetProgressionGeneraleCommand, \
     AssignerResponsableDeNotesCommand, \
     SearchAdressesFeuilleDeNotesCommand
@@ -83,6 +83,7 @@ from ddd.logic.encodage_des_notes.soumission.use_case.read.get_choix_entites_adr
 from ddd.logic.encodage_des_notes.soumission.use_case.read.get_feuille_de_notes_service import get_feuille_de_notes
 from ddd.logic.encodage_des_notes.soumission.use_case.read.get_progression_generale_encodage_service import \
     get_progression_generale
+from ddd.logic.encodage_des_notes.soumission.use_case.read.get_responsable_de_notes_service import get_responsable_de_notes
 from ddd.logic.encodage_des_notes.soumission.use_case.read.search_donnees_administratives_feuille_de_notes_service \
     import \
     search_donnees_administratives_feuille_de_notes
@@ -388,6 +389,10 @@ class MessageBus:
             cmd,
             EntiteUCLRepository(),
             EntitesCohorteTranslator()
+        ),
+        GetResponsableDeNotesCommand: lambda cmd: get_responsable_de_notes(
+            cmd,
+            ResponsableDeNotesRepository(),
         )
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 

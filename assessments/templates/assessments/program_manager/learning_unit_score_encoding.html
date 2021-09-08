@@ -102,7 +102,7 @@
                     <div class="form-group">
                         <label>{% trans 'Progress' %}</label>
                         <div class="progress">
-                            <div class="progress-bar {% if feuille_de_notes.encodage_est_complet %} progress-bar-success {% else %} progress-bar-warning {% endif %}" role="progressbar" style="width: {% widthratio feuille_de_notes.quantite_notes_soumises feuille_de_notes.quantite_total_notes 1 %}%;">
+                            <div class="progress-bar {% if feuille_de_notes.encodage_est_complet %} progress-bar-success {% else %} progress-bar-warning {% endif %}" role="progressbar" style="width: {% widthratio feuille_de_notes.quantite_notes_soumises feuille_de_notes.quantite_total_notes 100 %}%;">
                                 <span>
                                     <strong id="luy_progression"> {{ feuille_de_notes.quantite_notes_soumises }} / {{ feuille_de_notes.quantite_total_notes }} </strong>
                                 </span>

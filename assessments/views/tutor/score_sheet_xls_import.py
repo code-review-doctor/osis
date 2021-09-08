@@ -23,9 +23,38 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.contrib import messages
+from django.utils.translation import gettext_lazy as _
+
 from assessments.views.common.score_sheet_xls_import import ScoreSheetXLSImportBaseView
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
+from ddd.logic.encodage_des_notes.soumission.commands import EncoderNoteCommand
+from infrastructure.messages_bus import message_bus_instance
 
 
 class ScoreSheetXLSImportTutorView(ScoreSheetXLSImportBaseView):
-    def call_command(self, note_etudiant):
-        pass
+    def call_command(self, matricule, score_sheet_serialized):
+        injected_notes_counter = 0
+
+        for index, note_etudiant in enumerate(score_sheet_serialized['notes_etudiants']):
+            cmd = EncoderNoteCommand(
+                code_unite_enseignement=note_etudiant['code_unite_enseignement'],
+                annee_unite_enseignement=score_sheet_serialized['annee_academique'],
+                numero_session=score_sheet_serialized['numero_session'],
+                matricule_fgs_enseignant=matricule,
+                noma_etudiant=note_etudiant['noma'],
+                email_etudiant=note_etudiant['email'],
+                note=note_etudiant['note'],
+            )
+            try:
+                message_bus_instance.invoke(cmd)
+                injected_notes_counter += 1
+            except MultipleBusinessExceptions as e:
+                for exception in e.exceptions:
+                    error_message = "{} : {} {}".format(exception.message, _('Row'), str(index + 1))
+                    messages.error(self.request, error_message)
+
+        if injected_notes_counter:
+            messages.success(self.request, "{} {}".format(str(injected_notes_counter), _("Score(s) saved")))
+        else:
+            messages.error(self.request, _("No score injected"))

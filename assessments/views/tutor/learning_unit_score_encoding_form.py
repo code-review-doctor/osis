@@ -41,3 +41,12 @@ class LearningUnitScoreEncodingTutorFormView(LearningUnitScoreEncodingBaseFormVi
             code_unite_enseignement=self.kwargs['learning_unit_code'].upper()
         )
         return message_bus_instance.invoke(cmd)
+
+    def get_initial(self):
+        formeset_initial = []
+        for note_etudiant in self.feuille_de_notes.notes_etudiants:
+            if not note_etudiant.est_soumise and not note_etudiant.date_echeance_atteinte:
+                formeset_initial.append({'note': note_etudiant.note, 'noma': note_etudiant.noma})
+            else:
+                formeset_initial.append({})
+        return formeset_initial

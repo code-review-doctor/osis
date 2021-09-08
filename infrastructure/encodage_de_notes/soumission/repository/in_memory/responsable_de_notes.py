@@ -79,6 +79,7 @@ class ResponsableDeNotesInMemoryRepository(InMemoryGenericRepository, IResponsab
                 ResponsableDeNotesDTO(
                     nom='Chileng',
                     prenom='Jean-Michel',
+                    matricule=entity.matricule_fgs_enseignant,
                     code_unite_enseignement=unite_enseignement_identity.code_unite_enseignement,
                     annee_unite_enseignement=unite_enseignement_identity.annee_academique
                 ) for entity in cls.entities if unite_enseignement_identity in entity.unites_enseignements
