@@ -28,6 +28,7 @@ from typing import List
 from ddd.logic.encodage_des_notes.encodage.builder.gestionnaire_parcours_builder import GestionnaireParcoursBuilder
 from ddd.logic.encodage_des_notes.encodage.commands import EncoderNotesCommand
 from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import IdentiteNoteEtudiant
+from ddd.logic.encodage_des_notes.encodage.domain.service.cohorte_non_complete import CohorteNonCompleteDomainService
 from ddd.logic.encodage_des_notes.encodage.domain.service.encoder_notes_en_lot import EncoderNotesEnLot
 from ddd.logic.encodage_des_notes.encodage.domain.service.i_cohortes_du_gestionnaire import ICohortesDuGestionnaire
 from ddd.logic.encodage_des_notes.encodage.domain.service.i_notifier_encodage_notes import INotifierEncodageNotes
@@ -68,15 +69,23 @@ def encoder_notes(
     periode_ouverte = periode_encodage_note_translator.get()
 
     # WHEN
+    cohortes_non_completes = CohorteNonCompleteDomainService().search(
+        [cmd_note.code_unite_enseignement for cmd_note in cmd.notes_encodees],
+        periode_ouverte.annee_concernee,
+        periode_ouverte.session_concernee,
+        note_etudiant_repo
+    )
+
     notes = EncoderNotesEnLot().execute(cmd.notes_encodees, gestionnaire_parcours, note_etudiant_repo, periode_ouverte)
     notifier_notes_domaine_service.notifier(
         notes,
+        cohortes_non_completes,
         gestionnaire_parcours,
         note_etudiant_repo,
         translator,
         signaletique_repo,
         signaletique_etudiant_repo,
-        adresse_feuille_de_notes_repo
+        adresse_feuille_de_notes_repo,
     )
 
     return notes

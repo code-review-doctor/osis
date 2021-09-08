@@ -52,20 +52,10 @@ MAIL_TEMPLATE_NAME = "assessments_all_scores_by_pgm_manager"
 
 
 @attr.s(frozen=True, slots=True)
-class EmailData:
-    subject_data = attr.ib(type=Dict)
-    template_base_data = attr.ib(type=Dict)
-    html_template_ref = attr.ib(type=str)
-    txt_template_ref = attr.ib(type=str)
-    receivers = attr.ib(type=List)
-    cc = attr.ib(type=List[Person])
-    table = attr.ib(type=Any)
-
-
-@attr.s(frozen=True, slots=True)
 class DonneesEmail:
     code_unite_enseignement = attr.ib(type=str)
     nom_cohorte = attr.ib(type=str)
+    encodage_complet_avant_encodage = attr.ib(type=bool)
     identites_notes_encodees = attr.ib(type=List['IdentiteNoteEtudiant'])
     notes = attr.ib(type=List['NoteEtudiant'])
     emails_destinataires = attr.ib(type=List[str])
@@ -81,6 +71,7 @@ class NotifierEncodageNotes(INotifierEncodageNotes):
     def notifier(
             cls,
             identites_notes_encodees: List['IdentiteNoteEtudiant'],
+            cohortes_non_entierement_encodees_avant_encodage: List[Tuple[str, str]],
             gestionnaire_parcours: 'GestionnaireParcours',
             note_etudiant_repository: 'INoteEtudiantRepository',
             attribution_enseignant_translator: 'IAttributionEnseignantTranslator',
@@ -90,6 +81,7 @@ class NotifierEncodageNotes(INotifierEncodageNotes):
     ) -> None:
         liste_donnees_email = cls._get_donnees_email(
             identites_notes_encodees,
+            cohortes_non_entierement_encodees_avant_encodage,
             gestionnaire_parcours,
             note_etudiant_repository,
             attribution_enseignant_translator,
@@ -120,15 +112,26 @@ class NotifierEncodageNotes(INotifierEncodageNotes):
         if donnes_email.adresse_feuille_de_notes and donnes_email.adresse_feuille_de_notes.email:
             cc.append(Person(email=donnes_email.adresse_feuille_de_notes.email))
 
+        rows = cls._format_lignes_table(donnes_email.notes, donnes_email.signaletiques_etudiant_par_noma)
+        row_styles = [
+            cls._get_row_style(
+                row,
+                donnes_email.code_unite_enseignement,
+                donnes_email.identites_notes_encodees,
+                donnes_email.encodage_complet_avant_encodage
+            ) for row in rows
+        ]
+        txt_complementary_rows_content = ["*" if row_style else "" for row_style in row_styles]
+
         table = message_config.create_table(
             'enrollments',
             get_enrollment_headers(donnes_email.langue_email),
             {
-                "style": [],
-                "data": cls._format_lignes_table(donnes_email.notes, donnes_email.signaletiques_etudiant_par_noma),
+                "style": row_styles,
+                "data": rows,
                 "txt_complementary_first_col": {
                     "header": _get_txt_complementary_first_col_header(donnes_email.langue_email),
-                    "rows_content": []
+                    "rows_content": txt_complementary_rows_content
                 }
             },
             data_translatable=['Justification'],
@@ -146,6 +149,24 @@ class NotifierEncodageNotes(INotifierEncodageNotes):
 
         )
         send_message.send_messages(message_content)
+
+    @classmethod
+    def _get_row_style(
+            cls,
+            row: Tuple,
+            code_unite_enseignment: str,
+            notes_nouvellement_encodees: List['IdentiteNoteEtudiant'],
+            encodage_etait_complet: bool
+
+    ) -> str:
+        if not encodage_etait_complet:
+            return 'background-color: lime;'
+        est_une_note_nouvellement_encodee = any(
+            note
+            for note in notes_nouvellement_encodees
+            if (note.code_unite_enseignement, note.noma) == (code_unite_enseignment, row[2])
+        )
+        return 'background-color: lime;' if est_une_note_nouvellement_encodee else ''
 
     @classmethod
     def _format_lignes_table(
@@ -171,6 +192,7 @@ class NotifierEncodageNotes(INotifierEncodageNotes):
     def _get_donnees_email(
             cls,
             identites_notes_encodees: List['IdentiteNoteEtudiant'],
+            cohortes_non_entierement_encodees_avant_encodage: List[Tuple[str, str]],
             gestionnaire_parcours: 'GestionnaireParcours',
             note_etudiant_repository: 'INoteEtudiantRepository',
             attribution_enseignant_translator: 'IAttributionEnseignantTranslator',
@@ -217,12 +239,16 @@ class NotifierEncodageNotes(INotifierEncodageNotes):
                 key=lambda note: note.nom_cohorte
             )
             for nom_cohorte, notes_pour_meme_cohorte in notes_groupes_par_cohorte.items():
+                if not cls._doit_notifier_encodage_pour_la_cohorte(notes_pour_meme_cohorte, identites_notes_encodees):
+                    continue
                 adresse_feuille_de_notes = cls._get_adresse_feuille_de_notes(
                     nom_cohorte,
                     adresse_feuille_de_notes_repository
                 )
                 for langue, ensemble_de_signaletiques in signaletiques_enseignants_groupes_par_langue.items():
                     email_destinataire = [signaletique.email for signaletique in ensemble_de_signaletiques]
+                    encodage_complet_avant = (code_unite_enseignement, nom_cohorte) \
+                        in cohortes_non_entierement_encodees_avant_encodage
                     result.append(
                         DonneesEmail(
                             code_unite_enseignement=code_unite_enseignement,
@@ -234,6 +260,7 @@ class NotifierEncodageNotes(INotifierEncodageNotes):
                             signaletiques_etudiant_par_noma=signaletiques_etudiants_par_noma,
                             email_gestionnaire=email_gestionnaire,
                             adresse_feuille_de_notes=adresse_feuille_de_notes,
+                            encodage_complet_avant_encodage=encodage_complet_avant
                         )
                     )
         return result
@@ -286,6 +313,20 @@ class NotifierEncodageNotes(INotifierEncodageNotes):
             return adresse_feuille_de_notes_repository.get(identite_adresse_feuille_de_notes)
         except IndexError:
             return None
+
+    @classmethod
+    def _doit_notifier_encodage_pour_la_cohorte(
+            cls,
+            notes_de_la_cohorte: List['NoteEtudiant'],
+            identites_notes_encodees: List['IdentiteNoteEtudiant']
+    ) -> bool:
+        a_une_note_nouvellement_encodee = any(
+            note for note in notes_de_la_cohorte if note.entity_id in identites_notes_encodees
+        )
+        notes_de_la_cohorte_sont_toutes_encodees = all(
+            not note.is_manquant for note in notes_de_la_cohorte
+        )
+        return a_une_note_nouvellement_encodee and notes_de_la_cohorte_sont_toutes_encodees
 
     @classmethod
     def a_une_note_encodee(
