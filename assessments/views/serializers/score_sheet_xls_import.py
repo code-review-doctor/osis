@@ -113,7 +113,10 @@ class ScoreSheetXLSImportSerializer(serializers.Serializer):
         return filter(self.__is_student_score_row, worksheet.rows)
 
     def __convert_to_integer(self, raw_cell_value) -> int:
-        return int(raw_cell_value) if isinstance(raw_cell_value, str) and raw_cell_value.isdigit() else raw_cell_value
+        try:
+            return int(raw_cell_value)
+        except (ValueError, TypeError,):
+            return raw_cell_value
 
     def get_notes_etudiants(self, worksheet: Worksheet):
         notes_etudiants = []
