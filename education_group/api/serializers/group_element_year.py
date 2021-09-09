@@ -178,6 +178,10 @@ class LearningUnitNodeTreeSerializer(CommonNodeTreeSerializer):
     code = serializers.CharField(source='child.code', read_only=True)
     remark = serializers.CharField(source='child.other_remark', read_only=True)
     remark_en = serializers.CharField(source='child.other_remark_english', read_only=True)
+    language = serializers.CharField(source='child.language_code', read_only=True)
+    exchange_students = serializers.BooleanField(source='child.exchange_students', read_only=True)
+    french_friendly = serializers.BooleanField(source='child.french_friendly', read_only=True)
+    english_friendly = serializers.BooleanField(source='child.english_friendly', read_only=True)
     lecturing_volume = VolumeField(
         source='child.volume_total_lecturing',
         max_digits=6,

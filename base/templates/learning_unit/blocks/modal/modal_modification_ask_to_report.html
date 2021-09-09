@@ -44,7 +44,7 @@
 
 <script>
     function __submitModification(val) {
-        let form = $('form');
+        let form = $('.learningUnitForm');
         let input = $("<input>").attr("type", "hidden").attr("name", "postponement").val(val);
         form.append($(input));
         $('#modalReport').modal('hide');

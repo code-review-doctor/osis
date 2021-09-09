@@ -1,5 +1,5 @@
 # SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# Copyright (C) 2015-2021 THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
@@ -371,9 +371,6 @@ msgstr ""
 "Etes-vous certain de vouloir supprimer définitivement cette unité "
 "d'enseignement ?"
 
-msgid "Are you sure you want to delete the achievement?"
-msgstr "Êtes-vous sûr·e de vouloir supprimer l'acquis d'apprentissage ?"
-
 msgid "Are you sure you want to delete the teaching material?"
 msgstr "Êtes-vous sûr·e de vouloir supprimer le support de cours ?"
 
@@ -720,6 +717,13 @@ msgstr "Informations par défaut"
 msgid "Default learning unit enrollment"
 msgstr "Inscription par défaut aux cours"
 
+msgid "Delete"
+msgstr "Supprimer"
+
+msgctxt "learning_unit_achievement_delete"
+msgid "Delete achievement"
+msgstr "Supprimer l'acquis d'apprentissage"
+
 msgid "Delete learning unit year definitively"
 msgstr "Supprimer l'UE définitivement"
 
@@ -823,6 +827,14 @@ msgstr "Documentation"
 msgid "Down"
 msgstr "Descendre"
 
+msgid ""
+"Due to a pending change in OSIS, student counters for 1BA, 11BA and learning units containing classes could be "
+"distorted(abnormally high). For accurate statistics, please consult the EPC statistics."
+msgstr ""
+"Suite à un changement en cours d'implémentation dans OSIS, les compteurs relatifs aux étudiants de 1BA, 11BA et aux "
+"cours qui contiennent des classes pourraient être faussés (anormalement élevés). Pour une statistique précise, "
+"veuillez consulter les statistiques d'EPC."
+
 msgid "Duration"
 msgstr "Durée"
 
@@ -914,6 +926,9 @@ msgstr "Intitulé propre en anglais"
 msgid "English title specific complement"
 msgstr "Intitulé en EN compl. spéc. à l'UE"
 
+msgid "English-friendly"
+msgstr "English-friendly"
+
 msgid "Enrolled"
 msgstr "Inscrit"
 
@@ -1004,6 +1019,9 @@ msgstr "Inscription aux examens"
 
 msgid "Exceptional procedure"
 msgstr "Procédure exceptionnelle"
+
+msgid "Exchange students"
+msgstr "Etudiants d'échange"
 
 msgid "Execute"
 msgstr "Exécuter"
@@ -1116,6 +1134,9 @@ msgstr "Français"
 
 msgid "French title proper"
 msgstr "Intitulé propre en français"
+
+msgid "French-friendly"
+msgstr "French-friendly"
 
 msgid "From"
 msgstr "De"
@@ -1233,6 +1254,44 @@ msgstr "Inactif"
 
 msgid "Include subordinate entities"
 msgstr "Inclure les entités subordonnées"
+
+msgid ""
+"Indicates if the UE can be accessible for a student, even if the UE is not "
+"included in the detailed program of his training"
+msgstr ""
+"Indique si l'UE peut être accessible pour un étudiant, même si l'UE ne "
+"figure pas dans le programme détaillé de sa formation"
+
+msgid ""
+"Indicates if the UE includes an internship, so that students enrolled in "
+"this UE must be declared to the DIMONA"
+msgstr ""
+"Indique si l'UE comprend un stage, de sorte que les étudiants inscrits à "
+"cette UE doivent être déclarés à la DIMONA."
+
+msgid "Indicates if this UE is accessible to exchange students"
+msgstr "Indique si cette UE est accessible aux étudiants d'échange."
+
+msgid ""
+"Indicates, for the UE whose language of instruction is not French, if this "
+"UE is nevertheless accessible to French speaking students. If the language "
+"of instruction is French, the value of this field must be 'no'"
+msgstr ""
+"Indique, pour les UE dont la langue d'enseignement n'est pas le français, si "
+"cette UE est cependant accessible aux étudiants parlant français. Si la "
+"langue d'enseignement est le français, la valeur de ce champ doit être 'non'"
+
+msgid ""
+"Indicates, for the UE whose teaching language is not English, if this UE is "
+"however accessible to English speaking students. If the language of "
+"instruction is English, the value of this field must be 'no'"
+msgstr ""
+"Indique, pour les UE dont la langue d'enseignement n'est pas l'anglais, si "
+"cette UE est cependant accessible aux étudiants parlant anglais. Si la "
+"langue d'enseignement est l'anglais, la valeur de ce champ doit être 'non'"
+
+msgid "Individual loan"
+msgstr "Emprunt individuel"
 
 msgid "Initial data"
 msgstr "Valeur initiale"
@@ -2817,6 +2876,9 @@ msgstr "Cette action annulera définitivement la proposition"
 msgid "This action will permanently cancel the selected proposal(s)"
 msgstr ""
 "Cette action annulera définitivement la (les) proposition(s) sélectionnée(s)"
+
+msgid "This action will permanently delete the achievement"
+msgstr "Cette action supprimera définitivement l'acquis d'apprentissage"
 
 msgid "This code already exists for this learning unit"
 msgstr "Ce code existe déja pour cette unité d'enseignement"

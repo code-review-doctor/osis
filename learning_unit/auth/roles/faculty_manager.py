@@ -151,11 +151,16 @@ class FacultyManager(osis_role_models.EntityRoleModel):
             'learning_unit.view_learningclassyear': rules.always_allow,
             'learning_unit.change_learningclassyear':
                 predicates.is_user_attached_to_learning_unit_current_requirement_entity &
-                predicates.is_learning_class_year_older_or_equals_than_limit_settings_year,
+                predicates.is_learning_class_year_older_or_equals_than_limit_settings_year &
+                predicates.is_learning_unit_of_class_edition_for_faculty_manager_period_open,
             'attribution.can_change_class_repartition':
                 predicates.is_effective_class_edition_for_faculty_manager_period_open &
                 predicates.is_user_attached_to_learning_unit_current_requirement_entity,
             'attribution.can_delete_class_repartition':
                 predicates.is_effective_class_edition_for_faculty_manager_period_open &
                 predicates.is_user_attached_to_learning_unit_current_requirement_entity,
+            'learning_unit.delete_learningclassyear':
+                predicates.is_user_attached_to_learning_unit_current_requirement_entity &
+                predicates.is_learning_class_year_older_or_equals_than_limit_settings_year &
+                predicates.is_learning_unit_of_class_edition_for_faculty_manager_period_open,
         })
