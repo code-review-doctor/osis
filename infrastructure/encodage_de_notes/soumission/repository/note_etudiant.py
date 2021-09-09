@@ -30,7 +30,7 @@ from typing import Optional, List
 from django.db import connection
 from django.db.models import F, Case, CharField, Value, When, BooleanField, ExpressionWrapper, DateField, Q, OuterRef, \
     Subquery
-from django.db.models.functions import Coalesce, Cast, Concat
+from django.db.models.functions import Coalesce, Cast, Concat, Replace
 
 from base.models.exam_enrollment import ExamEnrollment
 from base.models.session_exam_deadline import SessionExamDeadline
@@ -39,6 +39,7 @@ from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import N
 from ddd.logic.encodage_des_notes.soumission.dtos import NoteEtudiantFromRepositoryDTO, \
     DateEcheanceNoteDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_note_etudiant import INoteEtudiantRepository, SearchCriteria
+from education_group.models.enums.cohort_name import CohortName
 from osis_common.ddd.interface import ApplicationService
 
 
@@ -74,7 +75,7 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
                 code_unite_enseignement=row.acronym,
                 annee_academique=row.year,
                 credits_unite_enseignement=row.credits_unite_enseignement,
-                nom_cohorte=row.acronym
+                nom_cohorte=row.nom_cohorte
             )
             result.append(NoteEtudiantBuilder.build_from_repository_dto(dto_object))
         return result
@@ -287,10 +288,23 @@ def _fetch_session_exams():
             subqs_deadline[:1],
             output_field=DateField()
         ),
+        nom_cohorte=Case(
+            When(
+                learning_unit_enrollment__offer_enrollment__cohort_year__name=CohortName.FIRST_YEAR.name,
+                then=Replace(
+                    'learning_unit_enrollment__offer_enrollment__education_group_year__acronym',
+                    Value('1BA'),
+                    Value('11BA')
+                )
+            ),
+            default=F('learning_unit_enrollment__offer_enrollment__education_group_year__acronym'),
+            output_field=CharField()
+        ),
     ).values_list(
         'acronym',
         'year',
         'number_session',
+        'nom_cohorte',
         'credits_unite_enseignement',
         'noma',
         'email',
