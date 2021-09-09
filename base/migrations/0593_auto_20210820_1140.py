@@ -23,7 +23,7 @@ def initialize_sex_and_edit_gender_values(apps, schema_editor):
 class Migration(migrations.Migration):
     dependencies = [
         ('reference', '0008_zipcode'),
-        ('base', '0591_remove_organization_code'),
+        ('base', '0592_auto_20210812_1142'),
     ]
 
     operations = [
