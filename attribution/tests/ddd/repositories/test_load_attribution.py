@@ -94,7 +94,7 @@ class TestLoadAttribution(TestCase):
         self.assertEqual(attributions[1].learning_unit_year.year, self.l_unit_1_identity.year)
         self.assertEqual(teacher_attribution.last_name, "Marchal")
         self.assertEqual(teacher_attribution.first_name, "Tilia")
-        self.assertIsNone(teacher_attribution.middle_name)
+        self.assertEqual(teacher_attribution.middle_name, '')
         self.assertEqual(teacher_attribution.email, "tilia@gmail.com")
 
 
