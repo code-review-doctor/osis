@@ -17,6 +17,7 @@ def initialize_sex_and_edit_gender_values(apps, schema_editor):
                 person.gender = 'H'
         else:
             person.gender = 'X'
+            person.sex = ''
     Person.objects.bulk_update(persons_to_update, ['sex', 'gender'], batch_size=1000)
 
 
