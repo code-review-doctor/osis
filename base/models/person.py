@@ -1,4 +1,3 @@
-
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -27,18 +26,22 @@ from datetime import date
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models import Q
 from django.db.models import Value
 from django.db.models.functions import Concat, Lower
 from django.utils.functional import cached_property
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, pgettext_lazy
 
 from base.models.enums import person_source_type
 from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP, SIC_GROUP, \
     UE_FACULTY_MANAGER_GROUP, ADMINISTRATIVE_MANAGER_GROUP, PROGRAM_MANAGER_GROUP, UE_CENTRAL_MANAGER_GROUP
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin, SerializableModelManager
 from osis_common.utils.models import get_object_or_none
+from osis_document.contrib import FileField
+
+FILE_MAX_SIZE = None  # TODO : ??
 
 
 class PersonAdmin(SerializableModelAdmin):
@@ -55,26 +58,81 @@ class EmployeeManager(SerializableModelManager):
 
 class Person(SerializableModel):
     GENDER_CHOICES = (
+        ('F', pgettext_lazy("female gender", "Female")),
+        ('H', pgettext_lazy("gender male", "Male")),
+        ('X', _('Other'))
+    )
+    SEX_CHOICES = (
         ('F', _('Female')),
-        ('M', _('Male')),
-        ('U', _('unknown')))
+        ('M', _('Male'))
+    )
+    YEAR_REGEX = RegexValidator(
+        regex=r'^[1-2]\d{3}$',
+        message=_('Birth year must be between 1000 and 2999'),
+        code='invalid_birth_year'
+    )
 
     objects = SerializableModelManager()
     employees = EmployeeManager()
 
-    external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
+    external_id = models.CharField(max_length=100, blank=True, default='', db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     user = models.OneToOneField(User, on_delete=models.SET_NULL, blank=True, null=True)
-    global_id = models.CharField(max_length=10, blank=True, null=True, db_index=True)
-    gender = models.CharField(max_length=1, blank=True, null=True, choices=GENDER_CHOICES, default='U')
-    first_name = models.CharField(max_length=50, blank=True, null=True, db_index=True)
-    middle_name = models.CharField(max_length=50, blank=True, null=True)
-    last_name = models.CharField(max_length=50, blank=True, null=True, db_index=True)
+    global_id = models.CharField(max_length=10, blank=True, default='', db_index=True)
+    gender = models.CharField(max_length=1, blank=True, default='', choices=GENDER_CHOICES)
+
+    first_name = models.CharField(max_length=50, blank=True, default='', db_index=True)
+    middle_name = models.CharField(max_length=50, blank=True, default='')
+    last_name = models.CharField(max_length=50, blank=True, default='', db_index=True)
     email = models.EmailField(max_length=255, default='')
-    phone = models.CharField(max_length=30, blank=True, null=True)
-    phone_mobile = models.CharField(max_length=30, blank=True, null=True)
+    phone = models.CharField(max_length=30, blank=True, default='')
+    phone_mobile = models.CharField(max_length=30, blank=True, default='')
     language = models.CharField(max_length=30, null=True, choices=settings.LANGUAGES, default=settings.LANGUAGE_CODE)
     birth_date = models.DateField(blank=True, null=True)
+
+    sex = models.CharField(max_length=1, blank=True, default='', choices=SEX_CHOICES)
+    first_name_in_use = models.CharField(max_length=50, default='')
+    birth_year = models.IntegerField(blank=True, null=True, validators=[YEAR_REGEX])
+    birth_country = models.ForeignKey(
+        'reference.Country',
+        blank=True, null=True,
+        verbose_name=_('Birth country'),
+        on_delete=models.PROTECT,
+        related_name='birth_persons'
+    )
+    birth_place = models.CharField(max_length=255, default='')
+    country_of_citizenship = models.ForeignKey(
+        'reference.Country', verbose_name=_('Country of citizenship'), on_delete=models.PROTECT, blank=True, null=True
+    )
+    id_card = FileField(
+        mimetypes=['image/jpeg', 'image/png', 'application/pdf'],
+        max_size=FILE_MAX_SIZE,
+        max_files=2,
+        min_files=1,
+    )
+    passport = FileField(
+        mimetypes=['image/jpeg', 'image/png', 'application/pdf'],
+        max_size=FILE_MAX_SIZE,
+        max_files=2,
+        min_files=1,
+    )
+    last_registration_year = models.ForeignKey(
+        'base.AcademicYear',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+    national_number = models.CharField(max_length=255, default='')
+    id_card_number = models.CharField(max_length=255, default='')
+    passport_number = models.CharField(max_length=255, default='')
+    passport_expiration_date = models.DateField(null=True)
+    id_photo = FileField(
+        mimetypes=['image/jpeg', 'image/png'],
+        max_size=FILE_MAX_SIZE,
+        max_files=1,
+        min_files=1,
+    )
+
     source = models.CharField(max_length=25, blank=True, null=True, choices=person_source_type.CHOICES,
                               default=person_source_type.BASE)
     employee = models.BooleanField(default=False)
@@ -101,8 +159,7 @@ class Person(SerializableModel):
             return self.first_name
         elif self.user:
             return self.user.first_name
-        else:
-            return "-"
+        return "-"
 
     @cached_property
     def is_central_manager(self):
