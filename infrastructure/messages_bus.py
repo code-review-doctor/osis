@@ -69,13 +69,13 @@ from ddd.logic.encodage_des_notes.encodage.use_case.read.get_progression_general
     get_progression_generale_gestionnaire
 from ddd.logic.encodage_des_notes.encodage.use_case.read.rechercher_notes_service import rechercher_notes
 from ddd.logic.encodage_des_notes.encodage.use_case.write.encoder_notes_service import encoder_notes
-from ddd.logic.encodage_des_notes.soumission.commands import EncoderNoteCommand, SoumettreNoteCommand, \
-    GetAdresseFeuilleDeNotesServiceCommand, GetChoixEntitesAdresseFeuilleDeNotesCommand, \
-    EncoderAdresseFeuilleDeNotesSpecifique, EncoderAdresseEntiteCommeAdresseFeuilleDeNotes, \
-    EcraserAdresseFeuilleDeNotesPremiereAnneeDeBachelier, GetResponsableDeNotesCommand
 from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand, GetProgressionGeneraleCommand, \
     AssignerResponsableDeNotesCommand, \
     SearchAdressesFeuilleDeNotesCommand
+from ddd.logic.encodage_des_notes.soumission.commands import SoumettreNoteCommand, \
+    GetAdresseFeuilleDeNotesServiceCommand, GetChoixEntitesAdresseFeuilleDeNotesCommand, \
+    EncoderAdresseFeuilleDeNotesSpecifique, EncoderAdresseEntiteCommeAdresseFeuilleDeNotes, \
+    EcraserAdresseFeuilleDeNotesPremiereAnneeDeBachelier, GetResponsableDeNotesCommand, EncoderNotesEtudiantCommand
 from ddd.logic.encodage_des_notes.soumission.use_case.read.get_addresse_feuille_de_notes_service import \
     get_adresse_feuille_de_notes
 from ddd.logic.encodage_des_notes.soumission.use_case.read.get_choix_entites_adresse_feuille_de_notes_service import \
@@ -83,22 +83,22 @@ from ddd.logic.encodage_des_notes.soumission.use_case.read.get_choix_entites_adr
 from ddd.logic.encodage_des_notes.soumission.use_case.read.get_feuille_de_notes_service import get_feuille_de_notes
 from ddd.logic.encodage_des_notes.soumission.use_case.read.get_progression_generale_encodage_service import \
     get_progression_generale
-from ddd.logic.encodage_des_notes.soumission.use_case.read.get_responsable_de_notes_service import get_responsable_de_notes
+from ddd.logic.encodage_des_notes.soumission.use_case.read.get_responsable_de_notes_service import \
+    get_responsable_de_notes
 from ddd.logic.encodage_des_notes.soumission.use_case.read.search_donnees_administratives_feuille_de_notes_service \
     import \
     search_donnees_administratives_feuille_de_notes
 from ddd.logic.encodage_des_notes.soumission.use_case.write.assigner_responsable_de_notes_service import \
     assigner_responsable_de_notes
-from ddd.logic.encodage_des_notes.soumission.use_case.write\
+from ddd.logic.encodage_des_notes.soumission.use_case.write \
     .ecraser_adresse_feuille_de_note_premiere_annee_de_bachelier_par_adresse_du_bachelier_service import \
     ecraser_adresse_feuille_de_note_premiere_annee_de_bachelier_par_adresse_du_bachelier
-from ddd.logic.encodage_des_notes.soumission.use_case.write.encode_note_etudiant_service import \
-    encoder_note_etudiant
 from ddd.logic.encodage_des_notes.soumission.use_case.write \
     .encoder_adresse_entite_comme_adresse_feuille_de_notes_service import \
     encoder_adresse_entite_comme_adresse_feuille_de_notes
 from ddd.logic.encodage_des_notes.soumission.use_case.write.encoder_adresse_feuille_de_notes_specifique_service import \
     encoder_adresse_feuille_de_notes_specifique
+from ddd.logic.encodage_des_notes.soumission.use_case.write.encoder_notes_etudiant_service import encoder_notes_etudiant
 from ddd.logic.encodage_des_notes.soumission.use_case.write.soumettre_note_etudiant_service import \
     soumettre_note_etudiant
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, GetLearningUnitCommand, \
@@ -289,7 +289,7 @@ class MessageBus:
             AttributionEnseignantTranslator(),
             UniteEnseignementTranslator(),
         ),
-        EncoderNoteCommand: lambda cmd: encoder_note_etudiant(
+        EncoderNotesEtudiantCommand: lambda cmd: encoder_notes_etudiant(
             cmd,
             NoteEtudiantRepository(),
             PeriodeEncodageNotesTranslator(),
