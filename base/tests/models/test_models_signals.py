@@ -96,7 +96,7 @@ class CreateUpdatePerson(TestCase):
             'USER_FGS': '7777777',
         }
         user = get_or_create_user(user_infos)
-        person = get_or_create_person(None, 'first_name_2', None)
+        person = get_or_create_person(None, 'first_name_2')
         person = mdl_signals._create_update_person(user, person, user_infos)
         self.assertEqual(person.user, user)
         self.assertEqual(person.global_id, user_infos.get('USER_FGS'))
