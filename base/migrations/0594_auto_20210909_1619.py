@@ -21,14 +21,4 @@ class Migration(migrations.Migration):
             name='phone_mobile',
             field=models.CharField(blank=True, default='', max_length=30),
         ),
-        migrations.AlterField(
-            model_name='person',
-            name='phone',
-            field=models.CharField(blank=True, default='', max_length=30),
-        ),
-        migrations.AlterField(
-            model_name='person',
-            name='middle_name',
-            field=models.CharField(blank=True, default='', max_length=50),
-        ),
     ]
