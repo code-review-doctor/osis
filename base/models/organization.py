@@ -128,10 +128,10 @@ class Organization(SerializableModel):
         return None
 
     def __get_current_root_entity_version(self) -> EntityVersion:
-        return EntityVersion.objects.current(datetime.now()).filter(entity__organization=self.pk).only_roots()\
+        return EntityVersion.objects.current(datetime.now()).filter(entity__organization=self.pk).only_roots() \
             .prefetch_related(
-                Prefetch(
-                    'entityversionaddress_set',
-                    queryset=EntityVersionAddress.objects.all().select_related('country')
-                )
-            ).order_by('-start_date').first()
+            Prefetch(
+                'entityversionaddress_set',
+                queryset=EntityVersionAddress.objects.all().select_related('country')
+            )
+        ).order_by('-start_date').first()

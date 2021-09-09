@@ -30,7 +30,8 @@ from django.views.generic import TemplateView
 
 from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmissionCalendar
 from base.views.mixins import AjaxTemplateMixin
-from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand, SoumettreNoteCommand
+from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand, SoumettreNoteCommand, \
+    SoumettreNotesCommand
 from infrastructure.messages_bus import message_bus_instance
 from osis_role.contrib.views import AjaxPermissionRequiredMixin
 
@@ -54,15 +55,17 @@ class LearningUnitScoreEncodingTutorSubmitView(AjaxPermissionRequiredMixin, Ajax
         return super().dispatch(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        for note in self.feuille_de_notes.get_notes_en_attente_de_soumission():
-            cmd = SoumettreNoteCommand(
-                code_unite_enseignement=self.feuille_de_notes.code_unite_enseignement,
-                annee_unite_enseignement=self.feuille_de_notes.annee_academique,
-                numero_session=self.feuille_de_notes.numero_session,
-                noma_etudiant=note.noma,
-                matricule_fgs_enseignant=self.person.global_id,
-            )
-            message_bus_instance.invoke(cmd)
+        cmd = SoumettreNotesCommand(
+            matricule_fgs_enseignant=self.person.global_id,
+            code_unite_enseignement=self.feuille_de_notes.code_unite_enseignement,
+            annee_unite_enseignement=self.feuille_de_notes.annee_academique,
+            numero_session=self.feuille_de_notes.numero_session,
+            notes=[
+                SoumettreNoteCommand(noma_etudiant=note.noma)
+                for note in self.feuille_de_notes.get_notes_en_attente_de_soumission()
+            ]
+        )
+        message_bus_instance.invoke(cmd)
         return self._ajax_response()
 
     def get_success_url(self):

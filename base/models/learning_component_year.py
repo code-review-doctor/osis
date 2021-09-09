@@ -40,9 +40,11 @@ from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY
 
 
 class LearningComponentYearAdmin(VersionAdmin):
-    list_display = ('learning_unit_year', 'acronym', 'type', 'comment', 'changed')
+    list_display = ('learning_unit_year', 'acronym', 'type', 'comment', 'changed', 'hourly_volume_total_annual')
     search_fields = ['acronym', 'learning_unit_year__acronym']
-    list_filter = ('learning_unit_year__academic_year',)
+    list_filter = ('learning_unit_year__academic_year', 'type')
+
+    raw_id_fields = ('learning_unit_year',)
 
 
 class RepartitionVolumeField(models.DecimalField):

@@ -45,4 +45,5 @@ class NoteEtudiantBuilder(interface.RootEntityBuilder):
             email=dto_object.email,
             est_soumise=dto_object.est_soumise,
             note=NoteBuilder.build(dto_object.note),
+            nom_cohorte=dto_object.nom_cohorte
         )

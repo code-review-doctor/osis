@@ -45,7 +45,8 @@ class ScoreSheetXLSSerializerTest(SimpleTestCase):
             contact_responsable_notes=DetailContactDTO(
                 matricule_fgs="987654321",
                 email="thomas.durant@email.be",
-                adresse_professionnelle=None
+                adresse_professionnelle=None,
+                langue="fr-be"
             ),
             autres_enseignants=[],
             annee_academique=2021,

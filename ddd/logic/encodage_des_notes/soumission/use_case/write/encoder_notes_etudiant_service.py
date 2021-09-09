@@ -23,42 +23,44 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
+
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_attribution_enseignant import \
+    IAttributionEnseignantTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodage_notes import \
     IPeriodeEncodageNotesTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.domain.service.periode_encodage_ouverte import PeriodeEncodageOuverte
-from ddd.logic.encodage_des_notes.soumission.builder.note_etudiant_identity_builder import NoteEtudiantIdentityBuilder
-from ddd.logic.encodage_des_notes.soumission.commands import SoumettreNoteCommand
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.periode_encodage_ouverte import \
+    PeriodeEncodageOuverte
+from ddd.logic.encodage_des_notes.soumission.commands import EncoderNotesEtudiantCommand
 from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import IdentiteNoteEtudiant
-from ddd.logic.encodage_des_notes.soumission.domain.service.responsable_de_notes import ResponsableDeNotes
+from ddd.logic.encodage_des_notes.soumission.domain.service.encoder_notes_en_lot import EncoderNotesEtudiantEnLot
+from ddd.logic.encodage_des_notes.soumission.domain.service.enseignant_attribue_unite_enseignement import \
+    EnseignantAttribueUniteEnseignement
 from ddd.logic.encodage_des_notes.soumission.repository.i_note_etudiant import INoteEtudiantRepository
-from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
 
 
-def soumettre_note_etudiant(
-        cmd: 'SoumettreNoteCommand',
+def encoder_notes_etudiant(
+        cmd: 'EncoderNotesEtudiantCommand',
         note_etudiant_repo: 'INoteEtudiantRepository',
-        responsable_notes_repo: 'IResponsableDeNotesRepository',
         periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
-) -> 'IdentiteNoteEtudiant':
+        attribution_translator: 'IAttributionEnseignantTranslator'
+) -> List['IdentiteNoteEtudiant']:
     # Given
-    PeriodeEncodageOuverte().verifier(
-        periode_soumission_note_translator,
-    )
-    note_etudiant_identity = NoteEtudiantIdentityBuilder.build_from_command(cmd)
-    note = note_etudiant_repo.get(note_etudiant_identity)
-
-    ResponsableDeNotes().verifier(
+    PeriodeEncodageOuverte().verifier(periode_soumission_note_translator)
+    EnseignantAttribueUniteEnseignement().verifier(
+        cmd.code_unite_enseignement,
+        cmd.annee_unite_enseignement,
         cmd.matricule_fgs_enseignant,
-        note.code_unite_enseignement,
-        note.annee,
-        responsable_notes_repo
+        attribution_translator
     )
 
     # When
-    note.soumettre()
+    identites_notes_encodees = EncoderNotesEtudiantEnLot().execute(
+        cmd,
+        note_etudiant_repo,
+    )
 
     # Then
-    note_etudiant_repo.save(note)
-    # Historiser (DomainService)
+    # TODO :: Historiser (DomainService) ?
 
-    return note_etudiant_identity
+    return identites_notes_encodees

@@ -1,4 +1,3 @@
-##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -15,7 +14,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,40 +22,29 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Set
+from typing import List
 
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_attribution_enseignant import \
+    IAttributionEnseignantTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_etudiant import \
+    ISignaletiqueEtudiantTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_personne import \
     ISignaletiquePersonneTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.dtos import DetailContactDTO, AdresseDTO
+from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import IdentiteNoteEtudiant
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_notifier_soumission_notes import INotifierSoumissionNotes
+from ddd.logic.encodage_des_notes.soumission.repository.i_note_etudiant import INoteEtudiantRepository
 
 
-class SignaletiquePersonneTranslatorInMemory(ISignaletiquePersonneTranslator):
-
-    signaletiques = {
-        DetailContactDTO(
-            matricule_fgs='00321234',
-            email='charles.smith@email.com',
-            adresse_professionnelle=AdresseDTO(
-                code_postal='1410',
-                ville='Waterloo',
-                rue_numero_boite='Rue de Waterloo, 123',
-            ),
-            langue="fr-be"
-        ),
-    }
+class InMemoryNotifierSoumissionNotes(INotifierSoumissionNotes):
+    appels = []
 
     @classmethod
-    def search(
+    def notifier(
             cls,
-            matricules_fgs: Set[str]
-    ) -> Set['DetailContactDTO']:
-        return set(
-            filter(
-                lambda dto: _filter(dto, matricules_fgs),
-                cls.signaletiques,
-            )
-        )
-
-
-def _filter(dto, matricules_fgs):
-    return dto.matricule_fgs in matricules_fgs
+            identites_notes_soumises: List['IdentiteNoteEtudiant'],
+            note_etudiant_repo: 'INoteEtudiantRepository',
+            attribution_enseignant_translator: 'IAttributionEnseignantTranslator',
+            signaletique_personne_translator: 'ISignaletiquePersonneTranslator',
+            signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
+    ) -> None:
+        cls.appels.append(locals())

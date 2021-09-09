@@ -48,6 +48,7 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
     def search(
             cls,
             entity_ids: Optional[List['IdentiteNoteEtudiant']] = None,
+            codes_unite_enseignement: List[str] = None,
             noms_cohortes: List[str] = None,
             annee_academique: int = None,
             numero_session: int = None,
@@ -59,6 +60,7 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
         filter_qs = cls._build_filter(
             entity_ids=entity_ids,
             noms_cohortes=noms_cohortes,
+            codes_unite_enseignement=codes_unite_enseignement,
             annee_academique=annee_academique,
             numero_session=numero_session,
             nomas=nomas,
@@ -95,6 +97,7 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
             numero_session: int = None,
             nomas: List[str] = None,
             code_unite_enseignement: str = None,
+            codes_unite_enseignement: List[str] = None,
             note_manquante: bool = False,
             justification: JustificationTypes = None,
     ) -> List[Q]:
@@ -141,6 +144,10 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
         if code_unite_enseignement:
             result.append(
                 Q(code_unite_enseignement__icontains=code_unite_enseignement)
+            )
+        if codes_unite_enseignement:
+            result.append(
+                Q(code_unite_enseignement__in=codes_unite_enseignement)
             )
         return result
 

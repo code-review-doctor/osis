@@ -70,6 +70,7 @@ class NoteManquanteEtudiantFactory(factory.Factory):
 
     entity_id = factory.SubFactory(_IdentiteNoteEtudiantFactory)
     note = NoteManquante()
+    nom_cohorte = "DROI1BA"
     email = factory.Faker('email')
     date_limite_de_remise = DateDTO.build_from_date(datetime.date.today())
     credits_unite_enseignement = CREDITS_MIN_POUR_NOTE_DECIMALE - 5.0  # Non autorisé par défaut
