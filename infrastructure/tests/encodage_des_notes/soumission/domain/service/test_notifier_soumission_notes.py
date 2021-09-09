@@ -42,7 +42,7 @@ class TestNotifierEncodageNotes(TestCase):
     def setUp(self):
         self.note_etudiant_repo = NoteEtudiantInMemoryRepository()
         self.note_etudiant_repo.entities.clear()
-        self.addClassCleanup(self.note_etudiant_repo.entities.clear)
+        self.addCleanup(self.note_etudiant_repo.entities.clear)
 
         self.attribution_translator = AttributionEnseignantTranslatorInMemory()
         self.signaletique_personne_repo = SignaletiquePersonneTranslatorInMemory()

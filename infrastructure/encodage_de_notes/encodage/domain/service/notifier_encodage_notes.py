@@ -237,7 +237,8 @@ class NotifierEncodageNotes(INotifierEncodageNotes):
         )
 
         result = []
-        for code_unite_enseignement, notes_pour_meme_unite_enseignement in notes_groupees_par_code_unite_enseignement.items():
+        for code_unite_enseignement, notes_pour_meme_unite_enseignement in notes_groupees_par_code_unite_enseignement.\
+                items():
             signaletiques_enseignants = cls._search_signaletiques_enseignants_attribuee_unite_enseignement(
                 code_unite_enseignement,
                 annee_academique,
