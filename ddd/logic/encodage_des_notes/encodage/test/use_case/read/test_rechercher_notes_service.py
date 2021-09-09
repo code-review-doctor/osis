@@ -35,10 +35,14 @@ from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import 
 from infrastructure.encodage_de_notes.encodage.domain.service.in_memory.cohortes_du_gestionnaire import \
     CohortesDuGestionnaireInMemory
 from infrastructure.encodage_de_notes.encodage.repository.in_memory.note_etudiant import NoteEtudiantInMemoryRepository
+from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.inscription_examen import \
+    InscriptionExamenTranslatorInMemory
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.periode_encodage_notes import \
     PeriodeEncodageNotesTranslatorInMemory
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.signaletique_etudiant import \
     SignaletiqueEtudiantTranslatorInMemory
+from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.unite_enseignement import \
+    UniteEnseignementTranslatorInMemory
 from infrastructure.messages_bus import message_bus_instance
 
 
@@ -63,6 +67,8 @@ class TestRechercherNotes(SimpleTestCase):
         self.periode_translator = PeriodeEncodageNotesTranslatorInMemory()
         self.cohorte_gestionnaire_translator = CohortesDuGestionnaireInMemory()
         self.signaletique_etudiant_translator = SignaletiqueEtudiantTranslatorInMemory()
+        self.unite_enseignement_translator = UniteEnseignementTranslatorInMemory()
+        self.inscription_examen_translator = InscriptionExamenTranslatorInMemory()
         self.__mock_service_bus()
 
     def __mock_service_bus(self):
@@ -72,6 +78,8 @@ class TestRechercherNotes(SimpleTestCase):
             NoteEtudiantGestionnaireRepository=lambda: self.note_etudiant_repo,
             CohortesDuGestionnaireTranslator=lambda: self.cohorte_gestionnaire_translator,
             SignaletiqueEtudiantTranslator=lambda: self.signaletique_etudiant_translator,
+            UniteEnseignementTranslator=lambda: self.unite_enseignement_translator,
+            InscriptionExamenTranslator=lambda: self.inscription_examen_translator
         )
         message_bus_patcher.start()
         self.addCleanup(message_bus_patcher.stop)
@@ -107,7 +115,7 @@ class TestRechercherNotes(SimpleTestCase):
 
         self.assertSetEqual(
             {note_dto.note for note_dto in result},
-            {str(note.note.value)}
+            {str(note.note)}
         )
 
     def test_should_return_notes_manquantes_when_etat_est_note_manquante(self):

@@ -27,7 +27,7 @@ import random
 
 import factory
 
-from base.models.enums.exam_enrollment_justification_type import TutorJustificationTypes
+from base.models.enums.exam_enrollment_justification_type import JustificationTypes
 from ddd.logic.encodage_des_notes.soumission.domain.model._note import NoteManquante, NoteChiffree, Justification
 from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import IdentiteNoteEtudiant, NoteEtudiant, \
     CREDITS_MIN_POUR_NOTE_DECIMALE
@@ -48,7 +48,7 @@ def generate_note_chiffree() -> 'NoteChiffree':
 
 def generate_note_justification() -> 'Justification':
     return Justification(
-        value=random.choice(TutorJustificationTypes.all())
+        value=random.choice(JustificationTypes.all())
     )
 
 

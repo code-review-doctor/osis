@@ -128,7 +128,7 @@
                     </thead>
                     <tbody>
                          {% for note_etudiant in feuille_de_notes.notes_etudiants %}
-                            <tr class="result" style="background-color: {% if note_etudiant.date_echeance_atteinte %} #D3D3D3 {% endif %}">
+                            <tr class="result" style="{% include 'assessments/common/row-background-color.html' %}">
                                 <td style="text-align:center;" id="enrollment_status_{{ forloop.counter }}" headers="status">
                                     {% if note_etudiant.date_echeance_atteinte %}
                                         <span class="glyphicon glyphicon-lock" aria-hidden="true" style="color: #8B008B;" title="{% trans 'Deadline reached' %}"></span>

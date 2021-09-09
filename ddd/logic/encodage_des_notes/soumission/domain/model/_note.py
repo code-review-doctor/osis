@@ -45,8 +45,8 @@ class NoteBuilder:
     def build(value: str) -> 'Note':
         if value in LETTRES_AUTORISEES:
             map_to_enum = {
-                ABSENCE_INJUSTIFIEE: TutorJustificationTypes.ABSENCE_UNJUSTIFIED,
-                TRICHERIE: TutorJustificationTypes.CHEATING,
+                ABSENCE_INJUSTIFIEE: JustificationTypes.ABSENCE_UNJUSTIFIED,
+                TRICHERIE: JustificationTypes.CHEATING,
             }
             return Justification(value=map_to_enum[value])
         if value in JustificationTypes.get_names():
@@ -97,13 +97,13 @@ class NoteManquante(Note):
 
 @attr.s(slots=True, frozen=True)
 class Justification(Note):
-    value = attr.ib(type=TutorJustificationTypes)
+    value = attr.ib(type=JustificationTypes)
 
     def __str__(self) -> str:
         if self.value:
             return {
-                TutorJustificationTypes.ABSENCE_UNJUSTIFIED.name: ABSENCE_INJUSTIFIEE,
-                TutorJustificationTypes.CHEATING.name: TRICHERIE,
+                JustificationTypes.ABSENCE_UNJUSTIFIED.name: ABSENCE_INJUSTIFIEE,
+                JustificationTypes.CHEATING.name: TRICHERIE,
                 JustificationTypes.ABSENCE_JUSTIFIED.name: ABSENCE_JUSTIFIEE
             }[self.value.name]
         return ""

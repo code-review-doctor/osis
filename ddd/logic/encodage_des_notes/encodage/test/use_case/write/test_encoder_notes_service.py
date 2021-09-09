@@ -35,7 +35,8 @@ from base.models.enums.exam_enrollment_justification_type import JustificationTy
 from ddd.logic.encodage_des_notes.encodage.commands import EncoderNotesCommand, EncoderNoteCommand
 from ddd.logic.encodage_des_notes.encodage.domain.model._note import Justification, NoteChiffree
 from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import NoteEtudiant
-from ddd.logic.encodage_des_notes.encodage.domain.validator.exceptions import NoteIncorrecteException
+from ddd.logic.encodage_des_notes.encodage.domain.validator.exceptions import NoteIncorrecteException, \
+    EncoderNotesEnLotLigneBusinessExceptions
 from ddd.logic.encodage_des_notes.encodage.dtos import CohorteGestionnaireDTO
 from ddd.logic.encodage_des_notes.encodage.test.factory.note_etudiant import NoteManquanteEtudiantFactory, \
     NoteDecimalesAuthorisees
@@ -167,10 +168,10 @@ class EncoderNoteTest(SimpleTestCase):
 
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             self.message_bus.invoke(cmd)
-        self.assertIsInstance(
-            class_exceptions.exception.exceptions.pop(),
-            DateEcheanceNoteAtteinteException
-        )
+
+        exception = class_exceptions.exception.exceptions.pop()
+        self.assertIsInstance(exception, EncoderNotesEnLotLigneBusinessExceptions)
+        self.assertEqual(exception.message, DateEcheanceNoteAtteinteException().message)
 
     def test_should_autoriser_si_date_de_remise_est_aujourdhui(self):
         note_etudiant_a_remettre_au_plus_tard_aujourdhui = NoteManquanteEtudiantFactory(date_remise_aujourdhui=True)
@@ -189,10 +190,9 @@ class EncoderNoteTest(SimpleTestCase):
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             self.message_bus.invoke(cmd)
 
-        self.assertIsInstance(
-            class_exceptions.exception.exceptions.pop(),
-            NomaNeCorrespondPasEmailException
-        )
+        exception = class_exceptions.exception.exceptions.pop()
+        self.assertIsInstance(exception, EncoderNotesEnLotLigneBusinessExceptions)
+        self.assertEqual(exception.message, NomaNeCorrespondPasEmailException().message)
 
     def test_should_ignorer_noma_non_inscrit_examen(self):
         noma_non_insct_examen = '99999999'
@@ -209,10 +209,10 @@ class EncoderNoteTest(SimpleTestCase):
 
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             self.message_bus.invoke(cmd)
-        self.assertIsInstance(
-            class_exceptions.exception.exceptions.pop(),
-            NoteIncorrecteException
-        )
+
+        exception = class_exceptions.exception.exceptions.pop()
+        self.assertIsInstance(exception, EncoderNotesEnLotLigneBusinessExceptions)
+        self.assertEqual(exception.message, NoteIncorrecteException(note_incorrecte="-1").message)
 
     def test_should_encoder_note_de_presence(self):
         note_de_presence = "0"
@@ -226,9 +226,11 @@ class EncoderNoteTest(SimpleTestCase):
 
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             self.message_bus.invoke(cmd)
-        self.assertIsInstance(
-            class_exceptions.exception.exceptions.pop(),
-            NoteIncorrecteException
+        exception = class_exceptions.exception.exceptions.pop()
+        self.assertIsInstance(exception, EncoderNotesEnLotLigneBusinessExceptions)
+        self.assertEqual(
+            exception.message,
+            NoteIncorrecteException(note_incorrecte="21").message
         )
 
     def test_should_encoder_20(self):
@@ -243,30 +245,27 @@ class EncoderNoteTest(SimpleTestCase):
 
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             self.message_bus.invoke(cmd)
-        self.assertIsInstance(
-            class_exceptions.exception.exceptions.pop(),
-            NoteIncorrecteException
-        )
+        exception = class_exceptions.exception.exceptions.pop()
+        self.assertIsInstance(exception, EncoderNotesEnLotLigneBusinessExceptions)
+        self.assertEqual(exception.message, NoteIncorrecteException(note_incorrecte="S").message)
 
     def test_should_empecher_si_note_mal_formatee(self):
         cmd = self._evolve_command(note="T 12")
 
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             self.message_bus.invoke(cmd)
-        self.assertIsInstance(
-            class_exceptions.exception.exceptions.pop(),
-            NoteIncorrecteException
-        )
+        exception = class_exceptions.exception.exceptions.pop()
+        self.assertIsInstance(exception, EncoderNotesEnLotLigneBusinessExceptions)
+        self.assertEqual(exception.message, NoteIncorrecteException(note_incorrecte="T 12").message)
 
     def test_should_empecher_si_note_decimale_non_autorisee(self):
         cmd = self._evolve_command(note="12.5")
 
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             self.message_bus.invoke(cmd)
-        self.assertIsInstance(
-            class_exceptions.exception.exceptions.pop(),
-            NoteDecimaleNonAutoriseeException
-        )
+        exception = class_exceptions.exception.exceptions.pop()
+        self.assertIsInstance(exception, EncoderNotesEnLotLigneBusinessExceptions)
+        self.assertEqual(exception.message, NoteDecimaleNonAutoriseeException().message)
 
     def test_should_encoder_si_note_decimale_autorisee(self):
         note_etudiant = NoteDecimalesAuthorisees(entity_id=self.note.entity_id)
@@ -350,9 +349,17 @@ class EncoderNoteTest(SimpleTestCase):
         self.assertEqual(len(exceptions), 3)  # 3 notes sur 4 en erreur
 
         # Doit renvoyer une liste ordonnée des erreurs rencontrées pour chaque note
-        self.assertIsInstance(class_exceptions.exception.exceptions.pop(), NoteIncorrecteException)
-        self.assertIsInstance(class_exceptions.exception.exceptions.pop(), NomaNeCorrespondPasEmailException)
-        self.assertIsInstance(class_exceptions.exception.exceptions.pop(), NoteIncorrecteException)
+        exception = class_exceptions.exception.exceptions.pop()
+        self.assertIsInstance(exception, EncoderNotesEnLotLigneBusinessExceptions)
+        self.assertEqual(exception.message, NoteIncorrecteException(note_incorrecte=cmd.notes_encodees[0].note).message)
+
+        exception = class_exceptions.exception.exceptions.pop()
+        self.assertIsInstance(exception, EncoderNotesEnLotLigneBusinessExceptions)
+        self.assertEqual(exception.message, NomaNeCorrespondPasEmailException().message)
+
+        exception = class_exceptions.exception.exceptions.pop()
+        self.assertIsInstance(exception, EncoderNotesEnLotLigneBusinessExceptions)
+        self.assertEqual(exception.message, NoteIncorrecteException(note_incorrecte=cmd.notes_encodees[3].note).message)
 
     @mock.patch("infrastructure.messages_bus.NoteEtudiantGestionnaireRepository")
     def test_should_sauvegarder_note_meme_si_autre_note_en_erreur(self, mock_note_repo):
@@ -382,7 +389,9 @@ class EncoderNoteTest(SimpleTestCase):
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             self.message_bus.invoke(cmd)
 
-        self.assertIsInstance(class_exceptions.exception.exceptions.pop(), NoteIncorrecteException)
+        exception = class_exceptions.exception.exceptions.pop()
+        self.assertIsInstance(exception, EncoderNotesEnLotLigneBusinessExceptions)
+        self.assertEqual(exception.message, NoteIncorrecteException(note_incorrecte=cmd.notes_encodees[0].note).message)
 
         self.assertEqual(
             len(appels_save),

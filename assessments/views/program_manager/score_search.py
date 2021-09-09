@@ -25,12 +25,14 @@
 ##############################################################################
 import urllib
 
+from django.contrib import messages
 from django.forms import formset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.views.generic import FormView
+from django.utils.translation import gettext_lazy as _, ngettext
 
 from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmissionCalendar
 from assessments.forms.score_encoding import ScoreSearchForm, ScoreSearchEncodingForm, ScoreEncodingFormSet
@@ -63,12 +65,17 @@ class ScoreSearchFormView(PermissionRequiredMixin, FormView):
         return ScoreSearchForm(data=self.request.GET or None, matricule_fgs_gestionnaire=self.person.global_id)
 
     def get_form_class(self):
-        return formset_factory(ScoreSearchEncodingForm, formset=ScoreEncodingFormSet, extra=0)
+        return formset_factory(
+            ScoreSearchEncodingForm,
+            formset=ScoreEncodingFormSet,
+            extra=0,
+            max_num=len(self.get_initial())
+        )
 
     def get_initial(self):
         formeset_initial = []
         for note_etudiant in self.notes_etudiant_filtered:
-            if not note_etudiant.date_echeance_atteinte:
+            if not note_etudiant.date_echeance_atteinte and not note_etudiant.desinscrit_tardivement:
                 formeset_initial.append({
                     'note': note_etudiant.note,
                     'noma': note_etudiant.noma,
@@ -77,6 +84,10 @@ class ScoreSearchFormView(PermissionRequiredMixin, FormView):
             else:
                 formeset_initial.append({})
         return formeset_initial
+
+    def form_invalid(self, form):
+        """If the form is invalid, render the invalid form."""
+        return self.render_to_response(self.get_context_data(form=form))
 
     def form_valid(self, formset):
         cmd = EncoderNotesCommand(
@@ -105,9 +116,25 @@ class ScoreSearchFormView(PermissionRequiredMixin, FormView):
                     )
                     form.add_error('note', exception.message)
 
+        self.display_success_error_counter(cmd, formset)
         if formset.is_valid():
             return self.get_success_url()
         return self.render_to_response(self.get_context_data(form=formset))
+
+    def display_success_error_counter(self, cmd, formset):
+        error_counter = sum(1 for form in formset if form.has_changed() and not form.is_valid())
+        success_counter = len(cmd.notes_encodees) - error_counter
+        if error_counter > 0:
+            messages.error(
+                self.request,
+                ngettext(
+                    "There is %(error_counter)s error in form",
+                    "There are %(error_counter)s errors in form",
+                    error_counter
+                ) % {'error_counter': error_counter}
+            )
+        if success_counter > 0:
+            messages.success(self.request, '%s %s' % (str(success_counter), _('Score(s) saved')))
 
     def get_success_url(self):
         redirect_url = reverse('score_search') + "?" + urllib.parse.urlencode(self.request.GET)

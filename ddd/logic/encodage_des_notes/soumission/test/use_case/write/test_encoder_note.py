@@ -31,7 +31,7 @@ import attr
 from django.test import SimpleTestCase
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
-from base.models.enums.exam_enrollment_justification_type import TutorJustificationTypes
+from base.models.enums.exam_enrollment_justification_type import JustificationTypes
 from ddd.logic.encodage_des_notes.shared_kernel.validator.exceptions import DateEcheanceNoteAtteinteException, \
     NomaNeCorrespondPasEmailException, NoteDecimaleNonAutoriseeException, PeriodeEncodageNotesFermeeException
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderNoteCommand
@@ -287,23 +287,26 @@ class EncoderNoteTest(SimpleTestCase):
         )
 
     def test_should_encoder_absence_injustifiee(self):
-        for absence_injustifiee in ['A', TutorJustificationTypes.ABSENCE_UNJUSTIFIED.name]:
+        for absence_injustifiee in ['A', JustificationTypes.ABSENCE_UNJUSTIFIED.name]:
             with self.subTest(absence=absence_injustifiee):
                 cmd = attr.evolve(self.cmd, note=absence_injustifiee)
 
                 entity_id = self.message_bus.invoke(cmd)
 
-                expected_result = Justification(value=TutorJustificationTypes.ABSENCE_UNJUSTIFIED)
-                self.assertEqual(self.repository.get(entity_id).note, expected_result)
+                expected_result = Justification(value=JustificationTypes.ABSENCE_UNJUSTIFIED)
+                self.assertEqual(
+                    self.repository.get(entity_id).note,
+                    expected_result
+                )
 
     def test_should_encoder_tricherie(self):
-        for tricherie in ['T', TutorJustificationTypes.CHEATING.name]:
+        for tricherie in ['T', JustificationTypes.CHEATING.name]:
             with self.subTest(tricherie=tricherie):
                 cmd = attr.evolve(self.cmd, note=tricherie)
 
                 entity_id = self.message_bus.invoke(cmd)
 
-                expected_result = Justification(value=TutorJustificationTypes.CHEATING)
+                expected_result = Justification(value=JustificationTypes.CHEATING)
                 self.assertEqual(self.repository.get(entity_id).note, expected_result)
 
     def _generate_command_from_note_etudiant(self, note_etudiant: 'NoteEtudiant'):

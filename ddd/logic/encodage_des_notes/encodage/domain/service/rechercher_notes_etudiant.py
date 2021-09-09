@@ -64,6 +64,7 @@ class RechercheNotesEtudiant(interface.DomainService):
             prenom=prenom,
             etat=etat,
             gestionnaire_parcours=gestionnaire_parcours,
+            periode_encodage=periode_encodage,
             note_etudiant_repo=note_etudiant_repo,
             signaletique_etudiant_translator=signaletique_etudiant_translator,
         )
@@ -92,31 +93,37 @@ class RechercheNotesEtudiant(interface.DomainService):
 
         notes_etudiants_dto = []
         for note_etudiant in note_etudiant_filtered:
-            unite_enseignement_dto = unites_enseignements[note_etudiant.code_unite_enseignement]
-            signaletique_etudiant_dto = signaletique_par_noma[note_etudiant.noma]
-            desinscription_exmen_dto = desinscr_exam_par_noma.get(note_etudiant.noma)
+            unite_enseignement_dto = unites_enseignements.get(note_etudiant.code_unite_enseignement)
+            signaletique_etudiant_dto = signaletique_par_noma.get(note_etudiant.noma)
+            desinscriptions_examens_dto = desinscr_exam_par_noma.get(note_etudiant.noma, set())
 
-            inscription_exmen_dto = inscr_examen_par_noma.get(note_etudiant.noma)
+            inscription_examen_dto = next(
+                (inscription for inscription in inscr_examen_par_noma.get(note_etudiant.noma, set())
+                 if inscription.code_unite_enseignement == note_etudiant.code_unite_enseignement), None
+            )
             ouverture_periode_soumission = periode_encodage.debut_periode_soumission.to_date()
-            inscrit_tardivement = inscription_exmen_dto and \
-                inscription_exmen_dto.date_inscription.to_date() > ouverture_periode_soumission
+            inscrit_tardivement = inscription_examen_dto and \
+                inscription_examen_dto.date_inscription.to_date() > ouverture_periode_soumission
 
             notes_etudiants_dto.append(
                 NoteEtudiantDTO(
-                    code_unite_enseignement=unite_enseignement_dto.code,
-                    intitule_complet_unite_enseignement=unite_enseignement_dto.intitule_complet,
-                    annee_unite_enseignement=unite_enseignement_dto.annee,
-                    est_soumise=None,
+                    code_unite_enseignement=getattr(unite_enseignement_dto, 'code', ''),
+                    intitule_complet_unite_enseignement=getattr(unite_enseignement_dto, 'intitule_complet', ''),
+                    annee_unite_enseignement=getattr(unite_enseignement_dto, 'annee', ''),
+                    est_soumise=not note_etudiant.is_manquant,
                     date_remise_de_notes=DateDTO.build_from_date(note_etudiant.echeance_gestionnaire),
                     nom_cohorte=note_etudiant.nom_cohorte,
                     noma=note_etudiant.noma,
-                    nom=signaletique_etudiant_dto.nom,
-                    prenom=signaletique_etudiant_dto.prenom,
-                    peps=signaletique_etudiant_dto.peps,
+                    nom=getattr(signaletique_etudiant_dto, 'nom', ''),
+                    prenom=getattr(signaletique_etudiant_dto, 'prenom', ''),
+                    peps=getattr(signaletique_etudiant_dto, 'peps', ''),
                     email=note_etudiant.email,
                     note=str(note_etudiant.note),
                     inscrit_tardivement=inscrit_tardivement,
-                    desinscrit_tardivement=bool(desinscription_exmen_dto)
+                    desinscrit_tardivement=any(
+                        desinscription for desinscription in desinscriptions_examens_dto if
+                        desinscription.code_unite_enseignement == note_etudiant.code_unite_enseignement
+                    )
                 )
             )
         return notes_etudiants_dto
@@ -130,6 +137,7 @@ class RechercheNotesEtudiant(interface.DomainService):
             prenom: str,
             etat: str,
             gestionnaire_parcours: 'GestionnaireParcours',
+            periode_encodage: 'PeriodeEncodageNotesDTO',
             note_etudiant_repo: 'INoteEtudiantRepository',
             signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
     ):
@@ -154,6 +162,8 @@ class RechercheNotesEtudiant(interface.DomainService):
         return note_etudiant_repo.search(
             noms_cohortes=noms_cohortes,
             nomas=nomas_searched,
+            annee_academique=periode_encodage.annee_concernee,
+            numero_session=periode_encodage.session_concernee,
             note_manquante=note_manquante,
             justification=justification,
         )
@@ -186,13 +196,16 @@ def _get_desinscriptions_examens_par_noma(
         annee: int,
         numero_session: int,
         inscription_examen_translator: 'IInscriptionExamenTranslator'
-) -> Dict['Noma', 'DesinscriptionExamenDTO']:
+) -> Dict['Noma', List['DesinscriptionExamenDTO']]:
     desinscriptions_examens = inscription_examen_translator.search_desinscrits_pour_plusieurs_unites_enseignement(
         codes_unites_enseignement=codes_unites_enseignement,
         annee=annee,
         numero_session=numero_session,
     )
-    return {desinscr.noma: desinscr for desinscr in desinscriptions_examens}
+    desinscriptions_examens_par_noma = dict()
+    for desinscr in desinscriptions_examens:
+        desinscriptions_examens_par_noma.setdefault(desinscr.noma, set()).add(desinscr)
+    return desinscriptions_examens_par_noma
 
 
 def _get_inscriptions_examens_par_noma(
@@ -200,13 +213,16 @@ def _get_inscriptions_examens_par_noma(
         annee: int,
         numero_session: int,
         inscription_examen_translator: 'IInscriptionExamenTranslator'
-) -> Dict['Noma', 'InscriptionExamenDTO']:
+) -> Dict['Noma', List['InscriptionExamenDTO']]:
     inscr_examens = inscription_examen_translator.search_inscrits_pour_plusieurs_unites_enseignement(
         codes_unites_enseignement=codes_unites_enseignement,
         annee=annee,
         numero_session=numero_session,
     )
-    return {insc_exam.noma: insc_exam for insc_exam in inscr_examens}
+    inscriptions_examens_par_noma = dict()
+    for inscr in inscr_examens:
+        inscriptions_examens_par_noma.setdefault(inscr.noma, set()).add(inscr)
+    return inscriptions_examens_par_noma
 
 
 def _get_unites_enseignements_par_code(
