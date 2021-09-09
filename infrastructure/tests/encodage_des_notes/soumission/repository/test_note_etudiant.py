@@ -206,6 +206,9 @@ class NoteEtudiantRepositoryTest(TestCase):
             learning_unit_enrollment__learning_unit_year=luy,
             learning_unit_enrollment__offer_enrollment__student__registration_id=note_etudiant_to_save.noma,
             learning_unit_enrollment__offer_enrollment__student__person__email=note_etudiant_to_save.email,
+            learning_unit_enrollment__offer_enrollment__education_group_year__acronym=note_etudiant_to_save.nom_cohorte,
+            learning_unit_enrollment__offer_enrollment__education_group_year__partial_acronym=
+            note_etudiant_to_save.nom_cohorte,
             **class_attributes
         )
         SessionExamDeadlineFactory(

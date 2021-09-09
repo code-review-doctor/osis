@@ -77,6 +77,7 @@ class NoteEtudiantFromRepositoryDTO(interface.DTO):
     code_unite_enseignement = attr.ib(type=str)
     annee_academique = attr.ib(type=int)
     credits_unite_enseignement = attr.ib(type=float)
+    nom_cohorte = attr.ib(type=str)
 
 
 @attr.s(frozen=True, slots=True)

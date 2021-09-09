@@ -38,18 +38,22 @@ class NoteEtudiantInMemoryRepository(InMemoryGenericRepository, INoteEtudiantRep
     def search(
             cls,
             entity_ids: Optional[List['IdentiteNoteEtudiant']] = None,
+            codes_unite_enseignement: List[str] = None,
             noms_cohortes: List[str] = None,
             nomas: List[str] = None,
             note_manquante: bool = False,
             justification: JustificationTypes = None,
             **kwargs
     ) -> List['NoteEtudiant']:
-        if not (entity_ids or noms_cohortes or nomas or note_manquante or justification):
+        if not (entity_ids or noms_cohortes or nomas or note_manquante or justification or codes_unite_enseignement):
             return []
 
         result = cls.entities
         if entity_ids:
             result = (note for note in result if note.entity_id in entity_ids)
+
+        if codes_unite_enseignement:
+            result = (note for note in result if note.entity_id.code_unite_enseignement in codes_unite_enseignement)
 
         if noms_cohortes:
             result = (note for note in result if note.nom_cohorte in noms_cohortes)

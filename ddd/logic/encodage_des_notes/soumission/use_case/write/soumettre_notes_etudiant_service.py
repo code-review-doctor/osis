@@ -23,42 +23,57 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
+
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_attribution_enseignant import \
+    IAttributionEnseignantTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodage_notes import \
     IPeriodeEncodageNotesTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_etudiant import \
+    ISignaletiqueEtudiantTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_personne import \
+    ISignaletiquePersonneTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.periode_encodage_ouverte import PeriodeEncodageOuverte
-from ddd.logic.encodage_des_notes.soumission.builder.note_etudiant_identity_builder import NoteEtudiantIdentityBuilder
-from ddd.logic.encodage_des_notes.soumission.commands import SoumettreNoteCommand
+from ddd.logic.encodage_des_notes.soumission.commands import SoumettreNotesCommand
 from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import IdentiteNoteEtudiant
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_notifier_soumission_notes import INotifierSoumissionNotes
 from ddd.logic.encodage_des_notes.soumission.domain.service.responsable_de_notes import ResponsableDeNotes
+from ddd.logic.encodage_des_notes.soumission.domain.service.soumettre_notes_en_lot import SoumettreNotesEnLot
 from ddd.logic.encodage_des_notes.soumission.repository.i_note_etudiant import INoteEtudiantRepository
 from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
 
 
-def soumettre_note_etudiant(
-        cmd: 'SoumettreNoteCommand',
+def soumettre_notes_etudiant(
+        cmd: 'SoumettreNotesCommand',
         note_etudiant_repo: 'INoteEtudiantRepository',
         responsable_notes_repo: 'IResponsableDeNotesRepository',
         periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
-) -> 'IdentiteNoteEtudiant':
+        notification_service: 'INotifierSoumissionNotes',
+        translator: 'IAttributionEnseignantTranslator',
+        signaletique_repo: 'ISignaletiquePersonneTranslator',
+        signaletique_etudiant_repo: 'ISignaletiqueEtudiantTranslator',
+) -> List['IdentiteNoteEtudiant']:
     # Given
-    PeriodeEncodageOuverte().verifier(
-        periode_soumission_note_translator,
-    )
-    note_etudiant_identity = NoteEtudiantIdentityBuilder.build_from_command(cmd)
-    note = note_etudiant_repo.get(note_etudiant_identity)
+    PeriodeEncodageOuverte().verifier(periode_soumission_note_translator)
 
     ResponsableDeNotes().verifier(
         cmd.matricule_fgs_enseignant,
-        note.code_unite_enseignement,
-        note.annee,
+        cmd.code_unite_enseignement,
+        cmd.annee_unite_enseignement,
         responsable_notes_repo
     )
 
     # When
-    note.soumettre()
+    notes_soumises = SoumettreNotesEnLot().soumettre(cmd, note_etudiant_repo)
 
     # Then
-    note_etudiant_repo.save(note)
-    # Historiser (DomainService)
 
-    return note_etudiant_identity
+    notification_service.notifier(
+        notes_soumises,
+        note_etudiant_repo,
+        translator,
+        signaletique_repo,
+        signaletique_etudiant_repo,
+    )
+
+    return notes_soumises

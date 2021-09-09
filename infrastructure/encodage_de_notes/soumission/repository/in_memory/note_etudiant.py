@@ -35,6 +35,33 @@ class NoteEtudiantInMemoryRepository(InMemoryGenericRepository, INoteEtudiantRep
     entities = list()  # type: List[NoteEtudiant]
 
     @classmethod
+    def search(
+            cls,
+            entity_ids: List['IdentiteNoteEtudiant'] = None,
+            code_unite_enseignement: str = None,
+            annee_academique: int = None,
+            numero_session: int = None,
+            **kwargs
+    ) -> List['NoteEtudiant']:
+        if not (entity_ids or code_unite_enseignement or annee_academique or numero_session):
+            return []
+
+        result = cls.entities
+        if entity_ids:
+            result = (note for note in result if note.entity_id in entity_ids)
+
+        if code_unite_enseignement:
+            result = (note for note in result if note.entity_id.code_unite_enseignement == code_unite_enseignement)
+
+        if annee_academique:
+            result = (note for note in result if note.annee == annee_academique)
+
+        if numero_session:
+            result = (note for note in result if note.numero_session == numero_session)
+
+        return list(result)
+
+    @classmethod
     def search_by_code_unite_enseignement_annee_session(
             cls,
             criterias: List[SearchCriteria]

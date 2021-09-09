@@ -48,11 +48,16 @@ class EncoderNotesEtudiantCommand(interface.CommandRequest):
 
 @attr.s(frozen=True, slots=True)
 class SoumettreNoteCommand(interface.CommandRequest):
+    noma_etudiant = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class SoumettreNotesCommand(interface.CommandRequest):
+    matricule_fgs_enseignant = attr.ib(type=str)
     code_unite_enseignement = attr.ib(type=str)
     annee_unite_enseignement = attr.ib(type=int)
     numero_session = attr.ib(type=int)
-    noma_etudiant = attr.ib(type=str)
-    matricule_fgs_enseignant = attr.ib(type=str)
+    notes = attr.ib(type=List[SoumettreNoteCommand])
 
 
 @attr.s(frozen=True, slots=True)

@@ -30,7 +30,7 @@ from typing import Optional, List
 from django.db import connection
 from django.db.models import F, Case, CharField, Value, When, BooleanField, ExpressionWrapper, DateField, Q, OuterRef, \
     Subquery
-from django.db.models.functions import Coalesce, Cast, Concat
+from django.db.models.functions import Coalesce, Cast, Concat, Replace
 
 from base.models.exam_enrollment import ExamEnrollment
 from base.models.session_exam_deadline import SessionExamDeadline
@@ -39,28 +39,30 @@ from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import N
 from ddd.logic.encodage_des_notes.soumission.dtos import NoteEtudiantFromRepositoryDTO, \
     DateEcheanceNoteDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_note_etudiant import INoteEtudiantRepository, SearchCriteria
+from education_group.models.enums.cohort_name import CohortName
 from osis_common.ddd.interface import ApplicationService
 
 
 class NoteEtudiantRepository(INoteEtudiantRepository):
     @classmethod
-    def search(cls, entity_ids: Optional[List['IdentiteNoteEtudiant']] = None, **kwargs) -> List['NoteEtudiant']:
-        if not entity_ids:
+    def search(
+            cls,
+            entity_ids: Optional[List['IdentiteNoteEtudiant']] = None,
+            annee_academique: int = None,
+            numero_session: int = None,
+            code_unite_enseignement: str = None,
+            **kwargs
+    ) -> List['NoteEtudiant']:
+        filter_qs = cls._build_filter(
+            entity_ids=entity_ids,
+            annee_academique=annee_academique,
+            numero_session=numero_session,
+            code_unite_enseignement=code_unite_enseignement,
+        )
+        if not filter_qs:
             return []
 
-        q_filters = functools.reduce(
-            operator.or_,
-            [
-                Q(
-                    acronym=entity_id.code_unite_enseignement,
-                    year=entity_id.annee_academique,
-                    number_session=entity_id.numero_session,
-                    noma=entity_id.noma
-                )
-                for entity_id in entity_ids
-            ]
-        )
-        rows = _fetch_session_exams().filter(q_filters)
+        rows = _fetch_session_exams().filter(*filter_qs)
         result = []
         for row in rows:
             dto_object = NoteEtudiantFromRepositoryDTO(
@@ -72,9 +74,48 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
                 numero_session=row.number_session,
                 code_unite_enseignement=row.acronym,
                 annee_academique=row.year,
-                credits_unite_enseignement=row.credits_unite_enseignement
+                credits_unite_enseignement=row.credits_unite_enseignement,
+                nom_cohorte=row.nom_cohorte
             )
             result.append(NoteEtudiantBuilder.build_from_repository_dto(dto_object))
+        return result
+
+    @classmethod
+    def _build_filter(
+            cls,
+            entity_ids: Optional[List['IdentiteNoteEtudiant']] = None,
+            annee_academique: int = None,
+            numero_session: int = None,
+            code_unite_enseignement: str = None,
+    ) -> List[Q]:
+        result = []
+        if entity_ids:
+            result.append(
+                functools.reduce(
+                    operator.or_,
+                    [
+                        Q(
+                            acronym=entity_id.code_unite_enseignement,
+                            year=entity_id.annee_academique,
+                            number_session=entity_id.numero_session,
+                            noma=entity_id.noma
+                        )
+                        for entity_id in entity_ids
+                    ]
+                )
+            )
+        if annee_academique:
+            result.append(
+                Q(year=annee_academique)
+            )
+        if numero_session:
+            result.append(
+                Q(number_session=numero_session)
+            )
+        if code_unite_enseignement:
+            result.append(
+                Q(acronym__icontains=code_unite_enseignement)
+            )
         return result
 
     @classmethod
@@ -105,7 +146,8 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
                 numero_session=row.number_session,
                 code_unite_enseignement=row.acronym,
                 annee_academique=row.year,
-                credits_unite_enseignement=row.credits_unite_enseignement
+                credits_unite_enseignement=row.credits_unite_enseignement,
+                nom_cohorte=row.acronym
             )
             result.append(NoteEtudiantBuilder.build_from_repository_dto(dto_object))
         return result
@@ -245,11 +287,24 @@ def _fetch_session_exams():
         date_limite_de_remise=Subquery(
             subqs_deadline[:1],
             output_field=DateField()
-        )
+        ),
+        nom_cohorte=Case(
+            When(
+                learning_unit_enrollment__offer_enrollment__cohort_year__name=CohortName.FIRST_YEAR.name,
+                then=Replace(
+                    'learning_unit_enrollment__offer_enrollment__education_group_year__acronym',
+                    Value('1BA'),
+                    Value('11BA')
+                )
+            ),
+            default=F('learning_unit_enrollment__offer_enrollment__education_group_year__acronym'),
+            output_field=CharField()
+        ),
     ).values_list(
         'acronym',
         'year',
         'number_session',
+        'nom_cohorte',
         'credits_unite_enseignement',
         'noma',
         'email',
