@@ -23,26 +23,28 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
+
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodage_notes import \
     IPeriodeEncodageNotesTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.periode_encodage_ouverte import \
     PeriodeEncodageOuverte
-from ddd.logic.encodage_des_notes.soumission.builder.note_etudiant_identity_builder import NoteEtudiantIdentityBuilder
-from ddd.logic.encodage_des_notes.soumission.commands import EncoderNoteCommand
-from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import NoteEtudiant
+from ddd.logic.encodage_des_notes.soumission.commands import EncoderNotesEtudiantCommand
+from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import IdentiteNoteEtudiant
+from ddd.logic.encodage_des_notes.soumission.domain.service.encoder_notes_en_lot import EncoderNotesEtudiantEnLot
 from ddd.logic.encodage_des_notes.soumission.domain.service.enseignant_attribue_unite_enseignement import \
     EnseignantAttribueUniteEnseignement
 from ddd.logic.encodage_des_notes.soumission.repository.i_note_etudiant import INoteEtudiantRepository
 
 
-def encoder_note_etudiant(
-        cmd: 'EncoderNoteCommand',
+def encoder_notes_etudiant(
+        cmd: 'EncoderNotesEtudiantCommand',
         note_etudiant_repo: 'INoteEtudiantRepository',
         periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
         attribution_translator: 'IAttributionEnseignantTranslator'
-) -> 'NoteEtudiant':
+) -> List['IdentiteNoteEtudiant']:
     # Given
     PeriodeEncodageOuverte().verifier(periode_soumission_note_translator)
     EnseignantAttribueUniteEnseignement().verifier(
@@ -51,14 +53,14 @@ def encoder_note_etudiant(
         cmd.matricule_fgs_enseignant,
         attribution_translator
     )
-    note_etudiant_identity = NoteEtudiantIdentityBuilder.build_from_command(cmd)
-    note_etudiant = note_etudiant_repo.get(note_etudiant_identity)
 
     # When
-    note_etudiant.encoder(cmd.email_etudiant, cmd.note)
+    identites_notes_encodees = EncoderNotesEtudiantEnLot().execute(
+        cmd,
+        note_etudiant_repo,
+    )
 
     # Then
-    note_etudiant_repo.save(note_etudiant)
     # TODO :: Historiser (DomainService) ?
 
-    return note_etudiant.entity_id
+    return identites_notes_encodees
