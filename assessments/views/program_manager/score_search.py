@@ -85,10 +85,6 @@ class ScoreSearchFormView(PermissionRequiredMixin, FormView):
                 formeset_initial.append({})
         return formeset_initial
 
-    def form_invalid(self, form):
-        """If the form is invalid, render the invalid form."""
-        return self.render_to_response(self.get_context_data(form=form))
-
     def form_valid(self, formset):
         cmd = EncoderNotesCommand(
             matricule_fgs_gestionnaire=self.person.global_id,
