@@ -26,8 +26,11 @@
 from django.conf.urls import url
 
 from base.api.views.person import PersonRoles
+from assessments.views import score_encoding
 
 app_name = "base"
 urlpatterns = [
     url(r'^person/(?P<global_id>[0-9]+)/roles$', PersonRoles.as_view(), name=PersonRoles.name),
+    url(r'^xlsapidownload/([A-Za-z0-9]+)/([0-9]+)/$',
+        score_encoding.export_xls_for_api, name='scores_encoding_download'),
 ]

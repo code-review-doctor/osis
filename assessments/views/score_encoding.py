@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import copy
+import json
 import logging
 import traceback
 
@@ -32,6 +33,7 @@ import pika.exceptions
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test, permission_required
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import close_old_connections, transaction
 from django.db.utils import OperationalError as DjangoOperationalError, InterfaceError as DjangoInterfaceError
@@ -40,6 +42,7 @@ from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from psycopg2._psycopg import OperationalError as PsycopOperationalError, InterfaceError as PsycopInterfaceError
+from rest_framework.response import Response
 
 import base
 from assessments.business import score_encoding_progress, score_encoding_list, score_encoding_export
@@ -51,10 +54,19 @@ from base.auth.roles import program_manager
 from base.auth.roles import tutor as tutor_mdl
 from base.models import session_exam_calendar
 from base.models.enums import exam_enrollment_state as enrollment_states, exam_enrollment_state
+from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.utils import send_mail
 from osis_common.document import paper_sheet
 from osis_common.queue.queue_sender import send_message
+from rest_framework.authtoken.models import Token
+import base64
+from rest_framework import serializers
+# from rest_framework.views import APIView
+from rest_framework.decorators import api_view, renderer_classes
+from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer, BaseRenderer
+from django.core.files.base import ContentFile
+from rest_framework import status
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 queue_exception_logger = logging.getLogger(settings.QUEUE_EXCEPTION_LOGGER)
@@ -782,3 +794,55 @@ def _get_count_still_enrolled(enrollments):
         if enrollment.enrollment_state == enrollment_states.ENROLLED:
             nb_enrolled += 1
     return nb_enrolled
+
+
+class PDFRenderer(BaseRenderer):
+    media_type = 'application/pdf'
+    format = 'pdf'
+    charset = None
+    render_style = 'binary'
+
+    def render(self, data, media_type=None, renderer_context=None):
+        if isinstance(data, bytes):
+            return data
+        data_to_response = json.dumps(data)
+        return bytes(data_to_response.encode('utf-8'))
+
+
+class XLSRenderer(BaseRenderer):
+    media_type = 'application/vnd.ms-excel'
+    # application / vnd.openxmlformats - officedocument.spreadsheetml.sheet
+    format = 'xls'
+    charset = None
+    render_style = 'binary'
+
+    def render(self, data, media_type=None, renderer_context=None):
+        if isinstance(data, bytes):
+            return data
+        data_to_response = json.dumps(data)
+        return bytes(data_to_response.encode('utf-8'))
+
+
+@api_view(('GET',))
+@renderer_classes((XLSRenderer,))
+def export_xls_for_api(request, token, learning_unit_year_id):
+    print('export_xls2')
+    print("token : {}".format(token))
+    user = Token.objects.get(key=token).user
+
+    is_program_manager = base.auth.roles.program_manager.is_program_manager(user)
+
+    user = User.objects.get(pk=241)
+    try:
+        scores_list = score_encoding_list.get_scores_encoding_list(user, learning_unit_year_id=learning_unit_year_id)
+
+        scores_list = score_encoding_list.filter_without_closed_exam_enrollments(scores_list, is_program_manager)
+
+        if scores_list.enrollments:
+            r = score_encoding_export.export_xls_for_api(scores_list.enrollments, is_program_manager)
+
+            return Response(r)
+    except LearningUnitYear.DoesNotExist:
+        return Response(None, 309)
+    except:
+        return Response(None, 310)

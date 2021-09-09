@@ -42,6 +42,7 @@ from base.models.enums import peps_type
 from base.models.exam_enrollment import ExamEnrollment
 from base.models.student_specific_profile import StudentSpecificProfile
 from osis_common.decorators.download import set_download_cookie
+from rest_framework.response import Response
 
 HEADER = [_('Academic year'), _('Session'), _('Learning unit'), pgettext_lazy('encoding', 'Program'),
           _('Registration number'), _('Lastname'), _('Firstname'), _('Email'), _('Numbered scores'),
@@ -71,71 +72,13 @@ BORDER_LEFT = Border(
 
 
 @set_download_cookie
-def export_xls(exam_enrollments: List[ExamEnrollment], is_program_manager: bool):
-    workbook = Workbook()
-    worksheet = workbook.active
-    _add_header_and_legend_to_file(exam_enrollments, worksheet, is_program_manager)
+def export_xls(exam_enrollments: List[ExamEnrollment], is_program_manager: bool) -> HttpResponse:
+    workbook = _get_export_xls_workbook(exam_enrollments, is_program_manager)
+    j = save_virtual_workbook(workbook)
 
-    row_number = 12
-    for exam_enroll in exam_enrollments:
-        student = exam_enroll.learning_unit_enrollment.student
-        offer = exam_enroll.learning_unit_enrollment.offer_enrollment.education_group_year
-        person = mdl.person.find_by_id(student.person.id)
-        end_date = __get_session_exam_deadline(exam_enroll)
-
-        score = None
-        if exam_enroll.score_final is not None:
-            if exam_enroll.session_exam.learning_unit_year.decimal_scores:
-                score = "{0:.2f}".format(exam_enroll.score_final)
-            else:
-                score = "{0:.0f}".format(exam_enroll.score_final)
-
-        justification = JUSTIFICATION_ALIASES.get(exam_enroll.justification_final, "")
-        student_specific_profile = None
-        if hasattr(exam_enroll.learning_unit_enrollment.student, 'studentspecificprofile'):
-            student_specific_profile = exam_enroll.learning_unit_enrollment.student.studentspecificprofile
-
-        line_content = [
-            str(exam_enroll.learning_unit_enrollment.learning_unit_year.academic_year),
-            str(exam_enroll.session_exam.number_session),
-            exam_enroll.session_exam.learning_unit_year.acronym,
-            offer.acronym,
-            student.registration_id,
-            person.last_name,
-            person.first_name,
-            person.email,
-            score,
-            str(justification),
-            end_date if exam_enroll.enrollment_state == 'ENROLLED' else ''
-        ]
-        if student_specific_profile:
-            line_content.extend([
-                _get_type_peps(student_specific_profile),
-                str(_('Yes')) if student_specific_profile.arrangement_additional_time else '-',
-                str(_('Yes')) if student_specific_profile.arrangement_appropriate_copy else '-',
-                str(_('Yes')) if student_specific_profile.arrangement_specific_locale else '-',
-                str(_('Yes')) if student_specific_profile.arrangement_other else '-',
-                str(student_specific_profile.arrangement_comment)
-                if student_specific_profile.arrangement_comment else '-',
-                str(student_specific_profile.guide) if student_specific_profile.guide else '-',
-            ])
-        else:
-            line_content.extend(["-", "-", "-", "-", "-", "-", "-"])
-        worksheet.append(line_content)
-        row_number += 1
-        __coloring_non_editable(worksheet, row_number, score, exam_enroll.justification_final)
-        _coloring_enrollment_state(worksheet, row_number, exam_enroll)
-        _set_peps_border(worksheet, row_number)
-
-    lst_exam_enrollments = list(exam_enrollments)
-    number_session = lst_exam_enrollments[0].session_exam.number_session
-    learn_unit_acronym = lst_exam_enrollments[0].session_exam.learning_unit_year.acronym
-    academic_year = lst_exam_enrollments[0].learning_unit_enrollment.learning_unit_year.academic_year
-
-    filename = "session_%s_%s_%s.xlsx" % (str(academic_year.year), str(number_session), learn_unit_acronym)
-    response = HttpResponse(save_virtual_workbook(workbook),
+    response = HttpResponse(j,
                             content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    response['Content-Disposition'] = 'attachment; filename=%s' % filename
+    response['Content-Disposition'] = 'attachment; filename=%s' % _build_file_name(exam_enrollments)
     return response
 
 
@@ -342,10 +285,11 @@ def _get_type_peps(student_specific_profile: StudentSpecificProfile) -> str:
 
 
 def _update_border_for_first_peps_column(cell):
-    if cell.has_style:
-        c = cell.style
-        c.border = BORDER_LEFT
-        cell.style = c
+    pass
+    # if cell.has_style:
+    #     c = cell.style
+    #     c.border = BORDER_LEFT
+    #     cell.style = c
 
 
 def _build_offers_entities_emails_list(exam_enrollments: List[ExamEnrollment]) -> str:
@@ -355,3 +299,77 @@ def _build_offers_entities_emails_list(exam_enrollments: List[ExamEnrollment]) -
     }
     addresses = score_sheet_address.search_from_education_group_ids(education_group_ids)
     return ';'.join({address.email for address in addresses if address.email})
+
+
+def _build_file_name(exam_enrollments):
+    lst_exam_enrollments = list(exam_enrollments)
+    number_session = lst_exam_enrollments[0].session_exam.number_session
+    learn_unit_acronym = lst_exam_enrollments[0].session_exam.learning_unit_year.acronym
+    academic_year = lst_exam_enrollments[0].learning_unit_enrollment.learning_unit_year.academic_year
+    filename = "session_%s_%s_%s.xlsx" % (str(academic_year.year), str(number_session), learn_unit_acronym)
+    return filename
+
+
+def _get_export_xls_workbook(exam_enrollments, is_program_manager):
+    workbook = Workbook()
+    worksheet = workbook.active
+    _add_header_and_legend_to_file(exam_enrollments, worksheet, is_program_manager)
+    row_number = 12
+    for exam_enroll in exam_enrollments:
+        student = exam_enroll.learning_unit_enrollment.student
+        offer = exam_enroll.learning_unit_enrollment.offer_enrollment.education_group_year
+        person = mdl.person.find_by_id(student.person.id)
+        end_date = __get_session_exam_deadline(exam_enroll)
+
+        score = None
+        if exam_enroll.score_final is not None:
+            if exam_enroll.session_exam.learning_unit_year.decimal_scores:
+                score = "{0:.2f}".format(exam_enroll.score_final)
+            else:
+                score = "{0:.0f}".format(exam_enroll.score_final)
+
+        justification = JUSTIFICATION_ALIASES.get(exam_enroll.justification_final, "")
+        student_specific_profile = None
+        if hasattr(exam_enroll.learning_unit_enrollment.student, 'studentspecificprofile'):
+            student_specific_profile = exam_enroll.learning_unit_enrollment.student.studentspecificprofile
+
+        line_content = [
+            str(exam_enroll.learning_unit_enrollment.learning_unit_year.academic_year),
+            str(exam_enroll.session_exam.number_session),
+            exam_enroll.session_exam.learning_unit_year.acronym,
+            offer.acronym,
+            student.registration_id,
+            person.last_name,
+            person.first_name,
+            person.email,
+            score,
+            str(justification),
+            end_date if exam_enroll.enrollment_state == 'ENROLLED' else ''
+        ]
+        if student_specific_profile:
+            line_content.extend([
+                _get_type_peps(student_specific_profile),
+                str(_('Yes')) if student_specific_profile.arrangement_additional_time else '-',
+                str(_('Yes')) if student_specific_profile.arrangement_appropriate_copy else '-',
+                str(_('Yes')) if student_specific_profile.arrangement_specific_locale else '-',
+                str(_('Yes')) if student_specific_profile.arrangement_other else '-',
+                str(student_specific_profile.arrangement_comment)
+                if student_specific_profile.arrangement_comment else '-',
+                str(student_specific_profile.guide) if student_specific_profile.guide else '-',
+            ])
+        else:
+            line_content.extend(["-", "-", "-", "-", "-", "-", "-"])
+        worksheet.append(line_content)
+        row_number += 1
+        __coloring_non_editable(worksheet, row_number, score, exam_enroll.justification_final)
+        _coloring_enrollment_state(worksheet, row_number, exam_enroll)
+        _set_peps_border(worksheet, row_number)
+    return workbook
+
+
+def export_xls_for_api(exam_enrollments: List[ExamEnrollment], is_program_manager: bool):
+    print("export_xls_for_api")
+    workbook = _get_export_xls_workbook(exam_enrollments, is_program_manager)
+    j = save_virtual_workbook(workbook)
+    return j
+
