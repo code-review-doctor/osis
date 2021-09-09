@@ -26,6 +26,7 @@ from collections import defaultdict
 from typing import List, Dict, Iterable, Any, Callable, Tuple
 
 import attr
+from django.utils import translation
 
 from base.utils import send_mail
 from base.utils.send_mail import get_enrollment_headers
@@ -100,9 +101,8 @@ class NotifierSoumissionNotes(INotifierSoumissionNotes):
 
         table = message_config.create_table(
             'submitted_enrollments',
-            get_enrollment_headers(donnes_email.langue_email),
+            cls._get_table_headers(donnes_email.langue_email),
             cls._format_lignes_table(donnes_email.notes, donnes_email.signaletiques_etudiant_par_noma),
-            data_translatable=['Justification'],
         )
         message_content = message_config.create_message_content(
             html_template_ref,
@@ -113,6 +113,18 @@ class NotifierSoumissionNotes(INotifierSoumissionNotes):
             subject_data,
         )
         send_message.send_messages(message_content)
+
+    @classmethod
+    def _get_table_headers(cls, lang_code: str):
+        with translation.override(lang_code):
+            return [
+                translation.pgettext('Submission email table header', 'Program'),
+                translation.pgettext('Submission email table header', 'Session number'),
+                translation.pgettext('Submission email table header', 'Registration number'),
+                translation.gettext_lazy('Last name'),
+                translation.gettext_lazy('First name'),
+                translation.gettext_lazy('Score'),
+            ]
 
     @classmethod
     def _format_lignes_table(
@@ -128,8 +140,7 @@ class NotifierSoumissionNotes(INotifierSoumissionNotes):
                 note.noma,
                 signaletiques_etudiant_par_noma[note.noma].nom,
                 signaletiques_etudiant_par_noma[note.noma].prenom,
-                str(note.note) if note.is_chiffree else "",
-                str(note.note) if note.is_justification else ""
+                str(note.note),
             )
             result.append(ligne)
         return result

@@ -26,9 +26,10 @@ from collections import defaultdict
 from typing import List, Dict, Iterable, Any, Callable, Tuple, Optional
 
 import attr
+from django.utils import translation
 
 from base.models.person import Person
-from base.utils.send_mail import get_enrollment_headers, _get_txt_complementary_first_col_header
+from base.utils.send_mail import _get_txt_complementary_first_col_header
 from ddd.logic.encodage_des_notes.encodage.domain.model.gestionnaire_parcours import GestionnaireParcours
 from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import IdentiteNoteEtudiant, NoteEtudiant
 from ddd.logic.encodage_des_notes.encodage.domain.service.i_notifier_encodage_notes import INotifierEncodageNotes
@@ -125,7 +126,7 @@ class NotifierEncodageNotes(INotifierEncodageNotes):
 
         table = message_config.create_table(
             'enrollments',
-            get_enrollment_headers(donnes_email.langue_email),
+            cls._get_table_headers(donnes_email.langue_email),
             {
                 "style": row_styles,
                 "data": rows,
@@ -134,7 +135,6 @@ class NotifierEncodageNotes(INotifierEncodageNotes):
                     "rows_content": txt_complementary_rows_content
                 }
             },
-            data_translatable=['Justification'],
         )
 
         message_content = message_config.create_message_content(
@@ -149,6 +149,18 @@ class NotifierEncodageNotes(INotifierEncodageNotes):
 
         )
         send_message.send_messages(message_content)
+
+    @classmethod
+    def _get_table_headers(cls, lang_code: str):
+        with translation.override(lang_code):
+            return [
+                translation.pgettext('Submission email table header', 'Program'),
+                translation.pgettext('Submission email table header', 'Session number'),
+                translation.pgettext('Submission email table header', 'Registration number'),
+                translation.gettext_lazy('Last name'),
+                translation.gettext_lazy('First name'),
+                translation.gettext_lazy('Score'),
+            ]
 
     @classmethod
     def _get_row_style(
@@ -182,8 +194,7 @@ class NotifierEncodageNotes(INotifierEncodageNotes):
                 note.noma,
                 signaletiques_etudiant_par_noma[note.noma].nom,
                 signaletiques_etudiant_par_noma[note.noma].prenom,
-                str(note.note) if note.is_chiffree else "",
-                str(note.note) if note.is_justification else ""
+                str(note.note),
             )
             result.append(ligne)
         return result
