@@ -12,12 +12,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterField(
             model_name='person',
-            name='external_id',
-            field=models.CharField(blank=True, db_index=True, default='', max_length=100),
-        ),
-        migrations.AlterField(
-            model_name='person',
-            name='first_name',
-            field=models.CharField(blank=True, db_index=True, default='', max_length=50),
+            name='middle_name',
+            field=models.CharField(blank=True, default='', max_length=50),
         ),
     ]

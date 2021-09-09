@@ -12,12 +12,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterField(
             model_name='person',
-            name='global_id',
-            field=models.CharField(blank=True, db_index=True, default='', max_length=10),
-        ),
-        migrations.AlterField(
-            model_name='person',
-            name='last_name',
-            field=models.CharField(blank=True, db_index=True, default='', max_length=50),
+            name='phone',
+            field=models.CharField(blank=True, default='', max_length=30),
         ),
     ]
