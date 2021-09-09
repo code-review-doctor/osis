@@ -16,9 +16,4 @@ class Migration(migrations.Migration):
             field=models.CharField(blank=True, choices=[('F', 'Female'), ('H', 'Male'), ('X', 'Other')], default='',
                                    max_length=1),
         ),
-        migrations.AlterField(
-            model_name='person',
-            name='phone_mobile',
-            field=models.CharField(blank=True, default='', max_length=30),
-        ),
     ]
