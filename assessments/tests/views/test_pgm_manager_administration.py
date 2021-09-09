@@ -117,7 +117,7 @@ class PgmManagerAdministrationTest(TestCase):
         pgm2 = ProgramManagerFactory(person=self.person, education_group=educ_group_year2.education_group)
 
         response = self.client.get(
-            reverse('delete_manager_person', args=[self.person.pk]) + "?education_groups={},{}".format(
+            reverse('delete_manager_person', args=[self.person.global_id]) + "?education_groups={},{}".format(
                 educ_group_year1.education_group_id,
                 educ_group_year2.education_group_id
             )
@@ -125,7 +125,7 @@ class PgmManagerAdministrationTest(TestCase):
         self.assertFalse(response.context['other_programs'])
 
         self.client.post(
-            reverse('delete_manager_person', args=[self.person.pk]) + "?education_groups={},{}".format(
+            reverse('delete_manager_person', args=[self.person.global_id]) + "?education_groups={},{}".format(
                 educ_group_year1.education_group_id,
                 educ_group_year2.education_group_id
             )

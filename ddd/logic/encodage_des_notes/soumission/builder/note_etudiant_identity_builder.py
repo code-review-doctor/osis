@@ -26,7 +26,7 @@
 from typing import Union
 
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderNoteCommand, SoumettreNoteCommand, \
-    SoumettreNotesCommand
+    SoumettreNotesCommand, EncoderNotesEtudiantCommand
 from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import IdentiteNoteEtudiant
 from ddd.logic.encodage_des_notes.soumission.dtos import NoteEtudiantFromRepositoryDTO
 from osis_common.ddd.interface import EntityIdentityBuilder
@@ -34,22 +34,27 @@ from osis_common.ddd.interface import EntityIdentityBuilder
 
 class NoteEtudiantIdentityBuilder(EntityIdentityBuilder):
     @classmethod
-    def build_from_command(
-            cls,
-            cmd: Union['EncoderNoteCommand', 'SoumettreNoteCommand']
-    ) -> 'IdentiteNoteEtudiant':
-        return IdentiteNoteEtudiant(
-            numero_session=cmd.numero_session,
-            code_unite_enseignement=cmd.code_unite_enseignement,
-            annee_academique=cmd.annee_unite_enseignement,
-            noma=cmd.noma_etudiant
-        )
+    def build_from_command(cls, cmd: 'CommandRequest') -> 'EntityIdentity':
+        pass
 
     @classmethod
     def build_from_soumettre_note_command(
             cls,
             cmd: 'SoumettreNotesCommand',
             cmd_note: 'SoumettreNoteCommand'
+    ) -> 'IdentiteNoteEtudiant':
+        return IdentiteNoteEtudiant(
+            numero_session=cmd.numero_session,
+            code_unite_enseignement=cmd.code_unite_enseignement,
+            annee_academique=cmd.annee_unite_enseignement,
+            noma=cmd_note.noma_etudiant
+        )
+
+    @classmethod
+    def build_from_encoder_note_command(
+            cls,
+            cmd: 'EncoderNotesEtudiantCommand',
+            cmd_note: 'EncoderNoteCommand'
     ) -> 'IdentiteNoteEtudiant':
         return IdentiteNoteEtudiant(
             numero_session=cmd.numero_session,

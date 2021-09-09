@@ -32,13 +32,18 @@ from osis_common.ddd import interface
 
 @attr.s(frozen=True, slots=True)
 class EncoderNoteCommand(interface.CommandRequest):
+    noma_etudiant = attr.ib(type=str, validator=attr.validators.instance_of(str))
+    email_etudiant = attr.ib(type=str, validator=attr.validators.instance_of(str))
+    note = attr.ib(type=str, validator=attr.validators.instance_of(str))
+
+
+@attr.s(frozen=True, slots=True)
+class EncoderNotesEtudiantCommand(interface.CommandRequest):
     code_unite_enseignement = attr.ib(type=str, validator=attr.validators.instance_of(str))
     annee_unite_enseignement = attr.ib(type=int, validator=attr.validators.instance_of(int))
     numero_session = attr.ib(type=int, validator=attr.validators.instance_of(int))
     matricule_fgs_enseignant = attr.ib(type=str, validator=attr.validators.instance_of(str))
-    noma_etudiant = attr.ib(type=str, validator=attr.validators.instance_of(str))
-    email_etudiant = attr.ib(type=str, validator=attr.validators.instance_of(str))
-    note = attr.ib(type=str, validator=attr.validators.instance_of(str))
+    notes = attr.ib(type=List[EncoderNoteCommand], validator=attr.validators.instance_of(list))
 
 
 @attr.s(frozen=True, slots=True)
