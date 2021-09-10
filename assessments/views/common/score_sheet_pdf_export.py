@@ -33,34 +33,6 @@ from osis_common.document import paper_sheet
 from osis_role.contrib.views import PermissionRequiredMixin
 
 
-class ScoreSheetPDFExportBaseView(PermissionRequiredMixin, View):
-    # PermissionRequiredMixin
-    permission_required = "assessments.can_access_scoreencoding"
-
-    @cached_property
-    def person(self):
-        return self.request.user.person
-
-    def get(self, request, *args, **kwargs):
-        feuille_de_notes = self.get_feuille_de_notes()
-        donnees_administratives = self.get_donnees_administratives()
-
-        score_sheet_serialized = ScoreSheetPDFSerializer(instance={
-            'feuille_de_notes': feuille_de_notes,
-            'donnees_administratives': donnees_administratives
-        }, context={'person': self.person})
-        return paper_sheet.print_notes(score_sheet_serialized.data)
-
-    def get_feuille_de_notes(self):
-        raise NotImplementedError()
-
-    def get_donnees_administratives(self):
-        cmd = SearchAdressesFeuilleDeNotesCommand(
-            codes_unite_enseignement=[self.kwargs['learning_unit_code']]
-        )
-        return message_bus_instance.invoke(cmd)
-
-
 class ScoreSheetsPDFExportBaseView(PermissionRequiredMixin, View):
     # PermissionRequiredMixin
     permission_required = "assessments.can_access_scoreencoding"
