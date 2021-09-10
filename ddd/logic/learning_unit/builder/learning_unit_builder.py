@@ -119,9 +119,7 @@ class LearningUnitBuilder(RootEntityBuilder):
             professional_integration=False,  # TODO :: to implement and unit test
             is_active=False,  # TODO :: to implement and unit test
             individual_loan=False,
-            english_friendly=False,
-            french_friendly=False,
-            exchange_students=False,
+            mobility=_build_mobility(False, False, False),
             stage_dimona=False,
         )
 
@@ -293,8 +291,6 @@ def _build_part(
 
 
 def _build_mobility(english_friendly: bool, french_friendly: bool, exchange_students: bool) -> 'Mobility':
-    print('_build_mobility')
-    print(english_friendly)
     return Mobility(
         english_friendly=english_friendly,
         french_friendly=french_friendly,
