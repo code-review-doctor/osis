@@ -84,6 +84,9 @@ class FeuilleDeNotesParCohorte(interface.DomainService):
             if note.nom_cohorte in cohortes_gerees_par_gestionnaire:
                 etudiants_gestionnaire.append(
                     NoteEtudiantDTO(
+                        code_unite_enseignement=note.code_unite_enseignement,
+                        annee_unite_enseignement=note.annee_unite_enseignement,
+                        intitule_complet_unite_enseignement=note.intitule_complet_unite_enseignement,
                         est_soumise=note.est_soumise,
                         date_remise_de_notes=note.date_remise_de_notes,
                         nom_cohorte=note.nom_cohorte,

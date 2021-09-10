@@ -362,6 +362,8 @@ class MessageBus:
             PeriodeEncodageNotesTranslator(),
             CohortesDuGestionnaireTranslator(),
             SignaletiqueEtudiantTranslator(),
+            UniteEnseignementTranslator(),
+            InscriptionExamenTranslator(),
         ),
         GetProgressionGeneraleGestionnaireCommand: lambda cmd: get_progression_generale_gestionnaire(
             cmd,

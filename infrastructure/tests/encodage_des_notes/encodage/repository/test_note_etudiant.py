@@ -115,6 +115,32 @@ class TestNoteEtudiant(TestCase):
         result = self.repo.search(justification=note_justification.note.value)
         self.assertCountEqual(result, [note_justification])
 
+    def test_should_ordonne_par_code_unite_enseignement_nom_cohorte_annee_academique_session_noma(self):
+        note_chiffree_1 = NoteEtudiantChiffreeFactory(
+            entity_id__code_unite_enseignement='LAGRO1200',
+            entity_id__annee_academique=2021,
+            entity_id__numero_session=2,
+            entity_id__noma="987654321",
+            nom_cohorte='DROI1BA'
+        )
+        note_chiffree_2 = NoteEtudiantChiffreeFactory(
+            entity_id__code_unite_enseignement='LAGRO1200',
+            entity_id__annee_academique=2021,
+            entity_id__numero_session=2,
+            entity_id__noma="654987321",
+            nom_cohorte='DROI1BA'
+        )
+
+        self._create_save_necessary_data(note_chiffree_1)
+        self._create_save_necessary_data(note_chiffree_2)
+
+        results = self.repo.search(noms_cohortes=['DROI1BA'])
+        self.assertEqual(len(results), 2)
+
+        # Noma "654987321" < "987654321"
+        self.assertEqual(results[0].noma, note_chiffree_2.entity_id.noma)
+        self.assertEqual(results[1].noma, note_chiffree_1.entity_id.noma)
+
     def _create_save_necessary_data(self, note_etudiant_to_save, for_class: bool = False):
         luy_acronym = note_etudiant_to_save.code_unite_enseignement
         if for_class:

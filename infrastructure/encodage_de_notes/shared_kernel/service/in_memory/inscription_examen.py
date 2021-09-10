@@ -81,6 +81,20 @@ class InscriptionExamenTranslatorInMemory(IInscriptionExamenTranslator):
         )
 
     @classmethod
+    def search_desinscrits_pour_plusieurs_unites_enseignement(
+            cls,
+            codes_unites_enseignement: Set[str],
+            numero_session: int,
+            annee: int,
+    ) -> Set['DesinscriptionExamenDTO']:
+        return set(
+            filter(
+                lambda dto: _filter(dto, codes_unites_enseignement, annee),
+                cls.desinscrits,
+            )
+        )
+
+    @classmethod
     def search_inscrits(
             cls,
             code_unite_enseignement: str,

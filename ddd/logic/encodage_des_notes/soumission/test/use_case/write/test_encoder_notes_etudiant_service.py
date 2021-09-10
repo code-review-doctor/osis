@@ -31,7 +31,7 @@ import attr
 from django.test import SimpleTestCase
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
-from base.models.enums.exam_enrollment_justification_type import TutorJustificationTypes
+from base.models.enums.exam_enrollment_justification_type import JustificationTypes
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import PeriodeEncodageNotesDTO
 from ddd.logic.encodage_des_notes.shared_kernel.validator.exceptions import DateEcheanceNoteAtteinteException, \
     NomaNeCorrespondPasEmailException, NoteDecimaleNonAutoriseeException, PeriodeEncodageNotesFermeeException
@@ -39,7 +39,8 @@ from ddd.logic.encodage_des_notes.soumission.commands import EncoderNoteCommand,
 from ddd.logic.encodage_des_notes.soumission.domain.model._note import Justification
 from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import NoteEtudiant
 from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import \
-    EnseignantNonAttribueUniteEnseignementException, NoteIncorrecteException, NoteDejaSoumiseException
+    EnseignantNonAttribueUniteEnseignementException, NoteIncorrecteException, NoteDejaSoumiseException, \
+    EncoderNotesEtudiantEnLotLigneBusinessExceptions
 from ddd.logic.encodage_des_notes.soumission.dtos import DateDTO, AttributionEnseignantDTO
 from ddd.logic.encodage_des_notes.soumission.test.factory.note_etudiant import NoteManquanteEtudiantFactory, \
     NoteDecimalesAuthorisees, NoteDejaSoumise
@@ -174,10 +175,10 @@ class EncoderNotesTest(SimpleTestCase):
 
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             self.message_bus.invoke(cmd)
-        self.assertIsInstance(
-            class_exceptions.exception.exceptions.pop(),
-            DateEcheanceNoteAtteinteException
-        )
+
+        exception = class_exceptions.exception.exceptions.pop()
+        self.assertIsInstance(exception, EncoderNotesEtudiantEnLotLigneBusinessExceptions)
+        self.assertEqual(exception.message, DateEcheanceNoteAtteinteException().message)
 
     def test_should_autoriser_si_date_de_remise_est_aujourdhui(self):
         note_etudiant_a_remettre_au_plus_tard_aujourdhui = NoteManquanteEtudiantFactory(date_remise_aujourdhui=True)
@@ -205,10 +206,9 @@ class EncoderNotesTest(SimpleTestCase):
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             self.message_bus.invoke(cmd)
 
-        self.assertIsInstance(
-            class_exceptions.exception.exceptions.pop(),
-            NomaNeCorrespondPasEmailException
-        )
+        exception = class_exceptions.exception.exceptions.pop()
+        self.assertIsInstance(exception, EncoderNotesEtudiantEnLotLigneBusinessExceptions)
+        self.assertEqual(exception.message, NomaNeCorrespondPasEmailException().message)
 
     def test_should_ignore_when_noma_ne_dispose_pas_de_note_etudiant(self):
         cmd = attr.evolve(
@@ -239,10 +239,10 @@ class EncoderNotesTest(SimpleTestCase):
 
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             self.message_bus.invoke(cmd)
-        self.assertIsInstance(
-            class_exceptions.exception.exceptions.pop(),
-            NoteIncorrecteException
-        )
+
+        exception = class_exceptions.exception.exceptions.pop()
+        self.assertIsInstance(exception, EncoderNotesEtudiantEnLotLigneBusinessExceptions)
+        self.assertEqual(exception.message, NoteIncorrecteException(note_incorrecte='-1').message)
 
     def test_should_encoder_note_de_presence(self):
         note_de_presence = "0"
@@ -273,10 +273,10 @@ class EncoderNotesTest(SimpleTestCase):
 
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             self.message_bus.invoke(cmd)
-        self.assertIsInstance(
-            class_exceptions.exception.exceptions.pop(),
-            NoteIncorrecteException
-        )
+
+        exception = class_exceptions.exception.exceptions.pop()
+        self.assertIsInstance(exception, EncoderNotesEtudiantEnLotLigneBusinessExceptions)
+        self.assertEqual(exception.message, NoteIncorrecteException(note_incorrecte='21').message)
 
     def test_should_encoder_20(self):
         cmd = attr.evolve(
@@ -306,10 +306,10 @@ class EncoderNotesTest(SimpleTestCase):
 
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             self.message_bus.invoke(cmd)
-        self.assertIsInstance(
-            class_exceptions.exception.exceptions.pop(),
-            NoteIncorrecteException
-        )
+
+        exception = class_exceptions.exception.exceptions.pop()
+        self.assertIsInstance(exception, EncoderNotesEtudiantEnLotLigneBusinessExceptions)
+        self.assertEqual(exception.message, NoteIncorrecteException(note_incorrecte='S').message)
 
     def test_should_empecher_si_note_mal_formatee(self):
         cmd = attr.evolve(
@@ -325,10 +325,10 @@ class EncoderNotesTest(SimpleTestCase):
 
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             self.message_bus.invoke(cmd)
-        self.assertIsInstance(
-            class_exceptions.exception.exceptions.pop(),
-            NoteIncorrecteException
-        )
+
+        exception = class_exceptions.exception.exceptions.pop()
+        self.assertIsInstance(exception, EncoderNotesEtudiantEnLotLigneBusinessExceptions)
+        self.assertEqual(exception.message, NoteIncorrecteException(note_incorrecte='T 12').message)
 
     def test_should_empecher_si_note_decimale_non_autorisee(self):
         cmd = attr.evolve(
@@ -344,10 +344,10 @@ class EncoderNotesTest(SimpleTestCase):
 
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             self.message_bus.invoke(cmd)
-        self.assertIsInstance(
-            class_exceptions.exception.exceptions.pop(),
-            NoteDecimaleNonAutoriseeException
-        )
+
+        exception = class_exceptions.exception.exceptions.pop()
+        self.assertIsInstance(exception, EncoderNotesEtudiantEnLotLigneBusinessExceptions)
+        self.assertEqual(exception.message, NoteDecimaleNonAutoriseeException().message)
 
     def test_should_encoder_si_note_decimale_autorisee(self):
         note_etudiant = NoteDecimalesAuthorisees()
@@ -366,13 +366,13 @@ class EncoderNotesTest(SimpleTestCase):
 
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             self.message_bus.invoke(cmd)
-        self.assertIsInstance(
-            class_exceptions.exception.exceptions.pop(),
-            NoteDejaSoumiseException
-        )
+
+        exception = class_exceptions.exception.exceptions.pop()
+        self.assertIsInstance(exception, EncoderNotesEtudiantEnLotLigneBusinessExceptions)
+        self.assertEqual(exception.message, NoteDejaSoumiseException().message)
 
     def test_should_encoder_absence_injustifiee(self):
-        for absence_injustifiee in ['A', TutorJustificationTypes.ABSENCE_UNJUSTIFIED.name]:
+        for absence_injustifiee in ['A', JustificationTypes.ABSENCE_UNJUSTIFIED.name]:
             with self.subTest(absence=absence_injustifiee):
                 cmd = attr.evolve(
                     self.cmd,
@@ -387,11 +387,11 @@ class EncoderNotesTest(SimpleTestCase):
 
                 entity_id = self.message_bus.invoke(cmd)[0]
 
-                expected_result = Justification(value=TutorJustificationTypes.ABSENCE_UNJUSTIFIED)
+                expected_result = Justification(value=JustificationTypes.ABSENCE_UNJUSTIFIED)
                 self.assertEqual(self.repository.get(entity_id).note, expected_result)
 
     def test_should_encoder_tricherie(self):
-        for tricherie in ['T', TutorJustificationTypes.CHEATING.name]:
+        for tricherie in ['T', JustificationTypes.CHEATING.name]:
             with self.subTest(tricherie=tricherie):
                 cmd = attr.evolve(
                     self.cmd,
@@ -406,7 +406,7 @@ class EncoderNotesTest(SimpleTestCase):
 
                 entity_id = self.message_bus.invoke(cmd)[0]
 
-                expected_result = Justification(value=TutorJustificationTypes.CHEATING)
+                expected_result = Justification(value=JustificationTypes.CHEATING)
                 self.assertEqual(self.repository.get(entity_id).note, expected_result)
 
     def _generate_command_from_note_etudiant(self, note_etudiant: 'NoteEtudiant', note=None):

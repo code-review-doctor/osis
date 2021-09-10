@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-24 13:09+0200\n"
+"POT-Creation-Date: 2021-09-09 17:18+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -79,7 +79,13 @@ msgstr ""
 msgid "A=Absent"
 msgstr ""
 
+msgid "Absence justified"
+msgstr ""
+
 msgid "Absence justified cannot be remplaced by absence unjustified"
+msgstr ""
+
+msgid "Absence unjustified"
 msgstr ""
 
 msgid "Absent"
@@ -642,6 +648,12 @@ msgstr ""
 
 msgid "The selected entity no longer exists today (end date passed)."
 msgstr ""
+
+#, python-format
+msgid "There is %(error_counter)s error in form"
+msgid_plural "There are %(error_counter)s errors in form"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "This process helps tutor while encoding notes for the exams sessions."
 msgstr ""

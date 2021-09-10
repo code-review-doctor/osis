@@ -32,9 +32,6 @@ from django.views.generic import FormView
 
 from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmissionCalendar
 from assessments.forms.score_encoding import ScoreEncodingForm, ScoreEncodingFormSet
-from base.ddd.utils.business_validator import MultipleBusinessExceptions
-from ddd.logic.encodage_des_notes.soumission.commands import EncoderNoteCommand, EncoderNotesEtudiantCommand
-from infrastructure.messages_bus import message_bus_instance
 from osis_role.contrib.views import PermissionRequiredMixin
 
 
@@ -49,31 +46,6 @@ class LearningUnitScoreEncodingBaseFormView(PermissionRequiredMixin, FormView):
     @cached_property
     def feuille_de_notes(self):
         raise NotImplementedError()
-
-    def form_valid(self, formset):
-        try:
-            cmd = EncoderNotesEtudiantCommand(
-                code_unite_enseignement=self.feuille_de_notes.code_unite_enseignement,
-                annee_unite_enseignement=self.feuille_de_notes.annee_academique,
-                numero_session=self.feuille_de_notes.numero_session,
-                matricule_fgs_enseignant=self.person.global_id,
-                notes=[
-                    EncoderNoteCommand(
-                        noma_etudiant=form.cleaned_data['noma'],
-                        email_etudiant=self.feuille_de_notes.get_email_for_noma(form.cleaned_data['noma']),
-                        note=form.cleaned_data['note'],
-                    )
-                    for form in formset
-                ]
-            )
-            message_bus_instance.invoke(cmd)
-        except MultipleBusinessExceptions as e:
-            for exception in e.exceptions:
-                formset.add_error(None, exception.message)
-
-        if formset.is_valid():
-            return self.get_success_url()
-        return self.render_to_response(self.get_context_data(form=formset))
 
     def dispatch(self, request, *args, **kwargs):
         opened_calendars = ScoresExamSubmissionCalendar().get_opened_academic_events()

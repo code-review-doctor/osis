@@ -53,6 +53,9 @@ class ScoreSheetXLSSerializerTest(SimpleTestCase):
             numero_session=2,
             notes_etudiants=[
                 NoteEtudiantDTO(
+                    code_unite_enseignement='LDROI1200',
+                    annee_unite_enseignement=2021,
+                    intitule_complet_unite_enseignement='Introduction au droit',
                     est_soumise=False,
                     date_remise_de_notes=DateDTO.build_from_date(datetime.date.today() - datetime.timedelta(days=1)),
                     nom_cohorte='DROI2M',
@@ -66,6 +69,9 @@ class ScoreSheetXLSSerializerTest(SimpleTestCase):
                     desinscrit_tardivement=False,
                 ),
                 NoteEtudiantDTO(
+                    code_unite_enseignement='LDROI1200',
+                    annee_unite_enseignement=2021,
+                    intitule_complet_unite_enseignement='Introduction au droit',
                     est_soumise=True,
                     date_remise_de_notes=DateDTO.build_from_date(datetime.date.today() + datetime.timedelta(days=5)),
                     nom_cohorte='DROI2M',

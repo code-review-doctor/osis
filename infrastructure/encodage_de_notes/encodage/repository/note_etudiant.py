@@ -210,7 +210,7 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
         if nomas:
             qs = qs.filter(learning_unit_enrollment__offer_enrollment__student__registration_id__in=nomas)
         if note_manquante:
-            qs = qs.filter(score_final__isnull=True, justification_final_isnull=True)
+            qs = qs.filter(score_final__isnull=True, justification_final__isnull=True)
 
         qs = qs.annotate(
             code_unite_enseignement=Concat(
@@ -315,10 +315,6 @@ def _fetch_session_exams():
         note=Coalesce(
             'justification_final',
             Cast('score_final', output_field=CharField()),
-            'justification_reencoded',
-            Cast('score_reencoded', output_field=CharField()),
-            'justification_draft',
-            Cast('score_draft', output_field=CharField()),
             Value(''),
         ),
         echeance_gestionnaire=Subquery(
@@ -341,4 +337,5 @@ def _fetch_session_exams():
         'nom_cohorte',
         'annee_academique',
         'numero_session',
+        'noma'
     )
