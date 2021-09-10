@@ -456,6 +456,7 @@ def export_xls(request, learning_unit_year_id):
 @permission_required('assessments.can_access_scoreencoding', raise_exception=True)
 @user_passes_test(_is_inside_scores_encodings_period, login_url=reverse_lazy('outside_scores_encodings_period'))
 def notes_printing(request, learning_unit_year_id=None, tutor_id=None, education_group_year_id=None):
+    print('ici notes_printing')
     is_program_manager = base.auth.roles.program_manager.is_program_manager(request.user)
     scores_list_encoded = score_encoding_list.get_scores_encoding_list(
         user=request.user,
@@ -846,3 +847,18 @@ def export_xls_for_api(request, token, learning_unit_year_id):
         return Response(None, 309)
     except:
         return Response(None, 310)
+
+
+@api_view(('GET',))
+@renderer_classes((PDFRenderer,))
+def notes_printing2(request, token, learning_unit_year_id):
+    is_program_manager = base.auth.roles.program_manager.is_program_manager(request.user)
+    scores_list_encoded = score_encoding_list.get_scores_encoding_list(
+        user=request.user,
+        learning_unit_year_id=learning_unit_year_id,
+        tutor_id=None,
+        education_group_year_id=None
+    )
+    tutor = tutor_mdl.find_by_user(request.user) if not is_program_manager else None
+    sheet_data = score_encoding_sheet.scores_sheet_data(scores_list_encoded.enrollments, tutor=tutor)
+    return paper_sheet.print_notes(sheet_data)
