@@ -202,9 +202,6 @@ class _LearningUnitFactory(factory.Factory):
     is_active = True
     individual_loan = False
     mobility = factory.SubFactory(_MobilityFactory)
-    english_friendly = False
-    french_friendly = False
-    exchange_students = False
     stage_dimona = False
 
 
