@@ -26,8 +26,7 @@
 from django.test import TestCase
 
 from base.models.enums.academic_calendar_type import AcademicCalendarTypes
-from base.tests.factories.cohort_year import CohortYearFactory
-from base.tests.factories.offer_year_calendar import OfferYearCalendarFactory
+from base.tests.factories.offer_year_calendar import OfferYearCalendarFactory, OfferYearCalendar11BAFactory
 from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
 from ddd.logic.encodage_des_notes.soumission.dtos import DateDTO
 from infrastructure.encodage_de_notes.soumission.domain.service.deliberation import DeliberationTranslator
@@ -66,10 +65,30 @@ class DeliberationTest(TestCase):
             education_group_year__acronym="DROI1BA",
         )
         SessionExamCalendarFactory(academic_calendar=off_calendar.academic_calendar, number_session=self.numero_session)
-        CohortYearFactory(education_group_year=off_calendar.education_group_year)  # 11BA
+
+        cohort_11ba_off_calendar = OfferYearCalendar11BAFactory(
+            academic_calendar__reference=AcademicCalendarTypes.DELIBERATION.name,
+            education_group_year=off_calendar.education_group_year,
+        )
+        SessionExamCalendarFactory(
+            academic_calendar=cohort_11ba_off_calendar.academic_calendar,
+            number_session=self.numero_session
+        )
+
         result = self.translator.search(self.annee, self.numero_session, {'DROI11BA'})
         dto = list(result)[0]
         self.assertEqual(dto.nom_cohorte, 'DROI11BA')
-        start_date = off_calendar.start_date
-        self.assertNotEqual(dto.date, DateDTO(jour=start_date.day, mois=start_date.month, annee=start_date.year))
-        # TODO :: assertion sur date de délibé du 11BA
+        bachelor_start_date = off_calendar.start_date
+        first_year_bachelor_start_date = cohort_11ba_off_calendar.start_date
+        self.assertNotEqual(
+            dto.date,
+            DateDTO(jour=bachelor_start_date.day, mois=bachelor_start_date.month, annee=bachelor_start_date.year)
+        )
+        self.assertEqual(
+            dto.date,
+            DateDTO(
+                jour=first_year_bachelor_start_date.day,
+                mois=first_year_bachelor_start_date.month,
+                annee=first_year_bachelor_start_date.year
+            )
+        )
