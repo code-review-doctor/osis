@@ -29,6 +29,8 @@ from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from ddd.logic.encodage_des_notes.soumission.builder.note_etudiant_identity_builder import NoteEtudiantIdentityBuilder
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderNotesEtudiantCommand
 from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import IdentiteNoteEtudiant, NoteEtudiant
+from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import \
+    EncoderNotesEtudiantEnLotLigneBusinessExceptions
 from ddd.logic.encodage_des_notes.soumission.repository.i_note_etudiant import INoteEtudiantRepository
 from osis_common.ddd import interface
 
@@ -61,10 +63,12 @@ class EncoderNotesEtudiantEnLot(interface.DomainService):
             if note_a_modifier:
                 try:
                     note_a_modifier.encoder(note_encodee_cmd.email_etudiant, note_encodee_cmd.note)
-
                     notes_a_persister.append(note_a_modifier)
                 except MultipleBusinessExceptions as e:
-                    exceptions += list(e.exceptions)
+                    exceptions += [
+                        EncoderNotesEtudiantEnLotLigneBusinessExceptions(note_id=identite, exception=business_exception)
+                        for business_exception in e.exceptions
+                    ]
 
         for note in notes_a_persister:
             note_etudiant_repo.save(note)

@@ -95,6 +95,17 @@
                     </div>
                 </div>
             </div>
+
+             <div class="alert alert-info">
+                <span id="message_decimal_accepted">
+                    {% if feuille_de_notes.note_decimale_est_autorisee %}
+                        {% trans 'Decimal values in scores are accepted.' %}
+                    {% else %}
+                        {% trans "Decimal values in scores are NOT accepted." %}{% trans "If you try to put decimal values, it will be ignored." %}
+                    {% endif %}
+                </span>
+            </div>
+
             <form class="form-inline" method="POST">
                 {% csrf_token %}
 
@@ -148,7 +159,7 @@
                                             {% bootstrap_field score_encoding_form.noma %}
                                         {% endwith %}
                                     {% else %}
-                                        {{ note_etudiant.note }}
+                                         {% include 'assessments/common/note_read.html' %}
                                     {% endif %}
                                 </td>
                                 <td headers="deadline">

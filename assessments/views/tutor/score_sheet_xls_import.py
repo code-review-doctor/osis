@@ -38,30 +38,35 @@ class ScoreSheetXLSImportTutorView(ScoreSheetXLSImportBaseView):
             messages.error(self.request, _("No score injected"))
             return
 
-        try:
-            cmd = EncoderNotesEtudiantCommand(
-                code_unite_enseignement=score_sheet_serialized['notes_etudiants'][0].code_unite_enseignement,
-                annee_unite_enseignement=score_sheet_serialized['annee_academique'],
-                numero_session=score_sheet_serialized['numero_session'],
-                matricule_fgs_enseignant=matricule,
-                notes=[
-                    EncoderNoteCommand(
-                        noma_etudiant=note_etudiant['noma'],
-                        email_etudiant=note_etudiant['email'],
-                        note=note_etudiant['note'],
-                    )
-                    for note_etudiant in score_sheet_serialized['notes_etudiants']
-                ]
-            )
-            identites_notes_encodees = message_bus_instance.invoke(cmd)
-        except MultipleBusinessExceptions as e:
-            identites_notes_encodees = []
-            #  FIXME add error message with specifying line
-            # for exception in e.exceptions:
-            #     error_message = "{} : {} {}".format(exception.message, _('Row'), str(index + 1))
-            #     messages.error(self.request, error_message)
+        cmd = EncoderNotesEtudiantCommand(
+            code_unite_enseignement=score_sheet_serialized['notes_etudiants'][0]['code_unite_enseignement'],
+            annee_unite_enseignement=score_sheet_serialized['annee_academique'],
+            numero_session=score_sheet_serialized['numero_session'],
+            matricule_fgs_enseignant=matricule,
+            notes=[
+                EncoderNoteCommand(
+                    noma_etudiant=note_etudiant['noma'],
+                    email_etudiant=note_etudiant['email'],
+                    note=note_etudiant['note'],
+                )
+                for note_etudiant in score_sheet_serialized['notes_etudiants']
+            ]
+        )
 
-        if identites_notes_encodees:
-            messages.success(self.request, "{} {}".format(str(len(identites_notes_encodees)), _("Score(s) saved")))
+        injected_notes_counter = len(cmd.notes)
+        try:
+            message_bus_instance.invoke(cmd)
+        except MultipleBusinessExceptions as e:
+            injected_notes_counter -= len(e.exceptions)
+            for exception in e.exceptions:
+                row_number = next(
+                    note_etudiant['row_number'] for note_etudiant in score_sheet_serialized['notes_etudiants']
+                    if note_etudiant['noma'] == exception.note_id.noma
+                )
+                error_message = "{} : {} {}".format(exception.message, _('Row'), str(row_number))
+                messages.error(self.request, error_message)
+
+        if injected_notes_counter:
+            messages.success(self.request, "{} {}".format(str(injected_notes_counter), _("Score(s) saved")))
         else:
             messages.error(self.request, _("No score injected"))

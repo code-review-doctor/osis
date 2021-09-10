@@ -23,6 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from gettext import ngettext
+from django.utils.translation import gettext_lazy as _
+
+from django.contrib import messages
 from django.utils.functional import cached_property
 
 from assessments.views.common.learning_unit_score_encoding_form import LearningUnitScoreEncodingBaseFormView
@@ -68,9 +72,25 @@ class LearningUnitScoreEncodingProgramManagerFormView(LearningUnitScoreEncodingB
                     )
                     form.add_error('note', exception.message)
 
+        self.display_success_error_counter(cmd, formset)
         if formset.is_valid():
             return self.get_success_url()
         return self.render_to_response(self.get_context_data(form=formset))
+
+    def display_success_error_counter(self, cmd, formset):
+        error_counter = sum(1 for form in formset if form.has_changed() and not form.is_valid())
+        success_counter = len(cmd.notes_encodees) - error_counter
+        if error_counter > 0:
+            messages.error(
+                self.request,
+                ngettext(
+                    "There is %(error_counter)s error in form",
+                    "There are %(error_counter)s errors in form",
+                    error_counter
+                ) % {'error_counter': error_counter}
+            )
+        if success_counter > 0:
+            messages.success(self.request, '%s %s' % (str(success_counter), _('Score(s) saved')))
 
     def get_initial(self):
         formeset_initial = []

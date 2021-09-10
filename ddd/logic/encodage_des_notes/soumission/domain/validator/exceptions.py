@@ -27,6 +27,7 @@ from typing import Set
 
 from django.utils.translation import gettext_lazy as _
 
+from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import IdentiteNoteEtudiant
 from osis_common.ddd.interface import BusinessException
 
 
@@ -88,3 +89,9 @@ class EntiteNonValidePourAdresseException(BusinessException):
     def __init__(self, **kwargs):
         message = _("The entity is not valid for the score sheet address")
         super().__init__(message, **kwargs)
+
+
+class EncoderNotesEtudiantEnLotLigneBusinessExceptions(BusinessException):
+    def __init__(self, note_id: IdentiteNoteEtudiant, exception: BusinessException):
+        self.note_id = note_id
+        super().__init__(exception.message)
