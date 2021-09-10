@@ -25,12 +25,14 @@
 ##############################################################################
 from typing import Set
 
-from django.db.models import F
+from django.db.models import F, Case, When, Value, CharField
+from django.db.models.functions import Replace
 
 from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.models.offer_year_calendar import OfferYearCalendar
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_deliberation import IDeliberationTranslator
 from ddd.logic.encodage_des_notes.soumission.dtos import DeliberationDTO, DateDTO
+from education_group.models.enums.cohort_name import CohortName
 
 
 class DeliberationTranslator(IDeliberationTranslator):
@@ -42,14 +44,22 @@ class DeliberationTranslator(IDeliberationTranslator):
             session: int,
             noms_cohortes: Set[str],
     ) -> Set['DeliberationDTO']:
-        # TODO :: gérer date délibé des 11BA
         qs = OfferYearCalendar.objects.filter(
             academic_calendar__reference=AcademicCalendarTypes.DELIBERATION.name,
             education_group_year__academic_year__year=annee,
             academic_calendar__sessionexamcalendar__number_session=session,
         ).annotate(
             date=F('start_date'),
-            nom_cohorte=F('education_group_year__acronym'),
+            nom_cohorte=Case(
+                When(
+                    cohort_year__name=CohortName.FIRST_YEAR.name,
+                    then=Replace('education_group_year__acronym', Value('1BA'), Value('11BA'))
+                ),
+                default=F('education_group_year__acronym'),
+                output_field=CharField()
+            ),
+        ).filter(
+            nom_cohorte__in=noms_cohortes
         ).values(
             'date',
             'nom_cohorte',
