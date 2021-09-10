@@ -29,6 +29,7 @@ from django.utils.functional import cached_property
 from django.views.generic import TemplateView
 
 from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmissionCalendar
+from base.utils.urls import reverse_with_get
 from osis_role.contrib.views import PermissionRequiredMixin
 
 
@@ -62,8 +63,8 @@ class LearningUnitScoreEncodingBaseView(PermissionRequiredMixin, TemplateView):
         })
 
     def get_learning_unit_print_url(self):
-        return reverse('score_sheet_pdf_export', kwargs={
-            'learning_unit_code': self.kwargs['learning_unit_code']
+        return reverse_with_get('score_sheets_pdf_export', get={
+            'codes_unite_enseignement': self.kwargs['learning_unit_code']
         })
 
     def get_learning_unit_download_xls_url(self):

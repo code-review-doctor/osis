@@ -44,6 +44,12 @@ class ScoreEncodingForm(forms.Form):
     noma = forms.CharField(widget=HiddenInput())
 
 
+class ScoreSearchEncodingForm(forms.Form):
+    note = forms.CharField(max_length=100, required=False)
+    noma = forms.CharField(widget=HiddenInput())
+    code_unite_enseignement = forms.CharField(widget=HiddenInput())
+
+
 class ScoreSearchForm(forms.Form):
     noma = forms.CharField(required=False)
     nom = forms.CharField(required=False)

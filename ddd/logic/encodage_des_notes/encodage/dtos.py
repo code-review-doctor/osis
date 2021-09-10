@@ -79,6 +79,9 @@ class FeuilleDeNotesParCohorteDTO(interface.DTO):
     def nombre_inscriptions(self) -> int:
         return self.quantite_total_notes
 
+    def get_email_for_noma(self, noma: str) -> str:
+        return next(note_etudiant.email for note_etudiant in self.notes_etudiants if note_etudiant.noma == noma)
+
 
 @attr.s(frozen=True, slots=True)
 class NoteEtudiantFromRepositoryDTO(interface.DTO):

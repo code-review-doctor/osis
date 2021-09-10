@@ -269,7 +269,7 @@
                                                                 <div
                                                                         class="progress-bar {% if progression_encodage.encodage_est_complet %} progress-bar-success {% else %} progress-bar-warning {% endif %}"
                                                                         role="progressbar"
-                                                                        style="width: {% widthratio progression_encodage.quantite_notes_soumises progression_encodage.quantite_total_notes 100 %}%;"
+                                                                        style="width: {% widthratio progression_encodage.quantite_notes_soumises progression_encodage.quantite_totale_notes 100 %}%;"
                                                                         title="{% trans "Represents the quantity of scores submitted to the administration. The number surrounded by parenthesis is the number of scores encoded by the tutor that aren't submitted yet ('draft' state)" %}"
                                                                 >
                                                                    <span>
@@ -284,12 +284,19 @@
                                                             </div>
                                                         </td>
                                                         <td headers="tab_paper_download_action" class="text-center">
-                                                            <a class="btn btn-default download"
-                                                               href="{% url 'score_sheet_pdf_export' progression_encodage.code_unite_enseignement %}"
-                                                               role="button" id="lnk_notes_printing_{{progression_encodage.code_unite_enseignement}}"
-                                                               data-toggle="tooltip" data-placement="right"
-                                                               title="{% trans 'Print the scores' %}"
-                                                            > <em class="fas fa-print"></em> {% trans 'Print' %}</a>
+                                                            <form id="form_print_{{ progression_encodage.code_unite_enseignement }}" method="get" action="{% url 'score_sheets_pdf_export' %}">
+                                                                <input type="checkbox" name="codes_unite_enseignement" value="{{ progression_encodage.code_unite_enseignement }}" checked hidden>
+                                                                <button
+                                                                        type="submit"
+                                                                        class="btn btn-default download"
+                                                                        role="button"
+                                                                        id="lnk_notes_printing_{{progression_encodage.code_unite_enseignement}}"
+                                                                        data-toggle="tooltip" data-placement="right"
+                                                                        title="{% trans 'Print the scores' %}"
+                                                                >
+                                                                    <em class="fas fa-print"></em> {% trans 'Print' %}
+                                                                </button>
+                                                            </form>
                                                         </td>
                                                     </tr>
                                                 {% endfor %}
@@ -330,7 +337,7 @@
                                                                 <div
                                                                         class="progress-bar {% if progression_encodage.encodage_est_complet %} progress-bar-success {% else %} progress-bar-warning {% endif %}"
                                                                         role="progressbar"
-                                                                        style="width: {% widthratio progression_encodage.quantite_notes_soumises progression_encodage.quantite_total_notes 100 %}%;"
+                                                                        style="width: {% widthratio progression_encodage.quantite_notes_soumises progression_encodage.quantite_totale_notes 100 %}%;"
                                                                         title="{% trans "Represents the quantity of scores submitted to the administration. The number surrounded by parenthesis is the number of scores encoded by the tutor that aren't submitted yet ('draft' state)" %}"
                                                                 >
                                                                    <span>

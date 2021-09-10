@@ -82,6 +82,9 @@ class EtudiantPepsDTO(interface.DTO):
 class NoteEtudiantDTO(interface.DTO):
     est_soumise = attr.ib(type=bool)
     date_remise_de_notes = attr.ib(type=DateDTO)  # TODO :: renommer en echeance_enseignant
+    code_unite_enseignement = attr.ib(type=str)
+    annee_unite_enseignement = attr.ib(type=int)
+    intitule_complet_unite_enseignement = attr.ib(type=str)
     nom_cohorte = attr.ib(type=str)  # inscription examen
     noma = attr.ib(type=str)  # matricule
     nom = attr.ib(type=str)  # signaletique

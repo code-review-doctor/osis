@@ -43,10 +43,11 @@ class _XLSNoteEtudiantRowImportSerializer(serializers.Serializer):
     note = serializers.SerializerMethodField()
     email = serializers.SerializerMethodField()
     noma = serializers.SerializerMethodField()
+    row_number = serializers.SerializerMethodField()
 
     def get_code_unite_enseignement(self, obj: tuple):
         col_unite_enseignement = HEADER.index(_('Learning unit'))
-        return obj[col_unite_enseignement].value
+        return str(obj[col_unite_enseignement].value)
 
     def get_note(self, obj: tuple):
         col_note = HEADER.index(_('Numbered scores'))
@@ -54,11 +55,14 @@ class _XLSNoteEtudiantRowImportSerializer(serializers.Serializer):
 
     def get_email(self, obj: tuple):
         col_email = HEADER.index(_('Email'))
-        return obj[col_email].value
+        return str(obj[col_email].value)
 
     def get_noma(self, obj: tuple):
         col_noma = HEADER.index(_('Registration number'))
-        return obj[col_noma].value
+        return str(obj[col_noma].value)
+
+    def get_row_number(self, obj: tuple) -> int:
+        return self.context['row_number']
 
 
 class ScoreSheetXLSImportSerializer(serializers.Serializer):
@@ -120,8 +124,8 @@ class ScoreSheetXLSImportSerializer(serializers.Serializer):
 
     def get_notes_etudiants(self, worksheet: Worksheet):
         notes_etudiants = []
-        for count, row in enumerate(self.__get_student_rows(worksheet)):
-            row_serialized = _XLSNoteEtudiantRowImportSerializer(instance=row).data
+        for row in self.__get_student_rows(worksheet):
+            row_serialized = _XLSNoteEtudiantRowImportSerializer(instance=row, context={'row_number': row[0].row}).data
             notes_etudiants.append(row_serialized)
         return notes_etudiants
 

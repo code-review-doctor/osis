@@ -30,10 +30,12 @@ from ddd.logic.encodage_des_notes.encodage.commands import RechercherNotesComman
 from ddd.logic.encodage_des_notes.encodage.domain.service.i_cohortes_du_gestionnaire import ICohortesDuGestionnaire
 from ddd.logic.encodage_des_notes.encodage.domain.service.rechercher_notes_etudiant import RechercheNotesEtudiant
 from ddd.logic.encodage_des_notes.encodage.repository.note_etudiant import INoteEtudiantRepository
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_inscription_examen import IInscriptionExamenTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodage_notes import \
     IPeriodeEncodageNotesTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_etudiant import \
     ISignaletiqueEtudiantTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_unite_enseignement import IUniteEnseignementTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import NoteEtudiantDTO
 
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.periode_encodage_ouverte import PeriodeEncodageOuverte
@@ -44,9 +46,12 @@ def rechercher_notes(
         note_etudiant_repo: 'INoteEtudiantRepository',
         periode_encodage_note_translator: 'IPeriodeEncodageNotesTranslator',
         cohortes_gestionnaire_translator: 'ICohortesDuGestionnaire',
-        signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator'
+        signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
+        unite_enseignement_translator: 'IUniteEnseignementTranslator',
+        inscription_examen_translator: 'IInscriptionExamenTranslator',
 ) -> List['NoteEtudiantDTO']:
     PeriodeEncodageOuverte().verifier(periode_encodage_note_translator)
+    periode_encodage = periode_encodage_note_translator.get()
     gestionnaire_parcours = GestionnaireParcoursBuilder().get(
         cmd.matricule_fgs_gestionnaire,
         cohortes_gestionnaire_translator
@@ -58,6 +63,10 @@ def rechercher_notes(
         prenom=cmd.prenom,
         etat=cmd.etat,
         gestionnaire_parcours=gestionnaire_parcours,
+        periode_encodage=periode_encodage,
+
         note_etudiant_repo=note_etudiant_repo,
-        signaletique_etudiant_translator=signaletique_etudiant_translator
+        signaletique_etudiant_translator=signaletique_etudiant_translator,
+        unite_enseignement_translator=unite_enseignement_translator,
+        inscription_examen_translator=inscription_examen_translator,
     )

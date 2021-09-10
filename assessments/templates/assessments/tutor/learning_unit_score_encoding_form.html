@@ -95,6 +95,17 @@
                     </div>
                 </div>
             </div>
+
+            <div class="alert alert-info">
+                <span id="message_decimal_accepted">
+                    {% if feuille_de_notes.note_decimale_est_autorisee %}
+                        {% trans 'Decimal values in scores are accepted.' %}
+                    {% else %}
+                        {% trans "Decimal values in scores are NOT accepted." %}{% trans "If you try to put decimal values, it will be ignored." %}
+                    {% endif %}
+                </span>
+            </div>
+
             <form class="form-inline" method="POST">
                 {% csrf_token %}
 
@@ -128,7 +139,7 @@
                     </thead>
                     <tbody>
                          {% for note_etudiant in feuille_de_notes.notes_etudiants %}
-                            <tr class="result" style="background-color: {% if note_etudiant.date_echeance_atteinte %} #D3D3D3 {% endif %}">
+                            <tr class="result" style="{% include 'assessments/common/row-background-color.html' %}">
                                 <td style="text-align:center;" id="enrollment_status_{{ forloop.counter }}" headers="status">
                                     {% if note_etudiant.date_echeance_atteinte %}
                                         <span class="glyphicon glyphicon-lock" aria-hidden="true" style="color: #8B008B;" title="{% trans 'Deadline reached' %}"></span>
@@ -142,13 +153,13 @@
                                 <td headers="lastname">{{ note_etudiant.nom }}</td>
                                 <td headers="firstname">{{ note_etudiant.prenom }}</td>
                                 <td id="enrollment_note_{{ forloop.counter0 }}" headers="score">
-                                    {% if not note_etudiant.est_soumise and not note_etudiant.date_echeance_atteinte %}
+                                    {% if not note_etudiant.est_soumise and not note_etudiant.date_echeance_atteinte and not note_etudiant.desinscrit_tardivement %}
                                         {% with score_encoding_form=form|index:forloop.counter0 %}
                                             {% bootstrap_field score_encoding_form.note show_label=False %}
                                             {% bootstrap_field score_encoding_form.noma %}
                                         {% endwith %}
                                     {% else %}
-                                        {{ note_etudiant.note }}
+                                         {% include 'assessments/common/note_read.html' %}
                                     {% endif %}
                                 </td>
                                 <td headers="deadline">

@@ -23,9 +23,43 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.contrib import messages
+from django.utils.translation import gettext_lazy as _
+
 from assessments.views.common.score_sheet_xls_import import ScoreSheetXLSImportBaseView
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
+from ddd.logic.encodage_des_notes.encodage.commands import EncoderNotesCommand, EncoderNoteCommand
+from infrastructure.messages_bus import message_bus_instance
 
 
 class ScoreSheetXLSImportProgramManagerView(ScoreSheetXLSImportBaseView):
     def call_command(self, matricule, score_sheet_serialized):
-        pass
+        cmd = EncoderNotesCommand(
+            matricule_fgs_gestionnaire=self.person.global_id,
+            notes_encodees=[
+                EncoderNoteCommand(
+                    noma=note_etudiant['noma'],
+                    email=note_etudiant['email'],
+                    code_unite_enseignement=note_etudiant['code_unite_enseignement'],
+                    note=note_etudiant['note'],
+                ) for note_etudiant in score_sheet_serialized['notes_etudiants']
+            ]
+        )
+
+        injected_notes_counter = len(cmd.notes_encodees)
+        try:
+            message_bus_instance.invoke(cmd)
+        except MultipleBusinessExceptions as e:
+            injected_notes_counter -= len(e.exceptions)
+            for exception in e.exceptions:
+                row_number = next(
+                    note_etudiant['row_number'] for note_etudiant in score_sheet_serialized['notes_etudiants']
+                    if note_etudiant['noma'] == exception.note_id.noma
+                )
+                error_message = "{} : {} {}".format(exception.message, _('Row'), str(row_number))
+                messages.error(self.request, error_message)
+
+        if injected_notes_counter:
+            messages.success(self.request, "{} {}".format(str(injected_notes_counter), _("Score(s) saved")))
+        else:
+            messages.error(self.request, _("No score injected"))

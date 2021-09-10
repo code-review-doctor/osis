@@ -97,6 +97,9 @@ class FeuilleDeNotesParUniteEnseignement(interface.DomainService):  # TODO :: d√
             signaletique = signaletique_par_noma[note.noma]
             notes_etudiants.append(
                 NoteEtudiantDTO(
+                    code_unite_enseignement=unite_enseignement.code,
+                    intitule_complet_unite_enseignement=unite_enseignement.intitule_complet,
+                    annee_unite_enseignement=unite_enseignement.annee,
                     est_soumise=note.est_soumise,
                     date_remise_de_notes=note.date_limite_de_remise,
                     nom_cohorte=inscr_exmen.nom_cohorte if inscr_exmen else desinscription.nom_cohorte,
