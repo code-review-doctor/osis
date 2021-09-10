@@ -156,7 +156,7 @@ msgid "Inactive"
 msgstr "Inactif"
 
 msgid "Individual loan"
-msgstr ""
+msgstr "Emprunt individuel"
 
 msgid "Institution"
 msgstr "Institution"
