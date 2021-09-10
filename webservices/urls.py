@@ -50,7 +50,8 @@ webservice_apps = [
     'continuing_education',
     'base',
     'program_management',
-    'internship'
+    'internship',
+    'assessments'
 ]
 
 for appname in webservice_apps:
