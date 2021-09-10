@@ -179,11 +179,20 @@
                         </div>
 
                         <div role="tabpanel" class="tab-pane fade" id="tab_via_paper">
-                            <a class="btn btn-default download"
-                               href="#"
-                               style="margin:15px 0; "
-                               role="button" id="lnk_notes_printing_all">
-                                <em class="fas fa-print"></em> {% trans 'Print all courses' %}</a>
+
+                            <form id="form_print_all" method="get" action="{% url 'score_sheets_pdf_export' %}">
+                                {% for progression_encodage in progression_generale.progression_generale %}
+                                    <input type="checkbox" name="codes_unite_enseignement" value="{{ progression_encodage.code_unite_enseignement }}" checked hidden>
+                                {% endfor %}
+                                <button
+                                        type="submit"
+                                        class="btn btn-default download"
+                                        style="margin:15px 0; "
+                                        role="button"
+                                        id="lnk_notes_printing_all">
+                                    <em class="fas fa-print"></em> {% trans 'Print all courses' %}
+                                </button>
+                            </form>
 
                             <table class="table table-hover">
                                 <thead>
@@ -216,12 +225,19 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                <a class="btn btn-default download"
-                                                   href="{% url 'score_sheet_pdf_export' progression_encodage.code_unite_enseignement %}"
-                                                   role="button" id="lnk_notes_printing_{{progression_encodage.code_unite_enseignement}}"
-                                                   data-toggle="tooltip" data-placement="right"
-                                                   title="{% trans 'Print the scores' %}"
-                                                > <em class="fas fa-print"></em> {% trans 'Print' %}</a>
+                                                <form id="form_print_{{ progression_encodage.code_unite_enseignement }}" method="get" action="{% url 'score_sheets_pdf_export' %}">
+                                                    <input type="checkbox" name="codes_unite_enseignement" value="{{ progression_encodage.code_unite_enseignement }}" checked hidden>
+                                                    <button
+                                                            type="submit"
+                                                            class="btn btn-default download"
+                                                            role="button"
+                                                            id="lnk_notes_printing_{{progression_encodage.code_unite_enseignement}}"
+                                                            data-toggle="tooltip" data-placement="right"
+                                                            title="{% trans 'Print the scores' %}"
+                                                    >
+                                                        <em class="fas fa-print"></em> {% trans 'Print' %}
+                                                    </button>
+                                                </form>
                                             </td>
                                         </tr>
                                     {% endfor %}

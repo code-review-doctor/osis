@@ -41,7 +41,8 @@ from assessments.views.program_manager.pgm_manager_administration import \
     ProgramManagerPersonDeleteView as ProgramManagerPersonDeleteViewNew
 from assessments.views.program_manager.score_search import ScoreSearchFormView
 from assessments.views.score_encoding import LearningUnitScoreEncodingView, LearningUnitScoreEncodingFormView, \
-    ScoreSheetPDFExportView, ScoreSheetXLSExportView, ScoreSheetXLSImportView, ScoreEncodingProgressOverviewView
+    ScoreSheetPDFExportView, ScoreSheetXLSExportView, ScoreSheetXLSImportView, ScoreEncodingProgressOverviewView, \
+    ScoreSheetsPDFExportView
 from assessments.views.scores_responsible import ScoresResponsibleSearch
 from assessments.views.tutor.learning_unit_score_encoding_submit import LearningUnitScoreEncodingTutorSubmitView
 from education_group.converters import AcronymConverter
@@ -93,6 +94,7 @@ urlpatterns = [
             path('xls_export', ScoreSheetXLSExportView.as_view(), name='score_sheet_xls_export'),
             path('xls_import', ScoreSheetXLSImportView.as_view(), name='score_sheet_xls_import'),
         ]))),
+        path('pdf_export', ScoreSheetsPDFExportView.as_view(), name='score_sheets_pdf_export'),
     ])),
 
     url(r'^offers/', include([

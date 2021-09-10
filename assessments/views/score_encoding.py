@@ -53,13 +53,14 @@ from assessments.views.program_manager.learning_unit_score_encoding_form import 
     LearningUnitScoreEncodingProgramManagerFormView
 from assessments.views.program_manager.score_encoding_progress_overview import \
     ScoreEncodingProgressOverviewProgramManagerView
-from assessments.views.program_manager.score_sheet_pdf_export import ScoreSheetPDFExportProgramManagerView
+from assessments.views.program_manager.score_sheet_pdf_export import ScoreSheetPDFExportProgramManagerView, \
+    ScoreSheetsPDFExportProgramManagerView
 from assessments.views.program_manager.score_sheet_xls_export import ScoreSheetXLSExportProgramManagerView
 from assessments.views.program_manager.score_sheet_xls_import import ScoreSheetXLSImportProgramManagerView
 from assessments.views.tutor.learning_unit_score_encoding import LearningUnitScoreEncodingTutorView
 from assessments.views.tutor.learning_unit_score_encoding_form import LearningUnitScoreEncodingTutorFormView
 from assessments.views.tutor.score_encoding_progress_overview import ScoreEncodingProgressOverviewTutorView
-from assessments.views.tutor.score_sheet_pdf_export import ScoreSheetPDFExportTutorView
+from assessments.views.tutor.score_sheet_pdf_export import ScoreSheetPDFExportTutorView, ScoreSheetsPDFExportTutorView
 from assessments.views.tutor.score_sheet_xls_export import ScoreSheetXLSExportTutorView
 from assessments.views.tutor.score_sheet_xls_import import ScoreSheetXLSImportTutorView
 from attribution import models as mdl_attr
@@ -849,6 +850,22 @@ class ScoreSheetPDFExportView(LoginRequiredMixin, View):
             return ScoreSheetPDFExportTutorView.as_view()(request, *args, **kwargs)
         elif EntityRoleHelper.has_role(self.person, ProgramManager):
             return ScoreSheetPDFExportProgramManagerView.as_view()(request, *args, **kwargs)
+        return self.handle_no_permission()
+
+
+class ScoreSheetsPDFExportView(LoginRequiredMixin, View):
+    @cached_property
+    def person(self):
+        return self.request.user.person
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return self.handle_no_permission()
+
+        if EntityRoleHelper.has_role(self.person, Tutor):
+            return ScoreSheetsPDFExportTutorView.as_view()(request, *args, **kwargs)
+        elif EntityRoleHelper.has_role(self.person, ProgramManager):
+            return ScoreSheetsPDFExportProgramManagerView.as_view()(request, *args, **kwargs)
         return self.handle_no_permission()
 
 

@@ -59,3 +59,35 @@ class ScoreSheetPDFExportBaseView(PermissionRequiredMixin, View):
             codes_unite_enseignement=[self.kwargs['learning_unit_code']]
         )
         return message_bus_instance.invoke(cmd)
+
+
+class ScoreSheetsPDFExportBaseView(PermissionRequiredMixin, View):
+    # PermissionRequiredMixin
+    permission_required = "assessments.can_access_scoreencoding"
+
+    @cached_property
+    def person(self):
+        return self.request.user.person
+
+    def get(self, request, *args, **kwargs):
+        codes_unites_enseignement = self.request.GET.getlist('codes_unite_enseignement')
+
+        score_sheet_serialized = ScoreSheetPDFSerializer(
+            instance=[
+                {
+                    'feuille_de_notes': self.get_feuille_de_notes(code),
+                    'donnees_administratives': self.get_donnees_administratives(code)
+                } for code in codes_unites_enseignement
+            ],
+            context={'person': self.person}
+        )
+        return paper_sheet.print_notes(score_sheet_serialized.data)
+
+    def get_feuille_de_notes(self, code_unite_enseignement: str):
+        raise NotImplementedError()
+
+    def get_donnees_administratives(self, code_unite_enseignement: str):
+        cmd = SearchAdressesFeuilleDeNotesCommand(
+            codes_unite_enseignement=[code_unite_enseignement.upper()]
+        )
+        return message_bus_instance.invoke(cmd)

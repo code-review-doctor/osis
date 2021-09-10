@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from assessments.views.common.score_sheet_pdf_export import ScoreSheetPDFExportBaseView
+from assessments.views.common.score_sheet_pdf_export import ScoreSheetPDFExportBaseView, ScoreSheetsPDFExportBaseView
 from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand
 from infrastructure.messages_bus import message_bus_instance
 
@@ -33,5 +33,14 @@ class ScoreSheetPDFExportProgramManagerView(ScoreSheetPDFExportBaseView):
         cmd = GetFeuilleDeNotesCommand(
             matricule_fgs_enseignant=self.person.global_id,
             code_unite_enseignement=self.kwargs['learning_unit_code'].upper()
+        )
+        return message_bus_instance.invoke(cmd)
+
+
+class ScoreSheetsPDFExportProgramManagerView(ScoreSheetsPDFExportBaseView):
+    def get_feuille_de_notes(self, code_unite_enseignement: str):
+        cmd = GetFeuilleDeNotesCommand(
+            matricule_fgs_enseignant=self.person.global_id,
+            code_unite_enseignement=code_unite_enseignement.upper()
         )
         return message_bus_instance.invoke(cmd)

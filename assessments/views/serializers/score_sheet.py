@@ -163,6 +163,9 @@ class ScoreSheetPDFSerializer(serializers.Serializer):
         return self.context['person'].global_id
 
     def get_learning_unit_years(self, obj):
+        if isinstance(obj, list):
+            return [_LearningUnitYearsSerializer(instance=item).data for item in obj]
+
         serializer = _LearningUnitYearsSerializer(instance=obj)
         return [serializer.data]
 
