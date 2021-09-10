@@ -223,12 +223,12 @@ class PersonTest(PersonTestCase):
         self.assertEqual(self.person_with_user.get_first_name(), self.person_with_user.first_name)
 
     def test_show_first_name_from_person_without_first_name(self):
-        self.person_with_user.first_name = None
+        self.person_with_user.first_name = ''
         self.person_with_user.save()
         self.assertEqual(self.person_with_user.get_first_name(), self.person_with_user.user.first_name)
 
     def test_show_first_name_from_person_without_user(self):
-        self.person_with_user.first_name = None
+        self.person_with_user.first_name = ''
         self.person_with_user.user = None
         self.person_with_user.save()
         self.assertEqual(self.person_with_user.get_first_name(), "-")

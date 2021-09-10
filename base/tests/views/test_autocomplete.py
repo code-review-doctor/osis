@@ -30,7 +30,6 @@ from django.urls import reverse
 
 from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.models.enums.organization_type import ACADEMIC_PARTNER, EMBASSY
-from base.tests.factories.campus import CampusFactory
 from base.tests.factories.entity_version_address import MainRootEntityVersionAddressFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory
@@ -211,11 +210,11 @@ class TestCampusAutocomplete(TestCase):
 class TestPersonAutoComplete(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.jean = PersonFactory(first_name="Jean", last_name="Dupont", middle_name=None, global_id="001456",
+        cls.jean = PersonFactory(first_name="Jean", last_name="Dupont", middle_name='', global_id="001456",
                                  employee=True)
         cls.henry = PersonFactory(first_name="Henry", last_name="Arkin", middle_name="De", global_id="002587500",
                                   employee=True)
-        cls.student = PersonFactory(first_name="Henry", last_name="Dioup", middle_name=None, global_id="488513",
+        cls.student = PersonFactory(first_name="Henry", last_name="Dioup", middle_name='', global_id="488513",
                                     employee=False)
 
     def test_get_queryset_with_name(self):
