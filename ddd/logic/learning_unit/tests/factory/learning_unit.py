@@ -31,7 +31,9 @@ from base.models.enums.internship_subtypes import InternshipSubtype
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.models.enums.learning_unit_year_session import DerogationSession
 from base.models.enums.quadrimesters import DerogationQuadrimester
+from base.tests.factories.utils.fuzzy import FuzzyBoolean
 from ddd.logic.learning_unit.domain.model._financial_volumes_repartition import FinancialVolumesRepartition
+from ddd.logic.learning_unit.domain.model._mobility import Mobility
 from ddd.logic.learning_unit.domain.model._partim import Partim, PartimIdentity
 from ddd.logic.learning_unit.domain.model._remarks import Remarks
 from ddd.logic.learning_unit.domain.model._titles import Titles
@@ -151,6 +153,16 @@ class _PracticalPartFactory(factory.Factory):
     volumes = factory.SubFactory(_VolumesFactory)
 
 
+class _MobilityFactory(factory.Factory):
+    class Meta:
+        model = Mobility
+        abstract = False
+
+    english_friendly = FuzzyBoolean()
+    french_friendly = FuzzyBoolean()
+    exchange_students = FuzzyBoolean()
+
+
 class LearningUnitIdentityFactory(factory.Factory):
     class Meta:
         model = LearningUnitIdentity
@@ -188,6 +200,12 @@ class _LearningUnitFactory(factory.Factory):
 
     professional_integration = True
     is_active = True
+    individual_loan = False
+    mobility = factory.SubFactory(_MobilityFactory)
+    english_friendly = False
+    french_friendly = False
+    exchange_students = False
+    stage_dimona = False
 
 
 class _CourseLearningUnitFactory(_LearningUnitFactory):

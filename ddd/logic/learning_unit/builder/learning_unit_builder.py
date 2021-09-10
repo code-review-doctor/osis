@@ -38,6 +38,7 @@ from ddd.logic.learning_unit.builder.learning_unit_identity_builder import Learn
 from ddd.logic.learning_unit.builder.ucl_entity_identity_builder import UclEntityIdentityBuilder
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand
 from ddd.logic.learning_unit.domain.model._financial_volumes_repartition import FinancialVolumesRepartition
+from ddd.logic.learning_unit.domain.model._mobility import Mobility
 from ddd.logic.learning_unit.domain.model._partim import PartimBuilder
 from ddd.logic.learning_unit.domain.model._remarks import Remarks
 from ddd.logic.learning_unit.domain.model._titles import Titles
@@ -117,6 +118,11 @@ class LearningUnitBuilder(RootEntityBuilder):
             teaching_place=UclouvainCampusIdentityBuilder.build_from_uuid(dto.teaching_place_uuid),
             professional_integration=False,  # TODO :: to implement and unit test
             is_active=False,  # TODO :: to implement and unit test
+            individual_loan=False,
+            english_friendly=False,
+            french_friendly=False,
+            exchange_students=False,
+            stage_dimona=False,
         )
 
     @classmethod
@@ -181,6 +187,13 @@ class LearningUnitBuilder(RootEntityBuilder):
             teaching_place=UclouvainCampusIdentityBuilder.build_from_uuid(dto.teaching_place_uuid),
             professional_integration=dto.professional_integration,
             is_active=dto.is_active,
+            individual_loan=dto.individual_loan,
+            mobility=_build_mobility(
+                english_friendly=dto.english_friendly,
+                french_friendly=dto.french_friendly,
+                exchange_students=dto.exchange_students
+            ),
+            stage_dimona=dto.stage_dimona,
         )
 
     @classmethod
@@ -277,3 +290,13 @@ def _build_part(
     if part_type == LECTURING:
         return LecturingPart(volumes=volumes)
     return PracticalPart(volumes=volumes)
+
+
+def _build_mobility(english_friendly: bool, french_friendly: bool, exchange_students: bool) -> 'Mobility':
+    print('_build_mobility')
+    print(english_friendly)
+    return Mobility(
+        english_friendly=english_friendly,
+        french_friendly=french_friendly,
+        exchange_students=exchange_students,
+    )

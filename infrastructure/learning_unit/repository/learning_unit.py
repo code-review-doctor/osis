@@ -206,15 +206,21 @@ class LearningUnitRepository(ILearningUnitRepository):
 
     @classmethod
     def get(cls, entity_id: 'LearningUnitIdentity') -> 'LearningUnit':
+        print('get')
         qs = _get_common_queryset().filter(acronym=entity_id.code, academic_year__year=entity_id.year)
         partims = _get_partims(qs)
+        print('if1')
         qs = _annotate_queryset(qs)
+        print('if2')
         qs = _values_queryset(qs)
+        print('if3')
         obj_as_dict = qs.get()
         partims_dto = [
             PartimFromRepositoryDTO(**partim) for partim in partims
         ]
+        print('if4')
         dto_from_database = LearningUnitFromRepositoryDTO(**obj_as_dict, partims=partims_dto)
+        print('if5')
         return LearningUnitBuilder.build_from_repository_dto(dto_from_database)
 
     @classmethod
@@ -392,6 +398,11 @@ def _values_queryset(queryset: QuerySet) -> QuerySet:
         'teaching_place_uuid',
         'professional_integration',
         'is_active',
+        'individual_loan',
+        'english_friendly',
+        'french_friendly',
+        'exchange_students',
+        'stage_dimona',
     )
     return queryset
 

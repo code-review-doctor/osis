@@ -122,6 +122,9 @@ msgstr "Supprimer la classe définitivement"
 msgid "Derogation's session"
 msgstr "Session de dérogation"
 
+msgid "English-friendly"
+msgstr "English-friendly"
+
 msgid "Error"
 msgstr "Erreur"
 
@@ -137,6 +140,9 @@ msgstr "Remarque de faculté (non publiée)"
 msgid "Formation catalogue"
 msgstr "Catalogue des formations"
 
+msgid "French-friendly"
+msgstr "French-friendly"
+
 msgid "Full"
 msgstr "Complet"
 
@@ -148,6 +154,9 @@ msgstr "Identification"
 
 msgid "Inactive"
 msgstr "Inactif"
+
+msgid "Individual loan"
+msgstr ""
 
 msgid "Institution"
 msgstr "Institution"
@@ -263,6 +272,9 @@ msgstr "Enregistrer"
 
 msgid "Session derogation"
 msgstr "Session dérogation"
+
+msgid "Stage-Dimona"
+msgstr "Stage-Dimona"
 
 msgid "State"
 msgstr "Etat"

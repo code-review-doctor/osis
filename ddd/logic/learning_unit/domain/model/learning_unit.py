@@ -33,6 +33,7 @@ from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.models.enums.learning_unit_year_session import DerogationSession
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from ddd.logic.learning_unit.commands import CreatePartimCommand
+from ddd.logic.learning_unit.domain.model._mobility import Mobility
 from ddd.logic.learning_unit.domain.model._partim import Partim, PartimBuilder
 from ddd.logic.learning_unit.domain.model._remarks import Remarks
 from ddd.logic.learning_unit.domain.model._titles import Titles
@@ -80,6 +81,9 @@ class LearningUnit(interface.RootEntity):
     practical_part = attr.ib(type=PracticalPart)
     professional_integration = attr.ib(type=bool)
     is_active = attr.ib(type=bool)
+    individual_loan = attr.ib(type=bool)
+    mobility = attr.ib(type=Mobility)
+    stage_dimona = attr.ib(type=bool)
 
     @property
     def academic_year(self) -> 'AcademicYearIdentity':

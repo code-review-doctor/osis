@@ -89,6 +89,11 @@ class LearningUnitFromRepositoryDTO(DTO):
     teaching_place_uuid = attr.ib(type=str)
     professional_integration = attr.ib(type=bool)
     is_active = attr.ib(type=bool)
+    individual_loan = attr.ib(type=bool)
+    english_friendly = attr.ib(type=bool)
+    french_friendly = attr.ib(type=bool)
+    exchange_students = attr.ib(type=bool)
+    stage_dimona = attr.ib(type=bool)
 
 
 @attr.s(frozen=True, slots=True)
