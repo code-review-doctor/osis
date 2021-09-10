@@ -27,12 +27,12 @@ from django.conf.urls import url, include
 from django.urls import path, register_converter
 
 from assessments.views import score_encoding, upload_xls_utils, pgm_manager_administration, score_sheet
-from assessments.views.program_manager import pgm_manager_administration as pgm_manager_administration_new
 from assessments.views import scores_responsible
 from assessments.views.address.score_sheet import ScoreSheetAddressView, FirstYearBachelorScoreSheetAddressView
 from assessments.views.pgm_manager_administration import ProgramManagerListView, ProgramManagerDeleteView, \
     ProgramManagerCreateView, PersonAutocomplete, MainProgramManagerUpdateView, MainProgramManagerPersonUpdateView, \
     ProgramManagerPersonDeleteView
+from assessments.views.program_manager import pgm_manager_administration as pgm_manager_administration_new
 from assessments.views.program_manager.pgm_manager_administration import \
     ProgramManagerListView as ProgramManagerListViewNew, ProgramManagerDeleteView as ProgramManagerDeleteViewNew, \
     ProgramManagerCreateView as ProgramManagerCreateViewNew, \
@@ -41,7 +41,8 @@ from assessments.views.program_manager.pgm_manager_administration import \
     ProgramManagerPersonDeleteView as ProgramManagerPersonDeleteViewNew
 from assessments.views.program_manager.score_search import ScoreSearchFormView
 from assessments.views.score_encoding import LearningUnitScoreEncodingView, LearningUnitScoreEncodingFormView, \
-    ScoreSheetPDFExportView, ScoreSheetXLSExportView, ScoreSheetXLSImportView, ScoreEncodingProgressOverviewView
+    ScoreSheetXLSExportView, ScoreSheetXLSImportView, ScoreEncodingProgressOverviewView, \
+    ScoreSheetsPDFExportView
 from assessments.views.scores_responsible import ScoresResponsibleSearch
 from assessments.views.tutor.learning_unit_score_encoding_submit import LearningUnitScoreEncodingTutorSubmitView
 from education_group.converters import AcronymConverter
@@ -89,10 +90,10 @@ urlpatterns = [
                 LearningUnitScoreEncodingTutorSubmitView.as_view(),
                 name='learning_unit_score_encoding_submit',
             ),
-            path('pdf_export', ScoreSheetPDFExportView.as_view(), name='score_sheet_pdf_export'),
             path('xls_export', ScoreSheetXLSExportView.as_view(), name='score_sheet_xls_export'),
             path('xls_import', ScoreSheetXLSImportView.as_view(), name='score_sheet_xls_import'),
         ]))),
+        path('pdf_export', ScoreSheetsPDFExportView.as_view(), name='score_sheets_pdf_export'),
     ])),
 
     url(r'^offers/', include([
