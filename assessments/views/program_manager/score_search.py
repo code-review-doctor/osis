@@ -73,17 +73,17 @@ class ScoreSearchFormView(PermissionRequiredMixin, FormView):
         )
 
     def get_initial(self):
-        formeset_initial = []
+        formset_initial = []
         for note_etudiant in self.notes_etudiant_filtered:
             if not note_etudiant.date_echeance_atteinte and not note_etudiant.desinscrit_tardivement:
-                formeset_initial.append({
+                formset_initial.append({
                     'note': note_etudiant.note,
                     'noma': note_etudiant.noma,
                     'code_unite_enseignement': note_etudiant.code_unite_enseignement
                 })
             else:
-                formeset_initial.append({})
-        return formeset_initial
+                formset_initial.append({})
+        return formset_initial
 
     def form_valid(self, formset):
         cmd = EncoderNotesCommand(

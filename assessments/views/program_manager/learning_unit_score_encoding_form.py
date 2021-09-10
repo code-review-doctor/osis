@@ -93,10 +93,10 @@ class LearningUnitScoreEncodingProgramManagerFormView(LearningUnitScoreEncodingB
             messages.success(self.request, '%s %s' % (str(success_counter), _('Score(s) saved')))
 
     def get_initial(self):
-        formeset_initial = []
+        formset_initial = []
         for note_etudiant in self.feuille_de_notes.notes_etudiants:
             if not note_etudiant.date_echeance_atteinte:
-                formeset_initial.append({'note': note_etudiant.note, 'noma': note_etudiant.noma})
+                formset_initial.append({'note': note_etudiant.note, 'noma': note_etudiant.noma})
             else:
-                formeset_initial.append({})
-        return formeset_initial
+                formset_initial.append({})
+        return formset_initial
