@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from decimal import Decimal
 
 from django.conf import settings
 from rest_framework import serializers
@@ -44,12 +43,12 @@ class AttributionSerializer(serializers.Serializer):
     start_year = serializers.IntegerField()
     function = serializers.CharField()
     function_text = serializers.SerializerMethodField()
-    lecturing_charge = serializers.DecimalField(max_digits=5, decimal_places=2)
-    practical_charge = serializers.DecimalField(max_digits=5, decimal_places=2)
-    total_learning_unit_charge = serializers.SerializerMethodField()
+    lecturing_charge = serializers.DecimalField(max_digits=4, decimal_places=1)
+    practical_charge = serializers.DecimalField(max_digits=4, decimal_places=1)
+    total_learning_unit_charge = serializers.DecimalField(max_digits=4, decimal_places=1)
     links = serializers.SerializerMethodField()
     has_peps = serializers.BooleanField()
-    effective_class_repartition = EffectiveClassRepartitionSerializer(many=True)
+    effective_class_repartition = EffectiveClassRepartitionSerializer(many=True, default=None)
 
     @staticmethod
     def get_type_text(obj) -> str:
@@ -62,10 +61,6 @@ class AttributionSerializer(serializers.Serializer):
         if obj.function:
             return Functions.get_value(obj.function)
         return ""
-
-    @staticmethod
-    def get_total_learning_unit_charge(obj) -> str:
-        return str((obj.lecturing_charge or Decimal(0.0)) + (obj.practical_charge or Decimal(0.0)))
 
     def get_links(self, obj) -> dict:
         return {
