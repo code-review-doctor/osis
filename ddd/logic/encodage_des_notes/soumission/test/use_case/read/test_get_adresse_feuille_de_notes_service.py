@@ -31,7 +31,7 @@ from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_not
 from ddd.logic.encodage_des_notes.soumission.dtos import AdresseFeuilleDeNotesDTO
 from ddd.logic.encodage_des_notes.tests.factory.adresse_feuille_de_notes import \
     AdresseFeuilleDeNotesSpecifiqueFactory, \
-    AdresseFeuilleDeNotesBaseeSurEntiteFactory
+    AdresseFeuilleDeNotesBaseeSurEntiteFactory, AdresseFeuilleDeNotesVideFactory
 from infrastructure.encodage_de_notes.soumission.repository.in_memory.adresse_feuille_de_notes import \
     AdresseFeuilleDeNotesInMemoryRepository
 from infrastructure.messages_bus import message_bus_instance
@@ -77,6 +77,17 @@ class TestGetAdresseFeuilleDeNotesService(SimpleTestCase):
         self.assert_dto_corresponds_to_adress(
             result,
             adresse,
+        )
+
+    def test_should_retourner_adresse_de_feuille_de_notes_vide_si_adresse_non_definie_pour_la_cohorte(self):
+        cmd = attr.evolve(self.cmd, nom_cohorte="DROI1BA")
+
+        result = message_bus_instance.invoke(cmd)
+
+        expected = AdresseFeuilleDeNotesVideFactory(entity_id__nom_cohorte=cmd.nom_cohorte)
+        self.assert_dto_corresponds_to_adress(
+            result,
+            expected
         )
 
     def assert_dto_corresponds_to_adress(

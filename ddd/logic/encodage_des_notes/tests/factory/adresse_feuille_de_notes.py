@@ -39,11 +39,24 @@ class _IdentiteAdresseFeuilleDeNotesFactory(factory.Factory):
     nom_cohorte = "DROI1BA"
 
 
-class AdresseFeuilleDeNotesSpecifiqueFactory(factory.Factory):
+class AdresseFeuilleDeNotesVideFactory(factory.Factory):
     class Meta:
         model = AdresseFeuilleDeNotes
         abstract = False
 
+    entity_id = factory.SubFactory(_IdentiteAdresseFeuilleDeNotesFactory)
+    entite = None
+    destinataire = ""
+    rue_numero = ""
+    code_postal = ""
+    ville = ""
+    pays = ""
+    telephone = ""
+    fax = ""
+    email = ""
+
+
+class AdresseFeuilleDeNotesSpecifiqueFactory(AdresseFeuilleDeNotesVideFactory):
     entity_id = factory.SubFactory(_IdentiteAdresseFeuilleDeNotesFactory)
     entite = None
     destinataire = "Faculté de Droit"
@@ -61,11 +74,7 @@ class PremiereAnneeBachelierAdresseFeuilleDeNotesSpecifiqueFactory(AdresseFeuill
     pays = "France"
 
 
-class AdresseFeuilleDeNotesBaseeSurEntiteFactory(factory.Factory):
-    class Meta:
-        model = AdresseFeuilleDeNotes
-        abstract = False
-
+class AdresseFeuilleDeNotesBaseeSurEntiteFactory(AdresseFeuilleDeNotesVideFactory):
     entity_id = factory.SubFactory(_IdentiteAdresseFeuilleDeNotesFactory)
     entite = factory.SubFactory(_IdentiteEntiteFactory, sigle="EPL")
     destinataire = "Faculté de EPL"

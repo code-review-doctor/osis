@@ -26,7 +26,8 @@
 from typing import Iterable, List
 
 import attr
-from django.db.models import Exists, OuterRef, Q
+from django.db.models import Q, Value, F
+from django.db.models.functions import Replace
 from django.utils.functional import cached_property
 from django.views.generic import ListView
 
@@ -36,7 +37,6 @@ from base.models.education_group_year import EducationGroupYear, EducationGroupY
 from base.models.entity_version import EntityVersion
 from base.models.enums.education_group_categories import Categories
 from base.utils.cache import CacheFilterMixin
-from education_group.models.cohort_year import CohortYear
 from education_group.models.enums.cohort_name import CohortName
 from osis_role.contrib.views import PermissionRequiredMixin
 
@@ -77,55 +77,65 @@ class OffersSearch(PermissionRequiredMixin, CacheFilterMixin, ListView):
         return context
 
 
-def get_queryset(acronym: str, management_entity: str) -> Iterable[EducationGroupYear]:
+def get_queryset(acronym: str, management_entity: str) -> Iterable:
     cte = EntityVersion.objects.with_parents(acronym__icontains=management_entity)
     entity_ids_with_children = cte.queryset().with_cte(cte).values_list('entity_id').distinct()
 
-    cohort_11ba_qs = CohortYear.objects.filter(
-        name=CohortName.FIRST_YEAR.name,
-        education_group_year=OuterRef("id")
+    offers = EducationGroupYearQueryset.annotate_entity_requirement_acronym(
+        EducationGroupYear.objects.filter(
+            management_entity_id__in=entity_ids_with_children,
+            acronym__icontains=acronym,
+            education_group_type__category=Categories.TRAINING.name,
+            academic_year=academic_year.current_academic_year()
+        ).exclude(
+            Q(acronym__icontains="common-") | Q(acronym__icontains="11BA"),
+        ).annotate(
+            sigle=F('acronym'),
+        ).select_related(
+            'education_group',
+            'management_entity',
+            'academic_year',
+        )
+    ).values(
+        "sigle",
+        "title",
+        "management_entity_acronym"
     )
 
-    offer_years = EducationGroupYear.objects.filter(
-        management_entity_id__in=entity_ids_with_children,
-        acronym__icontains=acronym,
-        education_group_type__category=Categories.TRAINING.name,
-        academic_year=academic_year.current_academic_year()
-    ).exclude(
-        Q(acronym__icontains="common-") | Q(acronym__icontains="11BA"),
-    ).select_related(
-        'education_group',
-        'management_entity',
-        'academic_year',
-    ).annotate(
-        has_11ba=Exists(cohort_11ba_qs)
-    ).order_by(
-        'acronym'
+    cohorts_11ba = EducationGroupYearQueryset.annotate_entity_requirement_acronym(
+        EducationGroupYear.objects.filter(
+            management_entity_id__in=entity_ids_with_children,
+            education_group_type__category=Categories.TRAINING.name,
+            academic_year=academic_year.current_academic_year(),
+            cohortyear__name=CohortName.FIRST_YEAR.name
+        ).exclude(
+            Q(acronym__icontains="common-") | Q(acronym__icontains="11BA"),
+        ).annotate(
+            sigle=Replace('acronym', Value('1BA'), Value('11BA')),
+        ).filter(
+            sigle__icontains=acronym
+        ).select_related(
+            'education_group',
+            'management_entity',
+            'academic_year',
+        )
+    ).values(
+        "sigle",
+        "title",
+        "management_entity_acronym"
     )
-    return EducationGroupYearQueryset.annotate_entity_requirement_acronym(offer_years)
+    return offers.union(cohorts_11ba).order_by('sigle')
 
 
 def convert_queryset_to_dto(qs) -> List[OfferSearchDTO]:
-    result = []
-
-    for egy_obj in qs:
-        result.append(
-            OfferSearchDTO(
-                acronym=egy_obj.acronym,
-                title=egy_obj.title,
-                management_entity_acronym=egy_obj.management_entity_acronym
-            )
+    return [
+        OfferSearchDTO(
+            acronym=row['sigle'],
+            title=convert_title_to_first_year_bachelor_title(row['title']) if "11BA" in row["sigle"] else row['title'],
+            management_entity_acronym=row['management_entity_acronym']
         )
-        if egy_obj.has_11ba:
-            result.append(
-                OfferSearchDTO(
-                    acronym=egy_obj.acronym.replace("1BA", "11BA"),
-                    title=convert_title_to_first_year_bachelor_title(egy_obj.title),
-                    management_entity_acronym=egy_obj.management_entity_acronym
-                )
-            )
-
-    return result
+        for row in qs
+    ]
 
 
 # fixme will be solved by read service
