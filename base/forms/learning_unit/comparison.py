@@ -62,9 +62,16 @@ class SelectComparisonYears(forms.Form):
 
 def _get_choices(academic_years, current_academic_year):
     if len(academic_years) == LIMIT_OF_CHOICES:
+        str_current_academic_year = str(current_academic_year) + '-' + str(current_academic_year + 1)[-2:]
         return [
-            (academic_years[0].year, str(academic_years[0]) + ' / ' + str(current_academic_year)),
-            (academic_years[1].year, str(current_academic_year) + ' / ' + str(academic_years[1]))
+            (
+                academic_years[0].year,
+                str(academic_years[0]) + ' / ' + str_current_academic_year
+            ),
+            (
+                academic_years[1].year,
+                str_current_academic_year + ' / ' + str(academic_years[1])
+            )
         ]
     return None
 
