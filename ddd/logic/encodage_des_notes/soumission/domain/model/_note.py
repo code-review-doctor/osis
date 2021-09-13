@@ -81,7 +81,7 @@ class NoteChiffree(Note):
     value = attr.ib(type=float)
 
     def __str__(self):
-        if self.value:
+        if self.value is not None:
             return str(self.value)
         return ""
 
