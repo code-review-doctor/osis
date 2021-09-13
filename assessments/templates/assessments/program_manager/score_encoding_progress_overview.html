@@ -161,7 +161,7 @@
                                                         <td headers="tab_online_tutor_deadline">
                                                             {% for echeance in progression_encodage.dates_echeance %}
                                                                 {% if forloop.counter == 2 %}
-                                                                    <div id="tutor_deadlines_collapse_{{ progression_encodage.code_unite_enseignement }}" class="collapse in">
+                                                                    <div id="tutor_deadlines_collapse_{{ progression_encodage.code_unite_enseignement }}" class="collapse">
                                                                 {% endif %}
                                                                 <div class="row row-score-encoding">
                                                                     {% if echeance.est_atteinte %}
