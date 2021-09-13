@@ -24,16 +24,18 @@
 ##############################################################################
 from ddd.logic.encodage_des_notes.soumission.builder.adresse_feuille_de_notes_identity_builder import \
     AdresseFeuilleDeNotesIdentityBuilder
-from ddd.logic.encodage_des_notes.soumission.commands import GetAdresseFeuilleDeNotesServiceCommand
-from ddd.logic.encodage_des_notes.soumission.domain.service.get_adresse_feuille_de_notes_dto import \
-    GetAdresseFeuilleDeNotesDTODomainService
 from ddd.logic.encodage_des_notes.soumission.dtos import AdresseFeuilleDeNotesDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_notes import \
     IAdresseFeuilleDeNotesRepository
+from osis_common.ddd import interface
 
 
-def get_adresse_feuille_de_notes(
-        cmd: GetAdresseFeuilleDeNotesServiceCommand,
-        repo: IAdresseFeuilleDeNotesRepository,
-) -> 'AdresseFeuilleDeNotesDTO':
-    return GetAdresseFeuilleDeNotesDTODomainService.get(cmd.nom_cohorte, repo)
+class GetAdresseFeuilleDeNotesDTODomainService(interface.DomainService):
+
+    @classmethod
+    def get(cls, nom_cohorte: str, repo: 'IAdresseFeuilleDeNotesRepository') -> AdresseFeuilleDeNotesDTO:
+        identite = AdresseFeuilleDeNotesIdentityBuilder().build_from_nom_cohorte(nom_cohorte)
+        try:
+            return repo.search_dtos([identite])[0]
+        except IndexError:
+            return AdresseFeuilleDeNotesDTO(nom_cohorte=nom_cohorte)
