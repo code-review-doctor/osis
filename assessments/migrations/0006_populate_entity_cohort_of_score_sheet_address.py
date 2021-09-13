@@ -78,8 +78,7 @@ def populate_entity_field(apps, schema_editor):
             fill_entity_field(apps, address, ucl_structure)
             print("- {}".format(address.id))
         except IndexError as e:
-            pass
-            # print("- {} (error)".format(address.id))
+            print("- {} (error)".format(address.id))
 
 
 def get_score_sheet_address_to_populate_cohort_name_field_queryset(apps):
