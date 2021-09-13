@@ -76,6 +76,7 @@ class EtudiantPepsDTO(interface.DTO):
     autre_amenagement = attr.ib(type=bool)
     details_autre_amenagement = attr.ib(type=str)
     accompagnateur = attr.ib(type=str)
+    sous_type_peps = attr.ib(type=str, default='')
 
 
 @attr.s(frozen=True, slots=True)

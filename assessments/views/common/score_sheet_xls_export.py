@@ -34,6 +34,7 @@ from assessments.export import score_sheet_xls
 from assessments.views.serializers.score_sheet_xls import ScoreSheetXLSSerializer
 from ddd.logic.encodage_des_notes.soumission.commands import SearchAdressesFeuilleDeNotesCommand
 from infrastructure.messages_bus import message_bus_instance
+from osis_common.decorators.download import set_download_cookie
 from osis_common.document import xls_build
 from osis_role.contrib.views import PermissionRequiredMixin
 
@@ -68,6 +69,7 @@ class ScoreSheetXLSExportBaseView(PermissionRequiredMixin, View):
         )
         return message_bus_instance.invoke(cmd)
 
+    @set_download_cookie
     def get(self, request, *args, **kwargs):
         score_sheet_serialized = ScoreSheetXLSSerializer(instance={
             'feuille_de_notes': self.feuille_de_notes,

@@ -25,8 +25,10 @@
 ##############################################################################
 from typing import Set, List, Dict
 
-from django.db.models import F
+from django.db.models import F, Value, Case, When, CharField
+from django.db.models.functions import Concat, Upper
 
+from base.models.enums.peps_type import PepsTypes
 from base.models.student import Student
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_etudiant import \
     ISignaletiqueEtudiantTranslator
@@ -54,17 +56,41 @@ class SignaletiqueEtudiantTranslator(ISignaletiqueEtudiantTranslator):
             nom=F('person__last_name'),
             prenom=F('person__first_name'),
             type_peps=F('studentspecificprofile__type'),
+            sous_type_peps=Case(
+                When(
+                    studentspecificprofile__type=PepsTypes.DISABILITY.name,
+                    then=F('studentspecificprofile__subtype_disability'),
+                ),
+                When(
+                    studentspecificprofile__type=PepsTypes.SPORT.name,
+                    then=F('studentspecificprofile__subtype_sport'),
+                ),
+                default=Value(''),
+                output_field=CharField()
+            ),
             tiers_temps=F('studentspecificprofile__arrangement_additional_time'),
             copie_adaptee=F('studentspecificprofile__arrangement_appropriate_copy'),
             local_specifique=F('studentspecificprofile__arrangement_specific_locale'),
             autre_amenagement=F('studentspecificprofile__arrangement_other'),
             details_autre_amenagement=F('studentspecificprofile__arrangement_comment'),
-            accompagnateur=F('studentspecificprofile__guide'),
+            accompagnateur=Case(
+                When(
+                   studentspecificprofile__guide__isnull=True,
+                   then=Value('')
+                ),
+                default=Concat(
+                    Upper(F('studentspecificprofile__guide__last_name')),
+                    Value(', '),
+                    F('studentspecificprofile__guide__first_name')
+                ),
+                output_field=CharField(),
+            )
         ).values(
             'noma',
             'nom',
             'prenom',
             'type_peps',
+            'sous_type_peps',
             'tiers_temps',
             'copie_adaptee',
             'local_specifique',
