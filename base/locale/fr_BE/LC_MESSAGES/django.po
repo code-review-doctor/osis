@@ -818,6 +818,14 @@ msgstr "Documentation"
 msgid "Down"
 msgstr "Descendre"
 
+msgid ""
+"Due to a pending change in OSIS, student counters for 1BA, 11BA and learning units containing classes could be "
+"distorted(abnormally high). For accurate statistics, please consult the EPC statistics."
+msgstr ""
+"Suite à un changement en cours d'implémentation dans OSIS, les compteurs relatifs aux étudiants de 1BA, 11BA et aux "
+"cours qui contiennent des classes pourraient être faussés (anormalement élevés). Pour une statistique précise, "
+"veuillez consulter les statistiques d'EPC."
+
 msgid "Duration"
 msgstr "Durée"
 
