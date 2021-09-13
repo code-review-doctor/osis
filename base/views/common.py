@@ -147,7 +147,7 @@ def home(request):
 
 def _get_highlight_events():
     return [
-        {**attr.asdict(event), 'url': reverse('scores_encoding')}
+        {**attr.asdict(event), 'url': reverse('score_encoding_progress_overview')}
         for event in ScoresExamSubmissionCalendar().get_opened_academic_events()
     ]
 
