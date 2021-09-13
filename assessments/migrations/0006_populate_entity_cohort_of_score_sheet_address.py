@@ -20,7 +20,7 @@ def get_score_sheet_address_to_populate_entity_field_queryset(apps):
     ScoreSheetAddress = apps.get_model("assessments", "ScoreSheetAddress")
 
     education_group_year_prefetch = EducationGroupYear.objects.filter(
-        academic_year=ACADEMIC_YEAR
+        academic_year__year=ACADEMIC_YEAR
     ).select_related(
         "administration_entity",
         "management_entity"
@@ -49,6 +49,16 @@ def fill_entity_field(apps, address, ucl_structure):
         address.entity = _get_parent_entity(apps, management_entity, ucl_structure)
     else:
         raise Exception("Unrecognized entity address choice")
+
+    latest_entity_version = address.entity.entityversion_set.order_by('start_date').last()
+    address.recipient = "{} - {}".format(latest_entity_version.acronym, latest_entity_version.title)
+    address.location = address.entity.location
+    address.postal_code = address.entity.postal_code
+    address.city = address.entity.city
+    address.country = address.entity.country
+    address.phone = address.entity.phone
+    address.fax = address.entity.fax
+
     address.save()
 
 
