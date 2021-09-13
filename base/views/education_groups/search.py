@@ -26,7 +26,7 @@
 from typing import Iterable, List
 
 import attr
-from django.db.models import Exists, OuterRef, Q, Value, F
+from django.db.models import Q, Value, F
 from django.db.models.functions import Replace
 from django.utils.functional import cached_property
 from django.views.generic import ListView
@@ -37,7 +37,6 @@ from base.models.education_group_year import EducationGroupYear, EducationGroupY
 from base.models.entity_version import EntityVersion
 from base.models.enums.education_group_categories import Categories
 from base.utils.cache import CacheFilterMixin
-from education_group.models.cohort_year import CohortYear
 from education_group.models.enums.cohort_name import CohortName
 from osis_role.contrib.views import PermissionRequiredMixin
 
