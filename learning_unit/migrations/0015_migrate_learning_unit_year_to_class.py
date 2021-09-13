@@ -12,6 +12,7 @@ def get_learning_unit_year_of_type_class_queryset(apps):
     LearningUnitYear = apps.get_model('base', 'LearningUnitYear')
     return LearningUnitYear.objects.filter(
         acronym__regex=r'\w+[a-zA-Z]$',
+        learning_container_year__isnull=True,
         subtype="FULL"
     ).select_related(
         "learning_container_year",
@@ -140,6 +141,7 @@ def migrate_attributions_to_class_attributions(apps, component_year, class_year)
 
 
 def create_class_from_learning_unit_year(apps, schema_editor):
+    print("Populate learning class year table")
     LearningComponentYear = apps.get_model('base', 'LearningComponentYear')
 
     qs = get_learning_unit_year_of_type_class_queryset(apps)
@@ -159,17 +161,10 @@ def create_class_from_learning_unit_year(apps, schema_editor):
             delete_element(apps, luy)
 
             # luy.delete()
+            print("- {}".format(class_year.id))
 
         except LearningComponentYear.DoesNotExist:
             errors.append(luy)
-
-    print('Learning Unit Year does not exist for: \n{}'.format(
-        "\n".join([str(luy) for luy in errors])
-    ))
-    print(
-        "Course errors: \n{}".format(
-            "\n".join([str(luy.pk) for luy in errors if luy.learning_container_year.container_type == 'COURSE'])
-        ))
 
 
 class Migration(migrations.Migration):
