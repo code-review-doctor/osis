@@ -176,7 +176,7 @@ class ResponsableDeNotesRepository(IResponsableDeNotesRepository):
 
     @classmethod
     def get_for_unite_enseignement(cls, code_unite_enseignement: 'str', annee_academique: int) -> 'ResponsableDeNotes':
-        return cls.search(code_unite_enseignement=code_unite_enseignement, annee_academique=annee_academique)[0]
+        return cls.search(codes_unites_enseignement=[code_unite_enseignement], annee_academique=annee_academique)[0]
 
     @classmethod
     def get_detail_enseignant(cls, entity_id: 'IdentiteResponsableDeNotes') -> 'EnseignantDTO':
