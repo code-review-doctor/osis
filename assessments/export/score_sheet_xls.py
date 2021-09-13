@@ -180,7 +180,7 @@ def _build_rows(worksheet, feuille_de_notes_serialized):
             __set_non_editable_color(worksheet, column_number, current_row_number)
         for column_number in range(10, len(HEADER) + 1):
             __set_non_editable_color(worksheet, column_number, current_row_number)
-        if not row['est_soumise']:
+        if row['est_soumise']:
             __set_non_editable_color(worksheet, 9, current_row_number)
 
         if row['inscrit_tardivement']:

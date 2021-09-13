@@ -25,11 +25,13 @@
 ##############################################################################
 import datetime
 
+import attr
 from django.test import SimpleTestCase
 
 from assessments.views.serializers.score_sheet_xls import ScoreSheetXLSSerializer
-from ddd.logic.encodage_des_notes.shared_kernel.dtos import FeuilleDeNotesDTO, DateDTO, NoteEtudiantDTO, EnseignantDTO,\
-    DetailContactDTO
+from base.models.enums.peps_type import PepsTypes, HtmSubtypes, SportSubtypes
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import FeuilleDeNotesDTO, DateDTO, NoteEtudiantDTO, EnseignantDTO, \
+    DetailContactDTO, EtudiantPepsDTO
 from ddd.logic.encodage_des_notes.soumission.dtos import DonneesAdministrativesFeuilleDeNotesDTO, \
     AdresseFeuilleDeNotesDTO
 
@@ -143,3 +145,59 @@ class ScoreSheetXLSSerializerTest(SimpleTestCase):
         self.assertTrue("details_autre_amenagement" in sheet_serialized['rows'][0])
         self.assertTrue("accompagnateur" in sheet_serialized['rows'][0])
         self.assertTrue("enrollment_state_color" in sheet_serialized['rows'][0])
+
+    def test_assert_type_peps_disability_correctly_formatted(self):
+        self.instance['feuille_de_notes'].notes_etudiants[1] = attr.evolve(
+            self.instance['feuille_de_notes'].notes_etudiants[1],
+            peps=EtudiantPepsDTO(
+                type_peps=PepsTypes.DISABILITY.name,
+                sous_type_peps=HtmSubtypes.REDUCED_MOBILITY.name,
+                tiers_temps=False,
+                copie_adaptee=False,
+                local_specifique=False,
+                autre_amenagement=False,
+                details_autre_amenagement='',
+                accompagnateur='',
+            )
+        )
+        sheet_serialized = ScoreSheetXLSSerializer(instance=self.instance).data
+
+        expected_result = "{} - {}".format(str(PepsTypes.DISABILITY.value), str(HtmSubtypes.REDUCED_MOBILITY.value))
+        self.assertEqual(sheet_serialized['rows'][0]["type_peps"], expected_result)
+
+    def test_assert_type_peps_sport_correctly_formatted(self):
+        self.instance['feuille_de_notes'].notes_etudiants[1] = attr.evolve(
+            self.instance['feuille_de_notes'].notes_etudiants[1],
+            peps=EtudiantPepsDTO(
+                type_peps=PepsTypes.SPORT.name,
+                sous_type_peps=SportSubtypes.PROMISING_ATHLETE.name,
+                tiers_temps=False,
+                copie_adaptee=False,
+                local_specifique=False,
+                autre_amenagement=False,
+                details_autre_amenagement='',
+                accompagnateur='',
+            )
+        )
+        sheet_serialized = ScoreSheetXLSSerializer(instance=self.instance).data
+
+        expected_result = "{} - {}".format(str(PepsTypes.SPORT.value), str(SportSubtypes.PROMISING_ATHLETE.value))
+        self.assertEqual(sheet_serialized['rows'][0]["type_peps"], expected_result)
+
+    def test_assert_type_peps_not_defined_correctly_formatted(self):
+        self.instance['feuille_de_notes'].notes_etudiants[1] = attr.evolve(
+            self.instance['feuille_de_notes'].notes_etudiants[1],
+            peps=EtudiantPepsDTO(
+                type_peps=PepsTypes.NOT_DEFINED.name,
+                sous_type_peps='',
+                tiers_temps=False,
+                copie_adaptee=False,
+                local_specifique=False,
+                autre_amenagement=False,
+                details_autre_amenagement='',
+                accompagnateur='',
+            )
+        )
+        sheet_serialized = ScoreSheetXLSSerializer(instance=self.instance).data
+
+        self.assertEqual(sheet_serialized['rows'][0]["type_peps"], "-")

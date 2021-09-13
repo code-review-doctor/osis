@@ -25,9 +25,11 @@
 ##############################################################################
 import json
 import operator
+from django.utils.translation import gettext_lazy as _
 
 from rest_framework import serializers
 
+from base.models.enums.peps_type import PepsTypes, HtmSubtypes, SportSubtypes
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import NoteEtudiantDTO
 from education_group.templatetags.academic_year_display import display_as_academic_year
 
@@ -56,37 +58,59 @@ class _NoteEtudiantRowSerializer(serializers.Serializer):
 
     def get_type_peps(self, note_etudiant: NoteEtudiantDTO):
         try:
-            return operator.attrgetter("peps.type_peps")(note_etudiant)
+            type_peps = operator.attrgetter("peps.type_peps")(note_etudiant)
+            if not type_peps:
+                return "-"
+
+            type_peps_str = str(PepsTypes.get_value(type_peps))
+            sous_type_peps = operator.attrgetter("peps.sous_type_peps")(note_etudiant)
+            if type_peps == PepsTypes.DISABILITY.name:
+                return "{} - {}".format(
+                    type_peps_str,
+                    str(HtmSubtypes.get_value(sous_type_peps)) if sous_type_peps else '-'
+                )
+            elif type_peps == PepsTypes.SPORT.name:
+                return "{} - {}".format(
+                    type_peps_str,
+                    str(SportSubtypes.get_value(sous_type_peps)) if sous_type_peps else '-'
+                )
+            elif type_peps == PepsTypes.NOT_DEFINED.name:
+                return "-"
+            return type_peps_str
         except AttributeError:
             return "-"
 
     def get_tiers_temps(self, note_etudiant: NoteEtudiantDTO):
         try:
-            return operator.attrgetter("peps.tiers_temps")(note_etudiant)
+            is_tiers_temps = operator.attrgetter("peps.tiers_temps")(note_etudiant)
+            return str(_('Yes')) if is_tiers_temps else '-'
         except AttributeError:
             return "-"
 
     def get_copie_adaptee(self, note_etudiant: NoteEtudiantDTO):
         try:
-            return operator.attrgetter("peps.copie_adaptee")(note_etudiant)
+            is_copie_adaptee = operator.attrgetter("peps.tiers_temps")(note_etudiant)
+            return str(_('Yes')) if is_copie_adaptee else '-'
         except AttributeError:
             return "-"
 
     def get_local_specifique(self, note_etudiant: NoteEtudiantDTO):
         try:
-            return operator.attrgetter("peps.local_specifique")(note_etudiant)
+            local_specifique = operator.attrgetter("peps.local_specifique")(note_etudiant)
+            return str(_('Yes')) if local_specifique else '-'
         except AttributeError:
             return "-"
 
     def get_autre_amenagement(self, note_etudiant: NoteEtudiantDTO):
         try:
-            return operator.attrgetter("peps.autre_amenagement")(note_etudiant)
+            autre_amenagement = operator.attrgetter("peps.autre_amenagement")(note_etudiant)
+            return str(_('Yes')) if autre_amenagement else '-'
         except AttributeError:
             return "-"
 
     def get_details_autre_amenagement(self, note_etudiant: NoteEtudiantDTO):
         try:
-            return operator.attrgetter("peps.autre_amenagement")(note_etudiant)
+            return operator.attrgetter("peps.details_autre_amenagement")(note_etudiant)
         except AttributeError:
             return "-"
 
@@ -129,10 +153,10 @@ class ScoreSheetXLSSerializer(serializers.Serializer):
         )
 
     def get_contact_emails(self, obj) -> str:
-        return ";".join([
+        return ";".join({
             d_admin.contact_feuille_de_notes.email for d_admin in obj['donnees_administratives']
             if d_admin.contact_feuille_de_notes.email
-        ])
+        })
 
     def get_rows(self, obj):
         notes_etudiants_avec_date_echeance_non_atteinte = filter(

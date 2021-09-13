@@ -41,6 +41,7 @@ class SignaletiqueEtudiantTranslatorInMemory(ISignaletiqueEtudiantTranslator):
             prenom="Marie",
             peps=EtudiantPepsDTO(
                 type_peps=PepsTypes.ARRANGEMENT_JURY.name,
+                sous_type_peps='',
                 tiers_temps=True,
                 copie_adaptee=True,
                 local_specifique=True,
@@ -55,6 +56,7 @@ class SignaletiqueEtudiantTranslatorInMemory(ISignaletiqueEtudiantTranslator):
             prenom="Pierre",
             peps=EtudiantPepsDTO(
                 type_peps=PepsTypes.ARRANGEMENT_JURY.name,
+                sous_type_peps='',
                 tiers_temps=True,
                 copie_adaptee=True,
                 local_specifique=True,
@@ -69,6 +71,7 @@ class SignaletiqueEtudiantTranslatorInMemory(ISignaletiqueEtudiantTranslator):
             prenom="Julie",
             peps=EtudiantPepsDTO(
                 type_peps=PepsTypes.ARRANGEMENT_JURY.name,
+                sous_type_peps='',
                 tiers_temps=False,
                 copie_adaptee=False,
                 local_specifique=False,
@@ -83,6 +86,7 @@ class SignaletiqueEtudiantTranslatorInMemory(ISignaletiqueEtudiantTranslator):
             prenom="Andre",
             peps=EtudiantPepsDTO(
                 type_peps=PepsTypes.ARRANGEMENT_JURY.name,
+                sous_type_peps='',
                 tiers_temps=True,
                 copie_adaptee=True,
                 local_specifique=True,
@@ -97,6 +101,7 @@ class SignaletiqueEtudiantTranslatorInMemory(ISignaletiqueEtudiantTranslator):
             prenom="Adrien",
             peps=EtudiantPepsDTO(
                 type_peps=PepsTypes.ARRANGEMENT_JURY.name,
+                sous_type_peps='',
                 tiers_temps=False,
                 copie_adaptee=False,
                 local_specifique=True,

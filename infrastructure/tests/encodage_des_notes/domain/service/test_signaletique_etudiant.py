@@ -25,7 +25,8 @@
 ##############################################################################
 from django.test import TestCase
 
-from base.models.enums.peps_type import PepsTypes
+from base.models.enums.peps_type import PepsTypes, SportSubtypes, HtmSubtypes
+from base.tests.factories.person import PersonFactory
 from base.tests.factories.student import StudentFactory
 from base.tests.factories.student_specific_profile import StudentSpecificProfileFactory
 from ddd.logic.encodage_des_notes.soumission.dtos import SignaletiqueEtudiantDTO
@@ -50,6 +51,7 @@ class InscriptionExamenTest(TestCase):
     def test_should_trouver_1_etudiant_avec_peps(self):
         student_peps = StudentSpecificProfileFactory(
             type=PepsTypes.ARTIST.name,
+            guide=None
         )
         result = self.translator.search([student_peps.student.registration_id])
         self.assertEqual(len(result), 1)
@@ -60,12 +62,82 @@ class InscriptionExamenTest(TestCase):
                 prenom=student_peps.student.person.first_name,
                 peps=EtudiantPepsDTO(
                     type_peps=student_peps.type,
+                    sous_type_peps='',
                     tiers_temps=student_peps.arrangement_additional_time,
                     copie_adaptee=student_peps.arrangement_appropriate_copy,
                     local_specifique=student_peps.arrangement_specific_locale,
                     autre_amenagement=student_peps.arrangement_other,
                     details_autre_amenagement=student_peps.arrangement_comment,
-                    accompagnateur=student_peps.guide,
+                    accompagnateur='',
+                ),
+            )
+        }
+        self.assertSetEqual(expected_result, result)
+
+    def test_should_trouver_accompagnateur_pour_etudiant_avec_peps(self):
+        student_peps_with_guide = StudentSpecificProfileFactory(
+            type=PepsTypes.ARTIST.name,
+            guide=PersonFactory()
+        )
+
+        result = self.translator.search([student_peps_with_guide.student.registration_id])
+        self.assertEqual(len(result), 1)
+        expected_result_accompagnateur = "{}, {}".format(
+            student_peps_with_guide.guide.last_name.upper(),
+            student_peps_with_guide.guide.first_name,
+        )
+
+        self.assertEqual(result.pop().peps.accompagnateur, expected_result_accompagnateur)
+
+    def test_should_calculer_sous_type_peps_en_fonction_sport_type_peps(self):
+        student_peps_sport_type = StudentSpecificProfileFactory(
+            type=PepsTypes.SPORT.name,
+            subtype_sport=SportSubtypes.PROMISING_ATHLETE.name
+        )
+
+        result = self.translator.search([student_peps_sport_type.student.registration_id])
+        self.assertEqual(len(result), 1)
+        expected_result = {
+            SignaletiqueEtudiantDTO(
+                noma=student_peps_sport_type.student.registration_id,
+                nom=student_peps_sport_type.student.person.last_name,
+                prenom=student_peps_sport_type.student.person.first_name,
+                peps=EtudiantPepsDTO(
+                    type_peps=student_peps_sport_type.type,
+                    sous_type_peps=student_peps_sport_type.subtype_sport,
+                    tiers_temps=student_peps_sport_type.arrangement_additional_time,
+                    copie_adaptee=student_peps_sport_type.arrangement_appropriate_copy,
+                    local_specifique=student_peps_sport_type.arrangement_specific_locale,
+                    autre_amenagement=student_peps_sport_type.arrangement_other,
+                    details_autre_amenagement=student_peps_sport_type.arrangement_comment,
+                    accompagnateur='',
+                ),
+            )
+        }
+        self.assertSetEqual(expected_result, result)
+
+    def test_should_calculer_sous_type_peps_en_fonction_handicap_type_peps(self):
+        student_peps_sport_type = StudentSpecificProfileFactory(
+            type=PepsTypes.DISABILITY.name,
+            subtype_disability=HtmSubtypes.REDUCED_MOBILITY.name
+        )
+
+        result = self.translator.search([student_peps_sport_type.student.registration_id])
+        self.assertEqual(len(result), 1)
+        expected_result = {
+            SignaletiqueEtudiantDTO(
+                noma=student_peps_sport_type.student.registration_id,
+                nom=student_peps_sport_type.student.person.last_name,
+                prenom=student_peps_sport_type.student.person.first_name,
+                peps=EtudiantPepsDTO(
+                    type_peps=student_peps_sport_type.type,
+                    sous_type_peps=student_peps_sport_type.subtype_disability,
+                    tiers_temps=student_peps_sport_type.arrangement_additional_time,
+                    copie_adaptee=student_peps_sport_type.arrangement_appropriate_copy,
+                    local_specifique=student_peps_sport_type.arrangement_specific_locale,
+                    autre_amenagement=student_peps_sport_type.arrangement_other,
+                    details_autre_amenagement=student_peps_sport_type.arrangement_comment,
+                    accompagnateur='',
                 ),
             )
         }
