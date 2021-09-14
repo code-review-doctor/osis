@@ -55,6 +55,7 @@ from base.models.enums.entity_container_year_link_type import EntityContainerYea
 from base.models.enums.learning_component_year_type import LEARNING_COMPONENT_YEAR_TYPES
 from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
 from base.models.enums.vacant_declaration_type import DECLARATION_TYPE
+from base.models.learning_unit_enrollment import LearningUnitEnrollment
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
@@ -84,13 +85,24 @@ def learning_unit_formations(request, learning_unit_year_id=None, code=None, yea
     node_identity = NodeIdentity(code=learn_unit_year.acronym, year=learn_unit_year.academic_year.year)
     utilizations = utilizations_serializer(node_identity, search_program_trees_using_node, NodeRepository())
     context['direct_parents'] = utilizations
-
-    context['root_formations'] = education_group_year.find_with_enrollments_count(learn_unit_year)
+    root_formations = education_group_year.find_with_enrollments_count(learn_unit_year)
+    context['root_formations'] = root_formations
     context['total_formation_enrollments'] = 0
     context['total_learning_unit_enrollments'] = 0
-    for root_formation in context['root_formations']:
+    learning_unit_enrollment_classes = LearningUnitEnrollment.objects.filter(
+        learning_unit_year=learning_unit_year_id, learning_class_year__isnull=False
+    ).distinct('learning_class_year')
+    context['learning_unit_enrollment_classes'] = learning_unit_enrollment_classes
+    totals_classes = {}
+    for root_formation in root_formations:
         context['total_formation_enrollments'] += root_formation.count_formation_enrollments
         context['total_learning_unit_enrollments'] += root_formation.count_learning_unit_enrollments
+        if root_formation.classes_counter:
+            for class_id, class_counter in root_formation.classes_counter.items():
+                tot = totals_classes.get(class_id, 0)
+                tot = tot + class_counter
+                totals_classes.update({class_id: tot})
+    context['totals_classes'] = totals_classes
     context['tab_active'] = "learning_unit_formations"  # Corresponds to url_name
     return render(request, "learning_unit/formations.html", context)
 
@@ -544,3 +556,14 @@ def proposal_is_on_future_year(proposal, base_luy):
 
 def proposal_is_on_same_year(proposal, base_luy):
     return proposal.learning_unit_year.academic_year.year == base_luy.academic_year.year
+
+
+def _group_by_education_group_year(classes):
+    group_by_education_group_year = {}
+    for classe in classes:
+        key = classe.offer_enrollment.education_group_year.pk
+        if key in group_by_education_group_year:
+            group_by_education_group_year[key] += group_by_education_group_year[key]
+        else:
+            group_by_education_group_year[key] = 1
+    return group_by_education_group_year

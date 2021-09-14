@@ -1,6 +1,6 @@
 {% extends "learning_unit/layout_detail.html" %}
 {% load static %}
-{% load i18n %}
+{% load i18n dictionnary %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -60,8 +60,11 @@
                                 <thead>
                                 <tr>
                                     <th>{% trans 'Training' %}</th>
+                                    <th>{% trans 'Enrolled to training' %}</th>
                                     <th>{% trans 'Enrolled to learning unit' %}</th>
-                                    <th>{% trans 'Total enrollments to training' %}</th>
+                                    {% for classe in learning_unit_enrollment_classes %}
+                                        <th>{% trans 'Enrolled to' %} {{ classe.learning_class_year.effective_class_complete_acronym }}</th>
+                                    {% endfor %}
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -73,14 +76,28 @@
                                                 {{ education_group_year.acronym }}
                                             </a>
                                         </td>
-                                        <td>{{ education_group_year.count_learning_unit_enrollments }}</td>
                                         <td>{{ education_group_year.count_formation_enrollments }}</td>
+                                        <td>{{ education_group_year.count_learning_unit_enrollments }}</td>
+                                        {% if education_group_year.classes_counter %}
+                                            {% for learning_unit_enrollment in learning_unit_enrollment_classes %}
+                                                {% with class_count=education_group_year.classes_counter|get_item_or_zero:learning_unit_enrollment.learning_class_year.pk %}
+                                                <td>{{ class_count }}</td>
+                                                {% endwith %}
+                                            {% endfor %}
+                                        {% else %}
+                                            {% for classe in learning_unit_enrollment_classes %}
+                                                <td>0</td>
+                                            {% endfor %}
+                                        {% endif %}
                                     </tr>
                                 {% endfor %}
                                 <tr>
                                     <td><strong>{% trans 'Total' %}</strong></td>
                                     <td><strong>{{ total_learning_unit_enrollments }}</strong></td>
                                     <td><strong>{{ total_formation_enrollments }}</strong></td>
+                                    {% for learning_unit_enrollment in learning_unit_enrollment_classes %}
+                                        <td><strong>{{ totals_classes|get_item_or_zero:learning_unit_enrollment.learning_class_year.pk }}</strong></td>
+                                    {% endfor %}
                                 </tr>
                                 </tbody>
                             </table>
