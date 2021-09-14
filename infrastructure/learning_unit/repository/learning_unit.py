@@ -41,7 +41,8 @@ from base.models.learning_unit_year import LearningUnitYear as LearningUnitYearD
 from base.models.proposal_learning_unit import ProposalLearningUnit as ProposalLearningUnitDatabase
 from ddd.logic.learning_unit.builder.learning_unit_builder import LearningUnitBuilder
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit, LearningUnitIdentity
-from ddd.logic.learning_unit.dtos import LearningUnitFromRepositoryDTO, LearningUnitSearchDTO, PartimFromRepositoryDTO, \
+from ddd.logic.learning_unit.dtos import LearningUnitFromRepositoryDTO, LearningUnitSearchDTO, \
+    PartimFromRepositoryDTO, \
     LearningUnitPartimDTO
 from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepository
 from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
@@ -77,6 +78,20 @@ class LearningUnitRepository(ILearningUnitRepository):
 
         partims_prefetch = LearningUnitYearDatabase.objects.filter(
             subtype=learning_unit_year_subtypes.PARTIM,
+        ).annotate(
+            full_title=Case(
+                When(
+                    Q(learning_container_year__common_title__isnull=True) |
+                    Q(learning_container_year__common_title__exact=''),
+                    then='specific_title'
+                ),
+                When(
+                    Q(specific_title__isnull=True) | Q(specific_title__exact=''),
+                    then='learning_container_year__common_title'
+                ),
+                default=Concat('learning_container_year__common_title', Value(' - '), 'specific_title'),
+                output_field=CharField(),
+            ),
         )
 
         qs = qs.annotate(
@@ -129,7 +144,10 @@ class LearningUnitRepository(ILearningUnitRepository):
                         responsible_entity_code=learning_unit_year_db_obj.responsible_entity_code,
                         responsible_entity_title=learning_unit_year_db_obj.responsible_entity_title,
                         partims=[
-                            LearningUnitPartimDTO(code=partim.acronym, full_title=partim.specific_title)
+                            LearningUnitPartimDTO(
+                                code=partim.acronym,
+                                full_title=partim.full_title
+                            )
                             for partim
                             in learning_unit_year_db_obj.learning_container_year.partims
                         ]

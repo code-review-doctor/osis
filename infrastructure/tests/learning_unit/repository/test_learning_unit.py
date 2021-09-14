@@ -116,7 +116,10 @@ class LearningUnitRepositoryTestCase(TestCase):
                     partims=[
                         LearningUnitPartimDTO(
                             code=partim_db.acronym,
-                            full_title=partim_db.specific_title
+                            full_title="{} - {}".format(
+                                partim_db.learning_container_year.common_title,
+                                partim_db.specific_title
+                            )
                         )
                     ]
                 )
