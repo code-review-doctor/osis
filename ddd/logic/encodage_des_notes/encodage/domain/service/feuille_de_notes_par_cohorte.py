@@ -115,6 +115,7 @@ class FeuilleDeNotesParCohorte(interface.DomainService):
             annee_academique=feuille_notes_enseignant.annee_academique,
             numero_session=feuille_notes_enseignant.numero_session,
             notes_etudiants=etudiants_gestionnaire,
+            note_decimale_est_autorisee=feuille_notes_enseignant.note_decimale_est_autorisee
         )
 
 
