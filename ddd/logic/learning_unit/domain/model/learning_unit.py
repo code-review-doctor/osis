@@ -136,7 +136,7 @@ class LearningUnit(interface.RootEntity):
             )
             for partim in self.partims
         ]
-<<
+
 
 class CourseLearningUnit(LearningUnit):
     type = LearningContainerYearType.COURSE
