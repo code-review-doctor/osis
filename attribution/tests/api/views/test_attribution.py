@@ -77,7 +77,7 @@ class AttributionListViewTestCase(APITestCase):
             [
                 "code", "title_fr", "title_en", "year", "type", "type_text", "credits", "start_year", "function",
                 "function_text", "lecturing_charge", "practical_charge", "total_learning_unit_charge", "links",
-                "has_peps", "effective_class_repartition"
+                "has_peps", "effective_class_repartition", "is_partim"
             ]
         )
 
@@ -141,7 +141,7 @@ class MyAttributionListViewTestCase(APITestCase):
             [
                 "code", "title_fr", "title_en", "year", "type", "type_text", "credits", "start_year", "function",
                 "function_text", "lecturing_charge", "practical_charge", "total_learning_unit_charge", "links",
-                "has_peps", "effective_class_repartition"
+                "has_peps", "effective_class_repartition", "is_partim"
             ]
         )
 
