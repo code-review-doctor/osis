@@ -26,6 +26,7 @@
 import json
 import operator
 
+import attr
 from django.template.defaultfilters import floatformat
 from django.utils.translation import gettext_lazy as _
 
@@ -185,3 +186,19 @@ class ScoreSheetXLSSerializer(serializers.Serializer):
         representation = super().to_representation(instance)
         json_str = json.dumps(representation)
         return json.loads(json_str)
+
+
+class TutorScoreSheetXLSSerializer(ScoreSheetXLSSerializer):
+    def get_rows(self, obj):
+        notes_etudiants_filtered = filter(
+            lambda n: not n.date_echeance_atteinte and not n.est_soumise,
+            obj['feuille_de_notes'].notes_etudiants
+        )
+
+        notes_etudiants_without_value = map(lambda n: attr.evolve(n, note=''), notes_etudiants_filtered)
+        serializer = _NoteEtudiantRowSerializer(
+            instance=notes_etudiants_without_value,
+            context={'note_decimale_est_autorisee': obj['feuille_de_notes'].note_decimale_est_autorisee},
+            many=True
+        )
+        return serializer.data
