@@ -27,7 +27,7 @@ import logging
 from typing import Dict, Union, List, Tuple
 
 from django.conf import settings
-from django.db.models import F, Case, When, Q, Value, CharField, Exists, OuterRef, Sum, Subquery
+from django.db.models import F, Case, When, Q, Value, CharField, Exists, OuterRef, Sum, Subquery, BooleanField
 from django.db.models.functions import Concat
 from django.utils.functional import cached_property
 from rest_framework import generics
@@ -37,6 +37,7 @@ from attribution.api.serializers.attribution import AttributionSerializer
 from attribution.calendar.access_schedule_calendar import AccessScheduleCalendar
 from attribution.models.attribution_charge_new import AttributionChargeNew
 from base.models.enums import learning_component_year_type, offer_enrollment_state, learning_unit_enrollment_state
+from base.models.enums.learning_unit_year_subtypes import PARTIM
 from base.models.learning_component_year import LearningComponentYear
 from base.models.person import Person
 from base.models.student import Student
@@ -159,6 +160,14 @@ class AttributionListView(generics.ListAPIView):
                     ),
                     **COMMON_LEARNING_UNIT_ENROLLMENT_CLAUSE
                 )
+            ),
+            is_partim=Case(
+                When(
+                    Q(learning_component_year__learning_unit_year__subtype=PARTIM),
+                    then=True,
+                ),
+                default=False,
+                output_field=BooleanField()
             ),
             total_learning_unit_charge=Subquery(
                 LearningComponentYear.objects.filter(
