@@ -26,6 +26,7 @@
 from django.utils.functional import cached_property
 
 from assessments.views.common.score_sheet_xls_export import ScoreSheetXLSExportBaseView
+from assessments.views.serializers.score_sheet_xls import TutorScoreSheetXLSSerializer
 from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand
 from infrastructure.messages_bus import message_bus_instance
 
@@ -38,3 +39,6 @@ class ScoreSheetXLSExportTutorView(ScoreSheetXLSExportBaseView):
             code_unite_enseignement=self.kwargs['learning_unit_code']
         )
         return message_bus_instance.invoke(cmd)
+
+    def get_score_sheet_xls_serializer_cls(self):
+        return TutorScoreSheetXLSSerializer

@@ -31,7 +31,7 @@ from rest_framework import exceptions
 
 from assessments.export import score_sheet_xls
 from assessments.views.common.score_sheet_xls_export import XLSResponse
-from assessments.views.serializers.score_sheet_xls import ScoreSheetXLSSerializer
+from assessments.views.serializers.score_sheet_xls import TutorScoreSheetXLSSerializer
 from base.auth.roles.tutor import Tutor
 from ddd.logic.encodage_des_notes.soumission.commands import SearchAdressesFeuilleDeNotesCommand, \
     GetFeuilleDeNotesCommand
@@ -47,7 +47,7 @@ class ScoreSheetXLSExportAPIView(APIView):
         return self.request.user.person
 
     def get(self, request, *args, **kwargs):
-        score_sheet_serialized = ScoreSheetXLSSerializer(instance={
+        score_sheet_serialized = TutorScoreSheetXLSSerializer(instance={
             'feuille_de_notes': self.feuille_de_notes,
             'donnees_administratives': self.donnees_administratives,
         }).data
