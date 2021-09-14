@@ -26,6 +26,7 @@
 from django.forms import formset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
+from django.template.defaultfilters import floatformat
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.views.generic import FormView
@@ -79,3 +80,11 @@ class LearningUnitScoreEncodingBaseFormView(PermissionRequiredMixin, FormView):
 
     def get_permission_object(self):
         return None
+
+    def _get_initial_note_etudiant(self, note_etudiant):
+        try:
+            note_format = "2" if self.feuille_de_notes.note_decimale_est_autorisee else "0"
+            note_formated = floatformat(float(note_etudiant.note), note_format)
+        except ValueError:
+            note_formated = note_etudiant.note
+        return {'note': note_formated, 'noma': note_etudiant.noma}

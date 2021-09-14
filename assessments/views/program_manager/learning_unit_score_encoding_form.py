@@ -96,7 +96,8 @@ class LearningUnitScoreEncodingProgramManagerFormView(LearningUnitScoreEncodingB
         formset_initial = []
         for note_etudiant in self.feuille_de_notes.notes_etudiants:
             if not note_etudiant.date_echeance_atteinte:
-                formset_initial.append({'note': note_etudiant.note, 'noma': note_etudiant.noma})
+                initial_note_etudiant = self._get_initial_note_etudiant(note_etudiant)
+                formset_initial.append(initial_note_etudiant)
             else:
                 formset_initial.append({})
         return formset_initial

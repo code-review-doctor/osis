@@ -99,7 +99,8 @@ class LearningUnitScoreEncodingTutorFormView(LearningUnitScoreEncodingBaseFormVi
         for note_etudiant in self.feuille_de_notes.notes_etudiants:
             if not note_etudiant.est_soumise and not note_etudiant.date_echeance_atteinte and \
                     not note_etudiant.desinscrit_tardivement:
-                formset_initial.append({'note': note_etudiant.note, 'noma': note_etudiant.noma})
+                initial_note_etudiant = self._get_initial_note_etudiant(note_etudiant)
+                formset_initial.append(initial_note_etudiant)
             else:
                 formset_initial.append({})
         return formset_initial
