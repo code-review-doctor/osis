@@ -71,14 +71,29 @@ def _search_classes_effectives(code_annee_values, message_bus_instance):
     }
 
 
-def _search_unites_enseignement(code_annee_values, message_bus_instance):
+def _search_unites_enseignement(code_annee_values: Set[Tuple[str, int]], message_bus_instance):
+    code_annee_values_for_command = {(code[:-1], annee) for code, annee in code_annee_values}.union(code_annee_values)
     unites_enseignement = message_bus_instance.invoke(
-        LearningUnitSearchCommand(code_annee_values=code_annee_values)
+        LearningUnitSearchCommand(code_annee_values=code_annee_values_for_command)
     )
-    return {
+
+    result = {
         UniteEnseignementDTO(
             annee=dto.year,
             code=dto.code,
             intitule_complet=dto.full_title,
-        ) for dto in unites_enseignement
+        ) for dto in unites_enseignement if (dto.code, dto.year) in code_annee_values
     }
+
+    partims_result = {
+        UniteEnseignementDTO(
+            annee=dto.year,
+            code=partim.code,
+            intitule_complet=partim.full_title
+        )
+        for dto in unites_enseignement
+        for partim in dto.partims
+        if (partim.code, dto.year) in code_annee_values
+    }
+
+    return result.union(partims_result)

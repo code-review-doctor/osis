@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-14 14:59+0200\n"
+"POT-Creation-Date: 2021-09-14 15:58+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -98,9 +98,6 @@ msgstr ""
 "\n"
 "Vous soumettrez %(draft_scores_not_submitted)s notes au(x) faculté(s). "
 "Attention : les notes soumises <b>ne peuvent plus être modifiées.</b>"
-
-msgid "A=Absent"
-msgstr "A=Absent"
 
 msgid "Absence justified"
 msgstr "Absence justifiée"
@@ -525,7 +522,7 @@ msgid "Refresh list"
 msgstr "rafraîchir la liste"
 
 msgid "Reg. No."
-msgstr ""
+msgstr "Noma"
 
 msgid "Registration ID"
 msgstr "Noma"
@@ -683,15 +680,13 @@ msgstr "Soumission"
 msgid "Submit data"
 msgstr "Date de remise"
 
-msgid "T=Cheating"
-msgstr "T=Tricherie"
-
 msgid "Teacher deadline"
 msgstr "Date d'échéance de l'enseignant"
 
 msgid "Temporary save (not submitted to the faculty yet)"
 msgstr "Enregistrement temporaire (non soumis à la faculté pour le moment)"
 
+#, python-format
 msgid ""
 "The data presented on this document correspond to the state of the system "
 "dated %(creation_date)s and are likely to evolve"
@@ -809,6 +804,12 @@ msgstr "Sans attribution"
 msgid "Yes"
 msgstr "Oui"
 
+msgid "You can encode a number. Or a letter between A and T."
+msgstr "Vous pouvez encoder un nombre. Ou bien une lettre entre A et T."
+
+msgid "You can encode a number. Or a letter between A, S, T and M."
+msgstr "Vous pouvez encoder un nombre. Ou bien une lettre entre A, S, T et M."
+
 msgid "You can't encode a 'score' and a 'justification' together"
 msgstr "Vous ne pouvez pas encoder une note et une justification ensemble"
 
@@ -879,4 +880,4 @@ msgid "students"
 msgstr "étudiants"
 
 msgid "the"
-msgstr ""
+msgstr "le"

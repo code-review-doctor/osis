@@ -108,7 +108,10 @@ class NotifierEncodageNotes(INotifierEncodageNotes):
             'learning_unit_acronym': donnes_email.code_unite_enseignement,
             'offer_acronym': donnes_email.nom_cohorte
         }
-        receivers = [(None, email, donnes_email.langue_email) for email in donnes_email.emails_destinataires]
+        receivers = [
+            message_config.create_receiver(None, email, donnes_email.langue_email)
+            for email in donnes_email.emails_destinataires
+        ]
         cc = [Person(email=donnes_email.email_gestionnaire)]
         if donnes_email.adresse_feuille_de_notes and donnes_email.adresse_feuille_de_notes.email:
             cc.append(Person(email=donnes_email.adresse_feuille_de_notes.email))

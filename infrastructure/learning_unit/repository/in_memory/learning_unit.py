@@ -15,7 +15,23 @@ class LearningUnitRepository(InMemoryGenericRepository, ILearningUnitRepository)
 
     @classmethod
     def search_learning_units_dto(cls, code_annee_values: Set[Tuple[str, int]] = None) -> List['LearningUnitSearchDTO']:
-        raise NotImplementedError
+        return [
+            cls._convert_learning_unit_to_search_dto(entity)
+            for entity in cls.entities
+            if (entity.code, entity.year) in code_annee_values
+        ]
+
+    @classmethod
+    def _convert_learning_unit_to_search_dto(cls, learning_unit: 'LearningUnit') -> 'LearningUnitSearchDTO':
+        return LearningUnitSearchDTO(
+            year=learning_unit.year,
+            code=learning_unit.code,
+            full_title=learning_unit.complete_title_fr,
+            type=learning_unit.type,
+            responsible_entity_code=learning_unit.responsible_entity_identity.code,
+            responsible_entity_title="",
+            partims=learning_unit.get_partims_information()
+        )
 
     # TODO: To implement when Proposals are in DDD
     @classmethod
