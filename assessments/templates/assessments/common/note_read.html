@@ -32,5 +32,9 @@
 {% elif note_etudiant.note == 'M' %}
     {% trans 'Absence justified' %} (M)
 {% else %}
-    {{ note_etudiant.note }}
+    {% if feuille_de_notes.note_decimale_est_autorisee %}
+        {{ note_etudiant.note|floatformat:2 }}
+    {% else %}
+        {{ note_etudiant.note|floatformat:0 }}
+    {% endif %}
 {% endif %}

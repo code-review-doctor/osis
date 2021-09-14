@@ -188,7 +188,7 @@ class ResponsableDeNotesRepository(IResponsableDeNotesRepository):
         ).values(
             'nom',
             'prenom',
-        ).get()
+        ).distinct('tutor_id').get()
         return EnseignantDTO(**detail_enseignant_as_values)
 
     @classmethod

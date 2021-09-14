@@ -90,13 +90,11 @@ def _build_document_info(worksheet, feuille_de_notes_serialized):
 
 
 def _build_legends(worksheet, feuille_de_notes_serialized):
-    justification_label_authorized = "%s, %s" % (_('A=Absent'), _('T=Cheating'))
     justification_other_values = "%s, %s" % (_('S=Unjustified Absence'), _('M=Justified Absence'))
 
     worksheet.append([
-        str(_('Justification')),
-        str(_("Accepted value: %(justification_label_authorized)s ")
-            % {"justification_label_authorized": justification_label_authorized}),
+        str(_('Score')),
+        str(_('Score legend: A=Absent, T=Cheating, {score} (0=Score of presence)').format(score="0 - 20")),
         str(''),
         str(''),
         str(''),
@@ -114,10 +112,6 @@ def _build_legends(worksheet, feuille_de_notes_serialized):
         str(_('Unsubscribed lately')),
     ])
     worksheet.append([
-        str(_('Numbered scores')),
-        str(_('Score legend: %(score_legend)s (0=Score of presence)') % {"score_legend": "0 - 20"}),
-    ])
-    worksheet.append([
         str(''),
         str(_('Decimals authorized for this learning unit'))
         if feuille_de_notes_serialized['note_decimale_est_autorisee'] else
@@ -126,7 +120,7 @@ def _build_legends(worksheet, feuille_de_notes_serialized):
 
     worksheet.cell(row=7, column=7).fill = PatternFill(patternType='solid', fgColor=Color('dff0d8'))
     worksheet.cell(row=8, column=7).fill = PatternFill(patternType='solid', fgColor=Color('f2dede'))
-    worksheet.cell(row=10, column=2).font = Font(color=colors.RED)
+    worksheet.cell(row=9, column=2).font = Font(color=colors.RED)
     worksheet.append([str('')])
 
 
@@ -153,7 +147,7 @@ def _build_headers(worksheet):
 
 
 def _build_rows(worksheet, feuille_de_notes_serialized):
-    current_row_number = 13
+    current_row_number = 12
 
     for row in feuille_de_notes_serialized['rows']:
         worksheet.append([
