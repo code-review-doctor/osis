@@ -126,8 +126,6 @@ class LearningUnitRepositoryTestCase(TestCase):
             ]
         )
 
-        self.assertEqual(len(dtos), 1)
-
     def test_assert_learning_unit_domain_object_is_not_a_partim(self):
         luy_db = LearningUnitYearFullFactory(academic_year__current=True)
         partim_db = LearningUnitYearPartimFactory(
