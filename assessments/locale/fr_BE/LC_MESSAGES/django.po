@@ -769,8 +769,8 @@ msgstr "Oui"
 msgid "You can encode a number. Or a letter between A and T."
 msgstr "Vous pouvez encoder un nombre. Ou bien une lettre entre A et T."
 
-msgid "You can encode a number. Or a letter between A, S, T and M."
-msgstr "Vous pouvez encoder un nombre. Ou bien une lettre entre A, S, T et M."
+msgid "You can encode a number. Or a letter between A, T and M."
+msgstr "Vous pouvez encoder un nombre. Ou bien une lettre entre A, T et M."
 
 msgid "You can't encode a 'score' and a 'justification' together"
 msgstr "Vous ne pouvez pas encoder une note et une justification ensemble"

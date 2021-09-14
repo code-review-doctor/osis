@@ -712,7 +712,7 @@ msgstr ""
 msgid "You can encode a number. Or a letter between A and T."
 msgstr ""
 
-msgid "You can encode a number. Or a letter between A, S, T and M."
+msgid "You can encode a number. Or a letter between A, T and M."
 msgstr ""
 
 msgid "You can't encode a 'score' and a 'justification' together"
