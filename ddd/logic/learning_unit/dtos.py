@@ -92,6 +92,12 @@ class LearningUnitFromRepositoryDTO(DTO):
 
 
 @attr.s(frozen=True, slots=True)
+class LearningUnitPartimDTO(DTO):
+    code = attr.ib(type=str)
+    full_title = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
 class LearningUnitSearchDTO(DTO):
     year = attr.ib(type=int)
     code = attr.ib(type=str)
@@ -99,6 +105,7 @@ class LearningUnitSearchDTO(DTO):
     type = attr.ib(type=str)
     responsible_entity_code = attr.ib(type=str)
     responsible_entity_title = attr.ib(type=str)
+    partims = attr.ib(type=List[LearningUnitPartimDTO], default=attr.Factory(list))
 
 
 @attr.s(frozen=True, slots=True)

@@ -25,7 +25,7 @@
 ##############################################################################
 from typing import Optional, List, Set, Tuple
 
-from django.db.models import F, OuterRef, Subquery, Case, When, Q, CharField, Value, QuerySet
+from django.db.models import F, OuterRef, Subquery, Case, When, Q, CharField, Value, QuerySet, Prefetch
 from django.db.models.functions import Concat, Substr, Length
 
 from base.models.academic_year import AcademicYear as AcademicYearDatabase
@@ -41,7 +41,8 @@ from base.models.learning_unit_year import LearningUnitYear as LearningUnitYearD
 from base.models.proposal_learning_unit import ProposalLearningUnit as ProposalLearningUnitDatabase
 from ddd.logic.learning_unit.builder.learning_unit_builder import LearningUnitBuilder
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit, LearningUnitIdentity
-from ddd.logic.learning_unit.dtos import LearningUnitFromRepositoryDTO, LearningUnitSearchDTO, PartimFromRepositoryDTO
+from ddd.logic.learning_unit.dtos import LearningUnitFromRepositoryDTO, LearningUnitSearchDTO, PartimFromRepositoryDTO, \
+    LearningUnitPartimDTO
 from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepository
 from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
 from osis_common.ddd.interface import EntityIdentity, ApplicationService, Entity
@@ -74,6 +75,10 @@ class LearningUnitRepository(ILearningUnitRepository):
                 acronym__in={code for code, _ in code_annee_values}
             )
 
+        partims_prefetch = LearningUnitYearDatabase.objects.filter(
+            subtype=learning_unit_year_subtypes.PARTIM,
+        )
+
         qs = qs.annotate(
             code=F('acronym'),
             year=F('academic_year__year'),
@@ -101,18 +106,35 @@ class LearningUnitRepository(ILearningUnitRepository):
                     entity__id=OuterRef('learning_container_year__requirement_entity_id')
                 ).order_by('-start_date').values('title')[:1]
             ),
-        ).values(
-            "year",
-            "code",
-            "full_title",
-            "type",
-            "responsible_entity_code",
-            "responsible_entity_title",
+        ).select_related(
+            "learning_container_year"
+        ).prefetch_related(
+            Prefetch("learning_container_year__learningunityear_set", queryset=partims_prefetch, to_attr='partims'),
+        ).only(
+            "learning_container_year",
+            "language",
+            "academic_year"
         )
         result = []
-        for data_dict in qs:
-            if code_annee_values is None or (data_dict['code'], data_dict['year'],) in code_annee_values:
-                result.append(LearningUnitSearchDTO(**data_dict))
+        for learning_unit_year_db_obj in qs:
+            if code_annee_values is None or (
+                learning_unit_year_db_obj.code, learning_unit_year_db_obj.year
+            ) in code_annee_values:
+                result.append(
+                    LearningUnitSearchDTO(
+                        year=learning_unit_year_db_obj.year,
+                        code=learning_unit_year_db_obj.code,
+                        full_title=learning_unit_year_db_obj.full_title,
+                        type=learning_unit_year_db_obj.type,
+                        responsible_entity_code=learning_unit_year_db_obj.responsible_entity_code,
+                        responsible_entity_title=learning_unit_year_db_obj.responsible_entity_title,
+                        partims=[
+                            LearningUnitPartimDTO(code=partim.acronym, full_title=partim.specific_title)
+                            for partim
+                            in learning_unit_year_db_obj.learning_container_year.partims
+                        ]
+                    )
+                )
         return result
 
     @classmethod

@@ -16,6 +16,7 @@ from ddd.logic.learning_unit.builder.learning_unit_builder import LearningUnitBu
 from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from ddd.logic.learning_unit.builder.ucl_entity_identity_builder import UclEntityIdentityBuilder
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand
+from ddd.logic.learning_unit.dtos import LearningUnitSearchDTO, LearningUnitPartimDTO
 from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
 from reference.tests.factories.language import LanguageFactory
 
@@ -90,6 +91,39 @@ class LearningUnitRepositoryTestCase(TestCase):
         self.assertEqual(partim.remarks.publication_fr, partim_db.other_remark, 'remark_publication_fr')
         self.assertEqual(partim.credits, partim_db.credits, 'credits')
         self.assertEqual(partim.periodicity.name, partim_db.periodicity, 'periodicity')
+
+    def test_search_dtos(self):
+        luy_db = LearningUnitYearFullFactory(academic_year__current=True)
+        partim_db = LearningUnitYearPartimFactory(
+            learning_container_year=luy_db.learning_container_year,
+            acronym='LTEST1212X',
+            academic_year=luy_db.academic_year
+        )
+        dtos = self.learning_unit_repository.search_learning_units_dto(
+            code_annee_values={(luy_db.acronym, luy_db.academic_year.year)}
+        )
+
+        self.assertCountEqual(
+            dtos,
+            [
+                LearningUnitSearchDTO(
+                    year=luy_db.academic_year.year,
+                    code=luy_db.acronym,
+                    full_title="{} - {}".format(luy_db.learning_container_year.common_title, luy_db.specific_title),
+                    type=luy_db.learning_container_year.container_type,
+                    responsible_entity_code=None,
+                    responsible_entity_title=None,
+                    partims=[
+                        LearningUnitPartimDTO(
+                            code=partim_db.acronym,
+                            full_title=partim_db.specific_title
+                        )
+                    ]
+                )
+            ]
+        )
+
+        self.assertEqual(len(dtos), 1)
 
     def test_assert_learning_unit_domain_object_is_not_a_partim(self):
         luy_db = LearningUnitYearFullFactory(academic_year__current=True)
