@@ -774,6 +774,8 @@ components:
           $ref: '#/components/schemas/AttributionLinks'
         has_peps:
           type: boolean
+        is_partim:
+          type: boolean
         effective_class_repartition:
           type: array
           items:
