@@ -23,9 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+
 from django.conf import settings
 from rest_framework import serializers
 
+from attribution.api.serializers.effective_class_repartition import EffectiveClassRepartitionSerializer
 from attribution.models.enums.function import Functions
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 
@@ -41,32 +43,24 @@ class AttributionSerializer(serializers.Serializer):
     start_year = serializers.IntegerField()
     function = serializers.CharField()
     function_text = serializers.SerializerMethodField()
-    lecturing_charge = serializers.SerializerMethodField()
-    practical_charge = serializers.SerializerMethodField()
-    total_learning_unit_charge = serializers.SerializerMethodField()
+    lecturing_charge = serializers.DecimalField(max_digits=4, decimal_places=1)
+    practical_charge = serializers.DecimalField(max_digits=4, decimal_places=1)
+    total_learning_unit_charge = serializers.DecimalField(max_digits=4, decimal_places=1)
     links = serializers.SerializerMethodField()
+    has_peps = serializers.BooleanField()
+    effective_class_repartition = EffectiveClassRepartitionSerializer(many=True, default=None)
 
-    def get_type_text(self, obj) -> str:
+    @staticmethod
+    def get_type_text(obj) -> str:
         if obj.type:
             return LearningContainerYearType.get_value(obj.type)
         return ""
 
-    def get_function_text(self, obj) -> str:
+    @staticmethod
+    def get_function_text(obj) -> str:
         if obj.function:
             return Functions.get_value(obj.function)
         return ""
-
-    def get_lecturing_charge(self, obj):
-        attribution_charge = self.__get_attribution_charge_row(obj)
-        return attribution_charge.get('allocationChargeLecturing')
-
-    def get_practical_charge(self, obj):
-        attribution_charge = self.__get_attribution_charge_row(obj)
-        return attribution_charge.get('allocationChargePractical')
-
-    def get_total_learning_unit_charge(self, obj):
-        attribution_charge = self.__get_attribution_charge_row(obj)
-        return attribution_charge.get('learningUnitCharge')
 
     def get_links(self, obj) -> dict:
         return {
@@ -74,15 +68,13 @@ class AttributionSerializer(serializers.Serializer):
             "schedule": self.__get_schedule_url(obj)
         }
 
-    def __get_attribution_charge_row(self, obj):
-        attribution_charges = self.context.get("attribution_charges", [])
-        return next((row for row in attribution_charges if row['allocationId'] == obj.allocation_id), {})
-
-    def __get_catalog_url(self, obj):
+    @staticmethod
+    def __get_catalog_url(obj):
         if settings.LEARNING_UNIT_PORTAL_URL:
             return settings.LEARNING_UNIT_PORTAL_URL.format(year=obj.year, code=obj.code)
 
     def __get_schedule_url(self, obj):
-        if settings.SCHEDULE_APP_URL and "access_schedule_calendar" in self.context and \
-                obj.year in self.context["access_schedule_calendar"].get_target_years_opened():
+        has_access_schedule_calendar = obj.year in self.context["access_schedule_calendar"].get_target_years_opened() \
+            if "access_schedule_calendar" in self.context else False
+        if settings.SCHEDULE_APP_URL and has_access_schedule_calendar:
             return settings.SCHEDULE_APP_URL.format(code=obj.code)
