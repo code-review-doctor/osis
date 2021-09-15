@@ -816,7 +816,7 @@ def find_by_user(user, academic_yr=None):
     :return: All EducationGroupYear where the user is a program manager for a given year.
     """
     if not academic_yr:
-        academic_yr = academic_year.current_academic_year()
+        academic_yr = academic_year.starting_academic_year()
     return EducationGroupYear.objects.filter(
         academic_year=academic_yr,
         education_group__programmanager__person__user=user,

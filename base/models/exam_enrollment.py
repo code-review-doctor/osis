@@ -259,7 +259,7 @@ def get_progress_by_learning_unit_years_and_offer_years(user,
     if education_group_year_id:
         education_group_year_ids = [education_group_year_id]
     else:
-        education_group_year_ids = list(education_group_year.find_by_user(user).values_list('id', flat=True))
+        education_group_year_ids = education_group_year.find_by_user(user).values_list('id', flat=True)
 
     tutor_user = None
     if not program_manager.is_program_manager(user):
