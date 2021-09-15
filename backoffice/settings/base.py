@@ -175,6 +175,10 @@ TEMPLATES = [
     },
 ]
 
+FORMAT_MODULE_PATH = [
+    'backoffice.formats',
+]
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',

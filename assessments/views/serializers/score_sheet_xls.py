@@ -25,6 +25,9 @@
 ##############################################################################
 import json
 import operator
+
+import attr
+from django.template.defaultfilters import floatformat
 from django.utils.translation import gettext_lazy as _
 
 from rest_framework import serializers
@@ -38,7 +41,7 @@ class _NoteEtudiantRowSerializer(serializers.Serializer):
     noma = serializers.CharField(read_only=True, default='')
     nom = serializers.CharField(read_only=True, default='')
     prenom = serializers.CharField(read_only=True, default='')
-    note = serializers.CharField(read_only=True, default='')
+    note = serializers.SerializerMethodField()
     nom_cohorte = serializers.CharField(read_only=True, default='')
     email = serializers.CharField(read_only=True, default='')
     date_remise_de_notes = serializers.DateField(
@@ -127,6 +130,13 @@ class _NoteEtudiantRowSerializer(serializers.Serializer):
             return '#f2dede'
         return ''
 
+    def get_note(self, note_etudiant: NoteEtudiantDTO) -> str:
+        try:
+            note_format = "2" if self.context['note_decimale_est_autorisee'] else "0"
+            return floatformat(float(note_etudiant.note), note_format)
+        except ValueError:
+            return note_etudiant.note
+
 
 class ScoreSheetXLSSerializer(serializers.Serializer):
     numero_session = serializers.IntegerField(read_only=True, source='feuille_de_notes.numero_session', default='')
@@ -162,7 +172,11 @@ class ScoreSheetXLSSerializer(serializers.Serializer):
         notes_etudiants_avec_date_echeance_non_atteinte = filter(
             lambda n: not n.date_echeance_atteinte, obj['feuille_de_notes'].notes_etudiants
         )
-        serializer = _NoteEtudiantRowSerializer(instance=notes_etudiants_avec_date_echeance_non_atteinte, many=True)
+        serializer = _NoteEtudiantRowSerializer(
+            instance=notes_etudiants_avec_date_echeance_non_atteinte,
+            context={'note_decimale_est_autorisee': obj['feuille_de_notes'].note_decimale_est_autorisee},
+            many=True
+        )
         return serializer.data
 
     def to_representation(self, instance):
@@ -172,3 +186,19 @@ class ScoreSheetXLSSerializer(serializers.Serializer):
         representation = super().to_representation(instance)
         json_str = json.dumps(representation)
         return json.loads(json_str)
+
+
+class TutorScoreSheetXLSSerializer(ScoreSheetXLSSerializer):
+    def get_rows(self, obj):
+        notes_etudiants_filtered = filter(
+            lambda n: not n.date_echeance_atteinte and not n.est_soumise,
+            obj['feuille_de_notes'].notes_etudiants
+        )
+
+        notes_etudiants_without_value = map(lambda n: attr.evolve(n, note=''), notes_etudiants_filtered)
+        serializer = _NoteEtudiantRowSerializer(
+            instance=notes_etudiants_without_value,
+            context={'note_decimale_est_autorisee': obj['feuille_de_notes'].note_decimale_est_autorisee},
+            many=True
+        )
+        return serializer.data

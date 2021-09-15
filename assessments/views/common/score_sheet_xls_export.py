@@ -71,7 +71,7 @@ class ScoreSheetXLSExportBaseView(PermissionRequiredMixin, View):
 
     @set_download_cookie
     def get(self, request, *args, **kwargs):
-        score_sheet_serialized = ScoreSheetXLSSerializer(instance={
+        score_sheet_serialized = self.get_score_sheet_xls_serializer_cls()(instance={
             'feuille_de_notes': self.feuille_de_notes,
             'donnees_administratives': self.donnees_administratives,
         }).data
@@ -86,6 +86,9 @@ class ScoreSheetXLSExportBaseView(PermissionRequiredMixin, View):
                     'learning_unit_code': self.kwargs['learning_unit_code'],
                 })
             )
+
+    def get_score_sheet_xls_serializer_cls(self):
+        return ScoreSheetXLSSerializer
 
     def get_filename(self) -> str:
         return "session_%s_%s_%s.xlsx" % (

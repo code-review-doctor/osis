@@ -23,9 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import contextlib
 import itertools
 import json
 
+from django.template.defaultfilters import floatformat
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -41,7 +43,6 @@ class _EnrollmentSerializer(serializers.Serializer):
     last_name = serializers.CharField(read_only=True, source='nom')
     first_name = serializers.CharField(read_only=True, source='prenom')
     score = serializers.SerializerMethodField()
-    justification = serializers.SerializerMethodField()
     deadline = serializers.DateField(read_only=True, source='date_remise_de_notes.to_date', format="%d/%m/%Y")
     enrollment_state_color = serializers.SerializerMethodField()
 
@@ -53,15 +54,10 @@ class _EnrollmentSerializer(serializers.Serializer):
         return ''
 
     def get_score(self, note_etudiant) -> str:
-        try:
-            return str(float(note_etudiant.note))
-        except (ValueError, TypeError,):
-            return ""
-
-    def get_justification(self, note_etudiant) -> str:
-        if note_etudiant.note in ('A', 'T', 'M', 'S'):
-            return note_etudiant.note
-        return ""
+        with contextlib.suppress(ValueError, TypeError):
+            note_format = "2" if self.context['note_decimale_est_autorisee'] else "0"
+            return floatformat(float(note_etudiant.note), note_format)
+        return note_etudiant.note
 
 
 class _ProgramAddressSerializer(serializers.Serializer):
@@ -79,7 +75,7 @@ class _ProgramSerializer(serializers.Serializer):
     deliberation_date = serializers.SerializerMethodField()
     acronym = serializers.SerializerMethodField()
     address = _ProgramAddressSerializer(source='donnees_administratives_cohorte.contact_feuille_de_notes')
-    enrollments = _EnrollmentSerializer(source='notes_etudiants_cohorte', many=True)
+    enrollments = serializers.SerializerMethodField()
 
     def get_deliberation_date(self, obj):
         return obj['donnees_administratives_cohorte'].date_deliberation.to_date().strftime("%d/%m/%Y")  \
@@ -87,6 +83,10 @@ class _ProgramSerializer(serializers.Serializer):
 
     def get_acronym(self, obj):
         return obj['nom_cohorte']
+
+    def get_enrollments(self, obj):
+        serializer = _EnrollmentSerializer(instance=obj['notes_etudiants_cohorte'], many=True, context=self.context)
+        return serializer.data
 
 
 class _ScoreResponsibleAddressSerializer(serializers.Serializer):
@@ -132,7 +132,7 @@ class _LearningUnitYearsSerializer(serializers.Serializer):
                 'notes_etudiants_cohorte': notes_etudiants_cohorte,
                 'nom_cohorte': nom_cohorte,
                 'donnees_administratives_cohorte': donnees_administratives_cohorte,
-            })
+            }, context={'note_decimale_est_autorisee': obj['feuille_de_notes'].note_decimale_est_autorisee},)
             programs.append(serializer.data)
         return programs
 
