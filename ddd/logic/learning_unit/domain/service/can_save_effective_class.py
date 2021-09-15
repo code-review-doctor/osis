@@ -29,7 +29,7 @@ from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
 from ddd.logic.learning_unit.domain.service.i_student_enrollments import IStudentEnrollmentsTranslator
 from ddd.logic.learning_unit.domain.validator.exceptions import ClassTypeInvalidException, \
     LearningUnitHasPartimException, LearningUnitHasProposalException, \
-    LearningUnitHasEnrollmentException, LearningUnitHasNoVolumeException
+    LearningUnitHasEnrollmentException, LearningUnitHasNoVolumeException, LearningUnitNotExistingException
 from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepository
 from osis_common.ddd import interface
 
@@ -42,22 +42,27 @@ class CanCreateEffectiveClass(interface.DomainService):
             learning_unit: 'LearningUnit',
             learning_unit_repository: 'ILearningUnitRepository',
             student_enrollment_translator: 'IStudentEnrollmentsTranslator',
+            year: int
     ):
         exceptions = set()  # type Set[BusinessException]
-        if learning_unit.is_external():
-            exceptions.add(ClassTypeInvalidException())
 
-        if learning_unit.has_partim():
-            exceptions.add(LearningUnitHasPartimException())
+        if learning_unit is None:
+            exceptions.add(LearningUnitNotExistingException(year))
+        else:
+            if learning_unit.is_external():
+                exceptions.add(ClassTypeInvalidException())
 
-        if learning_unit_repository.has_proposal_this_year_or_in_past(learning_unit):
-            exceptions.add(LearningUnitHasProposalException())
+            if learning_unit.has_partim():
+                exceptions.add(LearningUnitHasPartimException())
 
-        if student_enrollment_translator.has_enrollments_to_learning_unit(learning_unit.entity_id):
-            exceptions.add(LearningUnitHasEnrollmentException())
+            if learning_unit_repository.has_proposal_this_year_or_in_past(learning_unit):
+                exceptions.add(LearningUnitHasProposalException())
 
-        if not learning_unit.has_volume():
-            exceptions.add(LearningUnitHasNoVolumeException())
+            if student_enrollment_translator.has_enrollments_to_learning_unit(learning_unit.entity_id):
+                exceptions.add(LearningUnitHasEnrollmentException())
+
+            if not learning_unit.has_volume():
+                exceptions.add(LearningUnitHasNoVolumeException())
 
         if exceptions:
             raise MultipleBusinessExceptions(exceptions=exceptions)

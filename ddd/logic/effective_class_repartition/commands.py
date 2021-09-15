@@ -44,6 +44,11 @@ class SearchTutorsDistributedToClassCommand(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
+class GetTutorRepartitionClassesCommand(interface.CommandRequest):
+    tutor_personal_id_number = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
 class DistributeClassToTutorCommand(interface.CommandRequest):
     tutor_personal_id_number = attr.ib(type=str)
     learning_unit_attribution_uuid = attr.ib(type=str)

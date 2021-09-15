@@ -46,6 +46,12 @@ class LearningUnitEnrollment(SerializableModel):
     learning_unit_year = models.ForeignKey('LearningUnitYear', on_delete=models.CASCADE)
     offer_enrollment = models.ForeignKey('OfferEnrollment', on_delete=models.PROTECT)
     enrollment_state = models.CharField(max_length=20, choices=learning_unit_enrollment_state.STATES, default="")
+    learning_class_year = models.ForeignKey(
+        'learning_unit.LearningClassYear',
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True
+    )
 
     class Meta:
         unique_together = ('offer_enrollment', 'learning_unit_year', 'enrollment_state',)

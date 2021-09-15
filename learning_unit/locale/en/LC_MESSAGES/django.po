@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-30 13:22+0200\n"
+"POT-Creation-Date: 2021-08-23 14:29+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -82,19 +82,28 @@ msgstr ""
 msgid "Classes can only be created by a faculty manager"
 msgstr ""
 
+msgid "Classes copy report"
+msgstr ""
+
 msgid "Code"
 msgstr ""
 
 msgid "Common part"
 msgstr ""
 
-msgid "Complete LU"
-msgstr ""
-
 msgid "Components"
 msgstr ""
 
 msgid "Confirm"
+msgstr ""
+
+msgid "Copy result"
+msgstr ""
+
+msgid "Copy source"
+msgstr ""
+
+msgid "Copy to next year"
 msgstr ""
 
 msgid "Credits"
@@ -107,6 +116,9 @@ msgid "Delete class definitively"
 msgstr ""
 
 msgid "Derogation's session"
+msgstr ""
+
+msgid "Error"
 msgstr ""
 
 msgid "Faculty manager"

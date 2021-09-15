@@ -1,5 +1,6 @@
 {% extends "class_detail_layout.html" %}
 {% load i18n static %}
+{% load waffle_tags %}
 {% comment "License" %}
     * OSIS stands for Open Student Information System. It's an application
     * designed to manage the core business of higher education institutions,
@@ -48,28 +49,31 @@
                         {{ tutor.distributed_volume_to_class | floatformat:2 }}
                     </td>
                     <td>
-                        {% if can_change_attribution %}
-                            <a class="trigger_modal"
-                               data-url="{% url "edit_class_attribution" learning_unit_year=year learning_unit_code=learning_unit_code class_code=class_code attribution_uuid=tutor.attribution_uuid %}">
-                                <span class="glyphicon glyphicon-edit"></span>
-                            </a>
-                        {% endif %}
-                        {% if can_delete_attribution %}
-                            <a class="trigger_modal"
-                               data-url="{% url "remove_class_attribution" learning_unit_year=year learning_unit_code=learning_unit_code class_code=class_code attribution_uuid=tutor.attribution_uuid %}">
-                                <span class="glyphicon glyphicon-trash"></span>
-                            </a>
-                        {% endif %}
+                        {% flag "learning_class_create" %}
+                            {% if can_change_attribution %}
+                                <a class="trigger_modal"
+                                   data-url="{% url "edit_class_attribution" learning_unit_year=year learning_unit_code=learning_unit_code class_code=class_code attribution_uuid=tutor.attribution_uuid %}">
+                                    <span class="glyphicon glyphicon-edit"></span>
+                                </a>
+                            {% endif %}
+                            {% if can_delete_attribution %}
+                                <a class="trigger_modal"
+                                   data-url="{% url "remove_class_attribution" learning_unit_year=year learning_unit_code=learning_unit_code class_code=class_code attribution_uuid=tutor.attribution_uuid %}">
+                                    <span class="glyphicon glyphicon-trash"></span>
+                                </a>
+                            {% endif %}
+                        {% endflag %}
                     </td>
                 </tr>
             {% endfor %}
             </tbody>
         </table>
-
-        <a href="{{ url_lu_tutors }}" id="manage_repartition"
-           class="btn btn-default"
-           role="button">
-            {% trans "Manage repartition" %}
-        </a>
+        {% flag "learning_class_create" %}
+            <a href="{{ url_lu_tutors }}" id="manage_repartition"
+               class="btn btn-default"
+               role="button">
+                {% trans "Manage repartition" %}
+            </a>
+        {% endflag %}
     </div>
 {% endblock %}

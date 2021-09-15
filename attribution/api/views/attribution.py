@@ -24,23 +24,42 @@
 #
 ##############################################################################
 import logging
-import traceback
+from typing import Dict, Union, List, Tuple
 
-import requests
 from django.conf import settings
-from django.db.models import F, Case, When, Q, Value, CharField
-from django.db.models.functions import Concat, Replace
+from django.db.models import F, Case, When, Q, Value, CharField, Exists, OuterRef, Sum, Subquery, BooleanField
+from django.db.models.functions import Concat
 from django.utils.functional import cached_property
 from rest_framework import generics
 from rest_framework.response import Response
 
 from attribution.api.serializers.attribution import AttributionSerializer
 from attribution.calendar.access_schedule_calendar import AccessScheduleCalendar
-from attribution.models.attribution import Attribution
 from attribution.models.attribution_charge_new import AttributionChargeNew
+from base.models.enums import learning_component_year_type, offer_enrollment_state, learning_unit_enrollment_state
+from base.models.enums.learning_unit_year_subtypes import PARTIM
+from base.models.learning_component_year import LearningComponentYear
 from base.models.person import Person
+from base.models.student import Student
+from ddd.logic.effective_class_repartition.commands import GetTutorRepartitionClassesCommand
+from ddd.logic.effective_class_repartition.domain.model._class_volume_repartition import ClassVolumeRepartition
+from ddd.logic.effective_class_repartition.domain.model.tutor import Tutor
+from ddd.logic.learning_unit.commands import GetEffectiveClassCommand
+from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
+from infrastructure.messages_bus import message_bus_instance
+from learning_unit.models.learning_class_year import LearningClassYear
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
+
+EffectiveClassRepartitionDict = Dict[str, Union[str, bool]]
+
+COMMON_LEARNING_UNIT_ENROLLMENT_CLAUSE = {
+    'offerenrollment__enrollment_state__in': [
+        offer_enrollment_state.PROVISORY,
+        offer_enrollment_state.SUBSCRIBED
+    ],
+    'offerenrollment__learningunitenrollment__enrollment_state': learning_unit_enrollment_state.ENROLLED
+}
 
 
 class AttributionListView(generics.ListAPIView):
@@ -50,18 +69,18 @@ class AttributionListView(generics.ListAPIView):
     name = 'attributions'
 
     def list(self, request, *args, **kwargs):
-        attributions = self._get_attributions_charge_new()
-        if self.request.query_params.get('with_classes') == "True":
+        if self.request.query_params.get('with_effective_class_repartition') == "True":
             # quick fix to be modified with the correct implementation of classes
-            attributions = list(attributions) + list(self._get_classes_attributions())
+            self._fill_classes_repartition()
         serializer = AttributionSerializer(
-            attributions,
+            self.attributions_charge_new,
             many=True,
             context=self.get_serializer_context()
         )
         return Response(serializer.data)
 
-    def _get_attributions_charge_new(self):
+    @cached_property
+    def attributions_charge_new(self):
         return AttributionChargeNew.objects.select_related(
             'attribution',
             'learning_component_year__learning_unit_year__academic_year'
@@ -72,11 +91,24 @@ class AttributionListView(generics.ListAPIView):
             attribution__tutor__person=self.person,
             attribution__decision_making=''
         ).annotate(
-            # Technical ID for making a match with data in EPC. Remove after refactoring...
-            allocation_id=Replace('attribution__external_id', Value('osis.attribution_'), Value('')),
+            tutor_personal_id=F('attribution__tutor__person__global_id'),
 
             code=F('learning_component_year__learning_unit_year__acronym'),
             type=F('learning_component_year__learning_unit_year__learning_container_year__container_type'),
+            lecturing_charge=Case(
+                When(
+                    Q(learning_component_year__type=learning_component_year_type.LECTURING),
+                    then='allocation_charge',
+                ),
+                default=None
+            ),
+            practical_charge=Case(
+                When(
+                    Q(learning_component_year__type=learning_component_year_type.PRACTICAL_EXERCISES),
+                    then='allocation_charge',
+                ),
+                default=None
+            ),
             title_fr=Case(
                 When(
                     Q(learning_component_year__learning_unit_year__learning_container_year__common_title__isnull=True) |
@@ -116,61 +148,108 @@ class AttributionListView(generics.ListAPIView):
             year=F('learning_component_year__learning_unit_year__academic_year__year'),
             credits=F('learning_component_year__learning_unit_year__credits'),
             start_year=F('attribution__start_year'),
-            function=F('attribution__function')
+            function=F('attribution__function'),
+            has_peps=Exists(
+                Student.objects.filter(
+                    studentspecificprofile__isnull=False,
+                    offerenrollment__learningunitenrollment__learning_unit_year__acronym=OuterRef(
+                        'learning_component_year__learning_unit_year__acronym'
+                    ),
+                    offerenrollment__learningunitenrollment__learning_unit_year__academic_year=OuterRef(
+                        'learning_component_year__learning_unit_year__academic_year'
+                    ),
+                    **COMMON_LEARNING_UNIT_ENROLLMENT_CLAUSE
+                )
+            ),
+            is_partim=Case(
+                When(
+                    Q(learning_component_year__learning_unit_year__subtype=PARTIM),
+                    then=True,
+                ),
+                default=False,
+                output_field=BooleanField()
+            ),
+            total_learning_unit_charge=Subquery(
+                LearningComponentYear.objects.filter(
+                    learning_unit_year_id=OuterRef('learning_component_year__learning_unit_year_id')
+                ).values(
+                    'learning_unit_year_id'
+                ).annotate(
+                    total_volume=Sum('hourly_volume_total_annual')
+                ).values('total_volume')[:1]
+            ),
         )
 
-    def _get_classes_attributions(self):
-        return Attribution.objects.select_related(
-            'learning_unit_year__academic_year'
+    def _fill_classes_repartition(self):
+        tutor_class_repartition = message_bus_instance.invoke(
+            GetTutorRepartitionClassesCommand(
+                tutor_personal_id_number=self.attributions_charge_new[0].tutor_personal_id
+            )
+        )  # type: Tutor
+        class_codes = [
+            "{}{}".format(
+                class_repartition.effective_class.learning_unit_identity.code,
+                class_repartition.effective_class.class_code
+            ) for class_repartition in tutor_class_repartition.distributed_effective_classes
+        ]
+        classes_peps = self._get_classes_peps(class_codes)
+        for attrib in self.attributions_charge_new:
+            learning_unit_year = attrib.learning_component_year.learning_unit_year
+            classes_repartition = tutor_class_repartition.get_classes_repartition_on_learning_unit(
+                learning_unit_code=learning_unit_year.acronym,
+                learning_unit_year=learning_unit_year.academic_year.year
+            )
+            attrib.effective_class_repartition = self._get_classes_repartition(classes_repartition, classes_peps)
+
+    @staticmethod
+    def _get_classes_peps(class_codes: List[str]) -> List[Tuple[str, bool]]:
+        classes_peps = LearningClassYear.objects.annotate(
+            full_code=Concat('learning_component_year__learning_unit_year__acronym', 'acronym')
         ).filter(
-            learning_unit_year__academic_year__year=self.kwargs['year'],
-            tutor__person=self.person,
-            learning_unit_year__learning_container_year__isnull=True
+            full_code__in=class_codes
         ).annotate(
-            # Technical ID for making a match with data in EPC. Remove after refactoring...
-            allocation_id=Replace('external_id', Value('osis.attribution_'), Value('')),
-
-            code=F('learning_unit_year__acronym'),
-            type=Value('COURSE', output_field=CharField()),
-            title_fr=Case(
-                When(
-                    Q(learning_unit_year__learning_container_year__common_title__isnull=True) |
-                    Q(learning_unit_year__learning_container_year__common_title__exact=''),
-                    then='learning_unit_year__specific_title'
-                ),
-                When(
-                    Q(learning_unit_year__specific_title__isnull=True) |
-                    Q(learning_unit_year__specific_title__exact=''),
-                    then='learning_unit_year__learning_container_year__common_title'
-                ),
-                default=Concat(
-                    'learning_unit_year__learning_container_year__common_title',
-                    Value(' - '),
-                    'learning_unit_year__specific_title'
-                ),
-                output_field=CharField(),
-            ),
-            title_en=Case(
-                When(
-                    Q(learning_unit_year__learning_container_year__common_title_english__isnull=True) |  # noqa
-                    Q(learning_unit_year__learning_container_year__common_title_english__exact=''),  # noqa
-                    then='learning_unit_year__specific_title_english'
-                ),
-                When(
-                    Q(learning_unit_year__specific_title_english__isnull=True) |
-                    Q(learning_unit_year__specific_title_english__exact=''),
-                    then='learning_unit_year__learning_container_year__common_title_english'
-                ),
-                default=Concat(
-                    'learning_unit_year__learning_container_year__common_title_english',
-                    Value(' - '),
-                    'learning_unit_year__specific_title_english'
-                ),
-                output_field=CharField(),
-            ),
-            year=F('learning_unit_year__academic_year__year'),
-            credits=F('learning_unit_year__credits'),
+            has_peps=Exists(
+                Student.objects.filter(
+                    studentspecificprofile__isnull=False,
+                    offerenrollment__learningunitenrollment__learning_unit_year__acronym=OuterRef(
+                        'learning_component_year__learning_unit_year__acronym'
+                    ),
+                    offerenrollment__learningunitenrollment__learning_unit_year__academic_year=OuterRef(
+                        'learning_component_year__learning_unit_year__academic_year'
+                    ),
+                    offerenrollment__learningunitenrollment__learning_class_year__acronym=OuterRef('acronym'),
+                    **COMMON_LEARNING_UNIT_ENROLLMENT_CLAUSE
+                )
+            )
+        ).values_list(
+            'full_code', 'has_peps'
         )
+        return list(classes_peps)
+
+    @staticmethod
+    def _get_classes_repartition(
+            classes_repartition: List[ClassVolumeRepartition],
+            classes_peps: List[Tuple[str, bool]]
+    ) -> List[EffectiveClassRepartitionDict]:
+        effective_class_repartition = []
+        for class_repartition in classes_repartition:
+            effective_class = message_bus_instance.invoke(
+                GetEffectiveClassCommand(
+                    class_code=class_repartition.class_code,
+                    learning_unit_year=class_repartition.effective_class.learning_unit_identity.year,
+                    learning_unit_code=class_repartition.effective_class.learning_unit_identity.code
+                )
+            )  # type: EffectiveClass
+            clean_code = effective_class.complete_acronym.replace('_', '').replace('-', '')
+            effective_class_repartition.append(
+                {
+                    'code': effective_class.complete_acronym,
+                    'title_fr': effective_class.titles.fr,
+                    'title_en': effective_class.titles.en,
+                    'has_peps': next(peps for code, peps in classes_peps if code == clean_code)
+                }
+            )
+        return effective_class_repartition
 
     @cached_property
     def person(self) -> Person:
@@ -180,42 +259,8 @@ class AttributionListView(generics.ListAPIView):
         return {
             **super().get_serializer_context(),
             'access_schedule_calendar': AccessScheduleCalendar(),
-            'attribution_charges': self.get_attribution_charges()
+            'year': self.kwargs['year'],
         }
-
-    # TODO: Remove after find synchronization solution because make a remote call to EPC to get right value
-    def get_attribution_charges(self):
-        attribution_charges = []
-        if not all([
-            settings.EPC_API_URL, settings.EPC_API_USER, settings.EPC_API_PASSWORD,
-            settings.EPC_ATTRIBUTIONS_TUTOR_ENDPOINT
-        ]):
-            logger.error("[Attribution API] Missing at least one env. settings (EPC_API_URL, EPC_API_USER, "
-                         "EPC_API_PASSWORD, EPC_ATTRIBUTIONS_TUTOR_ENDPOINT)  ) ")
-            return attribution_charges
-
-        try:
-            url = "{base_url}{endpoint}".format(
-                base_url=settings.EPC_API_URL,
-                endpoint=settings.EPC_ATTRIBUTIONS_TUTOR_ENDPOINT.format(
-                    global_id=self.person.global_id,
-                    year=self.kwargs['year']
-                )
-            )
-            response = requests.get(url, auth=(settings.EPC_API_USER, settings.EPC_API_PASSWORD,), timeout=100)
-            response.raise_for_status()
-            response_data = response.json() or {}
-            attribution_charges = response_data.get("tutorAllocations", [])
-            # Fix when the webservice return a dictionnary in place of a list.
-            # Occur when the tutor has a single attribution.
-            if type(attribution_charges) is dict:
-                attribution_charges = [attribution_charges]
-            return attribution_charges
-        except Exception:
-            log_trace = traceback.format_exc()
-            logger.warning('Error when returning attributions charge duration: \n {}'.format(log_trace))
-        finally:
-            return attribution_charges
 
 
 class MyAttributionListView(AttributionListView):
