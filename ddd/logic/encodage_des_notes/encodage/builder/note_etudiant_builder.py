@@ -29,6 +29,7 @@ from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import Not
 from ddd.logic.encodage_des_notes.encodage.domain.validator.validators_by_business_action import \
     EncoderNotesValidatorList
 from ddd.logic.encodage_des_notes.encodage.dtos import NoteEtudiantFromRepositoryDTO
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO
 
 from osis_common.ddd import interface
 from osis_common.ddd.interface import CommandRequest
@@ -45,9 +46,10 @@ class NoteEtudiantBuilder(interface.RootEntityBuilder):
             entity_id=NoteEtudiantIdentityBuilder().build_from_repository_dto(dto_object),
             email=dto_object.email,
             note=NoteBuilder.build(dto_object.note),
-            echeance_gestionnaire=dto_object.echeance_gestionnaire,
+            echeance_gestionnaire=DateDTO.build_from_date(dto_object.echeance_gestionnaire),
+            echeance_enseignant=DateDTO.build_from_date(dto_object.echeance_enseignant),
             nom_cohorte=dto_object.nom_cohorte,
-            note_decimale_autorisee=dto_object.note_decimale_autorisee
+            note_decimale_autorisee=dto_object.note_decimale_autorisee,
         )
 
     @classmethod
@@ -67,6 +69,7 @@ class NoteEtudiantBuilder(interface.RootEntityBuilder):
             email=ancienne_note.email,
             note=NoteBuilder.build(nouvelle_note),
             echeance_gestionnaire=ancienne_note.echeance_gestionnaire,
+            echeance_enseignant=ancienne_note.echeance_enseignant,
             nom_cohorte=ancienne_note.nom_cohorte,
             note_decimale_autorisee=ancienne_note.note_decimale_autorisee,
         )

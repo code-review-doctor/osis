@@ -102,6 +102,9 @@ class ScoreSheetXLSExportAPIViewTestCase(APITestCase):
                         annee_unite_enseignement=2021,
                         intitule_complet_unite_enseignement='Introduction au droit',
                         est_soumise=False,
+                        echeance_enseignant=DateDTO.build_from_date(
+                            datetime.date.today() + datetime.timedelta(days=1)
+                        ),
                         date_remise_de_notes=DateDTO.build_from_date(
                             datetime.date.today() + datetime.timedelta(days=1)
                         ),

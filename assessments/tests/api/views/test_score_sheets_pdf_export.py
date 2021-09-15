@@ -103,6 +103,9 @@ class ScoreSheetsPDFExportAPIViewTestCase(APITestCase):
                         date_remise_de_notes=DateDTO.build_from_date(
                             datetime.date.today() + datetime.timedelta(days=1)
                         ),
+                        echeance_enseignant=DateDTO.build_from_date(
+                            datetime.date.today() + datetime.timedelta(days=1)
+                        ),
                         nom_cohorte='DROI1BA',
                         noma='999999999',
                         nom='Helios',

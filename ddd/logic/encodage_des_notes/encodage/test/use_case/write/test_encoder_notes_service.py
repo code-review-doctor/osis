@@ -246,13 +246,13 @@ class EncoderNoteTest(SimpleTestCase):
         self.assertEqual(self.repository.get(entity_id).note.value, Decimal(20.0))
 
     def test_should_empecher_si_note_pas_lettre_autorisee(self):
-        cmd = self._evolve_command(note="S")
+        cmd = self._evolve_command(note="A")
 
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             self.message_bus.invoke(cmd)
         exception = class_exceptions.exception.exceptions.pop()
         self.assertIsInstance(exception, EncoderNotesEnLotLigneBusinessExceptions)
-        self.assertEqual(exception.message, NoteIncorrecteException(note_incorrecte="S").message)
+        self.assertEqual(exception.message, NoteIncorrecteException(note_incorrecte="A").message)
 
     def test_should_empecher_si_note_mal_formatee(self):
         cmd = self._evolve_command(note="T 12")
@@ -282,7 +282,7 @@ class EncoderNoteTest(SimpleTestCase):
         self.assertEqual(self.repository.get(entity_id).note.value, Decimal(12.5))
 
     def test_should_encoder_absence_injustifiee(self):
-        for absence_injustifiee in ['A', JustificationTypes.ABSENCE_UNJUSTIFIED.name]:
+        for absence_injustifiee in ['S', JustificationTypes.ABSENCE_UNJUSTIFIED.name]:
             with self.subTest(absence=absence_injustifiee):
                 cmd = self._evolve_command(note=absence_injustifiee)
 

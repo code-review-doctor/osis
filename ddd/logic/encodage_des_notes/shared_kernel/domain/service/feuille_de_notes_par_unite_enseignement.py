@@ -23,10 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import collections
 from typing import List, Dict, Optional
 
+import attr
+
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import FeuilleDeNotesDTO, NoteEtudiantDTO, EnseignantDTO, \
-    PeriodeEncodageNotesDTO
+    PeriodeEncodageNotesDTO, DateDTO
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_inscription_examen import IInscriptionExamenTranslator
@@ -42,11 +45,24 @@ from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes i
 from osis_common.ddd import interface
 
 
-class FeuilleDeNotesParUniteEnseignement(interface.DomainService):  # TODO :: d√©placer dans domain common
+@attr.s(frozen=True, slots=True)
+class DonneesNotes(interface.DTO):
+    code_unite_enseignement = attr.ib(type=str)
+    annee = attr.ib(type=int)
+    noma = attr.ib(type=str)
+    email = attr.ib(type=str)
+    note = attr.ib(type=str)
+    echeance_enseignant = attr.ib(type=DateDTO)
+    date_limite_de_remise = attr.ib(type=DateDTO)
+    est_soumise = attr.ib(type=bool)
+    note_decimale_autorisee = attr.ib(type=bool)
+
+
+class FeuilleDeNotesParUniteEnseignement(interface.DomainService):
 
     @staticmethod
     def get(
-            notes: List['NoteEtudiant'],
+            notes: List['DonneesNotes'],
             responsable_notes_repo: 'IResponsableDeNotesRepository',
             signaletique_personne_translator: 'ISignaletiquePersonneTranslator',
             periode_encodage: 'PeriodeEncodageNotesDTO',
@@ -101,6 +117,7 @@ class FeuilleDeNotesParUniteEnseignement(interface.DomainService):  # TODO :: d√
                     intitule_complet_unite_enseignement=unite_enseignement.intitule_complet,
                     annee_unite_enseignement=unite_enseignement.annee,
                     est_soumise=note.est_soumise,
+                    echeance_enseignant=note.echeance_enseignant,
                     date_remise_de_notes=note.date_limite_de_remise,
                     nom_cohorte=inscr_exmen.nom_cohorte if inscr_exmen else desinscription.nom_cohorte,
                     noma=note.noma,
@@ -108,7 +125,7 @@ class FeuilleDeNotesParUniteEnseignement(interface.DomainService):  # TODO :: d√
                     prenom=signaletique.prenom,
                     peps=signaletique.peps,
                     email=note.email,
-                    note=str(note.note),
+                    note=note.note,
                     inscrit_tardivement=inscrit_tardivement,
                     desinscrit_tardivement=bool(desinscription),
                 )
@@ -124,7 +141,7 @@ class FeuilleDeNotesParUniteEnseignement(interface.DomainService):  # TODO :: d√
         return FeuilleDeNotesDTO(
             code_unite_enseignement=code_unite_enseignement,
             intitule_complet_unite_enseignement=unite_enseignement.intitule_complet,
-            note_decimale_est_autorisee=notes[0].note_decimale_est_autorisee(),
+            note_decimale_est_autorisee=notes[0].note_decimale_autorisee,
             responsable_note=responsable_notes_dto,
             contact_responsable_notes=contact_responsable_notes,  # TODO :: merger responsable_note et contact_responsable note ?
             autres_enseignants=autres_enseignants,

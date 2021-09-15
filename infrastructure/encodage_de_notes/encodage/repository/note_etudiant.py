@@ -25,10 +25,10 @@
 ##############################################################################
 import functools
 import operator
-from typing import List, Optional, Set
+from typing import List, Optional, Set, Tuple
 
 from django.db.models import CharField, Q, OuterRef, Case, When, F, DateField, Value, BooleanField, \
-    Subquery
+    Subquery, ExpressionWrapper
 from django.db.models.functions import Concat, Coalesce, Cast, Replace
 
 from base.models.enums.exam_enrollment_justification_type import JustificationTypes
@@ -79,6 +79,44 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
                 email=row.email,
                 note=row.note,
                 echeance_gestionnaire=row.echeance_gestionnaire,
+                echeance_enseignant=row.echeance_enseignant,
+                numero_session=row.numero_session,
+                code_unite_enseignement=row.code_unite_enseignement,
+                annee_academique=row.annee_academique,
+                note_decimale_autorisee=row.note_decimale_autorisee,
+                nom_cohorte=row.nom_cohorte
+            )
+            result.append(NoteEtudiantBuilder.build_from_repository_dto(dto_object))
+        return result
+
+    @classmethod
+    def search_by_code_unite_enseignement_annee_session(
+            cls,
+            criterias: List[Tuple[str, int, int]]
+    ) -> List['NoteEtudiant']:
+        if not criterias:
+            return []
+
+        q_filters = functools.reduce(
+            operator.or_,
+            [
+                Q(
+                    code_unite_enseignement=criteria[0],
+                    annee_academique=criteria[1],
+                    numero_session=criteria[2],
+                )
+                for criteria in criterias
+            ]
+        )
+        rows = _fetch_session_exams().filter(q_filters)
+        result = []
+        for row in rows:
+            dto_object = NoteEtudiantFromRepositoryDTO(
+                noma=row.noma,
+                email=row.email,
+                note=row.note,
+                echeance_gestionnaire=row.echeance_gestionnaire,
+                echeance_enseignant=row.echeance_enseignant,
                 numero_session=row.numero_session,
                 code_unite_enseignement=row.code_unite_enseignement,
                 annee_academique=row.annee_academique,
@@ -285,6 +323,15 @@ def _fetch_session_exams():
         number_session=OuterRef("session_exam__number_session"),
         offer_enrollment=OuterRef('learning_unit_enrollment__offer_enrollment')
     ).values('deadline')
+    subqs_deadline_tutor = SessionExamDeadline.objects.filter(
+        number_session=OuterRef("session_exam__number_session"),
+        offer_enrollment=OuterRef('learning_unit_enrollment__offer_enrollment')
+    ).annotate(
+        date_limite_de_remise=Case(
+            When(deadline_tutor__isnull=True, then=F('deadline')),
+            default=ExpressionWrapper(F('deadline') - F('deadline_tutor'), output_field=DateField())
+        )
+    ).values('date_limite_de_remise')
     return ExamEnrollment.objects.annotate(
         code_unite_enseignement=Concat(
             'learning_unit_enrollment__learning_unit_year__acronym',
@@ -320,7 +367,11 @@ def _fetch_session_exams():
         echeance_gestionnaire=Subquery(
             subqs_deadline[:1],
             output_field=DateField()
-        )
+        ),
+        echeance_enseignant=Subquery(
+            subqs_deadline_tutor[:1],
+            output_field=DateField()
+        ),
     ).values_list(
         'code_unite_enseignement',
         'nom_cohorte',
@@ -331,6 +382,7 @@ def _fetch_session_exams():
         'email',
         'note',
         'echeance_gestionnaire',
+        'echeance_enseignant',
         named=True
     ).order_by(
         'code_unite_enseignement',

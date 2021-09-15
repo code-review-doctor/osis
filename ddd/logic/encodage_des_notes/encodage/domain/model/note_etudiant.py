@@ -28,6 +28,7 @@ from datetime import date
 import attr
 
 from ddd.logic.encodage_des_notes.encodage.domain.model._note import Note
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO
 from osis_common.ddd import interface
 
 Noma = str
@@ -46,7 +47,8 @@ class NoteEtudiant(interface.RootEntity):
     entity_id = attr.ib(type=IdentiteNoteEtudiant)
     email = attr.ib(type=str)
     note = attr.ib(type=Note)
-    echeance_gestionnaire = attr.ib(type=date)
+    echeance_gestionnaire = attr.ib(type=DateDTO)
+    echeance_enseignant = attr.ib(type=DateDTO)
     nom_cohorte = attr.ib(type=str)
     note_decimale_autorisee = attr.ib(type=bool)
 

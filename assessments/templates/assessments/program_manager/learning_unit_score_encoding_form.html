@@ -141,9 +141,8 @@
                                         data-toggle="tooltip"
                                         data-placement="top"
                                         data-html="true"
-                                        title="{% trans "You can encode a number. Or a letter between A, S, T and M." %}
+                                        title="{% trans "You can encode a number. Or a letter between S, T and M." %}
                                         <ul>
-                                            <li>A : {% trans "Absence unjustified" %}</li>
                                             <li>S : {% trans "Absence unjustified" %}</li>
                                             <li>T : {% trans "Cheating" %}</li>
                                             <li>M : {% trans "Absence justified" %}</li>
@@ -178,7 +177,7 @@
                                     {% endif %}
                                 </td>
                                 <td headers="deadline">
-                                    {{note_etudiant.date_remise_de_notes.to_date|date:"d/m/Y"}}
+                                    {{note_etudiant.echeance_enseignant.to_date|date:"d/m/Y"}}
                                 </td>
                             </tr>
                          {% endfor %}

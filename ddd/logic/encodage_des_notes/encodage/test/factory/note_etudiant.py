@@ -71,15 +71,18 @@ class NoteManquanteEtudiantFactory(factory.Factory):
     note = NoteManquante()
     email = factory.Faker('email')
     nom_cohorte = 'DROI1BA'
-    echeance_gestionnaire = datetime.date.today()
+    echeance_gestionnaire = factory.LazyFunction(lambda: DateDTO.build_from_date(datetime.date.today()))
+    echeance_enseignant = factory.LazyFunction(lambda: DateDTO.build_from_date(datetime.date.today()))
     note_decimale_autorisee = False
 
     class Params:
         date_remise_hier = factory.Trait(
-            echeance_gestionnaire=datetime.date.today() - datetime.timedelta(days=1)
+            echeance_gestionnaire=factory.LazyFunction(
+                lambda: DateDTO.build_from_date(datetime.date.today() - datetime.timedelta(days=1))
+            )
         )
         date_remise_aujourdhui = factory.Trait(
-            echeance_gestionnaire=datetime.date.today()
+            echeance_gestionnaire=factory.LazyFunction(lambda: DateDTO.build_from_date(datetime.date.today()))
         )
         for_class = factory.Trait(
             entity_id=factory.SubFactory(

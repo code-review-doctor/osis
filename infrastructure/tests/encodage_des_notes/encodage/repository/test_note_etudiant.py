@@ -115,6 +115,16 @@ class TestNoteEtudiant(TestCase):
         result = self.repo.search(justification=note_justification.note.value)
         self.assertCountEqual(result, [note_justification])
 
+    def test_should_search_notes_etudiant_by_code_unite_enseignement_annee_session(self):
+        note_chiffree = NoteEtudiantChiffreeFactory()
+        self._create_save_necessary_data(note_chiffree)
+        self.repo.save(note_chiffree)
+
+        result = self.repo.search_by_code_unite_enseignement_annee_session(
+            {(note_chiffree.code_unite_enseignement, note_chiffree.annee_academique, note_chiffree.numero_session)}
+        )
+        self.assertCountEqual(result, [note_chiffree])
+
     def test_should_ordonne_par_code_unite_enseignement_nom_cohorte_annee_academique_session_noma(self):
         note_chiffree_1 = NoteEtudiantChiffreeFactory(
             entity_id__code_unite_enseignement='LAGRO1200',
@@ -172,6 +182,6 @@ class TestNoteEtudiant(TestCase):
         SessionExamDeadlineFactory(
             offer_enrollment=enrollment.learning_unit_enrollment.offer_enrollment,
             number_session=note_etudiant_to_save.numero_session,
-            deadline=note_etudiant_to_save.echeance_gestionnaire,
+            deadline=note_etudiant_to_save.echeance_gestionnaire.to_date(),
             deadline_tutor=0
         )
