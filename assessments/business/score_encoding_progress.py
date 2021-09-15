@@ -40,23 +40,14 @@ def get_scores_encoding_progress(
         learning_unit_year_ids=None
 ):
 
-    if education_group_year_id:
-        queryset = exam_enrollment.get_progress_by_learning_unit_years_and_offer_years(
-            user=user,
-            education_group_year_id=education_group_year_id,
-            session_exam_number=number_session,
-            academic_year=academic_year,
-            learning_unit_year_ids=learning_unit_year_ids,
-            only_enrolled=True
-        )
-    else:
-        queryset = exam_enrollment.get_progress_by_learning_unit_years_and_offer_years(
-            user=user,
-            session_exam_number=number_session,
-            academic_year=academic_year,
-            learning_unit_year_ids=learning_unit_year_ids,
-            only_enrolled=True
-        )
+    queryset = exam_enrollment.get_progress_by_learning_unit_years_and_offer_years(
+        user=user,
+        education_group_year_id=education_group_year_id,
+        session_exam_number=number_session,
+        academic_year=academic_year,
+        learning_unit_year_ids=learning_unit_year_ids,
+        only_enrolled=True
+    )
 
     return _sort_by_acronym([ScoreEncodingProgress(obj) for obj in queryset])
 
