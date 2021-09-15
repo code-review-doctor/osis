@@ -231,6 +231,9 @@ class TutorScoreSheetXLSSerilizeTest(SimpleTestCase):
                     date_remise_de_notes=DateDTO.build_from_date(
                         datetime.date.today() - datetime.timedelta(days=1)
                     ),
+                    echeance_enseignant=DateDTO.build_from_date(
+                        datetime.date.today() + datetime.timedelta(days=5)
+                    ),
                     nom_cohorte='DROI2M',
                     noma='999999999',
                     nom='Helios',
@@ -249,6 +252,9 @@ class TutorScoreSheetXLSSerilizeTest(SimpleTestCase):
                     date_remise_de_notes=DateDTO.build_from_date(
                         datetime.date.today() + datetime.timedelta(days=5)
                     ),
+                    echeance_enseignant=DateDTO.build_from_date(
+                        datetime.date.today() + datetime.timedelta(days=5)
+                    ),
                     nom_cohorte='DROI2M',
                     noma='999999998',
                     nom='Palus',
@@ -265,6 +271,9 @@ class TutorScoreSheetXLSSerilizeTest(SimpleTestCase):
                     intitule_complet_unite_enseignement='Introduction au droit',
                     est_soumise=False,
                     date_remise_de_notes=DateDTO.build_from_date(
+                        datetime.date.today() + datetime.timedelta(days=5)
+                    ),
+                    echeance_enseignant=DateDTO.build_from_date(
                         datetime.date.today() + datetime.timedelta(days=5)
                     ),
                     nom_cohorte='DROI2M',
