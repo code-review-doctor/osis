@@ -15,14 +15,4 @@ class Migration(migrations.Migration):
             name='external_id',
             field=models.CharField(blank=True, db_index=True, default='', max_length=100),
         ),
-        migrations.AlterField(
-            model_name='person',
-            name='first_name',
-            field=models.CharField(blank=True, db_index=True, default='', max_length=50),
-        ),
-        migrations.AlterField(
-            model_name='person',
-            name='last_name',
-            field=models.CharField(blank=True, db_index=True, default='', max_length=50),
-        ),
     ]
