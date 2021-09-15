@@ -108,7 +108,9 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
                 for criteria in criterias
             ]
         )
-        rows = _fetch_session_exams().filter(q_filters)
+        rows = _fetch_session_exams(
+            codes_unite_enseignement=[criteria[0] for criteria in criterias]
+        ).filter(q_filters)
         result = []
         for row in rows:
             dto_object = NoteEtudiantFromRepositoryDTO(
@@ -296,7 +298,11 @@ def _save_note(note: 'NoteEtudiant'):
     db_obj.save()
 
 
-def _fetch_session_exams():
+def _fetch_session_exams(
+        codes_unite_enseignement: List[str] = None,
+        annee_academique: int = None,
+        numero_session: int = None
+):
     subqs_deadline = SessionExamDeadline.objects.filter(
         number_session=OuterRef("session_exam__number_session"),
         offer_enrollment=OuterRef('learning_unit_enrollment__offer_enrollment')
@@ -310,7 +316,16 @@ def _fetch_session_exams():
             default=ExpressionWrapper(F('deadline') - F('deadline_tutor'), output_field=DateField())
         )
     ).values('date_limite_de_remise')
-    return ExamEnrollment.objects.annotate(
+    qs = ExamEnrollment.objects.all()
+    if codes_unite_enseignement:
+        codes_unite_enseignement_sans_acronyme_classe = {code[:-1] for code in codes_unite_enseignement}
+        codes_unite_enseignement_pour_filtre = codes_unite_enseignement_sans_acronyme_classe.union(
+            codes_unite_enseignement
+        )
+        qs = qs.filter(
+            learning_unit_enrollment__learning_unit_year__acronym__in=codes_unite_enseignement_pour_filtre
+        )
+    return qs.annotate(
         code_unite_enseignement=Concat(
             'learning_unit_enrollment__learning_unit_year__acronym',
             'learning_unit_enrollment__learning_class_year__acronym',
