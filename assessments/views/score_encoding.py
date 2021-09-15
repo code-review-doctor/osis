@@ -152,13 +152,21 @@ def scores_encoding(request):
 
             learning_unit_year_ids = list(learning_unit_year_ids_filter_by_tutor)
 
-        score_encoding_progress_list = score_encoding_progress.get_scores_encoding_progress(
-            user=request.user,
-            education_group_year_id=education_group_year_id,
-            number_session=number_session,
-            academic_year=academic_yr,
-            learning_unit_year_ids=learning_unit_year_ids
-        )
+        if education_group_year_id:
+            score_encoding_progress_list = score_encoding_progress.get_scores_encoding_progress(
+                user=request.user,
+                education_group_year_id=education_group_year_id,
+                number_session=number_session,
+                academic_year=academic_yr,
+                learning_unit_year_ids=learning_unit_year_ids
+            )
+        else:
+            score_encoding_progress_list = score_encoding_progress.get_scores_encoding_progress(
+                user=request.user,
+                number_session=number_session,
+                academic_year=academic_yr,
+                learning_unit_year_ids=learning_unit_year_ids
+            )
 
         score_encoding_progress_list = score_encoding_progress. \
             append_related_tutors_and_score_responsibles(score_encoding_progress_list)
