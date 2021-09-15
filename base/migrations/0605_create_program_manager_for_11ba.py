@@ -86,7 +86,7 @@ def create_program_manager_for_cohort_11ba(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('base', '0601_auto_20210910_1306'),
+        ('base', '0604_auto_20210910_1306'),
     ]
 
     operations = [
