@@ -25,6 +25,10 @@
 ##############################################################################
 from rest_framework import serializers
 
+from base.models.learning_unit_enrollment import LearningUnitEnrollment
+from base.models.student_specific_profile import StudentSpecificProfile
+from learning_unit_enrollment.api.serializers.specific_profile import StudentSpecificProfileSerializer
+
 
 class EnrollmentSerializer(serializers.Serializer):
     date_enrollment = serializers.CharField()
@@ -33,8 +37,6 @@ class EnrollmentSerializer(serializers.Serializer):
     student_first_name = serializers.CharField(source="student.person.first_name")
     student_email = serializers.CharField(source="student.person.email")
     student_registration_id = serializers.CharField(source="student.registration_id")
-    type_peps = serializers.CharField(source="student.studentspecificprofile.type")
-    sport_subtype_peps = serializers.CharField(source="student.studentspecificprofile.subtype_sport")
-    disability_subtype_peps = serializers.CharField(source="student.studentspecificprofile.subtype_disability")
+    specific_profile = StudentSpecificProfileSerializer(read_only=True, source="student.studentspecificprofile")
     program = serializers.CharField(source="offer.acronym")
     learning_unit_acronym = serializers.CharField(source="learning_unit_year.acronym")

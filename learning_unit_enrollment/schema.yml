@@ -40,6 +40,8 @@ paths:
         - $ref: '#/components/parameters/X-User-LastName'
         - $ref: '#/components/parameters/X-User-Email'
         - $ref: '#/components/parameters/X-User-GlobalID'
+        - $ref: '#/components/parameters/PaginationLimit'
+        - $ref: '#/components/parameters/PaginationOffset'
       responses:
         '200':
           description: OK
@@ -47,37 +49,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EnrollmentList'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-      tags:
-        - enrollment
-  /specific_profile/{student_uuid}/:
-    get:
-      description: 'Return the specific profile of a student'
-      operationId: specific_profile
-      parameters:
-        - in: path
-          name: student_uuid
-          required: true
-          description: The student uuid
-          schema:
-            $ref: '#/components/responses/Uuid'
-        - $ref: '#/components/parameters/Accept-Language'
-        - $ref: '#/components/parameters/X-User-FirstName'
-        - $ref: '#/components/parameters/X-User-LastName'
-        - $ref: '#/components/parameters/X-User-Email'
-        - $ref: '#/components/parameters/X-User-GlobalID'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/StudentSpecificProfile'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -94,6 +65,20 @@ components:
       name: Authorization
       description: Enter your token in the format **Token &lt;token>**
   parameters:
+    PaginationLimit:
+      in: query
+      name: limit
+      description: Limit of paginated results
+      schema:
+        type: integer
+        example: 25
+    PaginationOffset:
+      in: query
+      name: offset
+      description: Offset of paginated results
+      schema:
+        type: integer
+        example: 25
     X-User-FirstName:
       in: header
       name: X-User-FirstName
@@ -148,13 +133,22 @@ components:
   schemas:
     StudentSpecificProfile:
       type: object
+      nullable: true
       properties:
         type:
           $ref: '#/components/schemas/TypePepsEnum'
+        type_text:
+          type: string
         subtype_sport:
           $ref: '#/components/schemas/SportSubtypePepsEnum'
+        subtype_sport_text:
+          type: string
+          nullable: true
         subtype_disability:
           $ref: '#/components/schemas/DisabilitySubtypePepsEnum'
+        subtype_disability_text:
+          type: string
+          nullable: true
         guide:
           type: string
           example: "John Doe"
@@ -168,6 +162,7 @@ components:
           type: boolean
         arrangement_comment:
           type: string
+          nullable: true
           example: "comment"
     Paging:
       type: object
@@ -213,8 +208,8 @@ components:
         student_registration_id:
           type: string
           example: "12345678"
-        has_peps:
-          type: boolean
+        specific_profile:
+          $ref: '#/components/schemas/StudentSpecificProfile'
         program:
           type: string
           example: "PRGM1BA"
