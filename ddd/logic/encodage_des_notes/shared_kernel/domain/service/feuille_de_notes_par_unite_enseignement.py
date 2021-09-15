@@ -44,7 +44,8 @@ from osis_common.ddd import interface
 
 DonneesNotes = collections.namedtuple(
     "DonneesNote",
-    "code_unite_enseignement annee noma email note date_limite_de_remise est_soumise note_decimale_autorisee"
+    "code_unite_enseignement annee noma email note echeance_enseignant "
+    "date_limite_de_remise est_soumise note_decimale_autorisee"
 )
 
 
@@ -107,6 +108,7 @@ class FeuilleDeNotesParUniteEnseignement(interface.DomainService):
                     intitule_complet_unite_enseignement=unite_enseignement.intitule_complet,
                     annee_unite_enseignement=unite_enseignement.annee,
                     est_soumise=note.est_soumise,
+                    echeance_enseignant=note.echeance_enseignant,
                     date_remise_de_notes=note.date_limite_de_remise,
                     nom_cohorte=inscr_exmen.nom_cohorte if inscr_exmen else desinscription.nom_cohorte,
                     noma=note.noma,

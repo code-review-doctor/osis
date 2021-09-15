@@ -72,7 +72,8 @@ def get_feuille_de_notes(
             note=str(note.note),
             date_limite_de_remise=note.date_limite_de_remise,
             est_soumise=note.est_soumise,
-            note_decimale_autorisee=note.note_decimale_est_autorisee()
+            note_decimale_autorisee=note.note_decimale_est_autorisee(),
+            echeance_enseignant=note.date_limite_de_remise
         )
         for note in notes
     ]

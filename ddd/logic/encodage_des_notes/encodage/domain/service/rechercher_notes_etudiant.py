@@ -112,6 +112,7 @@ class RechercheNotesEtudiant(interface.DomainService):
                     annee_unite_enseignement=getattr(unite_enseignement_dto, 'annee', ''),
                     est_soumise=not note_etudiant.is_manquant,
                     date_remise_de_notes=note_etudiant.echeance_gestionnaire,
+                    echeance_enseignant=note_etudiant.echeance_enseignant,
                     nom_cohorte=note_etudiant.nom_cohorte,
                     noma=note_etudiant.noma,
                     nom=getattr(signaletique_etudiant_dto, 'nom', ''),

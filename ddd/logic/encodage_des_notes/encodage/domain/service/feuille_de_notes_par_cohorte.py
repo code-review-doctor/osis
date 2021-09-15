@@ -25,8 +25,11 @@
 ##############################################################################
 from typing import List
 
+from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import NoteEtudiant
 from ddd.logic.encodage_des_notes.encodage.domain.service.i_cohortes_du_gestionnaire import ICohortesDuGestionnaire
 from ddd.logic.encodage_des_notes.encodage.dtos import FeuilleDeNotesParCohorteDTO
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.feuille_de_notes_par_unite_enseignement import \
+    FeuilleDeNotesParUniteEnseignement, DonneesNotes
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_inscription_examen import IInscriptionExamenTranslator
@@ -34,12 +37,8 @@ from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_et
     ISignaletiqueEtudiantTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_personne import \
     ISignaletiquePersonneTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.dtos import NoteEtudiantDTO, EnseignantDTO, PeriodeEncodageNotesDTO
-from ddd.logic.encodage_des_notes.shared_kernel.domain.service.feuille_de_notes_par_unite_enseignement import \
-    FeuilleDeNotesParUniteEnseignement, DonneesNotes
-
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_unite_enseignement import IUniteEnseignementTranslator
-from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import NoteEtudiant
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import EnseignantDTO, PeriodeEncodageNotesDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
 from osis_common.ddd import interface
 
@@ -67,9 +66,10 @@ class FeuilleDeNotesParCohorte(interface.DomainService):
                 noma=note.noma,
                 email=note.email,
                 note=str(note.note),
-                date_limite_de_remise=note.echeance_enseignant,
+                date_limite_de_remise=note.echeance_gestionnaire,
                 est_soumise=not note.is_manquant,
-                note_decimale_autorisee=note.note_decimale_autorisee
+                note_decimale_autorisee=note.note_decimale_autorisee,
+                echeance_enseignant=note.echeance_enseignant
             )
             for note in notes
         ]
@@ -90,29 +90,11 @@ class FeuilleDeNotesParCohorte(interface.DomainService):
             matricule_gestionnaire,
         )
 
-        etudiants_gestionnaire = []
-        etudiants_enseignant = feuille_notes_enseignant.notes_etudiants
-        test = sorted(etudiants_enseignant, key=lambda note: (note.nom_cohorte, note.nom, note.prenom))
-        for note in test:
-            if note.nom_cohorte in cohortes_gerees_par_gestionnaire:
-                etudiants_gestionnaire.append(
-                    NoteEtudiantDTO(
-                        code_unite_enseignement=note.code_unite_enseignement,
-                        annee_unite_enseignement=note.annee_unite_enseignement,
-                        intitule_complet_unite_enseignement=note.intitule_complet_unite_enseignement,
-                        est_soumise=note.est_soumise,
-                        date_remise_de_notes=note.date_remise_de_notes,
-                        nom_cohorte=note.nom_cohorte,
-                        noma=note.noma,
-                        nom=note.nom,
-                        prenom=note.prenom,
-                        peps=note.peps,
-                        email=note.email,
-                        note=note.note,
-                        inscrit_tardivement=note.inscrit_tardivement,
-                        desinscrit_tardivement=note.desinscrit_tardivement,
-                    )
-                )
+        notes_triees = sorted(
+            feuille_notes_enseignant.notes_etudiants,
+            key=lambda note: (note.nom_cohorte, note.nom, note.prenom)
+        )
+        etudiants_gestionnaire = [note for note in notes_triees if note.nom_cohorte in cohortes_gerees_par_gestionnaire]
 
         autres_enseignants = [
             EnseignantDTO(nom=enseignant.nom, prenom=enseignant.prenom)
