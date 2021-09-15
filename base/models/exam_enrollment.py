@@ -260,7 +260,7 @@ def get_progress_by_learning_unit_years_and_offer_years(user,
         education_group_year_ids = [education_group_year_id]
     else:
         education_group_years = education_group_year.find_by_user(user).values_list('id', flat=True)
-        education_group_year_ids = [edy.id for edy in education_group_years]
+        education_group_year_ids = [edy for edy in education_group_years]
 
     tutor_user = None
     if not program_manager.is_program_manager(user):
