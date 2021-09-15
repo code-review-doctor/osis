@@ -73,6 +73,7 @@ class LearningUnitScoreEncodingProgramManagerFormViewTest(TestCase):
                 annee_academique=2020,
                 numero_session=2,
                 notes_etudiants=[],
+                note_decimale_est_autorisee=True
             )
         raise Exception('Bus Command not mocked in test')
 

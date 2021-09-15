@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import collections
 from typing import List, Dict, Optional
 
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import FeuilleDeNotesDTO, NoteEtudiantDTO, EnseignantDTO, \
@@ -41,12 +42,17 @@ from ddd.logic.encodage_des_notes.soumission.dtos import SignaletiqueEtudiantDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
 from osis_common.ddd import interface
 
+DonneesNotes = collections.namedtuple(
+    "DonneesNote",
+    "code_unite_enseignement annee noma email note date_limite_de_remise est_soumise note_decimale_autorisee"
+)
 
-class FeuilleDeNotesParUniteEnseignement(interface.DomainService):  # TODO :: d√©placer dans domain common
+
+class FeuilleDeNotesParUniteEnseignement(interface.DomainService):
 
     @staticmethod
     def get(
-            notes: List['NoteEtudiant'],
+            notes: List['DonneesNotes'],
             responsable_notes_repo: 'IResponsableDeNotesRepository',
             signaletique_personne_translator: 'ISignaletiquePersonneTranslator',
             periode_encodage: 'PeriodeEncodageNotesDTO',
@@ -108,7 +114,7 @@ class FeuilleDeNotesParUniteEnseignement(interface.DomainService):  # TODO :: d√
                     prenom=signaletique.prenom,
                     peps=signaletique.peps,
                     email=note.email,
-                    note=str(note.note),
+                    note=note.note,
                     inscrit_tardivement=inscrit_tardivement,
                     desinscrit_tardivement=bool(desinscription),
                 )
@@ -124,7 +130,7 @@ class FeuilleDeNotesParUniteEnseignement(interface.DomainService):  # TODO :: d√
         return FeuilleDeNotesDTO(
             code_unite_enseignement=code_unite_enseignement,
             intitule_complet_unite_enseignement=unite_enseignement.intitule_complet,
-            note_decimale_est_autorisee=notes[0].note_decimale_est_autorisee(),
+            note_decimale_est_autorisee=notes[0].note_decimale_autorisee,
             responsable_note=responsable_notes_dto,
             contact_responsable_notes=contact_responsable_notes,  # TODO :: merger responsable_note et contact_responsable note ?
             autres_enseignants=autres_enseignants,

@@ -36,10 +36,10 @@ from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_pe
     ISignaletiquePersonneTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import NoteEtudiantDTO, EnseignantDTO, PeriodeEncodageNotesDTO
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.feuille_de_notes_par_unite_enseignement import \
-    FeuilleDeNotesParUniteEnseignement
+    FeuilleDeNotesParUniteEnseignement, DonneesNotes
 
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_unite_enseignement import IUniteEnseignementTranslator
-from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import NoteEtudiant
+from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import NoteEtudiant
 from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
 from osis_common.ddd import interface
 
@@ -60,9 +60,22 @@ class FeuilleDeNotesParCohorte(interface.DomainService):
             unite_enseignement_translator: 'IUniteEnseignementTranslator',
             cohortes_gestionnaire_translator: 'ICohortesDuGestionnaire',
     ) -> 'FeuilleDeNotesParCohorteDTO':
+        donnees_notes = [
+            DonneesNotes(
+                code_unite_enseignement=note.code_unite_enseignement,
+                annee=note.annee_academique,
+                noma=note.noma,
+                email=note.email,
+                note=str(note.note),
+                date_limite_de_remise=note.echeance_enseignant,
+                est_soumise=not note.is_manquant,
+                note_decimale_autorisee=note.note_decimale_autorisee
+            )
+            for note in notes
+        ]
 
         feuille_notes_enseignant = FeuilleDeNotesParUniteEnseignement().get(
-            notes=notes,
+            notes=donnees_notes,
             responsable_notes_repo=responsable_notes_repo,
             signaletique_personne_translator=signaletique_personne_translator,
             periode_encodage=periode_encodage,

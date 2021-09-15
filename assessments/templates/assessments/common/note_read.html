@@ -28,7 +28,9 @@
 {% if note_etudiant.note == 'T' %}
     {% trans 'Cheating' %} (T)
 {% elif note_etudiant.note == 'A' %}
-    {% trans 'Absence unjustified' %} (A)
+    {% trans 'Absent' %} (A)
+{% elif note_etudiant.note == 'S' %}
+    {% trans 'Absence unjustified' %} (S)
 {% elif note_etudiant.note == 'M' %}
     {% trans 'Absence justified' %} (M)
 {% else %}
