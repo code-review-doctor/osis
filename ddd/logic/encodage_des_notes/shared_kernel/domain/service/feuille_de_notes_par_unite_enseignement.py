@@ -26,8 +26,10 @@
 import collections
 from typing import List, Dict, Optional
 
+import attr
+
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import FeuilleDeNotesDTO, NoteEtudiantDTO, EnseignantDTO, \
-    PeriodeEncodageNotesDTO
+    PeriodeEncodageNotesDTO, DateDTO
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_inscription_examen import IInscriptionExamenTranslator
@@ -42,11 +44,18 @@ from ddd.logic.encodage_des_notes.soumission.dtos import SignaletiqueEtudiantDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
 from osis_common.ddd import interface
 
-DonneesNotes = collections.namedtuple(
-    "DonneesNote",
-    "code_unite_enseignement annee noma email note echeance_enseignant "
-    "date_limite_de_remise est_soumise note_decimale_autorisee"
-)
+
+@attr.s(frozen=True, slots=True)
+class DonneesNotes(interface.DTO):
+    code_unite_enseignement = attr.ib(type=str)
+    annee = attr.ib(type=int)
+    noma = attr.ib(type=str)
+    email = attr.ib(type=str)
+    note = attr.ib(type=str)
+    echeance_enseignant = attr.ib(type=DateDTO)
+    date_limite_de_remise = attr.ib(type=DateDTO)
+    est_soumise = attr.ib(type=bool)
+    note_decimale_autorisee = attr.ib(type=bool)
 
 
 class FeuilleDeNotesParUniteEnseignement(interface.DomainService):
