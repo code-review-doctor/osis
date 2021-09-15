@@ -30,7 +30,7 @@ from typing import Dict, List
 from django.conf import settings
 from django.template.defaultfilters import yesno
 from django.utils import translation
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy as _
 from openpyxl import Workbook
 from openpyxl.styles import Font
 from openpyxl.writer.excel import save_virtual_workbook
