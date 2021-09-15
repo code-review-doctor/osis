@@ -71,7 +71,9 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
         if not filter_qs:
             return []
 
-        rows = _fetch_session_exams().filter(*filter_qs)
+        rows = _fetch_session_exams(
+            noms_cohortes=noms_cohortes
+        ).filter(*filter_qs)
         result = []
         for row in rows:
             dto_object = NoteEtudiantFromRepositoryDTO(
@@ -300,8 +302,7 @@ def _save_note(note: 'NoteEtudiant'):
 
 def _fetch_session_exams(
         codes_unite_enseignement: List[str] = None,
-        annee_academique: int = None,
-        numero_session: int = None
+        noms_cohortes: List[str] = None,
 ):
     subqs_deadline = SessionExamDeadline.objects.filter(
         number_session=OuterRef("session_exam__number_session"),
@@ -324,6 +325,15 @@ def _fetch_session_exams(
         )
         qs = qs.filter(
             learning_unit_enrollment__learning_unit_year__acronym__in=codes_unite_enseignement_pour_filtre
+        )
+    if noms_cohortes:
+        noms_cohortes_avec_11ba_remplace_par_equivalent_1ba = [
+            cohorte.replace('11BA', '1BA')
+            for cohorte in noms_cohortes
+        ]
+        qs = qs.filter(
+            learning_unit_enrollment__offer_enrollment__education_group_year__acronym__in=
+            noms_cohortes_avec_11ba_remplace_par_equivalent_1ba
         )
     return qs.annotate(
         code_unite_enseignement=Concat(
