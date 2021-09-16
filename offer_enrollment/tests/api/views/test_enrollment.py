@@ -28,6 +28,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
+from education_group.tests.factories.first_year_bachelor import FirstYearBachelorFactory
 from offer_enrollment.api.views.enrollment import MyOfferEnrollmentsListView
 
 
@@ -62,3 +63,18 @@ class MyOfferEnrollmentsListViewTestCase(APITestCase):
         self.assertEqual(len(results), 1)
 
         self.assertCountEqual(list(results[0].keys()), ["acronym", "year", "title"])
+
+    def test_get_results_assert_acronym_11ba_is_correct(self):
+        cohort = FirstYearBachelorFactory()
+        offer_enrollment_11ba = OfferEnrollmentFactory(
+            cohort_year=cohort,
+            education_group_year=cohort.education_group_year
+        )
+        self.client.force_authenticate(user=offer_enrollment_11ba.student.person.user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        results = response.json()['results']
+        self.assertEqual(len(results), 1)
+
+        self.assertCountEqual(list(results[0]['acronym']), cohort.education_group_year.acronym.replace('1', '11'))
