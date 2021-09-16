@@ -27,21 +27,15 @@ import functools
 import operator
 from typing import Union, List
 
-import attr
 from django.db.models import F, Subquery, Q
 
-from base.models.enums.education_group_types import MiniTrainingType, TrainingType
 from education_group.ddd.domain.group import GroupIdentity
-from education_group.ddd.domain.mini_training import MiniTrainingIdentity
-from education_group.ddd.domain.service.identity_search import TrainingIdentitySearch \
-    as EducationGroupTrainingIdentitySearch
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.models.group_year import GroupYear
 from osis_common.ddd import interface
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.exception import ProgramTreeVersionNotFoundException
 from program_management.ddd.domain.node import NodeIdentity
-from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, STANDARD, NOT_A_TRANSITION
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.models.element import Element
@@ -171,10 +165,12 @@ class NodeIdentitySearch(interface.DomainService):
 class ProgramTreeIdentitySearch(interface.DomainService):
     @classmethod
     def get_from_node_identity(cls, node_identity: 'NodeIdentity') -> 'ProgramTreeIdentity':
+        from program_management.ddd.domain.program_tree import ProgramTreeIdentity
         return ProgramTreeIdentity(code=node_identity.code, year=node_identity.year)
 
     @classmethod
     def get_from_group_identity(cls, group_identity: 'GroupIdentity') -> 'ProgramTreeIdentity':
+        from program_management.ddd.domain.program_tree import ProgramTreeIdentity
         return ProgramTreeIdentity(code=group_identity.code, year=group_identity.year)
 
     @classmethod

@@ -34,7 +34,7 @@ from base.models.education_group_type import EducationGroupType
 from base.models.enums.education_group_types import EducationGroupTypesEnum, GroupType
 from base.utils.constants import INFINITE_VALUE
 from osis_common.models.osis_model_admin import OsisModelAdmin
-from program_management.models.enums.node_type import NodeType
+# from program_management.models.enums.node_type import NodeType
 
 
 class AuthorizedRelationshipAdmin(OsisModelAdmin):
@@ -65,7 +65,7 @@ class AuthorizedRelationship(models.Model):
 @attr.s(slots=True, frozen=True)
 class AuthorizedRelationshipObject:
     parent_type = attr.ib(type=EducationGroupTypesEnum)
-    child_type = attr.ib(type=Union[EducationGroupTypesEnum, NodeType])
+    child_type = attr.ib(type=Union[EducationGroupTypesEnum, 'NodeType'])
     min_count_authorized = attr.ib(type=int)
     max_count_authorized = attr.ib(type=int, converter=lambda value: INFINITE_VALUE if value is None else value)
 
@@ -77,7 +77,7 @@ class AuthorizedRelationshipList:
     def get_authorized_relationship(
             self,
             parent_type: EducationGroupTypesEnum,
-            child_type: Union[EducationGroupTypesEnum, NodeType]
+            child_type: Union[EducationGroupTypesEnum, 'NodeType']
     ) -> AuthorizedRelationshipObject:
         return next(
             (
@@ -91,14 +91,14 @@ class AuthorizedRelationshipList:
     def is_authorized(
             self,
             parent_type: EducationGroupTypesEnum,
-            child_type: Union[EducationGroupTypesEnum, NodeType]
+            child_type: Union[EducationGroupTypesEnum, 'NodeType']
     ) -> bool:
         return child_type in self.get_authorized_children_types(parent_type)
 
     def get_authorized_children_types(
             self,
             parent_type: EducationGroupTypesEnum
-    ) -> Set[Union[EducationGroupTypesEnum, NodeType]]:
+    ) -> Set[Union[EducationGroupTypesEnum, 'NodeType']]:
         return set(
             auth_rel.child_type for auth_rel in self.authorized_relationships
             if auth_rel.parent_type == parent_type
@@ -134,7 +134,7 @@ class AuthorizedRelationshipList:
     def update(
             self,
             parent_type: EducationGroupTypesEnum,
-            child_type: Union[EducationGroupTypesEnum, NodeType],
+            child_type: Union[EducationGroupTypesEnum, 'NodeType'],
             min_count_authorized: int = 0,
             max_count_authorized: int = INFINITE_VALUE):
         current_relationship_object = self.get_authorized_relationship(parent_type, child_type)
