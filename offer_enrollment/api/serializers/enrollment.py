@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,26 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
-import string
-
-import factory.fuzzy
-
-from base.models.enums import offer_enrollment_state
-from base.tests.factories.education_group_year import EducationGroupYearFactory
-from base.tests.factories.student import StudentFactory
+from django.conf import settings
+from rest_framework import serializers
 
 
-class OfferEnrollmentFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = "base.OfferEnrollment"
+class EnrollmentSerializer(serializers.Serializer):
+    acronym = serializers.CharField()
+    year = serializers.IntegerField()
+    title = serializers.SerializerMethodField()
 
-    changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1),
-                                               datetime.datetime(2017, 3, 1))
-    date_enrollment = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1),
-                                                       datetime.datetime(2017, 3, 1))
-    external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    student = factory.SubFactory(StudentFactory)
-    education_group_year = factory.SubFactory(EducationGroupYearFactory)
-    enrollment_state = offer_enrollment_state.SUBSCRIBED
-    cohort_year = None
+    def get_title(self, enrollment):
+        language = self.context['language']
+        return getattr(
+            enrollment.education_group_year,
+            'title' + ('_english' if language != settings.LANGUAGE_CODE_FR else '')
+        )
