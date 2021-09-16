@@ -58,6 +58,11 @@ class HistoriqueNotes:
     def get_history_identity(self) -> str:
         return get_history_identity(self.code_unite_enseignement, self.annee_academique, self.numero_session)
 
+    def get_encodage_text(self):
+        return _("The following scores %(scores_with_noma)s has been encoded") % {
+            'scores_with_noma': self.get_notes_display()
+        }
+
 
 class HistoriserEncodageNotesService(IHistoriserEncodageNotesService):
 
@@ -68,13 +73,9 @@ class HistoriserEncodageNotesService(IHistoriserEncodageNotesService):
 
         for historique in historique_notes:
             with translation.override('en'):
-                message_en = str(_("The following scores %(scores_with_noma)s has been encoded") % {
-                    'scores_with_noma': historique.get_notes_display()
-                })
+                message_en = str(historique.get_encodage_text())
             with translation.override('fr_BE'):
-                message_fr = str(_("The following scores %(scores_with_noma)s has been encoded") % {
-                    'scores_with_noma': historique.get_notes_display()
-                })
+                message_fr = str(historique.get_encodage_text())
             add_history_entry(
                 historique.get_history_identity(),
                 message_fr,
