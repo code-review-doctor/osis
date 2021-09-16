@@ -18,7 +18,7 @@ msgstr ""
 
 #, python-format
 msgid "(Noma: %(noma)s, Score: %(score)s)"
-msgstr ""
+msgstr "(Noma: %(noma)s, Note: %(score)s)"
 
 msgctxt "applications"
 msgid "Code"
@@ -47,8 +47,8 @@ msgstr "Session"
 
 #, python-format
 msgid "The following scores %(scores_with_noma)s has been encoded"
-msgstr "Les notes suivantes %(scores_with_noma)s ont été encodées."
+msgstr "Les notes suivantes %(scores_with_noma)s ont été encodées"
 
 #, python-format
 msgid "The following scores %(scores_with_noma)s has been submitted"
-msgstr "Les notes suivantes %(scores_with_noma)s ont été soumises."
+msgstr "Les notes suivantes %(scores_with_noma)s ont été soumises"

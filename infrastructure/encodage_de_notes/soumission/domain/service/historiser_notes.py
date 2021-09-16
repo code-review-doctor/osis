@@ -76,7 +76,7 @@ class HistoriserNotesService(IHistoriserNotesService):
         historique_notes = cls._build_historique_notes(notes_soumises)
 
         for historique in historique_notes:
-            with translation.override('fr_BE'):
+            with translation.override('fr-be'):
                 message_fr = str(historique.get_soumission_text())
             with translation.override('en'):
                 message_en = str(historique.get_soumission_text())
@@ -95,10 +95,10 @@ class HistoriserNotesService(IHistoriserNotesService):
         historique_notes = cls._build_historique_notes(notes_encodees)
 
         for historique in historique_notes:
-            with translation.override('fr_BE'):
-                message_fr = str(historique.get_soumission_text())
+            with translation.override('fr-be'):
+                message_fr = str(historique.get_encodage_text())
             with translation.override('en'):
-                message_en = str(historique.get_soumission_text())
+                message_en = str(historique.get_encodage_text())
 
             add_history_entry(
                 historique.get_history_identity(),
