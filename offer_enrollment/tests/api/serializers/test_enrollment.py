@@ -39,7 +39,8 @@ class EnrollmentSerializerTestCase(TestCase):
         cls.offer_enrollment_ns = SimpleNamespace(
             acronym=cls.offer_enrollment.education_group_year.acronym,
             year=cls.offer_enrollment.education_group_year.academic_year.year,
-            title=cls.offer_enrollment.education_group_year.title,
+            title_fr=cls.offer_enrollment.education_group_year.title,
+            title_en=cls.offer_enrollment.education_group_year.title_english,
             education_group_year=cls.offer_enrollment.education_group_year
         )
 
@@ -52,3 +53,6 @@ class EnrollmentSerializerTestCase(TestCase):
             'title',
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
+
+    def test_ensure_title_correctly_computed(self):
+        self.assertEquals(self.serializer.data['title'], self.offer_enrollment_ns.title_fr)
