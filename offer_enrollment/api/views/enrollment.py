@@ -53,7 +53,7 @@ class MyOfferEnrollmentsListView(LanguageContextSerializerMixin, generics.ListAP
             'education_group_year__academic_year',
             'cohort_year__education_group_year__academic_year'
         ).annotate(
-            program=Case(
+            acronym=Case(
                 When(
                     Q(cohort_year__name=CohortName.FIRST_YEAR.name),
                     then=Replace('cohort_year__education_group_year__acronym', Value('1'), Value('11'))

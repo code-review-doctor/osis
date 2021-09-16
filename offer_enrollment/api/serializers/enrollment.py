@@ -28,7 +28,7 @@ from rest_framework import serializers
 
 
 class EnrollmentSerializer(serializers.Serializer):
-    program = serializers.CharField()
+    acronym = serializers.CharField()
     year = serializers.IntegerField()
     title = serializers.SerializerMethodField()
 

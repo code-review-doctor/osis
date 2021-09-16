@@ -142,7 +142,7 @@ components:
     Enrollment:
       type: object
       properties:
-        program:
+        acronym:
           type: string
           example: "FSA1BA"
         year:
