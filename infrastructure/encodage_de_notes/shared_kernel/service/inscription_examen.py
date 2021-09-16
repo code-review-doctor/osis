@@ -152,9 +152,14 @@ def _get_common_queryset(
         numero_session: int,
         annee: int,
 ) -> QuerySet:
+    codes_unites_enseignement_without_class_acronym = {code[:-1] for code in codes_unites_enseignement}
+    codes_unites_enseignement_pour_filtre = codes_unites_enseignement_without_class_acronym.union(
+        codes_unites_enseignement
+    )
     return ExamEnrollment.objects.filter(
         learning_unit_enrollment__learning_unit_year__academic_year__year=annee,
         session_exam__number_session=numero_session,
+        learning_unit_enrollment__learning_unit_year__acronym__in=codes_unites_enseignement_pour_filtre
     ).annotate(
         code_unite_enseignement=Case(
             When(

@@ -25,7 +25,7 @@
 ##############################################################################
 import functools
 import operator
-from typing import Optional, List
+from typing import Optional, List, Dict, Set
 
 from django.db import connection
 from django.db.models import F, Case, CharField, Value, When, BooleanField, ExpressionWrapper, DateField, Q, OuterRef, \
@@ -155,10 +155,11 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
     @classmethod
     def search_dates_echeances(
             cls,
-            notes_identites: List[IdentiteNoteEtudiant]
+            notes_identites: Set[IdentiteNoteEtudiant]
     ) -> List[DateEcheanceNoteDTO]:
         dates_echeances_dto = []
         if notes_identites:
+            parameters = _get_dates_echeances_query_parameters(notes_identites)
             with connection.cursor() as cursor:
                 raw_query = '''
                     SELECT 
@@ -188,11 +189,14 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
                     JOIN base_academicyear on base_academicyear.id = base_learningunityear.academic_year_id
                     JOIN base_sessionexam on base_sessionexam.id = base_examenrollment.session_exam_id       
                     JOIN base_offerenrollment on base_offerenrollment.id = base_learningunitenrollment.offer_enrollment_id
-                    JOIN base_student on base_student.id = base_offerenrollment.student_id                 
-                    WHERE {where_clause}
+                    JOIN base_student on base_student.id = base_offerenrollment.student_id            
+                    WHERE base_academicyear.year = %(academic_year)s AND
+                        base_sessionexam.number_session = %(number_session)s  AND 
+                        base_student.registration_id in %(registration_ids)s AND
+                        CONCAT(base_learningunityear.acronym, learning_unit_learningclassyear.acronym) in %(acronyms)s     
                     ORDER BY code_unite_enseignement, annee_academique, echeance
-                '''.format(where_clause=_build_filter_dates_echeances(notes_identites))
-                cursor.execute(raw_query)
+                '''
+                cursor.execute(raw_query, parameters)
                 for row in cursor.fetchall():
                     dates_echeances_dto.append(
                         DateEcheanceNoteDTO(
@@ -319,26 +323,21 @@ def _fetch_session_exams():
     )
 
 
-def _build_filter_dates_echeances(notes_identites: List[IdentiteNoteEtudiant]) -> str:
-    filter_learning_unit = set()
-    filter_academic_year = set()
-    filter_sessionexam = set()
-    filter_student = set()
+def _get_dates_echeances_query_parameters(notes_identites: Set[IdentiteNoteEtudiant]) -> Dict:
+    acronyms = set()
+    registration_ids = set()
+    academic_year = None
+    number_session = None
 
     for note_identite in notes_identites:
-        filter_learning_unit.add(note_identite.code_unite_enseignement)
-        filter_academic_year.add(note_identite.annee_academique)
-        filter_sessionexam.add(note_identite.numero_session)
-        filter_student.add(note_identite.noma)
+        acronyms.add(note_identite.code_unite_enseignement)
+        registration_ids.add(note_identite.noma)
+        academic_year = note_identite.annee_academique
+        number_session = note_identite.numero_session
 
-    return """
-        base_academicyear.year in ({filter_academic_year}) AND
-        base_sessionexam.number_session in ({filter_sessionexam}) AND
-        base_student.registration_id in ({filter_student}) AND
-        CONCAT(base_learningunityear.acronym, learning_unit_learningclassyear.acronym) in ({filter_learning_unit})
-    """.format(
-        filter_learning_unit=",".join(["'{}'".format(acronym) for acronym in filter_learning_unit]),
-        filter_academic_year=",".join([str(year) for year in filter_academic_year]),
-        filter_sessionexam=",".join([str(session) for session in filter_sessionexam]),
-        filter_student=",".join(["'{}'".format(noma) for noma in filter_student]),
-    )
+    return {
+        "acronyms": tuple(acronyms),
+        "academic_year": academic_year,
+        "number_session": number_session,
+        "registration_ids": tuple(registration_ids),
+    }

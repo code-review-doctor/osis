@@ -44,7 +44,7 @@ class EducationGroupFactory(DjangoModelFactory):
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     changed = fake.date_time_this_decade(before_now=True, after_now=True, tzinfo=get_tzinfo())
-    start_year = factory.SubFactory(AcademicYearFactory, year=factory.fuzzy.FuzzyInteger(2000, timezone.now().year))
+    start_year = factory.SubFactory(AcademicYearFactory, year=2000)
     end_year = None
 
 

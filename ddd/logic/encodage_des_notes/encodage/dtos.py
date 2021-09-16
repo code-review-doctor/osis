@@ -53,38 +53,6 @@ class GestionnaireCohortesDTO(interface.DTO):
 
 
 @attr.s(frozen=True, slots=True)
-class FeuilleDeNotesParCohorteDTO(interface.DTO):
-    code_unite_enseignement = attr.ib(type=str)
-    intitule_complet_unite_enseignement = attr.ib(type=str)  # unite enseignement
-    responsable_note = attr.ib(type=EnseignantDTO)  # responsables notes + signaletique enseignant ?
-    contact_responsable_notes = attr.ib(type=DetailContactDTO)
-    autres_enseignants = attr.ib(type=List[EnseignantDTO])  # attributions
-    annee_academique = attr.ib(type=int)
-    numero_session = attr.ib(type=int)
-    notes_etudiants = attr.ib(type=List[NoteEtudiantDTO])
-    note_decimale_est_autorisee = attr.ib(type=bool)
-
-    @property
-    def encodage_est_complet(self) -> bool:
-        return self.quantite_notes_soumises == self.quantite_total_notes
-
-    @property
-    def quantite_notes_soumises(self) -> int:
-        return sum(1 for note in self.notes_etudiants if note.note is not None and note.est_soumise)
-
-    @property
-    def quantite_total_notes(self) -> int:
-        return len(self.notes_etudiants)
-
-    @property
-    def nombre_inscriptions(self) -> int:
-        return self.quantite_total_notes
-
-    def get_email_for_noma(self, noma: str) -> str:
-        return next(note_etudiant.email for note_etudiant in self.notes_etudiants if note_etudiant.noma == noma)
-
-
-@attr.s(frozen=True, slots=True)
 class NoteEtudiantFromRepositoryDTO(interface.DTO):
     noma = attr.ib(type=str)
     email = attr.ib(type=str)

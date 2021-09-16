@@ -28,7 +28,7 @@ from ddd.logic.encodage_des_notes.encodage.commands import GetFeuilleDeNotesGest
 from ddd.logic.encodage_des_notes.encodage.domain.service.feuille_de_notes_par_cohorte import \
     FeuilleDeNotesParCohorte
 from ddd.logic.encodage_des_notes.encodage.domain.service.i_cohortes_du_gestionnaire import ICohortesDuGestionnaire
-from ddd.logic.encodage_des_notes.encodage.dtos import FeuilleDeNotesParCohorteDTO
+from ddd.logic.encodage_des_notes.encodage.repository.note_etudiant import INoteEtudiantRepository
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_inscription_examen import IInscriptionExamenTranslator
@@ -40,7 +40,7 @@ from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_pe
     ISignaletiquePersonneTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_unite_enseignement import IUniteEnseignementTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.periode_encodage_ouverte import PeriodeEncodageOuverte
-from ddd.logic.encodage_des_notes.encodage.repository.note_etudiant import INoteEtudiantRepository
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import FeuilleDeNotesDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
 
 
@@ -55,7 +55,7 @@ def get_feuille_de_notes_gestionnaire(
         attribution_translator: 'IAttributionEnseignantTranslator',
         unite_enseignement_translator: 'IUniteEnseignementTranslator',
         cohortes_gestionnaire_translator: 'ICohortesDuGestionnaire',
-) -> 'FeuilleDeNotesParCohorteDTO':
+) -> 'FeuilleDeNotesDTO':
     # GIVEN
     PeriodeEncodageOuverte().verifier(periode_encodage_note_translator)
     GestionnaireParcoursBuilder().get(cmd.matricule_fgs_gestionnaire, cohortes_gestionnaire_translator)
