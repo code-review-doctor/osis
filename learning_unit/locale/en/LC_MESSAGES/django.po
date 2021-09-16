@@ -118,6 +118,9 @@ msgstr ""
 msgid "Derogation's session"
 msgstr ""
 
+msgid "English-friendly"
+msgstr ""
+
 msgid "Error"
 msgstr ""
 
@@ -133,6 +136,9 @@ msgstr ""
 msgid "Formation catalogue"
 msgstr ""
 
+msgid "French-friendly"
+msgstr ""
+
 msgid "Full"
 msgstr ""
 
@@ -143,6 +149,9 @@ msgid "Identification"
 msgstr ""
 
 msgid "Inactive"
+msgstr ""
+
+msgid "Individual loan"
 msgstr ""
 
 msgid "Institution"
@@ -255,6 +264,9 @@ msgstr ""
 
 msgid "Session derogation"
 msgstr ""
+
+msgid "Stage-Dimona"
+msgstr "Stage-Dimona"
 
 msgid "State"
 msgstr ""

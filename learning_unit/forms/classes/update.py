@@ -143,6 +143,11 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
         disabled=True,
         label=_('Allocation entity')
     )
+    learning_unit_individual_loan = forms.BooleanField(disabled=True, label=_('Individual loan'), required=False)
+    learning_unit_english_friendly = forms.BooleanField(disabled=True, label=_('English-friendly'), required=False)
+    learning_unit_french_friendly = forms.BooleanField(disabled=True, label=_('French-friendly'), required=False)
+    learning_unit_exchange_students = forms.BooleanField(disabled=True, label=_('Exchange students'), required=False)
+    learning_unit_stage_dimona = forms.BooleanField(disabled=True, label=_('Stage-Dimona'), required=False)
 
     def __init__(self, *args, learning_unit: 'LearningUnit' = None, user: User, **kwargs):
         self.user = user
@@ -165,6 +170,11 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
         self.__init_volumes()
         self.__init_learning_unit_responsible_field()
         self.__init_learning_unit_campus()
+        self.fields['learning_unit_individual_loan'].initial = self.learning_unit.individual_loan
+        self.fields['learning_unit_english_friendly'].initial = self.learning_unit.mobility.english_friendly
+        self.fields['learning_unit_french_friendly'].initial = self.learning_unit.mobility.french_friendly
+        self.fields['learning_unit_exchange_students'].initial = self.learning_unit.mobility.exchange_students
+        self.fields['learning_unit_stage_dimona'].initial = self.learning_unit.stage_dimona
 
     def __init_volumes(self):
         if self.learning_unit.has_practical_volume() and not self.learning_unit.has_lecturing_volume():
