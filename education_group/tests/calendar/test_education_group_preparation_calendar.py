@@ -84,8 +84,8 @@ class TestEducationGroupPreparationCalendarEnsureConsistencyUntilNPlus6(TestCase
                 "title": "Préparation des formations",
                 "reference": AcademicCalendarTypes.EDUCATION_GROUP_EDITION.name,
                 "data_year": self.current_academic_year.pk,
-                "start_date": datetime.date(2019, 7, 1),
-                "end_date": datetime.date(2020, 6, 1),
+                "start_date": datetime.date(self.current_academic_year.year - 1, 7, 1),
+                "end_date": datetime.date(self.current_academic_year.year, 6, 1),
             }
         )
 

@@ -56,7 +56,7 @@ class TestEducationGroupLimitedDailyManagementCalendarEnsureConsistencyUntilNPlu
                 "reference": AcademicCalendarTypes.EDUCATION_GROUP_LIMITED_DAILY_MANAGEMENT.name,
                 "data_year": self.current_academic_year.pk,
                 # The first time that we can edit an 2020's object is in 2018 (=2020-2)
-                "start_date": datetime.date(2018, 9, 15),
+                "start_date": datetime.date(self.current_academic_year.year - 2, 9, 15),
                 "end_date": None
             }
         )
