@@ -103,7 +103,7 @@ class _ScoreResponsibleSerializer(serializers.Serializer):
     def get_address(self, obj):
         return _ScoreResponsibleAddressSerializer(
             instance=obj['feuille_de_notes'].contact_responsable_notes.adresse_professionnelle
-        ).data
+        ).data if obj['feuille_de_notes'].contact_responsable_notes else None
 
 
 class _LearningUnitYearsSerializer(serializers.Serializer):

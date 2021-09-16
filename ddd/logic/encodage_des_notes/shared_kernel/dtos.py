@@ -112,8 +112,8 @@ class NoteEtudiantDTO(interface.DTO):
 class FeuilleDeNotesDTO(interface.DTO):
     code_unite_enseignement = attr.ib(type=str)
     intitule_complet_unite_enseignement = attr.ib(type=str)  # unite enseignement
-    responsable_note = attr.ib(type=EnseignantDTO)  # responsables notes + signaletique enseignant ?
-    contact_responsable_notes = attr.ib(type=DetailContactDTO)
+    responsable_note = attr.ib(type=Optional[EnseignantDTO])  # responsables notes + signaletique enseignant ?
+    contact_responsable_notes = attr.ib(type=Optional[DetailContactDTO])
     autres_enseignants = attr.ib(type=List[EnseignantDTO])  # attributions
     annee_academique = attr.ib(type=int)
     numero_session = attr.ib(type=int)
