@@ -30,7 +30,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
-from django.db.models import Count, Min, When, Case, Max, OuterRef, Subquery
+from django.db.models import Count, Min, When, Case, Max, OuterRef, Subquery, F
 from django.urls import reverse
 from django.utils import translation
 from django.utils.functional import cached_property
@@ -803,6 +803,7 @@ def find_with_enrollments_count(learning_unit_year):
     count_by_id = _count_education_group_enrollments_by_id(education_groups_years)
     for educ_group in education_groups_years:
         educ_group.count_formation_enrollments = count_by_id.get(educ_group.id) or 0
+        educ_group.classes_counter = _get_classes_counters(learning_unit_year, educ_group.id)
     return education_groups_years
 
 
@@ -834,3 +835,19 @@ def find_by_user(user, academic_yr=None):
         academic_year=academic_yr,
         education_group__programmanager__person__user=user,
     ).order_by('acronym')
+
+
+def _get_classes_counters(learning_unit_year_id: int, educ_group_id: int):
+    counters_by_classes = EducationGroupYear.objects \
+        .filter(offerenrollment__education_group_year__id=educ_group_id,
+                offerenrollment__learningunitenrollment__learning_unit_year_id=learning_unit_year_id,
+                offerenrollment__learningunitenrollment__learning_class_year__isnull=False) \
+        .annotate(count_classes_enrollments=Count('offerenrollment__learningunitenrollment__learning_class_year'))\
+        .annotate(classe=F('offerenrollment__learningunitenrollment__learning_class_year__id')).order_by('acronym')
+
+    if counters_by_classes:
+        dict_counter_by_class = {}
+        for obj in counters_by_classes:
+            dict_counter_by_class.update({obj.classe: obj.count_classes_enrollments})
+        return dict_counter_by_class
+    return None
