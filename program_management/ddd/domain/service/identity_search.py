@@ -36,7 +36,6 @@ from osis_common.ddd import interface
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.exception import ProgramTreeVersionNotFoundException
 from program_management.ddd.domain.node import NodeIdentity
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, STANDARD, NOT_A_TRANSITION
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.models.element import Element
 
@@ -49,6 +48,7 @@ class ProgramTreeVersionIdentitySearch(interface.DomainService):
 
     @classmethod
     def get_from_node_identities(cls, node_identities: List['NodeIdentity']) -> List['ProgramTreeVersionIdentity']:
+        from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
         if not node_identities:
             return []
 
@@ -112,9 +112,13 @@ class NodeIdentitySearch(interface.DomainService):
     def get_from_training_identity(
             self,
             training_identity: 'TrainingIdentity',
-            version_name: str = STANDARD,
-            transition_name: str = NOT_A_TRANSITION,
+            version_name: str = None,
+            transition_name: str = None,
     ) -> 'NodeIdentity':
+        from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, STANDARD, \
+            NOT_A_TRANSITION
+        version_name = STANDARD if version_name is None else version_name
+        transition_name = NOT_A_TRANSITION if transition_name is None else version_name
         values = GroupYear.objects.filter(
             educationgroupversion__offer__acronym=training_identity.acronym,
             educationgroupversion__offer__academic_year__year=training_identity.year,
