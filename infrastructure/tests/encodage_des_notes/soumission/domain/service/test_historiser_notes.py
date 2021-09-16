@@ -30,7 +30,7 @@ from osis_history.utilities import get_history_entries
 from base.tests.factories.person import PersonFactory
 from ddd.logic.encodage_des_notes.soumission.test.factory.note_etudiant import NoteChiffreEtudiantFactory
 from infrastructure.encodage_de_notes.soumission.domain.service import historiser_notes
-from infrastructure.encodage_de_notes.soumission.domain.service.historiser_notes import HistoriserNotes
+from infrastructure.encodage_de_notes.soumission.domain.service.historiser_notes import HistoriserNotesService
 
 
 class TestHistoriserNotes(TestCase):
@@ -46,7 +46,7 @@ class TestHistoriserNotes(TestCase):
         )
 
     def test_should_sauver_une_entree_historique_encodage(self):
-        HistoriserNotes.historiser_encodage(self.author.global_id, notes_encodees=[self.note])
+        HistoriserNotesService.historiser_encodage(self.author.global_id, notes_encodees=[self.note])
 
         history_entries = get_history_entries(object_uuid=self.history_uuid)
         self.assertEqual(len(history_entries), 1)
@@ -72,7 +72,7 @@ class TestHistoriserNotes(TestCase):
         self.assertEqual(history_entries[0].message_en, expected_message_en)
 
     def test_should_sauver_une_entree_historique_soumission(self):
-        HistoriserNotes.historiser_soumission(self.author.global_id, notes_soumises=[self.note])
+        HistoriserNotesService.historiser_soumission(self.author.global_id, notes_soumises=[self.note])
 
         history_entries = get_history_entries(object_uuid=self.history_uuid)
         self.assertEqual(len(history_entries), 1)

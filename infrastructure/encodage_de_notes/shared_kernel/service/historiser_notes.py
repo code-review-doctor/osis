@@ -1,3 +1,4 @@
+##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -22,29 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import abc
-from typing import List
-
-from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import NoteEtudiant
-from osis_common.ddd import interface
+import uuid
 
 
-class IHistoriserNotesService(interface.DomainService):
-
-    @classmethod
-    @abc.abstractmethod
-    def historiser_soumission(
-            cls,
-            matricule: str,
-            notes_soumises: List['NoteEtudiant'],
-    ) -> None:
-        raise NotImplementedError
-
-    @classmethod
-    @abc.abstractmethod
-    def historiser_encodage(
-            cls,
-            matricule: str,
-            notes_encodees: List['NoteEtudiant'],
-    ) -> None:
-        raise NotImplementedError
+def get_history_identity(code_unite_enseignement: str, annee_academique: int, numero_session: int) -> str:
+    name = "{}{}{}".format(code_unite_enseignement, str(annee_academique), str(numero_session))
+    return str(uuid.uuid3(uuid.NAMESPACE_OID, name=name))

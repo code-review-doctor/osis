@@ -27,6 +27,7 @@ from typing import List, Dict
 from ddd.logic.encodage_des_notes.soumission.builder.note_etudiant_identity_builder import NoteEtudiantIdentityBuilder
 from ddd.logic.encodage_des_notes.soumission.commands import SoumettreNotesCommand
 from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import IdentiteNoteEtudiant, NoteEtudiant
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_historiser_notes import IHistoriserNotesService
 from ddd.logic.encodage_des_notes.soumission.repository.i_note_etudiant import INoteEtudiantRepository
 from osis_common.ddd import interface
 
@@ -38,6 +39,7 @@ class SoumettreNotesEnLot(interface.DomainService):
             cls,
             cmd: 'SoumettreNotesCommand',
             note_etudiant_repo: 'INoteEtudiantRepository',
+            historiser_note_service: 'IHistoriserNotesService'
     ) -> List['IdentiteNoteEtudiant']:
         identite_builder = NoteEtudiantIdentityBuilder()
         identites = [identite_builder.build_from_soumettre_note_command(cmd, cmd_note) for cmd_note in cmd.notes]
@@ -45,7 +47,7 @@ class SoumettreNotesEnLot(interface.DomainService):
         notes = note_etudiant_repo.search(entity_ids=identites)
         notes_by_identite = {note.entity_id: note for note in notes}  # type: Dict[IdentiteNoteEtudiant, NoteEtudiant]
 
-        notes_soumises = []
+        notes_soumises = []  # type: List[NoteEtudiant]
         for cmd_note in cmd.notes:
             identite = identite_builder.build_from_soumettre_note_command(cmd, cmd_note)
             note_a_soumettre = notes_by_identite[identite]
@@ -54,6 +56,9 @@ class SoumettreNotesEnLot(interface.DomainService):
 
             note_etudiant_repo.save(note_a_soumettre)
 
-            notes_soumises.append(identite)
+            notes_soumises.append(note_a_soumettre)
 
-        return notes_soumises
+        if notes_soumises:
+            historiser_note_service.historiser_soumission(cmd.matricule_fgs_enseignant, notes_soumises)
+
+        return [note_soumise.entity_id for note_soumise in notes_soumises]

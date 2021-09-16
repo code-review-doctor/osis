@@ -25,20 +25,11 @@
 import abc
 from typing import List
 
-from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import NoteEtudiant
+from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import NoteEtudiant
 from osis_common.ddd import interface
 
 
-class IHistoriserNotesService(interface.DomainService):
-
-    @classmethod
-    @abc.abstractmethod
-    def historiser_soumission(
-            cls,
-            matricule: str,
-            notes_soumises: List['NoteEtudiant'],
-    ) -> None:
-        raise NotImplementedError
+class IHistoriserEncodageNotesService(interface.DomainService):
 
     @classmethod
     @abc.abstractmethod

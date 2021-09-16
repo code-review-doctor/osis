@@ -32,11 +32,11 @@ from django.utils.translation import gettext_lazy as _
 from osis_history.utilities import add_history_entry
 
 from base.models.person import Person
-from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import NoteEtudiant
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_historiser_notes import IHistoriserNotesService
+from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import NoteEtudiant
+from ddd.logic.encodage_des_notes.encodage.domain.service.i_historiser_notes import IHistoriserEncodageNotesService
 from infrastructure.encodage_de_notes.shared_kernel.service.historiser_notes import get_history_identity
 
-TAGS = ['encodage_de_notes', 'soumission']
+TAGS = ['encodage_de_notes', 'encodage']
 
 
 @attr.s(frozen=True, slots=True)
@@ -59,33 +59,7 @@ class HistoriqueNotes:
         return get_history_identity(self.code_unite_enseignement, self.annee_academique, self.numero_session)
 
 
-class HistoriserNotesService(IHistoriserNotesService):
-    @classmethod
-    def historiser_soumission(cls, matricule: str, notes_soumises: List['NoteEtudiant']) -> None:
-        author = Person.objects.get(global_id=matricule)
-        historique_notes = cls._build_historique_notes(notes_soumises)
-
-        for historique in historique_notes:
-            with translation.override('en'):
-                message_en = str(
-                    _("The following scores %(scores_with_noma)s has been submitted") % {
-                        'scores_with_noma': historique.get_notes_display()
-                    }
-                )
-            with translation.override('fr_BE'):
-                message_fr = str(
-                    _("The following scores %(scores_with_noma)s has been submitted") % {
-                        'scores_with_noma': historique.get_notes_display()
-                    }
-                )
-
-            add_history_entry(
-                historique.get_history_identity(),
-                message_fr,
-                message_en,
-                author=author.full_name,
-                tags=TAGS,
-            )
+class HistoriserEncodageNotesService(IHistoriserEncodageNotesService):
 
     @classmethod
     def historiser_encodage(cls, matricule: str, notes_encodees: List['NoteEtudiant']) -> None:
@@ -113,11 +87,11 @@ class HistoriserNotesService(IHistoriserNotesService):
     def _build_historique_notes(cls, notes: List['NoteEtudiant']) -> List['HistoriqueNotes']:
         historique_notes = {}
         for note in notes:
-            group_by_key = (note.code_unite_enseignement, note.annee, note.numero_session,)
+            group_by_key = (note.code_unite_enseignement, note.annee_academique, note.numero_session,)
             if not historique_notes.get(group_by_key):
                 historique_notes[group_by_key] = HistoriqueNotes(
                     code_unite_enseignement=note.code_unite_enseignement,
-                    annee_academique=note.annee,
+                    annee_academique=note.annee_academique,
                     numero_session=note.numero_session,
                     notes=[],
                 )

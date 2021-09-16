@@ -36,6 +36,7 @@ from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import I
 from ddd.logic.encodage_des_notes.soumission.domain.service.encoder_notes_en_lot import EncoderNotesEtudiantEnLot
 from ddd.logic.encodage_des_notes.soumission.domain.service.enseignant_attribue_unite_enseignement import \
     EnseignantAttribueUniteEnseignement
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_historiser_notes import IHistoriserNotesService
 from ddd.logic.encodage_des_notes.soumission.repository.i_note_etudiant import INoteEtudiantRepository
 
 
@@ -43,7 +44,8 @@ def encoder_notes_etudiant(
         cmd: 'EncoderNotesEtudiantCommand',
         note_etudiant_repo: 'INoteEtudiantRepository',
         periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
-        attribution_translator: 'IAttributionEnseignantTranslator'
+        attribution_translator: 'IAttributionEnseignantTranslator',
+        historiser_note_service: 'IHistoriserNotesService'
 ) -> List['IdentiteNoteEtudiant']:
     # Given
     PeriodeEncodageOuverte().verifier(periode_soumission_note_translator)
@@ -58,9 +60,7 @@ def encoder_notes_etudiant(
     identites_notes_encodees = EncoderNotesEtudiantEnLot().execute(
         cmd,
         note_etudiant_repo,
+        historiser_note_service
     )
-
-    # Then
-    # TODO :: Historiser (DomainService) ?
 
     return identites_notes_encodees

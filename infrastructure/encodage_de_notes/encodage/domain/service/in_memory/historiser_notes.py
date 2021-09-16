@@ -22,29 +22,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import abc
 from typing import List
 
+from ddd.logic.encodage_des_notes.encodage.domain.service.i_historiser_notes import IHistoriserEncodageNotesService
 from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import NoteEtudiant
-from osis_common.ddd import interface
 
 
-class IHistoriserNotesService(interface.DomainService):
-
-    @classmethod
-    @abc.abstractmethod
-    def historiser_soumission(
-            cls,
-            matricule: str,
-            notes_soumises: List['NoteEtudiant'],
-    ) -> None:
-        raise NotImplementedError
+class HistoriserEncodageNotesServiceInMemory(IHistoriserEncodageNotesService):
+    appels = []
 
     @classmethod
-    @abc.abstractmethod
-    def historiser_encodage(
-            cls,
-            matricule: str,
-            notes_encodees: List['NoteEtudiant'],
-    ) -> None:
-        raise NotImplementedError
+    def historiser_encodage(cls, matricule: str, notes_encodees: List['NoteEtudiant']) -> None:
+        cls.appels.append(locals())
