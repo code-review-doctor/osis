@@ -52,6 +52,7 @@ from learning_unit.models.learning_class_year import LearningClassYear
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 EffectiveClassRepartitionDict = Dict[str, Union[str, bool]]
+ClassPepsTuple = Tuple[str, bool]
 
 COMMON_LEARNING_UNIT_ENROLLMENT_CLAUSE = {
     'offerenrollment__enrollment_state__in': [
@@ -69,7 +70,7 @@ class AttributionListView(generics.ListAPIView):
     name = 'attributions'
 
     def list(self, request, *args, **kwargs):
-        if self.request.query_params.get('with_effective_class_repartition') == "True":
+        if self.request.query_params.get('with_effective_class_repartition') == "True" and self.attributions_charge_new:
             # quick fix to be modified with the correct implementation of classes
             self._fill_classes_repartition()
         serializer = AttributionSerializer(
@@ -181,28 +182,31 @@ class AttributionListView(generics.ListAPIView):
         )
 
     def _fill_classes_repartition(self):
-        tutor_class_repartition = message_bus_instance.invoke(
+        tutor_classes = message_bus_instance.invoke(
             GetTutorRepartitionClassesCommand(
                 tutor_personal_id_number=self.attributions_charge_new[0].tutor_personal_id
             )
         )  # type: Tutor
+        classes_peps = self._get_classes_peps(tutor_classes)
+        for attrib in self.attributions_charge_new:
+            if tutor_classes:
+                learning_unit_year = attrib.learning_component_year.learning_unit_year
+                classes_repartition = tutor_classes.get_classes_repartition_on_learning_unit(
+                    learning_unit_code=learning_unit_year.acronym,
+                    learning_unit_year=learning_unit_year.academic_year.year
+                )
+                attrib.effective_class_repartition = self._get_classes_repartition(classes_repartition, classes_peps)
+            else:
+                attrib.effective_class_repartition = []
+
+    @staticmethod
+    def _get_classes_peps(tutor_classes: 'Tutor') -> List[ClassPepsTuple]:
         class_codes = [
             "{}{}".format(
                 class_repartition.effective_class.learning_unit_identity.code,
                 class_repartition.effective_class.class_code
-            ) for class_repartition in tutor_class_repartition.distributed_effective_classes
-        ]
-        classes_peps = self._get_classes_peps(class_codes)
-        for attrib in self.attributions_charge_new:
-            learning_unit_year = attrib.learning_component_year.learning_unit_year
-            classes_repartition = tutor_class_repartition.get_classes_repartition_on_learning_unit(
-                learning_unit_code=learning_unit_year.acronym,
-                learning_unit_year=learning_unit_year.academic_year.year
-            )
-            attrib.effective_class_repartition = self._get_classes_repartition(classes_repartition, classes_peps)
-
-    @staticmethod
-    def _get_classes_peps(class_codes: List[str]) -> List[Tuple[str, bool]]:
+            ) for class_repartition in tutor_classes.distributed_effective_classes
+        ] if tutor_classes else []
         classes_peps = LearningClassYear.objects.annotate(
             full_code=Concat('learning_component_year__learning_unit_year__acronym', 'acronym')
         ).filter(
@@ -229,7 +233,7 @@ class AttributionListView(generics.ListAPIView):
     @staticmethod
     def _get_classes_repartition(
             classes_repartition: List[ClassVolumeRepartition],
-            classes_peps: List[Tuple[str, bool]]
+            classes_peps: List[ClassPepsTuple]
     ) -> List[EffectiveClassRepartitionDict]:
         effective_class_repartition = []
         for class_repartition in classes_repartition:
