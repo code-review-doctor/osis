@@ -25,18 +25,16 @@
 ##############################################################################
 from rest_framework import serializers
 
-from base.models.learning_unit_enrollment import LearningUnitEnrollment
-from base.models.student_specific_profile import StudentSpecificProfile
 from learning_unit_enrollment.api.serializers.specific_profile import StudentSpecificProfileSerializer
 
 
 class EnrollmentSerializer(serializers.Serializer):
     date_enrollment = serializers.CharField()
     enrollment_state = serializers.CharField()
-    student_last_name = serializers.CharField(source="student.person.last_name")
-    student_first_name = serializers.CharField(source="student.person.first_name")
-    student_email = serializers.CharField(source="student.person.email")
-    student_registration_id = serializers.CharField(source="student.registration_id")
+    student_last_name = serializers.CharField()
+    student_first_name = serializers.CharField()
+    student_email = serializers.CharField()
+    student_registration_id = serializers.CharField()
     specific_profile = StudentSpecificProfileSerializer(read_only=True, source="student.studentspecificprofile")
-    program = serializers.CharField(source="offer.acronym")
-    learning_unit_acronym = serializers.CharField(source="learning_unit_year.acronym")
+    program = serializers.CharField()
+    learning_unit_acronym = serializers.CharField()

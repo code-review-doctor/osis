@@ -26,6 +26,8 @@
 import logging
 
 from django.conf import settings
+from django.db.models import Case, When, Q, F
+from django.db.models.functions import Concat
 from rest_framework import generics
 
 from base.models.learning_unit_enrollment import LearningUnitEnrollment
@@ -44,9 +46,23 @@ class LearningUnitEnrollmentsListView(generics.ListAPIView):
     def get_queryset(self):
         acronym = self.kwargs['acronym']
         year = self.kwargs['year']
-        return LearningUnitEnrollment.objects.filter(
-            learning_unit_year__acronym=acronym,
+        return LearningUnitEnrollment.objects.annotate(
+            learning_unit_acronym=Case(
+                When(
+                    Q(learning_class_year__isnull=False),
+                    then=Concat(F('learning_unit_year__acronym'), F('learning_class_year__acronym'))
+                ),
+                default=F('learning_unit_year__acronym')
+            )
+        ).filter(
+            learning_unit_acronym=acronym,
             learning_unit_year__academic_year__year=year
+        ).annotate(
+            student_last_name=F('offer_enrollment__student__person__last_name'),
+            student_first_name=F('offer_enrollment__student__person__first_name'),
+            student_email=F('offer_enrollment__student__person__email'),
+            student_registration_id=F('offer_enrollment__student__registration_id'),
+            program=F('offer_enrollment__education_group_year__acronym'),
         ).select_related(
             'offer_enrollment__student__studentspecificprofile',
             'offer_enrollment__student__person',
