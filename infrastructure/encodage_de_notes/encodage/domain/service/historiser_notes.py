@@ -74,7 +74,7 @@ class HistoriserEncodageNotesService(IHistoriserEncodageNotesService):
         for historique in historique_notes:
             with translation.override('en'):
                 message_en = str(historique.get_encodage_text())
-            with translation.override('fr_BE'):
+            with translation.override('fr-be'):
                 message_fr = str(historique.get_encodage_text())
             add_history_entry(
                 historique.get_history_identity(),

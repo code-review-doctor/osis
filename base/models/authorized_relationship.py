@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import sys
 from typing import List, Set, Union
 
 import attr
@@ -34,7 +33,6 @@ from base.models.education_group_type import EducationGroupType
 from base.models.enums.education_group_types import EducationGroupTypesEnum, GroupType
 from base.utils.constants import INFINITE_VALUE
 from osis_common.models.osis_model_admin import OsisModelAdmin
-# from program_management.models.enums.node_type import NodeType
 
 
 class AuthorizedRelationshipAdmin(OsisModelAdmin):
