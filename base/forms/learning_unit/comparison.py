@@ -45,8 +45,10 @@ class SelectComparisonYears(forms.Form):
         else:
             year = int(year)
         years = AcademicYear.objects.filter(
-            Q(year=year + 1) | Q(year=year - 1)).order_by('year')
-        choices = _get_choices(years, year)
+            year__lte=year + 1,
+            year__gte=year - 1
+        ).order_by('year')
+        choices = _get_choices(years)
         initial_value = _get_initial(choices)
         self.fields['academic_years'] = forms.ChoiceField(
             widget=forms.RadioSelect,
@@ -60,11 +62,11 @@ class SelectComparisonYears(forms.Form):
             self.fields['academic_years'].initial = initial_value
 
 
-def _get_choices(academic_years, current_academic_year):
-    if len(academic_years) == LIMIT_OF_CHOICES:
+def _get_choices(academic_years):
+    if len(academic_years) == LIMIT_OF_CHOICES + 1:
         return [
-            (academic_years[0].year, str(academic_years[0]) + ' / ' + str(current_academic_year)),
-            (academic_years[1].year, str(current_academic_year) + ' / ' + str(academic_years[1]))
+            (academic_years[0].year, str(academic_years[0]) + ' / ' + str(academic_years[1])),
+            (academic_years[2].year, str(academic_years[1]) + ' / ' + str(academic_years[2]))
         ]
     return None
 
