@@ -26,9 +26,9 @@
 from django.contrib.auth.models import User
 from django.test import TestCase
 
+from base.auth.roles.tutor import Tutor
 from base.models import models_signals as mdl_signals, person as mdl_person
 from base.models.person import Person
-from base.auth.roles.tutor import Tutor
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity_manager import EntityManagerFactory
 from base.tests.factories.entity_version import EntityVersionFactory
@@ -50,7 +50,7 @@ def get_or_create_user(user_infos):
     return a_user
 
 
-def get_or_create_person(user=None, first_name=None, global_id=None):
+def get_or_create_person(user=None, first_name='', global_id=''):
     person = None
     created = False
     if user:
@@ -96,7 +96,7 @@ class CreateUpdatePerson(TestCase):
             'USER_FGS': '7777777',
         }
         user = get_or_create_user(user_infos)
-        person = get_or_create_person(None, 'first_name_2', None)
+        person = get_or_create_person(None, 'first_name_2')
         person = mdl_signals._create_update_person(user, person, user_infos)
         self.assertEqual(person.user, user)
         self.assertEqual(person.global_id, user_infos.get('USER_FGS'))

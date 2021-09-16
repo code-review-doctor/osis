@@ -31,7 +31,6 @@ from reversion.admin import VersionAdmin
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.enums.component_type import LECTURING
 from base.models.enums import quadrimesters, learning_unit_year_session
-from ddd.logic.learning_unit.commands import GetEffectiveClassCommand
 from learning_unit.business.create_class_copy_report import create_class_copy_report
 from osis_common.models import osis_model_admin
 from base.models.enums.learning_component_year_type import PRACTICAL_EXERCISES
@@ -39,6 +38,7 @@ from base.models.enums.learning_component_year_type import PRACTICAL_EXERCISES
 
 def copy_to_next_year(modeladmin, request, queryset):
     from ddd.logic.learning_unit.commands import CreateEffectiveClassCommand
+    from ddd.logic.learning_unit.commands import GetEffectiveClassCommand
     from infrastructure.messages_bus import message_bus_instance
     qs = queryset.select_related("learning_component_year")
 
