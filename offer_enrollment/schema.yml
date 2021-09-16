@@ -43,6 +43,39 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
         - enrollment
+  /my_enrollments/{year}:
+    get:
+      description: 'Return all enrollments of the connected user for a specific year'
+      operationId: my_enrollments_year_list
+      parameters:
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: integer
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
+        - $ref: '#/components/parameters/PaginationLimit'
+        - $ref: '#/components/parameters/PaginationOffset'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnrollmentList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - enrollment
 components:
   securitySchemes:
     Token:
