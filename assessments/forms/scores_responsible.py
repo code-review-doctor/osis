@@ -116,6 +116,7 @@ class ScoresResponsibleFilter(django_filters.FilterSet):
         queryset = business_scores_responsible.filter_learning_unit_year_according_person(
             queryset,
             self.request.user.person,
+            self.academic_year
         )
         queryset = super().filter_queryset(queryset)
 
