@@ -139,16 +139,12 @@ components:
           $ref: '#/components/schemas/TypePepsEnum'
         type_text:
           type: string
-        subtype_sport:
-          $ref: '#/components/schemas/SportSubtypePepsEnum'
-        subtype_sport_text:
+        subtype:
+          oneOf:
+            - $ref: '#/components/schemas/SportSubtypePepsEnum'
+            - $ref: '#/components/schemas/DisabilitySubtypePepsEnum'
+        subtype_text:
           type: string
-          nullable: true
-        subtype_disability:
-          $ref: '#/components/schemas/DisabilitySubtypePepsEnum'
-        subtype_disability_text:
-          type: string
-          nullable: true
         guide:
           type: string
           example: "John Doe"
