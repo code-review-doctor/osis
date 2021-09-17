@@ -61,7 +61,13 @@ def find_related_education_group_years(score_encoding_progress_list):
 
 def find_related_tutors(user, academic_year, session_exam_number):
     # Find all offer managed by current user
-    education_group_year_ids = list(education_group_year.find_by_user(user).values_list('id', flat=True))
+    education_group_year_ids = education_group_year.find_by_user(
+        user,
+        academic_yr=academic_year
+    ).values_list(
+        'id',
+        flat=True
+    )
 
     learning_unit_year_ids = list(
         exam_enrollment.find_for_score_encodings(
