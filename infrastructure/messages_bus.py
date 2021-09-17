@@ -136,6 +136,7 @@ from infrastructure.effective_class_repartition.domain.service.tutor_attribution
 from infrastructure.effective_class_repartition.repository.tutor import TutorRepository
 from infrastructure.encodage_de_notes.encodage.domain.service.cohortes_du_gestionnaire import \
     CohortesDuGestionnaireTranslator
+from infrastructure.encodage_de_notes.encodage.domain.service.historiser_notes import HistoriserEncodageNotesService
 from infrastructure.encodage_de_notes.encodage.domain.service.notifier_encodage_notes import NotifierEncodageNotes
 from infrastructure.encodage_de_notes.encodage.repository.note_etudiant import NoteEtudiantRepository as \
     NoteEtudiantGestionnaireRepository
@@ -149,6 +150,7 @@ from infrastructure.encodage_de_notes.shared_kernel.service.signaletique_etudian
 from infrastructure.encodage_de_notes.shared_kernel.service.unite_enseignement import UniteEnseignementTranslator
 from infrastructure.encodage_de_notes.soumission.domain.service.deliberation import DeliberationTranslator
 from infrastructure.encodage_de_notes.soumission.domain.service.entites_cohorte import EntitesCohorteTranslator
+from infrastructure.encodage_de_notes.soumission.domain.service.historiser_notes import HistoriserNotesService
 from infrastructure.encodage_de_notes.soumission.domain.service.notifier_soumission_notes import NotifierSoumissionNotes
 from infrastructure.encodage_de_notes.soumission.domain.service.signaletique_personne import \
     SignaletiquePersonneTranslator
@@ -297,6 +299,7 @@ class MessageBus:
             NoteEtudiantRepository(),
             PeriodeEncodageNotesTranslator(),
             AttributionEnseignantTranslator(),
+            HistoriserNotesService()
         ),
         SoumettreNotesCommand: lambda cmd: soumettre_notes_etudiant(
             cmd,
@@ -306,7 +309,8 @@ class MessageBus:
             NotifierSoumissionNotes(),
             AttributionEnseignantTranslator(),
             SignaletiquePersonneTranslator(),
-            SignaletiqueEtudiantTranslator()
+            SignaletiqueEtudiantTranslator(),
+            HistoriserNotesService()
         ),
         GetProgressionGeneraleCommand: lambda cmd: get_progression_generale(
             cmd,
@@ -350,7 +354,8 @@ class MessageBus:
             AttributionEnseignantTranslator(),
             SignaletiquePersonneTranslator(),
             SignaletiqueEtudiantTranslator(),
-            AdresseFeuilleDeNotesRepository()
+            AdresseFeuilleDeNotesRepository(),
+            HistoriserEncodageNotesService()
         ),
         GetCohortesGestionnaireCommand: lambda cmd: get_cohortes_gestionnaire(
             cmd,

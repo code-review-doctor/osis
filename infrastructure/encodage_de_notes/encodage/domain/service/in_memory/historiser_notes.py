@@ -1,4 +1,3 @@
-##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -15,7 +14,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,16 +22,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf import settings
-from django.contrib import admin
+from typing import List
 
-from assessments.models import *
+from ddd.logic.encodage_des_notes.encodage.domain.service.i_historiser_notes import IHistoriserEncodageNotesService
+from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import NoteEtudiant
 
-admin.site.register(score_sheet_address.ScoreSheetAddress,
-                    score_sheet_address.ScoreSheetAddressAdmin)
 
-admin.site.register(score_responsible.ScoreResponsible,
-                    score_responsible.ScoreResponsibleAdmin)
+class HistoriserEncodageNotesServiceInMemory(IHistoriserEncodageNotesService):
+    appels = []
 
-if 'osis_history' in settings.INSTALLED_APPS:
-    admin.site.register(score_history.ScoreHistory, score_history.ScoreHistoryAdmin)
+    @classmethod
+    def historiser_encodage(cls, matricule: str, notes_encodees: List['NoteEtudiant']) -> None:
+        cls.appels.append(locals())

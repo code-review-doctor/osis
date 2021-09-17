@@ -23,16 +23,33 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf import settings
+import uuid
+
 from django.contrib import admin
+from osis_history import models as osis_history_models
 
-from assessments.models import *
 
-admin.site.register(score_sheet_address.ScoreSheetAddress,
-                    score_sheet_address.ScoreSheetAddressAdmin)
+SCORE_HISTORY_TAGS = ['encodage_de_notes']
 
-admin.site.register(score_responsible.ScoreResponsible,
-                    score_responsible.ScoreResponsibleAdmin)
 
-if 'osis_history' in settings.INSTALLED_APPS:
-    admin.site.register(score_history.ScoreHistory, score_history.ScoreHistoryAdmin)
+class ScoreHistoryAdmin(admin.ModelAdmin):
+    list_display = ('message_fr', 'message_en', 'author', 'created',)
+    search_fields = ['author', 'message_fr', 'message_en', ]
+    list_display_links = None
+    actions = None
+    change_list_template = "assessments/admin/score_history_list.html"
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).filter(tags__contains=SCORE_HISTORY_TAGS)
+
+    def get_search_results(self, request, queryset, search_term):
+        queryset, use_distinct = super().get_search_results(request, queryset, search_term)
+        if search_term:
+            uuid_from_str = uuid.uuid3(uuid.NAMESPACE_OID, name=search_term)
+            queryset |= self.model.objects.filter(object_uuid=uuid_from_str)
+        return queryset, use_distinct
+
+
+class ScoreHistory(osis_history_models.HistoryEntry):
+    class Meta:
+        proxy = True

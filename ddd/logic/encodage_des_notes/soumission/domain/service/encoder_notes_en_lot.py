@@ -29,6 +29,7 @@ from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from ddd.logic.encodage_des_notes.soumission.builder.note_etudiant_identity_builder import NoteEtudiantIdentityBuilder
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderNotesEtudiantCommand
 from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import IdentiteNoteEtudiant, NoteEtudiant
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_historiser_notes import IHistoriserNotesService
 from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import \
     EncoderNotesEtudiantEnLotLigneBusinessExceptions
 from ddd.logic.encodage_des_notes.soumission.repository.i_note_etudiant import INoteEtudiantRepository
@@ -42,6 +43,7 @@ class EncoderNotesEtudiantEnLot(interface.DomainService):
             cls,
             cmd: 'EncoderNotesEtudiantCommand',
             note_etudiant_repo: 'INoteEtudiantRepository',
+            historiser_note_service: 'IHistoriserNotesService'
     ) -> List['IdentiteNoteEtudiant']:
         identite_builder = NoteEtudiantIdentityBuilder()
         identites_notes_a_encoder = [
@@ -72,6 +74,9 @@ class EncoderNotesEtudiantEnLot(interface.DomainService):
 
         for note in notes_a_persister:
             note_etudiant_repo.save(note)
+
+        if notes_a_persister:
+            historiser_note_service.historiser_encodage(cmd.matricule_fgs_enseignant, notes_a_persister)
 
         if exceptions:
             raise MultipleBusinessExceptions(exceptions=exceptions)

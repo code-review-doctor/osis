@@ -32,6 +32,7 @@ from ddd.logic.encodage_des_notes.encodage.builder.note_etudiant_builder import 
 from ddd.logic.encodage_des_notes.encodage.commands import EncoderNoteCommand
 from ddd.logic.encodage_des_notes.encodage.domain.model.gestionnaire_parcours import GestionnaireParcours
 from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import IdentiteNoteEtudiant
+from ddd.logic.encodage_des_notes.encodage.domain.service.i_historiser_notes import IHistoriserEncodageNotesService
 from ddd.logic.encodage_des_notes.encodage.domain.validator.exceptions import EncoderNotesEnLotLigneBusinessExceptions
 from ddd.logic.encodage_des_notes.encodage.repository.note_etudiant import INoteEtudiantRepository
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import PeriodeEncodageNotesDTO
@@ -49,7 +50,8 @@ class EncoderNotesEnLot(interface.DomainService):
             notes_encodees: List['EncoderNoteCommand'],
             gestionnaire_parcours: 'GestionnaireParcours',
             note_etudiant_repo: 'INoteEtudiantRepository',
-            periode_ouverte: 'PeriodeEncodageNotesDTO'
+            periode_ouverte: 'PeriodeEncodageNotesDTO',
+            historiser_note_service: 'IHistoriserEncodageNotesService'
     ) -> List['IdentiteNoteEtudiant']:
         note_encodee_cmd_par_identite = _associer_nouvelle_note_a_son_identite(notes_encodees, periode_ouverte)
         anciennes_notes_a_modifier = note_etudiant_repo.search(entity_ids=list(note_encodee_cmd_par_identite.keys()))
@@ -79,6 +81,12 @@ class EncoderNotesEnLot(interface.DomainService):
 
         for note in notes_a_persister:
             note_etudiant_repo.save(note)
+
+        if notes_a_persister:
+            historiser_note_service.historiser_encodage(
+                gestionnaire_parcours.entity_id.matricule_fgs_gestionnaire,
+                notes_a_persister,
+            )
 
         if exceptions:
             raise MultipleBusinessExceptions(exceptions=exceptions)
