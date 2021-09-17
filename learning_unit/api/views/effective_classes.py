@@ -31,7 +31,7 @@ from rest_framework import generics
 from rest_framework.response import Response
 
 from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
-from ddd.logic.learning_unit.commands import GetLearningUnitEffectiveClassesCommand
+from ddd.logic.learning_unit.commands import GetClassesEffectivesDepuisUniteDEnseignementCommand
 from ddd.logic.learning_unit.dtos import EffectiveClassFromRepositoryDTO
 from ddd.logic.shared_kernel.campus.commands import GetCampusCommand
 from ddd.logic.shared_kernel.campus.domain.model.uclouvain_campus import UclouvainCampus
@@ -56,7 +56,7 @@ class EffectiveClassesList(LanguageContextSerializerMixin, generics.ListAPIView)
     @cached_property
     def classes(self) -> List[SimpleNamespace]:
         classes = message_bus_instance.invoke(
-            GetLearningUnitEffectiveClassesCommand(
+            GetClassesEffectivesDepuisUniteDEnseignementCommand(
                 learning_unit_code=self.kwargs['acronym'].upper(),
                 learning_unit_year=self.kwargs['year']
             )

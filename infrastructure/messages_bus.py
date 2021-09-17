@@ -58,7 +58,7 @@ from ddd.logic.effective_class_repartition.use_case.write.unassign_tutor_class_s
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, GetLearningUnitCommand, \
     CreateEffectiveClassCommand, CanCreateEffectiveClassCommand, GetEffectiveClassCommand, \
     UpdateEffectiveClassCommand, DeleteEffectiveClassCommand, CanDeleteEffectiveClassCommand, \
-    GetEffectiveClassWarningsCommand, GetLearningUnitEffectiveClassesCommand
+    GetEffectiveClassWarningsCommand, GetClassesEffectivesDepuisUniteDEnseignementCommand
 from ddd.logic.learning_unit.use_case.read.check_can_create_class_service import check_can_create_effective_class
 from ddd.logic.learning_unit.use_case.read.check_can_delete_class_service import check_can_delete_effective_class
 from ddd.logic.learning_unit.use_case.read.get_effective_class_service import get_effective_class
@@ -198,7 +198,7 @@ class MessageBus:
             EffectiveClassRepository()
         ),
         GetTutorRepartitionClassesCommand: lambda cmd: get_tutor_repartition_classes(cmd, TutorRepository()),
-        GetLearningUnitEffectiveClassesCommand: lambda cmd: get_learning_unit_effective_classes(
+        GetClassesEffectivesDepuisUniteDEnseignementCommand: lambda cmd: get_learning_unit_effective_classes(
             cmd, EffectiveClassRepository()
         )
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]

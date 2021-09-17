@@ -146,7 +146,7 @@ class GetEffectiveClassCommand(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
-class GetLearningUnitEffectiveClassesCommand(interface.CommandRequest):
+class GetClassesEffectivesDepuisUniteDEnseignementCommand(interface.CommandRequest):
     learning_unit_code = attr.ib(type=str)
     learning_unit_year = attr.ib(type=int)
 

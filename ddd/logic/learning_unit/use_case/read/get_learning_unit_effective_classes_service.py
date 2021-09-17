@@ -26,13 +26,13 @@
 from typing import List
 
 from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
-from ddd.logic.learning_unit.commands import GetLearningUnitEffectiveClassesCommand
+from ddd.logic.learning_unit.commands import GetClassesEffectivesDepuisUniteDEnseignementCommand
 from ddd.logic.learning_unit.dtos import EffectiveClassFromRepositoryDTO
 from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
 
 
 def get_learning_unit_effective_classes(
-        cmd: 'GetLearningUnitEffectiveClassesCommand',
+        cmd: 'GetClassesEffectivesDepuisUniteDEnseignementCommand',
         effective_class_repository: 'IEffectiveClassRepository'
 ) -> List['EffectiveClassFromRepositoryDTO']:
     learning_unit_identity = LearningUnitIdentityBuilder.build_from_code_and_year(
