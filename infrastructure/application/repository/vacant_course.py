@@ -183,7 +183,6 @@ def _annotate_allocation_entity_parents(qs: QuerySet) -> QuerySet:
                         )
                     ),
                     parent_id=cte.col.entity_id,
-                    start_date__gte=cte.col.start_date,
                     end_date_queryable__lte=cte.col.end_date_queryable
                 ).values(
                     'parent_id',
