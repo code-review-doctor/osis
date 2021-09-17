@@ -78,8 +78,6 @@ class EffectiveClassesListTestCase(APITestCase):
             list(results[0].keys()),
             [
                 "class_code",
-                "learning_unit_code",
-                "learning_unit_year",
                 "title_fr",
                 "title_en",
                 "teaching_place_uuid",

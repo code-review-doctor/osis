@@ -70,8 +70,6 @@ class EffectiveClassesList(LanguageContextSerializerMixin, generics.ListAPIView)
             to_return.append(
                 SimpleNamespace(
                     class_code=effective_class.class_code,
-                    learning_unit_code=effective_class.learning_unit_code,
-                    learning_unit_year=effective_class.learning_unit_year,
                     title_fr=effective_class.title_fr,
                     title_en=effective_class.title_en,
                     teaching_place_uuid=effective_class.teaching_place_uuid,

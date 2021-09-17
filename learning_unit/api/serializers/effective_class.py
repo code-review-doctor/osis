@@ -28,8 +28,6 @@ from rest_framework import serializers
 
 class EffectiveClassSerializer(serializers.Serializer):
     class_code = serializers.CharField()
-    learning_unit_code = serializers.CharField()
-    learning_unit_year = serializers.IntegerField()
     title_fr = serializers.CharField()
     title_en = serializers.CharField()
     teaching_place_uuid = serializers.CharField()

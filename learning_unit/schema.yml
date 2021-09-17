@@ -646,10 +646,6 @@ components:
       properties:
         class_code:
           type: string
-        learning_unit_code:
-          type: string
-        learning_unit_year:
-          type: integer
         title_fr:
           type: string
         title_en:

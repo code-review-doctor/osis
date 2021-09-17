@@ -39,8 +39,6 @@ class EffectiveClassSerializerTestCase(TestCase):
     def setUpTestData(cls):
         ns = SimpleNamespace(
             class_code="Z",
-            learning_unit_code="LCODE1111",
-            learning_unit_year=2022,
             title_fr="TITRE",
             title_en="TITLE",
             teaching_place_uuid="1234664341",
@@ -58,8 +56,6 @@ class EffectiveClassSerializerTestCase(TestCase):
     def test_contains_expected_fields(self):
         expected_fields = [
             'class_code',
-            'learning_unit_code',
-            'learning_unit_year',
             'title_fr',
             'title_en',
             'teaching_place_uuid',
