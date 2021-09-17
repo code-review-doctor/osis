@@ -128,7 +128,7 @@ class LearningUnitTranslatorSearchTutorAttribution(TestCase):
 
         cls.service = LearningUnitTranslator()
 
-    def test_should_not_return_only_attribution_on_full_type(self):
+    def test_should_return_only_attribution_of_learning_unit_full_type(self):
         learning_unit_ids = [
             LearningUnitIdentity(code='LDROI1200', academic_year=AcademicYearIdentityBuilder.build_from_year(2018)),
         ]
