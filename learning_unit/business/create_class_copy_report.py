@@ -23,27 +23,36 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List, Dict
 
-from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
-from ddd.logic.learning_unit.commands import CanCreateEffectiveClassCommand
-from ddd.logic.learning_unit.domain.service.can_save_effective_class import CanCreateEffectiveClass
-from ddd.logic.learning_unit.domain.service.i_student_enrollments import IStudentEnrollmentsTranslator
-from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepository
+from django.contrib.auth.models import User
+from django.utils.translation import gettext_lazy as _
+from openpyxl.styles import Font
+
+from base.business.xls import get_name_or_username
+from osis_common.document import xls_build
+
+BOLD_FONT = Font(bold=True)
 
 
-def check_can_create_effective_class(
-        cmd: 'CanCreateEffectiveClassCommand',
-        learning_unit_repository: 'ILearningUnitRepository',
-        student_enrollment_translator: 'IStudentEnrollmentsTranslator',
-) -> None:
-    learning_unit_identity = LearningUnitIdentityBuilder.build_from_code_and_year(
-        code=cmd.learning_unit_code,
-        year=cmd.learning_unit_year
-    )
-    learning_unit = learning_unit_repository.get(learning_unit_identity)
-    CanCreateEffectiveClass().verify(
-        learning_unit=learning_unit,
-        learning_unit_repository=learning_unit_repository,
-        student_enrollment_translator=student_enrollment_translator,
-        year=cmd.learning_unit_year,
-    )
+def create_class_copy_report(user: User, copy_classes_report: List[Dict]):
+    working_sheets_data = []
+
+    for line in copy_classes_report:
+        working_sheets_data.append([line.get('source'), line.get('result'), line.get('exception')])
+    parameters = {
+        xls_build.DESCRIPTION: _('Classes copy report'),
+        xls_build.USER: get_name_or_username(user),
+        xls_build.FILENAME: "classes_copy_report",
+        xls_build.WS_TITLE: _('Classes copy report'),
+        xls_build.HEADER_TITLES: [
+            str(_('Copy source')),
+            str(_('Copy result')),
+            str(_('Error')),
+        ],
+        xls_build.FONT_ROWS: {
+            BOLD_FONT: [0]
+        }
+    }
+
+    return xls_build.generate_xls(xls_build.prepare_xls_parameters_list(working_sheets_data, parameters))

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-12 13:40+0200\n"
+"POT-Creation-Date: 2021-08-31 11:42+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -443,6 +443,12 @@ msgstr ""
 msgid "Birth Date"
 msgstr ""
 
+msgid "Birth country"
+msgstr ""
+
+msgid "Birth year must be between 1000 and 2999"
+msgstr ""
+
 msgid "Block"
 msgstr ""
 
@@ -627,6 +633,9 @@ msgstr ""
 msgid "Country"
 msgstr ""
 
+msgid "Country of citizenship"
+msgstr ""
+
 msgid "Course"
 msgstr ""
 
@@ -793,6 +802,11 @@ msgid "Documentation"
 msgstr ""
 
 msgid "Down"
+msgstr ""
+
+msgid ""
+"Due to a pending change in OSIS, student counters for 1BA, 11BA and learning units containing classes could be "
+"distorted(abnormally high). For accurate statistics, please consult the EPC statistics."
 msgstr ""
 
 msgid "Duration"
@@ -1025,6 +1039,10 @@ msgstr ""
 msgid "Failure"
 msgstr ""
 
+msgid "Female"
+msgstr ""
+
+msgctxt "female gender"
 msgid "Female"
 msgstr ""
 
@@ -1501,6 +1519,10 @@ msgstr ""
 msgid "Male"
 msgstr ""
 
+msgctxt "gender male"
+msgid "Male"
+msgstr ""
+
 msgid "Manage volumes"
 msgstr ""
 
@@ -1794,6 +1816,9 @@ msgid "Organizational chart"
 msgstr ""
 
 msgid "Organizations"
+msgstr ""
+
+msgid "Other"
 msgstr ""
 
 msgid "Other academic responsible"
