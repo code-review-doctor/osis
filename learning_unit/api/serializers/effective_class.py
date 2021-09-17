@@ -25,16 +25,25 @@
 ##############################################################################
 from rest_framework import serializers
 
+from base.models.enums.quadrimesters import DerogationQuadrimester
+
 
 class EffectiveClassSerializer(serializers.Serializer):
-    class_code = serializers.CharField()
+    code = serializers.CharField()
     title_fr = serializers.CharField()
     title_en = serializers.CharField()
     teaching_place_uuid = serializers.CharField()
     campus_name = serializers.CharField()
     organization_name = serializers.CharField()
     derogation_quadrimester = serializers.CharField()
+    derogation_quadrimester_text = serializers.SerializerMethodField()
     session_derogation = serializers.CharField()
     volume_q1 = serializers.DecimalField(max_digits=5, decimal_places=2)
     volume_q2 = serializers.DecimalField(max_digits=5, decimal_places=2)
-    class_type = serializers.CharField()
+    type = serializers.CharField()
+
+    @staticmethod
+    def get_derogation_quadrimester_text(obj) -> str:
+        if obj.derogation_quadrimester:
+            return DerogationQuadrimester.get_value(obj.derogation_quadrimester)
+        return ""

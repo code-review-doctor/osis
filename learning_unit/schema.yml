@@ -644,7 +644,7 @@ components:
     EffectiveClass:
       type: object
       properties:
-        class_code:
+        code:
           type: string
         title_fr:
           type: string
@@ -660,6 +660,8 @@ components:
           type: string
         derogation_quadrimester:
           $ref: '#/components/schemas/QuadrimesterEnum'
+        derogation_quadrimester_text:
+          type: string
         session_derogation:
           type: string
         volume_q1:
@@ -668,7 +670,7 @@ components:
         volume_q2:
           type: number
           multipleOf: 0.01
-        class_type:
+        type:
           $ref: '#/components/schemas/ComponentTypeEnum'
     LearningUnitComponent:
       type: object

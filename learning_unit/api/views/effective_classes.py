@@ -69,7 +69,7 @@ class EffectiveClassesList(LanguageContextSerializerMixin, generics.ListAPIView)
             campus = self._get_campus(effective_class)
             to_return.append(
                 SimpleNamespace(
-                    class_code=effective_class.class_code,
+                    code=effective_class.code,
                     title_fr=effective_class.title_fr,
                     title_en=effective_class.title_en,
                     teaching_place_uuid=effective_class.teaching_place_uuid,
@@ -77,7 +77,7 @@ class EffectiveClassesList(LanguageContextSerializerMixin, generics.ListAPIView)
                     session_derogation=effective_class.session_derogation,
                     volume_q1=effective_class.volume_q1,
                     volume_q2=effective_class.volume_q2,
-                    class_type=effective_class.class_type,
+                    type=effective_class.type,
                     campus_name=campus.name,
                     organization_name=campus.organization_name
                 )

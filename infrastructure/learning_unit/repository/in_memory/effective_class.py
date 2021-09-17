@@ -50,9 +50,7 @@ class EffectiveClassRepository(InMemoryGenericRepository, IEffectiveClassReposit
         for effective_class in cls.entities:
             if effective_class.learning_unit_identity == learning_unit_id:
                 dto = EffectiveClassDTO(
-                    class_code=effective_class.class_code,
-                    learning_unit_code=effective_class.learning_unit_code,
-                    learning_unit_year=effective_class.year,
+                    code=effective_class.class_code,
                     title_fr=effective_class.titles.fr,
                     title_en=effective_class.titles.en,
                     teaching_place_uuid=effective_class.teaching_place.uuid,
@@ -60,7 +58,7 @@ class EffectiveClassRepository(InMemoryGenericRepository, IEffectiveClassReposit
                     session_derogation=effective_class.session_derogation,
                     volume_q1=effective_class.volumes.volume_first_quadrimester,
                     volume_q2=effective_class.volumes.volume_second_quadrimester,
-                    class_type=LECTURING if effective_class.is_lecturing else PRACTICAL_EXERCISES,
+                    type=LECTURING if effective_class.is_lecturing else PRACTICAL_EXERCISES,
                 )
                 class_to_return.append(dto)
         return class_to_return

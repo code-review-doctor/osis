@@ -124,9 +124,7 @@ class EffectiveClassFromRepositoryDTO(DTO):
 
 @attr.s(frozen=True, slots=True)
 class EffectiveClassDTO(DTO):
-    class_code = attr.ib(type=str)
-    learning_unit_code = attr.ib(type=str)
-    learning_unit_year = attr.ib(type=int)
+    code = attr.ib(type=str)
     title_fr = attr.ib(type=str)
     title_en = attr.ib(type=str)
     teaching_place_uuid = attr.ib(type=str)
@@ -134,4 +132,4 @@ class EffectiveClassDTO(DTO):
     session_derogation = attr.ib(type=str)
     volume_q1 = attr.ib(type=DurationUnit)
     volume_q2 = attr.ib(type=DurationUnit)
-    class_type = attr.ib(type=str)
+    type = attr.ib(type=str)

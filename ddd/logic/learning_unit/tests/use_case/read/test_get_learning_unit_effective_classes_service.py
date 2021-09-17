@@ -45,9 +45,7 @@ class TestGetLearningUnitEffectiveClassesService(SimpleTestCase):
             learning_unit_year=self.effective_class.learning_unit_identity.year
         )
         self.dto = EffectiveClassDTO(
-            class_code=self.effective_class.class_code,
-            learning_unit_code=self.effective_class.learning_unit_code,
-            learning_unit_year=self.effective_class.year,
+            code=self.effective_class.class_code,
             title_fr=self.effective_class.titles.fr,
             title_en=self.effective_class.titles.en,
             teaching_place_uuid=self.effective_class.teaching_place.uuid,
@@ -55,7 +53,7 @@ class TestGetLearningUnitEffectiveClassesService(SimpleTestCase):
             session_derogation=self.effective_class.session_derogation,
             volume_q1=self.effective_class.volumes.volume_first_quadrimester,
             volume_q2=self.effective_class.volumes.volume_second_quadrimester,
-            class_type=LECTURING if self.effective_class.is_lecturing else PRACTICAL_EXERCISES,
+            type=LECTURING if self.effective_class.is_lecturing else PRACTICAL_EXERCISES,
         )
 
     def test_get_correct_learning_unit(self):
