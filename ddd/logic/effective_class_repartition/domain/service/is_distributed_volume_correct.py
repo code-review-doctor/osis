@@ -26,7 +26,9 @@
 from functools import partial
 
 from base.ddd.utils.business_validator import execute_functions_and_aggregate_exceptions
+from ddd.logic.application.domain.service.i_learning_unit_service import ILearningUnitService
 from ddd.logic.effective_class_repartition.domain.validator.exceptions import AssignedVolumeInvalidValueException
+from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from ddd.logic.learning_unit.domain.model._financial_volumes_repartition import DurationUnit
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
 from osis_common.ddd import interface
@@ -41,10 +43,15 @@ class DistributedVolumeWithClassVolume(interface.DomainService):
             cls,
             distributed_volume: 'DurationUnit',
             effective_class: 'EffectiveClass',
-            learning_unit: 'LearningUnit',
+            learning_unit_service: ILearningUnitService,
     ):
+        learning_unit_id = LearningUnitIdentityBuilder.build_from_code_and_year(
+            effective_class.learning_unit_identity.code,
+            effective_class.learning_unit_identity.year
+        )
+        learning_unit = learning_unit_service.search_learning_unit_annual_volume_dto(learning_unit_id)
         total_class_volume = effective_class.volumes.total_volume \
-            if effective_class.volumes.total_volume else learning_unit.volumes.volume_annual
+            if effective_class.volumes.total_volume else learning_unit.volume
         if distributed_volume:
             execute_functions_and_aggregate_exceptions(
                 partial(_should_be_lower_than_effective_class_volume, distributed_volume, total_class_volume),

@@ -25,7 +25,8 @@
 ##############################################################################
 from typing import List
 
-from ddd.logic.application.dtos import LearningUnitVolumeFromServiceDTO, LearningUnitTutorAttributionFromServiceDTO
+from ddd.logic.application.dtos import LearningUnitVolumeFromServiceDTO, LearningUnitTutorAttributionFromServiceDTO, \
+    LearningUnitAnnualVolumeFromServiceDTO
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 from osis_common.ddd import interface
 
@@ -44,4 +45,10 @@ class ILearningUnitService(interface.DomainService):
             self,
             entity_ids: List[LearningUnitIdentity]
     ) -> List[LearningUnitTutorAttributionFromServiceDTO]:
+        pass
+
+    def search_learning_unit_annual_volume_dto(
+            self,
+            entity_id: LearningUnitIdentity
+    ) -> LearningUnitAnnualVolumeFromServiceDTO:
         pass

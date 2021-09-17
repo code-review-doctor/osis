@@ -23,17 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from ddd.logic.application.domain.service.i_learning_unit_service import ILearningUnitService
 from ddd.logic.effective_class_repartition.builder.tutor_builder import TutorBuilder
 from ddd.logic.effective_class_repartition.builder.tutor_identity_builder import TutorIdentityBuilder
 from ddd.logic.effective_class_repartition.commands import DistributeClassToTutorCommand
 from ddd.logic.effective_class_repartition.domain.model.tutor import TutorIdentity
-from ddd.logic.effective_class_repartition.domain.service.i_tutor_attribution import \
-    ITutorAttributionToLearningUnitTranslator
 from ddd.logic.effective_class_repartition.domain.service.is_distributed_volume_correct import \
     DistributedVolumeWithClassVolume
 from ddd.logic.effective_class_repartition.repository.i_tutor import ITutorRepository
 from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
-from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
 
 
@@ -41,23 +39,17 @@ def distribute_class_to_tutor(
         cmd: DistributeClassToTutorCommand,
         repository: 'ITutorRepository',
         effective_class_repository: 'IEffectiveClassRepository',
-        learning_unit_repository: 'ILearningUnitRepository',
+        learning_unit_service: ILearningUnitService,
 ) -> 'TutorIdentity':
     # GIVEN
     tutor_identity = TutorIdentityBuilder.build_from_personal_id_number(cmd.tutor_personal_id_number)
     tutor = repository.get(tutor_identity) or TutorBuilder.build_from_command(cmd)
     effective_class = effective_class_repository.get(EffectiveClassIdentityBuilder.build_from_command(cmd))
-    learning_unit = learning_unit_repository.get(
-        LearningUnitIdentityBuilder.build_from_code_and_year(
-            effective_class.learning_unit_identity.code,
-            effective_class.learning_unit_identity.year
-        )
-    )
     # WHEN
     DistributedVolumeWithClassVolume().verify(
         distributed_volume=cmd.distributed_volume,
         effective_class=effective_class,
-        learning_unit=learning_unit
+        learning_unit_service=learning_unit_service
     )
     tutor.assign_class(
         effective_class_id=effective_class.entity_id,

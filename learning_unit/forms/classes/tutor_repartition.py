@@ -97,6 +97,7 @@ class ClassRemoveTutorRepartitionForm(DisplayExceptionsByFieldNameMixin, forms.F
             effective_class: 'EffectiveClass' = None,
             tutor: 'TutorAttributionToLearningUnitDTO' = None,
             user: User,
+            learning_unit: 'LearningUnit',
             **kwargs
     ):
         self.user = user

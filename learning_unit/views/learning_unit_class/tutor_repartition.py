@@ -116,6 +116,7 @@ class TutorRepartitionRemoveView(TutorRepartitionView):
         kwargs = super().get_form_kwargs()
         kwargs['tutor'] = self.tutor
         kwargs['user'] = self.request.user
+        kwargs['learning_unit'] = self.learning_unit
         return kwargs
 
     def get_success_msg(self) -> str:

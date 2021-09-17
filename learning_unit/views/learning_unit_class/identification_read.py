@@ -93,6 +93,13 @@ def get_class_type(learning_unit: 'LearningUnit') -> Dict[str, str]:
     }
 
 
+def get_volumes(learning_unit: 'LearningUnit') -> 'Volumes':
+    if learning_unit.has_practical_volume() and not learning_unit.has_lecturing_volume():
+        return learning_unit.practical_part.volumes
+    else:
+        return learning_unit.lecturing_part.volumes
+
+
 def get_related_history(
         learning_unit_year: LearningUnitYear,
         effective_class: 'EffectiveClass'
