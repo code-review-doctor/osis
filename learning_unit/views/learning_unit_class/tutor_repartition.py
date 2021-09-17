@@ -74,6 +74,7 @@ class TutorRepartitionView(CommonClassView, AjaxTemplateMixin, FormView):
         kwargs['effective_class'] = self.effective_class
         kwargs['tutor'] = self.tutor
         kwargs['user'] = self.request.user
+        kwargs['learning_unit'] = self.learning_unit
         return kwargs
 
     def post(self, request, *args, **kwargs):
@@ -81,7 +82,8 @@ class TutorRepartitionView(CommonClassView, AjaxTemplateMixin, FormView):
             request.POST,
             user=request.user,
             tutor=self.tutor,
-            effective_class=self.effective_class
+            effective_class=self.effective_class,
+            learning_unit=self.learning_unit
         )
         try:
             form.save()

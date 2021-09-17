@@ -58,6 +58,7 @@ class ClassTutorRepartitionForm(DisplayExceptionsByFieldNameMixin, forms.Form):
                  effective_class: 'EffectiveClass' = None,
                  tutor: Union['TutorAttributionToLearningUnitDTO', 'TutorClassRepartitionDTO'] = None,
                  user: User,
+                 learning_unit: 'LearningUnit',
                  **kwargs
                  ):
         self.user = user
@@ -69,7 +70,7 @@ class ClassTutorRepartitionForm(DisplayExceptionsByFieldNameMixin, forms.Form):
 
         self.fields['full_name'].initial = tutor.full_name
         self.__init_function()
-        self.fields['class_volume'].initial = self.effective_class.volumes.total_volume
+        self.fields['class_volume'].initial = self.effective_class.volumes.total_volume if self.effective_class.volumes.total_volume else learning_unit.volumes.volume_annual
 
     def __init_function(self):
         if self.tutor:

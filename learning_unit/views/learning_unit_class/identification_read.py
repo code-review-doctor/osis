@@ -58,7 +58,7 @@ class ClassIdentificationView(CommonClassView, TemplateView):
                 'effective_class': self.effective_class,
                 'show_button': True,
                 'class_type': get_class_type(self.learning_unit),
-                'volumes': get_volumes(self.learning_unit),
+                'volumes': self.learning_unit.volumes,
                 'history': get_related_history(self.learning_unit_year, self.effective_class),
                 'language':
                     message_bus_instance.invoke(
@@ -91,13 +91,6 @@ def get_class_type(learning_unit: 'LearningUnit') -> Dict[str, str]:
         'type_title': dict(COMPONENT_TYPES).get(class_type),
         'acronym': DEFAULT_ACRONYM_COMPONENT[class_type]
     }
-
-
-def get_volumes(learning_unit: 'LearningUnit') -> 'Volumes':
-    if learning_unit.has_practical_volume() and not learning_unit.has_lecturing_volume():
-        return learning_unit.practical_part.volumes
-    else:
-        return learning_unit.lecturing_part.volumes
 
 
 def get_related_history(
