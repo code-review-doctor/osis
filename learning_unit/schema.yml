@@ -659,8 +659,7 @@ components:
         organization_name:
           type: string
         derogation_quadrimester:
-          type:
-            $ref: '#/components/schemas/QuadrimesterEnum'
+          $ref: '#/components/schemas/QuadrimesterEnum'
         session_derogation:
           type: string
         volume_q1:
@@ -670,8 +669,7 @@ components:
           type: number
           multipleOf: 0.01
         class_type:
-          type:
-            $ref: '#/components/schemas/ComponentTypeEnum'
+          $ref: '#/components/schemas/ComponentTypeEnum'
     LearningUnitComponent:
       type: object
       properties:
