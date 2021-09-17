@@ -28,7 +28,7 @@ import operator
 from typing import List
 
 from django.db import models
-from django.db.models import Q, F, Subquery, OuterRef
+from django.db.models import Q, F, Subquery, OuterRef, Case, When, Value
 
 from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.attribution_new import AttributionNew
@@ -84,16 +84,27 @@ class LearningUnitTranslator(ILearningUnitService):
             year=F('learning_container_year__academic_year__year'),
             first_name=F('tutor__person__first_name'),
             last_name=F('tutor__person__last_name'),
-            lecturing_volume=Subquery(
+            lecturing_volume_raw=Subquery(
                 subqs.filter(
                     learning_component_year__type=learning_component_year_type.LECTURING
                 ).values('allocation_charge')[:1],
                 output_field=models.DecimalField()
             ),
-            practical_volume=Subquery(
+            practical_volume_raw=Subquery(
                 subqs.filter(
                     learning_component_year__type=learning_component_year_type.PRACTICAL_EXERCISES
                 ).values('allocation_charge')[:1],
+                output_field=models.DecimalField()
+            )
+        ).annotate(
+            lecturing_volume=Case(
+                When(lecturing_volume_raw__isnull=True, then=Value(0)),
+                default=F('lecturing_volume_raw'),
+                output_field=models.DecimalField()
+            ),
+            practical_volume=Case(
+                When(practical_volume_raw__isnull=True, then=Value(0)),
+                default=F('practical_volume_raw'),
                 output_field=models.DecimalField()
             )
         ).values(
