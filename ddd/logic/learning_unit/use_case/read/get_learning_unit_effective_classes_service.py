@@ -36,7 +36,7 @@ def get_learning_unit_effective_classes(
         effective_class_repository: 'IEffectiveClassRepository'
 ) -> List['EffectiveClassDTO']:
     learning_unit_identity = LearningUnitIdentityBuilder.build_from_code_and_year(
-        code=cmd.learning_unit_code,
-        year=cmd.learning_unit_year
+        code=cmd.code_unite_enseignement,
+        year=cmd.annee_unite_enseignement
     )
     return effective_class_repository.search_dtos(learning_unit_id=learning_unit_identity)

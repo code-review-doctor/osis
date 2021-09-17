@@ -57,8 +57,8 @@ class EffectiveClassesList(LanguageContextSerializerMixin, generics.ListAPIView)
     def classes(self) -> List[SimpleNamespace]:
         classes = message_bus_instance.invoke(
             GetClassesEffectivesDepuisUniteDEnseignementCommand(
-                learning_unit_code=self.kwargs['acronym'].upper(),
-                learning_unit_year=self.kwargs['year']
+                code_unite_enseignement=self.kwargs['acronym'].upper(),
+                annee_unite_enseignement=self.kwargs['year']
             )
         )  # type: List[EffectiveClassDTO]
         return self._add_campus_info_to_classes(classes)

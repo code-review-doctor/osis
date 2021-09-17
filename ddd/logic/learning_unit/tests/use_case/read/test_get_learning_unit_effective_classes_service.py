@@ -41,8 +41,8 @@ class TestGetLearningUnitEffectiveClassesService(SimpleTestCase):
         self.effective_class = LecturingEffectiveClassFactory()
         self.effective_class_repository.save(self.effective_class)
         self.command = GetClassesEffectivesDepuisUniteDEnseignementCommand(
-            learning_unit_code=self.effective_class.learning_unit_identity.code,
-            learning_unit_year=self.effective_class.learning_unit_identity.year
+            code_unite_enseignement=self.effective_class.learning_unit_identity.code,
+            annee_unite_enseignement=self.effective_class.learning_unit_identity.year
         )
         self.dto = EffectiveClassDTO(
             code=self.effective_class.class_code,
