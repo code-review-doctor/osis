@@ -29,12 +29,12 @@ from django.db.models import F, QuerySet
 
 from base.models.campus import Campus
 from base.models.enums import learning_component_year_type
-from base.models.enums.learning_unit_year_session import DerogationSession
 from base.models.learning_component_year import LearningComponentYear as LearningComponentYearDb
 from ddd.logic.learning_unit.builder.effective_class_builder import EffectiveClassBuilder
 from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass, EffectiveClassIdentity, \
     LecturingEffectiveClass
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 from ddd.logic.learning_unit.dtos import EffectiveClassFromRepositoryDTO
 from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
 from learning_unit.models.learning_class_year import LearningClassYear as LearningClassYearDb
@@ -59,6 +59,24 @@ class EffectiveClassRepository(IEffectiveClassRepository):
     @classmethod
     def search(cls, entity_ids: Optional[List['EffectiveClassIdentity']] = None, **kwargs) -> List['EffectiveClass']:
         raise NotImplementedError
+
+    @classmethod
+    def search_dtos(
+            cls,
+            learning_unit_id: LearningUnitIdentity = None,
+            **kwargs
+    ) -> List[EffectiveClassFromRepositoryDTO]:
+        qs = _get_common_queryset()
+        if learning_unit_id:
+            qs = qs.filter(
+                learning_component_year__learning_unit_year__acronym=learning_unit_id.code,
+                learning_component_year__learning_unit_year__academic_year__year=learning_unit_id.year,
+            )
+        qs = _annotate_queryset(qs)
+        qs = _values_queryset(qs)
+        return [
+            EffectiveClassFromRepositoryDTO(**effective_class) for effective_class in qs
+        ]
 
     @classmethod
     def delete(cls, entity_id: 'EffectiveClassIdentity', **kwargs: ApplicationService) -> None:

@@ -1,6 +1,6 @@
 ##############################################################################
 #
-# OSIS stands for Open Student Information System. It's an application
+#    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
 #    such as universities, faculties, institutes and professional schools.
 #    The core business involves the administration of students, teachers,
@@ -15,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,25 +23,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
-import string
+from typing import List
 
-import factory.fuzzy
+from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
+from ddd.logic.learning_unit.commands import GetLearningUnitEffectiveClassesCommand
+from ddd.logic.learning_unit.dtos import EffectiveClassFromRepositoryDTO
+from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
 
-from base.tests.factories.organization import OrganizationFactory
 
-
-class CampusFactory(factory.DjangoModelFactory):
-    class Meta:
-        model = 'base.Campus'
-
-    external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-
-    changed = factory.fuzzy.FuzzyNaiveDateTime(
-        datetime.datetime(2016, 1, 1),
-        datetime.datetime(2017, 3, 1)
+def get_learning_unit_effective_classes(
+        cmd: 'GetLearningUnitEffectiveClassesCommand',
+        effective_class_repository: 'IEffectiveClassRepository'
+) -> List['EffectiveClassFromRepositoryDTO']:
+    learning_unit_identity = LearningUnitIdentityBuilder.build_from_code_and_year(
+        code=cmd.learning_unit_code,
+        year=cmd.learning_unit_year
     )
-
-    name = factory.Faker('city')
-    organization = factory.SubFactory(OrganizationFactory)
-    is_administration = False
+    return effective_class_repository.search_dtos(learning_unit_id=learning_unit_identity)

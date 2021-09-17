@@ -27,6 +27,8 @@ import abc
 from typing import List, Optional
 
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity, EffectiveClass
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
+from ddd.logic.learning_unit.dtos import EffectiveClassFromRepositoryDTO
 from osis_common.ddd import interface
 from osis_common.ddd.interface import ApplicationService
 
@@ -36,6 +38,15 @@ class IEffectiveClassRepository(interface.AbstractRepository):
     @classmethod
     @abc.abstractmethod
     def search(cls, entity_ids: Optional[List[EffectiveClassIdentity]] = None, **kwargs) -> List[EffectiveClass]:
+        pass
+
+    @classmethod
+    @abc.abstractmethod
+    def search_dtos(
+            cls,
+            learning_unit_id: Optional[LearningUnitIdentity] = None,
+            **kwargs
+    ) -> List[EffectiveClassFromRepositoryDTO]:
         pass
 
     @classmethod

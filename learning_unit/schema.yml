@@ -170,6 +170,49 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
         - learning_units
+  /learning_units/{year}/{acronym}/classes:
+    get:
+      description: Return the classes of the learning unit
+      operationId: get_learning_unit_classes
+      parameters:
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: integer
+        - in: path
+          name: acronym
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: query
+          name: lang
+          schema:
+            type: string
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EffectiveClass'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - learning_units
   /learning_units/{year}/{acronym}/attributions:
     get:
       description: Return all attributions assign to the learning unit
@@ -598,6 +641,41 @@ components:
             local_url:
               type: string
               format: uri
+    EffectiveClass:
+      type: object
+      properties:
+        class_code:
+          type: string
+        learning_unit_code:
+          type: string
+        learning_unit_year:
+          type: integer
+        title_fr:
+          type: string
+        title_en:
+          type: string
+          nullable: true
+        teaching_place_uuid:
+          type: string
+          format: uuid
+        campus_name:
+          type: string
+        organization_name:
+          type: string
+        derogation_quadrimester:
+          type:
+            $ref: '#/components/schemas/QuadrimesterEnum'
+        session_derogation:
+          type: string
+        volume_q1:
+          type: number
+          multipleOf: 0.01
+        volume_q2:
+          type: number
+          multipleOf: 0.01
+        class_type:
+          type:
+            $ref: '#/components/schemas/ComponentTypeEnum'
     LearningUnitComponent:
       type: object
       properties:
