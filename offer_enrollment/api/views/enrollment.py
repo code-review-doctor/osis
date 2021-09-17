@@ -69,3 +69,17 @@ class MyOfferEnrollmentsListView(LanguageContextSerializerMixin, generics.ListAP
     @cached_property
     def person(self) -> Person:
         return self.request.user.person
+
+
+class MyOfferYearEnrollmentsListView(MyOfferEnrollmentsListView):
+    """
+       Return all offer enrollments of connected user for a specific year
+    """
+    name = 'my_enrollments_year'
+    serializer_class = EnrollmentSerializer
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.filter(
+            education_group_year__academic_year__year=self.kwargs['year']
+        )

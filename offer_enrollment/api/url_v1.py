@@ -25,9 +25,14 @@
 ##############################################################################
 from django.urls import path
 
-from offer_enrollment.api.views.enrollment import MyOfferEnrollmentsListView
+from offer_enrollment.api.views.enrollment import MyOfferEnrollmentsListView, MyOfferYearEnrollmentsListView
 
 app_name = "offer_enrollment"
 urlpatterns = [
     path('my_enrollments/', MyOfferEnrollmentsListView.as_view(), name=MyOfferEnrollmentsListView.name),
+    path(
+        'my_enrollments/<int:year>',
+        MyOfferYearEnrollmentsListView.as_view(),
+        name=MyOfferYearEnrollmentsListView.name
+    ),
 ]
