@@ -23,7 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 # ##############################################################################
-from ddd.logic.admission.preparation.projet_doctoral.builder.proposition_identity_builder import PropositionIdentityBuilder
+from ddd.logic.admission.preparation.projet_doctoral.builder.proposition_identity_builder import \
+    PropositionIdentityBuilder
 from ddd.logic.admission.preparation.projet_doctoral.commands import CompleterPropositionCommand
 from ddd.logic.admission.preparation.projet_doctoral.domain.model.proposition import PropositionIdentity
 from ddd.logic.admission.preparation.projet_doctoral.domain.service.bureau_CDE import BureauCDE
@@ -45,14 +46,25 @@ def completer_proposition(
     # WHEN
     proposition_candidat.completer(
         type_admission=cmd.type_admission,
+        justification=cmd.justification,
         bureau_CDE=cmd.bureau_CDE,
         type_financement=cmd.type_financement,
         type_contrat_travail=cmd.type_contrat_travail,
+        eft=cmd.eft,
+        bourse_recherche=cmd.bourse_recherche,
+        duree_prevue=cmd.duree_prevue,
+        temps_consacre=cmd.temps_consacre,
         titre=cmd.titre_projet,
         resume=cmd.resume_projet,
+        langue_redaction_these=cmd.langue_redaction_these,
+        documents=cmd.documents_projet,
+        graphe_gantt=cmd.graphe_gantt,
+        proposition_programme_doctoral=cmd.proposition_programme_doctoral,
+        projet_formation_complementaire=cmd.projet_formation_complementaire,
         doctorat_deja_realise=cmd.doctorat_deja_realise,
         institution=cmd.institution,
-        documents=cmd.documents_projet,
+        date_soutenance=cmd.date_soutenance,
+        raison_non_soutenue=cmd.raison_non_soutenue,
     )
 
     # THEN

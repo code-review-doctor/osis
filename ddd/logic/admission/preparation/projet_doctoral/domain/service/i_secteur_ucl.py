@@ -25,11 +25,12 @@
 ##############################################################################
 from abc import abstractmethod
 
+from infrastructure.shared_kernel.entite.dtos import EntiteUclDTO
 from osis_common.ddd import interface
 
 
 class ISecteurUclTranslator(interface.DomainService):
     @classmethod
     @abstractmethod
-    def get(cls, sigle_entite: str) -> 'EntiteUclDTO':  # TODO :: réutiliser EntiteUclDTO from shared kernel
+    def get(cls, sigle_entite: str) -> 'EntiteUclDTO':
         pass

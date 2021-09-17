@@ -35,9 +35,12 @@ from ddd.logic.admission.preparation.projet_doctoral.commands import (
     IdentifierMembreCACommand,
     SupprimerMembreCACommand,
     SupprimerPromoteurCommand,
+    SearchPropositionsCommand,
 )
 from ddd.logic.admission.preparation.projet_doctoral.use_case.read.rechercher_doctorats_service import \
     rechercher_doctorats
+from ddd.logic.admission.preparation.projet_doctoral.use_case.read.rechercher_propositions_service import \
+    rechercher_propositions
 from ddd.logic.admission.preparation.projet_doctoral.use_case.write.approuver_proposition_service import \
     approuver_proposition
 from ddd.logic.admission.preparation.projet_doctoral.use_case.write.completer_proposition_service import \
@@ -116,6 +119,10 @@ class MessageBusInMemory:
             cmd,
             PropositionInMemoryRepository(),
             GroupeDeSupervisionInMemoryRepository(),
+        ),
+        SearchPropositionsCommand: lambda cmd: rechercher_propositions(
+            cmd,
+            PropositionInMemoryRepository(),
         ),
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 

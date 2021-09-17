@@ -23,17 +23,30 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.admission.preparation.projet_doctoral.builder.proposition_identity_builder import PropositionIdentityBuilder
+from ddd.logic.admission.preparation.projet_doctoral.builder.proposition_identity_builder import \
+    PropositionIdentityBuilder
 from ddd.logic.admission.preparation.projet_doctoral.commands import InitierPropositionCommand
 from ddd.logic.admission.preparation.projet_doctoral.domain.model._detail_projet import DetailProjet
-from ddd.logic.admission.preparation.projet_doctoral.domain.model._experience_precedente_recherche import ExperiencePrecedenteRecherche, \
-    ChoixDoctoratDejaRealise, aucune_experience_precedente_recherche
-from ddd.logic.admission.preparation.projet_doctoral.domain.model._financement import Financement, ChoixTypeFinancement, \
-    financement_non_rempli
+from ddd.logic.admission.preparation.projet_doctoral.domain.model._experience_precedente_recherche import (
+    ExperiencePrecedenteRecherche,
+    ChoixDoctoratDejaRealise,
+    aucune_experience_precedente_recherche,
+)
+from ddd.logic.admission.preparation.projet_doctoral.domain.model._financement import (
+    Financement, ChoixTypeFinancement,
+    financement_non_rempli,
+)
 from ddd.logic.admission.preparation.projet_doctoral.domain.model.doctorat import DoctoratIdentity
-from ddd.logic.admission.preparation.projet_doctoral.domain.model.proposition import Proposition, ChoixStatusProposition, ChoixTypeAdmission, \
-    ChoixBureauCDE
-from ddd.logic.admission.preparation.projet_doctoral.domain.validator.validator_by_business_action import InitierPropositionValidatorList
+from ddd.logic.admission.preparation.projet_doctoral.domain.model.proposition import (
+    Proposition,
+)
+from ddd.logic.admission.preparation.projet_doctoral.domain.model._enums import (
+    ChoixBureauCDE,
+    ChoixStatusProposition,
+    ChoixTypeAdmission,
+)
+from ddd.logic.admission.preparation.projet_doctoral.domain.validator.validator_by_business_action import \
+    InitierPropositionValidatorList
 from osis_common.ddd import interface
 
 
@@ -65,6 +78,7 @@ class PropositionBuilder(interface.RootEntityBuilder):
         return Proposition(
             entity_id=PropositionIdentityBuilder.build(),
             status=ChoixStatusProposition.IN_PROGRESS,
+            justification=cmd.justification,
             type_admission=ChoixTypeAdmission[cmd.type_admission],
             doctorat_id=doctorat_id,
             matricule_candidat=cmd.matricule_candidat,
@@ -80,6 +94,10 @@ def _build_financement(cmd: 'InitierPropositionCommand'):
         return Financement(
             type=ChoixTypeFinancement[cmd.type_financement],
             type_contrat_travail=cmd.type_contrat_travail,
+            eft=cmd.eft,
+            bourse_recherche=cmd.bourse_recherche,
+            duree_prevue=cmd.duree_prevue,
+            temps_consacre=cmd.temps_consacre,
         )
     return financement_non_rempli
 
@@ -89,6 +107,10 @@ def _build_projet(cmd: 'InitierPropositionCommand') -> 'DetailProjet':
         titre=cmd.titre_projet,
         resume=cmd.resume_projet,
         documents=cmd.documents_projet,
+        langue_redaction_these=cmd.langue_redaction_these,
+        graphe_gantt=cmd.graphe_gantt,
+        proposition_programme_doctoral=cmd.proposition_programme_doctoral,
+        projet_formation_complementaire=cmd.projet_formation_complementaire,
     )
 
 
@@ -98,4 +120,6 @@ def _build_experience_precedente_recherche(cmd: 'InitierPropositionCommand') -> 
     return ExperiencePrecedenteRecherche(
         doctorat_deja_realise=ChoixDoctoratDejaRealise[cmd.doctorat_deja_realise],
         institution=cmd.institution,
+        date_soutenance=cmd.date_soutenance,
+        raison_non_soutenue=cmd.raison_non_soutenue,
     )

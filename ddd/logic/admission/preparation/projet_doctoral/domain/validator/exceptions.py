@@ -117,3 +117,9 @@ class DejaMembreCAException(BusinessException):
     def __init__(self, **kwargs):
         message = _("Already a member of CA.")
         super().__init__(message, **kwargs)
+
+
+class JustificationRequiseException(BusinessException):
+    def __init__(self, **kwargs):
+        message = _("A justification is needed when creating a pre-admission.")
+        super().__init__(message, **kwargs)

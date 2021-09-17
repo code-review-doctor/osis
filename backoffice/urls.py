@@ -71,8 +71,6 @@ if 'continuing_education' in settings.INSTALLED_APPS:
 if 'admission' in settings.INSTALLED_APPS:
     urlpatterns += (
         url(r'^admissions/', include('admission.urls', namespace='admissions')),
-        # API
-        url(r'^admissions/v1/', include('admission.api.urls_v1', namespace='admission_api_v1')),
     )
 if 'osis_mail_template' in settings.INSTALLED_APPS:
     urlpatterns += (url(r'^osis_mail_template/', include('osis_mail_template.urls')),)

@@ -23,7 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Union, List, Optional
+import datetime
+from typing import List, Optional, Union
 
 import attr
 
@@ -93,6 +94,7 @@ class CurriculumDTO(interface.DTO):
 class PropositionDTO(interface.DTO):
     type_admission = attr.ib(type=str)
     sigle_doctorat = attr.ib(type=str)
+    annee_doctorat = attr.ib(type=int)
     intitule_doctorat_fr = attr.ib(type=str)
     intitule_doctorat_en = attr.ib(type=str)
     matricule_candidat = attr.ib(type=str)
@@ -102,11 +104,36 @@ class PropositionDTO(interface.DTO):
     )  # CDE = Comission Doctorale du domaine Sciences Economique et de Gestion
     type_financement = attr.ib(type=Optional[str])
     type_contrat_travail = attr.ib(type=Optional[str])
+    eft = attr.ib(type=Optional[int])
+    bourse_recherche = attr.ib(type=Optional[str])
+    duree_prevue = attr.ib(type=Optional[int])
+    temps_consacre = attr.ib(type=Optional[int])
     titre_projet = attr.ib(type=Optional[str])
     resume_projet = attr.ib(type=Optional[str])
     documents_projet = attr.ib(type=List[str])  # str == UUID
+    graphe_gantt = attr.ib(type=List[str])
+    proposition_programme_doctoral = attr.ib(type=List[str])
+    projet_formation_complementaire = attr.ib(type=List[str])
+    langue_redaction_these = attr.ib(type=str)
     doctorat_deja_realise = attr.ib(type=str)
     institution = attr.ib(type=Optional[str])
+    date_soutenance = attr.ib(type=Optional[datetime.date])
+    raison_non_soutenue = attr.ib(type=Optional[str])
+
+
+@attr.s(frozen=True, slots=True)
+class PropositionSearchDTO(interface.DTO):
+    uuid = attr.ib(type=str)
+    type_admission = attr.ib(type=str)
+    sigle_doctorat = attr.ib(type=str)
+    intitule_doctorat_fr = attr.ib(type=str)
+    intitule_doctorat_en = attr.ib(type=str)
+    matricule_candidat = attr.ib(type=str)
+    code_secteur_formation = attr.ib(type=str)
+    bureau_CDE = attr.ib(
+        type=Optional[str],
+    )  # CDE = Comission Doctorale du domaine Sciences Economique et de Gestion
+    created_at = attr.ib(type=datetime.datetime)
 
 
 @attr.s(frozen=True, slots=True)

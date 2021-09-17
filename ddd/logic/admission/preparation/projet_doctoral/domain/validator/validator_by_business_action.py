@@ -35,6 +35,8 @@ from ddd.logic.admission.preparation.projet_doctoral.domain.model._promoteur imp
 from ddd.logic.admission.preparation.projet_doctoral.domain.model._membre_CA import MembreCAIdentity
 from ddd.logic.admission.preparation.projet_doctoral.domain.validator._should_institution_dependre_doctorat_realise import \
     ShouldInstitutionDependreDoctoratRealise
+from ddd.logic.admission.preparation.projet_doctoral.domain.validator._should_justification_donnee_si_preadmission import \
+    ShouldJustificationDonneeSiPreadmission
 from ddd.logic.admission.preparation.projet_doctoral.domain.validator._should_membre_CA_etre_dans_groupe_de_supervision import \
     ShouldMembreCAEtreDansGroupeDeSupervision
 from ddd.logic.admission.preparation.projet_doctoral.domain.validator._should_membre_CA_pas_deja_present_dans_groupe_de_supervision import \
@@ -55,7 +57,9 @@ from ddd.logic.admission.preparation.projet_doctoral.domain.validator._should_ty
 
 @attr.s(frozen=True, slots=True)
 class InitierPropositionValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
+    type_admission = attr.ib(type=str)
     type_financement = attr.ib(type=str)
+    justification = attr.ib(type=Optional[str], default='')
     type_contrat_travail = attr.ib(type=Optional[str], default='')
     doctorat_deja_realise = attr.ib(type=str, default=ChoixDoctoratDejaRealise.NO.name)
     institution = attr.ib(type=Optional[str], default='')
@@ -65,6 +69,7 @@ class InitierPropositionValidatorList(TwoStepsMultipleBusinessExceptionListValid
 
     def get_invariants_validators(self) -> List[BusinessValidator]:
         return [
+            ShouldJustificationDonneeSiPreadmission(self.type_admission, self.justification),
             ShouldTypeContratTravailDependreTypeFinancement(self.type_financement, self.type_contrat_travail),
             ShouldInstitutionDependreDoctoratRealise(self.doctorat_deja_realise, self.institution),
         ]
@@ -72,7 +77,9 @@ class InitierPropositionValidatorList(TwoStepsMultipleBusinessExceptionListValid
 
 @attr.s(frozen=True, slots=True)
 class CompletionPropositionValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
+    type_admission = attr.ib(type=str)
     type_financement = attr.ib(type=str)
+    justification = attr.ib(type=Optional[str], default='')
     type_contrat_travail = attr.ib(type=Optional[str], default='')
     doctorat_deja_realise = attr.ib(type=str, default=ChoixDoctoratDejaRealise.NO.name)
     institution = attr.ib(type=Optional[str], default='')
@@ -82,6 +89,7 @@ class CompletionPropositionValidatorList(TwoStepsMultipleBusinessExceptionListVa
 
     def get_invariants_validators(self) -> List[BusinessValidator]:
         return [
+            ShouldJustificationDonneeSiPreadmission(self.type_admission, self.justification),
             ShouldTypeContratTravailDependreTypeFinancement(self.type_financement, self.type_contrat_travail),
             ShouldInstitutionDependreDoctoratRealise(self.doctorat_deja_realise, self.institution),
         ]

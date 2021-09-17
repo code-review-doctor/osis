@@ -35,8 +35,10 @@ from ddd.logic.admission.preparation.projet_doctoral.domain.model._financement i
 from ddd.logic.admission.preparation.projet_doctoral.domain.model.proposition import (
     PropositionIdentity,
     Proposition,
-    ChoixTypeAdmission,
+)
+from ddd.logic.admission.preparation.projet_doctoral.domain.model._enums import (
     ChoixStatusProposition,
+    ChoixTypeAdmission,
 )
 from ddd.logic.admission.preparation.projet_doctoral.test.factory.doctorat import _DoctoratIdentityFactory
 

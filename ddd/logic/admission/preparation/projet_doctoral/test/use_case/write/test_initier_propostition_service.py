@@ -33,8 +33,8 @@ from ddd.logic.admission.preparation.projet_doctoral.domain.model._experience_pr
 )
 from ddd.logic.admission.preparation.projet_doctoral.domain.model._financement import ChoixTypeFinancement, \
     financement_non_rempli
-from ddd.logic.admission.preparation.projet_doctoral.domain.model.proposition import ChoixTypeAdmission, Proposition, \
-    ChoixBureauCDE
+from ddd.logic.admission.preparation.projet_doctoral.domain.model.proposition import Proposition
+from ddd.logic.admission.preparation.projet_doctoral.domain.model._enums import ChoixBureauCDE, ChoixTypeAdmission
 from ddd.logic.admission.preparation.projet_doctoral.domain.validator.exceptions import (
     MaximumPropositionsAtteintException,
     DoctoratNonTrouveException, BureauCDEInconsistantException,

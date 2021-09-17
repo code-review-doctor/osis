@@ -42,6 +42,10 @@ class ChoixTypeFinancement(ChoiceEnum):
 class Financement(interface.ValueObject):
     type = attr.ib(type=Union[ChoixTypeFinancement, str])
     type_contrat_travail = attr.ib(type=Optional[str], default='')
+    eft = attr.ib(type=Optional[int], default=None)
+    bourse_recherche = attr.ib(type=Optional[str], default='')
+    duree_prevue = attr.ib(type=Optional[int], default=None)
+    temps_consacre = attr.ib(type=Optional[int], default=None)
 
 
 financement_non_rempli = Financement(

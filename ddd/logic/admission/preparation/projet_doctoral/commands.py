@@ -23,10 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
 from typing import List, Optional
 
 import attr
 
+from ddd.logic.admission.preparation.projet_doctoral.domain.model._detail_projet import ChoixLangueRedactionThese
 from ddd.logic.admission.preparation.projet_doctoral.domain.model._experience_precedente_recherche import \
     ChoixDoctoratDejaRealise
 from osis_common.ddd import interface
@@ -40,34 +42,56 @@ class InitierPropositionCommand(interface.CommandRequest):
     sigle_formation = attr.ib(type=str)
     annee_formation = attr.ib(type=int)
     matricule_candidat = attr.ib(type=str)
+    justification = attr.ib(type=Optional[str], default='')
     bureau_CDE = attr.ib(
         type=Optional[str],
         default='',
     )  # CDE = Comission Doctorale du domaine Sciences Economique et de Gestion
     type_financement = attr.ib(type=Optional[str], default='')
     type_contrat_travail = attr.ib(type=Optional[str], default='')
+    eft = attr.ib(type=Optional[int], default=None)
+    bourse_recherche = attr.ib(type=Optional[str], default='')
+    duree_prevue = attr.ib(type=Optional[int], default=None)
+    temps_consacre = attr.ib(type=Optional[int], default=None)
     titre_projet = attr.ib(type=Optional[str], default='')
     resume_projet = attr.ib(type=Optional[str], default='')
     documents_projet = attr.ib(type=List[UUID], factory=list)
+    graphe_gantt = attr.ib(type=List[UUID], factory=list)
+    proposition_programme_doctoral = attr.ib(type=List[UUID], factory=list)
+    projet_formation_complementaire = attr.ib(type=List[UUID], factory=list)
+    langue_redaction_these = attr.ib(type=str, default=ChoixLangueRedactionThese.UNDECIDED.name)
     doctorat_deja_realise = attr.ib(type=str, default=ChoixDoctoratDejaRealise.NO.name)
     institution = attr.ib(type=Optional[str], default='')
+    date_soutenance = attr.ib(type=Optional[datetime.date], default=None)
+    raison_non_soutenue = attr.ib(type=Optional[str], default='')
 
 
 @attr.s(frozen=True, slots=True)
 class CompleterPropositionCommand(interface.CommandRequest):
     uuid = attr.ib(type=str)
     type_admission = attr.ib(type=str)
+    justification = attr.ib(type=Optional[str], default='')
     bureau_CDE = attr.ib(
         type=Optional[str],
         default='',
     )  # CDE = Comission Doctorale du domaine Sciences Economique et de Gestion
     type_financement = attr.ib(type=Optional[str], default='')
     type_contrat_travail = attr.ib(type=Optional[str], default='')
+    eft = attr.ib(type=Optional[int], default=None)
+    bourse_recherche = attr.ib(type=Optional[str], default='')
+    duree_prevue = attr.ib(type=Optional[int], default=None)
+    temps_consacre = attr.ib(type=Optional[int], default=None)
     titre_projet = attr.ib(type=Optional[str], default='')
     resume_projet = attr.ib(type=Optional[str], default='')
     documents_projet = attr.ib(type=List[UUID], factory=list)
+    graphe_gantt = attr.ib(type=List[UUID], factory=list)
+    proposition_programme_doctoral = attr.ib(type=List[UUID], factory=list)
+    projet_formation_complementaire = attr.ib(type=List[UUID], factory=list)
+    langue_redaction_these = attr.ib(type=str, default=ChoixLangueRedactionThese.UNDECIDED.name)
     doctorat_deja_realise = attr.ib(type=str, default=ChoixDoctoratDejaRealise.NO.name)
     institution = attr.ib(type=Optional[str], default='')
+    date_soutenance = attr.ib(type=Optional[datetime.date], default=None)
+    raison_non_soutenue = attr.ib(type=Optional[str], default='')
 
 
 @attr.s(frozen=True, slots=True)
@@ -122,6 +146,11 @@ class DefinirCotutelleCommand(interface.CommandRequest):
     motivation = attr.ib(type=Optional[str], default='')
     institution = attr.ib(type=Optional[str], default='')
     uuid_document_demande_ouverture = attr.ib(type=Optional[str], default='')
+
+
+@attr.s(frozen=True, slots=True)
+class SearchPropositionsCommand(interface.CommandRequest):
+    matricule_candidat = attr.ib(type=Optional[str], default='')
 
 
 @attr.s(frozen=True, slots=True)

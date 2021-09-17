@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from ddd.logic.admission.preparation.projet_doctoral.builder.proposition_identity_builder import \
+    PropositionIdentityBuilder
 from ddd.logic.admission.preparation.projet_doctoral.domain.service.i_doctorat import IDoctoratTranslator
 from ddd.logic.admission.preparation.projet_doctoral.domain.service.i_secteur_ucl import ISecteurUclTranslator
 from ddd.logic.admission.preparation.projet_doctoral.dtos import PropositionDTO
@@ -39,4 +41,32 @@ class PropositionDto(interface.DomainService):
             doctorat_translator: 'IDoctoratTranslator',
             secteur_ucl_translator: 'ISecteurUclTranslator',
     ) -> 'PropositionDTO':
-        raise NotImplementedError
+        proposition = repository.get(PropositionIdentityBuilder.build_from_uuid(uuid_proposition))
+        doctorat = doctorat_translator.search(proposition.doctorat_id.sigle, proposition.doctorat_id.annee)[0]
+        return PropositionDTO(
+            type_admission=proposition.type_admission.name,
+            sigle_doctorat=proposition.doctorat_id.sigle,
+            annee_doctorat=proposition.doctorat_id.annee,
+            intitule_doctorat_fr=doctorat.intitule_fr,
+            intitule_doctorat_en=doctorat.intitule_en,
+            matricule_candidat=proposition.matricule_candidat,
+            code_secteur_formation=secteur_ucl_translator.get(doctorat.sigle_entite_gestion).sigle,
+            bureau_CDE=proposition.bureau_CDE,
+            type_financement=proposition.financement.type.name,
+            type_contrat_travail=proposition.financement.type_contrat_travail,
+            eft=proposition.financement.eft,
+            bourse_recherche=proposition.financement.bourse_recherche,
+            duree_prevue=proposition.financement.duree_prevue,
+            temps_consacre=proposition.financement.temps_consacre,
+            titre_projet=proposition.projet.titre,
+            resume_projet=proposition.projet.resume,
+            documents_projet=proposition.projet.documents,
+            graphe_gantt=proposition.projet.graphe_gantt,
+            proposition_programme_doctoral=proposition.projet.proposition_programme_doctoral,
+            projet_formation_complementaire=proposition.projet.projet_formation_complementaire,
+            langue_redaction_these=proposition.projet.langue_redaction_these,
+            doctorat_deja_realise=proposition.experience_precedente_recherche.doctorat_deja_realise.name,
+            institution=proposition.experience_precedente_recherche.institution,
+            date_soutenance=proposition.experience_precedente_recherche.date_soutenance,
+            raison_non_soutenue=proposition.experience_precedente_recherche.raison_non_soutenue,
+        )

@@ -1,4 +1,4 @@
-##############################################################################
+# ##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -22,30 +22,18 @@
 #    at the root of the source code of this program.  If not,
 #    see http://www.gnu.org/licenses/.
 #
-##############################################################################
+# ##############################################################################
 from typing import List
 
-import attr
-import uuid
-
-from django.utils.translation import gettext_lazy as _
-
-from base.models.utils.utils import ChoiceEnum
-from osis_common.ddd import interface
+from ddd.logic.admission.preparation.projet_doctoral.commands import SearchPropositionsCommand
+from ddd.logic.admission.preparation.projet_doctoral.dtos import PropositionSearchDTO
+from ddd.logic.admission.preparation.projet_doctoral.repository.i_proposition import IPropositionRepository
 
 
-class ChoixLangueRedactionThese(ChoiceEnum):
-    FRENCH = _('French')
-    ENGLISH = _('English')
-    UNDECIDED = _('Undecided')
-
-
-@attr.s(frozen=True, slots=True)
-class DetailProjet(interface.ValueObject):
-    titre = attr.ib(type=str, default='')
-    resume = attr.ib(type=str, default='')
-    langue_redaction_these = attr.ib(type=ChoixLangueRedactionThese, default=ChoixLangueRedactionThese.UNDECIDED)
-    documents = attr.ib(type=List[uuid.UUID], factory=list)
-    graphe_gantt = attr.ib(type=List[uuid.UUID], factory=list)
-    proposition_programme_doctoral = attr.ib(type=List[uuid.UUID], factory=list)
-    projet_formation_complementaire = attr.ib(type=List[uuid.UUID], factory=list)
+def rechercher_propositions(
+        cmd: 'SearchPropositionsCommand',
+        proposition_repository: 'IPropositionRepository',
+) -> List['PropositionSearchDTO']:
+    return proposition_repository.search_dto(
+        matricule_candidat=cmd.matricule_candidat,
+    )

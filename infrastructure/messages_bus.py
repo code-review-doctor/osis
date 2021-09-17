@@ -28,14 +28,17 @@ from typing import Callable, Dict, List
 from ddd.logic.admission.preparation.projet_doctoral.commands import (
     ApprouverPropositionCommand,
     CompleterPropositionCommand,
-    DemanderSignatureCommand, IdentifierPromoteurCommand,
+    DemanderSignatureCommand, GetPropositionCommand, IdentifierPromoteurCommand,
     InitierPropositionCommand,
     SearchDoctoratCommand,
-    SupprimerMembreCACommand,
+    SearchPropositionsCommand, SupprimerMembreCACommand,
     SupprimerPromoteurCommand,
 )
+from ddd.logic.admission.preparation.projet_doctoral.use_case.read.get_proposition_service import get_proposition
 from ddd.logic.admission.preparation.projet_doctoral.use_case.read.rechercher_doctorats_service import \
     rechercher_doctorats
+from ddd.logic.admission.preparation.projet_doctoral.use_case.read.rechercher_propositions_service import \
+    rechercher_propositions
 from ddd.logic.admission.preparation.projet_doctoral.use_case.write.approuver_proposition_service import \
     approuver_proposition
 from ddd.logic.admission.preparation.projet_doctoral.use_case.write.completer_proposition_service import \
@@ -124,6 +127,7 @@ from infrastructure.admission.preparation.projet_doctoral.domain.service.constit
     ConstitutionSupervisionService
 from infrastructure.admission.preparation.projet_doctoral.domain.service.doctorat import DoctoratTranslator
 from infrastructure.admission.preparation.projet_doctoral.domain.service.promoteur import PromoteurTranslator
+from infrastructure.admission.preparation.projet_doctoral.domain.service.secteur_ucl import SecteurUclTranslator
 from infrastructure.admission.preparation.projet_doctoral.repository.groupe_de_supervision import \
     GroupeDeSupervisionRepository
 from infrastructure.admission.preparation.projet_doctoral.repository.proposition import PropositionRepository
@@ -250,6 +254,16 @@ class MessageBus:
             cmd,
             PropositionRepository(),
             DoctoratTranslator(),
+        ),
+        SearchPropositionsCommand: lambda cmd: rechercher_propositions(
+            cmd,
+            PropositionRepository(),
+        ),
+        GetPropositionCommand: lambda cmd: get_proposition(
+            cmd,
+            PropositionRepository(),
+            DoctoratTranslator(),
+            SecteurUclTranslator(),
         ),
         CompleterPropositionCommand: lambda cmd: completer_proposition(
             cmd,

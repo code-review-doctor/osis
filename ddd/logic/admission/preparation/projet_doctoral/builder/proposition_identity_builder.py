@@ -26,10 +26,13 @@
 import uuid
 
 from ddd.logic.admission.preparation.projet_doctoral.domain.model.proposition import PropositionIdentity
-from osis_common.ddd.interface import EntityIdentityBuilder, DTO
+from osis_common.ddd.interface import CommandRequest, EntityIdentity, EntityIdentityBuilder, DTO
 
 
 class PropositionIdentityBuilder(EntityIdentityBuilder):
+    @classmethod
+    def build_from_command(cls, cmd: 'CommandRequest') -> 'EntityIdentity':
+        raise NotImplementedError
 
     @classmethod
     def build_from_repository_dto(cls, dto_object: 'DTO') -> 'PropositionIdentity':

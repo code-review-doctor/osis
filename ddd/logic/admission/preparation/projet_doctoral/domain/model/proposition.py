@@ -23,13 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+from typing import List, Optional
 
 import attr
-from django.utils.translation import gettext_lazy as _
 
-from base.models.utils.utils import ChoiceEnum
 from ddd.logic.admission.preparation.projet_doctoral.domain.model._detail_projet import DetailProjet
+from ddd.logic.admission.preparation.projet_doctoral.domain.model._enums import (
+    ChoixBureauCDE,
+    ChoixStatusProposition,
+    ChoixTypeAdmission,
+)
 from ddd.logic.admission.preparation.projet_doctoral.domain.model._experience_precedente_recherche import (
     ExperiencePrecedenteRecherche,
     aucune_experience_precedente_recherche, ChoixDoctoratDejaRealise,
@@ -46,22 +49,6 @@ from ddd.logic.admission.preparation.projet_doctoral.domain.validator.validator_
 from osis_common.ddd import interface
 
 
-class ChoixStatusProposition(ChoiceEnum):
-    CANCELLED = _('CANCELLED')
-    IN_PROGRESS = _('IN_PROGRESS')
-    SUBMITTED = _('SUBMITTED')
-
-
-class ChoixBureauCDE(ChoiceEnum):
-    ECONOMY = _('ECONOMY')
-    MANAGEMENT = _('MANAGEMENT')
-
-
-class ChoixTypeAdmission(ChoiceEnum):
-    ADMISSION = _('ADMISSION')
-    PRE_ADMISSION = _('PRE_ADMISSION')
-
-
 @attr.s(frozen=True, slots=True)
 class PropositionIdentity(interface.EntityIdentity):
     uuid = attr.ib(type=str)
@@ -74,10 +61,11 @@ class Proposition(interface.RootEntity):
     doctorat_id = attr.ib(type=DoctoratIdentity)
     matricule_candidat = attr.ib(type=str)
     projet = attr.ib(type=DetailProjet)
+    justification = attr.ib(type=Optional[str], default='')
     status = attr.ib(type=ChoixStatusProposition, default=ChoixStatusProposition.IN_PROGRESS)
     bureau_CDE = attr.ib(
-        type=ChoixBureauCDE,
-        default=None,
+        type=Optional[ChoixBureauCDE],
+        default='',
     )  # CDE = Comission Doctorale du domaine Sciences Economique et de Gestion
     financement = attr.ib(type=Financement, default=financement_non_rempli)
     experience_precedente_recherche = attr.ib(
@@ -99,53 +87,120 @@ class Proposition(interface.RootEntity):
     def completer(
             self,
             type_admission: str,
+            justification: str,
             bureau_CDE: str,
             type_financement: str,
             type_contrat_travail: str,
+            eft: str,
+            bourse_recherche: str,
+            duree_prevue: str,
+            temps_consacre: str,
+            langue_redaction_these: str,
             titre: str,
             resume: str,
             doctorat_deja_realise: str,
             institution: str,
+            date_soutenance: str,
+            raison_non_soutenue: str,
             documents: List[str] = None,
+            graphe_gantt: List[str] = None,
+            proposition_programme_doctoral: List[str] = None,
+            projet_formation_complementaire: List[str] = None,
     ) -> None:
         CompletionPropositionValidatorList(
+            type_admission=type_admission,
             type_financement=type_financement,
+            justification=justification,
             type_contrat_travail=type_contrat_travail,
             doctorat_deja_realise=doctorat_deja_realise,
             institution=institution,
         ).validate()
-        self._completer_proposition(type_admission, bureau_CDE)
-        self._completer_financement(type_financement, type_contrat_travail)
-        self._completer_projet(titre, resume, documents)
-        self._completer_experience_precedente(doctorat_deja_realise, institution)
+        self._completer_proposition(type_admission, justification, bureau_CDE)
+        self._completer_financement(
+            type=type_financement,
+            type_contrat_travail=type_contrat_travail,
+            eft=eft,
+            bourse_recherche=bourse_recherche,
+            duree_prevue=duree_prevue,
+            temps_consacre=temps_consacre,
+        )
+        self._completer_projet(
+            titre=titre,
+            resume=resume,
+            langue_redaction_these=langue_redaction_these,
+            documents=documents,
+            graphe_gantt=graphe_gantt,
+            proposition_programme_doctoral=proposition_programme_doctoral,
+            projet_formation_complementaire=projet_formation_complementaire,
+        )
+        self._completer_experience_precedente(
+            doctorat_deja_realise=doctorat_deja_realise,
+            institution=institution,
+            date_soutenance=date_soutenance,
+            raison_non_soutenue=raison_non_soutenue,
+        )
 
-    def _completer_proposition(self, type_admission: str, bureau_CDE: str):
+    def _completer_proposition(self, type_admission: str, justification: str, bureau_CDE: str):
         self.type_admission = ChoixTypeAdmission[type_admission]
+        self.justification = justification
         self.bureau_CDE = ChoixBureauCDE[bureau_CDE] if bureau_CDE else ''
 
-    def _completer_financement(self, type: str, type_contrat_travail: str):
+    def _completer_financement(
+            self,
+            type: str,
+            type_contrat_travail: str,
+            eft: str,
+            bourse_recherche: str,
+            duree_prevue: str,
+            temps_consacre: str,
+    ):
         if type:
             self.financement = Financement(
                 type=ChoixTypeFinancement[type],
                 type_contrat_travail=type_contrat_travail,
+                eft=eft,
+                bourse_recherche=bourse_recherche,
+                duree_prevue=duree_prevue,
+                temps_consacre=temps_consacre,
             )
         else:
             self.financement = financement_non_rempli
 
-    def _completer_projet(self, titre: str, resume: str, documents: List[str] = None):
+    def _completer_projet(
+            self,
+            titre: str,
+            resume: str,
+            langue_redaction_these: str,
+            documents: List[str] = None,
+            graphe_gantt: List[str] = None,
+            proposition_programme_doctoral: List[str] = None,
+            projet_formation_complementaire: List[str] = None,
+    ):
         self.projet = DetailProjet(
             titre=titre,
             resume=resume,
             documents=documents,
+            langue_redaction_these=langue_redaction_these,
+            graphe_gantt=graphe_gantt,
+            proposition_programme_doctoral=proposition_programme_doctoral,
+            projet_formation_complementaire=projet_formation_complementaire,
         )
 
-    def _completer_experience_precedente(self, doctorat_deja_realise: str, institution: str):
+    def _completer_experience_precedente(
+            self,
+            doctorat_deja_realise: str,
+            institution: str,
+            date_soutenance: str,
+            raison_non_soutenue: str,
+    ):
         if doctorat_deja_realise == ChoixDoctoratDejaRealise.NO.name:
             self.experience_precedente_recherche = aucune_experience_precedente_recherche
         else:
             self.experience_precedente_recherche = ExperiencePrecedenteRecherche(
                 doctorat_deja_realise=ChoixDoctoratDejaRealise[doctorat_deja_realise],
                 institution=institution,
+                date_soutenance=date_soutenance,
+                raison_non_soutenue=raison_non_soutenue,
             )
 
     def verifier(self):

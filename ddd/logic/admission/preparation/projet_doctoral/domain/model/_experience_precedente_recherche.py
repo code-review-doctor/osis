@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
 from typing import Optional
 
 import attr
@@ -42,6 +43,8 @@ class ChoixDoctoratDejaRealise(ChoiceEnum):
 class ExperiencePrecedenteRecherche(interface.ValueObject):
     doctorat_deja_realise = attr.ib(type=ChoixDoctoratDejaRealise, default=ChoixDoctoratDejaRealise.NO)
     institution = attr.ib(type=Optional[str], default='')
+    date_soutenance = attr.ib(type=Optional[datetime.date], default=None)
+    raison_non_soutenue = attr.ib(type=Optional[str], default='')
 
 
 aucune_experience_precedente_recherche = ExperiencePrecedenteRecherche(

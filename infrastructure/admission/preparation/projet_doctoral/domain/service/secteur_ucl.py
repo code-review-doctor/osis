@@ -1,4 +1,4 @@
-##############################################################################
+# ##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -22,30 +22,19 @@
 #    at the root of the source code of this program.  If not,
 #    see http://www.gnu.org/licenses/.
 #
-##############################################################################
-from typing import List
-
-import attr
-import uuid
-
-from django.utils.translation import gettext_lazy as _
-
-from base.models.utils.utils import ChoiceEnum
-from osis_common.ddd import interface
+# ##############################################################################
+from admission.contrib.models import EntityProxy
+from base.models.entity import Entity
+from ddd.logic.admission.preparation.projet_doctoral.domain.service.i_secteur_ucl import ISecteurUclTranslator
+from infrastructure.shared_kernel.entite.dtos import EntiteUclDTO
 
 
-class ChoixLangueRedactionThese(ChoiceEnum):
-    FRENCH = _('French')
-    ENGLISH = _('English')
-    UNDECIDED = _('Undecided')
-
-
-@attr.s(frozen=True, slots=True)
-class DetailProjet(interface.ValueObject):
-    titre = attr.ib(type=str, default='')
-    resume = attr.ib(type=str, default='')
-    langue_redaction_these = attr.ib(type=ChoixLangueRedactionThese, default=ChoixLangueRedactionThese.UNDECIDED)
-    documents = attr.ib(type=List[uuid.UUID], factory=list)
-    graphe_gantt = attr.ib(type=List[uuid.UUID], factory=list)
-    proposition_programme_doctoral = attr.ib(type=List[uuid.UUID], factory=list)
-    projet_formation_complementaire = attr.ib(type=List[uuid.UUID], factory=list)
+class SecteurUclTranslator(ISecteurUclTranslator):
+    @classmethod
+    def get(cls, sigle_entite: str) -> 'EntiteUclDTO':
+        # FIXME use command from shared kernel
+        entity = Entity.objects.get(entityversion__acronym=sigle_entite)
+        return EntiteUclDTO(
+            sigle=entity.most_recent_entity_version.acronym,
+            intitule=entity.most_recent_entity_version.title,
+        )
