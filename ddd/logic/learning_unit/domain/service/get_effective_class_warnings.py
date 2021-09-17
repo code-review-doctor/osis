@@ -55,7 +55,7 @@ def _check_classes_quadrimester(effective_class: 'EffectiveClass', learning_unit
     quadri = effective_class.derogation_quadrimester
     lu_quadri = learning_unit.derogation_quadrimester
 
-    if quadri and quadri.name not in QUADRIMESTER_CHECK_RULES[lu_quadri.name]['correct_values']:
+    if lu_quadri and quadri and quadri.name not in QUADRIMESTER_CHECK_RULES[lu_quadri.name]['correct_values']:
         _warnings.append(message % {
             'code_class': effective_class.complete_acronym,
             'should_be_values': QUADRIMESTER_CHECK_RULES[lu_quadri.name]['available_values_str']
