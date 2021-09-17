@@ -38,7 +38,7 @@ class EffectiveClassSerializerTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         ns = SimpleNamespace(
-            class_code="Z",
+            code="Z",
             title_fr="TITRE",
             title_en="TITLE",
             teaching_place_uuid="1234664341",
@@ -46,7 +46,7 @@ class EffectiveClassSerializerTestCase(TestCase):
             session_derogation=DerogationSession.DEROGATION_SESSION_1XX.name,
             volume_q1=0.0,
             volume_q2=10.0,
-            class_type=LECTURING,
+            type=LECTURING,
             campus_name="Campus",
             organization_name="UCLouvain"
         )
@@ -55,15 +55,16 @@ class EffectiveClassSerializerTestCase(TestCase):
 
     def test_contains_expected_fields(self):
         expected_fields = [
-            'class_code',
+            'code',
             'title_fr',
             'title_en',
             'teaching_place_uuid',
             'derogation_quadrimester',
+            'derogation_quadrimester_text',
             'session_derogation',
             'volume_q1',
             'volume_q2',
-            'class_type',
+            'type',
             'campus_name',
             'organization_name',
         ]

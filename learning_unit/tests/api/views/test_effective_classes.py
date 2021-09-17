@@ -77,15 +77,16 @@ class EffectiveClassesListTestCase(APITestCase):
         self.assertCountEqual(
             list(results[0].keys()),
             [
-                "class_code",
+                "code",
                 "title_fr",
                 "title_en",
                 "teaching_place_uuid",
                 "derogation_quadrimester",
+                "derogation_quadrimester_text",
                 "session_derogation",
                 "volume_q1",
                 "volume_q2",
-                "class_type",
+                "type",
                 "campus_name",
                 "organization_name",
             ]

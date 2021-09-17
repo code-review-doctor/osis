@@ -75,7 +75,17 @@ class EffectiveClassRepository(IEffectiveClassRepository):
         qs = _annotate_queryset(qs)
         qs = _values_queryset(qs)
         return [
-            EffectiveClassDTO(**effective_class) for effective_class in qs
+            EffectiveClassDTO(
+                code=effective_class['class_code'],
+                title_fr=effective_class['title_fr'],
+                title_en=effective_class['title_en'],
+                teaching_place_uuid=effective_class['teaching_place_uuid'],
+                derogation_quadrimester=effective_class['derogation_quadrimester'],
+                session_derogation=effective_class['session_derogation'],
+                volume_q1=effective_class['volume_q1'],
+                volume_q2=effective_class['volume_q2'],
+                type=effective_class['class_type'],
+            ) for effective_class in qs
         ]
 
     @classmethod

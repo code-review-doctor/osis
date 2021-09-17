@@ -665,11 +665,9 @@ components:
         session_derogation:
           type: string
         volume_q1:
-          type: number
-          multipleOf: 0.01
+          type: string
         volume_q2:
-          type: number
-          multipleOf: 0.01
+          type: string
         type:
           $ref: '#/components/schemas/ComponentTypeEnum'
     LearningUnitComponent:
