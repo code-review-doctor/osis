@@ -32,7 +32,7 @@ from django.db.models import Q, F, Subquery, OuterRef, Case, When, Value
 
 from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.attribution_new import AttributionNew
-from base.models.enums import learning_component_year_type
+from base.models.enums import learning_component_year_type, learning_unit_year_subtypes
 from base.models.learning_unit_year import LearningUnitYear
 from ddd.logic.application.domain.service.i_learning_unit_service import ILearningUnitService
 from ddd.logic.application.dtos import LearningUnitVolumeFromServiceDTO, LearningUnitTutorAttributionFromServiceDTO
@@ -79,7 +79,9 @@ class LearningUnitTranslator(ILearningUnitService):
                  ) for entity_id in entity_ids)
         )
         subqs = AttributionChargeNew.objects.filter(attribution__id=OuterRef('id'))
-        qs = AttributionNew.objects.filter(filter_clause).annotate(
+        qs = AttributionNew.objects.filter(filter_clause).exclude(
+            attributionchargenew__learning_component_year__learning_unit_year__subtype=learning_unit_year_subtypes.PARTIM
+        ).annotate(
             code=F('learning_container_year__acronym'),
             year=F('learning_container_year__academic_year__year'),
             first_name=F('tutor__person__first_name'),

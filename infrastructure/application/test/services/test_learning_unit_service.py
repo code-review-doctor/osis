@@ -27,10 +27,14 @@ from decimal import Decimal
 
 from django.test import TestCase
 
+from attribution.models.enums.function import Functions
+from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
+from base.models.enums import learning_component_year_type
 from base.tests.factories.learning_component_year import LecturingLearningComponentYearFactory, \
     PracticalLearningComponentYearFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from ddd.logic.application.dtos import LearningUnitVolumeFromServiceDTO
+from base.tests.factories.learning_unit_year import LearningUnitYearFullFactory, LearningUnitYearPartimFactory
+from base.tests.factories.tutor import TutorFactory
+from ddd.logic.application.dtos import LearningUnitVolumeFromServiceDTO, LearningUnitTutorAttributionFromServiceDTO
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
 from infrastructure.application.services.learning_unit_service import LearningUnitTranslator
@@ -39,16 +43,16 @@ from infrastructure.application.services.learning_unit_service import LearningUn
 class LearningUnitTranslatorSearchLearningUnitVolumes(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.ldroi1200 = LearningUnitYearFactory(
+        cls.ldroi1200 = LearningUnitYearFullFactory(
             acronym='LDROI1200',
             academic_year__year=2018,
             learning_container_year__acronym='LDROI1200',
-            learning_container_year__academic_year__year=2018
+            learning_container_year__academic_year__year=2018,
         )
         LecturingLearningComponentYearFactory(learning_unit_year=cls.ldroi1200, hourly_volume_total_annual=Decimal(30))
         PracticalLearningComponentYearFactory(learning_unit_year=cls.ldroi1200, hourly_volume_total_annual=Decimal(5))
 
-        cls.lagro2000 = LearningUnitYearFactory(
+        cls.lagro2000 = LearningUnitYearFullFactory(
             acronym='LAGRO2000',
             academic_year__year=2018,
             learning_container_year__acronym='LAGRO2000',
@@ -85,4 +89,62 @@ class LearningUnitTranslatorSearchLearningUnitVolumes(TestCase):
                 practical_volume_total=Decimal(0),
             ),
             results
+        )
+
+
+class LearningUnitTranslatorSearchTutorAttribution(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.ldroi1200 = LearningUnitYearFullFactory(
+            acronym='LDROI1200',
+            academic_year__year=2018,
+            learning_container_year__acronym='LDROI1200',
+            learning_container_year__academic_year__year=2018,
+        )
+        cls.tutor = TutorFactory()
+
+        cls.practical_volume_assigned = AttributionChargeNewFactory(
+            attribution__tutor=cls.tutor,
+            attribution__function=Functions.CO_HOLDER.name,
+            attribution__learning_container_year=cls.ldroi1200.learning_container_year,
+            learning_component_year__type=learning_component_year_type.PRACTICAL_EXERCISES,
+            learning_component_year__learning_unit_year=cls.ldroi1200,
+            allocation_charge=10
+        )
+
+        cls.ldroi1200a = LearningUnitYearPartimFactory(
+            acronym='LDROI1200A',
+            academic_year=cls.ldroi1200.academic_year,
+            learning_container_year=cls.ldroi1200.learning_container_year
+        )
+        cls.practical_volume_assigned_on_partim = AttributionChargeNewFactory(
+            attribution__tutor=cls.tutor,
+            attribution__function=Functions.CO_HOLDER.name,
+            attribution__learning_container_year=cls.ldroi1200a.learning_container_year,
+            learning_component_year__type=learning_component_year_type.PRACTICAL_EXERCISES,
+            learning_component_year__learning_unit_year=cls.ldroi1200a,
+            allocation_charge=15
+        )
+
+        cls.service = LearningUnitTranslator()
+
+    def test_should_not_return_only_attribution_on_full_type(self):
+        learning_unit_ids = [
+            LearningUnitIdentity(code='LDROI1200', academic_year=AcademicYearIdentityBuilder.build_from_year(2018)),
+        ]
+
+        results = self.service.search_tutor_attribution_dto(learning_unit_ids)
+        self.assertEqual(len(results), 1)
+
+        self.assertEqual(
+            results[0],
+            LearningUnitTutorAttributionFromServiceDTO(
+                code='LDROI1200',
+                year=2018,
+                first_name=self.tutor.person.first_name,
+                last_name=self.tutor.person.last_name,
+                function=Functions.CO_HOLDER.name,
+                lecturing_volume=Decimal(0),
+                practical_volume=Decimal(10),
+            )
         )
