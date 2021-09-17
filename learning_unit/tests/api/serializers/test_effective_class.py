@@ -65,6 +65,7 @@ class EffectiveClassSerializerTestCase(TestCase):
             'volume_q1',
             'volume_q2',
             'type',
+            'type_text',
             'campus_name',
             'organization_name',
         ]

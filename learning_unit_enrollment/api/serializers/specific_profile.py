@@ -31,10 +31,8 @@ from base.models.enums.peps_type import PepsTypes, SportSubtypes, HtmSubtypes
 class StudentSpecificProfileSerializer(serializers.Serializer):
     type = serializers.CharField()
     type_text = serializers.SerializerMethodField()
-    subtype_sport = serializers.CharField()
-    subtype_sport_text = serializers.SerializerMethodField()
-    subtype_disability = serializers.CharField()
-    subtype_disability_text = serializers.SerializerMethodField()
+    subtype = serializers.SerializerMethodField()
+    subtype_text = serializers.SerializerMethodField()
     guide = serializers.CharField()
     arrangement_additional_time = serializers.BooleanField()
     arrangement_appropriate_copy = serializers.BooleanField()
@@ -42,11 +40,22 @@ class StudentSpecificProfileSerializer(serializers.Serializer):
     arrangement_specific_locale = serializers.BooleanField()
     arrangement_comment = serializers.CharField()
 
-    def get_type_text(self, obj):
+    @staticmethod
+    def get_type_text(obj):
         return PepsTypes.get_value(obj.type)
 
-    def get_subtype_sport_text(self, obj):
-        return SportSubtypes.get_value(obj.subtype_sport)
+    @staticmethod
+    def get_subtype(obj):
+        if obj.type == PepsTypes.SPORT.name:
+            return obj.subtype_sport
+        elif obj.type == PepsTypes.DISABILITY.name:
+            return obj.subtype_disability
+        return ""
 
-    def get_subtype_disability_text(self, obj):
-        return HtmSubtypes.get_value(obj.subtype_disability)
+    @staticmethod
+    def get_subtype_text(obj):
+        if obj.type == PepsTypes.SPORT.name:
+            return SportSubtypes.get_value(obj.subtype_sport)
+        elif obj.type == PepsTypes.DISABILITY.name:
+            return HtmSubtypes.get_value(obj.subtype_disability)
+        return ""
