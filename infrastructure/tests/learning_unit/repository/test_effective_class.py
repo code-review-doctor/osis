@@ -99,7 +99,7 @@ class EffectiveClassRepositoryTestCase(TestCase):
                 learning_unit_year=ue.academic_year.year
             )
         )
-        self.assertEqual(effective_class.entity_id.code, class_db.acronym)
+        self.assertEqual(effective_class.entity_id.class_code, class_db.acronym)
         self.assertEqual(effective_class.entity_id.learning_unit_identity.code, ue.acronym)
         self.assertEqual(effective_class.entity_id.learning_unit_identity.academic_year.year, ue.academic_year.year)
         self.assertEqual(effective_class.titles.fr, class_db.title_fr)
