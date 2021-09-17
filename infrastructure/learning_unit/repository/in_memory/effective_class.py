@@ -29,7 +29,7 @@ from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass, EffectiveClassIdentity
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
-from ddd.logic.learning_unit.dtos import EffectiveClassFromRepositoryDTO
+from ddd.logic.learning_unit.dtos import EffectiveClassDTO
 from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
 
 
@@ -45,11 +45,11 @@ class EffectiveClassRepository(InMemoryGenericRepository, IEffectiveClassReposit
             cls,
             learning_unit_id: Optional['LearningUnitIdentity'] = None,
             **kwargs
-    ) -> List['EffectiveClassFromRepositoryDTO']:
+    ) -> List['EffectiveClassDTO']:
         class_to_return = []
         for effective_class in cls.entities:
             if effective_class.learning_unit_identity == learning_unit_id:
-                dto = EffectiveClassFromRepositoryDTO(
+                dto = EffectiveClassDTO(
                     class_code=effective_class.class_code,
                     learning_unit_code=effective_class.learning_unit_code,
                     learning_unit_year=effective_class.year,

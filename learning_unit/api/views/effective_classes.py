@@ -32,7 +32,7 @@ from rest_framework.response import Response
 
 from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
 from ddd.logic.learning_unit.commands import GetClassesEffectivesDepuisUniteDEnseignementCommand
-from ddd.logic.learning_unit.dtos import EffectiveClassFromRepositoryDTO
+from ddd.logic.learning_unit.dtos import EffectiveClassDTO
 from ddd.logic.shared_kernel.campus.commands import GetCampusCommand
 from ddd.logic.shared_kernel.campus.domain.model.uclouvain_campus import UclouvainCampus
 from infrastructure.messages_bus import message_bus_instance
@@ -60,10 +60,10 @@ class EffectiveClassesList(LanguageContextSerializerMixin, generics.ListAPIView)
                 learning_unit_code=self.kwargs['acronym'].upper(),
                 learning_unit_year=self.kwargs['year']
             )
-        )  # type: List[EffectiveClassFromRepositoryDTO]
+        )  # type: List[EffectiveClassDTO]
         return self._add_campus_info_to_classes(classes)
 
-    def _add_campus_info_to_classes(self, classes: List['EffectiveClassFromRepositoryDTO']) -> List[SimpleNamespace]:
+    def _add_campus_info_to_classes(self, classes: List['EffectiveClassDTO']) -> List[SimpleNamespace]:
         to_return = []
         for effective_class in classes:
             campus = self._get_campus(effective_class)
@@ -85,7 +85,7 @@ class EffectiveClassesList(LanguageContextSerializerMixin, generics.ListAPIView)
         return to_return
 
     @staticmethod
-    def _get_campus(effective_class: 'EffectiveClassFromRepositoryDTO') -> 'UclouvainCampus':
+    def _get_campus(effective_class: 'EffectiveClassDTO') -> 'UclouvainCampus':
         return message_bus_instance.invoke(
             GetCampusCommand(effective_class.teaching_place_uuid)
         )

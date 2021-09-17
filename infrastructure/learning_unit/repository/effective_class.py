@@ -35,7 +35,7 @@ from ddd.logic.learning_unit.builder.effective_class_identity_builder import Eff
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass, EffectiveClassIdentity, \
     LecturingEffectiveClass
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
-from ddd.logic.learning_unit.dtos import EffectiveClassFromRepositoryDTO
+from ddd.logic.learning_unit.dtos import EffectiveClassFromRepositoryDTO, EffectiveClassDTO
 from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
 from learning_unit.models.learning_class_year import LearningClassYear as LearningClassYearDb
 from osis_common.ddd.interface import ApplicationService
@@ -65,7 +65,7 @@ class EffectiveClassRepository(IEffectiveClassRepository):
             cls,
             learning_unit_id: LearningUnitIdentity = None,
             **kwargs
-    ) -> List[EffectiveClassFromRepositoryDTO]:
+    ) -> List[EffectiveClassDTO]:
         qs = _get_common_queryset()
         if learning_unit_id:
             qs = qs.filter(
@@ -75,7 +75,7 @@ class EffectiveClassRepository(IEffectiveClassRepository):
         qs = _annotate_queryset(qs)
         qs = _values_queryset(qs)
         return [
-            EffectiveClassFromRepositoryDTO(**effective_class) for effective_class in qs
+            EffectiveClassDTO(**effective_class) for effective_class in qs
         ]
 
     @classmethod

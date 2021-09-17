@@ -28,7 +28,7 @@ from django.test import SimpleTestCase
 
 from base.models.enums.learning_component_year_type import PRACTICAL_EXERCISES, LECTURING
 from ddd.logic.learning_unit.commands import GetClassesEffectivesDepuisUniteDEnseignementCommand
-from ddd.logic.learning_unit.dtos import EffectiveClassFromRepositoryDTO
+from ddd.logic.learning_unit.dtos import EffectiveClassDTO
 from ddd.logic.learning_unit.tests.factory.effective_class import LecturingEffectiveClassFactory
 from ddd.logic.learning_unit.use_case.read import get_learning_unit_effective_classes_service
 from infrastructure.learning_unit.repository.in_memory.effective_class import EffectiveClassRepository
@@ -44,7 +44,7 @@ class TestGetLearningUnitEffectiveClassesService(SimpleTestCase):
             learning_unit_code=self.effective_class.learning_unit_identity.code,
             learning_unit_year=self.effective_class.learning_unit_identity.year
         )
-        self.dto = EffectiveClassFromRepositoryDTO(
+        self.dto = EffectiveClassDTO(
             class_code=self.effective_class.class_code,
             learning_unit_code=self.effective_class.learning_unit_code,
             learning_unit_year=self.effective_class.year,
