@@ -140,9 +140,8 @@ components:
         type_text:
           type: string
         subtype:
-          oneOf:
-            - $ref: '#/components/schemas/SportSubtypePepsEnum'
-            - $ref: '#/components/schemas/DisabilitySubtypePepsEnum'
+          nullable: true
+          $ref: '#/components/schemas/SubtypeEnum'
         subtype_text:
           type: string
         guide:
@@ -223,17 +222,12 @@ components:
         - ENTREPRENEUR
         - ARRANGEMENT_JURY
         - ""
-    SportSubtypePepsEnum:
+    SubtypeEnum:
       type: string
       nullable: true
       enum:
         - PROMISING_ATHLETE_HL
         - PROMISING_ATHLETE
-        - ""
-    DisabilitySubtypePepsEnum:
-      type: string
-      nullable: true
-      enum:
         - REDUCED_MOBILITY
         - OTHER_DISABILITY
         - ""
