@@ -28,6 +28,7 @@ from typing import List, Optional
 
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity, EffectiveClass
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
+from ddd.logic.learning_unit.dtos import EffectiveClassDTO
 from osis_common.ddd import interface
 from osis_common.ddd.interface import ApplicationService
 
