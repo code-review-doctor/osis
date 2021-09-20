@@ -354,7 +354,10 @@ def _fetch_session_exams(
     ).values('date_limite_de_remise')
     qs = ExamEnrollment.objects.all()
     if codes_unite_enseignement:
-        codes_unite_enseignement_sans_acronyme_classe = {code[:-1] for code in codes_unite_enseignement}
+        codes_unite_enseignement_sans_acronyme_classe = {
+            code.replace('-', '').replace('_', '')[:-1]
+            for code in codes_unite_enseignement
+        }
         codes_unite_enseignement_pour_filtre = codes_unite_enseignement_sans_acronyme_classe.union(
             codes_unite_enseignement
         )

@@ -163,7 +163,10 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
             with connection.cursor() as cursor:
                 raw_query = '''
                     SELECT 
-                        CONCAT(base_learningunityear.acronym, learning_unit_learningclassyear.acronym) AS code_unite_enseignement, 
+                        CASE WHEN base_learningcomponentyear.type = 'LECTURING' THEN CONCAT(base_learningunityear.acronym, '-' , learning_unit_learningclassyear.acronym)
+                             WHEN base_learningcomponentyear.type = 'PRACTICAL_EXERCISES' THEN CONCAT(base_learningunityear.acronym, '_' , learning_unit_learningclassyear.acronym)
+                             ELSE base_learningunityear.acronym
+                        END AS code_unite_enseignement, 
                         base_academicyear.year AS annee_academique, 
                         base_sessionexam.number_session AS numero_session, 
                         base_student.registration_id AS noma,
@@ -186,6 +189,7 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
                     JOIN base_learningunitenrollment on base_learningunitenrollment.id = base_examenrollment.learning_unit_enrollment_id
                     JOIN base_learningunityear on base_learningunityear.id = base_learningunitenrollment.learning_unit_year_id
                     LEFT JOIN learning_unit_learningclassyear on learning_unit_learningclassyear.id = base_learningunitenrollment.learning_class_year_id
+                    LEFT JOIN base_learningcomponentyear on base_learningcomponentyear.id = learning_unit_learningclassyear.learning_component_year_id
                     JOIN base_academicyear on base_academicyear.id = base_learningunityear.academic_year_id
                     JOIN base_sessionexam on base_sessionexam.id = base_examenrollment.session_exam_id       
                     JOIN base_offerenrollment on base_offerenrollment.id = base_learningunitenrollment.offer_enrollment_id
@@ -193,7 +197,10 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
                     WHERE base_academicyear.year = %(academic_year)s AND
                         base_sessionexam.number_session = %(number_session)s  AND 
                         base_student.registration_id in %(registration_ids)s AND
-                        CONCAT(base_learningunityear.acronym, learning_unit_learningclassyear.acronym) in %(acronyms)s     
+                        CASE WHEN base_learningcomponentyear.type = 'LECTURING' THEN CONCAT(base_learningunityear.acronym, '-' , learning_unit_learningclassyear.acronym)
+                             WHEN base_learningcomponentyear.type = 'PRACTICAL_EXERCISES' THEN CONCAT(base_learningunityear.acronym, '_' , learning_unit_learningclassyear.acronym)
+                             ELSE base_learningunityear.acronym
+                        END in %(acronyms)s     
                     ORDER BY code_unite_enseignement, annee_academique, echeance
                 '''
                 cursor.execute(raw_query, parameters)
