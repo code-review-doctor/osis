@@ -42,7 +42,7 @@ from ddd.logic.application.domain.model.vacant_course import VacantCourseIdentit
 from ddd.logic.application.domain.validator.exceptions import VacantCourseApplicationManagedInTeamException, \
     ApplicationAlreadyExistsException, VolumesAskedShouldBeLowerOrEqualToVolumeAvailable, \
     VacantCourseNotAllowedDeclarationType, VacantCourseNotFound, AttributionSubstituteException, \
-    AttributionAboutToExpireWithoutVolumeException, CourseInSuppressionProposalException
+    AttributionAboutToExpireWithoutVolumeException
 from ddd.logic.application.dtos import AttributionAboutToExpireDTO
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
@@ -266,22 +266,6 @@ class TestGetAttributionsAboutToExpireService(TestCase):
         self.assertEqual(
             results[0].unavailable_renewal_reason,
             AttributionSubstituteException().message
-        )
-
-    def test_assert_unavailable_renewal_reason_case_course_in_suppression_proposal(self):
-        self.applicant.attributions = [
-            attr.evolve(self.attribution_about_to_expire, course_is_in_suppression_proposal=True)
-        ]
-
-        cmd = GetAttributionsAboutToExpireCommand(global_id=self.global_id)
-        results = self.message_bus.invoke(cmd)
-
-        self.assertEqual(len(results), 1)
-        self.assertIsInstance(results[0], AttributionAboutToExpireDTO)
-        self.assertFalse(results[0].is_renewable)
-        self.assertEqual(
-            results[0].unavailable_renewal_reason,
-            CourseInSuppressionProposalException(year=self.attribution_about_to_expire.course_id.year).message
         )
 
     def test_assert_renewal_because_no_unavailable_renewal_reason(self):

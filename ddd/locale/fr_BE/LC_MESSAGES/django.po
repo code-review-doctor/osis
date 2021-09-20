@@ -192,12 +192,6 @@ msgstr ""
 "Ce cours est géré en équipe. La candidature des équipes d'enseignants "
 "s'effectue via la procédure papier."
 
-#, python-format
-msgid ""
-"This course will be discontinued in %(academic_year)s following a program "
-"reform."
-msgstr "Ce cours sera supprimé en %(academic_year)s suite à une réforme de programme."
-
 msgid "Tutor already assigned to the class"
 msgstr "L'enseignant est déjà assigné à cette classe"
 

@@ -39,7 +39,7 @@ from ddd.logic.application.domain.service.apply_on_vacant_course import ApplyOnV
 from ddd.logic.application.domain.service.i_learning_unit_service import ILearningUnitService
 from ddd.logic.application.domain.validator.exceptions import AttributionAboutToExpireNotFound, \
     AttributionAboutToExpireFunctionException, VacantCourseNotFound, AttributionSubstituteException, \
-    AttributionAboutToExpireWithoutVolumeException, CourseInSuppressionProposalException
+    AttributionAboutToExpireWithoutVolumeException
 from ddd.logic.application.dtos import AttributionAboutToExpireDTO
 from ddd.logic.application.repository.i_vacant_course_repository import IVacantCourseRepository
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
@@ -197,9 +197,6 @@ def _get_unavailable_renewal_reason(
         vacant_courses_next_year: List[VacantCourse],
         all_existing_applications: List[Application]
 ) -> str:
-    if attribution_about_to_expire.course_is_in_suppression_proposal:
-        return CourseInSuppressionProposalException(year=attribution_about_to_expire.course_id.year).message
-
     vacant_course_next_year = _get_vacant_course_by_code(
         attribution_about_to_expire.course_id.code, vacant_courses_next_year
     )
