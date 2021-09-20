@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import random
 from random import randint
 from decimal import Decimal
 
@@ -154,29 +155,37 @@ class DistributeClassToTutorService(TestCase):
         self.assertEqual(class_volume.attribution_uuid, cmd.learning_unit_attribution_uuid)
         self.assertEqual(class_volume.effective_class, self.effective_class.entity_id)
 
+
+class DistributeClassToTutorServiceWhileNoRepartition(TestCase):
+    def setUp(self):
+        self.learning_unit = CourseWithLecturingVolumesOnly()
+        effective_class_entity_id = EffectiveClassIdentity(
+            class_code='P',
+            learning_unit_identity=self.learning_unit.entity_id
+        )
+        self.tutor_repository = TutorRepository()
+        self.effective_class_repository = EffectiveClassRepository()
+        self.tutor = TutorWithoutDistributedEffectiveClassesFactory()
+        self.tutor_repository.save(self.tutor)
+        self.effective_class_without_repartition = LecturingEffectiveClassWithoutRepartitionFactory(
+            entity_id=effective_class_entity_id
+        )
+        self.effective_class_repository.save(self.effective_class_without_repartition)
+        self.learning_unit_translator = LearningUnitTranslator()
+
     @mock.patch("infrastructure.application.services.learning_unit_service.LearningUnitTranslator."
                 "search_learning_unit_annual_volume_dto")
     def test_no_volume_repartition_on_class_should_use_ue_volume(self, mock_volume):
-        learning_unit = CourseWithLecturingVolumesOnly()
-        available_ue_volume = learning_unit.lecturing_part.volumes.volume_annual
+
+        available_ue_volume = self.learning_unit.lecturing_part.volumes.volume_annual
         mock_volume.return_value = LearningUnitAnnualVolumeFromServiceDTO(volume=available_ue_volume)
-        tutor1 = TutorWithoutDistributedEffectiveClassesFactory()
-        self.tutor_repository.save(tutor1)
-        effective_class_entity_id = EffectiveClassIdentity(
-            class_code='A',
-            learning_unit_identity=learning_unit.entity_id
-        )
-        effective_class_without_repartition = LecturingEffectiveClassWithoutRepartitionFactory(
-            entity_id=effective_class_entity_id
-        )
-        self.effective_class_repository.save(effective_class_without_repartition)
 
         cmd = DistributeClassToTutorCommand(
-            class_code=effective_class_without_repartition.entity_id.class_code,
-            learning_unit_code=effective_class_without_repartition.entity_id.learning_unit_identity.code,
+            class_code=self.effective_class_without_repartition.entity_id.class_code,
+            learning_unit_code=self.effective_class_without_repartition.entity_id.learning_unit_identity.code,
             learning_unit_attribution_uuid='uuid',
-            year=effective_class_without_repartition.entity_id.learning_unit_identity.academic_year.year,
-            tutor_personal_id_number=tutor1.entity_id.personal_id_number,
+            year=self.effective_class_without_repartition.entity_id.learning_unit_identity.academic_year.year,
+            tutor_personal_id_number=self.tutor.entity_id.personal_id_number,
             distributed_volume=randint(1, available_ue_volume),
         )
         tutor_id = distribute_class_to_tutor(
