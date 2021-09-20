@@ -32,6 +32,7 @@ from django.db.models import CharField, Q, OuterRef, Case, When, F, DateField, V
 from django.db.models.functions import Concat, Coalesce, Cast, Replace
 
 from base.models.enums.exam_enrollment_justification_type import JustificationTypes
+from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.exam_enrollment import ExamEnrollment
 from base.models.session_exam_deadline import SessionExamDeadline
 from ddd.logic.encodage_des_notes.encodage.builder.note_etudiant_builder import NoteEtudiantBuilder
@@ -233,9 +234,26 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
             qs = qs.filter(score_final__isnull=True, justification_final__isnull=True)
 
         qs = qs.annotate(
-            code_unite_enseignement=Concat(
-                'learning_unit_enrollment__learning_unit_year__acronym',
-                'learning_unit_enrollment__learning_class_year__acronym',
+            code_unite_enseignement=Case(
+                When(
+                    learning_unit_enrollment__learning_class_year__learning_component_year__type=LECTURING,
+                    then=Concat(
+                        'learning_unit_enrollment__learning_unit_year__acronym',
+                        Value('-'),
+                        'learning_unit_enrollment__learning_class_year__acronym',
+                        output_field=CharField()
+                    )
+                ),
+                When(
+                    learning_unit_enrollment__learning_class_year__learning_component_year__type=PRACTICAL_EXERCISES,
+                    then=Concat(
+                        'learning_unit_enrollment__learning_unit_year__acronym',
+                        Value('_'),
+                        'learning_unit_enrollment__learning_class_year__acronym',
+                        output_field=CharField()
+                    )
+                ),
+                default=F('learning_unit_enrollment__learning_unit_year__acronym'),
                 output_field=CharField()
             ),
         )
@@ -282,11 +300,28 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
 
 def _save_note(note: 'NoteEtudiant'):
     db_obj = ExamEnrollment.objects.annotate(
-        code_unite_enseignement=Concat(
-            'learning_unit_enrollment__learning_unit_year__acronym',
-            'learning_unit_enrollment__learning_class_year__acronym',
+        code_unite_enseignement=Case(
+            When(
+                learning_unit_enrollment__learning_class_year__learning_component_year__type=LECTURING,
+                then=Concat(
+                    'learning_unit_enrollment__learning_unit_year__acronym',
+                    Value('-'),
+                    'learning_unit_enrollment__learning_class_year__acronym',
+                    output_field=CharField()
+                )
+            ),
+            When(
+                learning_unit_enrollment__learning_class_year__learning_component_year__type=PRACTICAL_EXERCISES,
+                then=Concat(
+                    'learning_unit_enrollment__learning_unit_year__acronym',
+                    Value('_'),
+                    'learning_unit_enrollment__learning_class_year__acronym',
+                    output_field=CharField()
+                )
+            ),
+            default=F('learning_unit_enrollment__learning_unit_year__acronym'),
             output_field=CharField()
-        )
+        ),
     ).get(
         code_unite_enseignement=note.code_unite_enseignement,
         learning_unit_enrollment__learning_unit_year__academic_year__year=note.annee_academique,
@@ -336,9 +371,26 @@ def _fetch_session_exams(
             noms_cohortes_avec_11ba_remplace_par_equivalent_1ba
         )
     return qs.annotate(
-        code_unite_enseignement=Concat(
-            'learning_unit_enrollment__learning_unit_year__acronym',
-            'learning_unit_enrollment__learning_class_year__acronym',
+        code_unite_enseignement=Case(
+            When(
+                learning_unit_enrollment__learning_class_year__learning_component_year__type=LECTURING,
+                then=Concat(
+                    'learning_unit_enrollment__learning_unit_year__acronym',
+                    Value('-'),
+                    'learning_unit_enrollment__learning_class_year__acronym',
+                    output_field=CharField()
+                )
+            ),
+            When(
+                learning_unit_enrollment__learning_class_year__learning_component_year__type=PRACTICAL_EXERCISES,
+                then=Concat(
+                    'learning_unit_enrollment__learning_unit_year__acronym',
+                    Value('_'),
+                    'learning_unit_enrollment__learning_class_year__acronym',
+                    output_field=CharField()
+                )
+            ),
+            default=F('learning_unit_enrollment__learning_unit_year__acronym'),
             output_field=CharField()
         ),
         annee_academique=F('learning_unit_enrollment__learning_unit_year__academic_year__year'),

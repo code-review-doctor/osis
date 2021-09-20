@@ -104,8 +104,9 @@ class EffectiveClassRepository(IEffectiveClassRepository):
 
     @classmethod
     def search_dtos(cls, codes: Set[str], annee: int) -> List['EffectiveClassFromRepositoryDTO']:
-        codes_unites_enseignement = {code[:-1] for code in codes}
-        lettres_classes = {code[-1] for code in codes}
+        codes_sans_tiret = {code.replace('-', '').replace('_', '') for code in codes}
+        codes_unites_enseignement = {code[:-1] for code in codes_sans_tiret}
+        lettres_classes = {code[-1] for code in codes_sans_tiret}
         qs = _get_common_queryset().filter(
             # Préfiltre sur année pour performances
             learning_component_year__learning_unit_year__academic_year__year=annee,
