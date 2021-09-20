@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from education_group.templatetags.academic_year_display import display_as_academic_year
 from osis_common.ddd.interface import BusinessException
 
 from django.utils.translation import gettext_lazy as _
