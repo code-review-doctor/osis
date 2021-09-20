@@ -30,11 +30,14 @@ from django.test import TestCase
 from attribution.models.enums.function import Functions
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from base.models.enums import learning_component_year_type
+from base.models.enums.proposal_type import ProposalType
 from base.tests.factories.learning_component_year import LecturingLearningComponentYearFactory, \
     PracticalLearningComponentYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFullFactory, LearningUnitYearPartimFactory
+from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.tutor import TutorFactory
-from ddd.logic.application.dtos import LearningUnitVolumeFromServiceDTO, LearningUnitTutorAttributionFromServiceDTO
+from ddd.logic.application.dtos import LearningUnitVolumeFromServiceDTO, LearningUnitTutorAttributionFromServiceDTO, \
+    LearningUnitModificationProposalFromServiceDTO
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
 from infrastructure.application.services.learning_unit_service import LearningUnitTranslator
@@ -148,3 +151,72 @@ class LearningUnitTranslatorSearchTutorAttribution(TestCase):
                 practical_volume=Decimal(10),
             )
         )
+
+
+class LearningUnitTranslatorSearchModificationProposal(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.ldroi1200 = LearningUnitYearFullFactory(
+            acronym='LDROI1200',
+            academic_year__year=2018,
+            learning_container_year__acronym='LDROI1200',
+            learning_container_year__academic_year__year=2018,
+        )
+
+        cls.service = LearningUnitTranslator()
+
+    def test_assert_search_modification_proposal_case_no_return(self):
+        results = self.service.search_learning_unit_modification_proposal_dto(
+            codes=['LDROI1200'],
+            year=2018
+        )
+        self.assertIsInstance(results, list)
+        self.assertEqual(len(results), 0)
+
+    def test_assert_search_modification_proposal_return_list_dto(self):
+        proposal = ProposalLearningUnitFactory(
+            learning_unit_year=self.ldroi1200,
+            type=ProposalType.MODIFICATION.name,
+            initial_data={
+                'learning_container_year': {'common_title': 'Introduction aux droits ancien titre'},
+                'learning_unit_year': {'specific_title': 'null', 'acronym': 'LDROI1120'}
+            }
+        )
+
+        results = self.service.search_learning_unit_modification_proposal_dto(
+            codes=['LDROI1120'],
+            year=2018
+        )
+        self.assertEqual(len(results), 1)
+
+        self.assertEqual(
+            results[0],
+            LearningUnitModificationProposalFromServiceDTO(
+                code='LDROI1200',
+                year=2018,
+                old_code=proposal.initial_data['learning_unit_year']['acronym'],
+                old_title=proposal.initial_data['learning_container_year']['common_title'],
+            )
+        )
+
+    def test_assert_search_modification_proposal_old_title_correctly_computed(self):
+        proposal = ProposalLearningUnitFactory(
+            learning_unit_year=self.ldroi1200,
+            type=ProposalType.TRANSFORMATION_AND_MODIFICATION.name,
+            initial_data={
+                'learning_container_year': {'common_title': 'Introduction aux droits ancien titre'},
+                'learning_unit_year': {'specific_title': 'Titre specifique', 'acronym': 'LDROI1120'},
+            }
+        )
+
+        results = self.service.search_learning_unit_modification_proposal_dto(
+            codes=['LDROI1120'],
+            year=2018
+        )
+        self.assertEqual(len(results), 1)
+
+        expected_title = "{} - {}".format(
+            proposal.initial_data['learning_container_year']['common_title'],
+            proposal.initial_data['learning_unit_year']['specific_title']
+        )
+        self.assertEqual(results[0].old_title, expected_title)

@@ -167,6 +167,14 @@ class LearningUnitTutorAttributionFromServiceDTO(DTO):
 
 
 @attr.s(frozen=True, slots=True)
+class LearningUnitModificationProposalFromServiceDTO(DTO):
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
+    old_code = attr.ib(type=str)
+    old_title = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
 class ApplicantAttributionChargeSummaryDTO(DTO):
     code = attr.ib(type=str)
     year = attr.ib(type=int)
