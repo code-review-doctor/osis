@@ -88,6 +88,7 @@ class InscriptionExamenTest(TestCase):
         class_year = LearningClassYearFactory(
             learning_component_year__learning_unit_year__academic_year__year=self.annee,
             learning_component_year__learning_unit_year__acronym=self.code_unite_enseignement,
+            learning_component_year__lecturing=True,
             acronym='A'
         )
         exam_1 = ExamEnrollmentFactory(
@@ -97,13 +98,13 @@ class InscriptionExamenTest(TestCase):
             enrollment_state=exam_enrollment_state.ENROLLED,
         )
 
-        result = self.translator.search_inscrits("LDROI1001A", self.numero_session, self.annee)
+        result = self.translator.search_inscrits("LDROI1001-A", self.numero_session, self.annee)
         self.assertEqual(len(result), 1)
         expected_result = {
             InscriptionExamenDTO(
                 annee=self.annee,
                 noma=exam_1.learning_unit_enrollment.offer_enrollment.student.registration_id,
-                code_unite_enseignement='LDROI1001A',
+                code_unite_enseignement='LDROI1001-A',
                 nom_cohorte=exam_1.learning_unit_enrollment.offer_enrollment.education_group_year.acronym,
                 date_inscription=exam_1.date_enrollment,
             )
@@ -114,6 +115,7 @@ class InscriptionExamenTest(TestCase):
         class_year = LearningClassYearFactory(
             learning_component_year__learning_unit_year__academic_year__year=self.annee,
             learning_component_year__learning_unit_year__acronym=self.code_unite_enseignement,
+            learning_component_year__practical=True,
             acronym='A'
         )
         exam_1 = ExamEnrollmentFactory(
@@ -123,13 +125,13 @@ class InscriptionExamenTest(TestCase):
             enrollment_state=exam_enrollment_state.NOT_ENROLLED,
         )
 
-        result = self.translator.search_desinscrits("LDROI1001A", self.numero_session, self.annee)
+        result = self.translator.search_desinscrits("LDROI1001_A", self.numero_session, self.annee)
         self.assertEqual(len(result), 1)
         expected_result = {
             DesinscriptionExamenDTO(
                 annee=self.annee,
                 noma=exam_1.learning_unit_enrollment.offer_enrollment.student.registration_id,
-                code_unite_enseignement='LDROI1001A',
+                code_unite_enseignement='LDROI1001_A',
                 nom_cohorte=exam_1.learning_unit_enrollment.offer_enrollment.education_group_year.acronym,
             )
         }

@@ -86,7 +86,7 @@ class NoteManquanteEtudiantFactory(factory.Factory):
         for_class = factory.Trait(
             entity_id=factory.SubFactory(
                 _IdentiteNoteEtudiantFactory,
-                code_unite_enseignement='LDROI1001A'
+                code_unite_enseignement='LDROI1001-A'
             )
         )
 

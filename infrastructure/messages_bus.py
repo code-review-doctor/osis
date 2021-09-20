@@ -229,11 +229,13 @@ class MessageBus:
             cmd,
             TutorAttributionToLearningUnitTranslator(),
             TutorRepository(),
+            EffectiveClassRepository()
         ),
         SearchClassesEnseignantCommand: lambda cmd: search_classes_enseignant(
             cmd,
             TutorAttributionToLearningUnitTranslator(),
             TutorRepository(),
+            EffectiveClassRepository()
         ),
         ApplyOnVacantCourseCommand: lambda cmd: apply_on_vacant_course(
             cmd, ApplicationRepository(), ApplicationCalendarRepository(),

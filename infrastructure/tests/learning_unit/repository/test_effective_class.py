@@ -1,5 +1,4 @@
 from decimal import Decimal
-from unittest import skip
 
 from django.test import TestCase
 
@@ -36,7 +35,6 @@ class EffectiveClassRepositoryTestCase(TestCase):
 
         self.class_repository = EffectiveClassRepository()
 
-    @skip("Will be fixed in later on with learning unit class development")
     def test_save_and_get_make_correct_mapping(self):
         dto_object = EffectiveClassFromRepositoryDTO(
             class_code='X',
@@ -71,6 +69,21 @@ class EffectiveClassRepositoryTestCase(TestCase):
         self.class_repository.delete(class_identity)
         self.assertEqual(LearningClassYearDb.objects.all().count(), 0)
 
+    def test_search(self):
+        ue = LearningUnitYearFactory()
+        class_db = LearningClassYearFactory(learning_component_year__learning_unit_year=ue)
+
+        entity_id = EffectiveClassIdentityBuilder.build_from_code_and_learning_unit_identity_data(
+            class_code=class_db.acronym,
+            learning_unit_code=ue.acronym,
+            learning_unit_year=ue.academic_year.year
+        )
+        result = self.class_repository.search(
+            entity_ids=[entity_id]
+        )
+
+        self.assertEqual(len(result), 1)
+
     def test_get_all_identities(self):
         classes_db = [LearningClassYearFactory() for _ in range(5)]
         identities = [
@@ -87,28 +100,6 @@ class EffectiveClassRepositoryTestCase(TestCase):
         ]
         # assert lists contain same elements regardless order
         self.assertCountEqual(identities, self.class_repository.get_all_identities())
-
-    # Isn't it redundant with first test ?
-    def test_get_effective_class(self):
-        ue = LearningUnitYearFactory()
-        class_db = LearningClassYearFactory(learning_component_year__learning_unit_year=ue)
-        effective_class = self.class_repository.get(
-            entity_id=EffectiveClassIdentityBuilder.build_from_code_and_learning_unit_identity_data(
-                class_code=class_db.acronym,
-                learning_unit_code=ue.acronym,
-                learning_unit_year=ue.academic_year.year
-            )
-        )
-        self.assertEqual(effective_class.entity_id.class_code, class_db.acronym)
-        self.assertEqual(effective_class.entity_id.learning_unit_identity.code, ue.acronym)
-        self.assertEqual(effective_class.entity_id.learning_unit_identity.academic_year.year, ue.academic_year.year)
-        self.assertEqual(effective_class.titles.fr, class_db.title_fr)
-        self.assertEqual(effective_class.titles.en, class_db.title_en)
-        self.assertEqual(effective_class.derogation_quadrimester.name, class_db.quadrimester)
-        self.assertIsInstance(effective_class.session_derogation, DerogationSession)
-        self.assertEqual(effective_class.session_derogation.value, class_db.session)
-        self.assertEqual(effective_class.volumes.volume_first_quadrimester, class_db.hourly_volume_partial_q1)
-        self.assertEqual(effective_class.volumes.volume_second_quadrimester, class_db.hourly_volume_partial_q2)
 
 
 class SearchDtosTest(TestCase):
@@ -141,14 +132,17 @@ class SearchDtosTest(TestCase):
         self.assertEqual(dto.class_code, self.lettre_classe)
         self.assertEqual(dto.learning_unit_code, self.code_unite_enseignement)
         self.assertEqual(dto.learning_unit_year, self.annee)
-        self.assertEqual(dto.code_complet_classe, self.code_unite_enseignement + self.lettre_classe)
+        self.assertEqual(dto.code_complet_classe, self.code_unite_enseignement + "-" + self.lettre_classe)
 
     def test_should_renvoyer_intitules(self):
         dto = self.class_repository.search_dtos(codes={self.code_complet_classe}, annee=self.annee)[0]
         self.assertEqual(dto.title_fr, self.class_db.title_fr)
         self.assertEqual(dto.title_en, self.class_db.title_en)
         self.assertNotEqual(dto.title_fr, self.class_db.learning_component_year.learning_unit_year.specific_title)
-        self.assertNotEqual(dto.title_en, self.class_db.learning_component_year.learning_unit_year.specific_title_english)
+        self.assertNotEqual(
+            dto.title_en,
+            self.class_db.learning_component_year.learning_unit_year.specific_title_english
+        )
 
     def test_should_renvoyer_volumes(self):
         dto = self.class_repository.search_dtos(codes={self.code_complet_classe}, annee=self.annee)[0]

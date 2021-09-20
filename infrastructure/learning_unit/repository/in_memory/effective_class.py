@@ -29,6 +29,8 @@ from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
 from base.models.enums.learning_component_year_type import LECTURING
 from base.models.enums.learning_unit_year_session import DerogationSession
 from base.models.enums.quadrimesters import DerogationQuadrimester
+from ddd.logic.learning_unit.builder.effective_class_builder import EffectiveClassBuilder
+from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
 from ddd.logic.learning_unit.domain.model._financial_volumes_repartition import DurationUnit
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass, EffectiveClassIdentity
 from ddd.logic.learning_unit.dtos import EffectiveClassFromRepositoryDTO
@@ -51,11 +53,30 @@ class EffectiveClassRepository(InMemoryGenericRepository, IEffectiveClassReposit
             volume_q2=DurationUnit(0.0),  # FIXME :: peut avoir une valeur à 0.0 ?
             class_type=LECTURING,
         ),
+        EffectiveClassFromRepositoryDTO(
+            class_code='X',
+            learning_unit_code='LDROI1001',
+            learning_unit_year=2021,
+            title_fr='Intitulé spécifique à la classe effective',
+            title_en='Specific title of the effective class',
+            teaching_place_uuid='teaching-place-uuid',
+            derogation_quadrimester=DerogationQuadrimester.Q1.name,
+            session_derogation=DerogationSession.DEROGATION_SESSION_1XX.value,
+            volume_q1=DurationUnit(5.0),
+            volume_q2=DurationUnit(0.0),  # FIXME :: peut avoir une valeur à 0.0 ?
+            class_type=LECTURING,
+        ),
     ]
 
     @classmethod
     def search(cls, entity_ids: Optional[List['EffectiveClassIdentity']] = None, **kwargs) -> List['EffectiveClass']:
-        raise NotImplementedError
+        builder = EffectiveClassBuilder()
+        identity_builder = EffectiveClassIdentityBuilder()
+        return [
+            builder.build_from_repository_dto(dto)
+            for dto in cls.dtos
+            if identity_builder.build_from_repository_dto(dto) in entity_ids
+        ]
 
     @classmethod
     def search_dtos(cls, codes: Set[str], annee: int) -> List['EffectiveClassFromRepositoryDTO']:

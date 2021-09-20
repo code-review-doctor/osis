@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import itertools
 from typing import Optional, List, Set
 
 from django.db.models import F, QuerySet
@@ -49,7 +50,25 @@ class EffectiveClassRepository(IEffectiveClassRepository):
 
     @classmethod
     def search(cls, entity_ids: Optional[List['EffectiveClassIdentity']] = None, **kwargs) -> List['EffectiveClass']:
-        raise NotImplementedError
+        if not entity_ids:
+            return []
+        entity_ids_by_year = itertools.groupby(
+            sorted(
+                entity_ids,
+                key=lambda entity: entity.learning_unit_identity.academic_year.year
+            ),
+            key=lambda entity: entity.learning_unit_identity.academic_year.year
+        )
+        dtos = []
+        for year, entity_ids_of_same_year in entity_ids_by_year:
+            dtos.extend(
+                cls.search_dtos(
+                    {entity.complete_class_code for entity in entity_ids_of_same_year},
+                    year
+                )
+            )
+        builder = EffectiveClassBuilder()
+        return [builder.build_from_repository_dto(dto) for dto in dtos]
 
     @classmethod
     def delete(cls, entity_id: 'EffectiveClassIdentity', **kwargs: ApplicationService) -> None:
