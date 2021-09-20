@@ -84,7 +84,7 @@ class ApplicantRepositoryGet(TestCase):
             function=Functions[self.attribution_practical_ldroi1200.attribution.function],
             end_year=AcademicYearIdentity(year=self.attribution_practical_ldroi1200.attribution.end_year),
             start_year=AcademicYearIdentity(year=self.attribution_practical_ldroi1200.attribution.start_year),
-            lecturing_volume=None,
+            lecturing_volume=Decimal(0),
             practical_volume=self.attribution_practical_ldroi1200.allocation_charge,
             is_substitute=False
         )

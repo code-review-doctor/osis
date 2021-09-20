@@ -28,7 +28,7 @@ import operator
 from typing import Optional, List
 
 from django.db import models
-from django.db.models import F, QuerySet, Q, Subquery, OuterRef, Case, When
+from django.db.models import F, QuerySet, Q, Subquery, OuterRef, Case, When, Value
 
 from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.attribution_new import AttributionNew
@@ -95,6 +95,8 @@ def _prefetch_attributions(applicant_qs) -> List[AttributionFromRepositoryDTO]:
     attributions_as_dict = AttributionNew.objects.filter(
         tutor__person__global_id__in=applicant_qs.values_list('global_id', flat=True),
         decision_making=''
+    ).exclude(
+        attributionchargenew__learning_component_year__learning_unit_year__subtype=learning_unit_year_subtypes.PARTIM
     ).annotate(
         course_id_code=F('learning_container_year__acronym'),
         course_id_year=F('learning_container_year__academic_year__year'),
@@ -106,13 +108,13 @@ def _prefetch_attributions(applicant_qs) -> List[AttributionFromRepositoryDTO]:
             output_field=models.CharField()
         ),
         applicant_id_global_id=F('tutor__person__global_id'),
-        lecturing_volume=Subquery(
+        lecturing_volume_raw=Subquery(
             subqs.filter(
                 learning_component_year__type=learning_component_year_type.LECTURING
             ).values('allocation_charge')[:1],
             output_field=models.DecimalField()
         ),
-        practical_volume=Subquery(
+        practical_volume_raw=Subquery(
             subqs.filter(
                 learning_component_year__type=learning_component_year_type.PRACTICAL_EXERCISES
             ).values('allocation_charge')[:1],
@@ -122,6 +124,17 @@ def _prefetch_attributions(applicant_qs) -> List[AttributionFromRepositoryDTO]:
             When(substitute__isnull=False, then=True),
             default=False,
             output_field=models.BooleanField()
+        )
+    ).annotate(
+        lecturing_volume=Case(
+            When(lecturing_volume_raw__isnull=True, then=Value(0)),
+            default=F('lecturing_volume_raw'),
+            output_field=models.DecimalField()
+        ),
+        practical_volume=Case(
+            When(practical_volume_raw__isnull=True, then=Value(0)),
+            default=F('practical_volume_raw'),
+            output_field=models.DecimalField()
         )
     ).values(
         'course_id_code',
