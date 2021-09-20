@@ -213,7 +213,6 @@ components:
           example: "LABCD1234"
     TypePepsEnum:
       type: string
-      nullable: true
       enum:
         - NOT_DEFINED
         - DISABILITY
@@ -221,10 +220,8 @@ components:
         - ARTIST
         - ENTREPRENEUR
         - ARRANGEMENT_JURY
-        - ""
     SubtypeEnum:
       type: string
-      nullable: true
       enum:
         - PROMISING_ATHLETE_HL
         - PROMISING_ATHLETE
