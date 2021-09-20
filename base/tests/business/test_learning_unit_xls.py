@@ -86,7 +86,7 @@ ROOT_ACRONYM = 'DRTI'
 VERSION_ACRONYM = 'CRIM'
 ALL_COLUMNS_FOR_ATTRIBUTIONS_LIST = [
         'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
-        'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE'
+        'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG'
     ]
 
 
@@ -835,7 +835,7 @@ class TestLearningUnitXlsClassesDetail(TestCase):
             entity_requirement=Subquery(self.entity_requirement),
             entity_allocation=Subquery(self.entity_allocation),
         )
-        result = prepare_xls_content_with_attributions(qs, 31)
+        result = prepare_xls_content_with_attributions(qs, 33)
         data = result.get('data')
 
         # 4 UE attributions = 3 attributions on lecturing + 1 on practical
@@ -874,7 +874,7 @@ class TestLearningUnitXlsClassesDetail(TestCase):
 
         expected = _build_cells_ref(
             ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
-             'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC'], [3, 4, 5, 7])
+             'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE'], [3, 4, 5, 7])
 
         self.assertSetEqual(
             cells_with_white_font,
@@ -882,8 +882,8 @@ class TestLearningUnitXlsClassesDetail(TestCase):
         )
 
     def _assert_class_attribution_volumes(self, class_attribution_line_data, attribution_class):
-        self.assertEqual(class_attribution_line_data[34], '')
-        self.assertEqual(class_attribution_line_data[35], attribution_class.allocation_charge)
+        self.assertEqual(class_attribution_line_data[36], '')
+        self.assertEqual(class_attribution_line_data[37], attribution_class.allocation_charge)
 
     def test_get_class_score_responsibles(self):
         score_responsibles = _get_class_score_responsibles(self.class_a)
