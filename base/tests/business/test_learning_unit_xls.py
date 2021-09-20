@@ -454,6 +454,8 @@ class TestLearningUnitXls(TestCase):
             str(_('yes')) if luy.exchange_students else str(_('no')),
             str(_('yes')) if luy.individual_loan else str(_('no')),
             str(_('yes')) if luy.stage_dimona else str(_('no')),
+            luy.other_remark,
+            luy.other_remark_english,
         ]
         self.assertEqual(
             get_data_part2(learning_unit_yr=luy, effective_class=None, with_attributions=False),
@@ -610,6 +612,8 @@ class TestLearningUnitXls(TestCase):
             str(_('yes')) if luy.exchange_students else str(_('no')),
             str(_('yes')) if luy.individual_loan else str(_('no')),
             str(_('yes')) if luy.stage_dimona else str(_('no')),
+            luy.other_remark,
+            luy.other_remark_english,
             "{} ({}) - {} - {}".format(
                 self.a_group_year_parent.partial_acronym,
                 "{0:.2f}".format(self.group_element_child.relative_credits),
@@ -659,22 +663,24 @@ class TestLearningUnitXls(TestCase):
             entity_requirement=Subquery(self.entity_requirement),
             entity_allocation=Subquery(self.entity_allocation),
         )
-        result = prepare_xls_content_with_attributions(qs, 31)
+        result = prepare_xls_content_with_attributions(qs, 33)
         self.assertEqual(len(result.get('data')), 2)
         self.assertCountEqual(result.get('cells_with_top_border'), ['A2', 'B2', 'C2', 'D2', 'E2', 'F2', 'G2', 'H2',
                                                                     'I2', 'J2', 'K2', 'L2', 'M2', 'N2', 'O2', 'P2',
                                                                     'Q2', 'R2', 'S2', 'T2', 'U2', 'V2', 'W2', 'X2',
-                                                                    'Y2', 'Z2', 'AA2', 'AB2', 'AC2', 'AD2', 'AE2']
+                                                                    'Y2', 'Z2', 'AA2', 'AB2', 'AC2', 'AD2', 'AE2',
+                                                                    'AF2', 'AG2'
+                                                                    ]
                               )
         self.assertCountEqual(result.get('cells_with_white_font'),
                               [
                                   'A3', 'B3', 'C3', 'D3', 'E3', 'F3', 'G3', 'H3', 'I3', 'J3', 'K3', 'L3', 'M3', 'N3',
                                   'O3', 'P3', 'Q3', 'R3', 'S3', 'T3', 'U3', 'V3', 'W3', 'X3', 'Y3', 'Z3', 'AA3', 'AB3',
-                                  'AC3'
+                                  'AC3', 'AD3', 'AE3'
                               ]
                               )
         first_attribution = result.get('data')[0]
-        attribution_first_column = 29
+        attribution_first_column = 31
         self.assertEqual(first_attribution[attribution_first_column], 'Dupuis Tom')
         self.assertEqual(first_attribution[attribution_first_column+1], 'dupuis@gmail.com')
         self.assertEqual(first_attribution[attribution_first_column+2], _("Coordinator"))
@@ -815,6 +821,8 @@ class TestLearningUnitXlsClassesDetail(TestCase):
             yesno(luy.exchange_students).strip(),
             yesno(luy.individual_loan).strip(),
             yesno(luy.stage_dimona).strip(),
+            luy.other_remark,
+            luy.other_remark_english,
         ]
 
         self.assertEqual(
@@ -941,6 +949,8 @@ def _expected_titles_common_part2_b() -> List[str]:
         str(_('Exchange students')),
         str(_('Individual loan')),
         str(_('Stage-Dimona')),
+        str(_('Other remark (intended for publication)')),
+        str(_('Other remark in english (intended for publication)')),
     ]
 
 

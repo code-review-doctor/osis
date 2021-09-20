@@ -65,9 +65,9 @@ from program_management.tests.factories.education_group_version import \
 from program_management.tests.factories.element import ElementFactory
 from reference.tests.factories.country import CountryFactory
 
-TRAINING_TITLE_COLUMN = 35
-TRAINING_CODE_COLUMN = 34
-GATHERING_COLUMN = 33
+TRAINING_TITLE_COLUMN = 37
+TRAINING_CODE_COLUMN = 36
+GATHERING_COLUMN = 35
 ROOT_ACRONYM = 'DRTI'
 VERSION_ACRONYM = 'CRIM'
 
@@ -195,6 +195,8 @@ class TestUeUtilization(TestCase):
                                  str(_('Exchange students')),
                                  str(_('Individual loan')),
                                  str(_('Stage-Dimona')),
+                                 str(_('Other remark (intended for publication)')),
+                                 str(_('Other remark in english (intended for publication)')),
                                  str(_('Gathering')), str(_('Training code')), str(_('Training title')),
                                  str(_('Training management entity')),
                                  str(_('Training management entity faculty')),
@@ -295,7 +297,8 @@ class TestUeUtilization(TestCase):
 
         first_row_cells_without_training_data = [
             'A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1', 'I1', 'J1', 'K1', 'L1', 'M1', 'N1', 'O1', 'P1', 'Q1', 'R1',
-            'S1', 'T1', 'U1', 'V1', 'W1', 'X1', 'Y1', 'Z1', 'AA1', 'AB1', 'AC1', 'AD1', 'AE1', 'AF1', 'AG1'
+            'S1', 'T1', 'U1', 'V1', 'W1', 'X1', 'Y1', 'Z1', 'AA1', 'AB1', 'AC1', 'AD1', 'AE1', 'AF1', 'AG1', 'AH1',
+            'AI1'
         ]
         self.assertListEqual(result[WHITE_FONT], first_row_cells_without_training_data)
 
@@ -307,7 +310,7 @@ class TestUeUtilization(TestCase):
         row_colored_because_of_proposal = [
             'A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1', 'I1', 'J1', 'K1', 'L1', 'M1', 'N1', 'O1', 'P1', 'Q1', 'R1',
             'S1', 'T1', 'U1', 'V1', 'W1', 'X1', 'Y1', 'Z1', 'AA1', 'AB1', 'AC1', 'AD1', 'AE1', 'AF1', 'AG1', 'AH1',
-            'AI1', 'AJ1', 'AK1', 'AL1'
+            'AI1', 'AJ1', 'AK1', 'AL1', 'AM1', 'AN1'
         ]
         self.assertDictEqual(result, {PROPOSAL_LINE_STYLES.get(self.proposal.type): row_colored_because_of_proposal})
 
@@ -325,10 +328,11 @@ class TestUeUtilization(TestCase):
         )
         first_row_cells_without_training_data = [
             'A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1', 'I1', 'J1', 'K1', 'L1', 'M1', 'N1', 'O1', 'P1', 'Q1', 'R1',
-            'S1', 'T1', 'U1', 'V1', 'W1', 'X1', 'Y1', 'Z1', 'AA1', 'AB1', 'AC1', 'AD1', 'AE1', 'AF1', 'AG1'
+            'S1', 'T1', 'U1', 'V1', 'W1', 'X1', 'Y1', 'Z1', 'AA1', 'AB1', 'AC1', 'AD1', 'AE1', 'AF1', 'AG1', 'AH1',
+            'AI1'
         ]
         row_colored_because_of_proposal = [
-            'AH1', 'AI1', 'AJ1', 'AK1', 'AL1'
+            'AJ1', 'AK1', 'AL1', 'AM1', 'AN1'
         ]
         self.assertListEqual(result[WHITE_FONT], first_row_cells_without_training_data)
         self.assertListEqual(result[PROPOSAL_LINE_STYLES.get(proposal.type)], row_colored_because_of_proposal)
@@ -397,6 +401,8 @@ class TestUeUtilization(TestCase):
             _('yes') if luy.exchange_students else _('no'),
             _('yes') if luy.individual_loan else _('no'),
             _('yes') if luy.stage_dimona else _('no'),
+            luy.other_remark,
+            luy.other_remark_english,
             "{} ({})".format(self.a_group_year_parent.partial_acronym,
                              "{0:.2f}".format(self.group_element_child.relative_credits)),
             self.a_group_year_parent.acronym,
