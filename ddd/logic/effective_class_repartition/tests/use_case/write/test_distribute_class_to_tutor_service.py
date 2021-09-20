@@ -23,23 +23,29 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import random
+from random import randint
 from decimal import Decimal
 
 import attr
 from django.test import TestCase
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
+from ddd.logic.application.dtos import LearningUnitAnnualVolumeFromServiceDTO
 from ddd.logic.effective_class_repartition.commands import DistributeClassToTutorCommand
+from ddd.logic.effective_class_repartition.domain.model.tutor import TutorIdentity
 from ddd.logic.effective_class_repartition.domain.validator.exceptions import TutorAlreadyAssignedException, \
     AssignedVolumeInvalidValueException
 from ddd.logic.effective_class_repartition.tests.factory.tutor import TutorWithoutDistributedEffectiveClassesFactory
 from ddd.logic.effective_class_repartition.use_case.write.distribute_class_to_tutor_service import \
     distribute_class_to_tutor
+from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
 from ddd.logic.learning_unit.tests.factory.effective_class import LecturingEffectiveClassFactory
+from ddd.logic.learning_unit.tests.factory.learning_unit import CourseWithLecturingVolumesOnly
 from infrastructure.effective_class_repartition.repository.in_memory.tutor import TutorRepository
 from infrastructure.learning_unit.repository.in_memory.effective_class import EffectiveClassRepository
 from infrastructure.application.services.learning_unit_service import LearningUnitTranslator
+from ddd.logic.learning_unit.tests.factory.effective_class import LecturingEffectiveClassWithoutRepartitionFactory
+from unittest import mock
 
 
 class DistributeClassToTutorService(TestCase):
@@ -147,3 +153,37 @@ class DistributeClassToTutorService(TestCase):
         self.assertEqual(class_volume.distributed_volume, cmd.distributed_volume)
         self.assertEqual(class_volume.attribution_uuid, cmd.learning_unit_attribution_uuid)
         self.assertEqual(class_volume.effective_class, self.effective_class.entity_id)
+
+    @mock.patch("infrastructure.application.services.learning_unit_service.LearningUnitTranslator."
+                "search_learning_unit_annual_volume_dto")
+    def test_no_volume_repartition_on_class_should_use_ue_volume(self, mock_volume):
+        learning_unit = CourseWithLecturingVolumesOnly()
+        available_ue_volume = learning_unit.lecturing_part.volumes.volume_annual
+        mock_volume.return_value = LearningUnitAnnualVolumeFromServiceDTO(volume=available_ue_volume)
+        tutor1 = TutorWithoutDistributedEffectiveClassesFactory()
+        self.tutor_repository.save(tutor1)
+        effective_class_entity_id = EffectiveClassIdentity(
+            class_code='A',
+            learning_unit_identity=learning_unit.entity_id
+        )
+        effective_class_without_repartition = LecturingEffectiveClassWithoutRepartitionFactory(
+            entity_id=effective_class_entity_id
+        )
+        self.effective_class_repository.save(effective_class_without_repartition)
+
+        cmd = DistributeClassToTutorCommand(
+            class_code=effective_class_without_repartition.entity_id.class_code,
+            learning_unit_code=effective_class_without_repartition.entity_id.learning_unit_identity.code,
+            learning_unit_attribution_uuid='uuid',
+            year=effective_class_without_repartition.entity_id.learning_unit_identity.academic_year.year,
+            tutor_personal_id_number=tutor1.entity_id.personal_id_number,
+            distributed_volume=randint(1, available_ue_volume),
+        )
+        tutor_id = distribute_class_to_tutor(
+            cmd,
+            self.tutor_repository,
+            self.effective_class_repository,
+            self.learning_unit_translator,
+        )
+        # No exception AssignedVolumeInvalidValueException was raised
+        self.assertTrue(isinstance(tutor_id, TutorIdentity))

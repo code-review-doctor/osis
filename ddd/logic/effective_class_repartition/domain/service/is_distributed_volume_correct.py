@@ -50,8 +50,9 @@ class DistributedVolumeWithClassVolume(interface.DomainService):
             effective_class.learning_unit_identity.year
         )
         learning_unit = learning_unit_service.search_learning_unit_annual_volume_dto(learning_unit_id)
-        total_class_volume = effective_class.volumes.total_volume \
-            if effective_class.volumes.total_volume else learning_unit.volume
+        class_tot_vol = effective_class.volumes.total_volume
+        total_class_volume = class_tot_vol \
+            if class_tot_vol and class_tot_vol > 0 else learning_unit.volume
         if distributed_volume:
             execute_functions_and_aggregate_exceptions(
                 partial(_should_be_lower_than_effective_class_volume, distributed_volume, total_class_volume),
