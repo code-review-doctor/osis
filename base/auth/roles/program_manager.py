@@ -166,12 +166,11 @@ def find_by_management_entity(administration_entities: List['EntityVersion']):
     return None
 
 
-def get_learning_unit_years_attached_to_program_managers(programs_manager_qs, entity_structure):
-    current_ac = current_academic_year()
+def get_learning_unit_years_attached_to_program_managers(programs_manager_qs, entity_structure, academic_year):
     allowed_entities_scopes = set()
 
     offer_enrollments_education_group_year = LearningUnitEnrollment.objects.filter(
-        offer_enrollment__education_group_year__academic_year=current_ac,
+        offer_enrollment__education_group_year__academic_year=academic_year,
         offer_enrollment__education_group_year__education_group__in=programs_manager_qs.values_list(
             'education_group',
             flat=True
@@ -185,7 +184,7 @@ def get_learning_unit_years_attached_to_program_managers(programs_manager_qs, en
         )
     )
     lu_enrollments = LearningUnitEnrollment.objects.filter(
-        offer_enrollment__education_group_year__academic_year=current_ac,
+        offer_enrollment__education_group_year__academic_year=academic_year,
         offer_enrollment__education_group_year__education_group__in=programs_manager_qs.values_list(
             'education_group',
             flat=True
