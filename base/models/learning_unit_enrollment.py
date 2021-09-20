@@ -30,13 +30,23 @@ from osis_common.models.serializable_model import SerializableModelAdmin, Serial
 
 
 class LearningUnitEnrollmentAdmin(SerializableModelAdmin):
-    list_display = ('student', 'learning_unit_year', 'offer', 'date_enrollment', 'enrollment_state', 'changed')
+    list_display = (
+        'student',
+        'learning_unit_year',
+        'learning_class_year',
+        'offer',
+        'date_enrollment',
+        'enrollment_state',
+        'changed',
+    )
     list_filter = ('learning_unit_year__academic_year', 'enrollment_state',)
-    search_fields = ['learning_unit_year__acronym',
-                     'offer_enrollment__education_group_year__acronym',
-                     'offer_enrollment__student__registration_id',
-                     'offer_enrollment__student__person__first_name',
-                     'offer_enrollment__student__person__last_name']
+    search_fields = [
+        'learning_unit_year__acronym',
+        'offer_enrollment__education_group_year__acronym',
+        'offer_enrollment__student__registration_id',
+        'offer_enrollment__student__person__first_name',
+        'offer_enrollment__student__person__last_name',
+    ]
 
 
 class LearningUnitEnrollment(SerializableModel):
