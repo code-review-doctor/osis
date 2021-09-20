@@ -382,6 +382,9 @@
       $('#table_online').DataTable({
         paging: false,
         searching: false,
+        language: {
+            "emptyTable": "{% trans "No result!" %}"
+        },
         info: false,
         columnDefs: [
             { orderable: false, targets: 0 },
