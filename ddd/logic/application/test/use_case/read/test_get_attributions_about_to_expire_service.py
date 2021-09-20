@@ -42,7 +42,7 @@ from ddd.logic.application.domain.model.vacant_course import VacantCourseIdentit
 from ddd.logic.application.domain.validator.exceptions import VacantCourseApplicationManagedInTeamException, \
     ApplicationAlreadyExistsException, VolumesAskedShouldBeLowerOrEqualToVolumeAvailable, \
     VacantCourseNotAllowedDeclarationType, VacantCourseNotFound, AttributionSubstituteException, \
-    AttributionAboutToExpireWithoutVolumeException
+    AttributionAboutToExpireWithoutVolumeException, CourseInSuppressionProposalException
 from ddd.logic.application.dtos import AttributionAboutToExpireDTO
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
@@ -70,6 +70,7 @@ class TestGetAttributionsAboutToExpireService(TestCase):
                 academic_year=AcademicYearIdentityBuilder.build_from_year(year=2017),
             ),
             course_title="Introduction au droit",
+            course_is_in_suppression_proposal=False,
             function=Functions.CO_HOLDER,
             end_year=AcademicYearIdentityBuilder.build_from_year(year=2017),
             start_year=AcademicYearIdentityBuilder.build_from_year(year=2016),
@@ -149,7 +150,8 @@ class TestGetAttributionsAboutToExpireService(TestCase):
             start_year=AcademicYearIdentityBuilder.build_from_year(year=2016),
             lecturing_volume=Decimal(10),
             practical_volume=Decimal(15),
-            is_substitute=False
+            is_substitute=False,
+            course_is_in_suppression_proposal=False
         )]
 
         cmd = GetAttributionsAboutToExpireCommand(global_id=self.global_id)
@@ -264,6 +266,22 @@ class TestGetAttributionsAboutToExpireService(TestCase):
         self.assertEqual(
             results[0].unavailable_renewal_reason,
             AttributionSubstituteException().message
+        )
+
+    def test_assert_unavailable_renewal_reason_case_course_in_suppression_proposal(self):
+        self.applicant.attributions = [
+            attr.evolve(self.attribution_about_to_expire, course_is_in_suppression_proposal=True)
+        ]
+
+        cmd = GetAttributionsAboutToExpireCommand(global_id=self.global_id)
+        results = self.message_bus.invoke(cmd)
+
+        self.assertEqual(len(results), 1)
+        self.assertIsInstance(results[0], AttributionAboutToExpireDTO)
+        self.assertFalse(results[0].is_renewable)
+        self.assertEqual(
+            results[0].unavailable_renewal_reason,
+            CourseInSuppressionProposalException(year=self.attribution_about_to_expire.course_id.year).message
         )
 
     def test_assert_renewal_because_no_unavailable_renewal_reason(self):

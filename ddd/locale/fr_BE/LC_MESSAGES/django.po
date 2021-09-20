@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-30 13:45+0200\n"
+"POT-Creation-Date: 2021-09-20 10:17+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -192,6 +192,12 @@ msgstr ""
 "Ce cours est géré en équipe. La candidature des équipes d'enseignants "
 "s'effectue via la procédure papier."
 
+#, python-format
+msgid ""
+"This course will be discontinued in %(academic_year)s following a program "
+"reform."
+msgstr "Ce cours sera supprimé en %(academic_year)s suite à une réforme de programme."
+
 msgid "Tutor already assigned to the class"
 msgstr "L'enseignant est déjà assigné à cette classe"
 
@@ -225,12 +231,14 @@ msgstr ""
 "Vous ne pouvez pas créer une nouvelle classe sur cette unité d'enseignement "
 "car elle est en proposition pour cette année ou une année antérieure."
 
+#, python-format
 msgid ""
 "You cannot create class in %(year)s because there is no learning unit "
 "corresponding in %(year)s"
 msgstr ""
-"Vous ne pouvez pas créer une classe sur cette unité d'enseignement en %(year)s"
-", car il n'existe pas d'unité d'enseignement correspondant en %(year)s."
+"Vous ne pouvez pas créer une classe sur cette unité d'enseignement en "
+"%(year)s, car il n'existe pas d'unité d'enseignement correspondant en "
+"%(year)s."
 
 msgid ""
 "You cannot create class on this learning unit because the component's annual "

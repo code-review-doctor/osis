@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from education_group.templatetags.academic_year_display import display_as_academic_year
 from osis_common.ddd.interface import BusinessException
 
 from django.utils.translation import gettext_lazy as _
@@ -113,4 +114,14 @@ class AttributionSubstituteException(BusinessException):
 
     def __init__(self, *args,  **kwargs):
         message = _("A substitute can not renew his function of substitute")
+        super().__init__(message, **kwargs)
+
+
+class CourseInSuppressionProposalException(BusinessException):
+    status_code = "APPLICATION-12"
+
+    def __init__(self, *args,  year: int, **kwargs):
+        message = _("This course will be discontinued in %(academic_year)s following a program reform.") % {
+            "academic_year": display_as_academic_year(year)
+        }
         super().__init__(message, **kwargs)
