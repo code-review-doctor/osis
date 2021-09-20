@@ -27,6 +27,7 @@ from typing import Dict, List
 from collections import defaultdict
 from django.db.models import QuerySet
 from django.db.models.expressions import RawSQL
+from django.template.defaultfilters import yesno
 from openpyxl.styles import Color, Font
 
 from base.business.learning_unit_xls import HEADER_TEACHERS, \
@@ -49,9 +50,11 @@ XLS_DESCRIPTION = _('List of learning units with one line per training')
 WORKSHEET_TITLE = _('Learning units training list')
 WHITE_FONT = Font(color=Color('00FFFFFF'))
 FIRST_TRAINING_COLUMN = 36
-TOTAL_NB_OF_COLUMNS = 40
+TOTAL_NB_OF_COLUMNS = 42
 HEADER_PROGRAMS = [
     str(_('Gathering')),
+    str(_('Relative credits')),
+    str(_('Mandatory')),
     str(_('Training code')),
     str(_('Training title')),
     str(_('Training management entity')),
@@ -128,7 +131,8 @@ def _prepare_xls_content(learning_unit_years: QuerySet) -> Dict:
                             leaf_credits,
                             partial_acronym,
                             training,
-                            learning_unit_yr.academic_year
+                            learning_unit_yr.academic_year,
+                            group_element_year.is_mandatory,
                         )
                         if training_data:
                             lines.append(lu_data_part1 + lu_data_part2 + training_data)
@@ -154,9 +158,12 @@ def _prepare_xls_content(learning_unit_years: QuerySet) -> Dict:
 def _build_training_data_columns(leaf_credits: str,
                                  partial_acronym: str,
                                  training: dict,
-                                 an_academic_year: AcademicYear) -> List:
+                                 an_academic_year: AcademicYear,
+                                 is_mandatory: bool) -> List:
     data = list()
-    data.append("{} ({})".format(partial_acronym, leaf_credits))
+    data.append("{}".format(partial_acronym))
+    data.append("{}".format(leaf_credits))
+    data.append(yesno(is_mandatory).strip())
     data.append("{}".format(acronym_with_version_label(
         training['acronym'], training['transition_name'], training['version_name']))
     )
