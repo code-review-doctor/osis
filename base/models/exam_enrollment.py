@@ -33,7 +33,6 @@ from django.utils.translation import gettext as _
 from attribution.models import attribution
 from base.models import person, session_exam_deadline, \
     academic_year as academic_yr, education_group_year
-from base.auth.roles import program_manager, tutor
 from base.models.enums import exam_enrollment_justification_type as justification_types
 from base.models.enums import exam_enrollment_state as enrollment_states
 from base.models.enums.exam_enrollment_justification_type import JustificationTypes
@@ -262,6 +261,7 @@ def get_progress_by_learning_unit_years_and_offer_years(user,
         education_group_year_ids = education_group_year.find_by_user(user, academic_year).values_list('id', flat=True)
 
     tutor_user = None
+    from base.auth.roles import program_manager, tutor
     if not program_manager.is_program_manager(user):
         tutor_user = tutor.find_by_user(user)
 

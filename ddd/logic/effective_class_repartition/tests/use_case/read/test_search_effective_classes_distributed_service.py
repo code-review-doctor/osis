@@ -37,6 +37,7 @@ from infrastructure.effective_class_repartition.domain.service.in_memory.tutor_a
     TutorAttributionToLearningUnitTranslatorInMemory
 from infrastructure.effective_class_repartition.repository.in_memory.tutor import TutorRepository as \
     TutorRepositoryInMemory
+from infrastructure.learning_unit.repository.in_memory.effective_class import EffectiveClassRepository
 from infrastructure.messages_bus import message_bus_instance
 
 
@@ -64,6 +65,8 @@ class SearchClassesEnseignantTest(SimpleTestCase):
             ]
         )
         self.tutor_repository.save(self.tutor)
+
+        self.effective_class_repository = EffectiveClassRepository()
         self.__mock_service_bus()
 
     def __mock_service_bus(self):
@@ -71,6 +74,7 @@ class SearchClassesEnseignantTest(SimpleTestCase):
             'infrastructure.messages_bus',
             TutorAttributionToLearningUnitTranslator=lambda: self.attributions_translator,
             TutorRepository=lambda: self.tutor_repository,
+            EffectiveClassRepository=lambda: self.effective_class_repository,
         )
         message_bus_patcher.start()
         self.addCleanup(message_bus_patcher.stop)
@@ -104,7 +108,7 @@ class SearchClassesEnseignantTest(SimpleTestCase):
         dto = result[0]
         self.assertEqual(
             dto.complete_class_code,
-            self.tutor.distributed_effective_classes[0].effective_class.complete_class_code,
+            self.effective_class_repository.dtos[1].code_complet_classe
         )
         self.assertEqual(
             dto.annee,

@@ -48,6 +48,8 @@ from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.attributio
     AttributionEnseignantTranslatorInMemory
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.periode_encodage_notes import \
     PeriodeEncodageNotesTranslatorInMemory
+from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.historiser_notes import \
+    HistoriserNotesServiceInMemory
 from infrastructure.encodage_de_notes.soumission.repository.in_memory.note_etudiant import \
     NoteEtudiantInMemoryRepository
 from infrastructure.messages_bus import message_bus_instance
@@ -78,6 +80,8 @@ class EncoderNotesTest(SimpleTestCase):
 
         self.periode_encodage_notes_translator = PeriodeEncodageNotesTranslatorInMemory()
         self.attribution_translator = AttributionEnseignantTranslatorInMemory()
+        self.historiser_notes_service = HistoriserNotesServiceInMemory()
+        self.historiser_notes_service.appels.clear()
         self.__mock_service_bus()
 
     def __mock_service_bus(self):
@@ -86,6 +90,7 @@ class EncoderNotesTest(SimpleTestCase):
             NoteEtudiantRepository=lambda: self.repository,
             PeriodeEncodageNotesTranslator=lambda: self.periode_encodage_notes_translator,
             AttributionEnseignantTranslator=lambda: self.attribution_translator,
+            HistoriserNotesService=lambda: self.historiser_notes_service
         )
         message_bus_patcher.start()
         self.addCleanup(message_bus_patcher.stop)
@@ -408,6 +413,10 @@ class EncoderNotesTest(SimpleTestCase):
 
                 expected_result = Justification(value=JustificationTypes.CHEATING)
                 self.assertEqual(self.repository.get(entity_id).note, expected_result)
+
+    def test_should_historiser_encodage(self):
+        self.message_bus.invoke(self.cmd)
+        self.assertEqual(len(self.historiser_notes_service.appels), 1)
 
     def _generate_command_from_note_etudiant(self, note_etudiant: 'NoteEtudiant', note=None):
         return EncoderNotesEtudiantCommand(

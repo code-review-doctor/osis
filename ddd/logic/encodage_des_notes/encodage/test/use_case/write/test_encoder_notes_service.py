@@ -47,6 +47,8 @@ from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import 
     PasGestionnaireParcoursCohorteException
 from infrastructure.encodage_de_notes.encodage.domain.service.in_memory.cohortes_du_gestionnaire import \
     CohortesDuGestionnaireInMemory
+from infrastructure.encodage_de_notes.encodage.domain.service.in_memory.historiser_notes import \
+    HistoriserEncodageNotesServiceInMemory
 from infrastructure.encodage_de_notes.encodage.domain.service.in_memory.notifier_encodage_notes import \
     NotifierEncodageNotesInMemory
 from infrastructure.encodage_de_notes.encodage.repository.in_memory.note_etudiant import NoteEtudiantInMemoryRepository
@@ -80,6 +82,9 @@ class EncoderNoteTest(SimpleTestCase):
         self.cohortes_gestionnaire_trans = CohortesDuGestionnaireInMemory()
         self.notifier_notes_domain_service = NotifierEncodageNotesInMemory()
         self.notifier_notes_domain_service.notifications.clear()
+        self.historiser_note_service = HistoriserEncodageNotesServiceInMemory()
+        self.historiser_note_service.appels.clear()
+
         self.__mock_service_bus()
 
     def __mock_service_bus(self):
@@ -89,6 +94,7 @@ class EncoderNoteTest(SimpleTestCase):
             PeriodeEncodageNotesTranslator=lambda: self.periode_encodage_notes_translator,
             CohortesDuGestionnaireTranslator=lambda: self.cohortes_gestionnaire_trans,
             NotifierEncodageNotes=lambda: self.notifier_notes_domain_service,
+            HistoriserEncodageNotesService=lambda: self.historiser_note_service
         )
         message_bus_patcher.start()
         self.addCleanup(message_bus_patcher.stop)
@@ -316,6 +322,10 @@ class EncoderNoteTest(SimpleTestCase):
 
         notification_kwargs = self.notifier_notes_domain_service.notifications[0]
         self.assertEqual(notification_kwargs['notes_encodees'], result)
+
+    def test_should_historiser_encodage(self):
+        self.message_bus.invoke(self.cmd)
+        self.assertEqual(len(self.historiser_note_service.appels), 1)
 
     def test_should_afficher_rapport_plusieurs_notes_erreurs(self):
         note1 = NoteManquanteEtudiantFactory()

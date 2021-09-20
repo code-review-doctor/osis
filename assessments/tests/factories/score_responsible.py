@@ -43,6 +43,7 @@ class ScoreResponsibleFactory(factory.DjangoModelFactory):
 class ScoreResponsibleOfClassFactory(ScoreResponsibleFactory):
     learning_class_year = factory.SubFactory(
         LearningClassYearFactory,
+        learning_component_year__lecturing=True,
         learning_component_year__learning_unit_year=factory.LazyAttribute(
             lambda component: component.factory_parent.factory_parent.learning_unit_year
         )

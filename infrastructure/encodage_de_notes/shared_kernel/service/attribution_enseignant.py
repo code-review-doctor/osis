@@ -92,7 +92,7 @@ def _search_repartition_classes(
         cmd = SearchClassesEnseignantCommand(matricule_fgs_enseignant=matricule_enseignant, annee=annee)
     else:
         code_classe = code_unite_enseignement[-1]
-        code_sans_lettre_classe = code_unite_enseignement[:-1]
+        code_sans_lettre_classe = code_unite_enseignement.replace('_', '').replace('-', '')[:-1]
         cmd = SearchTutorsDistributedToClassCommand(
             learning_unit_code=code_sans_lettre_classe,
             learning_unit_year=annee,

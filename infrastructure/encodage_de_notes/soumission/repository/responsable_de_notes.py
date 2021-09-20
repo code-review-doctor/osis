@@ -29,11 +29,12 @@ import operator
 import string
 from typing import Optional, List, Set
 
-from django.db.models import F, Q, CharField
+from django.db.models import F, Q, CharField, Case, When, Value
 from django.db.models.functions import Concat
 
 from assessments.models.score_responsible import ScoreResponsible
 from base.auth.roles.tutor import Tutor
+from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.learning_unit_year import LearningUnitYear
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import EnseignantDTO
 from ddd.logic.encodage_des_notes.soumission.builder.responsable_de_notes_builder import ResponsableDeNotesBuilder
@@ -111,9 +112,26 @@ class ResponsableDeNotesRepository(IResponsableDeNotesRepository):
             ]
         ) if unite_enseignement_to_exclude else None
         qs_base_score_responsible = ScoreResponsible.objects.annotate(
-            acronym=Concat(
-                'learning_unit_year__acronym',
-                'learning_class_year__acronym',
+            acronym=Case(
+                When(
+                    learning_class_year__learning_component_year__type=LECTURING,
+                    then=Concat(
+                        'learning_unit_year__acronym',
+                        Value('-'),
+                        'learning_class_year__acronym',
+                        output_field=CharField()
+                    )
+                ),
+                When(
+                    learning_class_year__learning_component_year__type=PRACTICAL_EXERCISES,
+                    then=Concat(
+                        'learning_unit_year__acronym',
+                        Value('_'),
+                        'learning_class_year__acronym',
+                        output_field=CharField()
+                    )
+                ),
+                default=F('learning_unit_year__acronym'),
                 output_field=CharField()
             ),
             year=F('learning_unit_year__academic_year__year')
@@ -147,7 +165,7 @@ class ResponsableDeNotesRepository(IResponsableDeNotesRepository):
         tutor = Tutor.objects.get(person__global_id=entity_id.matricule_fgs_enseignant)
         if is_class:
             luy = LearningUnitYear.objects.get(
-                acronym=unite_enseignement.code_unite_enseignement[:-1],
+                acronym=unite_enseignement.code_unite_enseignement[:-2],
                 academic_year__year=unite_enseignement.annee_academique
             )
             class_year = LearningClassYear.objects.get(
@@ -207,9 +225,26 @@ class ResponsableDeNotesRepository(IResponsableDeNotesRepository):
             nom=F('tutor__person__last_name'),
             prenom=F('tutor__person__first_name'),
             matricule=F('tutor__person__global_id'),
-            code_unite_enseignement=Concat(
-                'learning_unit_year__acronym',
-                'learning_class_year__acronym',
+            code_unite_enseignement=Case(
+                When(
+                    learning_class_year__learning_component_year__type=LECTURING,
+                    then=Concat(
+                        'learning_unit_year__acronym',
+                        Value('-'),
+                        'learning_class_year__acronym',
+                        output_field=CharField()
+                    )
+                ),
+                When(
+                    learning_class_year__learning_component_year__type=PRACTICAL_EXERCISES,
+                    then=Concat(
+                        'learning_unit_year__acronym',
+                        Value('_'),
+                        'learning_class_year__acronym',
+                        output_field=CharField()
+                    )
+                ),
+                default=F('learning_unit_year__acronym'),
                 output_field=CharField()
             ),
             annee_unite_enseignement=F('learning_unit_year__academic_year__year'),
@@ -236,7 +271,28 @@ class ResponsableDeNotesRepository(IResponsableDeNotesRepository):
 def _fetch_responsable_de_notes():
     return ScoreResponsible.objects.annotate(
         global_id=F('tutor__person__global_id'),
-        acronym=Concat('learning_unit_year__acronym', 'learning_class_year__acronym', output_field=CharField()),  # FIXME :: quid si learning_class_year__acronym n'existe pas ?
+        acronym=Case(
+            When(
+                learning_class_year__learning_component_year__type=LECTURING,
+                then=Concat(
+                    'learning_unit_year__acronym',
+                    Value('-'),
+                    'learning_class_year__acronym',
+                    output_field=CharField()
+                )
+            ),
+            When(
+                learning_class_year__learning_component_year__type=PRACTICAL_EXERCISES,
+                then=Concat(
+                    'learning_unit_year__acronym',
+                    Value('_'),
+                    'learning_class_year__acronym',
+                    output_field=CharField()
+                )
+            ),
+            default=F('learning_unit_year__acronym'),
+            output_field=CharField()
+        ),
         year=F('learning_unit_year__academic_year__year'),
     ).values_list(
         'global_id',

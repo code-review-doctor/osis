@@ -15,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,16 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf import settings
-from django.contrib import admin
+import uuid
 
-from assessments.models import *
 
-admin.site.register(score_sheet_address.ScoreSheetAddress,
-                    score_sheet_address.ScoreSheetAddressAdmin)
-
-admin.site.register(score_responsible.ScoreResponsible,
-                    score_responsible.ScoreResponsibleAdmin)
-
-if 'osis_history' in settings.INSTALLED_APPS:
-    admin.site.register(score_history.ScoreHistory, score_history.ScoreHistoryAdmin)
+def get_history_identity(code_unite_enseignement: str, annee_academique: int, numero_session: int) -> str:
+    name = "{}{}{}".format(code_unite_enseignement, str(annee_academique), str(numero_session))
+    return str(uuid.uuid3(uuid.NAMESPACE_OID, name=name))
