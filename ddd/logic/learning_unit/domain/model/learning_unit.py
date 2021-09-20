@@ -134,8 +134,7 @@ class LearningUnit(interface.RootEntity):
     def volumes(self) -> 'Volumes':
         if self.has_practical_volume() and not self.has_lecturing_volume():
             return self.practical_part.volumes
-        else:
-            return self.lecturing_part.volumes
+        return self.lecturing_part.volumes
 
 
 class CourseLearningUnit(LearningUnit):
