@@ -27,7 +27,7 @@ import random
 from decimal import Decimal
 
 import attr
-from django.test import SimpleTestCase
+from django.test import TestCase
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from ddd.logic.effective_class_repartition.commands import DistributeClassToTutorCommand
@@ -39,9 +39,10 @@ from ddd.logic.effective_class_repartition.use_case.write.distribute_class_to_tu
 from ddd.logic.learning_unit.tests.factory.effective_class import LecturingEffectiveClassFactory
 from infrastructure.effective_class_repartition.repository.in_memory.tutor import TutorRepository
 from infrastructure.learning_unit.repository.in_memory.effective_class import EffectiveClassRepository
+from infrastructure.application.services.learning_unit_service import LearningUnitTranslator
 
 
-class DistributeClassToTutorService(SimpleTestCase):
+class DistributeClassToTutorService(TestCase):
     def setUp(self):
         self.tutor_repository = TutorRepository()
         self.effective_class_repository = EffectiveClassRepository()
@@ -57,12 +58,14 @@ class DistributeClassToTutorService(SimpleTestCase):
             tutor_personal_id_number=self.tutor.entity_id.personal_id_number,
             distributed_volume=self.effective_class.volumes.volume_first_quadrimester
         )
+        self.learning_unit_translator = LearningUnitTranslator()
 
     def test_should_distribute_effective_class(self):
         tutor_id = distribute_class_to_tutor(
             self.distribute_class_cmd,
             self.tutor_repository,
             self.effective_class_repository,
+            self.learning_unit_translator,
         )
         tutor = self.tutor_repository.get(tutor_id)
         class_volume = tutor.distributed_effective_classes[0]
@@ -86,6 +89,7 @@ class DistributeClassToTutorService(SimpleTestCase):
             cmd,
             self.tutor_repository,
             self.effective_class_repository,
+            self.learning_unit_translator,
         )
         tutor = self.tutor_repository.get(tutor_id)
         class_volume = tutor.distributed_effective_classes[0]
@@ -101,6 +105,7 @@ class DistributeClassToTutorService(SimpleTestCase):
                 cmd,
                 self.tutor_repository,
                 self.effective_class_repository,
+                self.learning_unit_translator,
             )
         self.assertIsInstance(
             e.exception.exceptions.pop(),
@@ -112,12 +117,14 @@ class DistributeClassToTutorService(SimpleTestCase):
             self.distribute_class_cmd,
             self.tutor_repository,
             self.effective_class_repository,
+            self.learning_unit_translator,
         )
         with self.assertRaises(MultipleBusinessExceptions) as e:
             distribute_class_to_tutor(
                 self.distribute_class_cmd,
                 self.tutor_repository,
                 self.effective_class_repository,
+                self.learning_unit_translator,
             )
         self.assertIsInstance(e.exception.exceptions.pop(), TutorAlreadyAssignedException)
 
@@ -126,9 +133,15 @@ class DistributeClassToTutorService(SimpleTestCase):
             self.distribute_class_cmd,
             self.tutor_repository,
             self.effective_class_repository,
+            self.learning_unit_translator,
         )
         cmd = attr.evolve(self.distribute_class_cmd, learning_unit_attribution_uuid='uuid2', distributed_volume=1)
-        tutor_id = distribute_class_to_tutor(cmd, self.tutor_repository, self.effective_class_repository)
+        tutor_id = distribute_class_to_tutor(
+            cmd,
+            self.tutor_repository,
+            self.effective_class_repository,
+            self.learning_unit_translator
+        )
         tutor = self.tutor_repository.get(tutor_id)
         class_volume = tutor.distributed_effective_classes[-1]
         self.assertEqual(class_volume.distributed_volume, cmd.distributed_volume)
