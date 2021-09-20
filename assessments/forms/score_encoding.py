@@ -90,7 +90,12 @@ class ScoreSearchForm(forms.Form):
 
 class ScoreEncodingProgressFilterForm(forms.Form):
     cohorte_name = forms.ChoiceField(required=False, label=pgettext_lazy('encoding', 'Program'))
-    tutor = forms.CharField(max_length=100, required=False, label=_('Tutor'))
+    tutor = forms.CharField(
+        max_length=100,
+        required=False,
+        label=_('Tutor'),
+        widget=forms.TextInput(attrs={'placeholder':  _('Name')})
+    )
     learning_unit_code = forms.CharField(
         max_length=100, required=False, label=_('Learning unit'),
         widget=forms.TextInput(attrs={'placeholder':  pgettext_lazy('UE acronym', 'Acronym')})
