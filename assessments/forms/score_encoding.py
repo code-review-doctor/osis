@@ -51,15 +51,16 @@ class ScoreSearchEncodingForm(forms.Form):
 
 
 class ScoreSearchForm(forms.Form):
-    noma = forms.CharField(required=False)
-    nom = forms.CharField(required=False)
-    prenom = forms.CharField(required=False)
+    noma = forms.CharField(required=False, label=_("Reg. No."))
+    nom = forms.CharField(required=False, label=_("Lastname"))
+    prenom = forms.CharField(required=False, label=_("Firstname"))
     justification = forms.ChoiceField(
         choices=choice_field.add_blank(
             JustificationTypes.choices(),
             blank_choice_display=pgettext_lazy("male plural", "All")
         ),
-        required=False
+        required=False,
+        label=_("Justification")
     )
     nom_cohorte = forms.ChoiceField(required=False, label=pgettext_lazy('encoding', 'Program'))
 
