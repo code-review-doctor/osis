@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import itertools
 from typing import Optional, List, Set
 
 from django.db.models import F, QuerySet
@@ -49,7 +50,25 @@ class EffectiveClassRepository(IEffectiveClassRepository):
 
     @classmethod
     def search(cls, entity_ids: Optional[List['EffectiveClassIdentity']] = None, **kwargs) -> List['EffectiveClass']:
-        raise NotImplementedError
+        if not entity_ids:
+            return []
+        entity_ids_by_year = itertools.groupby(
+            sorted(
+                entity_ids,
+                key=lambda entity: entity.learning_unit_identity.academic_year.year
+            ),
+            key=lambda entity: entity.learning_unit_identity.academic_year.year
+        )
+        dtos = []
+        for year, entity_ids_of_same_year in entity_ids_by_year:
+            dtos.extend(
+                cls.search_dtos(
+                    {entity.complete_class_code for entity in entity_ids_of_same_year},
+                    year
+                )
+            )
+        builder = EffectiveClassBuilder()
+        return [builder.build_from_repository_dto(dto) for dto in dtos]
 
     @classmethod
     def delete(cls, entity_id: 'EffectiveClassIdentity', **kwargs: ApplicationService) -> None:
@@ -104,8 +123,9 @@ class EffectiveClassRepository(IEffectiveClassRepository):
 
     @classmethod
     def search_dtos(cls, codes: Set[str], annee: int) -> List['EffectiveClassFromRepositoryDTO']:
-        codes_unites_enseignement = {code[:-1] for code in codes}
-        lettres_classes = {code[-1] for code in codes}
+        codes_sans_tiret = {code.replace('-', '').replace('_', '') for code in codes}
+        codes_unites_enseignement = {code[:-1] for code in codes_sans_tiret}
+        lettres_classes = {code[-1] for code in codes_sans_tiret}
         qs = _get_common_queryset().filter(
             # Préfiltre sur année pour performances
             learning_component_year__learning_unit_year__academic_year__year=annee,

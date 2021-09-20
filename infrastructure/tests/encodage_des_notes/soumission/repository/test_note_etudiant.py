@@ -185,7 +185,7 @@ class NoteEtudiantRepositoryTest(TestCase):
     def _create_save_necessary_data(self, note_etudiant_to_save, for_class: bool = False):
         luy_acronym = note_etudiant_to_save.code_unite_enseignement
         if for_class:
-            luy_acronym = luy_acronym[:-1]
+            luy_acronym = luy_acronym[:-2]
 
         luy = LearningUnitYearFactory(
             acronym=luy_acronym,
@@ -196,6 +196,7 @@ class NoteEtudiantRepositoryTest(TestCase):
         class_attributes = {
             "learning_unit_enrollment__learning_class_year": LearningClassYearFactory(
                 learning_component_year__learning_unit_year=luy,
+                learning_component_year__lecturing=True,
                 acronym=note_etudiant_to_save.entity_id.code_unite_enseignement[-1]
             )
         } if for_class else {}

@@ -94,8 +94,14 @@ copy_to_next_year.short_description = _("Copy to next year")
 
 
 class LearningClassYearAdmin(VersionAdmin, osis_model_admin.OsisModelAdmin):
-    list_display = ('learning_component_year', 'acronym')
+    list_display = ('learning_component_year', 'acronym', 'get_academic_year')
+    list_filter = ('learning_component_year__learning_unit_year__academic_year',)
     search_fields = ['acronym', 'learning_component_year__learning_unit_year__acronym']
+
+    def get_academic_year(self, obj: 'LearningClassYear'):
+        return obj.learning_component_year.learning_unit_year.academic_year
+    get_academic_year.admin_order_field = 'academic_year'
+    get_academic_year.short_description = 'Academic Year'
 
 
 class LearningClassYearManager(models.Manager):

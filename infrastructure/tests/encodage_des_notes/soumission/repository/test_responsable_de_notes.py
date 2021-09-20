@@ -189,7 +189,7 @@ class ResponsableDeNotesRepositoryTest(TestCase):
             if self._is_class_acronym(identite_ue.code_unite_enseignement):
                 ScoreResponsibleOfClassFactory(
                     tutor=tutor,
-                    learning_unit_year__acronym=identite_ue.code_unite_enseignement[:-1],
+                    learning_unit_year__acronym=identite_ue.code_unite_enseignement[:-2],
                     learning_unit_year__academic_year__year=identite_ue.annee_academique,
                     learning_class_year__acronym=identite_ue.code_unite_enseignement[-1]
                 )
