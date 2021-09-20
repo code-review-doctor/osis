@@ -51,7 +51,7 @@ class LearningUnitIdentity(interface.EntityIdentity):
     code = attr.ib(type=str)
 
     def __str__(self):
-        return "{} - ({})".format(self.code, self.academic_year)
+        return "{} - ({})".format(self.code, self.academic_year.year)
 
     @property
     def year(self) -> int:

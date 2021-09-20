@@ -58,11 +58,13 @@ from ddd.logic.effective_class_repartition.use_case.write.unassign_tutor_class_s
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, GetLearningUnitCommand, \
     CreateEffectiveClassCommand, CanCreateEffectiveClassCommand, GetEffectiveClassCommand, \
     UpdateEffectiveClassCommand, DeleteEffectiveClassCommand, CanDeleteEffectiveClassCommand, \
-    GetEffectiveClassWarningsCommand
+    GetEffectiveClassWarningsCommand, GetClassesEffectivesDepuisUniteDEnseignementCommand
 from ddd.logic.learning_unit.use_case.read.check_can_create_class_service import check_can_create_effective_class
 from ddd.logic.learning_unit.use_case.read.check_can_delete_class_service import check_can_delete_effective_class
 from ddd.logic.learning_unit.use_case.read.get_effective_class_service import get_effective_class
 from ddd.logic.learning_unit.use_case.read.get_effective_class_warnings_service import get_effective_class_warnings
+from ddd.logic.learning_unit.use_case.read.get_learning_unit_effective_classes_service import \
+    get_learning_unit_effective_classes
 from ddd.logic.learning_unit.use_case.read.get_learning_unit_service import get_learning_unit
 from ddd.logic.learning_unit.use_case.write.create_effective_class_service import create_effective_class
 from ddd.logic.learning_unit.use_case.write.create_learning_unit_service import create_learning_unit
@@ -195,7 +197,10 @@ class MessageBus:
             TutorRepository(),
             EffectiveClassRepository()
         ),
-        GetTutorRepartitionClassesCommand: lambda cmd: get_tutor_repartition_classes(cmd, TutorRepository())
+        GetTutorRepartitionClassesCommand: lambda cmd: get_tutor_repartition_classes(cmd, TutorRepository()),
+        GetClassesEffectivesDepuisUniteDEnseignementCommand: lambda cmd: get_learning_unit_effective_classes(
+            cmd, EffectiveClassRepository()
+        )
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 
     def invoke(self, command: CommandRequest) -> ApplicationServiceResult:

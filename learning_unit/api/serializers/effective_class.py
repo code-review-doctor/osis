@@ -23,25 +23,35 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.utils.translation import gettext_lazy as _
+from rest_framework import serializers
 
-from base.models.utils.utils import ChoiceEnum
-
-LECTURING = "LECTURING"
-PRACTICAL_EXERCISES = "PRACTICAL_EXERCISES"
-
-COMPONENT_TYPES = (
-    (LECTURING, _("Lecturing")),
-    (PRACTICAL_EXERCISES, _("Practical exercises"))
-)
-
-DEFAULT_ACRONYM_COMPONENT = {
-    LECTURING: "PM",
-    PRACTICAL_EXERCISES: "PP",
-    None: "NT"
-}
+from base.models.enums.component_type import ComponentType
+from base.models.enums.quadrimesters import DerogationQuadrimester
 
 
-class ComponentType(ChoiceEnum):
-    LECTURING = _("Lecturing")
-    PRACTICAL_EXERCISES = _("Practical exercises")
+class EffectiveClassSerializer(serializers.Serializer):
+    code = serializers.CharField()
+    title_fr = serializers.CharField()
+    title_en = serializers.CharField()
+    teaching_place_uuid = serializers.CharField()
+    campus_name = serializers.CharField()
+    organization_name = serializers.CharField()
+    derogation_quadrimester = serializers.CharField()
+    derogation_quadrimester_text = serializers.SerializerMethodField()
+    session_derogation = serializers.CharField()
+    volume_q1 = serializers.DecimalField(max_digits=5, decimal_places=2)
+    volume_q2 = serializers.DecimalField(max_digits=5, decimal_places=2)
+    type = serializers.CharField()
+    type_text = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_derogation_quadrimester_text(obj) -> str:
+        if obj.derogation_quadrimester:
+            return DerogationQuadrimester.get_value(obj.derogation_quadrimester)
+        return ""
+
+    @staticmethod
+    def get_type_text(obj) -> str:
+        if obj.type:
+            return ComponentType.get_value(obj.type)
+        return ""

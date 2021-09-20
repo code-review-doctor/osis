@@ -58,7 +58,8 @@ class AttributionSerializerTestCase(TestCase):
             lecturing_charge="15.0",
             practical_charge="10.5",
             has_peps=False,
-            total_learning_unit_charge="55.5"
+            total_learning_unit_charge="55.5",
+            is_partim=False
         )
 
         cls.academic_event = AcademicEvent(
@@ -100,9 +101,10 @@ class AttributionSerializerTestCase(TestCase):
             'total_learning_unit_charge',
             'links',
             'has_peps',
-            'effective_class_repartition'
+            'effective_class_repartition',
+            'is_partim'
         ]
-        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
+        self.assertCountEqual(list(self.serializer.data.keys()), expected_fields)
 
     def test_ensure_function_text_correctly_computed(self):
         self.assertEquals(self.serializer.data['function_text'], Functions.COORDINATOR.value)

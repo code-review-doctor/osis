@@ -11,7 +11,7 @@ servers:
  - url: https://osis.uclouvain.be/api/v1/learning_unit/
    description: 'Production server'
 info:
-  version: '1.06'
+  version: '1.07'
   title: 'Learning Unit Service'
   description: |-
     A set of API endpoints that allow you to get information about learning unit
@@ -162,6 +162,49 @@ paths:
                 properties:
                   title:
                     type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - learning_units
+  /learning_units/{year}/{acronym}/classes:
+    get:
+      description: Return the classes of the learning unit
+      operationId: get_learning_unit_classes
+      parameters:
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: integer
+        - in: path
+          name: acronym
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: query
+          name: lang
+          schema:
+            type: string
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EffectiveClass'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -598,6 +641,37 @@ components:
             local_url:
               type: string
               format: uri
+    EffectiveClass:
+      type: object
+      properties:
+        code:
+          type: string
+        title_fr:
+          type: string
+        title_en:
+          type: string
+          nullable: true
+        teaching_place_uuid:
+          type: string
+          format: uuid
+        campus_name:
+          type: string
+        organization_name:
+          type: string
+        derogation_quadrimester:
+          $ref: '#/components/schemas/QuadrimesterEnum'
+        derogation_quadrimester_text:
+          type: string
+        session_derogation:
+          type: string
+        volume_q1:
+          type: string
+        volume_q2:
+          type: string
+        type:
+          $ref: '#/components/schemas/ComponentTypeEnum'
+        type_text:
+          type: string
     LearningUnitComponent:
       type: object
       properties:
