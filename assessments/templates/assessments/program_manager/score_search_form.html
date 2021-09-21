@@ -150,7 +150,7 @@
                                                         {% bootstrap_field score_encoding_form.code_unite_enseignement %}
                                                     {% endwith %}
                                                 {% else %}
-                                                    {{ note_etudiant.note }}
+                                                    {{ note_etudiant.note|default:"-" }}
                                                 {% endif %}
                                             </td>
                                          </tr>
