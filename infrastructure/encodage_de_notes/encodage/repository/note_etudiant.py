@@ -274,9 +274,18 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
         # TODO: Remove filtering to enseignement and use translator to get all code_unite_enseignement + annee_academic
         # managed by tutor name searched
         if enseignant:
+            mots = enseignant.split(" ")
+            filters = [
+                Q(learning_unit_enrollment__learning_unit_year__learningcomponentyear__attributionchargenew__attribution__tutor__person__first_name__icontains=mot)
+                | Q(learning_unit_enrollment__learning_unit_year__learningcomponentyear__attributionchargenew__attribution__tutor__person__last_name__icontains=mot)
+                for mot in mots
+            ]
+
             qs = qs.filter(
-                Q(learning_unit_enrollment__learning_unit_year__learningcomponentyear__attributionchargenew__attribution__tutor__person__first_name__icontains=enseignant)
-                | Q(learning_unit_enrollment__learning_unit_year__learningcomponentyear__attributionchargenew__attribution__tutor__person__last_name__icontains=enseignant)
+                functools.reduce(
+                    operator.or_,
+                    filters
+                )
             )
 
         return {IdentiteNoteEtudiant(**row) for row in qs}
