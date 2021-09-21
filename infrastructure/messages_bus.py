@@ -186,12 +186,14 @@ class MessageBus:
             cmd,
             TutorRepository(),
             EffectiveClassRepository(),
+            LearningUnitTranslator(),
         ),
         UnassignTutorClassCommand: lambda cmd: unassign_tutor_class(cmd, TutorRepository()),
         EditClassVolumeRepartitionToTutorCommand: lambda cmd: edit_class_volume_repartition_to_tutor(
             cmd,
             TutorRepository(),
-            EffectiveClassRepository()
+            EffectiveClassRepository(),
+            LearningUnitTranslator(),
         ),
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 
