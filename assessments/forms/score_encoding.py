@@ -74,7 +74,7 @@ class ScoreSearchForm(forms.Form):
         choices = (
             (cohorte.nom_cohorte, cohorte.nom_cohorte,) for cohorte in sorted(results, key=lambda x: x.nom_cohorte)
         )
-        return choice_field.add_blank(tuple(choices))
+        return choice_field.add_blank(tuple(choices), blank_choice_display=pgettext_lazy("male plural", "All"))
 
     def clean(self):
         cleaned_data = super().clean()
