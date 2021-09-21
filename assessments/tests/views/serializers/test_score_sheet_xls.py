@@ -105,7 +105,7 @@ class ScoreSheetXLSSerializerTest(SimpleTestCase):
                 pays="Belgique",
                 telephone='',
                 fax='',
-                email='',
+                email='dummy@gmail.com',
             ),
         )
 
@@ -203,6 +203,10 @@ class ScoreSheetXLSSerializerTest(SimpleTestCase):
         sheet_serialized = ScoreSheetXLSSerializer(instance=self.instance).data
 
         self.assertEqual(sheet_serialized['rows'][0]["type_peps"], "-")
+
+    def test_assert_contact_emails_is_empty(self):
+        sheet_serialized = ScoreSheetXLSSerializer(instance=self.instance).data
+        self.assertEqual(sheet_serialized['contact_emails'], "")
 
 
 class TutorScoreSheetXLSSerilizeTest(SimpleTestCase):
@@ -303,7 +307,7 @@ class TutorScoreSheetXLSSerilizeTest(SimpleTestCase):
                 pays="Belgique",
                 telephone='',
                 fax='',
-                email='',
+                email='dummy@gmail.com',
             ),
         )
 
@@ -323,3 +327,8 @@ class TutorScoreSheetXLSSerilizeTest(SimpleTestCase):
         self.assertEqual(len(sheet_serialized['rows']), 1)
 
         self.assertEqual(sheet_serialized['rows'][0]['note'], '')
+
+    def test_assert_contact_emails_is_not_empty(self):
+        sheet_serialized = TutorScoreSheetXLSSerializer(instance=self.instance).data
+
+        self.assertEqual(sheet_serialized['contact_emails'], "dummy@gmail.com")

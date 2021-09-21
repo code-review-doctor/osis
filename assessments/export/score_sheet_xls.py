@@ -73,8 +73,8 @@ def _build_document_info(worksheet, feuille_de_notes_serialized):
         '',
         '',
         '',
-        str('Contacts'),
-        feuille_de_notes_serialized['contact_emails']
+        str('Contacts') if feuille_de_notes_serialized['contact_emails'] else '',
+        feuille_de_notes_serialized['contact_emails'],
     ])
     worksheet.append([str('Session: %s' % feuille_de_notes_serialized['numero_session'])])
     worksheet.append([''])
