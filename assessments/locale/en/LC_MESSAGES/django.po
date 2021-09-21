@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-20 16:54+0200\n"
+"POT-Creation-Date: 2021-09-21 13:22+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -528,6 +528,9 @@ msgstr ""
 msgid "Score have more than 2 decimal places"
 msgstr ""
 
+msgid "Score legend"
+msgstr ""
+
 #, python-format
 msgid "Score legend: %(score_legend)s (0=Score of presence)"
 msgstr ""
@@ -745,9 +748,6 @@ msgstr ""
 msgid "You can encode a number. Or a letter between A and T."
 msgstr ""
 
-msgid "You can encode a number. Or a letter between S, T and M."
-msgstr ""
-
 msgid "You can't encode a 'score' and a 'justification' together"
 msgstr ""
 
@@ -791,6 +791,9 @@ msgid "more_than_one_academic_year_error"
 msgstr ""
 
 msgid "no_valid_academic_year_error"
+msgstr ""
+
+msgid "number between 0-20 (0=Score of presence)"
 msgstr ""
 
 msgid "of"
