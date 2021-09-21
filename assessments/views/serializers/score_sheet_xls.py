@@ -153,8 +153,9 @@ class ScoreSheetXLSSerializer(serializers.Serializer):
         return display_as_academic_year(obj['feuille_de_notes'].annee_academique)
 
     def get_titre(self, obj) -> str:
-        return "{} - {}".format(
+        return "{} - {} {}".format(
             self.get_annee_academique(obj),
+            obj['feuille_de_notes'].code_unite_enseignement,
             obj['feuille_de_notes'].intitule_complet_unite_enseignement
         )
 
