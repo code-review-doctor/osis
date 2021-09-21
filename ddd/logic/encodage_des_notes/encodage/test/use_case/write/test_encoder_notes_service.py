@@ -317,6 +317,13 @@ class EncoderNoteTest(SimpleTestCase):
                 expected_result = Justification(value=JustificationTypes.CHEATING)
                 self.assertEqual(self.repository.get(entity_id).note, expected_result)
 
+    def test_should_encoder_note_manquante(self):
+        cmd = self._evolve_command(note="")
+
+        entity_id = self.message_bus.invoke(cmd)[0]
+
+        self.assertEqual(self.repository.get(entity_id).note.value, "")
+
     def test_should_notifier(self):
         result = self.message_bus.invoke(self.cmd)
 
@@ -442,7 +449,7 @@ class EncoderNoteTest(SimpleTestCase):
                     noma=noma or self.note.noma,
                     email=email or self.note.email,
                     code_unite_enseignement=self.note.code_unite_enseignement,
-                    note=note or "19",
+                    note=note if note is not None else "19",
                 )
             ],
         )
