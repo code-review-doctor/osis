@@ -57,6 +57,15 @@ class _EnrollmentSerializer(serializers.Serializer):
         with contextlib.suppress(ValueError, TypeError):
             note_format = "2" if self.context['note_decimale_est_autorisee'] else "0"
             return floatformat(float(note_etudiant.note), note_format)
+
+        if note_etudiant.note == 'T':
+            return str(_('Cheating'))
+        elif note_etudiant.note == 'A':
+            return str(_('Absent'))
+        elif note_etudiant.note == 'S':
+            return str(_('Absence unjustified'))
+        elif note_etudiant.note == 'M':
+            return str(_('Absence justified'))
         return note_etudiant.note
 
     def get_deadline(self, note_etudiant: NoteEtudiantDTO) -> str:
