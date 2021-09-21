@@ -114,14 +114,20 @@ def _get_deliberation_par_cohorte(deliberation_translator, noms_cohortes, period
 
 
 def _get_cohortes_par_unite_enseignement(codes_unites_enseignement, inscr_exam_translator, periode_soumission_ouverte):
+    cohortes_par_unite_enseignement = dict()
     inscr_examens = inscr_exam_translator.search_inscrits_pour_plusieurs_unites_enseignement(
         codes_unites_enseignement=set(codes_unites_enseignement),
         annee=periode_soumission_ouverte.annee_concernee,
         numero_session=periode_soumission_ouverte.session_concernee,
     )
-    cohortes_par_unite_enseignement = dict()
-    for inscr in inscr_examens:
-        cohortes_par_unite_enseignement.setdefault(inscr.code_unite_enseignement, set()).add(inscr.nom_cohorte)
+    desincr_examens = inscr_exam_translator.search_desinscrits_pour_plusieurs_unites_enseignement(
+        codes_unites_enseignement=set(codes_unites_enseignement),
+        annee=periode_soumission_ouverte.annee_concernee,
+        numero_session=periode_soumission_ouverte.session_concernee,
+    )
+
+    for row in inscr_examens | desincr_examens:
+        cohortes_par_unite_enseignement.setdefault(row.code_unite_enseignement, set()).add(row.nom_cohorte)
     return cohortes_par_unite_enseignement
 
 
