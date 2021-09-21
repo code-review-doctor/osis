@@ -127,7 +127,15 @@ class RechercheNotesEtudiant(interface.DomainService):
                     )
                 )
             )
-        return notes_etudiants_dto
+        return sorted(
+            notes_etudiants_dto,
+            key=lambda note: (
+                note.nom_cohorte,
+                note.code_unite_enseignement,
+                note.nom,
+                note.prenom
+            )
+        )
 
     @classmethod
     def _get_notes_etudiants_filtered(
