@@ -24,10 +24,12 @@
 #
 ##############################################################################
 import logging
+from decimal import Decimal
 from typing import Dict, Union, List, Tuple
 
 from django.conf import settings
-from django.db.models import F, Case, When, Q, Value, CharField, Exists, OuterRef, Sum, Subquery, BooleanField
+from django.db.models import F, Case, When, Q, Value, CharField, Exists, OuterRef, Sum, Subquery, BooleanField, \
+    DecimalField
 from django.db.models.functions import Concat
 from django.utils.functional import cached_property
 from rest_framework import generics
@@ -82,15 +84,15 @@ class AttributionListView(generics.ListAPIView):
 
     @cached_property
     def attributions_charge_new(self):
-        return AttributionChargeNew.objects.select_related(
+        attributions = AttributionChargeNew.objects.select_related(
             'attribution',
             'learning_component_year__learning_unit_year__academic_year'
-        ).distinct(
-            'attribution_id'
         ).filter(
             learning_component_year__learning_unit_year__academic_year__year=self.kwargs['year'],
             attribution__tutor__person=self.person,
             attribution__decision_making=''
+        ).distinct(
+            'attribution_id'
         ).annotate(
             tutor_personal_id=F('attribution__tutor__person__global_id'),
 
@@ -98,17 +100,27 @@ class AttributionListView(generics.ListAPIView):
             type=F('learning_component_year__learning_unit_year__learning_container_year__container_type'),
             lecturing_charge=Case(
                 When(
-                    Q(learning_component_year__type=learning_component_year_type.LECTURING),
-                    then='allocation_charge',
+                    Q(learning_component_year__type=learning_component_year_type.PRACTICAL_EXERCISES),
+                    then=Subquery(
+                        AttributionChargeNew.objects.filter(
+                            attribution_id=OuterRef('attribution_id'),
+                            learning_component_year__type=learning_component_year_type.LECTURING
+                        ).values('allocation_charge')[:1]
+                    ),
                 ),
-                default=None
+                default=F('allocation_charge')
             ),
             practical_charge=Case(
                 When(
-                    Q(learning_component_year__type=learning_component_year_type.PRACTICAL_EXERCISES),
-                    then='allocation_charge',
+                    Q(learning_component_year__type=learning_component_year_type.LECTURING),
+                    then=Subquery(
+                        AttributionChargeNew.objects.filter(
+                            attribution_id=OuterRef('attribution_id'),
+                            learning_component_year__type=learning_component_year_type.PRACTICAL_EXERCISES
+                        ).values('allocation_charge')[:1]
+                    ),
                 ),
-                default=None
+                default=F('allocation_charge')
             ),
             title_fr=Case(
                 When(
@@ -131,7 +143,8 @@ class AttributionListView(generics.ListAPIView):
             title_en=Case(
                 When(
                     Q(learning_component_year__learning_unit_year__learning_container_year__common_title_english__isnull=True) |  # noqa
-                    Q(learning_component_year__learning_unit_year__learning_container_year__common_title_english__exact=''),  # noqa
+                    Q(learning_component_year__learning_unit_year__learning_container_year__common_title_english__exact=''),
+                    # noqa
                     then='learning_component_year__learning_unit_year__specific_title_english'
                 ),
                 When(
@@ -173,10 +186,15 @@ class AttributionListView(generics.ListAPIView):
                 ).values(
                     'learning_unit_year_id'
                 ).annotate(
-                    total_volume=Sum('hourly_volume_total_annual')
-                ).values('total_volume')[:1]
+                    volume_global=Sum(
+                        (F('hourly_volume_total_annual') or Decimal(0)) * (F('planned_classes') or Decimal(0)),
+                        output_field=DecimalField()
+                    ),
+
+                ).values('volume_global')[:1],
             ),
         )
+        return attributions
 
     def _fill_classes_repartition(self):
         tutor_classes = message_bus_instance.invoke(
