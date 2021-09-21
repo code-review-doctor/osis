@@ -137,6 +137,7 @@ class NoteEtudiantRepositoryTest(TestCase):
                 annee_unite_enseignement=note_etudiant.entity_id.annee_academique,
                 numero_session=note_etudiant.entity_id.numero_session,
                 noma=note_etudiant.entity_id.noma,
+                note_brouillon=True,
                 note_soumise=note_etudiant.est_soumise,
                 jour=note_etudiant.date_limite_de_remise.jour,
                 mois=note_etudiant.date_limite_de_remise.mois,

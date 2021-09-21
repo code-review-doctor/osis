@@ -176,6 +176,11 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
                             WHEN justification_final IS NOT NULL THEN true
                             ELSE false
                         END note_soumise,
+                        CASE
+                            WHEN score_final IS NOT NULL OR justification_final IS NOT NULL THEN false
+                            WHEN score_draft IS NOT NULL OR justification_draft IS NOT NULL THEN true
+                            ELSE false
+                        END note_brouillon,
                         (
                             SELECT CASE
                                     WHEN deadline_tutor IS NULL THEN deadline
@@ -214,9 +219,10 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
                             numero_session=row[2],
                             noma=row[3],
                             note_soumise=row[4],
-                            jour=row[5].day,
-                            mois=row[5].month,
-                            annee=row[5].year,
+                            note_brouillon=row[5],
+                            jour=row[6].day,
+                            mois=row[6].month,
+                            annee=row[6].year,
                         )
                     )
         return dates_echeances_dto
