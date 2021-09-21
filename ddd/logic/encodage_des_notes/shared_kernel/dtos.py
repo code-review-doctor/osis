@@ -160,6 +160,7 @@ class DateEcheanceDTO(interface.DTO):
     jour = attr.ib(type=int)
     mois = attr.ib(type=int)
     annee = attr.ib(type=int)
+    quantitte_notes_brouillon = attr.ib(type=int)
     quantite_notes_soumises = attr.ib(type=int)
     quantite_total_notes = attr.ib(type=int)
 
@@ -187,6 +188,10 @@ class ProgressionEncodageNotesUniteEnseignementDTO(interface.DTO):
     dates_echeance = attr.ib(type=List[DateEcheanceDTO])
     responsable_note = attr.ib(type=EnseignantDTO)  # responsables notes
     a_etudiants_peps = attr.ib(type=bool)  # signaletique
+
+    @property
+    def quantite_notes_brouillon(self) -> int:
+        return sum(date.quantitte_notes_brouillon for date in self.dates_echeance)
 
     @property
     def quantite_notes_soumises(self) -> int:

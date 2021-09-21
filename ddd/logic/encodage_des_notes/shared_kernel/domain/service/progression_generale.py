@@ -159,6 +159,9 @@ def _get_dates_echeances_par_unite_enseignement(
                     jour=date_limite_de_remise.day,
                     mois=date_limite_de_remise.month,
                     annee=date_limite_de_remise.year,
+                    quantitte_notes_brouillon=sum(
+                        1 for echeance_note in echeances_notes_grouped if echeance_note.note_brouillon
+                    ),
                     quantite_notes_soumises=sum(
                         1 for echeance_note in echeances_notes_grouped if echeance_note.note_soumise
                     ),
