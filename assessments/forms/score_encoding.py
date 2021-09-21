@@ -29,7 +29,7 @@ from django.utils.translation import pgettext_lazy, gettext_lazy as _
 
 
 from base.forms.utils import choice_field
-from base.models.enums.exam_enrollment_justification_type import JustificationTypes
+from base.models.enums.exam_enrollment_justification_type import JustificationTypes, StateTypes
 from ddd.logic.encodage_des_notes.encodage.commands import GetCohortesGestionnaireCommand
 from infrastructure.messages_bus import message_bus_instance
 
@@ -54,13 +54,13 @@ class ScoreSearchForm(forms.Form):
     noma = forms.CharField(required=False, label=_("Reg. No."))
     nom = forms.CharField(required=False, label=_("Lastname"))
     prenom = forms.CharField(required=False, label=_("Firstname"))
-    justification = forms.ChoiceField(
+    etat = forms.ChoiceField(
         choices=choice_field.add_blank(
-            JustificationTypes.choices(),
+            StateTypes.choices(),
             blank_choice_display=pgettext_lazy("male plural", "All")
         ),
         required=False,
-        label=_("Justification")
+        label=_("State")
     )
     nom_cohorte = forms.ChoiceField(required=False, label=pgettext_lazy('encoding', 'Program'))
 
@@ -82,7 +82,7 @@ class ScoreSearchForm(forms.Form):
             cleaned_data['noma'],
             cleaned_data['nom'],
             cleaned_data['prenom'],
-            cleaned_data['justification'],
+            cleaned_data['etat'],
             cleaned_data['nom_cohorte'],
         ]):
             self.add_error(None, _("Please choose at least one criteria!"))

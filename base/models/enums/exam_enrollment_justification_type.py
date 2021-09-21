@@ -45,6 +45,13 @@ JUSTIFICATION_TYPES = (
     (CHEATING, _('Cheating')))                        # T
 
 
+class StateTypes(ChoiceEnum):
+    ABSENCE_UNJUSTIFIED = _("Absence unjustified")
+    ABSENCE_JUSTIFIED = _("Absence justified")
+    CHEATING = _("Cheating")
+    SCORE_MISSING = _("Missing score")
+
+
 class JustificationTypes(ChoiceEnum):
     ABSENCE_UNJUSTIFIED = _("Absence unjustified")
     ABSENCE_JUSTIFIED = _("Absence justified")
