@@ -26,6 +26,7 @@
 from django.utils.functional import cached_property
 from django.views import View
 
+from assessments.export import score_sheet_pdf
 from assessments.views.serializers.score_sheet import ScoreSheetPDFSerializer
 from ddd.logic.encodage_des_notes.soumission.commands import SearchAdressesFeuilleDeNotesCommand
 from infrastructure.messages_bus import message_bus_instance
@@ -53,7 +54,7 @@ class ScoreSheetsPDFExportBaseView(PermissionRequiredMixin, View):
             ],
             context={'person': self.person}
         )
-        return paper_sheet.print_notes(score_sheet_serialized.data)
+        return score_sheet_pdf.print_notes(score_sheet_serialized.data)
 
     def get_feuille_de_notes(self, code_unite_enseignement: str):
         raise NotImplementedError()

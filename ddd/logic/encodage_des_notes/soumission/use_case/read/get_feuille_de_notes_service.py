@@ -34,7 +34,7 @@ from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_pe
     ISignaletiquePersonneTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import FeuilleDeNotesDTO
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.feuille_de_notes_par_unite_enseignement import \
-    FeuilleDeNotesParUniteEnseignement
+    FeuilleDeNotesParUniteEnseignement, DonneesNotes
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_unite_enseignement import IUniteEnseignementTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.periode_encodage_ouverte import PeriodeEncodageOuverte
 from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand
@@ -63,8 +63,22 @@ def get_feuille_de_notes(
     )
 
     # WHEN
+    donnees_notes = [
+        DonneesNotes(
+            code_unite_enseignement=note.code_unite_enseignement,
+            annee=note.annee,
+            noma=note.noma,
+            email=note.email,
+            note=str(note.note),
+            date_limite_de_remise=note.date_limite_de_remise,
+            est_soumise=note.est_soumise,
+            note_decimale_autorisee=note.note_decimale_est_autorisee(),
+            echeance_enseignant=note.date_limite_de_remise
+        )
+        for note in notes
+    ]
     feuille_de_notes_dto = FeuilleDeNotesParUniteEnseignement().get(
-        notes,
+        donnees_notes,
         responsable_notes_repo,
         signaletique_personne_translator,
         periode_encodage,

@@ -62,6 +62,7 @@ class FeuilleDeNotesParCohorteDTO(interface.DTO):
     annee_academique = attr.ib(type=int)
     numero_session = attr.ib(type=int)
     notes_etudiants = attr.ib(type=List[NoteEtudiantDTO])
+    note_decimale_est_autorisee = attr.ib(type=bool)
 
     @property
     def encodage_est_complet(self) -> bool:
@@ -89,6 +90,7 @@ class NoteEtudiantFromRepositoryDTO(interface.DTO):
     email = attr.ib(type=str)
     note = attr.ib(type=str)
     echeance_gestionnaire = attr.ib(type=str)
+    echeance_enseignant = attr.ib(type=str)
     numero_session = attr.ib(type=int)
     code_unite_enseignement = attr.ib(type=str)
     annee_academique = attr.ib(type=int)

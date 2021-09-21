@@ -38,7 +38,7 @@ class ShouldDateEcheanceNonAtteinte(BusinessValidator):
     note_etudiant = attr.ib(type='NoteEtudiantGestionnaire')  # type: NoteEtudiantGestionnaire
 
     def validate(self, *args, **kwargs):
-        date_limite_remise = self.note_etudiant.echeance_gestionnaire
+        date_limite_remise = self.note_etudiant.echeance_gestionnaire.to_date()
         aujourdhui = datetime.date.today()
         if aujourdhui > date_limite_remise:
             raise DateEcheanceNoteAtteinteException()

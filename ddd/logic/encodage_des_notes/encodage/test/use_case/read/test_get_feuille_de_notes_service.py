@@ -36,7 +36,8 @@ from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import 
 from ddd.logic.encodage_des_notes.shared_kernel.validator.exceptions import PeriodeEncodageNotesFermeeException
 from ddd.logic.encodage_des_notes.soumission.dtos import AttributionEnseignantDTO, \
     InscriptionExamenDTO
-from ddd.logic.encodage_des_notes.soumission.test.factory.note_etudiant import NoteManquanteEtudiantFactory
+from ddd.logic.encodage_des_notes.encodage.test.factory.note_etudiant import NoteManquanteEtudiantFactory, \
+    NoteEtudiantJustificationFactory
 from ddd.logic.encodage_des_notes.soumission.test.factory.responsable_de_notes import \
     ResponsableDeNotesLDROI1001Annee2020Factory
 from infrastructure.encodage_de_notes.encodage.domain.service.in_memory.cohortes_du_gestionnaire import \
@@ -53,7 +54,7 @@ from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.unite_ense
     UniteEnseignementTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.signaletique_personne import \
     SignaletiquePersonneTranslatorInMemory
-from infrastructure.encodage_de_notes.soumission.repository.in_memory.note_etudiant import \
+from infrastructure.encodage_de_notes.encodage.repository.in_memory.note_etudiant import \
     NoteEtudiantInMemoryRepository
 from infrastructure.encodage_de_notes.soumission.repository.in_memory.responsable_de_notes import \
     ResponsableDeNotesInMemoryRepository
@@ -100,7 +101,7 @@ class GetFeuilleDeNotesGestionnaireTest(SimpleTestCase):
     def __mock_service_bus(self):
         message_bus_patcher = mock.patch.multiple(
             'infrastructure.messages_bus',
-            NoteEtudiantRepository=lambda: self.repository,
+            NoteEtudiantGestionnaireRepository=lambda: self.repository,
             ResponsableDeNotesRepository=lambda: self.resp_notes_repository,
             SignaletiquePersonneTranslator=lambda: self.signaletique_personne_translator,
             PeriodeEncodageNotesTranslator=lambda: self.periode_encodage_translator,
@@ -266,6 +267,18 @@ class GetFeuilleDeNotesGestionnaireTest(SimpleTestCase):
         self.assertEqual(result.notes_etudiants[0].prenom, 'Adrien')
         self.assertEqual(result.notes_etudiants[1].nom, 'Dupont')
         self.assertEqual(result.notes_etudiants[1].prenom, 'Marie')
+
+    def test_should_renvoyer_justification_correcte(self):
+        self.repository.delete(self.note.entity_id)
+
+        note_avec_justification = NoteEtudiantJustificationFactory(entity_id__noma=self.noma)
+        self.repository.save(note_avec_justification)
+
+        result = message_bus_instance.invoke(self.cmd)
+
+        self.assertEqual(len(result.notes_etudiants), 1)
+
+        self.assertEqual(result.notes_etudiants[0].note, str(note_avec_justification.note))
 
     def test_should_renvoyer_contact_responsable_notes(self):
         result = self.message_bus.invoke(self.cmd)

@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
     dependencies = [
         ('education_group', '0023_copy_11ba_in_new_model'),
         ('learning_unit', '0014_auto_20210604_1537'),
-        ('base', '0599_auto_20210910_1138'),
+        ('base', '0601_auto_20210914_0902'),
     ]
 
     operations = [

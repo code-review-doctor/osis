@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from assessments.views.common.learning_unit_score_encoding import LearningUnitScoreEncodingBaseView
-from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand
+from ddd.logic.encodage_des_notes.encodage.commands import GetFeuilleDeNotesGestionnaireCommand
 from infrastructure.messages_bus import message_bus_instance
 
 
@@ -39,8 +39,8 @@ class LearningUnitScoreEncodingProgramManagerView(LearningUnitScoreEncodingBaseV
         }
 
     def get_feuille_de_notes(self):
-        cmd = GetFeuilleDeNotesCommand(
-            matricule_fgs_enseignant=self.person.global_id,
+        cmd = GetFeuilleDeNotesGestionnaireCommand(
+            matricule_fgs_gestionnaire=self.person.global_id,
             code_unite_enseignement=self.kwargs['learning_unit_code'].upper()
         )
         return message_bus_instance.invoke(cmd)

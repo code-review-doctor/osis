@@ -111,6 +111,11 @@ class ResponsableDeNotesRepositoryTest(TestCase):
 
         assert_attrs_instances_are_equal(responsable, responsable_retrieved)
 
+    def test_get_for_unite_enseignement_should_retouner_none_quand_pas_de_responsable(self):
+        responsable_retrieved = self.responsable_de_notes_repository.get_for_unite_enseignement("LDROI1001", 2020)
+
+        self.assertIsNone(responsable_retrieved)
+
     def test_should_search_responsable_de_notes_by_entity_ids(self):
         responsables = [
             ResponsableDeNotesPourUneUniteEnseignement(),

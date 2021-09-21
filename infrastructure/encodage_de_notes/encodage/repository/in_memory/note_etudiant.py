@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List, Optional, Set
+from typing import List, Optional, Set, Tuple
 
 from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
 from base.models.enums.exam_enrollment_justification_type import JustificationTypes
@@ -68,6 +68,17 @@ class NoteEtudiantInMemoryRepository(InMemoryGenericRepository, INoteEtudiantRep
             result = (note for note in result if note.note.value == justification)
 
         return list(result)
+
+    @classmethod
+    def search_by_code_unite_enseignement_annee_session(
+            cls,
+            criterias: List[Tuple[str, int, int]]
+    ) -> List['NoteEtudiant']:
+        return [
+            entity
+            for entity in cls.entities
+            if (entity.code_unite_enseignement, entity.annee_academique, entity.numero_session) in criterias
+        ]
 
     @classmethod
     def search_notes_identites(

@@ -175,8 +175,15 @@ class ResponsableDeNotesRepository(IResponsableDeNotesRepository):
         return cls.search([entity_id])[0]
 
     @classmethod
-    def get_for_unite_enseignement(cls, code_unite_enseignement: 'str', annee_academique: int) -> 'ResponsableDeNotes':
-        return cls.search(codes_unites_enseignement=[code_unite_enseignement], annee_academique=annee_academique)[0]
+    def get_for_unite_enseignement(
+            cls,
+            code_unite_enseignement: 'str',
+            annee_academique: int
+    ) -> Optional['ResponsableDeNotes']:
+        try:
+            return cls.search(codes_unites_enseignement=[code_unite_enseignement], annee_academique=annee_academique)[0]
+        except IndexError:
+            return None
 
     @classmethod
     def get_detail_enseignant(cls, entity_id: 'IdentiteResponsableDeNotes') -> 'EnseignantDTO':
@@ -188,7 +195,7 @@ class ResponsableDeNotesRepository(IResponsableDeNotesRepository):
         ).values(
             'nom',
             'prenom',
-        ).get()
+        ).first()
         return EnseignantDTO(**detail_enseignant_as_values)
 
     @classmethod

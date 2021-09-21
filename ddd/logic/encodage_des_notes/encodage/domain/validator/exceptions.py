@@ -39,7 +39,7 @@ class NoteIncorrecteException(BusinessException):
     def __init__(self, note_incorrecte: str, **kwargs):
         message = _(
             "{note} isn't a valid score. Valid scores : 0 - 20 "
-            "(0=Score of presence), A=Absent, T=Cheating, M=Absence justified"
+            "(0=Score of presence), S=Absence unjustified, T=Cheating, M=Absence justified"
         ).format(note=note_incorrecte)
         super().__init__(message, **kwargs)
 

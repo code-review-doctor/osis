@@ -324,7 +324,7 @@ class MessageBus:
         ),
         GetFeuilleDeNotesGestionnaireCommand: lambda cmd: get_feuille_de_notes_gestionnaire(
             cmd,
-            NoteEtudiantRepository(),
+            NoteEtudiantGestionnaireRepository(),
             ResponsableDeNotesRepository(),
             SignaletiquePersonneTranslator(),  # TODO :: merger avec signaletique etudiant ?
             PeriodeEncodageNotesTranslator(),
