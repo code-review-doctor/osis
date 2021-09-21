@@ -159,6 +159,8 @@ class RechercheNotesEtudiant(interface.DomainService):
                 prenom,
                 signaletique_etudiant_translator
             )
+            if not nomas_searched:
+                return []
 
         return note_etudiant_repo.search(
             noms_cohortes=noms_cohortes,
