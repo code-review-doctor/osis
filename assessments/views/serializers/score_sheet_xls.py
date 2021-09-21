@@ -44,9 +44,7 @@ class _NoteEtudiantRowSerializer(serializers.Serializer):
     note = serializers.SerializerMethodField()
     nom_cohorte = serializers.CharField(read_only=True, default='')
     email = serializers.CharField(read_only=True, default='')
-    date_remise_de_notes = serializers.DateField(
-        read_only=True, source='date_remise_de_notes.to_date', format="%d/%m/%Y"
-    )
+    date_remise_de_notes = serializers.SerializerMethodField()
     est_soumise = serializers.BooleanField(read_only=True, default=False)
     inscrit_tardivement = serializers.BooleanField(read_only=True, default=False)
     desinscrit_tardivement = serializers.BooleanField(read_only=True, default=False)
@@ -129,6 +127,11 @@ class _NoteEtudiantRowSerializer(serializers.Serializer):
             return floatformat(float(note_etudiant.note), note_format)
         except ValueError:
             return note_etudiant.note
+
+    def get_date_remise_de_notes(self, note_etudiant: NoteEtudiantDTO) -> str:
+        if note_etudiant.date_remise_de_notes and not note_etudiant.desinscrit_tardivement:
+            return note_etudiant.date_remise_de_notes.to_date().strftime("%d/%m/%Y")
+        return ""
 
 
 class ScoreSheetXLSSerializer(serializers.Serializer):
