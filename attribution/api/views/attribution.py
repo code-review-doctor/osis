@@ -153,11 +153,8 @@ class AttributionListView(generics.ListAPIView):
             has_peps=Exists(
                 Student.objects.filter(
                     studentspecificprofile__isnull=False,
-                    offerenrollment__learningunitenrollment__learning_unit_year__acronym=OuterRef(
-                        'learning_component_year__learning_unit_year__acronym'
-                    ),
-                    offerenrollment__learningunitenrollment__learning_unit_year__academic_year=OuterRef(
-                        'learning_component_year__learning_unit_year__academic_year'
+                    offerenrollment__learningunitenrollment__learning_unit_year_id=OuterRef(
+                        'learning_component_year__learning_unit_year_id'
                     ),
                     **COMMON_LEARNING_UNIT_ENROLLMENT_CLAUSE
                 )
@@ -215,13 +212,10 @@ class AttributionListView(generics.ListAPIView):
             has_peps=Exists(
                 Student.objects.filter(
                     studentspecificprofile__isnull=False,
-                    offerenrollment__learningunitenrollment__learning_unit_year__acronym=OuterRef(
-                        'learning_component_year__learning_unit_year__acronym'
-                    ),
-                    offerenrollment__learningunitenrollment__learning_unit_year__academic_year=OuterRef(
-                        'learning_component_year__learning_unit_year__academic_year'
-                    ),
                     offerenrollment__learningunitenrollment__learning_class_year__acronym=OuterRef('acronym'),
+                    offerenrollment__learningunitenrollment__learning_unit_year_id=OuterRef(
+                        'learning_component_year__learning_unit_year_id'
+                    ),
                     **COMMON_LEARNING_UNIT_ENROLLMENT_CLAUSE
                 )
             )

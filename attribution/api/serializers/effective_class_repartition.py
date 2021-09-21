@@ -32,13 +32,18 @@ class EffectiveClassRepartitionSerializer(serializers.Serializer):
     code = serializers.CharField()
     title_fr = serializers.CharField()
     title_en = serializers.CharField()
-    schedule_url = serializers.SerializerMethodField()
     has_peps = serializers.BooleanField()
+    links = serializers.SerializerMethodField()
 
-    def get_schedule_url(self, obj):
+    def __get_schedule_url(self, obj):
         year = self.context.get('year')
         has_access_schedule_calendar = year in self.context["access_schedule_calendar"].get_target_years_opened() \
             if "access_schedule_calendar" in self.context else False
         if settings.SCHEDULE_APP_URL and has_access_schedule_calendar:
             clean_code = obj.get('code').replace('_', '').replace('-', '')
             return settings.SCHEDULE_APP_URL.format(code=clean_code)
+
+    def get_links(self, obj):
+        return {
+            'schedule': self.__get_schedule_url(obj)
+        }

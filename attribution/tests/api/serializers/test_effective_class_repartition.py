@@ -75,13 +75,13 @@ class EffectiveClassRepartitionSerializerTestCase(TestCase):
             'code',
             'title_fr',
             'title_en',
-            'schedule_url',
+            'links',
             'has_peps'
         ]
-        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
+        self.assertCountEqual(list(self.serializer.data.keys()), expected_fields)
 
     def test_ensure_schedule_app_url_correctly_computed_case_calendar_opened(self):
         expected_url = "https://schedule_dummy.uclouvain.be/{code}".format(
             code=self.class_repartition.get('code')
         )
-        self.assertEquals(self.serializer.data['schedule_url'], expected_url)
+        self.assertEquals(self.serializer.data['links']['schedule'], expected_url)
