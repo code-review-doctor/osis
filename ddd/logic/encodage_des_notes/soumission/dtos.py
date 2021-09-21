@@ -167,6 +167,7 @@ class DateEcheanceNoteDTO(interface.DTO):
     mois = attr.ib(type=int)
     annee = attr.ib(type=int)
     note_soumise = attr.ib(type=bool)
+    note_brouillon = attr.ib(type=bool)
 
     def to_date(self) -> date:
         return date(day=self.jour, month=self.mois, year=self.annee)
