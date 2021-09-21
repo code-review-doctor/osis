@@ -67,7 +67,7 @@ class _EnrollmentSerializer(serializers.Serializer):
 
 class _ProgramAddressSerializer(serializers.Serializer):
     recipient = serializers.CharField(read_only=True, source='destinataire', default='')
-    location = serializers.CharField(read_only=True,  source='rue_et_numero', default='')
+    location = serializers.CharField(read_only=True,  source='rue_numero', default='')
     postal_code = serializers.CharField(read_only=True, source='code_postal', default='')
     city = serializers.CharField(read_only=True, source='ville', default='')
     country = serializers.CharField(read_only=True, source='pays', default='')
