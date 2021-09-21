@@ -146,7 +146,6 @@ class ScoreSheetXLSSerializerTest(SimpleTestCase):
         self.assertTrue("autre_amenagement" in sheet_serialized['rows'][0])
         self.assertTrue("details_autre_amenagement" in sheet_serialized['rows'][0])
         self.assertTrue("accompagnateur" in sheet_serialized['rows'][0])
-        self.assertTrue("enrollment_state_color" in sheet_serialized['rows'][0])
 
     def test_assert_type_peps_disability_correctly_formatted(self):
         self.instance['feuille_de_notes'].notes_etudiants[1] = attr.evolve(

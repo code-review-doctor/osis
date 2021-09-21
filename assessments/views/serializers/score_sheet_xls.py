@@ -57,7 +57,6 @@ class _NoteEtudiantRowSerializer(serializers.Serializer):
     autre_amenagement = serializers.SerializerMethodField()
     details_autre_amenagement = serializers.SerializerMethodField()
     accompagnateur = serializers.SerializerMethodField()
-    enrollment_state_color = serializers.SerializerMethodField()
 
     def get_type_peps(self, note_etudiant: NoteEtudiantDTO):
         try:
@@ -122,13 +121,6 @@ class _NoteEtudiantRowSerializer(serializers.Serializer):
             return operator.attrgetter("peps.accompagnateur")(note_etudiant)
         except AttributeError:
             return "-"
-
-    def get_enrollment_state_color(self, note_etudiant: NoteEtudiantDTO) -> str:
-        if note_etudiant.inscrit_tardivement:
-            return '#dff0d8'
-        elif note_etudiant.desinscrit_tardivement:
-            return '#f2dede'
-        return ''
 
     def get_note(self, note_etudiant: NoteEtudiantDTO) -> str:
         try:

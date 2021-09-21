@@ -180,7 +180,7 @@ def _build_rows(worksheet, feuille_de_notes_serialized):
         if row['inscrit_tardivement']:
             __set_late_subscribe_row_color(worksheet, current_row_number)
         if row['desinscrit_tardivement']:
-            __set_late_subscribe_row_color(worksheet, current_row_number)
+            __set_late_unsubscribe_row_color(worksheet, current_row_number)
         __set_border_on_first_peps_cell(worksheet, current_row_number)
         current_row_number += 1
 
