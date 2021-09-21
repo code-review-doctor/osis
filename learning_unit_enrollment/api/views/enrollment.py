@@ -47,6 +47,7 @@ class LearningUnitEnrollmentsListView(generics.ListAPIView):
         acronym = self.kwargs['acronym']
         year = self.kwargs['year']
         return LearningUnitEnrollment.objects.annotate(
+            learning_unit_academic_year=F('learning_unit_year__academic_year__year'),
             learning_unit_acronym=Case(
                 When(
                     Q(learning_class_year__isnull=False),
@@ -56,7 +57,7 @@ class LearningUnitEnrollmentsListView(generics.ListAPIView):
             )
         ).filter(
             learning_unit_acronym=acronym,
-            learning_unit_year__academic_year__year=year
+            learning_unit_academic_year=year
         ).annotate(
             student_last_name=F('offer_enrollment__student__person__last_name'),
             student_first_name=F('offer_enrollment__student__person__first_name'),

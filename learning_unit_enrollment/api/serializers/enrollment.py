@@ -38,3 +38,4 @@ class EnrollmentSerializer(serializers.Serializer):
     specific_profile = StudentSpecificProfileSerializer(read_only=True, source="student.studentspecificprofile")
     program = serializers.CharField()
     learning_unit_acronym = serializers.CharField()
+    learning_unit_year = serializers.IntegerField(source="learning_unit_academic_year")

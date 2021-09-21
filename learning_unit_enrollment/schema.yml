@@ -48,7 +48,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/EnrollmentList'
+                $ref: '#/components/schemas/PaginatedEnrollmentList'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -146,6 +146,7 @@ components:
           type: string
         guide:
           type: string
+          nullable: true
           example: "John Doe"
         arrangement_additional_time:
           type: boolean
@@ -172,7 +173,7 @@ components:
           type: string
           format: uri
           nullable: true
-    EnrollmentList:
+    PaginatedEnrollmentList:
       allOf:
         - $ref: '#/components/schemas/Paging'
         - type: object
@@ -211,6 +212,9 @@ components:
         learning_unit_acronym:
           type: string
           example: "LABCD1234"
+        learning_unit_year:
+          type: integer
+          example: 2021
     TypePepsEnum:
       type: string
       enum:
