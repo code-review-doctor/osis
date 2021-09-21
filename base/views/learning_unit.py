@@ -55,6 +55,7 @@ from base.models.enums.entity_container_year_link_type import EntityContainerYea
 from base.models.enums.learning_component_year_type import LEARNING_COMPONENT_YEAR_TYPES
 from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
 from base.models.enums.vacant_declaration_type import DECLARATION_TYPE
+from base.models.learning_unit_enrollment import LearningUnitEnrollment
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
@@ -89,10 +90,10 @@ def learning_unit_formations(request, learning_unit_year_id=None, code=None, yea
     context['root_formations'] = root_formations
     context['total_formation_enrollments'] = 0
     context['total_learning_unit_enrollments'] = 0
-
     context['classes'] = LearningClassYear.objects.filter(
         learning_component_year__learning_unit_year__id=learning_unit_year_id
     ).distinct('pk')
+
     totals_classes = {}
     for root_formation in root_formations:
         context['total_formation_enrollments'] += root_formation.count_formation_enrollments
