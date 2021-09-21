@@ -52,6 +52,8 @@ from infrastructure.encodage_de_notes.encodage.domain.service.in_memory.historis
 from infrastructure.encodage_de_notes.encodage.domain.service.in_memory.notifier_encodage_notes import \
     NotifierEncodageNotesInMemory
 from infrastructure.encodage_de_notes.encodage.repository.in_memory.note_etudiant import NoteEtudiantInMemoryRepository
+from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.inscription_examen import \
+    InscriptionExamenTranslatorInMemory
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.periode_encodage_notes import \
     PeriodeEncodageNotesTranslatorInMemory
 from infrastructure.messages_bus import message_bus_instance
@@ -80,6 +82,7 @@ class EncoderNoteTest(SimpleTestCase):
 
         self.periode_encodage_notes_translator = PeriodeEncodageNotesTranslatorInMemory()
         self.cohortes_gestionnaire_trans = CohortesDuGestionnaireInMemory()
+        self.inscription_examen_trans = InscriptionExamenTranslatorInMemory()
         self.notifier_notes_domain_service = NotifierEncodageNotesInMemory()
         self.notifier_notes_domain_service.notifications.clear()
         self.historiser_note_service = HistoriserEncodageNotesServiceInMemory()
@@ -94,7 +97,8 @@ class EncoderNoteTest(SimpleTestCase):
             PeriodeEncodageNotesTranslator=lambda: self.periode_encodage_notes_translator,
             CohortesDuGestionnaireTranslator=lambda: self.cohortes_gestionnaire_trans,
             NotifierEncodageNotes=lambda: self.notifier_notes_domain_service,
-            HistoriserEncodageNotesService=lambda: self.historiser_note_service
+            HistoriserEncodageNotesService=lambda: self.historiser_note_service,
+            InscriptionExamenTranslator=lambda: self.inscription_examen_trans
         )
         message_bus_patcher.start()
         self.addCleanup(message_bus_patcher.stop)
