@@ -30,7 +30,6 @@ from assessments.export import score_sheet_pdf
 from assessments.views.serializers.score_sheet import ScoreSheetPDFSerializer
 from ddd.logic.encodage_des_notes.soumission.commands import SearchAdressesFeuilleDeNotesCommand
 from infrastructure.messages_bus import message_bus_instance
-from osis_common.document import paper_sheet
 from osis_role.contrib.views import PermissionRequiredMixin
 
 

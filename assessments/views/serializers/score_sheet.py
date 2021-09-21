@@ -26,7 +26,6 @@
 import contextlib
 import itertools
 import json
-from collections import namedtuple
 
 from django.template.defaultfilters import floatformat
 from django.utils import timezone
@@ -44,7 +43,7 @@ class _EnrollmentSerializer(serializers.Serializer):
     last_name = serializers.CharField(read_only=True, source='nom')
     first_name = serializers.CharField(read_only=True, source='prenom')
     score = serializers.SerializerMethodField()
-    deadline = serializers.DateField(read_only=True, source='date_remise_de_notes.to_date', format="%d/%m/%Y")
+    deadline = serializers.SerializerMethodField()
     enrollment_state_color = serializers.SerializerMethodField()
 
     def get_enrollment_state_color(self, note_etudiant: NoteEtudiantDTO) -> str:
@@ -59,6 +58,11 @@ class _EnrollmentSerializer(serializers.Serializer):
             note_format = "2" if self.context['note_decimale_est_autorisee'] else "0"
             return floatformat(float(note_etudiant.note), note_format)
         return note_etudiant.note
+
+    def get_deadline(self, note_etudiant: NoteEtudiantDTO) -> str:
+        if note_etudiant.date_remise_de_notes and not note_etudiant.desinscrit_tardivement:
+            return note_etudiant.date_remise_de_notes.to_date().strftime("%d/%m/%Y")
+        return ""
 
 
 class _ProgramAddressSerializer(serializers.Serializer):
