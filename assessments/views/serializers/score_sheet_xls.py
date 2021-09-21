@@ -112,7 +112,8 @@ class _NoteEtudiantRowSerializer(serializers.Serializer):
 
     def get_details_autre_amenagement(self, note_etudiant: NoteEtudiantDTO):
         try:
-            return operator.attrgetter("peps.details_autre_amenagement")(note_etudiant)
+            details_autre_amenagement = operator.attrgetter("peps.details_autre_amenagement")(note_etudiant)
+            return details_autre_amenagement if details_autre_amenagement else '-'
         except AttributeError:
             return "-"
 
