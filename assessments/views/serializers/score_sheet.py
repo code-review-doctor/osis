@@ -26,6 +26,7 @@
 import contextlib
 import itertools
 import json
+from collections import namedtuple
 
 from django.template.defaultfilters import floatformat
 from django.utils import timezone
@@ -96,14 +97,15 @@ class _ScoreResponsibleAddressSerializer(serializers.Serializer):
 
 
 class _ScoreResponsibleSerializer(serializers.Serializer):
-    first_name = serializers.CharField(read_only=True, source='feuille_de_notes.responsable_note.prenom')
-    last_name = serializers.CharField(read_only=True, source='feuille_de_notes.responsable_note.nom')
+    first_name = serializers.CharField(read_only=True, source='feuille_de_notes.responsable_note.prenom', default='')
+    last_name = serializers.CharField(read_only=True, source='feuille_de_notes.responsable_note.nom', default='')
     address = serializers.SerializerMethodField()
 
     def get_address(self, obj):
-        return _ScoreResponsibleAddressSerializer(
-            instance=obj['feuille_de_notes'].contact_responsable_notes.adresse_professionnelle
-        ).data if obj['feuille_de_notes'].contact_responsable_notes else None
+        instance = {}
+        if obj['feuille_de_notes'].contact_responsable_notes:
+            instance = obj['feuille_de_notes'].contact_responsable_notes.adresse_professionnelle
+        return _ScoreResponsibleAddressSerializer(instance=instance).data
 
 
 class _LearningUnitYearsSerializer(serializers.Serializer):
