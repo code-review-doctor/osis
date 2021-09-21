@@ -55,7 +55,6 @@ from base.models.enums.entity_container_year_link_type import EntityContainerYea
 from base.models.enums.learning_component_year_type import LEARNING_COMPONENT_YEAR_TYPES
 from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
 from base.models.enums.vacant_declaration_type import DECLARATION_TYPE
-from base.models.learning_unit_enrollment import LearningUnitEnrollment
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
@@ -64,6 +63,7 @@ from base.views.learning_units.common import get_common_context_learning_unit_ye
     get_common_context_to_publish
 from cms.models.text_label import TextLabel
 from cms.models.translated_text_label import TranslatedTextLabel
+from learning_unit.models.learning_class_year import LearningClassYear
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.repositories.node import NodeRepository
 from program_management.ddd.service.read.search_program_trees_using_node_service import search_program_trees_using_node
@@ -89,10 +89,10 @@ def learning_unit_formations(request, learning_unit_year_id=None, code=None, yea
     context['root_formations'] = root_formations
     context['total_formation_enrollments'] = 0
     context['total_learning_unit_enrollments'] = 0
-    learning_unit_enrollment_classes = LearningUnitEnrollment.objects.filter(
-        learning_unit_year=learning_unit_year_id, learning_class_year__isnull=False
-    ).distinct('learning_class_year')
-    context['learning_unit_enrollment_classes'] = learning_unit_enrollment_classes
+
+    context['classes'] = LearningClassYear.objects.filter(
+        learning_component_year__learning_unit_year__id=learning_unit_year_id
+    ).distinct('pk')
     totals_classes = {}
     for root_formation in root_formations:
         context['total_formation_enrollments'] += root_formation.count_formation_enrollments
