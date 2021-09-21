@@ -146,6 +146,7 @@ components:
           type: string
         guide:
           type: string
+          nullable: true
           example: "John Doe"
         arrangement_additional_time:
           type: boolean
