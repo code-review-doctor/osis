@@ -49,6 +49,13 @@ class TestNoteEtudiant(TestCase):
 
         assert_attrs_instances_are_equal(note_chiffree, self.repo.get(note_chiffree.entity_id))
 
+    def test_should_save_note_manquante(self):
+        note_manquante = NoteManquanteEtudiantFactory()
+        self._create_save_necessary_data(note_manquante)
+        self.repo.save(note_manquante)
+
+        assert_attrs_instances_are_equal(note_manquante, self.repo.get(note_manquante.entity_id))
+
     def test_should_save_note_etudiant_justification(self):
         note_justification = NoteEtudiantJustificationFactory()
         self._create_save_necessary_data(note_justification)

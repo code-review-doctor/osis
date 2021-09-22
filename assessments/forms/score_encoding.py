@@ -29,7 +29,7 @@ from django.utils.translation import pgettext_lazy, gettext_lazy as _
 
 
 from base.forms.utils import choice_field
-from base.models.enums.exam_enrollment_justification_type import JustificationTypes
+from base.models.enums.exam_enrollment_justification_type import JustificationTypes, StateTypes
 from ddd.logic.encodage_des_notes.encodage.commands import GetCohortesGestionnaireCommand
 from infrastructure.messages_bus import message_bus_instance
 
@@ -51,15 +51,16 @@ class ScoreSearchEncodingForm(forms.Form):
 
 
 class ScoreSearchForm(forms.Form):
-    noma = forms.CharField(required=False)
-    nom = forms.CharField(required=False)
-    prenom = forms.CharField(required=False)
-    justification = forms.ChoiceField(
+    noma = forms.CharField(required=False, label=_("Reg. No."))
+    nom = forms.CharField(required=False, label=_("Lastname"))
+    prenom = forms.CharField(required=False, label=_("Firstname"))
+    etat = forms.ChoiceField(
         choices=choice_field.add_blank(
-            JustificationTypes.choices(),
+            StateTypes.choices(),
             blank_choice_display=pgettext_lazy("male plural", "All")
         ),
-        required=False
+        required=False,
+        label=_("State")
     )
     nom_cohorte = forms.ChoiceField(required=False, label=pgettext_lazy('encoding', 'Program'))
 
@@ -73,7 +74,7 @@ class ScoreSearchForm(forms.Form):
         choices = (
             (cohorte.nom_cohorte, cohorte.nom_cohorte,) for cohorte in sorted(results, key=lambda x: x.nom_cohorte)
         )
-        return choice_field.add_blank(tuple(choices))
+        return choice_field.add_blank(tuple(choices), blank_choice_display=pgettext_lazy("male plural", "All"))
 
     def clean(self):
         cleaned_data = super().clean()
@@ -81,7 +82,7 @@ class ScoreSearchForm(forms.Form):
             cleaned_data['noma'],
             cleaned_data['nom'],
             cleaned_data['prenom'],
-            cleaned_data['justification'],
+            cleaned_data['etat'],
             cleaned_data['nom_cohorte'],
         ]):
             self.add_error(None, _("Please choose at least one criteria!"))
@@ -90,7 +91,12 @@ class ScoreSearchForm(forms.Form):
 
 class ScoreEncodingProgressFilterForm(forms.Form):
     cohorte_name = forms.ChoiceField(required=False, label=pgettext_lazy('encoding', 'Program'))
-    tutor = forms.CharField(max_length=100, required=False, label=_('Tutor'))
+    tutor = forms.CharField(
+        max_length=100,
+        required=False,
+        label=_('Tutor'),
+        widget=forms.TextInput(attrs={'placeholder':  _('Name')})
+    )
     learning_unit_code = forms.CharField(
         max_length=100, required=False, label=_('Learning unit'),
         widget=forms.TextInput(attrs={'placeholder':  pgettext_lazy('UE acronym', 'Acronym')})

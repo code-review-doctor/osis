@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import datetime
+import itertools
 from typing import List, Optional
 
 from django.db.models import F, Value, Subquery, OuterRef, Case, When, CharField, Q
@@ -70,7 +71,7 @@ class AdresseFeuilleDeNotesRepository(IAdresseFeuilleDeNotesRepository):
         cohortes = [entity_id.nom_cohorte for entity_id in entity_ids]
         if not cohortes:
             return []
-        rows = get_queryset(cohortes)
+        rows = get_addresse_feuille_notes(cohortes)
 
         return [cls._convert_row_to_dto(row) for row in rows]
 
@@ -147,7 +148,7 @@ class AdresseFeuilleDeNotesRepository(IAdresseFeuilleDeNotesRepository):
         return cls.search([entity_id])[0]
 
 
-def get_queryset(cohortes: List[str]):
+def get_addresse_feuille_notes(cohortes: List[str]):
     nom_cohorte_subqs = EducationGroupYear.objects.filter(
         education_group=OuterRef('education_group'),
         academic_year=current_academic_year()
@@ -167,21 +168,14 @@ def get_queryset(cohortes: List[str]):
         start_date__lte=date,
         entity=OuterRef('entity'),
     ).values('acronym')
-    entity_title_subqs = EntityVersion.objects.filter(
-        Q(end_date__gte=date) | Q(end_date__isnull=True),
-        start_date__lte=date,
-        entity=OuterRef('entity'),
-        ).values('title')
-
     first_year_cohort_without_scoresheet_address_subqs = CohortYear.objects.exclude(
         education_group_year__education_group__scoresheetaddress__cohort_name=CohortName.FIRST_YEAR.name
     ).values(
         "education_group_year__education_group"
     )
 
-    return ScoreSheetAddress.objects.annotate(
+    qs_1 = ScoreSheetAddress.objects.annotate(
         entite=Subquery(entity_acronym_subqs[:1]),
-        entite_intitule=Subquery(entity_title_subqs[:1])
     ).annotate(
         nom_cohorte=Case(
             When(cohort_name=CohortName.FIRST_YEAR.name, then=Subquery(nom_cohorte_first_year_bachelor_subqs[:1])),
@@ -207,13 +201,13 @@ def get_queryset(cohortes: List[str]):
         "telephone",
         "fax",
         "email",
-    ).union(
-        ScoreSheetAddress.objects.filter(
+    )
+
+    qs_2 = ScoreSheetAddress.objects.filter(
             education_group__in=first_year_cohort_without_scoresheet_address_subqs
         ).annotate(
-            entite=Subquery(entity_acronym_subqs[:1]),
-            entite_intitule=Subquery(entity_title_subqs[:1]),
             nom_cohorte=Subquery(nom_cohorte_first_year_bachelor_subqs[:1], output_field=CharField()),
+            entite=Subquery(entity_acronym_subqs[:1]),
         ).annotate(
             destinataire=F('recipient'),
             rue_numero=F("location"),
@@ -235,4 +229,4 @@ def get_queryset(cohortes: List[str]):
             "fax",
             "email",
         )
-    )
+    return list(itertools.chain(qs_1, qs_2))

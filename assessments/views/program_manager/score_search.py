@@ -152,7 +152,7 @@ class ScoreSearchFormView(PermissionRequiredMixin, FormView):
                 noma=search_form.cleaned_data['noma'],
                 nom=search_form.cleaned_data['nom'],
                 prenom=search_form.cleaned_data['prenom'],
-                etat=search_form.cleaned_data['justification'],
+                etat=search_form.cleaned_data['etat'],
                 nom_cohorte=search_form.cleaned_data['nom_cohorte'],
                 matricule_fgs_gestionnaire=self.person.global_id
             )

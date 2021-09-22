@@ -43,7 +43,7 @@ class _EnrollmentSerializer(serializers.Serializer):
     last_name = serializers.CharField(read_only=True, source='nom')
     first_name = serializers.CharField(read_only=True, source='prenom')
     score = serializers.SerializerMethodField()
-    deadline = serializers.DateField(read_only=True, source='date_remise_de_notes.to_date', format="%d/%m/%Y")
+    deadline = serializers.SerializerMethodField()
     enrollment_state_color = serializers.SerializerMethodField()
 
     def get_enrollment_state_color(self, note_etudiant: NoteEtudiantDTO) -> str:
@@ -57,12 +57,26 @@ class _EnrollmentSerializer(serializers.Serializer):
         with contextlib.suppress(ValueError, TypeError):
             note_format = "2" if self.context['note_decimale_est_autorisee'] else "0"
             return floatformat(float(note_etudiant.note), note_format)
+
+        if note_etudiant.note == 'T':
+            return str(_('Cheating'))
+        elif note_etudiant.note == 'A':
+            return str(_('Absent'))
+        elif note_etudiant.note == 'S':
+            return str(_('Absence unjustified'))
+        elif note_etudiant.note == 'M':
+            return str(_('Absence justified'))
         return note_etudiant.note
+
+    def get_deadline(self, note_etudiant: NoteEtudiantDTO) -> str:
+        if note_etudiant.date_remise_de_notes and not note_etudiant.desinscrit_tardivement:
+            return note_etudiant.date_remise_de_notes.to_date().strftime("%d/%m/%Y")
+        return ""
 
 
 class _ProgramAddressSerializer(serializers.Serializer):
     recipient = serializers.CharField(read_only=True, source='destinataire', default='')
-    location = serializers.CharField(read_only=True,  source='rue_et_numero', default='')
+    location = serializers.CharField(read_only=True,  source='rue_numero', default='')
     postal_code = serializers.CharField(read_only=True, source='code_postal', default='')
     city = serializers.CharField(read_only=True, source='ville', default='')
     country = serializers.CharField(read_only=True, source='pays', default='')
@@ -96,14 +110,15 @@ class _ScoreResponsibleAddressSerializer(serializers.Serializer):
 
 
 class _ScoreResponsibleSerializer(serializers.Serializer):
-    first_name = serializers.CharField(read_only=True, source='feuille_de_notes.responsable_note.prenom')
-    last_name = serializers.CharField(read_only=True, source='feuille_de_notes.responsable_note.nom')
+    first_name = serializers.CharField(read_only=True, source='feuille_de_notes.responsable_note.prenom', default='')
+    last_name = serializers.CharField(read_only=True, source='feuille_de_notes.responsable_note.nom', default='')
     address = serializers.SerializerMethodField()
 
     def get_address(self, obj):
-        return _ScoreResponsibleAddressSerializer(
-            instance=obj['feuille_de_notes'].contact_responsable_notes.adresse_professionnelle
-        ).data if obj['feuille_de_notes'].contact_responsable_notes else None
+        instance = {}
+        if obj['feuille_de_notes'].contact_responsable_notes:
+            instance = obj['feuille_de_notes'].contact_responsable_notes.adresse_professionnelle
+        return _ScoreResponsibleAddressSerializer(instance=instance).data
 
 
 class _LearningUnitYearsSerializer(serializers.Serializer):

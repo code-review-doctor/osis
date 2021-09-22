@@ -34,7 +34,6 @@ from ddd.logic.encodage_des_notes.soumission.domain.service.i_deliberation impor
 from ddd.logic.encodage_des_notes.soumission.dtos import DonneesAdministrativesFeuilleDeNotesDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_notes import \
     IAdresseFeuilleDeNotesRepository
-from ddd.logic.shared_kernel.entite.repository.entiteucl import IEntiteUCLRepository
 
 
 def search_donnees_administratives_feuille_de_notes(
