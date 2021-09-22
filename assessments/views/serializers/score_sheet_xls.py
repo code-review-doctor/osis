@@ -184,11 +184,7 @@ class ScoreSheetXLSSerializer(serializers.Serializer):
 
 class TutorScoreSheetXLSSerializer(ScoreSheetXLSSerializer):
     def get_rows(self, obj):
-        notes_etudiants_filtered = filter(
-            lambda n: not n.date_echeance_atteinte and not n.est_soumise,
-            obj['feuille_de_notes'].notes_etudiants
-        )
-
+        notes_etudiants_filtered = self._get_notes_etudiants_filtered(obj['feuille_de_notes'])
         notes_etudiants_without_value = map(lambda n: attr.evolve(n, note=''), notes_etudiants_filtered)
         serializer = _NoteEtudiantRowSerializer(
             instance=notes_etudiants_without_value,
@@ -198,7 +194,11 @@ class TutorScoreSheetXLSSerializer(ScoreSheetXLSSerializer):
         return serializer.data
 
     def get_contact_emails(self, obj) -> str:
+        cohortes_concerned = {n.nom_cohorte for n in self._get_notes_etudiants_filtered(obj['feuille_de_notes'])}
         return ";".join({
             d_admin.contact_feuille_de_notes.email for d_admin in obj['donnees_administratives']
-            if d_admin.contact_feuille_de_notes.email
+            if d_admin.contact_feuille_de_notes.email and d_admin.sigle_formation in cohortes_concerned
         })
+
+    def _get_notes_etudiants_filtered(self, feuille_de_notes):
+        return filter(lambda n: not n.date_echeance_atteinte and not n.est_soumise, feuille_de_notes.notes_etudiants)
