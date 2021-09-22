@@ -1,6 +1,6 @@
 ##############################################################################
 #
-# OSIS stands for Open Student Information System. It's an application
+#    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
 #    such as universities, faculties, institutes and professional schools.
 #    The core business involves the administration of students, teachers,
@@ -15,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,25 +23,27 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
-import string
 
-import factory.fuzzy
-
-from base.tests.factories.organization import OrganizationFactory
+from django.conf import settings
+from rest_framework import serializers
 
 
-class CampusFactory(factory.DjangoModelFactory):
-    class Meta:
-        model = 'base.Campus'
+class EffectiveClassRepartitionSerializer(serializers.Serializer):
+    code = serializers.CharField()
+    title_fr = serializers.CharField()
+    title_en = serializers.CharField()
+    has_peps = serializers.BooleanField()
+    links = serializers.SerializerMethodField()
 
-    external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
+    def __get_schedule_url(self, obj):
+        year = self.context.get('year')
+        has_access_schedule_calendar = year in self.context["access_schedule_calendar"].get_target_years_opened() \
+            if "access_schedule_calendar" in self.context else False
+        if settings.SCHEDULE_APP_URL and has_access_schedule_calendar:
+            clean_code = obj.get('code').replace('_', '').replace('-', '')
+            return settings.SCHEDULE_APP_URL.format(code=clean_code)
 
-    changed = factory.fuzzy.FuzzyNaiveDateTime(
-        datetime.datetime(2016, 1, 1),
-        datetime.datetime(2017, 3, 1)
-    )
-
-    name = factory.Faker('city')
-    organization = factory.SubFactory(OrganizationFactory)
-    is_administration = False
+    def get_links(self, obj):
+        return {
+            'schedule': self.__get_schedule_url(obj)
+        }

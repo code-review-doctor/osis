@@ -1,6 +1,6 @@
 ##############################################################################
 #
-# OSIS stands for Open Student Information System. It's an application
+#    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
 #    such as universities, faculties, institutes and professional schools.
 #    The core business involves the administration of students, teachers,
@@ -15,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,25 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
-import string
+from rest_framework import serializers
 
-import factory.fuzzy
-
-from base.tests.factories.organization import OrganizationFactory
+from learning_unit_enrollment.api.serializers.specific_profile import StudentSpecificProfileSerializer
 
 
-class CampusFactory(factory.DjangoModelFactory):
-    class Meta:
-        model = 'base.Campus'
-
-    external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-
-    changed = factory.fuzzy.FuzzyNaiveDateTime(
-        datetime.datetime(2016, 1, 1),
-        datetime.datetime(2017, 3, 1)
-    )
-
-    name = factory.Faker('city')
-    organization = factory.SubFactory(OrganizationFactory)
-    is_administration = False
+class EnrollmentSerializer(serializers.Serializer):
+    date_enrollment = serializers.CharField()
+    enrollment_state = serializers.CharField()
+    student_last_name = serializers.CharField()
+    student_first_name = serializers.CharField()
+    student_email = serializers.CharField()
+    student_registration_id = serializers.CharField()
+    specific_profile = StudentSpecificProfileSerializer(read_only=True, source="student.studentspecificprofile")
+    program = serializers.CharField()
+    learning_unit_acronym = serializers.CharField()
+    learning_unit_year = serializers.IntegerField(source="learning_unit_academic_year")

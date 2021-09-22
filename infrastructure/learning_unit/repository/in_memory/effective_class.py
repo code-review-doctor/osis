@@ -26,7 +26,10 @@
 from typing import Optional, List
 
 from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
+from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass, EffectiveClassIdentity
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
+from ddd.logic.learning_unit.dtos import EffectiveClassDTO
 from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
 
 
@@ -36,3 +39,26 @@ class EffectiveClassRepository(InMemoryGenericRepository, IEffectiveClassReposit
     @classmethod
     def search(cls, entity_ids: Optional[List['EffectiveClassIdentity']] = None, **kwargs) -> List['EffectiveClass']:
         raise NotImplementedError
+
+    @classmethod
+    def search_dtos(
+            cls,
+            learning_unit_id: Optional['LearningUnitIdentity'] = None,
+            **kwargs
+    ) -> List['EffectiveClassDTO']:
+        class_to_return = []
+        for effective_class in cls.entities:
+            if effective_class.learning_unit_identity == learning_unit_id:
+                dto = EffectiveClassDTO(
+                    code=effective_class.class_code,
+                    title_fr=effective_class.titles.fr,
+                    title_en=effective_class.titles.en,
+                    teaching_place_uuid=effective_class.teaching_place.uuid,
+                    derogation_quadrimester=effective_class.derogation_quadrimester,
+                    session_derogation=effective_class.session_derogation,
+                    volume_q1=effective_class.volumes.volume_first_quadrimester,
+                    volume_q2=effective_class.volumes.volume_second_quadrimester,
+                    type=LECTURING if effective_class.is_lecturing else PRACTICAL_EXERCISES,
+                )
+                class_to_return.append(dto)
+        return class_to_return

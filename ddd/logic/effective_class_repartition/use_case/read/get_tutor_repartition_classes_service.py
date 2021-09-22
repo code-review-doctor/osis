@@ -1,6 +1,6 @@
 ##############################################################################
 #
-# OSIS stands for Open Student Information System. It's an application
+#    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
 #    such as universities, faculties, institutes and professional schools.
 #    The core business involves the administration of students, teachers,
@@ -15,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,25 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
-import string
 
-import factory.fuzzy
+from ddd.logic.effective_class_repartition.builder.tutor_identity_builder import TutorIdentityBuilder
+from ddd.logic.effective_class_repartition.commands import GetTutorRepartitionClassesCommand
+from ddd.logic.effective_class_repartition.domain.model.tutor import Tutor
+from ddd.logic.effective_class_repartition.repository.i_tutor import ITutorRepository
 
-from base.tests.factories.organization import OrganizationFactory
 
-
-class CampusFactory(factory.DjangoModelFactory):
-    class Meta:
-        model = 'base.Campus'
-
-    external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-
-    changed = factory.fuzzy.FuzzyNaiveDateTime(
-        datetime.datetime(2016, 1, 1),
-        datetime.datetime(2017, 3, 1)
-    )
-
-    name = factory.Faker('city')
-    organization = factory.SubFactory(OrganizationFactory)
-    is_administration = False
+# TODO :: unit test
+def get_tutor_repartition_classes(
+        cmd: 'GetTutorRepartitionClassesCommand',
+        tutor_repository: 'ITutorRepository'
+) -> 'Tutor':
+    tutor_identity = TutorIdentityBuilder.build_from_personal_id_number(cmd.tutor_personal_id_number)
+    return tutor_repository.get(tutor_identity)
