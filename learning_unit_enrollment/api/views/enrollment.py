@@ -42,11 +42,12 @@ class LearningUnitEnrollmentsListView(generics.ListAPIView):
     """
     name = 'enrollments'
     serializer_class = EnrollmentSerializer
+    search_fields = ['student_first_name', 'student_last_name']
 
     def get_queryset(self):
         acronym = self.kwargs['acronym']
         year = self.kwargs['year']
-        return LearningUnitEnrollment.objects.annotate(
+        qs = LearningUnitEnrollment.objects.annotate(
             learning_unit_academic_year=F('learning_unit_year__academic_year__year'),
             learning_unit_acronym=Case(
                 When(
@@ -69,3 +70,8 @@ class LearningUnitEnrollmentsListView(generics.ListAPIView):
             'offer_enrollment__student__person',
             'learning_unit_year__academic_year'
         )
+        if self.request.GET.get('ordering') == 'specific_profile':
+            qs = qs.order_by('offer_enrollment__student__studentspecificprofile')
+        if self.request.GET.get('ordering') == '-specific_profile':
+            qs = qs.order_by('-offer_enrollment__student__studentspecificprofile')
+        return qs
