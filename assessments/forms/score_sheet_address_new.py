@@ -46,10 +46,10 @@ class ScoreSheetAddressForm(forms.Form):
         required=False,
         label=gettext_lazy('Please select an address'),
     )
-    recipient = forms.CharField(max_length=255, label=gettext_lazy('Recipient'), required=False)
-    location = forms.CharField(max_length=255, label=gettext_lazy('Street and number'), required=False)
-    postal_code = forms.CharField(max_length=255, label=gettext_lazy('Postal code'), required=False)
-    city = forms.CharField(max_length=255, label=gettext_lazy('City'), required=False)
+    recipient = forms.CharField(max_length=255, label=gettext_lazy('Recipient')+" *", required=False)
+    location = forms.CharField(max_length=255, label=gettext_lazy('Street and number')+" *", required=False)
+    postal_code = forms.CharField(max_length=255, label=gettext_lazy('Postal code')+" *", required=False)
+    city = forms.CharField(max_length=255, label=gettext_lazy('City')+" *", required=False)
     country = forms.ModelChoiceField(
         queryset=Country.objects.all(),
         required=False,
@@ -82,6 +82,7 @@ class ScoreSheetAddressForm(forms.Form):
 
         entity = cleaned_data.get('entity')
         if not entity:
+            self.check_field_required(cleaned_data, "recipient")
             self.check_field_required(cleaned_data, "location")
             self.check_field_required(cleaned_data, "postal_code")
             self.check_field_required(cleaned_data, "city")
