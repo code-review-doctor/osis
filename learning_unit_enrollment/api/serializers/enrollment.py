@@ -35,8 +35,7 @@ class EnrollmentSerializer(serializers.Serializer):
     student_first_name = serializers.CharField()
     student_email = serializers.CharField()
     student_registration_id = serializers.CharField()
-    specific_profile = StudentSpecificProfileSerializer(read_only=True,
-                                                        source="student.studentspecificprofile")  # WTF ?
+    specific_profile = StudentSpecificProfileSerializer(read_only=True, source="student.studentspecificprofile")
     program = serializers.CharField()
     learning_unit_acronym = serializers.CharField()
     learning_unit_year = serializers.IntegerField(source="learning_unit_academic_year")

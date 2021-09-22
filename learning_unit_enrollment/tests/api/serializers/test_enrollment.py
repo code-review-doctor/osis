@@ -50,7 +50,7 @@ class EnrollmentSerializerTestCase(TestCase):
             student_first_name=student.person.first_name,
             student_email=student.person.email,
             student_registration_id=student.registration_id,
-            student=student,  # WTF ?
+            student=student,
             program=cls.ue_enrollment.offer_enrollment.education_group_year.acronym,
             learning_unit_acronym=cls.ue_enrollment.learning_unit_year.acronym,
             learning_unit_academic_year=cls.ue_enrollment.learning_unit_year.academic_year.year,
