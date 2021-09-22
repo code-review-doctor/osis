@@ -54,3 +54,6 @@ class EntiteUCL(interface.RootEntity):
 
     def est_faculte(self) -> bool:
         return self.type == EntityType.FACULTY
+
+    def est_sector(self) -> bool:
+        return self.type == EntityType.SECTOR
