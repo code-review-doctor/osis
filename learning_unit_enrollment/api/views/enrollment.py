@@ -26,8 +26,8 @@
 import logging
 
 from django.conf import settings
-from django.db.models import Case, When, Q, F
-from django.db.models.functions import Concat
+from django.db.models import Case, When, Q, F, Value, CharField
+from django.db.models.functions import Concat, Replace
 from django.utils.functional import cached_property
 from rest_framework import generics
 
@@ -73,7 +73,16 @@ class LearningUnitEnrollmentsListView(generics.ListAPIView):
             student_first_name=F('offer_enrollment__student__person__first_name'),
             student_email=F('offer_enrollment__student__person__email'),
             student_registration_id=F('offer_enrollment__student__registration_id'),
-            program=F('offer_enrollment__education_group_year__acronym'),
+            program=Case(
+                When(
+                    Q(offer_enrollment__cohort_year__name=CohortName.FIRST_YEAR.name),
+                    then=Replace(
+                        'offer_enrollment__cohort_year__education_group_year__acronym', Value('1'), Value('11')
+                    )
+                ),
+                default=F('offer_enrollment__education_group_year__acronym'),
+                output_field=CharField()
+            ),
         ).select_related(
             'offer_enrollment__student__studentspecificprofile',
             'offer_enrollment__student__person',
@@ -94,10 +103,7 @@ class MyLearningUnitEnrollmentsListView(LearningUnitEnrollmentsListView):
     def get_queryset(self):
         program_code = self.kwargs['program_code']
         return self._get_common_qs().filter(
-            Q(offer_enrollment__education_group_year__acronym=program_code) | (
-                    Q(offer_enrollment__cohort_year__name=CohortName.FIRST_YEAR.name) &
-                    Q(offer_enrollment__education_group_year__acronym=program_code.replace('11', '1'))
-            ),
+            program=program_code,
             offer_enrollment__student__person=self.person,
             offer_enrollment__education_group_year__academic_year__year=self.year,
         )
