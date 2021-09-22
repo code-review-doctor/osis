@@ -77,7 +77,7 @@ class MyOfferEnrollmentsListViewTestCase(APITestCase):
         results = response.json()['results']
         self.assertEqual(len(results), 1)
 
-        self.assertCountEqual(list(results[0]['acronym']), cohort.education_group_year.acronym.replace('1', '11'))
+        self.assertEqual(results[0]['acronym'], cohort.education_group_year.acronym.replace('1', '11'))
 
 
 class MyOfferYearEnrollmentsListViewTestCase(APITestCase):

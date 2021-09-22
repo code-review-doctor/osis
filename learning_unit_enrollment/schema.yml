@@ -57,6 +57,47 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
         - enrollment
+  /my_enrollments/{program_code}/{year}/:
+    get:
+      description: 'Return all enrollments of the connected user based on an offer enrollment'
+      operationId: my_enrollments_list
+      parameters:
+        - in: path
+          name: program_code
+          required: true
+          description: The offer acronym
+          schema:
+            type: string
+            example: "FSA1BA"
+        - in: path
+          name: year
+          required: true
+          description: The offer academic year
+          schema:
+            type: integer
+            example: 2021
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
+        - $ref: '#/components/parameters/PaginationLimit'
+        - $ref: '#/components/parameters/PaginationOffset'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedEnrollmentList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - enrollment
 components:
   securitySchemes:
     Token:
