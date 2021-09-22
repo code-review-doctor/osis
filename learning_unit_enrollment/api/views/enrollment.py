@@ -95,7 +95,7 @@ class MyLearningUnitEnrollmentsListView(LearningUnitEnrollmentsListView):
         program_code = self.kwargs['program_code']
         return self._get_common_qs().filter(
             Q(offer_enrollment__education_group_year__acronym=program_code) | (
-                    Q(cohort_year__name=CohortName.FIRST_YEAR.name) &
+                    Q(offer_enrollment__cohort_year__name=CohortName.FIRST_YEAR.name) &
                     Q(offer_enrollment__education_group_year__acronym=program_code.replace('11', '1'))
             ),
             offer_enrollment__student__person=self.person,
