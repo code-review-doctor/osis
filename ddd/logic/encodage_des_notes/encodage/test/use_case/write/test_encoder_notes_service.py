@@ -291,42 +291,61 @@ class EncoderNoteTest(SimpleTestCase):
         entity_id = self.message_bus.invoke(cmd)[0]
         self.assertEqual(self.repository.get(entity_id).note.value, Decimal(12.5))
 
-    def test_should_encoder_absence_injustifiee(self):
-        for absence_injustifiee in ['S', JustificationTypes.ABSENCE_UNJUSTIFIED.name]:
-            with self.subTest(absence=absence_injustifiee):
-                cmd = self._evolve_command(note=absence_injustifiee)
-
-                entity_id = self.message_bus.invoke(cmd)[0]
-
-                expected_result = Justification(value=JustificationTypes.ABSENCE_UNJUSTIFIED)
-                self.assertEqual(self.repository.get(entity_id).note, expected_result)
-
-    def test_should_encoder_absence_justifiee(self):
-        for absence_justifiee in ['M', JustificationTypes.ABSENCE_JUSTIFIED.name]:
-            with self.subTest(absence=absence_justifiee):
-                cmd = self._evolve_command(note=absence_justifiee)
-
-                entity_id = self.message_bus.invoke(cmd)[0]
-
-                expected_result = Justification(value=JustificationTypes.ABSENCE_JUSTIFIED)
-                self.assertEqual(self.repository.get(entity_id).note, expected_result)
-
-    def test_should_encoder_tricherie(self):
-        for tricherie in ['T', JustificationTypes.CHEATING.name]:
-            with self.subTest(tricherie=tricherie):
-                cmd = self._evolve_command(note=tricherie)
-
-                entity_id = self.message_bus.invoke(cmd)[0]
-
-                expected_result = Justification(value=JustificationTypes.CHEATING)
-                self.assertEqual(self.repository.get(entity_id).note, expected_result)
-
-    def test_should_encoder_note_manquante(self):
-        cmd = self._evolve_command(note="")
+    def test_should_encoder_absence_injustifiee_as_S(self):
+        cmd = self._evolve_command(note='S')
 
         entity_id = self.message_bus.invoke(cmd)[0]
 
-        self.assertEqual(self.repository.get(entity_id).note.value, "")
+        expected_result = Justification(value=JustificationTypes.ABSENCE_UNJUSTIFIED)
+        self.assertEqual(self.repository.get(entity_id).note, expected_result)
+
+    def test_should_encoder_absence_injustifiee_as_ABSENCE_UNJUSTIFIED(self):
+        cmd = self._evolve_command(note=JustificationTypes.ABSENCE_UNJUSTIFIED.name)
+
+        entity_id = self.message_bus.invoke(cmd)[0]
+
+        expected_result = Justification(value=JustificationTypes.ABSENCE_UNJUSTIFIED)
+        self.assertEqual(self.repository.get(entity_id).note, expected_result)
+
+    def test_should_encoder_absence_justifiee_as_M(self):
+        cmd = self._evolve_command(note='M')
+
+        entity_id = self.message_bus.invoke(cmd)[0]
+
+        expected_result = Justification(value=JustificationTypes.ABSENCE_JUSTIFIED)
+        self.assertEqual(self.repository.get(entity_id).note, expected_result)
+
+    def test_should_encoder_absence_justifiee_as_ABSENCE_JUSTIFIED(self):
+        cmd = self._evolve_command(note=JustificationTypes.ABSENCE_JUSTIFIED.name)
+
+        entity_id = self.message_bus.invoke(cmd)[0]
+
+        expected_result = Justification(value=JustificationTypes.ABSENCE_JUSTIFIED)
+        self.assertEqual(self.repository.get(entity_id).note, expected_result)
+
+    def test_should_encoder_tricherie_as_T(self):
+        cmd = self._evolve_command(note='T')
+
+        entity_id = self.message_bus.invoke(cmd)[0]
+
+        expected_result = Justification(value=JustificationTypes.CHEATING)
+        self.assertEqual(self.repository.get(entity_id).note, expected_result)
+
+    def test_should_encoder_tricherie_as_CHEATING(self):
+        cmd = self._evolve_command(note=JustificationTypes.CHEATING.name)
+
+        entity_id = self.message_bus.invoke(cmd)[0]
+
+        expected_result = Justification(value=JustificationTypes.CHEATING)
+        self.assertEqual(self.repository.get(entity_id).note, expected_result)
+
+    def test_should_pas_persister_car_pas_de_modification(self):
+        self.assertEqual(self.repository.get(self.note.entity_id).note.value, "")
+        cmd = self._evolve_command(note="")
+
+        results = self.message_bus.invoke(cmd)
+        self.assertEqual(len(results), 0)
+        self.assertEqual(self.repository.get(self.note.entity_id).note.value, "")
 
     def test_should_notifier(self):
         result = self.message_bus.invoke(self.cmd)

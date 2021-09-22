@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import cmd
 from collections import OrderedDict
 from typing import List, Dict, Set
 
@@ -82,7 +81,8 @@ class EncoderNotesEnLot(interface.DomainService):
                         email_encode=email_encode,
                         nouvelle_note=nouvelle_valeur_note,
                     )
-                    notes_a_persister.append(nouvelle_note)
+                    if nouvelle_note.note != ancienne_note_etudiant.note:
+                        notes_a_persister.append(nouvelle_note)
                 except MultipleBusinessExceptions as e:
                     exceptions += [
                         EncoderNotesEnLotLigneBusinessExceptions(note_id=identite, exception=business_exception)
