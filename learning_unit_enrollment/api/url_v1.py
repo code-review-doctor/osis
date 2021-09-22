@@ -1,6 +1,6 @@
 ##############################################################################
 #
-# OSIS stands for Open Student Information System. It's an application
+#    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
 #    such as universities, faculties, institutes and professional schools.
 #    The core business involves the administration of students, teachers,
@@ -15,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,25 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
-import string
+from django.urls import path
 
-import factory.fuzzy
+from learning_unit_enrollment.api.views.enrollment import LearningUnitEnrollmentsListView
 
-from base.tests.factories.organization import OrganizationFactory
-
-
-class CampusFactory(factory.DjangoModelFactory):
-    class Meta:
-        model = 'base.Campus'
-
-    external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-
-    changed = factory.fuzzy.FuzzyNaiveDateTime(
-        datetime.datetime(2016, 1, 1),
-        datetime.datetime(2017, 3, 1)
-    )
-
-    name = factory.Faker('city')
-    organization = factory.SubFactory(OrganizationFactory)
-    is_administration = False
+app_name = "learning_unit_enrollment"
+urlpatterns = [
+    path('enrollments/<str:acronym>/<int:year>/', LearningUnitEnrollmentsListView.as_view(),
+         name=LearningUnitEnrollmentsListView.name),
+]

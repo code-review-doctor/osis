@@ -24,43 +24,28 @@
 #
 ##############################################################################
 import datetime
-from decimal import Decimal
-from types import SimpleNamespace
 
 import mock
 from django.test import TestCase, override_settings
 
-from attribution.api.serializers.attribution import AttributionSerializer
+from attribution.api.serializers.effective_class_repartition import EffectiveClassRepartitionSerializer
 from attribution.calendar.access_schedule_calendar import AccessScheduleCalendar
-from attribution.models.enums.function import Functions
 from base.business.academic_calendar import AcademicEvent
 from base.models.enums.academic_calendar_type import AcademicCalendarTypes
-from base.models.enums.learning_container_year_types import LearningContainerYearType
 
 
 @override_settings(
-    LEARNING_UNIT_PORTAL_URL="https://dummy_url.be/cours-{year}-{code}",
     SCHEDULE_APP_URL="https://schedule_dummy.uclouvain.be/{code}"
 )
-class AttributionSerializerTestCase(TestCase):
+class EffectiveClassRepartitionSerializerTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.attribution_obj = SimpleNamespace(
-            allocation_id="265656",  # Technical ID for making a match with data in EPC. Remove after refactoring...
-            code="LDROI1001",
-            type=LearningContainerYearType.COURSE.name,
-            title_fr="Introduction aux droits Partie I",
-            title_en="Introduction aux droits Partie I",
-            year=2020,
-            credits=Decimal("15.5"),
-            start_year=2015,
-            function=Functions.COORDINATOR.name,
-            lecturing_charge="15.0",
-            practical_charge="10.5",
-            has_peps=False,
-            total_learning_unit_charge="55.5",
-            is_partim=False
-        )
+        cls.class_repartition = {
+            'code': "LDROI1001A",
+            'title_fr': "Introduction aux droits Partie I",
+            'title_en': "Introduction aux droits Partie I",
+            'has_peps': False
+        }
 
         cls.academic_event = AcademicEvent(
             id=15,
@@ -71,8 +56,9 @@ class AttributionSerializerTestCase(TestCase):
             type=AcademicCalendarTypes.ACCESS_SCHEDULE_CALENDAR.name
         )
 
-        cls.serializer = AttributionSerializer(cls.attribution_obj, context={
+        cls.serializer = EffectiveClassRepartitionSerializer(cls.class_repartition, context={
             'access_schedule_calendar': AccessScheduleCalendar(),
+            'year': cls.academic_event.authorized_target_year
         })
 
     def setUp(self) -> None:
@@ -89,38 +75,13 @@ class AttributionSerializerTestCase(TestCase):
             'code',
             'title_fr',
             'title_en',
-            'year',
-            'type',
-            'type_text',
-            'credits',
-            'start_year',
-            'function',
-            'function_text',
-            'lecturing_charge',
-            'practical_charge',
-            'total_learning_unit_charge',
             'links',
-            'has_peps',
-            'effective_class_repartition',
-            'is_partim'
+            'has_peps'
         ]
         self.assertCountEqual(list(self.serializer.data.keys()), expected_fields)
 
-    def test_ensure_function_text_correctly_computed(self):
-        self.assertEquals(self.serializer.data['function_text'], Functions.COORDINATOR.value)
-
-    def test_ensure_type_text_correctly_computed(self):
-        self.assertEquals(self.serializer.data['type_text'], LearningContainerYearType.COURSE.value)
-
-    def test_ensure_catalog_app_url_correctly_computed(self):
-        expected_url = "https://dummy_url.be/cours-{year}-{code}".format(
-            year=self.attribution_obj.year,
-            code=self.attribution_obj.code
-        )
-        self.assertEquals(self.serializer.data['links']['catalog'], expected_url)
-
     def test_ensure_schedule_app_url_correctly_computed_case_calendar_opened(self):
         expected_url = "https://schedule_dummy.uclouvain.be/{code}".format(
-            code=self.attribution_obj.code
+            code=self.class_repartition.get('code')
         )
         self.assertEquals(self.serializer.data['links']['schedule'], expected_url)

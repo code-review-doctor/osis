@@ -42,8 +42,10 @@ from ddd.logic.application.use_case.write.send_applications_summary import send_
 from ddd.logic.application.use_case.write.update_application_service import update_application
 from ddd.logic.effective_class_repartition.commands import SearchAttributionsToLearningUnitCommand, \
     SearchTutorsDistributedToClassCommand, SearchAttributionCommand, DistributeClassToTutorCommand, \
-    UnassignTutorClassCommand, EditClassVolumeRepartitionToTutorCommand
+    UnassignTutorClassCommand, EditClassVolumeRepartitionToTutorCommand, GetTutorRepartitionClassesCommand
 from ddd.logic.effective_class_repartition.use_case.read.get_attribution_service import get_attribution
+from ddd.logic.effective_class_repartition.use_case.read.get_tutor_repartition_classes_service import \
+    get_tutor_repartition_classes
 from ddd.logic.effective_class_repartition.use_case.read.search_attributions_to_learning_unit_service import \
     search_attributions_to_learning_unit
 from ddd.logic.effective_class_repartition.use_case.read.search_effective_classes_distributed_service import \
@@ -56,11 +58,13 @@ from ddd.logic.effective_class_repartition.use_case.write.unassign_tutor_class_s
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, GetLearningUnitCommand, \
     CreateEffectiveClassCommand, CanCreateEffectiveClassCommand, GetEffectiveClassCommand, \
     UpdateEffectiveClassCommand, DeleteEffectiveClassCommand, CanDeleteEffectiveClassCommand, \
-    GetEffectiveClassWarningsCommand
+    GetEffectiveClassWarningsCommand, GetClassesEffectivesDepuisUniteDEnseignementCommand
 from ddd.logic.learning_unit.use_case.read.check_can_create_class_service import check_can_create_effective_class
 from ddd.logic.learning_unit.use_case.read.check_can_delete_class_service import check_can_delete_effective_class
 from ddd.logic.learning_unit.use_case.read.get_effective_class_service import get_effective_class
 from ddd.logic.learning_unit.use_case.read.get_effective_class_warnings_service import get_effective_class_warnings
+from ddd.logic.learning_unit.use_case.read.get_learning_unit_effective_classes_service import \
+    get_learning_unit_effective_classes
 from ddd.logic.learning_unit.use_case.read.get_learning_unit_service import get_learning_unit
 from ddd.logic.learning_unit.use_case.write.create_effective_class_service import create_effective_class
 from ddd.logic.learning_unit.use_case.write.create_learning_unit_service import create_learning_unit
@@ -193,6 +197,10 @@ class MessageBus:
             TutorRepository(),
             EffectiveClassRepository()
         ),
+        GetTutorRepartitionClassesCommand: lambda cmd: get_tutor_repartition_classes(cmd, TutorRepository()),
+        GetClassesEffectivesDepuisUniteDEnseignementCommand: lambda cmd: get_learning_unit_effective_classes(
+            cmd, EffectiveClassRepository()
+        )
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 
     def invoke(self, command: CommandRequest) -> ApplicationServiceResult:
