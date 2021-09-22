@@ -79,3 +79,20 @@ class TestGetChoixEntitesAdresseFeuilleDeNotes(SimpleTestCase):
             EntiteDTO(sigle="EPL", intitule="Ecole Polytechnique", sigle_parent="SST", type=EntityType.FACULTY)
         ]
         self.assertCountEqual(result, expected)
+
+    def test_should_return_entites_de_la_cohorte_avec_son_parent_de_type_de_sector(self):
+        self.entites_cohorte_translator.datas.append(IdentiteEntiteBuilder().build_from_sigle("INFO"))
+
+        result = self.message_bus.invoke(self.cmd)
+
+        expected = [
+            EntiteDTO(sigle="INFO", intitule="Ecole Informatique", sigle_parent="EPL", type=EntityType.SCHOOL),
+            EntiteDTO(sigle="EPL", intitule="Ecole Polytechnique", sigle_parent="SST", type=EntityType.FACULTY),
+            EntiteDTO(
+                sigle="SST",
+                intitule="Secteur des Sciences et Technologies",
+                sigle_parent="UCL",
+                type=EntityType.SECTOR
+            )
+        ]
+        self.assertCountEqual(result, expected)
