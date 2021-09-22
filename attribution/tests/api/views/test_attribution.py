@@ -91,7 +91,9 @@ class AttributionListViewTestCase(APITestCase):
         components = self.attribution_charge.learning_component_year.learning_unit_year.learningcomponentyear_set.all()
         self.assertEqual(
             results[0]['total_learning_unit_charge'],
-            "{:.1f}".format(sum(component.hourly_volume_total_annual for component in components))
+            "{:.1f}".format(
+                sum(component.hourly_volume_total_annual * component.planned_classes for component in components)
+            )
         )
 
 
@@ -155,5 +157,7 @@ class MyAttributionListViewTestCase(APITestCase):
         components = self.attribution_charge.learning_component_year.learning_unit_year.learningcomponentyear_set.all()
         self.assertEqual(
             results[0]['total_learning_unit_charge'],
-            "{:.1f}".format(sum(component.hourly_volume_total_annual for component in components))
+            "{:.1f}".format(
+                sum(component.hourly_volume_total_annual * component.planned_classes for component in components)
+            )
         )
