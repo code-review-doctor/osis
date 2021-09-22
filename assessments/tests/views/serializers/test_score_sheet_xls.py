@@ -288,6 +288,27 @@ class TutorScoreSheetXLSSerilizeTest(SimpleTestCase):
                     note=19,
                     inscrit_tardivement=False,
                     desinscrit_tardivement=False,
+                ),
+                NoteEtudiantDTO(
+                    code_unite_enseignement='LDROI1200',
+                    annee_unite_enseignement=2021,
+                    intitule_complet_unite_enseignement='Introduction au droit',
+                    est_soumise=True,
+                    date_remise_de_notes=DateDTO.build_from_date(
+                        datetime.date.today() - datetime.timedelta(days=5)
+                    ),
+                    echeance_enseignant=DateDTO.build_from_date(
+                        datetime.date.today() + datetime.timedelta(days=5)
+                    ),
+                    nom_cohorte='DROI2M',
+                    noma='999999996',
+                    nom='Durant',
+                    prenom='Paola',
+                    peps=None,
+                    email='paoladurant@gmail.com',
+                    note=5,
+                    inscrit_tardivement=False,
+                    desinscrit_tardivement=False,
                 )
             ],
         )
@@ -315,17 +336,27 @@ class TutorScoreSheetXLSSerilizeTest(SimpleTestCase):
             'donnees_administratives': [cls.donnees_administrative]
         }
 
-    def test_assert_rows_filtered_by_score_which_deadline_is_not_reached_and_not_submited(self):
+    def test_assert_rows_filtered_by_score_which_deadline_is_not_reached(self):
         sheet_serialized = TutorScoreSheetXLSSerializer(instance=self.instance).data
 
-        self.assertEqual(len(sheet_serialized['rows']), 1)
-        self.assertEqual(sheet_serialized['rows'][0]['noma'], '999999997')
+        self.assertEqual(len(sheet_serialized['rows']), 2)
+        noma_which_deadline_not_reached = ['999999998', '999999997']
+        self.assertEqual(
+            [row['noma'] for row in sheet_serialized['rows']],
+            noma_which_deadline_not_reached
+        )
 
-    def test_assert_rows_havent_any_score_event_if_encoded(self):
+    def test_assert_rows_which_are_not_yet_submited_have_blank_value_even_draft_encoded(self):
         sheet_serialized = TutorScoreSheetXLSSerializer(instance=self.instance).data
-        self.assertEqual(len(sheet_serialized['rows']), 1)
 
-        self.assertEqual(sheet_serialized['rows'][0]['note'], '')
+        row_noma_999999997 = next(row for row in sheet_serialized['rows'] if row['noma'] == '999999997')
+        self.assertEqual(row_noma_999999997['note'], '')
+
+    def test_assert_rows_which_are_submited_have_value(self):
+        sheet_serialized = TutorScoreSheetXLSSerializer(instance=self.instance).data
+
+        row_noma_999999998 = next(row for row in sheet_serialized['rows'] if row['noma'] == '999999998')
+        self.assertEqual(row_noma_999999998['note'], '19.00')
 
     def test_assert_contact_emails_is_not_empty(self):
         sheet_serialized = TutorScoreSheetXLSSerializer(instance=self.instance).data

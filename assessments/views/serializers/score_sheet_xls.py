@@ -185,7 +185,10 @@ class ScoreSheetXLSSerializer(serializers.Serializer):
 class TutorScoreSheetXLSSerializer(ScoreSheetXLSSerializer):
     def get_rows(self, obj):
         notes_etudiants_filtered = self._get_notes_etudiants_filtered(obj['feuille_de_notes'])
-        notes_etudiants_without_value = map(lambda n: attr.evolve(n, note=''), notes_etudiants_filtered)
+        notes_etudiants_without_value = map(
+            lambda n: attr.evolve(n, note='') if not n.est_soumise else n,
+            notes_etudiants_filtered
+        )
         serializer = _NoteEtudiantRowSerializer(
             instance=notes_etudiants_without_value,
             context={'note_decimale_est_autorisee': obj['feuille_de_notes'].note_decimale_est_autorisee},
@@ -201,4 +204,4 @@ class TutorScoreSheetXLSSerializer(ScoreSheetXLSSerializer):
         })
 
     def _get_notes_etudiants_filtered(self, feuille_de_notes):
-        return filter(lambda n: not n.date_echeance_atteinte and not n.est_soumise, feuille_de_notes.notes_etudiants)
+        return filter(lambda n: not n.date_echeance_atteinte, feuille_de_notes.notes_etudiants)
