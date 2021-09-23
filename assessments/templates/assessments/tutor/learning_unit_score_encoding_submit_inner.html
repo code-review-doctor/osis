@@ -40,9 +40,8 @@
 </div>
 
 <div class="modal-footer">
-    <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Cancel' %}</button>
-    {% if draft_scores_not_submitted > 0 %}
-        <button id="submit_btn" class="btn btn-primary"
+     {% if draft_scores_not_submitted > 0 %}
+        <button id="submit_btn" class="btn btn-warning"
                 type="submit"
                 onclick="$('#submission_scores_modal_form').submit();"
                 data-container="body"
@@ -50,4 +49,5 @@
             {% trans 'Submission' %}
         </button>
     {% endif %}
+    <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Cancel' %}</button>
 </div>

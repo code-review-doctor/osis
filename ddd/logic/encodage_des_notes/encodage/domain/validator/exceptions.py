@@ -48,3 +48,9 @@ class EncoderNotesEnLotLigneBusinessExceptions(BusinessException):
     def __init__(self, note_id: IdentiteNoteEtudiant, exception: BusinessException):
         self.note_id = note_id
         super().__init__(exception.message)
+
+
+class EtudiantNonInscritAExamenException(BusinessException):
+    def __init__(self, **kwargs):
+        message = _("Student not registered for exam")
+        super().__init__(message, **kwargs)

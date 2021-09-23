@@ -137,6 +137,7 @@ class NoteEtudiantRepositoryTest(TestCase):
                 annee_unite_enseignement=note_etudiant.entity_id.annee_academique,
                 numero_session=note_etudiant.entity_id.numero_session,
                 noma=note_etudiant.entity_id.noma,
+                note_brouillon=True,
                 note_soumise=note_etudiant.est_soumise,
                 jour=note_etudiant.date_limite_de_remise.jour,
                 mois=note_etudiant.date_limite_de_remise.mois,
@@ -185,7 +186,7 @@ class NoteEtudiantRepositoryTest(TestCase):
     def _create_save_necessary_data(self, note_etudiant_to_save, for_class: bool = False):
         luy_acronym = note_etudiant_to_save.code_unite_enseignement
         if for_class:
-            luy_acronym = luy_acronym[:-1]
+            luy_acronym = luy_acronym[:-2]
 
         luy = LearningUnitYearFactory(
             acronym=luy_acronym,
@@ -196,6 +197,7 @@ class NoteEtudiantRepositoryTest(TestCase):
         class_attributes = {
             "learning_unit_enrollment__learning_class_year": LearningClassYearFactory(
                 learning_component_year__learning_unit_year=luy,
+                learning_component_year__lecturing=True,
                 acronym=note_etudiant_to_save.entity_id.code_unite_enseignement[-1]
             )
         } if for_class else {}

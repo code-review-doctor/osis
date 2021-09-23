@@ -119,8 +119,8 @@
                             <div class="col-md-12">
                                 <ul class="nav nav-tabs" role="tablist">
                                     <li role="presentation" class="active"><a href="#tab_online" aria-controls="online" role="tab" data-toggle="tab" id="lnk_online">{% trans 'Online' %}</a></li>
-                                    <li role="presentation"><a href="#tab_via_paper" aria-controls="via_paper" role="tab" data-toggle="tab" id="lnk_via_paper">{% trans 'Via paper' %}</a></li>
                                     <li role="presentation"><a href="#tab_via_excel" aria-controls="via_excel" role="tab" data-toggle="tab" id="lnk_via_excel">{% trans 'Via excel' %}</a></li>
+                                    <li role="presentation"><a href="#tab_via_paper" aria-controls="via_paper" role="tab" data-toggle="tab" id="lnk_via_paper">{% trans 'Via paper' %}</a></li>
                                 </ul>
 
                                 <div class="tab-content">
@@ -236,82 +236,15 @@
                                         </table>
                                     </div>
 
-                                    <div role="tabpanel" class="tab-pane fade" id="tab_via_paper" style="margin-top: 20px;">
-                                        <table class="table table-hover">
-                                            <thead>
-                                                <tr>
-                                                    <th id="tab_paper_complete" class="col-md-1" >{% trans 'Complete' %}</th>
-                                                    <th id="tab_paper_acronym" class="col-md-1">{% trans 'Code' %}</th>
-                                                    <th id="tab_paper_title" class="col-md-4">{% trans 'Learning unit' %}</th>
-                                                    <th id="tab_paper_progress" class="col-md-4">{% trans 'Progress' %}</th>
-                                                    <th id="tab_paper_download_action"></th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {% for progression_encodage in progression_generale.progression_generale %}
-                                                    <tr class="result_paper">
-                                                        <td class="text-center" headers="tab_paper_complete">
-                                                             {% if progression_encodage.encodage_est_complet %}
-                                                                <i class="fas fa-check-circle" style="color: green"></i>
-                                                            {% else %}
-                                                                <i class="fas fa-exclamation-circle" style="color: #EEA237"></i>
-                                                            {% endif %}
-                                                        </td>
-                                                        <td headers="tab_paper_acronym">{{progression_encodage.code_unite_enseignement}}</td>
-                                                        <td headers="tab_paper_title">
-                                                            <a href="{% url 'learning_unit_score_encoding' progression_encodage.code_unite_enseignement %}"
-                                                               id="lnk_paper_show_{{ progression_encodage.code_unite_enseignement }}">
-                                                                {{ progression_encodage.intitule_complet_unite_enseignement }}
-                                                            </a>
-                                                        </td>
-                                                        <td headers="tab_paper_progress">
-                                                            <div class="progress">
-                                                                <div
-                                                                        class="progress-bar {% if progression_encodage.encodage_est_complet %} progress-bar-success {% else %} progress-bar-warning {% endif %}"
-                                                                        role="progressbar"
-                                                                        style="width: {% widthratio progression_encodage.quantite_notes_soumises progression_encodage.quantite_totale_notes 100 %}%;"
-                                                                        title="{% trans "Represents the quantity of scores submitted to the administration. The number surrounded by parenthesis is the number of scores encoded by the tutor that aren't submitted yet ('draft' state)" %}"
-                                                                >
-                                                                   <span>
-                                                                       {% if progression_encodage.quantite_notes_brouillon %}
-                                                                            ({{ progression_encodage.quantite_notes_brouillon }})
-                                                                       {% endif %}
-                                                                        <b>
-                                                                            {{ progression_encodage.quantite_notes_soumises}} / {{ progression_encodage.quantite_totale_notes }}
-                                                                        </b>
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        </td>
-                                                        <td headers="tab_paper_download_action" class="text-center">
-                                                            <form id="form_print_{{ progression_encodage.code_unite_enseignement }}" method="get" action="{% url 'score_sheets_pdf_export' %}">
-                                                                <input type="checkbox" name="codes_unite_enseignement" value="{{ progression_encodage.code_unite_enseignement }}" checked hidden>
-                                                                <button
-                                                                        type="submit"
-                                                                        class="btn btn-default download"
-                                                                        role="button"
-                                                                        id="lnk_notes_printing_{{progression_encodage.code_unite_enseignement}}"
-                                                                        data-toggle="tooltip" data-placement="right"
-                                                                        title="{% trans 'Print the scores' %}"
-                                                                >
-                                                                    <em class="fas fa-print"></em> {% trans 'Print' %}
-                                                                </button>
-                                                            </form>
-                                                        </td>
-                                                    </tr>
-                                                {% endfor %}
-                                            </tbody>
-                                        </table>
-                                    </div>
-
                                     <div role="tabpanel" class="tab-pane fade" id="tab_via_excel" style="margin-top: 20px;">
-                                        <table class="table table-hover">
+                                        <table id="table_excel" class="table table-hover">
                                             <thead>
                                                 <tr>
                                                     <th id="tab_excel_complete" class="col-md-1">{% trans 'Complete' %}</th>
                                                     <th id="tab_excel_acronym" class="col-md-1">{% trans 'Code' %}</th>
                                                     <th id="tab_excel_title" class="col-md-4">{% trans 'Learning unit' %}</th>
-                                                    <th id="tab_excel_progress" class="col-md-4">{% trans 'Progress' %}</th>
+                                                    <th id="tab_excel_responsible" class="col-md-2">{% trans 'Scores responsible' %}</th>
+                                                    <th id="tab_excel_progress" class="col-md-2">{% trans 'Progress' %}</th>
                                                     <th id="tab_excel_links"></th>
                                                 </tr>
                                             </thead>
@@ -331,6 +264,9 @@
                                                                id="lnk_excel_show_{{ progression_encodage.code_unite_enseignement }}">
                                                                 {{ progression_encodage.intitule_complet_unite_enseignement }}
                                                             </a>
+                                                        </td>
+                                                        <td headers="tab_excel_responsible">
+                                                            {{ progression_encodage.responsable_note.nom|upper }} {{ progression_encodage.responsable_note.prenom }}
                                                         </td>
                                                         <td headers="tab_excel_progress">
                                                             <div class="progress">
@@ -367,6 +303,79 @@
                                             </tbody>
                                         </table>
                                     </div>
+
+                                    <div role="tabpanel" class="tab-pane fade" id="tab_via_paper" style="margin-top: 20px;">
+                                        <table id="table_paper" class="table table-hover">
+                                            <thead>
+                                            <tr>
+                                                <th id="tab_paper_complete" class="col-md-1" >{% trans 'Complete' %}</th>
+                                                <th id="tab_paper_acronym" class="col-md-1">{% trans 'Code' %}</th>
+                                                <th id="tab_paper_title" class="col-md-4">{% trans 'Learning unit' %}</th>
+                                                <th id="tab_paper_responsible" class="col-md-2">{% trans 'Scores responsible' %}</th>
+                                                <th id="tab_paper_progress" class="col-md-2">{% trans 'Progress' %}</th>
+                                                <th id="tab_paper_download_action"></th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            {% for progression_encodage in progression_generale.progression_generale %}
+                                                <tr class="result_paper">
+                                                    <td class="text-center" headers="tab_paper_complete">
+                                                        {% if progression_encodage.encodage_est_complet %}
+                                                            <i class="fas fa-check-circle" style="color: green"></i>
+                                                        {% else %}
+                                                            <i class="fas fa-exclamation-circle" style="color: #EEA237"></i>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td headers="tab_paper_acronym">{{progression_encodage.code_unite_enseignement}}</td>
+                                                    <td headers="tab_paper_title">
+                                                        <a href="{% url 'learning_unit_score_encoding' progression_encodage.code_unite_enseignement %}"
+                                                           id="lnk_paper_show_{{ progression_encodage.code_unite_enseignement }}">
+                                                            {{ progression_encodage.intitule_complet_unite_enseignement }}
+                                                        </a>
+                                                    </td>
+                                                    <td headers="tab_paper_responsible">
+                                                        {{ progression_encodage.responsable_note.nom|upper }} {{ progression_encodage.responsable_note.prenom }}
+                                                    </td>
+                                                    <td headers="tab_paper_progress">
+                                                        <div class="progress">
+                                                            <div
+                                                                    class="progress-bar {% if progression_encodage.encodage_est_complet %} progress-bar-success {% else %} progress-bar-warning {% endif %}"
+                                                                    role="progressbar"
+                                                                    style="width: {% widthratio progression_encodage.quantite_notes_soumises progression_encodage.quantite_totale_notes 100 %}%;"
+                                                                    title="{% trans "Represents the quantity of scores submitted to the administration. The number surrounded by parenthesis is the number of scores encoded by the tutor that aren't submitted yet ('draft' state)" %}"
+                                                            >
+                                                                   <span>
+                                                                       {% if progression_encodage.quantite_notes_brouillon %}
+                                                                           ({{ progression_encodage.quantite_notes_brouillon }})
+                                                                       {% endif %}
+                                                                       <b>
+                                                                            {{ progression_encodage.quantite_notes_soumises}} / {{ progression_encodage.quantite_totale_notes }}
+                                                                        </b>
+                                                                    </span>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td headers="tab_paper_download_action" class="text-center">
+                                                        <form id="form_print_{{ progression_encodage.code_unite_enseignement }}" method="get" action="{% url 'score_sheets_pdf_export' %}">
+                                                            <input type="checkbox" name="codes_unite_enseignement" value="{{ progression_encodage.code_unite_enseignement }}" checked hidden>
+                                                            <button
+                                                                    type="submit"
+                                                                    class="btn btn-default download"
+                                                                    role="button"
+                                                                    id="lnk_notes_printing_{{progression_encodage.code_unite_enseignement}}"
+                                                                    data-toggle="tooltip" data-placement="right"
+                                                                    title="{% trans 'Print the scores' %}"
+                                                            >
+                                                                <em class="fas fa-print"></em> {% trans 'Print' %}
+                                                            </button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
@@ -379,9 +388,28 @@
 
 {% block script %}
     <script>
+
+        $('a[data-toggle="tab"]').on( 'shown.bs.tab', function (e) {
+            var id = $(e.target).attr("href");
+            localStorage.setItem('selectedTab', id);
+
+            const tables = document.querySelectorAll(".table");
+            for (let table of tables) {
+                table.style.width = null;
+            }
+        } );
+
+        var selectedTab = localStorage.getItem('selectedTab');
+        if (selectedTab != null) {
+            $('a[data-toggle="tab"][href="' + selectedTab + '"]').tab('show');
+        }
+
       $('#table_online').DataTable({
         paging: false,
         searching: false,
+        language: {
+            "emptyTable": "{% trans "No result!" %}"
+        },
         info: false,
         columnDefs: [
             { orderable: false, targets: 0 },
@@ -395,5 +423,43 @@
         ],
         order: [],
       });
+
+      $('#table_excel').DataTable({
+          paging: false,
+          searching: false,
+          language: {
+              "emptyTable": "{% trans "No result!" %}"
+          },
+          info: false,
+          columnDefs: [
+              { orderable: false, targets: 0 },
+              { orderable: true, targets: 1 },
+              { orderable: false, targets: 2 },
+              { orderable: true, targets: 3 },
+              { orderable: false, targets: 4 },
+              { orderable: false, targets: 5 },
+          ],
+          order: [],
+      });
+
+      $('#table_paper').DataTable({
+          paging: false,
+          searching: false,
+          language: {
+              "emptyTable": "{% trans "No result!" %}"
+          },
+          info: false,
+          columnDefs: [
+              { orderable: false, targets: 0 },
+              { orderable: true, targets: 1 },
+              { orderable: false, targets: 2 },
+              { orderable: true, targets: 3 },
+              { orderable: false, targets: 4 },
+              { orderable: false, targets: 5 },
+          ],
+          order: [],
+      });
+
+
     </script>
 {% endblock %}

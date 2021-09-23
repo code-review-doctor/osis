@@ -32,16 +32,19 @@ from ddd.logic.effective_class_repartition.domain.service.i_tutor_attribution im
     ITutorAttributionToLearningUnitTranslator
 from ddd.logic.effective_class_repartition.dtos import TutorClassRepartitionDTO
 from ddd.logic.effective_class_repartition.repository.i_tutor import ITutorRepository
+from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
 
 
 def search_classes_enseignant(
         cmd: 'SearchClassesEnseignantCommand',
         tutor_attribution_translator: 'ITutorAttributionToLearningUnitTranslator',
-        tutor_repository: 'ITutorRepository'
+        tutor_repository: 'ITutorRepository',
+        effective_class_repository: 'IEffectiveClassRepository'
 ) -> List['TutorClassRepartitionDTO']:
     return ClassDistributionWithAttribution().search_by_matricule_enseignant(
         cmd.matricule_fgs_enseignant,
         cmd.annee,
         tutor_attribution_translator,
-        tutor_repository
+        tutor_repository,
+        effective_class_repository
     )

@@ -29,10 +29,11 @@ from django.utils.functional import cached_property
 from django.views.generic import TemplateView
 
 from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmissionCalendar
+from base.utils.cache import CacheFilterMixin
 from osis_role.contrib.views import PermissionRequiredMixin
 
 
-class ScoreEncodingProgressOverviewBaseView(PermissionRequiredMixin, TemplateView):
+class ScoreEncodingProgressOverviewBaseView(PermissionRequiredMixin, CacheFilterMixin, TemplateView):
     # PermissionRequiredMixin
     permission_required = "assessments.can_access_scoreencoding"
 

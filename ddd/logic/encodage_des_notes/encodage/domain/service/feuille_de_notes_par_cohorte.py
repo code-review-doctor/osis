@@ -27,7 +27,6 @@ from typing import List
 
 from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import NoteEtudiant
 from ddd.logic.encodage_des_notes.encodage.domain.service.i_cohortes_du_gestionnaire import ICohortesDuGestionnaire
-from ddd.logic.encodage_des_notes.encodage.dtos import FeuilleDeNotesParCohorteDTO
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.feuille_de_notes_par_unite_enseignement import \
     FeuilleDeNotesParUniteEnseignement, DonneesNotes
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_attribution_enseignant import \
@@ -38,7 +37,7 @@ from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_et
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_personne import \
     ISignaletiquePersonneTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_unite_enseignement import IUniteEnseignementTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.dtos import EnseignantDTO, PeriodeEncodageNotesDTO
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import EnseignantDTO, PeriodeEncodageNotesDTO, FeuilleDeNotesDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
 from osis_common.ddd import interface
 
@@ -58,7 +57,7 @@ class FeuilleDeNotesParCohorte(interface.DomainService):
             attribution_translator: 'IAttributionEnseignantTranslator',
             unite_enseignement_translator: 'IUniteEnseignementTranslator',
             cohortes_gestionnaire_translator: 'ICohortesDuGestionnaire',
-    ) -> 'FeuilleDeNotesParCohorteDTO':
+    ) -> 'FeuilleDeNotesDTO':
         donnees_notes = [
             DonneesNotes(
                 code_unite_enseignement=note.code_unite_enseignement,
@@ -101,7 +100,7 @@ class FeuilleDeNotesParCohorte(interface.DomainService):
             for enseignant in feuille_notes_enseignant.autres_enseignants
         ]
 
-        return FeuilleDeNotesParCohorteDTO(
+        return FeuilleDeNotesDTO(
             code_unite_enseignement=feuille_notes_enseignant.code_unite_enseignement,
             intitule_complet_unite_enseignement=feuille_notes_enseignant.intitule_complet_unite_enseignement,
             responsable_note=feuille_notes_enseignant.responsable_note,

@@ -78,7 +78,7 @@ msgid "Deadline reached"
 msgstr "Date d'échéance atteinte"
 
 msgid "Decimal scores not authorized"
-msgstr "Notes décimales non authorisées"
+msgstr "Notes décimales non autorisées"
 
 msgid "Distributed volume should be filled in and be greater than 0"
 msgstr "Le volume attribué doit être supérieur à 0"

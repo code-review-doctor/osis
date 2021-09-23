@@ -29,6 +29,8 @@ from django.db.models import F, Case, When, QuerySet, Value, CharField
 from django.db.models.functions import Concat, Replace
 
 from base.models.enums import exam_enrollment_state
+from base.models.enums.component_type import PRACTICAL_EXERCISES
+from base.models.enums.learning_component_year_type import LECTURING
 from base.models.exam_enrollment import ExamEnrollment
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_inscription_examen import IInscriptionExamenTranslator
 from ddd.logic.encodage_des_notes.soumission.dtos import InscriptionExamenDTO, DesinscriptionExamenDTO
@@ -152,19 +154,39 @@ def _get_common_queryset(
         numero_session: int,
         annee: int,
 ) -> QuerySet:
+    codes_unites_enseignement_without_class_acronym = {
+        code.replace('-', '').replace('_', '')[:-1]
+        for code in codes_unites_enseignement
+    }
+    codes_unites_enseignement_pour_filtre = codes_unites_enseignement_without_class_acronym.union(
+        codes_unites_enseignement
+    )
     return ExamEnrollment.objects.filter(
         learning_unit_enrollment__learning_unit_year__academic_year__year=annee,
         session_exam__number_session=numero_session,
+        learning_unit_enrollment__learning_unit_year__acronym__in=codes_unites_enseignement_pour_filtre
     ).annotate(
         code_unite_enseignement=Case(
             When(
-                learning_unit_enrollment__learning_class_year__isnull=False,
+                learning_unit_enrollment__learning_class_year__learning_component_year__type=LECTURING,
                 then=Concat(
                     'learning_unit_enrollment__learning_unit_year__acronym',
+                    Value('-'),
                     'learning_unit_enrollment__learning_class_year__acronym',
-                ),
+                    output_field=CharField()
+                )
             ),
-            default='learning_unit_enrollment__learning_unit_year__acronym',
+            When(
+                learning_unit_enrollment__learning_class_year__learning_component_year__type=PRACTICAL_EXERCISES,
+                then=Concat(
+                    'learning_unit_enrollment__learning_unit_year__acronym',
+                    Value('_'),
+                    'learning_unit_enrollment__learning_class_year__acronym',
+                    output_field=CharField()
+                )
+            ),
+            default=F('learning_unit_enrollment__learning_unit_year__acronym'),
+            output_field=CharField()
         ),
     ).filter(
         code_unite_enseignement__in=codes_unites_enseignement,

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-23 14:29+0200\n"
+"POT-Creation-Date: 2021-09-17 09:42+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -122,8 +122,14 @@ msgstr "Supprimer la classe définitivement"
 msgid "Derogation's session"
 msgstr "Session de dérogation"
 
+msgid "English-friendly"
+msgstr "English-friendly"
+
 msgid "Error"
 msgstr "Erreur"
+
+msgid "Exchange students"
+msgstr "Etudiants d'échange"
 
 msgid "Faculty manager"
 msgstr "Gestionnaire facultaire"
@@ -137,6 +143,9 @@ msgstr "Remarque de faculté (non publiée)"
 msgid "Formation catalogue"
 msgstr "Catalogue des formations"
 
+msgid "French-friendly"
+msgstr "French-friendly"
+
 msgid "Full"
 msgstr "Complet"
 
@@ -148,6 +157,9 @@ msgstr "Identification"
 
 msgid "Inactive"
 msgstr "Inactif"
+
+msgid "Individual loan"
+msgstr "Emprunt individuel"
 
 msgid "Institution"
 msgstr "Institution"
@@ -263,6 +275,9 @@ msgstr "Enregistrer"
 
 msgid "Session derogation"
 msgstr "Session dérogation"
+
+msgid "Stage-Dimona"
+msgstr "Stage-Dimona"
 
 msgid "State"
 msgstr "Etat"

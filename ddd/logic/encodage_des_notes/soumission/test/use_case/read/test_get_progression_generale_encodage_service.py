@@ -36,6 +36,8 @@ from ddd.logic.encodage_des_notes.soumission.test.factory.responsable_de_notes i
     ResponsableDeNotesPourMultipleUniteEnseignements, _UniteEnseignementIdentiteFactory
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.attribution_enseignant import \
     AttributionEnseignantTranslatorInMemory
+from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.inscription_examen import \
+    InscriptionExamenTranslatorInMemory
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.periode_encodage_notes import \
     PeriodeEncodageNotesTranslatorInMemory
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.signaletique_etudiant import \
@@ -81,6 +83,7 @@ class GetProgressionGeneraleEncodageTest(SimpleTestCase):
         self.attribution_translator = AttributionEnseignantTranslatorInMemory()
         self.signaletique_translator = SignaletiqueEtudiantTranslatorInMemory()
         self.unite_enseignement_trans = UniteEnseignementTranslatorInMemory()
+        self.inscription_examen_trans = InscriptionExamenTranslatorInMemory()
         self.__mock_service_bus()
         self.addCleanup(lambda *args, **kwarg: self.repository.entities.clear())
 
@@ -93,6 +96,7 @@ class GetProgressionGeneraleEncodageTest(SimpleTestCase):
             SignaletiqueEtudiantTranslator=lambda: self.signaletique_translator,
             AttributionEnseignantTranslator=lambda: self.attribution_translator,
             UniteEnseignementTranslator=lambda: self.unite_enseignement_trans,
+            InscriptionExamenTranslator=lambda: self.inscription_examen_trans,
         )
         message_bus_patcher.start()
         self.addCleanup(message_bus_patcher.stop)
@@ -232,3 +236,15 @@ class GetProgressionGeneraleEncodageTest(SimpleTestCase):
         self.assertEqual(result.progression_generale[0].code_unite_enseignement, "LDROI1001")
         self.assertEqual(result.progression_generale[1].code_unite_enseignement, "LDROI1002")
         self.assertEqual(result.progression_generale[2].code_unite_enseignement, "LDROI1003")
+
+    def test_should_exclure_etudiants_desinscrits(self):
+        self.repository.save(
+            NoteManquanteEtudiantFactory(
+                entity_id__code_unite_enseignement="LDROI1001",
+                entity_id__noma="22222222"
+            )
+        )
+
+        result = self.message_bus.invoke(self.cmd)
+        self.assertEqual(len(result.progression_generale), 1)
+        self.assertEqual(result.progression_generale[0].dates_echeance[0].quantite_total_notes, 1)

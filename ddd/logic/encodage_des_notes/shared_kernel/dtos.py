@@ -25,7 +25,7 @@
 ##############################################################################
 import datetime
 from datetime import date
-from typing import List, Optional
+from typing import List, Optional, Iterable
 
 import attr
 
@@ -112,8 +112,8 @@ class NoteEtudiantDTO(interface.DTO):
 class FeuilleDeNotesDTO(interface.DTO):
     code_unite_enseignement = attr.ib(type=str)
     intitule_complet_unite_enseignement = attr.ib(type=str)  # unite enseignement
-    responsable_note = attr.ib(type=EnseignantDTO)  # responsables notes + signaletique enseignant ?
-    contact_responsable_notes = attr.ib(type=DetailContactDTO)
+    responsable_note = attr.ib(type=Optional[EnseignantDTO])  # responsables notes + signaletique enseignant ?
+    contact_responsable_notes = attr.ib(type=Optional[DetailContactDTO])
     autres_enseignants = attr.ib(type=List[EnseignantDTO])  # attributions
     annee_academique = attr.ib(type=int)
     numero_session = attr.ib(type=int)
@@ -121,20 +121,24 @@ class FeuilleDeNotesDTO(interface.DTO):
     notes_etudiants = attr.ib(type=List[NoteEtudiantDTO])
 
     @property
+    def notes_etudiants_inscrits(self) -> Iterable['NoteEtudiantDTO']:
+        return (note for note in self.notes_etudiants if not note.desinscrit_tardivement)
+
+    @property
     def encodage_est_complet(self) -> bool:
         return self.quantite_notes_soumises == self.quantite_total_notes
 
     @property
     def quantite_notes_soumises(self) -> int:
-        return sum(1 for note in self.notes_etudiants if note.note is not None and note.est_soumise)
+        return sum(1 for note in self.notes_etudiants_inscrits if note.note is not None and note.est_soumise)
 
     @property
     def quantite_notes_en_attente_de_soumission(self) -> int:
-        return sum(1 for note in self.notes_etudiants if note.est_en_attente_de_soumission())
+        return sum(1 for note in self.notes_etudiants_inscrits if note.est_en_attente_de_soumission())
 
     @property
     def quantite_total_notes(self) -> int:
-        return len(self.notes_etudiants)
+        return len(list(self.notes_etudiants_inscrits))
 
     @property
     def nombre_inscriptions(self) -> int:
@@ -144,7 +148,7 @@ class FeuilleDeNotesDTO(interface.DTO):
         return next(note_etudiant.email for note_etudiant in self.notes_etudiants if note_etudiant.noma == noma)
 
     def get_notes_en_attente_de_soumission(self) -> List[NoteEtudiantDTO]:
-        return [note for note in self.notes_etudiants if note.est_en_attente_de_soumission()]
+        return [note for note in self.notes_etudiants_inscrits if note.est_en_attente_de_soumission()]
 
 
 @attr.s(frozen=True, slots=True)
@@ -160,6 +164,7 @@ class DateEcheanceDTO(interface.DTO):
     jour = attr.ib(type=int)
     mois = attr.ib(type=int)
     annee = attr.ib(type=int)
+    quantite_notes_brouillon = attr.ib(type=int)
     quantite_notes_soumises = attr.ib(type=int)
     quantite_total_notes = attr.ib(type=int)
 
@@ -187,6 +192,10 @@ class ProgressionEncodageNotesUniteEnseignementDTO(interface.DTO):
     dates_echeance = attr.ib(type=List[DateEcheanceDTO])
     responsable_note = attr.ib(type=EnseignantDTO)  # responsables notes
     a_etudiants_peps = attr.ib(type=bool)  # signaletique
+
+    @property
+    def quantite_notes_brouillon(self) -> int:
+        return sum(date.quantite_notes_brouillon for date in self.dates_echeance)
 
     @property
     def quantite_notes_soumises(self) -> int:

@@ -45,8 +45,8 @@ class TutorAttributionToLearningUnitTranslator(ITutorAttributionToLearningUnitTr
             learning_unit_identity: 'LearningUnitIdentity',
     ) -> List['TutorAttributionToLearningUnitDTO']:
         qs = _get_common_qs().filter(
-            learning_container_year__acronym=learning_unit_identity.code,
-            learning_container_year__academic_year__year=learning_unit_identity.year,
+            attributionchargenew__learning_component_year__learning_unit_year__acronym=learning_unit_identity.code,
+            attributionchargenew__learning_component_year__learning_unit_year__academic_year__year=learning_unit_identity.year,
         )
         qs = _annotate_qs(qs)
         qs = _value_qs(qs).order_by(

@@ -36,6 +36,7 @@ from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_pe
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.periode_encodage_ouverte import PeriodeEncodageOuverte
 from ddd.logic.encodage_des_notes.soumission.commands import SoumettreNotesCommand
 from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import IdentiteNoteEtudiant
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_historiser_notes import IHistoriserNotesService
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_notifier_soumission_notes import INotifierSoumissionNotes
 from ddd.logic.encodage_des_notes.soumission.domain.service.responsable_de_notes import ResponsableDeNotes
 from ddd.logic.encodage_des_notes.soumission.domain.service.soumettre_notes_en_lot import SoumettreNotesEnLot
@@ -52,6 +53,7 @@ def soumettre_notes_etudiant(
         translator: 'IAttributionEnseignantTranslator',
         signaletique_repo: 'ISignaletiquePersonneTranslator',
         signaletique_etudiant_repo: 'ISignaletiqueEtudiantTranslator',
+        historiser_note_service: 'IHistoriserNotesService'
 ) -> List['IdentiteNoteEtudiant']:
     # Given
     PeriodeEncodageOuverte().verifier(periode_soumission_note_translator)
@@ -64,7 +66,7 @@ def soumettre_notes_etudiant(
     )
 
     # When
-    notes_soumises = SoumettreNotesEnLot().soumettre(cmd, note_etudiant_repo)
+    notes_soumises = SoumettreNotesEnLot().soumettre(cmd, note_etudiant_repo, historiser_note_service)
 
     # Then
 

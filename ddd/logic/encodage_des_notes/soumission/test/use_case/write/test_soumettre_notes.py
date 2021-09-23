@@ -44,6 +44,8 @@ from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.periode_en
     PeriodeEncodageNotesTranslatorInMemory
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.signaletique_etudiant import \
     SignaletiqueEtudiantTranslatorInMemory
+from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.historiser_notes import \
+    HistoriserNotesServiceInMemory
 from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.notifier_soumission_notes import \
     InMemoryNotifierSoumissionNotes
 from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.signaletique_personne import \
@@ -85,6 +87,8 @@ class SoumettreNoteTest(SimpleTestCase):
         self.attribution_enseignant_translator = AttributionEnseignantTranslatorInMemory()
         self.signaletique_personne_translator = SignaletiquePersonneTranslatorInMemory()
         self.signaletique_etudiant_translator = SignaletiqueEtudiantTranslatorInMemory()
+        self.historiser_notes_service = HistoriserNotesServiceInMemory()
+        self.historiser_notes_service.appels.clear()
 
         self.__mock_service_bus()
 
@@ -101,8 +105,8 @@ class SoumettreNoteTest(SimpleTestCase):
             NotifierSoumissionNotes=lambda: self.notifier_soumission_service,
             AttributionEnseignantTranslator=lambda: self.attribution_enseignant_translator,
             SignaletiquePersonneTranslator=lambda: self.signaletique_personne_translator,
-            SignaletiqueEtudiantTranslator=lambda: self.signaletique_personne_translator
-
+            SignaletiqueEtudiantTranslator=lambda: self.signaletique_personne_translator,
+            HistoriserNotesService=lambda: self.historiser_notes_service
         )
         message_bus_patcher.start()
         self.addCleanup(message_bus_patcher.stop)
@@ -173,3 +177,7 @@ class SoumettreNoteTest(SimpleTestCase):
             self.notifier_soumission_service.appels[0]["identites_notes_soumises"],
             identites_notes_soumises
         )
+
+    def test_should_historiser_soumission_note(self):
+        self.message_bus.invoke(self.cmd)
+        self.assertEqual(len(self.historiser_notes_service.appels), 1)

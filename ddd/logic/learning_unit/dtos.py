@@ -27,6 +27,7 @@ from typing import List, Optional
 
 import attr
 
+from base.models.enums import learning_component_year_type
 from ddd.logic.learning_unit.domain.model._financial_volumes_repartition import DurationUnit
 from ddd.logic.learning_unit.domain.model.responsible_entity import EntityCode
 from osis_common.ddd.interface import DTO
@@ -89,6 +90,11 @@ class LearningUnitFromRepositoryDTO(DTO):
     teaching_place_uuid = attr.ib(type=str)
     professional_integration = attr.ib(type=bool)
     is_active = attr.ib(type=bool)
+    individual_loan = attr.ib(type=bool)
+    english_friendly = attr.ib(type=bool)
+    french_friendly = attr.ib(type=bool)
+    exchange_students = attr.ib(type=bool)
+    stage_dimona = attr.ib(type=bool)
 
 
 @attr.s(frozen=True, slots=True)
@@ -130,4 +136,6 @@ class EffectiveClassFromRepositoryDTO(DTO):
 
     @property
     def code_complet_classe(self) -> str:
-        return self.learning_unit_code + self.class_code
+        if self.class_type == learning_component_year_type.LECTURING:
+            return self.learning_unit_code + "-" + self.class_code
+        return self.learning_unit_code + "_" + self.class_code

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-14 16:20+0200\n"
+"POT-Creation-Date: 2021-09-21 13:22+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -127,7 +127,7 @@ msgstr "Valeur acceptée: %(justification_label_authorized)s "
 
 msgctxt "UE acronym"
 msgid "Acronym"
-msgstr "Sigle"
+msgstr "Code"
 
 msgid "Add"
 msgstr "Ajouter"
@@ -296,7 +296,8 @@ msgstr "Entité de référence"
 msgid "Evaluations"
 msgstr "Evaluations"
 
-# python-format
+#, fuzzy, python-format
+#| msgid "Extra time (33% generally)"
 msgid "Extra time (33% generally)"
 msgstr "Tiers-Temps"
 
@@ -576,6 +577,9 @@ msgstr "Note déjà soumise"
 msgid "Score have more than 2 decimal places"
 msgstr "Note contenant plus de 2 décimales"
 
+msgid "Score legend"
+msgstr "Valeurs acceptées"
+
 #, python-format
 msgid "Score legend: %(score_legend)s (0=Score of presence)"
 msgstr "Valeur acceptée: %(score_legend)s (0=Note de présence)"
@@ -807,9 +811,6 @@ msgstr "Oui"
 msgid "You can encode a number. Or a letter between A and T."
 msgstr "Vous pouvez encoder un nombre. Ou bien une lettre entre A et T."
 
-msgid "You can encode a number. Or a letter between S, T and M."
-msgstr "Vous pouvez encoder un nombre. Ou bien une lettre entre S, T et M."
-
 msgid "You can't encode a 'score' and a 'justification' together"
 msgstr "Vous ne pouvez pas encoder une note et une justification ensemble"
 
@@ -863,6 +864,9 @@ msgstr "plus_de_une_annee_academique_erreur"
 
 msgid "no_valid_academic_year_error"
 msgstr "pas_de_annee_academique_valide_erreur"
+
+msgid "number between 0-20 (0=Score of presence)"
+msgstr "nombre entre 0-20 (0=Note de présence)"
 
 msgid "of"
 msgstr "sur"

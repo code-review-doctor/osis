@@ -31,6 +31,7 @@ from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import Ide
 from ddd.logic.encodage_des_notes.encodage.domain.service.cohorte_non_complete import CohorteNonCompleteDomainService
 from ddd.logic.encodage_des_notes.encodage.domain.service.encoder_notes_en_lot import EncoderNotesEnLot
 from ddd.logic.encodage_des_notes.encodage.domain.service.i_cohortes_du_gestionnaire import ICohortesDuGestionnaire
+from ddd.logic.encodage_des_notes.encodage.domain.service.i_historiser_notes import IHistoriserEncodageNotesService
 from ddd.logic.encodage_des_notes.encodage.domain.service.i_notifier_encodage_notes import INotifierEncodageNotes
 from ddd.logic.encodage_des_notes.encodage.repository.note_etudiant import INoteEtudiantRepository
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_attribution_enseignant import \
@@ -59,6 +60,8 @@ def encoder_notes(
         signaletique_repo: 'ISignaletiquePersonneTranslator',
         signaletique_etudiant_repo: 'ISignaletiqueEtudiantTranslator',
         adresse_feuille_de_notes_repo: 'IAdresseFeuilleDeNotesRepository',
+        historiser_note_service: 'IHistoriserEncodageNotesService',
+        inscription_examen_translator: 'IInscriptionExamenTranslator'
 ) -> List['IdentiteNoteEtudiant']:
     # Given
     PeriodeEncodageOuverte().verifier(periode_encodage_note_translator)
@@ -76,7 +79,14 @@ def encoder_notes(
         note_etudiant_repo
     )
 
-    notes = EncoderNotesEnLot().execute(cmd.notes_encodees, gestionnaire_parcours, note_etudiant_repo, periode_ouverte)
+    notes = EncoderNotesEnLot().execute(
+        cmd.notes_encodees,
+        gestionnaire_parcours,
+        note_etudiant_repo,
+        periode_ouverte,
+        historiser_note_service,
+        inscription_examen_translator
+    )
     notifier_notes_domaine_service.notifier(
         notes,
         cohortes_non_completes,

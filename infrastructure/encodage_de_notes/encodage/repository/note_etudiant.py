@@ -32,6 +32,7 @@ from django.db.models import CharField, Q, OuterRef, Case, When, F, DateField, V
 from django.db.models.functions import Concat, Coalesce, Cast, Replace
 
 from base.models.enums.exam_enrollment_justification_type import JustificationTypes
+from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.exam_enrollment import ExamEnrollment
 from base.models.session_exam_deadline import SessionExamDeadline
 from ddd.logic.encodage_des_notes.encodage.builder.note_etudiant_builder import NoteEtudiantBuilder
@@ -71,7 +72,9 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
         if not filter_qs:
             return []
 
-        rows = _fetch_session_exams().filter(*filter_qs)
+        rows = _fetch_session_exams(
+            noms_cohortes=noms_cohortes
+        ).filter(*filter_qs)
         result = []
         for row in rows:
             dto_object = NoteEtudiantFromRepositoryDTO(
@@ -108,7 +111,9 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
                 for criteria in criterias
             ]
         )
-        rows = _fetch_session_exams().filter(q_filters)
+        rows = _fetch_session_exams(
+            codes_unite_enseignement=[criteria[0] for criteria in criterias]
+        ).filter(q_filters)
         result = []
         for row in rows:
             dto_object = NoteEtudiantFromRepositoryDTO(
@@ -208,52 +213,47 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
         if numero_session:
             qs = qs.filter(session_exam__number_session=numero_session)
         if noms_cohortes:
-            # qs = qs.filter(learning_unit_enrollment__offer_enrollment__education_group_year__acronym__in=noms_cohortes)
-            qs = qs.annotate(
-                nom_cohorte=Case(
-                    When(
-                        learning_unit_enrollment__offer_enrollment__cohort_year__name=CohortName.FIRST_YEAR.name,
-                        then=Replace(
-                            'learning_unit_enrollment__offer_enrollment__education_group_year__acronym',
-                            Value('1BA'),
-                            Value('11BA')
-                        )
-                    ),
-                    default=F('learning_unit_enrollment__offer_enrollment__education_group_year__acronym'),
-                    output_field=CharField()
-                ),
-            ).filter(nom_cohorte__in=noms_cohortes)
-            # cohortes_11ba = {nom for nom in noms_cohortes if '11BA' in nom}
-            # cohortes_1ba = {nom for nom in noms_cohortes if '11BA' not in nom}
-            # if cohortes_1ba and cohortes_11ba:
-            #     equivalent_1ba = {nom.replace('11BA', '1BA') for nom in cohortes_11ba}
-            #     cohort_ids = CohortYear.objects.filter(
-            #         education_group_year__acronym__in=equivalent_1ba
-            #     ).values_list('pk', flat=True).distinct()
-            #     qs = qs.filter(
-            #         Q(learning_unit_enrollment__offer_enrollment__education_group_year__acronym__in=cohortes_1ba)
-            #         | Q(learning_unit_enrollment__offer_enrollment__cohort_year_id__in=cohort_ids)
-            #     )
-            # elif cohortes_1ba:
-            #     qs = qs.filter(learning_unit_enrollment__offer_enrollment__education_group_year__acronym__in=cohortes_1ba)
-            # elif cohortes_11ba:
-            #     equivalent_1ba = {nom.replace('11BA', '1BA') for nom in cohortes_11ba}
-            #     cohort_ids = CohortYear.objects.filter(
-            #         education_group_year__acronym__in=equivalent_1ba
-            #     ).values_list('pk', flat=True).distinct()
-            #     qs = qs.filter(learning_unit_enrollment__offer_enrollment__cohort_year_id__in=cohort_ids)
-            # if cohortes_11ba:
-            #     equivalent_1ba = {nom.replace('11BA', '1BA') for nom in cohortes_11ba}
-            #     qs = qs.filter(learning_unit_enrollment__offer_enrollment__cohort_year__education_group_year__acronym__in=equivalent_1ba)
+            cohortes_11ba = {nom for nom in noms_cohortes if '11BA' in nom}
+            autres_cohortes = {nom for nom in noms_cohortes if '11BA' not in nom}
+
+            autres_cohortes_q = Q(
+                learning_unit_enrollment__offer_enrollment__education_group_year__acronym__in=autres_cohortes
+            ) if autres_cohortes else Q()
+
+            equivalents_1ba = {cohorte.replace("11BA", "1BA") for cohorte in cohortes_11ba}
+            cohortes_11ba_q = Q(
+                Q(learning_unit_enrollment__offer_enrollment__education_group_year__acronym__in=equivalents_1ba) &
+                Q(learning_unit_enrollment__offer_enrollment__cohort_year__name=CohortName.FIRST_YEAR.name)
+            ) if cohortes_11ba else Q()
+
+            filter_cohorte = autres_cohortes_q | cohortes_11ba_q
+            qs = qs.filter(filter_cohorte)
         if nomas:
             qs = qs.filter(learning_unit_enrollment__offer_enrollment__student__registration_id__in=nomas)
         if note_manquante:
             qs = qs.filter(score_final__isnull=True, justification_final__isnull=True)
 
         qs = qs.annotate(
-            code_unite_enseignement=Concat(
-                'learning_unit_enrollment__learning_unit_year__acronym',
-                'learning_unit_enrollment__learning_class_year__acronym',
+            code_unite_enseignement=Case(
+                When(
+                    learning_unit_enrollment__learning_class_year__learning_component_year__type=LECTURING,
+                    then=Concat(
+                        'learning_unit_enrollment__learning_unit_year__acronym',
+                        Value('-'),
+                        'learning_unit_enrollment__learning_class_year__acronym',
+                        output_field=CharField()
+                    )
+                ),
+                When(
+                    learning_unit_enrollment__learning_class_year__learning_component_year__type=PRACTICAL_EXERCISES,
+                    then=Concat(
+                        'learning_unit_enrollment__learning_unit_year__acronym',
+                        Value('_'),
+                        'learning_unit_enrollment__learning_class_year__acronym',
+                        output_field=CharField()
+                    )
+                ),
+                default=F('learning_unit_enrollment__learning_unit_year__acronym'),
                 output_field=CharField()
             ),
         )
@@ -274,9 +274,18 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
         # TODO: Remove filtering to enseignement and use translator to get all code_unite_enseignement + annee_academic
         # managed by tutor name searched
         if enseignant:
+            mots = enseignant.split(" ")
+            filters = [
+                Q(learning_unit_enrollment__learning_unit_year__learningcomponentyear__attributionchargenew__attribution__tutor__person__first_name__icontains=mot)
+                | Q(learning_unit_enrollment__learning_unit_year__learningcomponentyear__attributionchargenew__attribution__tutor__person__last_name__icontains=mot)
+                for mot in mots
+            ]
+
             qs = qs.filter(
-                Q(learning_unit_enrollment__learning_unit_year__learningcomponentyear__attributionchargenew__attribution__tutor__person__first_name__icontains=enseignant)
-                | Q(learning_unit_enrollment__learning_unit_year__learningcomponentyear__attributionchargenew__attribution__tutor__person__last_name__icontains=enseignant)
+                functools.reduce(
+                    operator.or_,
+                    filters
+                )
             )
 
         return {IdentiteNoteEtudiant(**row) for row in qs}
@@ -300,11 +309,28 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
 
 def _save_note(note: 'NoteEtudiant'):
     db_obj = ExamEnrollment.objects.annotate(
-        code_unite_enseignement=Concat(
-            'learning_unit_enrollment__learning_unit_year__acronym',
-            'learning_unit_enrollment__learning_class_year__acronym',
+        code_unite_enseignement=Case(
+            When(
+                learning_unit_enrollment__learning_class_year__learning_component_year__type=LECTURING,
+                then=Concat(
+                    'learning_unit_enrollment__learning_unit_year__acronym',
+                    Value('-'),
+                    'learning_unit_enrollment__learning_class_year__acronym',
+                    output_field=CharField()
+                )
+            ),
+            When(
+                learning_unit_enrollment__learning_class_year__learning_component_year__type=PRACTICAL_EXERCISES,
+                then=Concat(
+                    'learning_unit_enrollment__learning_unit_year__acronym',
+                    Value('_'),
+                    'learning_unit_enrollment__learning_class_year__acronym',
+                    output_field=CharField()
+                )
+            ),
+            default=F('learning_unit_enrollment__learning_unit_year__acronym'),
             output_field=CharField()
-        )
+        ),
     ).get(
         code_unite_enseignement=note.code_unite_enseignement,
         learning_unit_enrollment__learning_unit_year__academic_year__year=note.annee_academique,
@@ -318,7 +344,10 @@ def _save_note(note: 'NoteEtudiant'):
     db_obj.save()
 
 
-def _fetch_session_exams():
+def _fetch_session_exams(
+        codes_unite_enseignement: List[str] = None,
+        noms_cohortes: List[str] = None,
+):
     subqs_deadline = SessionExamDeadline.objects.filter(
         number_session=OuterRef("session_exam__number_session"),
         offer_enrollment=OuterRef('learning_unit_enrollment__offer_enrollment')
@@ -332,10 +361,48 @@ def _fetch_session_exams():
             default=ExpressionWrapper(F('deadline') - F('deadline_tutor'), output_field=DateField())
         )
     ).values('date_limite_de_remise')
-    return ExamEnrollment.objects.annotate(
-        code_unite_enseignement=Concat(
-            'learning_unit_enrollment__learning_unit_year__acronym',
-            'learning_unit_enrollment__learning_class_year__acronym',
+    qs = ExamEnrollment.objects.all()
+    if codes_unite_enseignement:
+        codes_unite_enseignement_sans_acronyme_classe = {
+            code.replace('-', '').replace('_', '')[:-1]
+            for code in codes_unite_enseignement
+        }
+        codes_unite_enseignement_pour_filtre = codes_unite_enseignement_sans_acronyme_classe.union(
+            codes_unite_enseignement
+        )
+        qs = qs.filter(
+            learning_unit_enrollment__learning_unit_year__acronym__in=codes_unite_enseignement_pour_filtre
+        )
+    if noms_cohortes:
+        noms_cohortes_avec_11ba_remplace_par_equivalent_1ba = [
+            cohorte.replace('11BA', '1BA')
+            for cohorte in noms_cohortes
+        ]
+        qs = qs.filter(
+            learning_unit_enrollment__offer_enrollment__education_group_year__acronym__in=
+            noms_cohortes_avec_11ba_remplace_par_equivalent_1ba
+        )
+    return qs.annotate(
+        code_unite_enseignement=Case(
+            When(
+                learning_unit_enrollment__learning_class_year__learning_component_year__type=LECTURING,
+                then=Concat(
+                    'learning_unit_enrollment__learning_unit_year__acronym',
+                    Value('-'),
+                    'learning_unit_enrollment__learning_class_year__acronym',
+                    output_field=CharField()
+                )
+            ),
+            When(
+                learning_unit_enrollment__learning_class_year__learning_component_year__type=PRACTICAL_EXERCISES,
+                then=Concat(
+                    'learning_unit_enrollment__learning_unit_year__acronym',
+                    Value('_'),
+                    'learning_unit_enrollment__learning_class_year__acronym',
+                    output_field=CharField()
+                )
+            ),
+            default=F('learning_unit_enrollment__learning_unit_year__acronym'),
             output_field=CharField()
         ),
         annee_academique=F('learning_unit_enrollment__learning_unit_year__academic_year__year'),

@@ -27,6 +27,7 @@ from typing import Optional
 
 from ddd.logic.encodage_des_notes.encodage.domain.model.gestionnaire_parcours import GestionnaireParcours
 from ddd.logic.encodage_des_notes.encodage.repository.note_etudiant import INoteEtudiantRepository
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_inscription_examen import IInscriptionExamenTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_etudiant import \
     ISignaletiqueEtudiantTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.progression_generale import ProgressionGeneral
@@ -50,6 +51,7 @@ class ProgressionGeneraleEncodage(interface.DomainService):
             responsable_notes_repo: 'IResponsableDeNotesRepository',
             signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
             unite_enseignement_translator: 'IUniteEnseignementTranslator',
+            inscription_examen_translator: 'IInscriptionExamenTranslator',
 
             nom_cohorte: Optional[str],
             code_unite_enseignement: Optional[str],
@@ -76,5 +78,6 @@ class ProgressionGeneraleEncodage(interface.DomainService):
             responsable_notes_repo,
             periode_encodage,
             signaletique_etudiant_translator,
-            unite_enseignement_translator
+            unite_enseignement_translator,
+            inscription_examen_translator=inscription_examen_translator
         )

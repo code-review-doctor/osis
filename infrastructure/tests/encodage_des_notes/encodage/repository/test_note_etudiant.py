@@ -49,6 +49,13 @@ class TestNoteEtudiant(TestCase):
 
         assert_attrs_instances_are_equal(note_chiffree, self.repo.get(note_chiffree.entity_id))
 
+    def test_should_save_note_manquante(self):
+        note_manquante = NoteManquanteEtudiantFactory()
+        self._create_save_necessary_data(note_manquante)
+        self.repo.save(note_manquante)
+
+        assert_attrs_instances_are_equal(note_manquante, self.repo.get(note_manquante.entity_id))
+
     def test_should_save_note_etudiant_justification(self):
         note_justification = NoteEtudiantJustificationFactory()
         self._create_save_necessary_data(note_justification)
@@ -154,7 +161,7 @@ class TestNoteEtudiant(TestCase):
     def _create_save_necessary_data(self, note_etudiant_to_save, for_class: bool = False):
         luy_acronym = note_etudiant_to_save.code_unite_enseignement
         if for_class:
-            luy_acronym = luy_acronym[:-1]
+            luy_acronym = luy_acronym[:-2]
 
         luy = LearningUnitYearFactory(
             acronym=luy_acronym,
@@ -165,6 +172,7 @@ class TestNoteEtudiant(TestCase):
         class_attributes = {
             "learning_unit_enrollment__learning_class_year": LearningClassYearFactory(
                 learning_component_year__learning_unit_year=luy,
+                learning_component_year__lecturing=True,
                 acronym=note_etudiant_to_save.entity_id.code_unite_enseignement[-1]
             )
         } if for_class else {}

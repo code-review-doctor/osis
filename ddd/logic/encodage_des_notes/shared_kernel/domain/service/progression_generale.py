@@ -27,6 +27,7 @@ import collections
 import itertools
 from typing import List, Dict, Set, Tuple, Optional
 
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_inscription_examen import IInscriptionExamenTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import PeriodeEncodageNotesDTO, DateEcheanceDTO, \
     ProgressionEncodageNotesUniteEnseignementDTO, ProgressionGeneraleEncodageNotesDTO, EnseignantDTO
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_etudiant import \
@@ -51,32 +52,44 @@ class ProgressionGeneral(interface.DomainService):
         periode_encodage: 'PeriodeEncodageNotesDTO',
         signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
         unite_enseignement_translator: 'IUniteEnseignementTranslator',
+        inscription_examen_translator: 'IInscriptionExamenTranslator',
     ) -> 'ProgressionGeneraleEncodageNotesDTO':
+
         nomas_concernes = [note.noma for note in note_identites]
         nomas_avec_peps = _get_nomas_avec_peps(nomas_concernes, signaletique_etudiant_translator)
 
-        if note_identites:
-            detail_unite_enseignement_par_code = _get_detail_unite_enseignement_par_code(
-                {(note.code_unite_enseignement, note.annee_academique) for note in note_identites},
-                unite_enseignement_translator,
-            )
-            identites_unites_enseignements = {
-                UniteEnseignementIdentiteBuilder.build_from_code_and_annee(
-                    code_unite_enseignement=note.code_unite_enseignement,
-                    annee_academique=note.annee_academique,
-                ) for note in note_identites
-            }
-            dates_echeances_par_code_unite_enseigement = _get_dates_echeances_par_unite_enseignement(
-                note_identites,
-                note_etudiant_soumission_repo,
-            )
-            responsable_notes_par_code = _get_responsable_notes_par_unite_enseignement(
-                identites_unites_enseignements,
-                responsable_notes_repo,
-            )
+        identites_unites_enseignements = {
+            UniteEnseignementIdentiteBuilder.build_from_code_and_annee(
+                code_unite_enseignement=note.code_unite_enseignement,
+                annee_academique=note.annee_academique,
+            ) for note in note_identites
+        }
+
+        identites_notes_etudiant_non_desinscrit = cls._get_notes_pour_etudiants_non_desinscrits(
+            identites_unites_enseignements,
+            inscription_examen_translator,
+            note_identites
+        )
+
+        detail_unite_enseignement_par_code = _get_detail_unite_enseignement_par_code(
+            {(note.code_unite_enseignement, note.annee_academique) for note in identites_notes_etudiant_non_desinscrit},
+            unite_enseignement_translator,
+        )
+
+        dates_echeances_par_code_unite_enseigement = _get_dates_echeances_par_unite_enseignement(
+            identites_notes_etudiant_non_desinscrit,
+            note_etudiant_soumission_repo,
+        )
+        responsable_notes_par_code = _get_responsable_notes_par_unite_enseignement(
+            identites_unites_enseignements,
+            responsable_notes_repo,
+        )
 
         progressions = []
-        notes_ordonnee_ue = sorted(note_identites, key=lambda note_id: note_id.code_unite_enseignement)
+        notes_ordonnee_ue = sorted(
+            identites_notes_etudiant_non_desinscrit,
+            key=lambda note_id: note_id.code_unite_enseignement
+        )
         for code_ue, notes_id_par_ue in itertools.groupby(notes_ordonnee_ue, lambda note: note.code_unite_enseignement):
             progression_par_ue = cls._compute_progression_par_unite_enseignement(
                 list(notes_id_par_ue),
@@ -92,6 +105,32 @@ class ProgressionGeneral(interface.DomainService):
             numero_session=periode_encodage.session_concernee,
             progression_generale=progressions,
         )
+
+    @classmethod
+    def _get_notes_pour_etudiants_non_desinscrits(
+            cls,
+            identites_unites_enseignements: Set['UniteEnseignementIdentite'],
+            inscription_examen_translator: 'IInscriptionExamenTranslator',
+            note_identites: Set['IdentiteNoteEtudiant']
+    ) -> Set['IdentiteNoteEtudiant']:
+        numero_session = next(note.numero_session for note in note_identites)
+        annee_academique = next(note.annee_academique for note in note_identites)
+        codes_unites_enseignement = {identite.code_unite_enseignement for identite in identites_unites_enseignements}
+
+        desinscrits_dtos = inscription_examen_translator.search_desinscrits_pour_plusieurs_unites_enseignement(
+            codes_unites_enseignement=codes_unites_enseignement,
+            numero_session=numero_session,
+            annee=annee_academique
+        )
+
+        tuples_noma_etudiant_desinscrit_unite_enseignement = {
+            (dto.noma, dto.code_unite_enseignement) for dto in desinscrits_dtos
+        }
+        return {
+            note
+            for note in note_identites
+            if (note.noma, note.code_unite_enseignement) not in tuples_noma_etudiant_desinscrit_unite_enseignement
+        }
 
     @classmethod
     def _compute_progression_par_unite_enseignement(
@@ -159,6 +198,9 @@ def _get_dates_echeances_par_unite_enseignement(
                     jour=date_limite_de_remise.day,
                     mois=date_limite_de_remise.month,
                     annee=date_limite_de_remise.year,
+                    quantite_notes_brouillon=sum(
+                        1 for echeance_note in echeances_notes_grouped if echeance_note.note_brouillon
+                    ),
                     quantite_notes_soumises=sum(
                         1 for echeance_note in echeances_notes_grouped if echeance_note.note_soumise
                     ),
