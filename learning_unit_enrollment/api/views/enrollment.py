@@ -52,6 +52,11 @@ class LearningUnitEnrollmentsListView(generics.ListAPIView):
         'program'
     ]
 
+    def get_paginated_response(self, data):
+        response = super().get_paginated_response(data)
+        response.data.update({'enrolled_students_count': self.get_queryset().count()})
+        return response
+
     def get_queryset(self):
         acronym = self.kwargs['acronym']
         year = self.kwargs['year']
