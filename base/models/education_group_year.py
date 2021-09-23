@@ -805,7 +805,7 @@ def find_with_enrollments_count(learning_unit_year):
     for educ_group in education_groups_years:
         educ_group.count_formation_enrollments = count_by_id.get(educ_group.id).get('main') or 0
         educ_group.count_formation_enrollments_first_year = count_by_id.get(educ_group.id).get('first_year') or 0
-        educ_group.classes_counter = _get_classes_counters(learning_unit_year, educ_group.id) or 0
+        educ_group.classes_counter = _get_classes_counters(learning_unit_year, educ_group.id)
     return education_groups_years
 
 

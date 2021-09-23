@@ -96,8 +96,8 @@ def learning_unit_formations(request, learning_unit_year_id=None, code=None, yea
 
     totals_classes = {}
     for root_formation in root_formations:
-        context['total_formation_enrollments'] += root_formation.count_formation_enrollments + root_formation.count_formation_enrollments_first_year
-        context['total_learning_unit_enrollments'] += root_formation.count_learning_unit_enrollments + root_formation.count_learning_unit_enrollments_first_year
+        context['total_learning_unit_enrollments'] += root_formation.count_learning_unit_enrollments + \
+                                                      root_formation.count_learning_unit_enrollments_first_year
         if root_formation.classes_counter:
             for class_id, class_counter in root_formation.classes_counter.items():
                 tot = totals_classes.get(class_id, 0)
