@@ -1011,7 +1011,7 @@ class LearningUnitViewTestCase(TestCase):
         self.assertEqual(response.context["root_formations"][1].classes_counter,
                          {learning_class_yr.id: {'main': 1, 'first_year': 0}})
         # Count Student link to Formation
-        self.assertEqual(response.context["totals_classes"], {learning_class_yr.id: {'main': 1, 'first_year': 0}})
+        self.assertEqual(response.context["totals_classes"], {learning_class_yr.id: 1})
 
 
 class TestCreateXls(TestCase):
