@@ -31,12 +31,12 @@ from dal import autocomplete
 from django import forms
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.db.models import Q, Subquery, OuterRef, F, Value
+from django.db import models
+from django.db.models import Q, Subquery, OuterRef, F, Value, Case, When
 from django.db.models.functions import Replace
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
-from django.utils.functional import cached_property
 from django.views.generic import ListView, DeleteView, FormView
 from django.views.generic.base import TemplateView
 
@@ -55,7 +55,7 @@ from base.models.enums.education_group_types import TrainingType
 from base.models.person import Person
 from base.views.mixins import AjaxTemplateMixin
 from ddd.logic.encodage_des_notes.encodage.dtos import GestionnaireCohortesDTO, ProprietesGestionnaireCohorteDTO
-from education_group.models.cohort_year import CohortYear
+from education_group.models.enums.cohort_name import CohortName
 
 ALL_OPTION_VALUE = "-"
 ALL_OPTION_VALUE_ENTITY = "all_"
@@ -66,69 +66,70 @@ EXCLUDE_OFFER_TYPE_SEARCH = TrainingType.finality_types()
 class ProgramManagerListView(TemplateView):
     template_name = "assessments/programmanager_list.html"
 
-    @cached_property
-    def education_group_ids(self) -> List[int]:
-        return self.request.GET.getlist('education_groups')
+    @property
+    def nom_cohortes_selected(self) -> List['str']:
+        return self.request.GET.getlist('nom_cohortes_selected')
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        education_group_ids = self.education_group_ids
-        qs = ProgramManager.objects.filter(
-            education_group_id__in=education_group_ids
+        mgrs_dto = OrderedDict()
+        for values_dict in self.get_program_managers():
+            matricule_gestionnaire = values_dict['matricule_gestionnaire']
+            if matricule_gestionnaire not in mgrs_dto:
+                mgrs_dto[matricule_gestionnaire] = GestionnaireCohortesDTO(
+                    matricule_gestionnaire=values_dict['matricule_gestionnaire'],
+                    nom=values_dict['nom'],
+                    prenom=values_dict['prenom'],
+                    cohortes_gerees=[]
+                )
+            mgrs_dto[matricule_gestionnaire].cohortes_gerees.append(
+                ProprietesGestionnaireCohorteDTO(
+                    nom_cohorte=values_dict['nom_formation'],
+                    est_principal=values_dict['est_principal']
+                )
+            )
+
+        return {
+            **super().get_context_data(**kwargs),
+            'by_person': mgrs_dto,
+            'nom_cohortes_selected': self.nom_cohortes_selected
+        }
+
+    def get_program_managers(self):
+        nom_formation_subqs = EducationGroupYear.objects.filter(
+            education_group_id=OuterRef('education_group_id'),
+            academic_year=academic_year.current_academic_year()
+        ).order_by('-academic_year__year').values('acronym')
+
+        return ProgramManager.objects.all().annotate(
+            nom_formation_training=Subquery(nom_formation_subqs[:1])
         ).annotate(
-            nom_formation=Subquery(
-                EducationGroupYear.objects.filter(
-                    education_group_id=OuterRef('education_group_id')
-                ).order_by(
-                    '-academic_year__year'
-                ).values('acronym')[:1]
+            nom_formation=Case(
+                When(
+                    cohort=CohortName.FIRST_YEAR.name,
+                    then=Replace('nom_formation_training', Value('1BA'), Value('11BA'))
+                ),
+                default=F('nom_formation_training'),
+                output_field=models.CharField()
             ),
             matricule_gestionnaire=F('person__global_id'),
             is_11ba=F('cohort'),
             nom=F('person__last_name'),
             prenom=F('person__first_name'),
             est_principal=F('is_main'),
+        ).filter(
+            nom_formation__in=self.nom_cohortes_selected
         ).values(
             'nom_formation',
-            'is_11ba',
             'matricule_gestionnaire',
+            'is_11ba',
             'nom',
             'prenom',
             'est_principal'
-        ).order_by('nom', 'prenom')
-
-        context['education_groups'] = self.education_group_ids
-
-        mgrs_dto = OrderedDict()
-        for values_dict in qs:
-            matricule_gestionnaire = values_dict['matricule_gestionnaire']
-            if matricule_gestionnaire not in mgrs_dto:
-                mgrs_dto[matricule_gestionnaire] = _construire_gestionnaire_cohortes_dto(values_dict)
-            mgrs_dto[matricule_gestionnaire].cohortes_gerees.append(
-                _construire_proprietes_gestionnaire_cohorte(values_dict))
-
-        context["by_person"] = mgrs_dto
-        return context
-
-
-def _construire_gestionnaire_cohortes_dto(values_dict: Dict) -> GestionnaireCohortesDTO:
-    return GestionnaireCohortesDTO(
-        matricule_gestionnaire=values_dict['matricule_gestionnaire'],
-        nom=values_dict['nom'],
-        prenom=values_dict['prenom'],
-        cohortes_gerees=[]
-    )
-
-
-def _construire_proprietes_gestionnaire_cohorte(values_dict: Dict) -> ProprietesGestionnaireCohorteDTO:
-    acronym = acronym_corrige = values_dict['nom_formation']
-    if values_dict['is_11ba']:
-        acronym_corrige = acronym.replace('1BA', '11BA')
-    return ProprietesGestionnaireCohorteDTO(
-        nom_cohorte=acronym,
-        nom_cohorte_affiche=acronym_corrige,
-        est_principal=values_dict['est_principal']
-    )
+        ).order_by(
+            'nom',
+            'prenom',
+            'nom_formation',
+        )
 
 
 class ProgramManagerMixin(PermissionRequiredMixin, AjaxTemplateMixin):
@@ -138,57 +139,88 @@ class ProgramManagerMixin(PermissionRequiredMixin, AjaxTemplateMixin):
     permission_required = 'base.change_programmanager'
 
     @property
-    def education_group_ids(self) -> list:
-        return self.request.GET['education_groups'].split(',')
+    def nom_cohortes_selected(self) -> List['str']:
+        return self.request.GET['nom_cohortes_selected'].split(',')
 
     def get_success_url(self):
         url = reverse_lazy('program_manager_list') + "?"
-        for education_group_id in self.education_group_ids:
-            url += "education_groups={}&".format(education_group_id)
+        for nom_cohorte in self.nom_cohortes_selected:
+            url += "nom_cohortes_selected={}&".format(nom_cohorte)
         return url
+
+    def get_queryset(self):
+        nom_formation_subqs = EducationGroupYear.objects.filter(
+            education_group_id=OuterRef('education_group_id'),
+            academic_year=academic_year.current_academic_year()
+        ).values('acronym')
+
+        return ProgramManager.objects.all().annotate(
+            nom_formation_training=Subquery(nom_formation_subqs[:1])
+        ).annotate(
+            nom_formation=Case(
+                When(
+                    cohort=CohortName.FIRST_YEAR.name,
+                    then=Replace('nom_formation_training', Value('1BA'), Value('11BA'))
+                ),
+                default=F('nom_formation_training'),
+                output_field=models.CharField()
+            )
+        )
 
 
 class ProgramManagerDeleteView(ProgramManagerMixin, DeleteView):
     template_name = 'admin/programmanager_confirm_delete_inner.html'
 
     def get_object(self, queryset=None):
-        obj = self.model.objects.get(
+        obj = self.get_queryset().get(
             person__global_id=self.kwargs['global_id'],
-            education_group__educationgroupyear__acronym=self.kwargs['acronym'],
-            education_group__educationgroupyear__academic_year=academic_year.current_academic_year(),
+            nom_formation=self.kwargs['acronym']
         )
         self.pk_delete_object = obj.pk
         return obj
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        person = Person.objects.get(global_id=self.kwargs['global_id'])
-        context['manager'] = person
-        context['other_programs'] = person.programmanager_set.exclude(pk=self.pk_delete_object)
-        return context
+        return{
+            **super().get_context_data(),
+            'manager': Person.objects.get(global_id=self.kwargs['global_id']),
+            'other_programs': self.get_other_programs()
+        }
+
+    def get_other_programs(self):
+        return self.get_queryset().filter(
+            person__global_id=self.kwargs['global_id'],
+        ).exclude(
+            pk=self.pk_delete_object
+        ).order_by('nom_formation').values_list('nom_formation', flat=True)
 
 
 class ProgramManagerPersonDeleteView(ProgramManagerMixin, DeleteView):
     template_name = 'admin/programmanager_confirm_delete_inner.html'
 
-    def get_object(self, queryset=None):
-        return self.model.objects.filter(
-            person__global_id=self.kwargs['global_id'],
-            education_group_id__in=self.education_group_ids
-        )
-
     def delete(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        for obj in self.object.all():
+        for obj in self.get_object():
             obj.delete()
         return self._ajax_response() or HttpResponseRedirect(self.get_success_url())
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        manager = Person.objects.get(global_id=self.kwargs['global_id'])
-        context['manager'] = manager
-        context['other_programs'] = manager.programmanager_set.exclude(education_group_id__in=self.education_group_ids)
-        return context
+        return {
+            **super().get_context_data(),
+            'manager': Person.objects.get(global_id=self.kwargs['global_id']),
+            'other_programs': self.get_other_programs()
+        }
+
+    def get_object(self, queryset=None):
+        return self.get_queryset().filter(
+            person__global_id=self.kwargs['global_id'],
+            nom_formation__in=self.nom_cohortes_selected
+        )
+
+    def get_other_programs(self):
+        return self.get_queryset().filter(
+            person__global_id=self.kwargs['global_id']
+        ).exclude(
+            nom_formation__in=self.nom_cohortes_selected
+        ).order_by('nom_formation').values_list('nom_formation', flat=True)
 
 
 class MainProgramManagerUpdateCommonView(ProgramManagerMixin, ListView):
@@ -202,20 +234,18 @@ class MainProgramManagerUpdateCommonView(ProgramManagerMixin, ListView):
 
 
 class MainProgramManagerUpdateView(MainProgramManagerUpdateCommonView):
-
     def get_queryset(self):
-        return self.model.objects.filter(
+        return super().get_queryset().filter(
             person__global_id=self.kwargs["global_id"],
-            education_group__educationgroupyear__acronym=self.kwargs['acronym'],
-            education_group__educationgroupyear__academic_year=academic_year.current_academic_year()
+            nom_formation=self.kwargs['acronym']
         )
 
 
 class MainProgramManagerPersonUpdateView(MainProgramManagerUpdateCommonView):
     def get_queryset(self):
-        return self.model.objects.filter(
+        return super().get_queryset().filter(
             person__global_id=self.kwargs["global_id"],
-            education_group_id__in=self.education_group_ids
+            nom_formation__in=self.nom_cohortes_selected
         )
 
 
@@ -242,23 +272,45 @@ class ProgramManagerCreateView(ProgramManagerMixin, FormView):
     template_name = 'admin/manager_add_inner.html'
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['education_groups'] = self.request.GET['education_groups']
-        return context
+        return {
+            **super().get_context_data(**kwargs),
+            'nom_cohortes_selected':  self.request.GET['nom_cohortes_selected']
+        }
 
     def form_valid(self, form):
-        education_groups = EducationGroup.objects.filter(pk__in=self.education_group_ids).distinct()
-
         person = form.cleaned_data['person']
-        for education_group in education_groups:
-            cohort = None
-            cohort_year = CohortYear.objects.filter(education_group_year__education_group=education_group).first()
-            if cohort_year:
-                cohort = cohort_year.name
 
-            ProgramManager.objects.get_or_create(person=person, education_group=education_group, cohort=cohort)
-
+        self._create_non_first_year_cohortes(person)
+        self._create_first_year_cohortes(person)
         return super().form_valid(form)
+
+    def _create_non_first_year_cohortes(self, person: Person):
+        non_first_year_cohortes = {
+            cohorte_name for cohorte_name in self.nom_cohortes_selected if "11BA" not in cohorte_name
+        }
+
+        education_groups_ids = EducationGroup.objects.filter(
+            educationgroupyear__acronym__in=non_first_year_cohortes,
+            educationgroupyear__academic_year=academic_year.current_academic_year()
+        ).values_list('pk', flat=True)
+        for education_groups_id in education_groups_ids:
+            ProgramManager.objects.get_or_create(person=person, education_group_id=education_groups_id, cohort=None)
+
+    def _create_first_year_cohortes(self, person: Person):
+        first_year_cohortes = {cohorte_name for cohorte_name in self.nom_cohortes_selected if "11BA" in cohorte_name}
+
+        education_groups_ids = EducationGroup.objects.filter(
+            educationgroupyear__acronym__in={acronym.replace('11BA', '1BA') for acronym in first_year_cohortes},
+            educationgroupyear__academic_year=academic_year.current_academic_year(),
+
+        ).values_list('pk', flat=True)
+
+        for education_groups_id in education_groups_ids:
+            ProgramManager.objects.get_or_create(
+                person=person,
+                education_group_id=education_groups_id,
+                cohort=CohortName.FIRST_YEAR.name
+            )
 
 
 @login_required

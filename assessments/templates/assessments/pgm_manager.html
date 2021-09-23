@@ -125,8 +125,7 @@
                                         {% for pgm in pgms %}
                                             <tr>
                                                 <td>
-                                                    <input name="education_groups" type="checkbox" value="{{ pgm.education_group_id }}"
-                                                           onclick="load_managers()">
+                                                    <input name="nom_cohortes_selected" type="checkbox" value="{{ pgm.nom_formation }}" onclick="load_managers()">
                                                 </td>
                                                 <td>{{ pgm.nom_formation }}</td>
                                                 <td>{{ pgm.education_group_type }}</td>
@@ -153,10 +152,9 @@
             let form = $("#form_offer_year");
             $("#pnl_managers").load(form.attr('action'), form.serialize());
 
-            let choices = $('input[name=education_groups]:checked');
+            let choices = $('input[name=nom_cohortes_selected]:checked');
             $('#nb_selected').text(choices.length);
         }
-
         $(document).ready(function () {
             load_managers();
             data_table_init();
@@ -171,7 +169,7 @@
         });
 
         $("input[id='chb_pgm_all_id']").click(function () {
-            $("input[name='education_groups']").each(function () {
+            $("input[name='nom_cohortes_selected']").each(function () {
                 $(this).prop("checked", $("#chb_pgm_all_id").prop("checked"))
             });
             load_managers();
