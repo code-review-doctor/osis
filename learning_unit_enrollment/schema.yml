@@ -35,6 +35,16 @@ paths:
           schema:
             type: integer
             example: 2021
+        - in: query
+          name: search
+          schema:
+            type: string
+          required: false
+        - in: query
+          name: ordering
+          schema:
+            type: string
+          required: false
         - $ref: '#/components/parameters/Accept-Language'
         - $ref: '#/components/parameters/X-User-FirstName'
         - $ref: '#/components/parameters/X-User-LastName'
