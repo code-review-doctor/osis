@@ -23,15 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.urls import path
+from django.conf import settings
+from rest_framework import serializers
 
-from learning_unit_enrollment.api.views.enrollment import LearningUnitEnrollmentsListView, \
-    MyLearningUnitEnrollmentsListView
 
-app_name = "learning_unit_enrollment"
-urlpatterns = [
-    path('enrollments/<str:acronym>/<int:year>/', LearningUnitEnrollmentsListView.as_view(),
-         name=LearningUnitEnrollmentsListView.name),
-    path('my_enrollments/<str:program_code>/<int:year>/', MyLearningUnitEnrollmentsListView.as_view(),
-         name=MyLearningUnitEnrollmentsListView.name)
-]
+class EnrollmentSerializer(serializers.Serializer):
+    acronym = serializers.CharField()
+    year = serializers.IntegerField()
+    title = serializers.SerializerMethodField()
+
+    def get_title(self, enrollment):
+        language = self.context['language']
+        return getattr(
+            enrollment.education_group_year,
+            'title' + ('_english' if language != settings.LANGUAGE_CODE_FR else '')
+        )

@@ -1,50 +1,26 @@
 openapi: 3.0.0
 servers:
- - url: https://{environment}.osis.uclouvain.be/api/v1/learning_unit_enrollment/
-   variables:
-     environment:
-       default: dev
-       enum:
-         - dev # Development server
-         - qa # Staging server
-         - test # Test server
- - url: https://osis.uclouvain.be/api/v1/learning_unit_enrollment/
-   description: 'Production server'
+  - url: https://{environment}.osis.uclouvain.be/api/v1/offer_enrollment/
+    variables:
+      environment:
+        default: dev
+        enum:
+          - dev # Development server
+          - qa # Staging server
+          - test # Test server
+  - url: https://osis.uclouvain.be/api/v1/offer_enrollment/
+    description: 'Production server'
 info:
   version: '1.0'
-  title: 'Learning Unit Enrollment Service'
+  title: 'Offer Enrollment Service'
   description: |-
-    A set of API endpoints that allow you to get information about learning unit enrollment
+    A set of API endpoints that allow you to get information about offer enrollment
 paths:
-  /enrollments/{acronym}/{year}/:
+  /my_enrollments/:
     get:
-      description: 'Return all enrollments of a given learning unit year'
-      operationId: enrollments_list
+      description: 'Return all enrollments of the connected user'
+      operationId: my_enrollments_list
       parameters:
-        - in: path
-          name: acronym
-          required: true
-          description: The learning unit acronym
-          schema:
-            type: string
-            example: "LABCD1234"
-        - in: path
-          name: year
-          required: true
-          description: The learning unit academic year
-          schema:
-            type: integer
-            example: 2021
-        - in: query
-          name: search
-          schema:
-            type: string
-          required: false
-        - in: query
-          name: ordering
-          schema:
-            type: string
-          required: false
         - $ref: '#/components/parameters/Accept-Language'
         - $ref: '#/components/parameters/X-User-FirstName'
         - $ref: '#/components/parameters/X-User-LastName'
@@ -58,7 +34,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedEnrollmentList'
+                $ref: '#/components/schemas/EnrollmentList'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -67,25 +43,17 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
         - enrollment
-  /my_enrollments/{program_code}/{year}/:
+  /my_enrollments/{year}:
     get:
-      description: 'Return all enrollments of the connected user based on an offer enrollment'
-      operationId: my_enrollments_list
+      description: 'Return all enrollments of the connected user for a specific year'
+      operationId: my_enrollments_year_list
       parameters:
-        - in: path
-          name: program_code
-          required: true
-          description: The offer acronym
-          schema:
-            type: string
-            example: "FSA1BA"
         - in: path
           name: year
           required: true
-          description: The offer academic year
           schema:
+            description: ''
             type: integer
-            example: 2021
         - $ref: '#/components/parameters/Accept-Language'
         - $ref: '#/components/parameters/X-User-FirstName'
         - $ref: '#/components/parameters/X-User-LastName'
@@ -99,7 +67,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedEnrollmentList'
+                $ref: '#/components/schemas/EnrollmentList'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -182,35 +150,6 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
   schemas:
-    StudentSpecificProfile:
-      type: object
-      nullable: true
-      properties:
-        type:
-          $ref: '#/components/schemas/TypePepsEnum'
-        type_text:
-          type: string
-        subtype:
-          nullable: true
-          $ref: '#/components/schemas/SubtypeEnum'
-        subtype_text:
-          type: string
-        guide:
-          type: string
-          nullable: true
-          example: "John Doe"
-        arrangement_additional_time:
-          type: boolean
-        arrangement_appropriate_copy:
-          type: boolean
-        arrangement_other:
-          type: boolean
-        arrangement_specific_locale:
-          type: boolean
-        arrangement_comment:
-          type: string
-          nullable: true
-          example: "comment"
     Paging:
       type: object
       properties:
@@ -224,7 +163,7 @@ components:
           type: string
           format: uri
           nullable: true
-    PaginatedEnrollmentList:
+    EnrollmentList:
       allOf:
         - $ref: '#/components/schemas/Paging'
         - type: object
@@ -233,59 +172,19 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/Enrollment'
-            enrolled_students_count:
-              type: integer
-
     Enrollment:
       type: object
       properties:
-        date_enrollment:
+        acronym:
           type: string
-          format: date
-          example: "2021-09-06"
-        enrollment_state:
-          type: string
-          example: "ENROLLED"
-        student_last_name:
-          type: string
-          example: "Doe"
-        student_first_name:
-          type: string
-          example: "John"
-        student_email:
-          type: string
-          example: "john.doe@mail.xyz"
-        student_registration_id:
-          type: string
-          example: "12345678"
-        specific_profile:
-          $ref: '#/components/schemas/StudentSpecificProfile'
-        program:
-          type: string
-          example: "PRGM1BA"
-        learning_unit_acronym:
-          type: string
-          example: "LABCD1234"
-        learning_unit_year:
+          example: "FSA1BA"
+        year:
           type: integer
-          example: 2021
-    TypePepsEnum:
-      type: string
-      enum:
-        - NOT_DEFINED
-        - DISABILITY
-        - SPORT
-        - ARTIST
-        - ENTREPRENEUR
-        - ARRANGEMENT_JURY
-    SubtypeEnum:
-      type: string
-      enum:
-        - PROMISING_ATHLETE_HL
-        - PROMISING_ATHLETE
-        - REDUCED_MOBILITY
-        - OTHER_DISABILITY
-        - ""
+          example: 2020
+        title:
+          type: string
+          example: "Bachelier en Sciences de l'ingénieur"
+          nullable: true
     AcceptedLanguageEnum:
       type: string
       enum:
@@ -302,4 +201,4 @@ components:
         - code
         - message
 security:
-  - Token: []
+  - Token: [ ]
