@@ -189,9 +189,8 @@ class NotifierEncodageNotes(INotifierEncodageNotes):
             notes: List[NoteEtudiant],
             signaletiques_etudiant_par_noma: Dict[str, SignaletiqueEtudiantDTO]
     ) -> List[Tuple]:
-        result = []
-        for note in notes:
-            ligne = (
+        result = [
+            (
                 note.nom_cohorte,
                 note.numero_session,
                 note.noma,
@@ -199,8 +198,9 @@ class NotifierEncodageNotes(INotifierEncodageNotes):
                 signaletiques_etudiant_par_noma[note.noma].prenom,
                 str(note.note),
             )
-            result.append(ligne)
-        return result
+            for note in notes
+        ]
+        return sorted(result, key=lambda l: (l[0], l[3], l[4]))
 
     @classmethod
     def _get_donnees_email(
