@@ -61,7 +61,8 @@ class PgmManagerAdministrationTest(TestCase):
         cls.structure_child22 = EntityVersionFactory(acronym='COMU', parent=cls.structure_child2.entity)
 
         cls.entity_manager = EntityManagerFactory(entity=cls.structure_parent1.entity)
-        cls.academic_year_current, cls.academic_year_previous = AcademicYearFactory.produce_in_past(quantity=2)
+        cls.academic_year_current = AcademicYearFactory(current=True)
+        cls.academic_year_previous = AcademicYearFactory(year=cls.academic_year_current.year - 2)
         cls.person = PersonFactory()
         SessionExamCalendarFactory.create_academic_event(cls.academic_year_current)
 
@@ -98,19 +99,13 @@ class PgmManagerAdministrationTest(TestCase):
         educ_group_year2 = EducationGroupYearFactory(academic_year=self.academic_year_current, acronym="ENVIST")
         pgm1 = ProgramManagerFactory(person=self.person, education_group=educ_group_year1.education_group)
         pgm2 = ProgramManagerFactory(person=self.person, education_group=educ_group_year2.education_group)
-        response = self.client.get(
-            reverse('delete_manager', kwargs={'global_id': pgm1.person.global_id, 'acronym': "ENVI2M"}) + "?education_groups={},{}".format(
-                educ_group_year1.education_group_id,
-                educ_group_year2.education_group_id
-            )
-        )
-        self.assertEqual(response.context['other_programs'].get(), pgm2)
-        self.assertTrue(isinstance(response.context['other_programs'].get(), ProgramManager))
 
-        self.client.post(
-            reverse('delete_manager', kwargs={'global_id': pgm1.person.global_id, 'acronym': "ENVI2M"})
-            + "?education_groups={},{}".format(educ_group_year1.education_group_id, educ_group_year2.education_group_id)
-        )
+        url = reverse('delete_manager', kwargs={'global_id': pgm1.person.global_id, 'acronym': "ENVI2M"}) + \
+            "?nom_cohortes_selected={},{}".format(educ_group_year1.acronym, educ_group_year2.acronym)
+        response = self.client.get(url)
+        self.assertEqual(list(response.context['other_programs']), ['ENVIST'])
+
+        self.client.post(url)
         self.assertFalse(ProgramManager.objects.filter(pk=pgm1.pk).exists())
         self.assertTrue(ProgramManager.objects.filter(pk=pgm2.pk).exists())
 
@@ -121,17 +116,17 @@ class PgmManagerAdministrationTest(TestCase):
         pgm2 = ProgramManagerFactory(person=self.person, education_group=educ_group_year2.education_group)
 
         response = self.client.get(
-            reverse('delete_manager_person', args=[self.person.global_id]) + "?education_groups={},{}".format(
-                educ_group_year1.education_group_id,
-                educ_group_year2.education_group_id
+            reverse('delete_manager_person', args=[self.person.global_id]) + "?nom_cohortes_selected={},{}".format(
+                educ_group_year1.acronym,
+                educ_group_year2.acronym
             )
         )
         self.assertFalse(response.context['other_programs'])
 
         self.client.post(
-            reverse('delete_manager_person', args=[self.person.global_id]) + "?education_groups={},{}".format(
-                educ_group_year1.education_group_id,
-                educ_group_year2.education_group_id
+            reverse('delete_manager_person', args=[self.person.global_id]) + "?nom_cohortes_selected={},{}".format(
+                educ_group_year1.acronym,
+                educ_group_year2.acronym
             )
         )
         self.assertFalse(ProgramManager.objects.filter(pk=pgm1.pk).exists())
@@ -155,9 +150,9 @@ class PgmManagerAdministrationTest(TestCase):
             reverse('update_main_person',
                     kwargs={
                         'global_id': pgm1.person.global_id
-                    }) + "?education_groups={},{}".format(
-                educ_group_year1.education_group_id,
-                educ_group_year2.education_group_id
+                    }) + "?nom_cohortes_selected={},{}".format(
+                educ_group_year1.acronym,
+                educ_group_year2.acronym
             ), data={'is_main': 'true'}
         )
         pgm1.refresh_from_db()
@@ -171,9 +166,9 @@ class PgmManagerAdministrationTest(TestCase):
                         'global_id': pgm1.person.global_id,
                         'acronym': educ_group_year1.acronym
                     }
-                    ) + "?education_groups={},{}".format(
-                educ_group_year1.education_group_id,
-                educ_group_year2.education_group_id
+                    ) + "?nom_cohortes_selected={},{}".format(
+                educ_group_year1.acronym,
+                educ_group_year2.acronym
             ), data={'is_main': 'false'}
         )
         pgm1.refresh_from_db()
@@ -189,7 +184,7 @@ class PgmManagerAdministrationTest(TestCase):
 
         response = self.client.get(
             reverse('program_manager_list'),
-            data={'education_groups': [educ_group_year1.education_group, educ_group_year2.education_group]}
+            data={'nom_cohortes_selected': [educ_group_year1.acronym, educ_group_year2.acronym]}
         )
 
         self.assertIsInstance(response.context['by_person'], OrderedDict)
@@ -350,11 +345,8 @@ class PgmManagerAdministrationTest(TestCase):
             management_entity=self.structure_parent1.entity,
         )
 
-        self.client.post(
-            reverse("create_program_manager_person")
-            + "?education_groups={},{}".format(educ_group_year1.education_group_id, educ_group_year2.education_group_id),
-            data={'person': self.person.pk}
-        )
+        url = reverse("create_program_manager_person") + "?nom_cohortes_selected={},{}".format(educ_group_year1.acronym, educ_group_year2.acronym)
+        self.client.post(url, data={'person': self.person.pk})
 
         pgm_managers = ProgramManager.objects.filter(person=self.person)
         self.assertEqual(pgm_managers.count(), 2)
@@ -380,14 +372,13 @@ class PgmManagerAdministrationTest(TestCase):
         self.assertEqual(data, "A, B")
 
     def test_add_program_managers_for_11ba(self):
-        cohort = CohortYearFactory()
-        educ_group_id = cohort.education_group_year.education_group_id
-
-        self.client.post(
-            reverse("create_program_manager_person")
-            + "?education_groups={}".format(educ_group_id),
-            data={'person': self.person.pk}
+        cohort = CohortYearFactory(
+            education_group_year__acronym="DROI1BA",
+            education_group_year__academic_year=self.academic_year_current
         )
+
+        url = reverse("create_program_manager_person") + "?nom_cohortes_selected=DROI11BA"
+        self.client.post(url, data={'person': self.person.pk})
         self.assertEqual(ProgramManager.objects.filter(person=self.person).count(), 1)
         self.assertEqual(ProgramManager.objects.filter(person=self.person).first().cohort, cohort.name)
 
@@ -404,5 +395,4 @@ def build_proprietes_gestionnaire_cohorte_dto(education_group_yr: EducationGroup
     return ProprietesGestionnaireCohorteDTO(
         est_principal=False,
         nom_cohorte=education_group_yr.acronym,
-        nom_cohorte_affiche=education_group_yr.acronym,
     )
