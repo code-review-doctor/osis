@@ -26,11 +26,14 @@
 import logging
 
 from django.conf import settings
-from django.db.models import Case, When, Q, F
-from django.db.models.functions import Concat
+from django.db.models import Case, When, Q, F, Value, CharField
+from django.db.models.functions import Concat, Replace
+from django.utils.functional import cached_property
 from rest_framework import generics
 
 from base.models.learning_unit_enrollment import LearningUnitEnrollment
+from base.models.person import Person
+from education_group.models.enums.cohort_name import CohortName
 from learning_unit_enrollment.api.serializers.enrollment import EnrollmentSerializer
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
@@ -52,9 +55,19 @@ class LearningUnitEnrollmentsListView(generics.ListAPIView):
         'program'
     ]
 
+    @property
+    def year(self):
+        return self.kwargs['year']
+
     def get_queryset(self):
         acronym = self.kwargs['acronym']
-        year = self.kwargs['year']
+        return self._get_common_qs().filter(
+            learning_unit_acronym=acronym,
+            learning_unit_academic_year=self.year
+        )
+
+    @staticmethod
+    def _get_common_qs():
         return LearningUnitEnrollment.objects.annotate(
             learning_unit_academic_year=F('learning_unit_year__academic_year__year'),
             learning_unit_acronym=Case(
@@ -64,18 +77,43 @@ class LearningUnitEnrollmentsListView(generics.ListAPIView):
                 ),
                 default=F('learning_unit_year__acronym')
             )
-        ).filter(
-            learning_unit_acronym=acronym,
-            learning_unit_academic_year=year
         ).annotate(
             student_last_name=F('offer_enrollment__student__person__last_name'),
             student_first_name=F('offer_enrollment__student__person__first_name'),
             student_email=F('offer_enrollment__student__person__email'),
             student_registration_id=F('offer_enrollment__student__registration_id'),
-            program=F('offer_enrollment__education_group_year__acronym'),
+            program=Case(
+                When(
+                    Q(offer_enrollment__cohort_year__name=CohortName.FIRST_YEAR.name),
+                    then=Replace(
+                        'offer_enrollment__cohort_year__education_group_year__acronym', Value('1'), Value('11')
+                    )
+                ),
+                default=F('offer_enrollment__education_group_year__acronym'),
+                output_field=CharField()
+            ),
             specific_profile=F('offer_enrollment__student__studentspecificprofile')
         ).select_related(
             'offer_enrollment__student__studentspecificprofile',
             'offer_enrollment__student__person',
             'learning_unit_year__academic_year'
+        )
+
+
+class MyLearningUnitEnrollmentsListView(LearningUnitEnrollmentsListView):
+    """
+       Return all enrollments of a the connected user based on an offer enrollment
+    """
+    name = 'my_enrollments'
+
+    @cached_property
+    def person(self) -> Person:
+        return self.request.user.person
+
+    def get_queryset(self):
+        program_code = self.kwargs['program_code']
+        return self._get_common_qs().filter(
+            program=program_code,
+            offer_enrollment__student__person=self.person,
+            offer_enrollment__education_group_year__academic_year__year=self.year,
         )

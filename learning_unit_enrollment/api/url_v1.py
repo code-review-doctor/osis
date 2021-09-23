@@ -25,10 +25,13 @@
 ##############################################################################
 from django.urls import path
 
-from learning_unit_enrollment.api.views.enrollment import LearningUnitEnrollmentsListView
+from learning_unit_enrollment.api.views.enrollment import LearningUnitEnrollmentsListView, \
+    MyLearningUnitEnrollmentsListView
 
 app_name = "learning_unit_enrollment"
 urlpatterns = [
     path('enrollments/<str:acronym>/<int:year>/', LearningUnitEnrollmentsListView.as_view(),
          name=LearningUnitEnrollmentsListView.name),
+    path('my_enrollments/<str:program_code>/<int:year>/', MyLearningUnitEnrollmentsListView.as_view(),
+         name=MyLearningUnitEnrollmentsListView.name)
 ]

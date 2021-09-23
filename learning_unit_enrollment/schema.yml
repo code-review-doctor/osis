@@ -67,9 +67,9 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
         - enrollment
-  /enrollments/{program_code}/{year}/:
+  /my_enrollments/{program_code}/{year}/:
     get:
-      description: 'Return all enrollments of the connected user based on offer enrollment'
+      description: 'Return all enrollments of the connected user based on an offer enrollment'
       operationId: my_enrollments_list
       parameters:
         - in: path
