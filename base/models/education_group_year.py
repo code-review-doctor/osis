@@ -30,7 +30,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
-from django.db.models import Count, Min, When, Case, Max
+from django.db.models import Count, Min, When, Case, Max, Value, F, Q
 from django.urls import reverse
 from django.utils import translation
 from django.utils.functional import cached_property
@@ -49,6 +49,7 @@ from base.models.enums.funding_codes import FundingCodes
 from base.models.enums.offer_enrollment_state import SUBSCRIBED, PROVISORY
 from base.models.exceptions import ValidationWarning
 from base.models.validation_rule import ValidationRule
+from education_group.models.enums.cohort_name import CohortName
 from osis_common.models.serializable_model import SerializableModel, SerializableModelManager, SerializableModelAdmin, \
     SerializableQuerySet
 
@@ -789,7 +790,8 @@ def find_with_enrollments_count(learning_unit_year):
     education_groups_years = _find_with_learning_unit_enrollment_count(learning_unit_year)
     count_by_id = _count_education_group_enrollments_by_id(education_groups_years)
     for educ_group in education_groups_years:
-        educ_group.count_formation_enrollments = count_by_id.get(educ_group.id) or 0
+        educ_group.count_formation_enrollments = count_by_id.get(educ_group.id).get('main') or 0
+        educ_group.count_formation_enrollments_first_year = count_by_id.get(educ_group.id).get('first_year') or 0
     return education_groups_years
 
 
@@ -798,15 +800,53 @@ def _count_education_group_enrollments_by_id(education_groups_years):
         pk__in=[educ_group.id for educ_group in education_groups_years],
         offerenrollment__enrollment_state__in=[SUBSCRIBED, PROVISORY]
     ).annotate(
-        count_formation_enrollments=Count('offerenrollment')
-    ).values('id', 'count_formation_enrollments')
-    return {obj['id']: obj['count_formation_enrollments'] for obj in educ_groups}
+        count_formation_enrollments=Count(
+            'offerenrollment',
+            filter=Q(offerenrollment__cohort_year__isnull=True)
+        ),
+        count_formation_enrollments_first_year=Count(
+            'offerenrollment',
+            filter=Q(offerenrollment__cohort_year__name=CohortName.FIRST_YEAR.name)
+        ),
+    ).values(
+        'id',
+        'education_group_type__name',
+        'count_formation_enrollments',
+        'count_formation_enrollments_first_year'
+    )
+
+    count_education_group_enrollments = {}
+
+    for obj in educ_groups:
+        if obj['education_group_type__name'] == TrainingType.BACHELOR.name:
+            count_education_group_enrollments[obj['id']] = {
+                'main': obj['count_formation_enrollments'],
+                'first_year': obj['count_formation_enrollments_first_year'],
+            }
+        else:
+            count_education_group_enrollments[obj['id']] = {'main': obj['count_formation_enrollments']}
+
+    # return {obj['id']: obj['count_formation_enrollments'] for obj in educ_groups}
+    return count_education_group_enrollments
 
 
 def _find_with_learning_unit_enrollment_count(learning_unit_year):
-    return EducationGroupYear.objects \
-        .filter(offerenrollment__learningunitenrollment__learning_unit_year_id=learning_unit_year) \
-        .annotate(count_learning_unit_enrollments=Count('offerenrollment__learningunitenrollment')).order_by('acronym')
+    return EducationGroupYear.objects.filter(
+        offerenrollment__learningunitenrollment__learning_unit_year_id=learning_unit_year
+    ).annotate(
+        count_learning_unit_enrollments=Count(
+            'offerenrollment__learningunitenrollment',
+            filter=Q(offerenrollment__cohort_year__isnull=True)
+        ),
+        count_learning_unit_enrollments_first_year=Count(
+            'offerenrollment__learningunitenrollment',
+            filter=Q(offerenrollment__cohort_year__name=CohortName.FIRST_YEAR.name)
+        )
+    ).exclude(
+        acronym__icontains='11ba',
+    ).order_by(
+        'acronym'
+    )
 
 
 def find_by_user(user, academic_yr=None):

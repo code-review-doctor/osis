@@ -89,8 +89,8 @@ def learning_unit_formations(request, learning_unit_year_id=None, code=None, yea
     context['total_formation_enrollments'] = 0
     context['total_learning_unit_enrollments'] = 0
     for root_formation in context['root_formations']:
-        context['total_formation_enrollments'] += root_formation.count_formation_enrollments
-        context['total_learning_unit_enrollments'] += root_formation.count_learning_unit_enrollments
+        context['total_formation_enrollments'] += root_formation.count_formation_enrollments + root_formation.count_formation_enrollments_first_year
+        context['total_learning_unit_enrollments'] += root_formation.count_learning_unit_enrollments + root_formation.count_learning_unit_enrollments_first_year
     context['tab_active'] = "learning_unit_formations"  # Corresponds to url_name
     return render(request, "learning_unit/formations.html", context)
 
