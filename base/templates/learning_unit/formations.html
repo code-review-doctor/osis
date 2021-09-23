@@ -93,10 +93,10 @@
                                             </td>
                                             {% if education_group_year.classes_counter %}
                                                 {% for classe in classes %}
-                                                    {% with class_count=education_group_year.classes_counter|get_item:classe.pk %}
-                                                    <td>{{ class_count.main }}
+                                                    {% with class_count=education_group_year.classes_counter|get_item_or_zero:classe.pk %}
+                                                    <td>{{ class_count|get_item_or_zero:'main' }}
                                                         {% if education_group_year.education_group_type.name == 'BACHELOR'%}
-                                                        <br/>{{ class_count.first_year }}
+                                                        <br/>{{ class_count|get_item_or_zero:'first_year' }}
                                                         {% endif %}
                                                     </td>
                                                     {% endwith %}
