@@ -283,7 +283,7 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
 
             qs = qs.filter(
                 functools.reduce(
-                    operator.or_,
+                    operator.and_,
                     filters
                 )
             )
