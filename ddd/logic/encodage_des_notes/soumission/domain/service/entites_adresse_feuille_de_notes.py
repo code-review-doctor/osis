@@ -89,13 +89,8 @@ class EntiteAdresseFeuilleDeNotes(interface.DomainService):
         faculte_entites_administration_et_gestion = [
             entite for entite in entites_administration_et_gestion_avec_leur_hierarchie if entite.est_faculte()
         ]
-        sector_entites_administration_et_gestion = [
-            entite for entite in entites_administration_et_gestion_avec_leur_hierarchie if entite.est_sector()
-        ]
         return \
-            entites_administration_et_gestion + \
-            faculte_entites_administration_et_gestion + \
-            sector_entites_administration_et_gestion
+            entites_administration_et_gestion + faculte_entites_administration_et_gestion
 
     @classmethod
     def _convert_entite_to_dto(cls, entite: 'EntiteUCL') -> 'EntiteDTO':
