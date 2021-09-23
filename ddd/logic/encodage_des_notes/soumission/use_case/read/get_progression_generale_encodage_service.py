@@ -25,6 +25,7 @@
 ##############################################################################
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_inscription_examen import IInscriptionExamenTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodage_notes import \
     IPeriodeEncodageNotesTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_etudiant import \
@@ -48,6 +49,7 @@ def get_progression_generale(
         signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
         attribution_translator: 'IAttributionEnseignantTranslator',
         unite_enseignement_translator: 'IUniteEnseignementTranslator',
+        inscription_examen_translator: 'IInscriptionExamenTranslator',
 ) -> 'ProgressionGeneraleEncodageNotesDTO':
     # Given
     PeriodeEncodageOuverte().verifier(periode_soumission_note_translator)
@@ -61,6 +63,7 @@ def get_progression_generale(
         periode_soumission_note_translator=periode_soumission_note_translator,
         signaletique_etudiant_translator=signaletique_etudiant_translator,
         unite_enseignement_translator=unite_enseignement_translator,
+        inscription_examen_translator=inscription_examen_translator
     )
 
     # Then

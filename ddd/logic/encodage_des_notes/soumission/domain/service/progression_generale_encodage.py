@@ -27,6 +27,7 @@ from typing import List
 
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_inscription_examen import IInscriptionExamenTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodage_notes import \
     IPeriodeEncodageNotesTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_etudiant import \
@@ -52,6 +53,7 @@ class ProgressionGeneraleEncodage(interface.DomainService):
             periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
             signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
             unite_enseignement_translator: 'IUniteEnseignementTranslator',
+            inscription_examen_translator: 'IInscriptionExamenTranslator',
     ) -> 'ProgressionGeneraleEncodageNotesDTO':
         periode_soumission = periode_soumission_note_translator.get()
         annee_academique = periode_soumission.annee_concernee
@@ -71,7 +73,8 @@ class ProgressionGeneraleEncodage(interface.DomainService):
             responsable_notes_repo,
             periode_soumission,
             signaletique_etudiant_translator,
-            unite_enseignement_translator
+            unite_enseignement_translator,
+            inscription_examen_translator
         )
 
 

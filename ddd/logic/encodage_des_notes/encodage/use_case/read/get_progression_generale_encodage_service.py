@@ -29,6 +29,7 @@ from ddd.logic.encodage_des_notes.encodage.domain.service.i_cohortes_du_gestionn
 from ddd.logic.encodage_des_notes.encodage.domain.service.progression_generale_encodage import \
     ProgressionGeneraleEncodage
 from ddd.logic.encodage_des_notes.encodage.repository.note_etudiant import INoteEtudiantRepository
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_inscription_examen import IInscriptionExamenTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodage_notes import \
     IPeriodeEncodageNotesTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_etudiant import \
@@ -50,6 +51,7 @@ def get_progression_generale_gestionnaire(
         signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
         unite_enseignement_translator: 'IUniteEnseignementTranslator',
         cohortes_gestionnaire_translator: 'ICohortesDuGestionnaire',
+        inscription_examen_translator: 'IInscriptionExamenTranslator',
 ) -> 'ProgressionGeneraleEncodageNotesDTO':
     # GIVEN
     PeriodeEncodageOuverte().verifier(periode_encodage_note_translator)
@@ -64,6 +66,7 @@ def get_progression_generale_gestionnaire(
         responsable_notes_repo=responsable_notes_repo,
         signaletique_etudiant_translator=signaletique_etudiant_translator,
         unite_enseignement_translator=unite_enseignement_translator,
+        inscription_examen_translator=inscription_examen_translator,
 
         nom_cohorte=cmd.nom_cohorte,
         code_unite_enseignement=cmd.code_unite_enseignement,

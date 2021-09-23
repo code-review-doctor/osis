@@ -25,7 +25,7 @@
 ##############################################################################
 import datetime
 from datetime import date
-from typing import List, Optional
+from typing import List, Optional, Iterable
 
 import attr
 
@@ -121,20 +121,24 @@ class FeuilleDeNotesDTO(interface.DTO):
     notes_etudiants = attr.ib(type=List[NoteEtudiantDTO])
 
     @property
+    def notes_etudiants_inscrits(self) -> Iterable['NoteEtudiantDTO']:
+        return (note for note in self.notes_etudiants if not note.desinscrit_tardivement)
+
+    @property
     def encodage_est_complet(self) -> bool:
         return self.quantite_notes_soumises == self.quantite_total_notes
 
     @property
     def quantite_notes_soumises(self) -> int:
-        return sum(1 for note in self.notes_etudiants if note.note is not None and note.est_soumise)
+        return sum(1 for note in self.notes_etudiants_inscrits if note.note is not None and note.est_soumise)
 
     @property
     def quantite_notes_en_attente_de_soumission(self) -> int:
-        return sum(1 for note in self.notes_etudiants if note.est_en_attente_de_soumission())
+        return sum(1 for note in self.notes_etudiants_inscrits if note.est_en_attente_de_soumission())
 
     @property
     def quantite_total_notes(self) -> int:
-        return len(self.notes_etudiants)
+        return len(list(self.notes_etudiants_inscrits))
 
     @property
     def nombre_inscriptions(self) -> int:
@@ -144,7 +148,7 @@ class FeuilleDeNotesDTO(interface.DTO):
         return next(note_etudiant.email for note_etudiant in self.notes_etudiants if note_etudiant.noma == noma)
 
     def get_notes_en_attente_de_soumission(self) -> List[NoteEtudiantDTO]:
-        return [note for note in self.notes_etudiants if note.est_en_attente_de_soumission()]
+        return [note for note in self.notes_etudiants_inscrits if note.est_en_attente_de_soumission()]
 
 
 @attr.s(frozen=True, slots=True)
