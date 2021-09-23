@@ -109,24 +109,72 @@
                                 </div>
                                 <div class="col-md-3">
                                     <label class="text-muted">
-                                        {% trans 'Language' %}
+                                        {% trans 'Individual loan' %}
                                     </label>
                                     <br>
-                                    <span id="id_language" class="text-muted">
-                                         {{ language.name }}
+                                    <span id="id_individual_loan" class="text-muted">
+                                        {{ learning_unit.individual_loan | yesno | title }}
                                     </span>
                                 </div>
                             {% endblock content_row2 %}
                         </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label class="text-muted">
+                                    {% trans 'Language' %}
+                                </label>
+                                <br>
+                                <span id="id_language" class="text-muted">
+                                     {{ language.name }}
+                                </span>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="text-muted">
+                                    {% trans 'English-friendly' %}
+                                </label>
+                                <br>
+                                <span id="id_english_friendly" class="text-muted">
+                                     {{ learning_unit.mobility.english_friendly  | yesno | title }}
+                                </span>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="text-muted">
+                                    {% trans 'French-friendly' %}
+                                </label>
+                                <br>
+                                <span id="id_french_friendly" class="text-muted">
+                                     {{ learning_unit.mobility.french_friendly  | yesno | title }}
+                                </span>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="text-muted">
+                                    {% trans 'Exchange students' %}
+                                </label>
+                                <br>
+                                <span id="id_exchange_students" class="text-muted">
+                                     {{ learning_unit.mobility.exchange_students  | yesno | title }}
+                                </span>
+                            </div>
+                        </div>
                     <br>
                         <div class="row">
-                            <div class="col-md-12">
+                            <div class="col-md-3">
                                 <label class="text-muted">
                                     {% trans 'Professional integration' %}
                                 </label>
                                 <br>
                                 <span id="id_professional_integration" class="text-muted">
                                     {{ learning_unit.professional_integration | yesno | title }}
+                                </span>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="text-muted">
+                                    {% trans 'Stage-Dimona' %}
+                                </label>
+                                <br>
+                                <span id="id_stage_dimona" class="text-muted">
+                                    {{ learning_unit.stage_dimona | yesno | title }}
                                 </span>
                             </div>
                         </div>

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,25 +23,36 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.core.exceptions import PermissionDenied
+from typing import List, Dict
 
-from assessments.business import scores_responsible
-from attribution import models as mdl_attr
-from base.models.learning_unit_year import LearningUnitYear
+from django.contrib.auth.models import User
+from django.utils.translation import gettext_lazy as _
+from openpyxl.styles import Font
 
+from base.business.xls import get_name_or_username
+from osis_common.document import xls_build
 
-def get_learning_unit_year_managed_by_user_from_id(user, learning_unit_year_id, academic_year):
-    qs = LearningUnitYear.objects.filter(pk=learning_unit_year_id)
-    if scores_responsible.filter_learning_unit_year_according_person(qs, user.person, academic_year).exists():
-        return qs.get()
-    raise PermissionDenied("User is not an entity manager of the requirement entity of the learning unit")
+BOLD_FONT = Font(bold=True)
 
 
-def get_attributions_data(user, learning_unit_year_id, responsibles_order, academic_year):
-    a_learning_unit_year = get_learning_unit_year_managed_by_user_from_id(user, learning_unit_year_id, academic_year)
-    return {
-        'learning_unit_year': a_learning_unit_year,
-        'attributions': mdl_attr.attribution.find_all_responsible_by_learning_unit_year(
-            a_learning_unit_year, responsibles_order=responsibles_order),
-        'academic_year': a_learning_unit_year.academic_year
+def create_class_copy_report(user: User, copy_classes_report: List[Dict]):
+    working_sheets_data = []
+
+    for line in copy_classes_report:
+        working_sheets_data.append([line.get('source'), line.get('result'), line.get('exception')])
+    parameters = {
+        xls_build.DESCRIPTION: _('Classes copy report'),
+        xls_build.USER: get_name_or_username(user),
+        xls_build.FILENAME: "classes_copy_report",
+        xls_build.WS_TITLE: _('Classes copy report'),
+        xls_build.HEADER_TITLES: [
+            str(_('Copy source')),
+            str(_('Copy result')),
+            str(_('Error')),
+        ],
+        xls_build.FONT_ROWS: {
+            BOLD_FONT: [0]
+        }
     }
+
+    return xls_build.generate_xls(xls_build.prepare_xls_parameters_list(working_sheets_data, parameters))

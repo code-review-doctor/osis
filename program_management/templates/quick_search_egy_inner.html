@@ -76,7 +76,7 @@
                         version_label = version ? `${version}` : `${transition}`
                     }
                     data += version_label ? `[${version_label}]` : '';
-                    return '<a href="' + row['url'] + '">' + data + '</a>';
+                    return data;
                 }
             },
             {"name": "code", "targets": 3, "data": "code"},
