@@ -374,7 +374,7 @@ class TestFindWithEnrollmentsCount(TestCase):
             learning_class_year=learning_class_yr
         )
         result = find_with_enrollments_count(self.learning_unit_year)
-        self.assertEqual(result[0].classes_counter, {learning_class_yr.id: 1})
+        self.assertEqual(result[0].classes_counter, {learning_class_yr.id: {'main': 1, 'first_year': 0}})
 
     def test_ordered_by_acronym(self):
         education_group_year = EducationGroupYearFactory(acronym='XDRT1234')
