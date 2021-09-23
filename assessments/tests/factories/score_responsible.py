@@ -23,35 +23,27 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
-import string
 
 import factory.fuzzy
 
-from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
-from attribution.tests.factories.attribution_class import AttributionClassFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.tutor import TutorFactory
+from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
 
 
 class ScoreResponsibleFactory(factory.DjangoModelFactory):
     class Meta:
         model = 'assessments.ScoreResponsible'
 
-    external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    changed = factory.fuzzy.FuzzyNaiveDateTime(
-        datetime.datetime(2016, 1, 1),
-        datetime.datetime(2017, 3, 1)
-    )
+    tutor = factory.SubFactory(TutorFactory)
     learning_unit_year = factory.SubFactory(LearningUnitYearFactory)
-    attribution_charge = factory.SubFactory(AttributionChargeNewFactory)
-    attribution_class = None
+    learning_class_year = None
 
 
-class LearningUnitAttributionScoreResponsibleFactory(ScoreResponsibleFactory):
-    attribution_charge = factory.SubFactory(AttributionChargeNewFactory)
-    attribution_class = None
-
-
-class ClassAttributionScoreResponsibleFactory(ScoreResponsibleFactory):
-    attribution_charge = None
-    attribution_class = factory.SubFactory(AttributionClassFactory)
+class ScoreResponsibleOfClassFactory(ScoreResponsibleFactory):
+    learning_class_year = factory.SubFactory(
+        LearningClassYearFactory,
+        learning_component_year__learning_unit_year=factory.LazyAttribute(
+            lambda component: component.factory_parent.factory_parent.learning_unit_year
+        )
+    )

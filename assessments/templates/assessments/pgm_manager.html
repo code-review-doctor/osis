@@ -1,0 +1,199 @@
+{% extends "layout.html" %}
+{% load static i18n bootstrap3 %}
+{% comment "License" %}
+* OSIS stands for Open Student Information System. It's an application
+* designed to manage the core business of higher education institutions,
+* such as universities, faculties, institutes and professional schools.
+* The core business involves the administration of students, teachers,
+* courses, programs and so on.
+*
+* Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* A copy of this license - GNU General Public License - is available
+* at the root of the source code of this program.  If not,
+* see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+{% block breadcrumb %}
+    <li id="lnk_institution"><a href="{% url 'institution' %}" id="lnk_home_institution">{% trans 'Institution' %}</a>
+    </li>
+    <li id="lnk_studies"><a href="{% url 'academic_actors' %}">{% trans 'Academic actors' %}</a></li>
+    <li class="active" id="lnk_pgm_manager_management">{% trans 'Program managers' %}</li>
+{% endblock %}
+{% block content %}
+    {% if administrator_entities_string %}
+        <div class="page-header">
+            <h2>{% trans 'Program managers' %} - <label>{{ administrator_entities_string }}</label>
+            </h2>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <br>
+                <div class="row">
+                    <form method="get" action="{% url 'program_manager_search' %}">
+                        <div class="col-md-3">
+                            <label for="slt_entity">{% trans 'Entity' %}</label>
+                            <select class="form-control" id="slt_entity" name="entity">
+                                {% for e in entities_managed_root %}
+                                    <option value="all_{{ e.root.entity_id }}"
+                                            {% if e.root.entity_id|slugify == entity_root_selected %}
+                                            selected {% endif %}>{% trans 'All hierarchy of ' %} {{ e.root.acronym }}</option>
+                                    {% for e in e.structures %}
+                                        {% if e.entity_id|slugify == entity_selected %}
+                                            <option selected value="{{ e.entity_id }}">{{ e.acronym }}</option>
+                                        {% else %}
+                                            <option value="{{ e.entity_id }}">{{ e.acronym }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="slt_offer_type">{% trans 'Type of training' %}</label>
+                            <select class="form-control" id="slt_offer_type" name="offer_type">
+                                <option value="-">{% trans 'All' %}</option>
+                                {% for p in offer_types %}
+                                    {% if p.id|slugify == offer_type %}
+                                        <option selected value="{{ p.id }}">{{ p.get_name_display }}</option>
+                                    {% else %}
+                                        <option value="{{ p.id }}">{{ p.get_name_display }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="slt_manager">{% trans 'Managers' %}</label>
+                            <select class="form-control" id="slt_person" name="person">
+                                <option value="-">{% trans 'All' %}</option>
+                                {% for mgr in managers %}
+                                    <option value="{{ mgr.person.id }}"
+                                            {% if person.id == mgr.person.id %}selected{% endif %}>{{ mgr.person }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <br>
+                            <button type="submit" class="btn btn-primary" role="button">
+                                <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <br>
+                {% if add_errors %}
+                    <div class="alert-warning" id="pnl_errors">
+                        <ul>
+                            {% for error in add_errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+                <div>
+                    <div class="row">
+                        <form action="{% url 'program_manager_list' %}" method="get" id="form_offer_year">
+                            <div class="col-md-6">
+                                {% if pgms|length == 0 and init != "1" %}
+                                    <div class="alert alert-info" style="margin:5px">{% trans 'No result!' %}</div>
+                                {% endif %}
+                                {% if pgms|length > 0 %}
+                                    <strong style="color:gray;"><span
+                                            id="nb_selected"></span> {% trans 'of' %} {{ pgms|length }} {% trans 'Selected' %}
+                                    </strong>
+                                    <table class="table table-striped table-hover" id="tb_pgms">
+                                        <thead>
+                                        <tr>
+                                            <th class="no-sort">
+                                                <input type="checkbox" id="chb_pgm_all_id"
+                                                       title="{% trans 'Select/deselect all' %}">
+                                            </th>
+                                            <th>{% trans 'Training' %}</th>
+                                            <th>{% trans 'Type' %}</th>
+                                            <th>{% trans 'Entity' %}</th>
+                                        </tr>
+                                        </thead>
+                                        {% for pgm in pgms %}
+                                            <tr>
+                                                <td>
+                                                    <input name="education_groups" type="checkbox" value="{{ pgm.education_group_id }}"
+                                                           onclick="load_managers()">
+                                                </td>
+                                                <td>{{ pgm.nom_formation }}</td>
+                                                <td>{{ pgm.education_group_type }}</td>
+                                                <td>{{ pgm.management_entity }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </table>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6" id="pnl_managers"></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="center-block"><h3>{% trans 'No entity associated to your profile' %}</h3></div>
+    {% endif %}
+{% endblock %}
+
+{% block script %}
+    <script>
+        function load_managers() {
+            let form = $("#form_offer_year");
+            $("#pnl_managers").load(form.attr('action'), form.serialize());
+
+            let choices = $('input[name=education_groups]:checked');
+            $('#nb_selected').text(choices.length);
+        }
+
+        $(document).ready(function () {
+            load_managers();
+            data_table_init();
+
+            $("input[id$='_manager_search']").keypress(function (e) {
+                //To submit the form on key enter pressed
+                if (e.which === 13) {
+                    e.preventDefault();
+                    $("#bt_submit_person_search").trigger("click");
+                }
+            });
+        });
+
+        $("input[id='chb_pgm_all_id']").click(function () {
+            $("input[name='education_groups']").each(function () {
+                $(this).prop("checked", $("#chb_pgm_all_id").prop("checked"))
+            });
+            load_managers();
+        });
+
+        function data_table_init() {
+            $('#tb_pgms').DataTable({
+                paging: false,
+                searching: false,
+                stateSave: true,
+                info: false,
+                language: {
+                    search: gettext('search'),
+                    infoEmpty: gettext('no_record'),
+                    zeroRecords: gettext('no_record'),
+                },
+                "columnDefs": [{
+                    "targets": 'no-sort',
+                    "orderable": false,
+                }]
+            });
+        }
+    </script>
+{% endblock %}
+

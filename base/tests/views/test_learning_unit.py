@@ -992,8 +992,9 @@ class LearningUnitViewTestCase(TestCase):
     def test_learning_unit(self):
         learning_unit_year = LearningUnitYearFactory()
         ElementFactory(learning_unit_year=learning_unit_year)
-        education_group_year_1 = EducationGroupYearFactory()
-        education_group_year_2 = EducationGroupYearFactory()
+        education_group_year_1 = EducationGroupYearFactory(acronym="DROI1BA")
+        education_group_year_2 = EducationGroupYearFactory(acronym="MCOMU2M")
+        learning_class_yr = LearningClassYearFactory(learning_component_year__learning_unit_year=learning_unit_year)
         LearningUnitEnrollmentFactory(offer_enrollment__education_group_year=education_group_year_1,
                                       learning_unit_year=learning_unit_year)
         LearningUnitEnrollmentFactory(offer_enrollment__education_group_year=education_group_year_1,
@@ -1001,13 +1002,17 @@ class LearningUnitViewTestCase(TestCase):
         LearningUnitEnrollmentFactory(offer_enrollment__education_group_year=education_group_year_2,
                                       learning_unit_year=learning_unit_year)
         LearningUnitEnrollmentFactory(offer_enrollment__education_group_year=education_group_year_2,
-                                      learning_unit_year=learning_unit_year)
+                                      learning_unit_year=learning_unit_year,
+                                      learning_class_year=learning_class_yr)
         response = self.client.get(reverse(learning_unit_formations, args=[learning_unit_year.pk]))
         self.assertTemplateUsed(response, 'learning_unit/formations.html')
         # Count Education Group Year link to Learning Unit Year
         self.assertEqual(len(response.context["root_formations"]), 2)
+        self.assertEqual(response.context["root_formations"][1].classes_counter, {learning_class_yr.id: 1})
         # Count Student link to Formation
         self.assertEqual(response.context["total_formation_enrollments"], 4)
+        self.assertEqual(response.context["totals_classes"], {learning_class_yr.id: 1})
+
 
 
 class TestCreateXls(TestCase):

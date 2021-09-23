@@ -27,15 +27,11 @@ from typing import List
 
 from ddd.logic.learning_unit.commands import LearningUnitSearchCommand
 from ddd.logic.learning_unit.dtos import LearningUnitSearchDTO
-from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
+from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepository
 
 
-def search_learning_units(cmd: LearningUnitSearchCommand) -> List['LearningUnitSearchDTO']:
-    repository = LearningUnitRepository()
-    return repository.search_learning_units_dto(
-        code=cmd.code,
-        year=cmd.year,
-        full_title=cmd.full_title,
-        type=cmd.type,
-        responsible_entity_code=cmd.responsible_entity_code,
-    )
+def search_learning_units(
+        cmd: LearningUnitSearchCommand,
+        repository: 'ILearningUnitRepository'
+) -> List['LearningUnitSearchDTO']:
+    return repository.search_learning_units_dto(code_annee_values=cmd.code_annee_values)

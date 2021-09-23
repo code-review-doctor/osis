@@ -117,7 +117,7 @@ class PgmManagerAdministrationTest(TestCase):
         pgm2 = ProgramManagerFactory(person=self.person, education_group=educ_group_year2.education_group)
 
         response = self.client.get(
-            reverse('delete_manager_person', args=[self.person.pk]) + "?education_groups={},{}".format(
+            reverse('delete_manager_person', args=[self.person.global_id]) + "?education_groups={},{}".format(
                 educ_group_year1.education_group_id,
                 educ_group_year2.education_group_id
             )
@@ -125,7 +125,7 @@ class PgmManagerAdministrationTest(TestCase):
         self.assertFalse(response.context['other_programs'])
 
         self.client.post(
-            reverse('delete_manager_person', args=[self.person.pk]) + "?education_groups={},{}".format(
+            reverse('delete_manager_person', args=[self.person.global_id]) + "?education_groups={},{}".format(
                 educ_group_year1.education_group_id,
                 educ_group_year2.education_group_id
             )
@@ -144,7 +144,7 @@ class PgmManagerAdministrationTest(TestCase):
         pgm2 = ProgramManagerFactory(
             person=self.person,
             education_group=educ_group_year2.education_group,
-            is_main=False,
+            is_main=True,
         )
 
         self.client.post(
@@ -155,7 +155,7 @@ class PgmManagerAdministrationTest(TestCase):
         )
         pgm1.refresh_from_db()
         pgm2.refresh_from_db()
-        self.assertTrue(pgm1.is_main)
+        self.assertFalse(pgm1.is_main)
         self.assertTrue(pgm2.is_main)
 
         self.client.post(

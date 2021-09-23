@@ -24,9 +24,10 @@
 #
 ##############################################################################
 import abc
-from typing import List, Optional
+from typing import List, Optional, Set
 
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity, EffectiveClass
+from ddd.logic.learning_unit.dtos import EffectiveClassFromRepositoryDTO
 from osis_common.ddd import interface
 from osis_common.ddd.interface import ApplicationService
 
@@ -57,3 +58,13 @@ class IEffectiveClassRepository(interface.AbstractRepository):
     @abc.abstractmethod
     def get(cls, entity_id: 'EffectiveClassIdentity') -> 'EffectiveClass':
         raise NotImplementedError
+
+    @classmethod
+    @abc.abstractmethod
+    def search_dtos(cls, codes: Set[str], annee: int) -> List['EffectiveClassFromRepositoryDTO']:
+        pass
+
+    @classmethod
+    @abc.abstractmethod
+    def get_dto(cls, code: str, annee: int) -> 'EffectiveClassFromRepositoryDTO':
+        pass
