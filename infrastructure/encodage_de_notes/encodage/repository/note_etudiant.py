@@ -222,8 +222,8 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
 
             equivalents_1ba = {cohorte.replace("11BA", "1BA") for cohorte in cohortes_11ba}
             cohortes_11ba_q = Q(
-                Q(learning_unit_enrollment__offer_enrollment__education_group_year__acronym__in=equivalents_1ba) &
-                Q(learning_unit_enrollment__offer_enrollment__cohort_year__name=CohortName.FIRST_YEAR.name)
+                learning_unit_enrollment__offer_enrollment__education_group_year__acronym__in=equivalents_1ba,
+                learning_unit_enrollment__offer_enrollment__cohort_year__name=CohortName.FIRST_YEAR.name
             ) if cohortes_11ba else Q()
 
             filter_cohorte = autres_cohortes_q | cohortes_11ba_q
