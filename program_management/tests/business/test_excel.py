@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -91,7 +91,12 @@ class TestGeneratePrerequisitesWorkbook(SimpleTestCase):
 
         expected_learning_unit_year_line = LearningUnitYearLine(
             luy_acronym=node_has_prerequisite.code,
-            luy_title=node_has_prerequisite.full_title_en
+            luy_title=node_has_prerequisite.full_title_en,
+            empty_col1='',
+            empty_col2='',
+            credits=link_with_node_is_prerequisite.relative_credits_repr,
+            blocks=str(link_with_node_is_prerequisite.block) if link_with_node_is_prerequisite.block else '',
+            is_mandatory=_("Yes") if link_with_node_is_prerequisite.is_mandatory else _("No")
         )
         expected_prerequisite_item_line = PrerequisiteItemLine(
             text='{} :'.format(_('has as prerequisite')),
@@ -122,6 +127,18 @@ class TestGeneratePrerequisitesWorkbook(SimpleTestCase):
         )
 
         content = _build_excel_lines(tree)
+        learning_unit_year_line = content[2]
+
+        expected_learning_unit_year_line = LearningUnitYearLine(
+            luy_acronym=node_has_prerequisite.code,
+            luy_title=node_has_prerequisite.full_title_en,
+            empty_col1='',
+            empty_col2='',
+            credits=self._expected_credits_repr(link_with_node_is_prerequisite1, link_with_node_is_prerequisite2),
+            blocks=self._expected_blocks_repr(link_with_node_is_prerequisite1, link_with_node_is_prerequisite2),
+            is_mandatory=_("Yes") if link_with_node_is_prerequisite1.is_mandatory else _("No")
+        )
+        self.assertEqual(expected_learning_unit_year_line, learning_unit_year_line)
 
         prerequisite_item_line_1 = content[3]
         expected_prerequisite_item_line1 = PrerequisiteItemLine(
@@ -147,3 +164,15 @@ class TestGeneratePrerequisitesWorkbook(SimpleTestCase):
             mandatory=_("Yes") if link_with_node_is_prerequisite2.is_mandatory else _("No")
         )
         self.assertEqual(prerequisite_item_line_2, expected_prerequisite_item_line2)
+
+    def _expected_blocks_repr(self, link_with_node_is_prerequisite1, link_with_node_is_prerequisite2):
+        blocks = set()
+        blocks.add(str(link_with_node_is_prerequisite1.block) if link_with_node_is_prerequisite1.block else '')
+        blocks.add(str(link_with_node_is_prerequisite2.block) if link_with_node_is_prerequisite2.block else '')
+        return " ; ".join(sorted(blocks))
+
+    def _expected_credits_repr(self, link_with_node_is_prerequisite1, link_with_node_is_prerequisite2):
+        credits = set()
+        credits.add(link_with_node_is_prerequisite1.relative_credits_repr)
+        credits.add(link_with_node_is_prerequisite2.relative_credits_repr)
+        return " ; ".join(sorted(credits))
