@@ -233,6 +233,9 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/Enrollment'
+            enrolled_students_count:
+              type: integer
+
     Enrollment:
       type: object
       properties:
