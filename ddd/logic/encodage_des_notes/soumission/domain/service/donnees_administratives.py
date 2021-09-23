@@ -32,7 +32,8 @@ from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodag
 from ddd.logic.encodage_des_notes.soumission.builder.adresse_feuille_de_notes_identity_builder import \
     AdresseFeuilleDeNotesIdentityBuilder
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_deliberation import IDeliberationTranslator
-from ddd.logic.encodage_des_notes.soumission.dtos import DonneesAdministrativesFeuilleDeNotesDTO
+from ddd.logic.encodage_des_notes.soumission.dtos import DonneesAdministrativesFeuilleDeNotesDTO, \
+    AdresseFeuilleDeNotesDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_notes import \
     IAdresseFeuilleDeNotesRepository
 from osis_common.ddd import interface
@@ -77,7 +78,10 @@ class DonneesAdministratives(interface.DomainService):
                     sigle_formation=nom_cohorte,
                     code_unite_enseignement=code,
                     date_deliberation=deliberation.date if deliberation else None,
-                    contact_feuille_de_notes=adresse_par_cohorte[nom_cohorte],
+                    contact_feuille_de_notes=adresse_par_cohorte.get(
+                        nom_cohorte,
+                        AdresseFeuilleDeNotesDTO(nom_cohorte=nom_cohorte)
+                    ),
                 )
                 result.append(dto)
         return result

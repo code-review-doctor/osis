@@ -60,7 +60,8 @@ def encoder_notes(
         signaletique_repo: 'ISignaletiquePersonneTranslator',
         signaletique_etudiant_repo: 'ISignaletiqueEtudiantTranslator',
         adresse_feuille_de_notes_repo: 'IAdresseFeuilleDeNotesRepository',
-        historiser_note_service: 'IHistoriserEncodageNotesService'
+        historiser_note_service: 'IHistoriserEncodageNotesService',
+        inscription_examen_translator: 'IInscriptionExamenTranslator'
 ) -> List['IdentiteNoteEtudiant']:
     # Given
     PeriodeEncodageOuverte().verifier(periode_encodage_note_translator)
@@ -83,7 +84,8 @@ def encoder_notes(
         gestionnaire_parcours,
         note_etudiant_repo,
         periode_ouverte,
-        historiser_note_service
+        historiser_note_service,
+        inscription_examen_translator
     )
     notifier_notes_domaine_service.notifier(
         notes,

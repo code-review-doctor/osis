@@ -46,11 +46,11 @@ class ScoreSheetXLSImportProgramManagerView(ScoreSheetXLSImportBaseView):
             ]
         )
 
-        injected_notes_counter = len(cmd.notes_encodees)
+        injected_notes_counter = 0
         try:
-            message_bus_instance.invoke(cmd)
+            note_identities = message_bus_instance.invoke(cmd)
+            injected_notes_counter = len(note_identities)
         except MultipleBusinessExceptions as e:
-            injected_notes_counter -= len(e.exceptions)
             for exception in e.exceptions:
                 row_number = next(
                     note_etudiant['row_number'] for note_etudiant in score_sheet_serialized['notes_etudiants']

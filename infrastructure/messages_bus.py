@@ -358,7 +358,8 @@ class MessageBus:
             SignaletiquePersonneTranslator(),
             SignaletiqueEtudiantTranslator(),
             AdresseFeuilleDeNotesRepository(),
-            HistoriserEncodageNotesService()
+            HistoriserEncodageNotesService(),
+            InscriptionExamenTranslator(),
         ),
         GetCohortesGestionnaireCommand: lambda cmd: get_cohortes_gestionnaire(
             cmd,

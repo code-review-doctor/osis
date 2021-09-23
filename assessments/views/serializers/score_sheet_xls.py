@@ -44,9 +44,7 @@ class _NoteEtudiantRowSerializer(serializers.Serializer):
     note = serializers.SerializerMethodField()
     nom_cohorte = serializers.CharField(read_only=True, default='')
     email = serializers.CharField(read_only=True, default='')
-    date_remise_de_notes = serializers.DateField(
-        read_only=True, source='date_remise_de_notes.to_date', format="%d/%m/%Y"
-    )
+    date_remise_de_notes = serializers.SerializerMethodField()
     est_soumise = serializers.BooleanField(read_only=True, default=False)
     inscrit_tardivement = serializers.BooleanField(read_only=True, default=False)
     desinscrit_tardivement = serializers.BooleanField(read_only=True, default=False)
@@ -57,7 +55,6 @@ class _NoteEtudiantRowSerializer(serializers.Serializer):
     autre_amenagement = serializers.SerializerMethodField()
     details_autre_amenagement = serializers.SerializerMethodField()
     accompagnateur = serializers.SerializerMethodField()
-    enrollment_state_color = serializers.SerializerMethodField()
 
     def get_type_peps(self, note_etudiant: NoteEtudiantDTO):
         try:
@@ -113,7 +110,8 @@ class _NoteEtudiantRowSerializer(serializers.Serializer):
 
     def get_details_autre_amenagement(self, note_etudiant: NoteEtudiantDTO):
         try:
-            return operator.attrgetter("peps.details_autre_amenagement")(note_etudiant)
+            details_autre_amenagement = operator.attrgetter("peps.details_autre_amenagement")(note_etudiant)
+            return details_autre_amenagement if details_autre_amenagement else '-'
         except AttributeError:
             return "-"
 
@@ -123,19 +121,17 @@ class _NoteEtudiantRowSerializer(serializers.Serializer):
         except AttributeError:
             return "-"
 
-    def get_enrollment_state_color(self, note_etudiant: NoteEtudiantDTO) -> str:
-        if note_etudiant.inscrit_tardivement:
-            return '#dff0d8'
-        elif note_etudiant.desinscrit_tardivement:
-            return '#f2dede'
-        return ''
-
     def get_note(self, note_etudiant: NoteEtudiantDTO) -> str:
         try:
             note_format = "2" if self.context['note_decimale_est_autorisee'] else "0"
             return floatformat(float(note_etudiant.note), note_format)
         except ValueError:
             return note_etudiant.note
+
+    def get_date_remise_de_notes(self, note_etudiant: NoteEtudiantDTO) -> str:
+        if note_etudiant.date_remise_de_notes and not note_etudiant.desinscrit_tardivement:
+            return note_etudiant.date_remise_de_notes.to_date().strftime("%d/%m/%Y")
+        return ""
 
 
 class ScoreSheetXLSSerializer(serializers.Serializer):
@@ -157,16 +153,14 @@ class ScoreSheetXLSSerializer(serializers.Serializer):
         return display_as_academic_year(obj['feuille_de_notes'].annee_academique)
 
     def get_titre(self, obj) -> str:
-        return "{} - {}".format(
+        return "{} - {} {}".format(
             self.get_annee_academique(obj),
+            obj['feuille_de_notes'].code_unite_enseignement,
             obj['feuille_de_notes'].intitule_complet_unite_enseignement
         )
 
     def get_contact_emails(self, obj) -> str:
-        return ";".join({
-            d_admin.contact_feuille_de_notes.email for d_admin in obj['donnees_administratives']
-            if d_admin.contact_feuille_de_notes.email
-        })
+        return ""
 
     def get_rows(self, obj):
         notes_etudiants_avec_date_echeance_non_atteinte = filter(
@@ -190,15 +184,24 @@ class ScoreSheetXLSSerializer(serializers.Serializer):
 
 class TutorScoreSheetXLSSerializer(ScoreSheetXLSSerializer):
     def get_rows(self, obj):
-        notes_etudiants_filtered = filter(
-            lambda n: not n.date_echeance_atteinte and not n.est_soumise,
-            obj['feuille_de_notes'].notes_etudiants
+        notes_etudiants_filtered = self._get_notes_etudiants_filtered(obj['feuille_de_notes'])
+        notes_etudiants_without_value = map(
+            lambda n: attr.evolve(n, note='') if not n.est_soumise else n,
+            notes_etudiants_filtered
         )
-
-        notes_etudiants_without_value = map(lambda n: attr.evolve(n, note=''), notes_etudiants_filtered)
         serializer = _NoteEtudiantRowSerializer(
             instance=notes_etudiants_without_value,
             context={'note_decimale_est_autorisee': obj['feuille_de_notes'].note_decimale_est_autorisee},
             many=True
         )
         return serializer.data
+
+    def get_contact_emails(self, obj) -> str:
+        cohortes_concerned = {n.nom_cohorte for n in self._get_notes_etudiants_filtered(obj['feuille_de_notes'])}
+        return ";".join({
+            d_admin.contact_feuille_de_notes.email for d_admin in obj['donnees_administratives']
+            if d_admin.contact_feuille_de_notes.email and d_admin.sigle_formation in cohortes_concerned
+        })
+
+    def _get_notes_etudiants_filtered(self, feuille_de_notes):
+        return filter(lambda n: not n.date_echeance_atteinte, feuille_de_notes.notes_etudiants)
