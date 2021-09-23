@@ -35,7 +35,7 @@ from ddd.logic.learning_unit.domain.validator.exceptions import ShouldBeAlphanum
     CodeClassAlreadyExistForUeException, ClassTypeInvalidException, AnnualVolumeInvalidException, \
     LearningUnitHasPartimException, LearningUnitHasProposalException, LearningUnitHasEnrollmentException, \
     LearningUnitHasNoVolumeException, TeachingPlaceRequiredException, DerogationQuadrimesterInvalidChoiceException, \
-    DerogationSessionInvalidChoiceException
+    DerogationSessionInvalidChoiceException, LearningUnitNotExistingException
 from ddd.logic.learning_unit.tests.factory.learning_unit import CourseWithPracticalVolumesOnly, \
     CourseWithLecturingVolumesOnly, CourseWithLecturingAndPracticalVolumes, \
     LDROI1002ExternalLearningUnitFactory, CourseWithOnePartim, LDROI1004CourseWithoutVolumesLearningUnitFactory
@@ -362,4 +362,24 @@ class CreateEffectiveClassService(SimpleTestCase):
         self.assertIsInstance(
             class_exceptions.exception.exceptions.pop(),
             DerogationSessionInvalidChoiceException
+        )
+
+    def test_should_learning_unit_year_exists(self):
+        cmd = attr.evolve(
+            self.create_class_cmd,
+            class_code="A",
+            year=self.ue_with_lecturing_and_practical_volumes.year+1
+        )
+
+        with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
+            # Trying to create the same class a second time
+            create_effective_class(
+                cmd,
+                self.learning_unit_repository,
+                self.effective_class_repository,
+                self.student_enrollment_translator
+            )
+        self.assertIsInstance(
+            class_exceptions.exception.exceptions.pop(),
+            LearningUnitNotExistingException
         )

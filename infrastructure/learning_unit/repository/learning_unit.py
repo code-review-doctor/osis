@@ -392,6 +392,11 @@ def _values_queryset(queryset: QuerySet) -> QuerySet:
         'teaching_place_uuid',
         'professional_integration',
         'is_active',
+        'individual_loan',
+        'english_friendly',
+        'french_friendly',
+        'exchange_students',
+        'stage_dimona',
     )
     return queryset
 
