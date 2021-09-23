@@ -1008,10 +1008,10 @@ class LearningUnitViewTestCase(TestCase):
         self.assertTemplateUsed(response, 'learning_unit/formations.html')
         # Count Education Group Year link to Learning Unit Year
         self.assertEqual(len(response.context["root_formations"]), 2)
-        self.assertEqual(response.context["root_formations"][1].classes_counter, {learning_class_yr.id: {'main': 1, 'first_year':0}})
+        self.assertEqual(response.context["root_formations"][1].classes_counter,
+                         {learning_class_yr.id: {'main': 1, 'first_year': 0}})
         # Count Student link to Formation
-        self.assertEqual(response.context["total_formation_enrollments"], 4)
-        self.assertEqual(response.context["totals_classes"], {learning_class_yr.id: {'main': 1, 'first_year':0}})
+        self.assertEqual(response.context["totals_classes"], {learning_class_yr.id: {'main': 1, 'first_year': 0}})
 
 
 class TestCreateXls(TestCase):
