@@ -31,7 +31,8 @@ from dal import autocomplete
 from django import forms
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.db.models import Q, Subquery, OuterRef, F, Prefetch
+from django.db.models import Q, Subquery, OuterRef, F, Value
+from django.db.models.functions import Replace
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
@@ -94,7 +95,7 @@ class ProgramManagerListView(TemplateView):
             'nom',
             'prenom',
             'est_principal'
-        ).order_by('nom_formation')
+        ).order_by('nom', 'prenom')
 
         context['education_groups'] = self.education_group_ids
 
@@ -305,10 +306,12 @@ def pgm_manager_search(request):
         'entity_selected': entity_selected,
         'entity_root_selected': entity_root_selected,
         'offer_types': __search_offer_types(),
-        'pgms': _get_trainings(current_academic_yr,
-                               get_entity_list(entity_selected, get_entity_root(entity_root_selected)),
-                               manager_person,
-                               pgm_offer_type),
+        'pgms': _get_trainings(
+            current_academic_yr,
+            get_entity_list(entity_selected, get_entity_root(entity_root_selected)),
+            manager_person,
+            pgm_offer_type,
+        ),
         'managers': _get_entity_program_managers(administrator_entities),
         'offer_type': pgm_offer_type
     }
@@ -383,27 +386,25 @@ def get_administrator_entities(a_user) -> List[Dict[str, Union['EntityVersion', 
 
 
 def _get_trainings(academic_yr, entity_list, manager_person, education_group_type) -> List['EducationGroupYear']:
-    qs = EducationGroupYear.objects.filter(
+    base_qs = EducationGroupYear.objects.filter(
         academic_year=academic_yr,
         management_entity__in={ev.entity_id for ev in entity_list},
         education_group_type__category=education_group_categories.TRAINING,
-    ).prefetch_related(Prefetch('cohortyear_set', to_attr="cohortes"))
+    ).exclude(
+        Q(acronym__contains='common-') | Q(acronym__icontains="11BA")
+    ).select_related('management_entity', 'education_group_type')
 
     if education_group_type:
-        qs = qs.filter(education_group_type=education_group_type)
+        base_qs = base_qs.filter(education_group_type=education_group_type)
 
     if manager_person:
-        qs = qs.filter(education_group__programmanager__person=manager_person)
+        base_qs = base_qs.filter(education_group__programmanager__person=manager_person)
 
-    results = qs.distinct().select_related('management_entity', 'education_group_type').order_by('acronym')
-
-    for result in results:
-        if len(result.cohortes) > 0:
-            result.nom_formation = result.acronym.replace('1BA', '11BA')
-        else:
-            result.nom_formation = result.acronym
-
-    return results
+    qs_without_cohorte = base_qs.annotate(nom_formation=F('acronym'))
+    qs_with_cohorte = base_qs.filter(cohortyear__isnull=False).annotate(
+        nom_formation=Replace('acronym', Value('1BA'), Value('11BA'))
+    )
+    return qs_without_cohorte.union(qs_with_cohorte).order_by('nom_formation')
 
 
 def _get_entity_program_managers(entity):
