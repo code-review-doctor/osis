@@ -803,9 +803,9 @@ def find_with_enrollments_count(learning_unit_year):
     education_groups_years = _find_with_learning_unit_enrollment_count(learning_unit_year)
     count_by_id = _count_education_group_enrollments_by_id(education_groups_years)
     for educ_group in education_groups_years:
-        educ_group.classes_counter = _get_classes_counters(learning_unit_year, educ_group.id)
         educ_group.count_formation_enrollments = count_by_id.get(educ_group.id).get('main') or 0
         educ_group.count_formation_enrollments_first_year = count_by_id.get(educ_group.id).get('first_year') or 0
+        educ_group.classes_counter = _get_classes_counters(learning_unit_year, educ_group.id) or 0
     return education_groups_years
 
 
@@ -878,16 +878,35 @@ def find_by_user(user, academic_yr=None):
 
 
 def _get_classes_counters(learning_unit_year_id: int, educ_group_id: int):
-    counters_by_classes = EducationGroupYear.objects \
-        .filter(offerenrollment__education_group_year__id=educ_group_id,
-                offerenrollment__learningunitenrollment__learning_unit_year_id=learning_unit_year_id,
-                offerenrollment__learningunitenrollment__learning_class_year__isnull=False) \
-        .annotate(count_classes_enrollments=Count('offerenrollment__learningunitenrollment__learning_class_year'))\
-        .annotate(classe=F('offerenrollment__learningunitenrollment__learning_class_year__id')).order_by('acronym')
+    counters_by_classes = EducationGroupYear.objects.filter(
+        offerenrollment__education_group_year__id=educ_group_id,
+        offerenrollment__learningunitenrollment__learning_unit_year_id=learning_unit_year_id,
+        offerenrollment__learningunitenrollment__learning_class_year__isnull=False
+    ).annotate(
+        count_classes_enrollments=Count(
+            'offerenrollment__learningunitenrollment__learning_class_year',
+            filter=Q(offerenrollment__cohort_year__isnull=True)
+        ),
+        count_classes_enrollments_first_year=Count(
+            'offerenrollment__learningunitenrollment__learning_class_year',
+            filter=Q(offerenrollment__cohort_year__name=CohortName.FIRST_YEAR.name)
+        )
+    ).annotate(
+        classe=F('offerenrollment__learningunitenrollment__learning_class_year__id')
+    ).order_by(
+        'acronym'
+    )
 
     if counters_by_classes:
         dict_counter_by_class = {}
         for obj in counters_by_classes:
-            dict_counter_by_class.update({obj.classe: obj.count_classes_enrollments})
+            dict_counter_by_class.update(
+                {
+                    obj.classe: {
+                        'main': obj.count_classes_enrollments,
+                        'first_year': obj.count_classes_enrollments_first_year
+                    }
+                }
+            )
         return dict_counter_by_class
     return None

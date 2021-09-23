@@ -101,7 +101,7 @@ def learning_unit_formations(request, learning_unit_year_id=None, code=None, yea
         if root_formation.classes_counter:
             for class_id, class_counter in root_formation.classes_counter.items():
                 tot = totals_classes.get(class_id, 0)
-                tot = tot + class_counter
+                tot = tot + class_counter.get('main', 0) + class_counter.get('first_year', 0)
                 totals_classes.update({class_id: tot})
     context['totals_classes'] = totals_classes
     context['tab_active'] = "learning_unit_formations"  # Corresponds to url_name

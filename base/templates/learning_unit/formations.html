@@ -77,13 +77,28 @@
                                                 <a href="{{ url_education_group_year }}">
                                                     {{ education_group_year.acronym }}
                                                 </a>
+                                                {% if education_group_year.education_group_type.name == 'BACHELOR'%}
+                                                <br/>&nbsp;&nbsp;&nbsp;&nbsp;{{ education_group_year.acronym }}-1
+                                                {% endif %}
                                             </td>
-                                            <td>{{ education_group_year.count_formation_enrollments }}</td>
-                                            <td>{{ education_group_year.count_learning_unit_enrollments }}</td>
+                                            <td>{{ education_group_year.count_formation_enrollments }}
+                                                {% if education_group_year.education_group_type.name == 'BACHELOR'%}
+                                                <br/>{{ education_group_year.count_formation_enrollments_first_year }}
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ education_group_year.count_learning_unit_enrollments }}
+                                                {% if education_group_year.education_group_type.name == 'BACHELOR'%}
+                                                <br/>{{ education_group_year.count_learning_unit_enrollments_first_year }}
+                                                {% endif %}
+                                            </td>
                                             {% if education_group_year.classes_counter %}
                                                 {% for classe in classes %}
-                                                    {% with class_count=education_group_year.classes_counter|get_item_or_zero:classe.pk %}
-                                                    <td>{{ class_count }}</td>
+                                                    {% with class_count=education_group_year.classes_counter|get_item:classe.pk %}
+                                                    <td>{{ class_count.main }}
+                                                        {% if education_group_year.education_group_type.name == 'BACHELOR'%}
+                                                        <br/>{{ class_count.first_year }}
+                                                        {% endif %}
+                                                    </td>
                                                     {% endwith %}
                                                 {% endfor %}
                                             {% else %}
