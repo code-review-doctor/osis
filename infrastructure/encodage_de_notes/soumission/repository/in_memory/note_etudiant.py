@@ -93,5 +93,5 @@ class NoteEtudiantInMemoryRepository(InMemoryGenericRepository, INoteEtudiantRep
                 annee=entity.date_limite_de_remise.annee,
                 note_soumise=entity.est_soumise,
                 note_brouillon=False,
-            ) for entity in entities_sorted
+            ) for entity in entities_sorted if entity.entity_id in notes_identites
         ]

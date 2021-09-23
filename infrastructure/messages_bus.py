@@ -322,6 +322,7 @@ class MessageBus:
             SignaletiqueEtudiantTranslator(),
             AttributionEnseignantTranslator(),
             UniteEnseignementTranslator(),
+            InscriptionExamenTranslator(),
         ),
         AssignerResponsableDeNotesCommand: lambda cmd: assigner_responsable_de_notes(
             cmd,
@@ -381,6 +382,7 @@ class MessageBus:
             SignaletiqueEtudiantTranslator(),
             UniteEnseignementTranslator(),
             CohortesDuGestionnaireTranslator(),
+            InscriptionExamenTranslator(),
         ),
         GetPeriodeEncodageCommand: lambda cmd: get_periode_encodage(
             cmd,
