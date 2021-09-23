@@ -73,31 +73,43 @@
                                     {% for education_group_year in root_formations %}
                                         {% url 'training_identification' education_group_year.academic_year.year education_group_year.partial_acronym as url_education_group_year %}
                                         <tr>
+                                        {% if education_group_year.count_learning_unit_enrollments_first_year == 0 %}
                                             <td>
                                                 <a href="{{ url_education_group_year }}">
                                                     {{ education_group_year.acronym }}
                                                 </a>
-                                                {% if education_group_year.education_group_type.name == 'BACHELOR'%}
+                                            </td>
+                                            <td>{{ education_group_year.count_formation_enrollments }}</td>
+                                            <td>{{ education_group_year.count_learning_unit_enrollments }}</td>
+                                            {% if education_group_year.classes_counter %}
+                                                {% for classe in classes %}
+                                                    {% with class_count=education_group_year.classes_counter|get_item_or_zero:classe.pk %}
+                                                    <td>{{ class_count|get_item_or_zero:'main' }}</td>
+                                                    {% endwith %}
+                                                {% endfor %}
+                                            {% else %}
+                                                {% for classe in classes %}
+                                                    <td>0</td>
+                                                {% endfor %}
+                                            {% endif %}
+                                        {% else %}
+                                            <td>
+                                                <a href="{{ url_education_group_year }}">
+                                                    {{ education_group_year.acronym }}
+                                                </a>
                                                 <br/>&nbsp;&nbsp;&nbsp;&nbsp;{{ education_group_year.acronym }}-1
-                                                {% endif %}
                                             </td>
                                             <td>{{ education_group_year.count_formation_enrollments }}
-                                                {% if education_group_year.education_group_type.name == 'BACHELOR'%}
                                                 <br/>{{ education_group_year.count_formation_enrollments_first_year }}
-                                                {% endif %}
                                             </td>
                                             <td>{{ education_group_year.count_learning_unit_enrollments }}
-                                                {% if education_group_year.education_group_type.name == 'BACHELOR'%}
                                                 <br/>{{ education_group_year.count_learning_unit_enrollments_first_year }}
-                                                {% endif %}
                                             </td>
                                             {% if education_group_year.classes_counter %}
                                                 {% for classe in classes %}
                                                     {% with class_count=education_group_year.classes_counter|get_item_or_zero:classe.pk %}
                                                     <td>{{ class_count|get_item_or_zero:'main' }}
-                                                        {% if education_group_year.education_group_type.name == 'BACHELOR'%}
                                                         <br/>{{ class_count|get_item_or_zero:'first_year' }}
-                                                        {% endif %}
                                                     </td>
                                                     {% endwith %}
                                                 {% endfor %}
@@ -106,7 +118,8 @@
                                                     <td>0</td>
                                                 {% endfor %}
                                             {% endif %}
-                                        </tr>
+                                        {% endif %}
+                                    </tr>
                                     {% endfor %}
                                     <tr>
                                         <td><strong>{% trans 'Total' %}</strong></td>
