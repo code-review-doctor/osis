@@ -840,7 +840,6 @@ def _count_education_group_enrollments_by_id(education_groups_years):
         else:
             count_education_group_enrollments[obj['id']] = {'main': obj['count_formation_enrollments']}
 
-    # return {obj['id']: obj['count_formation_enrollments'] for obj in educ_groups}
     return count_education_group_enrollments
 
 
