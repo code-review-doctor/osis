@@ -29,11 +29,11 @@ from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
-from base.models.enums.component_type import LECTURING
 from base.models.enums import quadrimesters, learning_unit_year_session
+from base.models.enums.component_type import LECTURING
+from base.models.enums.learning_component_year_type import PRACTICAL_EXERCISES
 from learning_unit.business.create_class_copy_report import create_class_copy_report
 from osis_common.models import osis_model_admin
-from base.models.enums.learning_component_year_type import PRACTICAL_EXERCISES
 
 
 def copy_to_next_year(modeladmin, request, queryset):
@@ -94,10 +94,14 @@ copy_to_next_year.short_description = _("Copy to next year")
 
 
 class LearningClassYearAdmin(VersionAdmin, osis_model_admin.OsisModelAdmin):
-    list_display = ('learning_component_year', 'year', 'acronym')
+    list_display = ('learning_component_year', 'acronym', 'get_academic_year')
+    list_filter = ('learning_component_year__learning_unit_year__academic_year',)
     search_fields = ['acronym', 'learning_component_year__learning_unit_year__acronym']
 
-    actions = [copy_to_next_year]
+    def get_academic_year(self, obj: 'LearningClassYear'):
+        return obj.learning_component_year.learning_unit_year.academic_year
+    get_academic_year.admin_order_field = 'academic_year'
+    get_academic_year.short_description = 'Academic Year'
 
 
 class LearningClassYearManager(models.Manager):
@@ -159,7 +163,3 @@ class LearningClassYear(models.Model):
         volume_total_of_classes += self.hourly_volume_partial_q1 or 0
         volume_total_of_classes += self.hourly_volume_partial_q2 or 0
         return volume_total_of_classes
-
-    @property
-    def year(self):
-        return self.learning_component_year.learning_unit_year.academic_year.year

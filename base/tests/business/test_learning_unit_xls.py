@@ -31,7 +31,7 @@ from django.template.defaultfilters import yesno
 from django.test import TestCase
 from django.utils.translation import gettext_lazy as _
 
-from assessments.tests.factories.score_responsible import ClassAttributionScoreResponsibleFactory
+from assessments.tests.factories.score_responsible import ScoreResponsibleOfClassFactory
 from attribution.business import attribution_charge_new
 from attribution.models.enums.function import COORDINATOR
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
@@ -769,9 +769,9 @@ class TestLearningUnitXlsClassesDetail(TestCase):
             OuterRef('academic_year__start_date')
         ).values('acronym')[:1]
 
-        cls.score_responsible = ClassAttributionScoreResponsibleFactory(
+        cls.score_responsible = ScoreResponsibleOfClassFactory(
             learning_unit_year=cls.luy,
-            attribution_class=cls.attribution_1_on_class_a
+            learning_class_year=cls.class_a
         )
 
     def test_get_data_part1_with_effective_class_for_lecturing(self):
