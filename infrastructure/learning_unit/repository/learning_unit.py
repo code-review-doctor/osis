@@ -47,6 +47,8 @@ from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builde
 from osis_common.ddd.interface import EntityIdentity, ApplicationService, Entity
 from reference.models.language import Language as LanguageDatabase
 
+UNTYPED_COMPONENT_ACRONYM = 'NT'
+
 
 class LearningUnitRepository(ILearningUnitRepository):
 
@@ -277,6 +279,7 @@ def _annotate_queryset(queryset: QuerySet) -> QuerySet:
         learning_unit_year_id=OuterRef('pk'),
         hourly_volume_total_annual__gt=0.0,
     )
+    non_practical_component_filter = (Q(type=LECTURING) | Q(type__isnull=True, acronym=UNTYPED_COMPONENT_ACRONYM))
     queryset = queryset.annotate(
         code=F('acronym'),
         year=F('academic_year__year'),
@@ -313,35 +316,35 @@ def _annotate_queryset(queryset: QuerySet) -> QuerySet:
 
         lecturing_volume_q1=Subquery(
             components.filter(
-                (Q(type=LECTURING) | Q(type__isnull=True, acronym='NT'))
+                non_practical_component_filter
             ).values('hourly_volume_partial_q1')
         ),
         lecturing_volume_q2=Subquery(
             components.filter(
-                (Q(type=LECTURING) | Q(type__isnull=True, acronym='NT'))
+                non_practical_component_filter
             ).values('hourly_volume_partial_q2')
         ),
         lecturing_volume_annual=Subquery(
             components.filter(
-                (Q(type=LECTURING) | Q(type__isnull=True, acronym='NT'))
+                non_practical_component_filter
             ).values('hourly_volume_total_annual')
         ),
         lecturing_planned_classes=Subquery(
-            components.filter((Q(type=LECTURING) | Q(type__isnull=True, acronym='NT'))).values('planned_classes')
+            components.filter(non_practical_component_filter).values('planned_classes')
         ),
         lecturing_volume_repartition_responsible_entity=Subquery(  # TODO :: to unit test
             components.filter(
-                (Q(type=LECTURING) | Q(type__isnull=True, acronym='NT'))
+                non_practical_component_filter
             ).values('repartition_volume_requirement_entity')
         ),
         lecturing_volume_repartition_entity_2=Subquery(  # TODO :: to unit test
             components.filter(
-                (Q(type=LECTURING) | Q(type__isnull=True, acronym='NT'))
+                non_practical_component_filter
             ).values('repartition_volume_additional_entity_1')
         ),
         lecturing_volume_repartition_entity_3=Subquery(  # TODO :: to unit test
             components.filter(
-                (Q(type=LECTURING) | Q(type__isnull=True, acronym='NT'))
+                non_practical_component_filter
             ).values('repartition_volume_additional_entity_2')
         ),
 

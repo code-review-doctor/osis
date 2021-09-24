@@ -117,7 +117,7 @@ def _get_learning_component_year_id_from_entity(entity: 'EffectiveClass') -> int
     component_type = learning_component_year_type.LECTURING if isinstance(entity, LecturingEffectiveClass) \
         else learning_component_year_type.PRACTICAL_EXERCISES
     qs = LearningComponentYearDb.objects\
-        .select_related('learning_unit_year', 'learning_unit_year__academic_year')\
+        .select_related('learning_unit_year__academic_year')\
         .filter(
             learning_unit_year__academic_year__year=learning_unit_identity.year,
             learning_unit_year__acronym=learning_unit_identity.code
