@@ -28,17 +28,19 @@
 {% block breadcrumb %}
 <li id="lnk_institution">{% trans 'Institution' %}</li>
 <li id="lnk_studies"><a href="{% url 'academic_actors' %}">{% trans 'Academic actors' %}</a></li>
-<li><a href="{% url 'scores_responsible_list' %}" id="lnk_scores_responsible">{% trans 'Scores responsibles' %}</a></li>
-<li class="active">{{ learning_unit_year.acronym }}</li>
+<li><a href="{% url 'scores_responsibles_search' %}" id="lnk_scores_responsible">{% trans 'Scores responsibles' %}</a></li>
+<li class="active">{{ code }}</li>
 {% endblock %}
+
 {% block content %}
 <div class="page-header">
-    <h2>{% trans 'Tutors of the course' %} <label>{{ learning_unit_year.acronym }}</label> ({{ academic_year }})</h2>
+    <h2>{% trans 'Tutors of the course' %} <label>{{ code }}</label> ({{ annee_academique }})</h2>
 </div>
 <div class="panel panel-default">
     <div class="panel-body">
-        <form method="post" action="{% url 'scores_responsible_add' pk=learning_unit_year.id %}">
+        <form method="post">
             {% csrf_token %}
+
             <table class="table table-hover">
                 <thead>
                     <tr>
@@ -50,30 +52,20 @@
                 <tbody>
                     {% for attribution in attributions %}
                         <tr>
-                            <td>{{ attribution.tutor }}</td>
+                            <td>{{ attribution.enseignant }}</td>
+                            <td>{{ attribution.statut }}</td>
                             <td>
-                                {% with st=attribution.function %}
-                                    {{ attribution.get_function_display }}
-                                {% endwith %}
-                            </td>
-                            <td>
-                                <input id="txt_attribution"  name="attribution" value="attribution_{{ attribution.id }}"
-                                       type="radio" {% if attribution.score_responsible == True %} checked {% endif %} >
+                                <input id="txt_attribution"  name="matricule_fgs" value="{{ attribution.matricule_fgs }}"
+                                       type="radio" {% if attribution.responsable_de_notes %} checked {% endif %} >
                             </td>
                         </tr>
                     {% endfor%}
                 </tbody>
             </table>
             <div class="panel-body">
-                <button type="submit" id="scores_responsible_add" class="btn btn-primary" name="action" value="add" role="button"
-                        title="{% trans 'Add' %}">{% trans 'Save' %}</button>
-                <button type="submit" id="scores_responsible_cancel" class="btn btn-default" role="button"
-                        title="{% trans 'Cancel' %}">{% trans 'Cancel' %}</button>
+                <button type="submit" class="btn btn-primary" role="button" title="{% trans 'Add' %}">{% trans 'Save' %}</button>
+                <a class="btn btn-default" href="{% url 'scores_responsibles_search' %}" title="{% trans 'Cancel' %}">{% trans 'Cancel' %}</a>
             </div>
-            <input type="hidden" id="hdn_course_code" name="course_code" value="{{ request.GET.course_code }}">
-            <input type="hidden" id="hdn_learning_unit_title" name="learning_unit_title" value="{{ request.GET.learning_unit_title }}">
-            <input type="hidden" id="hdn_tutor" name="tutor" value="{{ request.GET.tutor }}">
-            <input type="hidden" id="hdn_scores_responsible" name="scores_responsible" value="{{ request.GET.scores_responsible }}">
         </form>
     </div>
 </div>
