@@ -231,7 +231,6 @@ class EducationGroupXlsAdministrativeDataTestCase(TestCase):
 
     def get_xls_administrative_data(self):
         an_education_group_year = self.version.offer
-        print(an_education_group_year.weighting)
         return [
             an_education_group_year.management_entity_version.acronym,
             an_education_group_year.acronym,
