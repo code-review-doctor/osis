@@ -112,6 +112,7 @@ urlpatterns = [
         ]))
     ])),
 
+    # TODO: Remove all suburl pgm_manager because unused (old version)
     url(r'^pgm_manager/', include([
         url(r'^$', pgm_manager_administration.pgm_manager_administration, name='pgm_manager'),
         url(r'^search$', pgm_manager_administration.pgm_manager_search, name='pgm_manager_search'),

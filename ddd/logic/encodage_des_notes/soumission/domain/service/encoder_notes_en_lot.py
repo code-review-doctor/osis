@@ -23,15 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List, Dict
+from typing import List, Dict, Set
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_inscription_examen import IInscriptionExamenTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import PeriodeEncodageNotesDTO
+from ddd.logic.encodage_des_notes.soumission.builder.note_etudiant_builder import NoteEtudiantBuilder
 from ddd.logic.encodage_des_notes.soumission.builder.note_etudiant_identity_builder import NoteEtudiantIdentityBuilder
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderNotesEtudiantCommand
 from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import IdentiteNoteEtudiant, NoteEtudiant
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_historiser_notes import IHistoriserNotesService
 from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import \
-    EncoderNotesEtudiantEnLotLigneBusinessExceptions
+    EncoderNotesEtudiantEnLotLigneBusinessExceptions, EtudiantNonInscritAExamenException
+from ddd.logic.encodage_des_notes.soumission.dtos import DesinscriptionExamenDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_note_etudiant import INoteEtudiantRepository
 from osis_common.ddd import interface
 
@@ -43,7 +47,9 @@ class EncoderNotesEtudiantEnLot(interface.DomainService):
             cls,
             cmd: 'EncoderNotesEtudiantCommand',
             note_etudiant_repo: 'INoteEtudiantRepository',
-            historiser_note_service: 'IHistoriserNotesService'
+            periode_soumission: 'PeriodeEncodageNotesDTO',
+            historiser_note_service: 'IHistoriserNotesService',
+            inscription_examen_translator: 'IInscriptionExamenTranslator'
     ) -> List['IdentiteNoteEtudiant']:
         identite_builder = NoteEtudiantIdentityBuilder()
         identites_notes_a_encoder = [
@@ -53,10 +59,14 @@ class EncoderNotesEtudiantEnLot(interface.DomainService):
 
         notes_a_encoder = note_etudiant_repo.search(entity_ids=identites_notes_a_encoder)
         notes_par_identite = {n.entity_id: n for n in notes_a_encoder}  # type: Dict[IdentiteNoteEtudiant, NoteEtudiant]
+        desinscriptions = inscription_examen_translator.search_desinscrits_pour_plusieurs_unites_enseignement(
+            codes_unites_enseignement={n.code_unite_enseignement for n in notes_a_encoder},
+            numero_session=periode_soumission.session_concernee,
+            annee=periode_soumission.annee_concernee
+        )
 
         exceptions = []
         notes_a_persister = []
-
         for note_encodee_cmd in cmd.notes:
             identite = identite_builder.build_from_encoder_note_command(cmd, note_encodee_cmd)
 
@@ -64,8 +74,14 @@ class EncoderNotesEtudiantEnLot(interface.DomainService):
 
             if note_a_modifier:
                 try:
-                    note_a_modifier.encoder(note_encodee_cmd.email_etudiant, note_encodee_cmd.note)
-                    notes_a_persister.append(note_a_modifier)
+                    _verifier_etudiant_est_desinscrit(identite, desinscriptions)
+                    nouvelle_note = NoteEtudiantBuilder().build_from_ancienne_note(
+                        ancienne_note=note_a_modifier,
+                        email_encode=note_encodee_cmd.email_etudiant,
+                        nouvelle_note=note_encodee_cmd.note,
+                    )
+                    if note_a_modifier.note != nouvelle_note.note:
+                        notes_a_persister.append(nouvelle_note)
                 except MultipleBusinessExceptions as e:
                     exceptions += [
                         EncoderNotesEtudiantEnLotLigneBusinessExceptions(note_id=identite, exception=business_exception)
@@ -82,3 +98,14 @@ class EncoderNotesEtudiantEnLot(interface.DomainService):
             raise MultipleBusinessExceptions(exceptions=exceptions)
 
         return [n.entity_id for n in notes_a_persister]
+
+
+def _verifier_etudiant_est_desinscrit(
+    identite_note_etudiant: IdentiteNoteEtudiant,
+    desinscriptions: Set[DesinscriptionExamenDTO]
+) -> None:
+    if any(desinscription for desinscription in desinscriptions if
+           desinscription.noma == identite_note_etudiant.noma and
+           desinscription.code_unite_enseignement == identite_note_etudiant.code_unite_enseignement and
+           desinscription.annee == identite_note_etudiant.annee_academique):
+        raise MultipleBusinessExceptions(exceptions=[EtudiantNonInscritAExamenException()])
