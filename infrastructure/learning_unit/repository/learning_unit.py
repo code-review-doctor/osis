@@ -311,18 +311,38 @@ def _annotate_queryset(queryset: QuerySet) -> QuerySet:
             ).order_by('-start_date').values('acronym')[:1]
         ),
 
-        lecturing_volume_q1=Subquery(components.filter(type=LECTURING).values('hourly_volume_partial_q1')),
-        lecturing_volume_q2=Subquery(components.filter(type=LECTURING).values('hourly_volume_partial_q2')),
-        lecturing_volume_annual=Subquery(components.filter(type=LECTURING).values('hourly_volume_total_annual')),
-        lecturing_planned_classes=Subquery(components.filter(type=LECTURING).values('planned_classes')),
+        lecturing_volume_q1=Subquery(
+            components.filter(
+                (Q(type=LECTURING) | Q(type__isnull=True, acronym='NT'))
+            ).values('hourly_volume_partial_q1')
+        ),
+        lecturing_volume_q2=Subquery(
+            components.filter(
+                (Q(type=LECTURING) | Q(type__isnull=True, acronym='NT'))
+            ).values('hourly_volume_partial_q2')
+        ),
+        lecturing_volume_annual=Subquery(
+            components.filter(
+                (Q(type=LECTURING) | Q(type__isnull=True, acronym='NT'))
+            ).values('hourly_volume_total_annual')
+        ),
+        lecturing_planned_classes=Subquery(
+            components.filter((Q(type=LECTURING) | Q(type__isnull=True, acronym='NT'))).values('planned_classes')
+        ),
         lecturing_volume_repartition_responsible_entity=Subquery(  # TODO :: to unit test
-            components.filter(type=LECTURING).values('repartition_volume_requirement_entity')
+            components.filter(
+                (Q(type=LECTURING) | Q(type__isnull=True, acronym='NT'))
+            ).values('repartition_volume_requirement_entity')
         ),
         lecturing_volume_repartition_entity_2=Subquery(  # TODO :: to unit test
-            components.filter(type=LECTURING).values('repartition_volume_additional_entity_1')
+            components.filter(
+                (Q(type=LECTURING) | Q(type__isnull=True, acronym='NT'))
+            ).values('repartition_volume_additional_entity_1')
         ),
         lecturing_volume_repartition_entity_3=Subquery(  # TODO :: to unit test
-            components.filter(type=LECTURING).values('repartition_volume_additional_entity_2')
+            components.filter(
+                (Q(type=LECTURING) | Q(type__isnull=True, acronym='NT'))
+            ).values('repartition_volume_additional_entity_2')
         ),
 
         practical_volume_q1=Subquery(components.filter(type=PRACTICAL_EXERCISES).values('hourly_volume_partial_q1')),
