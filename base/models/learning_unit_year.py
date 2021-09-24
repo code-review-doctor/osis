@@ -735,7 +735,8 @@ def _check_classes_session(ue_session, all_components: List[LearningComponentYea
     for learning_component_year in all_components:
         for effective_class in learning_component_year.classes:
             session = effective_class.session
-            if ue_session and session and session not in SESSION_CHECK_RULES[ue_session]['correct_values']:
+            if ue_session and session and ue_session != learning_unit_year_session.SESSION_123 and \
+                    session not in SESSION_CHECK_RULES[ue_session]['correct_values']:
                 _warnings.append(message % {
                     'code_class': effective_class.effective_class_complete_acronym,
                     'should_be_values': SESSION_CHECK_RULES[ue_session]['available_values_str']
