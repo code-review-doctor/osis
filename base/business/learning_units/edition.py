@@ -253,8 +253,7 @@ def _raise_if_entity_version_does_not_exist(new_lcy, new_academic_year):
 def _duplicate_learning_component_year(new_learn_unit_year, old_learn_unit_year):
     old_components = old_learn_unit_year.learningcomponentyear_set.all()
     for old_component in old_components:
-        new_component = update_related_object(old_component, 'learning_unit_year', new_learn_unit_year)
-        _duplicate_learning_class_year(new_component)
+        update_related_object(old_component, 'learning_unit_year', new_learn_unit_year)
 
 
 def _duplicate_learning_class_year(new_component):

@@ -189,6 +189,12 @@ class LearningComponentYear(models.Model):
         for entity_container_type, attr in self.repartition_volume_attrs_by_entity_container_type().items():
             setattr(self, attr, repartition_volumes[entity_container_type])
 
+    def is_class(self):
+        if self.learningclassyear_set:
+            return True
+        else:
+            return False
+
 
 def find_by_learning_container_year(learning_container_year, with_classes=False):
     queryset = LearningComponentYear.objects.filter(
