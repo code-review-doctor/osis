@@ -278,7 +278,7 @@ class NotifierEncodageNotes(INotifierEncodageNotes):
                 for langue, ensemble_de_signaletiques in signaletiques_enseignants_groupes_par_langue.items():
                     email_destinataire = [signaletique.email for signaletique in ensemble_de_signaletiques]
                     encodage_complet_avant = (code_unite_enseignement, nom_cohorte) \
-                        in cohortes_non_entierement_encodees_avant_encodage
+                        not in cohortes_non_entierement_encodees_avant_encodage
                     result.append(
                         DonneesEmail(
                             code_unite_enseignement=code_unite_enseignement,
