@@ -27,6 +27,7 @@ from typing import List, Dict, Iterable, Any, Callable, Tuple, Optional
 
 import attr
 from django.utils import translation
+from django.utils.translation import gettext_lazy
 
 from base.models.person import Person
 from base.utils.send_mail import _get_txt_complementary_first_col_header
@@ -196,11 +197,22 @@ class NotifierEncodageNotes(INotifierEncodageNotes):
                 note.noma,
                 signaletiques_etudiant_par_noma[note.noma].nom,
                 signaletiques_etudiant_par_noma[note.noma].prenom,
-                str(note.note),
+                cls._format_score(str(note.note)),
             )
             for note in notes
         ]
         return sorted(result, key=lambda l: (l[0], l[3], l[4]))
+
+    @classmethod
+    def _format_score(cls, score: str) -> str:
+        if score == 'T':
+            return gettext_lazy("Cheating")
+        elif score == 'S':
+            return gettext_lazy('Absence unjustified')
+        elif score == 'M':
+            return gettext_lazy('Absence justified')
+        else:
+            return score
 
     @classmethod
     def _get_donnees_email(
