@@ -33,7 +33,7 @@ from django.utils.functional import cached_property
 from django.views.generic import TemplateView
 from django_filters.views import FilterView
 
-from assessments.api.serializers.scores_responsible import BisScoresResponsibleListSerializer
+from assessments.api.serializers.scores_responsible import ScoresResponsibleListSerializer
 from assessments.forms.scores_responsible import ScoresResponsiblesFilter
 from assessments.models.score_responsible import ScoreResponsible
 from attribution.models.attribution_new import AttributionNew
@@ -53,7 +53,7 @@ class AttributionDTO:
     responsable_de_notes = attr.ib(type=bool)
 
 
-class ScoresResponsibles(LoginRequiredMixin, PermissionRequiredMixin, CacheFilterMixin, FilterView):
+class ScoresResponsiblesSearch(LoginRequiredMixin, PermissionRequiredMixin, CacheFilterMixin, FilterView):
     model = LearningUnitYear
     paginate_by = 20
     template_name = "assessments/score_responsible/score_responsibles.html"
@@ -69,7 +69,7 @@ class ScoresResponsibles(LoginRequiredMixin, PermissionRequiredMixin, CacheFilte
 
     def render_to_response(self, context, **response_kwargs):
         if self.request.is_ajax():
-            serializer = BisScoresResponsibleListSerializer(context['object_list'], many=True)
+            serializer = ScoresResponsibleListSerializer(context['object_list'], many=True)
             return JsonResponse({'object_list': serializer.data})
         return super().render_to_response(context, **response_kwargs)
 

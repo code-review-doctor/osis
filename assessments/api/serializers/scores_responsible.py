@@ -27,30 +27,7 @@ from django.urls import reverse
 from rest_framework import serializers
 
 
-class AttributionSerializer(serializers.Serializer):
-    tutor = serializers.CharField()
-    score_responsible = serializers.BooleanField()
-
-
 class ScoresResponsibleListSerializer(serializers.Serializer):
-    pk = serializers.IntegerField()
-    acronym = serializers.CharField()
-    learning_unit_title = serializers.CharField(source='full_title')
-    requirement_entity = serializers.CharField()
-    attributions = serializers.SerializerMethodField()
-
-    # FIXME Have to filter attribution to not have same person twice for a luy
-    #  (due to a conception problem in the model)
-    def get_attributions(self, obj):
-        visited = set()
-        attributions_list = [
-            e for e in obj.attribution_set.all()
-            if e.tutor.person_id not in visited and not visited.add(e.tutor.person_id)
-        ]
-        return AttributionSerializer(attributions_list, many=True).data
-
-
-class BisScoresResponsibleListSerializer(serializers.Serializer):
     pk = serializers.IntegerField()
     acronym = serializers.CharField()
     learning_unit_title = serializers.CharField(source='full_title')
