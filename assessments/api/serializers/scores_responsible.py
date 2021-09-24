@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
+from django.urls import reverse
 from rest_framework import serializers
 
 
@@ -48,3 +48,33 @@ class ScoresResponsibleListSerializer(serializers.Serializer):
             if e.tutor.person_id not in visited and not visited.add(e.tutor.person_id)
         ]
         return AttributionSerializer(attributions_list, many=True).data
+
+
+class BisScoresResponsibleListSerializer(serializers.Serializer):
+    pk = serializers.IntegerField()
+    acronym = serializers.CharField()
+    learning_unit_title = serializers.CharField(source='full_title')
+    requirement_entity = serializers.CharField()
+    attributions = serializers.SerializerMethodField()
+    select_url = serializers.SerializerMethodField()
+
+    def get_attributions(self, obj):
+        try:
+            score_responsible = list(obj.scoreresponsible_set.all())[0].tutor
+        except IndexError:
+            score_responsible = None
+
+        tutors = {
+            attribution_charge.attribution.tutor
+            for component in obj.learningcomponentyear_set.all()
+            for attribution_charge in component.attributionchargenew_set.all()
+        }
+
+        result = [{"tutor": str(tutor), "score_responsible": tutor == score_responsible} for tutor in tutors]
+        return sorted(result, key=lambda item: (not item["score_responsible"], item["tutor"]))
+
+    def get_select_url(self, obj):
+        return reverse(
+            "score_responsible_select",
+            kwargs={'code': obj.acronym}
+        )

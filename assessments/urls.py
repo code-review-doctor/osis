@@ -40,6 +40,7 @@ from assessments.views.program_manager.pgm_manager_administration import \
     MainProgramManagerPersonUpdateView as MainProgramManagerPersonUpdateViewNew, \
     ProgramManagerPersonDeleteView as ProgramManagerPersonDeleteViewNew
 from assessments.views.program_manager.score_search import ScoreSearchFormView
+from assessments.views.program_manager.scores_responsible import ScoresResponsibles, SelectScoreResponsible
 from assessments.views.score_encoding import LearningUnitScoreEncodingView, LearningUnitScoreEncodingFormView, \
     ScoreSheetXLSExportView, ScoreSheetXLSImportView, ScoreEncodingProgressOverviewView, \
     ScoreSheetsPDFExportView
@@ -148,6 +149,12 @@ urlpatterns = [
         url(r'^scores_responsible_add/(?P<pk>[0-9]+)/$', scores_responsible.scores_responsible_add,
             name='scores_responsible_add'),
     ])),
+
+    path('scores_responsibles/', include([
+        path('', ScoresResponsibles.as_view(), name='scores_responsibles_search'),
+        path('select/<acronym:code>/', SelectScoreResponsible.as_view(), name='score_responsible_select'),
+    ])),
+
 
     url(r'^$', score_encoding.assessments, name="assessments"),
 ]
