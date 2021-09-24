@@ -26,6 +26,7 @@ from collections import defaultdict
 from typing import List, Dict, Iterable, Any, Callable, Tuple, Optional
 
 import attr
+from django.conf import settings
 from django.utils import translation
 from django.utils.translation import gettext_lazy
 
@@ -51,6 +52,7 @@ from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_not
 from osis_common.messaging import message_config, send_message
 
 MAIL_TEMPLATE_NAME = "assessments_all_scores_by_pgm_manager"
+DEFAULT_LANGUAGE = settings.LANGUAGE_CODE_FR
 
 
 @attr.s(frozen=True, slots=True)
@@ -273,7 +275,7 @@ class NotifierEncodageNotes(INotifierEncodageNotes):
             )
             signaletiques_enseignants_groupes_par_langue = groupby(
                 signaletiques_enseignants,
-                key=lambda signaletique: signaletique.langue
+                key=lambda signaletique: signaletique.langue or DEFAULT_LANGUAGE
             )
             notes_groupes_par_cohorte = groupby(
                 notes_pour_meme_unite_enseignement,
