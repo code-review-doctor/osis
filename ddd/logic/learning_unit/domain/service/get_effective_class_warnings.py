@@ -114,9 +114,9 @@ def _class_volume_exceeds_learning_unit_volume(
     learning_unit_part = learning_unit.lecturing_part \
         if type(effective_class) == LecturingEffectiveClass else learning_unit.practical_part
     return effective_class.is_volume_first_quadrimester_greater_than(
-        learning_unit_part.volumes.volume_first_quadrimester if learning_unit_part else 0
+        _get_volume(learning_unit_part, 'volume_first_quadrimester')
     ) or effective_class.is_volume_second_quadrimester_greater_than(
-        learning_unit_part.volumes.volume_second_quadrimester if learning_unit_part else 0
+        _get_volume(learning_unit_part, 'volume_second_quadrimester')
     )
 
 
@@ -128,7 +128,7 @@ def _class_volumes_sum_in_q1_and_q2_exceeds_annual_volume(
         if type(effective_class) == LecturingEffectiveClass else learning_unit.practical_part
     class_sum_q1_q2 = (effective_class.volumes.volume_first_quadrimester or 0) + \
                       (effective_class.volumes.volume_second_quadrimester or 0)
-    return class_sum_q1_q2 > (learning_unit_part.volumes.volume_annual if learning_unit_part else 0)
+    return class_sum_q1_q2 > (_get_volume(learning_unit_part, 'volume_annual'))
 
 
 def _check_quadrimester_volume(effective_class: 'EffectiveClass') -> List[str]:
@@ -196,3 +196,10 @@ def _get_q1_q2_warnings(effective_class: 'EffectiveClass') -> List[str]:
                 }
             )
     return warnings
+
+
+def _get_volume(learning_unit, volume_attr: str):
+    if learning_unit:
+        return getattr(learning_unit.volumes, volume_attr, 0)
+    return 0
+
