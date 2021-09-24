@@ -96,8 +96,7 @@ def get_class_type(learning_unit: 'LearningUnit') -> Dict[str, str]:
 def get_volumes(learning_unit: 'LearningUnit') -> 'Volumes':
     if learning_unit.has_practical_volume() and not learning_unit.has_lecturing_volume():
         return learning_unit.practical_part.volumes
-    else:
-        return learning_unit.lecturing_part.volumes
+    return learning_unit.lecturing_part.volumes if learning_unit.lecturing_part else None
 
 
 def get_related_history(
