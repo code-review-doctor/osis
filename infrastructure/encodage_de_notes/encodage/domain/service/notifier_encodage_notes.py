@@ -110,7 +110,11 @@ class NotifierEncodageNotes(INotifierEncodageNotes):
             'offer_acronym': donnes_email.nom_cohorte
         }
         receivers = [
-            message_config.create_receiver(None, email, donnes_email.langue_email)
+            message_config.create_receiver(
+                cls._get_receiver_id(email),
+                email,
+                donnes_email.langue_email
+            )
             for email in donnes_email.emails_destinataires
         ]
         cc = [Person(email=donnes_email.email_gestionnaire)]
@@ -153,6 +157,13 @@ class NotifierEncodageNotes(INotifierEncodageNotes):
 
         )
         send_message.send_messages(message_content)
+
+    @classmethod
+    def _get_receiver_id(cls, email: str) -> Optional[int]:
+        person_obj = Person.objects.filter(email=email).only('id').first()
+        if person_obj:
+            return person_obj.id
+        return None
 
     @classmethod
     def _get_table_headers(cls, lang_code: str):
