@@ -92,7 +92,9 @@ INSTALLED_APPS = (
     'reversion',
     'django.contrib.gis',
     'ddd',
-    'osis_document'
+    'infrastructure',
+    'osis_document',
+    'osis_history'
 )
 
 
@@ -173,6 +175,10 @@ TEMPLATES = [
             ],
         },
     },
+]
+
+FORMAT_MODULE_PATH = [
+    'backoffice.formats',
 ]
 
 DATABASES = {

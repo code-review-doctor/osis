@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.conf import settings
 from django.contrib import admin
 
 from assessments.models import *
@@ -32,3 +33,6 @@ admin.site.register(score_sheet_address.ScoreSheetAddress,
 
 admin.site.register(score_responsible.ScoreResponsible,
                     score_responsible.ScoreResponsibleAdmin)
+
+if 'osis_history' in settings.INSTALLED_APPS:
+    admin.site.register(score_history.ScoreHistory, score_history.ScoreHistoryAdmin)

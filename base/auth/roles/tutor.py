@@ -32,7 +32,6 @@ from django.utils.translation import gettext_lazy as _
 
 from attribution.models import attribution
 from base.models import person
-from learning_unit.auth import predicates as learning_unit_predicates
 from attribution.auth import predicates as attribution_predicates
 from osis_common.models import serializable_model
 from osis_role.contrib.admin import RoleModelAdmin
@@ -60,6 +59,7 @@ class Tutor(RoleModel, serializable_model.SerializableModel):
 
     @classmethod
     def rule_set(cls):
+        from learning_unit.auth import predicates as learning_unit_predicates
         return rules.RuleSet({
             'assessments.can_access_scoreencoding': rules.always_allow,
             'base.can_access_academicyear': rules.always_allow,

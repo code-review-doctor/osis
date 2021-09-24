@@ -104,7 +104,7 @@ class ProgramManagerListView(ListView):
 
 class ProgramManagerMixin(PermissionRequiredMixin, AjaxTemplateMixin):
     model = ProgramManager
-    success_url = reverse_lazy('manager_list')
+    success_url = reverse_lazy('program_manager_list')
     partial_reload = '#pnl_managers'
     permission_required = 'base.change_programmanager'
 
@@ -113,7 +113,7 @@ class ProgramManagerMixin(PermissionRequiredMixin, AjaxTemplateMixin):
         return self.request.GET['education_groups'].split(',')
 
     def get_success_url(self):
-        url = reverse_lazy('manager_list') + "?"
+        url = reverse_lazy('program_manager_list') + "?"
         for education_group_id in self.education_group_ids:
             url += "education_groups={}&".format(education_group_id)
         return url

@@ -84,7 +84,7 @@ PROPOSAL_LINE_STYLES = {
 WRAP_TEXT_ALIGNMENT = Alignment(wrapText=True, vertical="top")
 WITH_ATTRIBUTIONS = 'with_attributions'
 WITH_GRP = 'with_grp'
-NB_COLUMNS_WHICH_COULD_BE_WHITENED = 29
+NB_COLUMNS_WHICH_COULD_BE_WHITENED = 31
 
 
 def learning_unit_titles_part1() -> List[str]:
@@ -361,6 +361,9 @@ def get_data_part2(learning_unit_yr: LearningUnitYear, effective_class: Learning
     lu_data_part2.append(yesno(learning_unit_yr.exchange_students).strip())
     lu_data_part2.append(yesno(learning_unit_yr.individual_loan).strip())
     lu_data_part2.append(yesno(learning_unit_yr.stage_dimona).strip())
+    lu_data_part2.append(learning_unit_yr.other_remark or "", )
+    lu_data_part2.append(learning_unit_yr.other_remark_english or "", )
+    #  If you add columns you have to update NB_COLUMNS_WHICH_COULD_BE_WHITENED
     return lu_data_part2
 
 
@@ -426,6 +429,8 @@ def learning_unit_titles_part2() -> List[str]:
         str(_('Exchange students')),
         str(_('Individual loan')),
         str(_('Stage-Dimona')),
+        str(_('Other remark (intended for publication)')),
+        str(_('Other remark in english (intended for publication)')),
     ]
 
 
@@ -754,7 +759,4 @@ def _get_attribution_volume(volume, is_attribution_class):
 
 
 def _get_class_score_responsibles(effective_class: LearningClassYear) -> List[Person]:
-    score_responsibles = set()
-    for a in effective_class.attributionclass_set.all():
-        score_responsibles.update([a.attribution_charge.attribution.tutor.person for _ in a.scoreresponsible_set.all()])
-    return list(score_responsibles)
+    return [responsible.tutor.person for responsible in effective_class.scoreresponsible_set.all()]

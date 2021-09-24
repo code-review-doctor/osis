@@ -24,21 +24,18 @@
 #
 ##############################################################################
 from django.db import models
-from django.utils.translation import gettext_lazy as _
 
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
 class ScoreResponsibleAdmin(OsisModelAdmin):
-    list_display = ('learning_unit_year', 'attribution_class', 'attribution_charge')
+    list_display = ('learning_unit_year', 'learning_class_year', 'tutor')
     search_fields = [
         'learning_unit_year__acronym',
-        'attribution_charge__attribution__tutor__person__last_name',
-        'attribution_charge__attribution__tutor__person__global_id',
-        'attribution_charge__attribution__function'
+        'learning_class_year__acronym',
     ]
     list_filter = (
-        'attribution_charge__attribution__learning_container_year__academic_year',
+        'learning_unit_year__academic_year',
     )
 
 
@@ -46,32 +43,24 @@ class ScoreResponsible(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
 
+    tutor = models.ForeignKey('base.Tutor', on_delete=models.PROTECT)
     learning_unit_year = models.ForeignKey('base.LearningUnitYear', on_delete=models.CASCADE)
-    attribution_charge = models.ForeignKey(
-        'attribution.AttributionChargeNew',
+    learning_class_year = models.ForeignKey(
+        'learning_unit.LearningClassYear',
         on_delete=models.CASCADE,
-        null=True,
-        blank=True
-    )
-    attribution_class = models.ForeignKey(
-        'attribution.AttributionClass',
-        on_delete=models.CASCADE,
-        null=True, blank=True
+        blank=True,
+        null=True
     )
 
     objects = models.Manager()
 
     def __str__(self):
-        return "{} - {}".format(
-            self.learning_unit_year,
-            self.attribution_charge
-        )
+        return "{}{} - {}".format(self.learning_unit_year, self.learning_class_year or "", self.tutor)
 
-    def save(self, *args, **kwargs):
-        self.__should_have_minimum_one_attribution()
-        super().save(*args, **kwargs)
-
-    def __should_have_minimum_one_attribution(self):
-        if (self.attribution_charge is None and self.attribution_class is None) or \
-                (self.attribution_charge and self.attribution_class):
-            raise AttributeError(_('Score responsible should be link to one attribution'))
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['learning_unit_year', 'learning_class_year'],
+                name='unique_score_responsible'
+            )
+        ]

@@ -68,3 +68,13 @@ class IEffectiveClassRepository(interface.AbstractRepository):
     @abc.abstractmethod
     def get(cls, entity_id: 'EffectiveClassIdentity') -> 'EffectiveClass':
         raise NotImplementedError
+
+    @classmethod
+    @abc.abstractmethod
+    def search_dtos(cls, codes: Set[str], annee: int) -> List['EffectiveClassFromRepositoryDTO']:
+        pass
+
+    @classmethod
+    @abc.abstractmethod
+    def get_dto(cls, code: str, annee: int) -> 'EffectiveClassFromRepositoryDTO':
+        pass

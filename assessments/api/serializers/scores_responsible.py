@@ -23,13 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
+from django.urls import reverse
 from rest_framework import serializers
-
-
-class AttributionSerializer(serializers.Serializer):
-    tutor = serializers.CharField()
-    score_responsible = serializers.BooleanField()
 
 
 class ScoresResponsibleListSerializer(serializers.Serializer):
@@ -38,13 +33,25 @@ class ScoresResponsibleListSerializer(serializers.Serializer):
     learning_unit_title = serializers.CharField(source='full_title')
     requirement_entity = serializers.CharField()
     attributions = serializers.SerializerMethodField()
+    select_url = serializers.SerializerMethodField()
 
-    # FIXME Have to filter attribution to not have same person twice for a luy
-    #  (due to a conception problem in the model)
     def get_attributions(self, obj):
-        visited = set()
-        attributions_list = [
-            e for e in obj.attribution_set.all()
-            if e.tutor.person_id not in visited and not visited.add(e.tutor.person_id)
-        ]
-        return AttributionSerializer(attributions_list, many=True).data
+        try:
+            score_responsible = list(obj.scoreresponsible_set.all())[0].tutor
+        except IndexError:
+            score_responsible = None
+
+        tutors = {
+            attribution_charge.attribution.tutor
+            for component in obj.learningcomponentyear_set.all()
+            for attribution_charge in component.attributionchargenew_set.all()
+        }
+
+        result = [{"tutor": str(tutor), "score_responsible": tutor == score_responsible} for tutor in tutors]
+        return sorted(result, key=lambda item: (not item["score_responsible"], item["tutor"]))
+
+    def get_select_url(self, obj):
+        return reverse(
+            "score_responsible_select",
+            kwargs={'code': obj.acronym}
+        )
