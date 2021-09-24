@@ -27,6 +27,7 @@ from typing import List
 
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_inscription_examen import IInscriptionExamenTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodage_notes import \
     IPeriodeEncodageNotesTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.periode_encodage_ouverte import \
@@ -45,10 +46,13 @@ def encoder_notes_etudiant(
         note_etudiant_repo: 'INoteEtudiantRepository',
         periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
         attribution_translator: 'IAttributionEnseignantTranslator',
-        historiser_note_service: 'IHistoriserNotesService'
+        historiser_note_service: 'IHistoriserNotesService',
+        inscription_examen_translator: 'IInscriptionExamenTranslator'
 ) -> List['IdentiteNoteEtudiant']:
     # Given
     PeriodeEncodageOuverte().verifier(periode_soumission_note_translator)
+    periode_soumission = periode_soumission_note_translator.get()
+
     EnseignantAttribueUniteEnseignement().verifier(
         cmd.code_unite_enseignement,
         cmd.annee_unite_enseignement,
@@ -60,7 +64,9 @@ def encoder_notes_etudiant(
     identites_notes_encodees = EncoderNotesEtudiantEnLot().execute(
         cmd,
         note_etudiant_repo,
-        historiser_note_service
+        periode_soumission,
+        historiser_note_service,
+        inscription_examen_translator
     )
 
     return identites_notes_encodees

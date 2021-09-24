@@ -69,6 +69,7 @@ class ScoreEncodingProgressOverviewTutorViewTest(TestCase):
                                 mois=12,
                                 annee=2020,
                                 quantite_notes_soumises=5,
+                                quantite_notes_brouillon=5,
                                 quantite_total_notes=10,
                             )
                         ],
