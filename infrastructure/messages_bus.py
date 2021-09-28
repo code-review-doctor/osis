@@ -160,6 +160,8 @@ from infrastructure.encodage_de_notes.soumission.repository.note_etudiant import
 from infrastructure.encodage_de_notes.soumission.repository.responsable_de_notes import ResponsableDeNotesRepository
 from infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class import \
     StudentEnrollmentsTranslator
+from infrastructure.encodage_de_notes.shared_kernel.repository.report import ReportRepository as \
+    EncodageDeNotesReportRepository
 from infrastructure.learning_unit.domain.service.tutor_distributed_to_class import TutorAssignedToClassTranslator
 from infrastructure.learning_unit.repository.effective_class import EffectiveClassRepository
 from infrastructure.learning_unit.repository.entity import UclEntityRepository
@@ -361,6 +363,7 @@ class MessageBus:
             AdresseFeuilleDeNotesRepository(),
             HistoriserEncodageNotesService(),
             InscriptionExamenTranslator(),
+            EncodageDeNotesReportRepository()
         ),
         GetCohortesGestionnaireCommand: lambda cmd: get_cohortes_gestionnaire(
             cmd,

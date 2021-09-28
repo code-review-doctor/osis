@@ -33,11 +33,15 @@ from ddd.logic.encodage_des_notes.encodage.commands import EncoderNoteCommand
 from ddd.logic.encodage_des_notes.encodage.domain.model.gestionnaire_parcours import GestionnaireParcours
 from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import IdentiteNoteEtudiant
 from ddd.logic.encodage_des_notes.encodage.domain.service.i_historiser_notes import IHistoriserEncodageNotesService
-from ddd.logic.encodage_des_notes.encodage.domain.validator.exceptions import EncoderNotesEnLotLigneBusinessExceptions, \
-    EtudiantNonInscritAExamenException
+from ddd.logic.encodage_des_notes.encodage.domain.validator.exceptions import \
+    EncoderNotesEnLotLigneBusinessExceptions, EtudiantNonInscritAExamenException
 from ddd.logic.encodage_des_notes.encodage.repository.note_etudiant import INoteEtudiantRepository
+from ddd.logic.encodage_des_notes.shared_kernel.domain.model.report import Report
+from ddd.logic.encodage_des_notes.shared_kernel.domain.model.report_events import NotesEnregistreesEvenement, \
+    NoteNonEnregistreeEvenement, AucuneNotesEnregistreesEvenement
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_inscription_examen import IInscriptionExamenTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import PeriodeEncodageNotesDTO
+from ddd.logic.encodage_des_notes.shared_kernel.repository.i_report import IReportRepository
 from ddd.logic.encodage_des_notes.soumission.dtos import DesinscriptionExamenDTO
 from osis_common.ddd import interface
 
@@ -55,7 +59,9 @@ class EncoderNotesEnLot(interface.DomainService):
             note_etudiant_repo: 'INoteEtudiantRepository',
             periode_ouverte: 'PeriodeEncodageNotesDTO',
             historiser_note_service: 'IHistoriserEncodageNotesService',
-            inscription_examen_translator: 'IInscriptionExamenTranslator'
+            inscription_examen_translator: 'IInscriptionExamenTranslator',
+            report: Report,
+            report_repository: 'IReportRepository'
     ) -> List['IdentiteNoteEtudiant']:
         note_encodee_cmd_par_identite = _associer_nouvelle_note_a_son_identite(notes_encodees, periode_ouverte)
         anciennes_notes_a_modifier = note_etudiant_repo.search(entity_ids=list(note_encodee_cmd_par_identite.keys()))
@@ -97,10 +103,18 @@ class EncoderNotesEnLot(interface.DomainService):
                 gestionnaire_parcours.entity_id.matricule_fgs_gestionnaire,
                 notes_a_persister,
             )
+            report.add_success(NotesEnregistreesEvenement(nombre_notes_enregistree=len(notes_a_persister)))
+        else:
+            report.add_error(AucuneNotesEnregistreesEvenement())
 
         if exceptions:
+            report.add_errors(
+                [NoteNonEnregistreeEvenement(cause=str(exception.message)) for exception in exceptions]
+            )
+            report_repository.save(report)
             raise MultipleBusinessExceptions(exceptions=exceptions)
 
+        report_repository.save(report)
         return [n.entity_id for n in notes_a_persister]
 
 
