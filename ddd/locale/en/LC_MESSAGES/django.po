@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-14 16:20+0200\n"
+"POT-Creation-Date: 2021-09-28 07:45+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -97,6 +97,9 @@ msgid "Score already submitted"
 msgstr ""
 
 msgid "Selected entity {} is not an authorized responsible entity"
+msgstr ""
+
+msgid "Student not registered for exam"
 msgstr ""
 
 msgid "Subdivision should be one character A-Z or 0-9"
