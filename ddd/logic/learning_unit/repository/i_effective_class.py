@@ -42,7 +42,7 @@ class IEffectiveClassRepository(interface.AbstractRepository):
 
     @classmethod
     @abc.abstractmethod
-    def search_dtos(
+    def search_dtos_by_learning_unit_id(
             cls,
             learning_unit_id: Optional[LearningUnitIdentity] = None,
             **kwargs

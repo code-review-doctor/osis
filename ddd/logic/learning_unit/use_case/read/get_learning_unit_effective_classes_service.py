@@ -39,4 +39,4 @@ def get_learning_unit_effective_classes(
         code=cmd.code_unite_enseignement,
         year=cmd.annee_unite_enseignement
     )
-    return effective_class_repository.search_dtos(learning_unit_id=learning_unit_identity)
+    return effective_class_repository.search_dtos_by_learning_unit_id(learning_unit_id=learning_unit_identity)
