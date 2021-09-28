@@ -94,7 +94,7 @@ class EffectiveClassRepository(InMemoryGenericRepository, IEffectiveClassReposit
             return dtos[0]
 
     @classmethod
-    def search_dtos(
+    def search_dtos_by_learning_unit(
             cls,
             learning_unit_id: Optional['LearningUnitIdentity'] = None,
             **kwargs

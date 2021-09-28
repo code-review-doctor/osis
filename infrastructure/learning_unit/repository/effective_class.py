@@ -72,7 +72,7 @@ class EffectiveClassRepository(IEffectiveClassRepository):
         return [builder.build_from_repository_dto(dto) for dto in dtos]
 
     @classmethod
-    def search_dtos_by_learning_unit_id(
+    def search_dtos_by_learning_unit(
             cls,
             learning_unit_id: LearningUnitIdentity = None,
             **kwargs
