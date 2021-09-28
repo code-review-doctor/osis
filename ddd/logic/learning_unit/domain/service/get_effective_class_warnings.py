@@ -202,4 +202,3 @@ def _get_volume(learning_unit, volume_attr: str):
     if learning_unit:
         return getattr(learning_unit.volumes, volume_attr, 0)
     return 0
-
