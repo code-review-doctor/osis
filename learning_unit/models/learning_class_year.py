@@ -56,7 +56,10 @@ def copy_to_next_year(modeladmin, request, queryset):
         # Have to check if the ue's acronym is the same in the destination year
         lc = obj.learning_component_year.learning_unit_year.learning_container_year.learning_container
         destination_year = obj.learning_component_year.learning_unit_year.academic_year.year + 1
-        destination_luy = LearningUnitYear.objects.get(academic_year__year=destination_year, learning_container_year__learning_container=lc)
+        destination_luy = LearningUnitYear.objects.get(
+            academic_year__year=destination_year,
+            learning_container_year__learning_container=lc
+        )
         cmd = CreateEffectiveClassCommand(
             class_code=obj.acronym,
             learning_unit_code=destination_luy.acronym,
