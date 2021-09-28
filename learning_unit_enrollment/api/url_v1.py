@@ -29,7 +29,6 @@ from learning_unit_enrollment.api.views.enrollment import LearningUnitEnrollment
     MyLearningUnitEnrollmentsListView
 
 app_name = "learning_unit_enrollment"
-
 urlpatterns = [
     path('enrollments/<str:acronym>/<int:year>/', LearningUnitEnrollmentsListView.as_view(),
          name=LearningUnitEnrollmentsListView.name),

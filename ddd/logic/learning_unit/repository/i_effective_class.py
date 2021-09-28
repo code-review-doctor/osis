@@ -42,6 +42,15 @@ class IEffectiveClassRepository(interface.AbstractRepository):
 
     @classmethod
     @abc.abstractmethod
+    def search_dtos_by_learning_unit_id(
+            cls,
+            learning_unit_id: Optional[LearningUnitIdentity] = None,
+            **kwargs
+    ) -> List[EffectiveClassDTO]:
+        pass
+
+    @classmethod
+    @abc.abstractmethod
     def delete(cls, entity_id: EffectiveClassIdentity, **kwargs: ApplicationService) -> None:
         pass
 

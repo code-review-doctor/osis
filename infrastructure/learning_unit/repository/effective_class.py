@@ -72,6 +72,34 @@ class EffectiveClassRepository(IEffectiveClassRepository):
         return [builder.build_from_repository_dto(dto) for dto in dtos]
 
     @classmethod
+    def search_dtos_by_learning_unit_id(
+            cls,
+            learning_unit_id: LearningUnitIdentity = None,
+            **kwargs
+    ) -> List[EffectiveClassDTO]:
+        qs = _get_common_queryset()
+        if learning_unit_id:
+            qs = qs.filter(
+                learning_component_year__learning_unit_year__acronym=learning_unit_id.code,
+                learning_component_year__learning_unit_year__academic_year__year=learning_unit_id.year,
+            )
+        qs = _annotate_queryset(qs)
+        qs = _values_queryset(qs)
+        return [
+            EffectiveClassDTO(
+                code=effective_class['class_code'],
+                title_fr=effective_class['title_fr'],
+                title_en=effective_class['title_en'],
+                teaching_place_uuid=effective_class['teaching_place_uuid'],
+                derogation_quadrimester=effective_class['derogation_quadrimester'],
+                session_derogation=effective_class['session_derogation'],
+                volume_q1=effective_class['volume_q1'],
+                volume_q2=effective_class['volume_q2'],
+                type=effective_class['class_type'],
+            ) for effective_class in qs
+        ]
+
+    @classmethod
     def delete(cls, entity_id: 'EffectiveClassIdentity', **kwargs: ApplicationService) -> None:
         obj = LearningClassYearDb.objects.get(
             acronym=entity_id.class_code,
