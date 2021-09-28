@@ -14,6 +14,16 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AddField(
+            model_name='learningunitenrollment',
+            name='learning_class_year',
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='learning_unit.LearningClassYear'),
+        ),
+        migrations.AddField(
+            model_name='offerenrollment',
+            name='cohort_year',
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to='education_group.CohortYear'),
+        ),
+        migrations.AddField(
             model_name='programmanager',
             name='cohort',
             field=models.CharField(choices=[('FIRST_YEAR', 'First year bachelor')], max_length=25, null=True, verbose_name='Name'),
