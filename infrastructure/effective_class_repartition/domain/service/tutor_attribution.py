@@ -25,7 +25,8 @@
 ##############################################################################
 from typing import List
 
-from django.db.models import F, QuerySet, OuterRef, Subquery
+from django.db import models
+from django.db.models import F, QuerySet, OuterRef, Subquery, Case, When
 
 from attribution.models.attribution_charge_new import AttributionChargeNew as AttributionChargeNewDb
 from attribution.models.attribution_new import AttributionNew as AttributionNewDb
@@ -97,7 +98,15 @@ def _annotate_qs(qs: QuerySet) -> QuerySet:
         learning_component_year__type=PRACTICAL_EXERCISES
     )
     return qs.annotate(
-        learning_unit_code=F('learning_container_year__acronym'),
+        learning_unit_code=Case(
+            When(attributionchargenew__isnull=True, then=F('learning_container_year__acronym')),
+            default=Subquery(
+                AttributionChargeNewDb.objects.filter(
+                    attribution_id=OuterRef('pk')
+                ).values('learning_component_year__learning_unit_year__acronym')[:1]
+            ),
+            output_field=models.CharField()
+        ),
         learning_unit_year=F('learning_container_year__academic_year__year'),
         attribution_uuid=F('uuid'),
         first_name=F('tutor__person__first_name'),
