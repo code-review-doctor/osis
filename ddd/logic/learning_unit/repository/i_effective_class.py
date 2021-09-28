@@ -24,7 +24,7 @@
 #
 ##############################################################################
 import abc
-from typing import List, Optional
+from typing import List, Optional, Set
 
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity, EffectiveClass
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
