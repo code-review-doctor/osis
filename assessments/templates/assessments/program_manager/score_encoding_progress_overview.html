@@ -156,7 +156,11 @@
                                                             </a>
                                                         </td>
                                                         <td headers="tab_online_responsible">
-                                                            {{ progression_encodage.responsable_note.nom|upper }} {{ progression_encodage.responsable_note.prenom }}
+                                                            {% if progression_encodage.responsable_note.nom or  progression_encodage.responsable_note.prenom %}
+                                                                {{ progression_encodage.responsable_note.nom|upper }} {{ progression_encodage.responsable_note.prenom }}
+                                                            {% else %}
+                                                                -
+                                                            {% endif %}
                                                         </td>
                                                         <td headers="tab_online_tutor_deadline">
                                                             {% for echeance in progression_encodage.dates_echeance %}

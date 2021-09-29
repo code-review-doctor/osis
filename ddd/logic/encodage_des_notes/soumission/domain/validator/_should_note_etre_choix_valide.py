@@ -36,6 +36,8 @@ class ShouldNoteEtreChoixValide(BusinessValidator):
     note = attr.ib(type=str)
 
     def validate(self, *args, **kwargs):
+        if not self.note:
+            return
         try:
             note_digit = float(self.note)
             if not NOTE_MIN <= note_digit <= NOTE_MAX:

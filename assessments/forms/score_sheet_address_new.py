@@ -82,6 +82,7 @@ class ScoreSheetAddressForm(forms.Form):
 
         entity = cleaned_data.get('entity')
         if not entity:
+            self.check_field_required(cleaned_data, "recipient")
             self.check_field_required(cleaned_data, "location")
             self.check_field_required(cleaned_data, "postal_code")
             self.check_field_required(cleaned_data, "city")

@@ -26,7 +26,9 @@ from collections import defaultdict
 from typing import List, Dict, Iterable, Any, Callable, Tuple, Optional
 
 import attr
+from django.conf import settings
 from django.utils import translation
+from django.utils.translation import gettext_lazy
 
 from base.models.person import Person
 from base.utils.send_mail import _get_txt_complementary_first_col_header
@@ -50,6 +52,7 @@ from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_not
 from osis_common.messaging import message_config, send_message
 
 MAIL_TEMPLATE_NAME = "assessments_all_scores_by_pgm_manager"
+DEFAULT_LANGUAGE = settings.LANGUAGE_CODE_FR
 
 
 @attr.s(frozen=True, slots=True)
@@ -109,7 +112,11 @@ class NotifierEncodageNotes(INotifierEncodageNotes):
             'offer_acronym': donnes_email.nom_cohorte
         }
         receivers = [
-            message_config.create_receiver(None, email, donnes_email.langue_email)
+            message_config.create_receiver(
+                cls._get_receiver_id(email),
+                email,
+                donnes_email.langue_email
+            )
             for email in donnes_email.emails_destinataires
         ]
         cc = [Person(email=donnes_email.email_gestionnaire)]
@@ -154,6 +161,13 @@ class NotifierEncodageNotes(INotifierEncodageNotes):
         send_message.send_messages(message_content)
 
     @classmethod
+    def _get_receiver_id(cls, email: str) -> Optional[int]:
+        person_obj = Person.objects.filter(email=email).only('id').first()
+        if person_obj:
+            return person_obj.id
+        return None
+
+    @classmethod
     def _get_table_headers(cls, lang_code: str):
         with translation.override(lang_code):
             return [
@@ -189,18 +203,29 @@ class NotifierEncodageNotes(INotifierEncodageNotes):
             notes: List[NoteEtudiant],
             signaletiques_etudiant_par_noma: Dict[str, SignaletiqueEtudiantDTO]
     ) -> List[Tuple]:
-        result = []
-        for note in notes:
-            ligne = (
+        result = [
+            (
                 note.nom_cohorte,
                 note.numero_session,
                 note.noma,
                 signaletiques_etudiant_par_noma[note.noma].nom,
                 signaletiques_etudiant_par_noma[note.noma].prenom,
-                str(note.note),
+                cls._format_score(str(note.note)),
             )
-            result.append(ligne)
-        return result
+            for note in notes
+        ]
+        return sorted(result, key=lambda l: (l[0], l[3], l[4]))
+
+    @classmethod
+    def _format_score(cls, score: str) -> str:
+        if score == 'T':
+            return gettext_lazy("Cheating")
+        elif score == 'S':
+            return gettext_lazy('Absence unjustified')
+        elif score == 'M':
+            return gettext_lazy('Absence justified')
+        else:
+            return score
 
     @classmethod
     def _get_donnees_email(
@@ -250,7 +275,7 @@ class NotifierEncodageNotes(INotifierEncodageNotes):
             )
             signaletiques_enseignants_groupes_par_langue = groupby(
                 signaletiques_enseignants,
-                key=lambda signaletique: signaletique.langue
+                key=lambda signaletique: signaletique.langue or DEFAULT_LANGUAGE
             )
             notes_groupes_par_cohorte = groupby(
                 notes_pour_meme_unite_enseignement,
@@ -266,7 +291,7 @@ class NotifierEncodageNotes(INotifierEncodageNotes):
                 for langue, ensemble_de_signaletiques in signaletiques_enseignants_groupes_par_langue.items():
                     email_destinataire = [signaletique.email for signaletique in ensemble_de_signaletiques]
                     encodage_complet_avant = (code_unite_enseignement, nom_cohorte) \
-                        in cohortes_non_entierement_encodees_avant_encodage
+                        not in cohortes_non_entierement_encodees_avant_encodage
                     result.append(
                         DonneesEmail(
                             code_unite_enseignement=code_unite_enseignement,

@@ -154,7 +154,7 @@ class TestNotifierEncodageNotes(TestCase):
         )
         self.assertEqual(
             result[0].encodage_complet_avant_encodage,
-            False
+            True
         )
         self.assertEqual(
             result[0].identites_notes_encodees,

@@ -55,6 +55,13 @@ class ProgressionGeneral(interface.DomainService):
         inscription_examen_translator: 'IInscriptionExamenTranslator',
     ) -> 'ProgressionGeneraleEncodageNotesDTO':
 
+        if not note_identites:
+            return ProgressionGeneraleEncodageNotesDTO(
+                annee_academique=periode_encodage.annee_concernee,
+                numero_session=periode_encodage.session_concernee,
+                progression_generale=[]
+            )
+
         nomas_concernes = [note.noma for note in note_identites]
         nomas_avec_peps = _get_nomas_avec_peps(nomas_concernes, signaletique_etudiant_translator)
 
