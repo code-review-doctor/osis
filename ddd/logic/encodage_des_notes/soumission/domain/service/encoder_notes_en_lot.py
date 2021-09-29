@@ -29,7 +29,7 @@ from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from ddd.logic.encodage_des_notes.shared_kernel.domain.model.encoder_notes_rapport import EncoderNotesRapport
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_inscription_examen import IInscriptionExamenTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import PeriodeEncodageNotesDTO
-from ddd.logic.encodage_des_notes.shared_kernel.repository.i_report import IEncoderNotesRapportRepository
+from ddd.logic.encodage_des_notes.shared_kernel.repository.i_encoder_notes_rapport import IEncoderNotesRapportRepository
 from ddd.logic.encodage_des_notes.soumission.builder.note_etudiant_builder import NoteEtudiantBuilder
 from ddd.logic.encodage_des_notes.soumission.builder.note_etudiant_identity_builder import NoteEtudiantIdentityBuilder
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderNotesEtudiantCommand

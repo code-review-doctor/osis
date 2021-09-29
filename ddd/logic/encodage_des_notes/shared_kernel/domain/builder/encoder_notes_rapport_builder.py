@@ -42,5 +42,5 @@ class EncoderNotesRapportBuilder(interface.RootEntityBuilder):
     def build_from_command(
             cls, cmd: Union['EncoderNotesEtudiantCommand', 'EncoderNotesCommand']
     ) -> 'EncoderNotesRapport':
-        report_identity = IdentiteEncoderNotesRapport(transaction_id=cmd.transaction_id)
-        return EncoderNotesRapport(entity_id=report_identity)
+        identite_encoder_notes_rapport = IdentiteEncoderNotesRapport(transaction_id=cmd.transaction_id)
+        return EncoderNotesRapport(entity_id=identite_encoder_notes_rapport)

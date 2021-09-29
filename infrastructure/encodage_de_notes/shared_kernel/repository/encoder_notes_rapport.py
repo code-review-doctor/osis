@@ -28,7 +28,7 @@ from django.core.cache import cache
 
 from ddd.logic.encodage_des_notes.shared_kernel.domain.model.encoder_notes_rapport import IdentiteEncoderNotesRapport, \
     EncoderNotesRapport
-from ddd.logic.encodage_des_notes.shared_kernel.repository.i_report import IEncoderNotesRapportRepository
+from ddd.logic.encodage_des_notes.shared_kernel.repository.i_encoder_notes_rapport import IEncoderNotesRapportRepository
 from osis_common.ddd.interface import ApplicationService
 
 DEFAULT_TIMEOUT = 60  # seconds
@@ -36,12 +36,12 @@ DEFAULT_TIMEOUT = 60  # seconds
 
 class EncoderNotesRapportRepository(IEncoderNotesRapportRepository):
     @classmethod
-    def save(cls, report: EncoderNotesRapport) -> None:
-        cache.set(str(report.entity_id.transaction_id), report, timeout=DEFAULT_TIMEOUT)
+    def save(cls, rapport: EncoderNotesRapport) -> None:
+        cache.set(str(rapport.entity_id.transaction_id), rapport, timeout=DEFAULT_TIMEOUT)
 
     @classmethod
-    def get(cls, report_identity: IdentiteEncoderNotesRapport) -> Optional['EncoderNotesRapport']:
-        return cache.get(str(report_identity.transaction_id))
+    def get(cls, rapport_identity: IdentiteEncoderNotesRapport) -> Optional['EncoderNotesRapport']:
+        return cache.get(str(rapport_identity.transaction_id))
 
     @classmethod
     def search(

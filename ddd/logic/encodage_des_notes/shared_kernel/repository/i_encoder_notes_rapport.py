@@ -33,11 +33,11 @@ from osis_common.ddd.interface import ApplicationService
 
 class IEncoderNotesRapportRepository(interface.AbstractRepository):
     @classmethod
-    def save(cls, entity: EncoderNotesRapport) -> None:
+    def save(cls, rapport: EncoderNotesRapport) -> None:
         raise NotImplementedError
 
     @classmethod
-    def get(cls, report_identity: IdentiteEncoderNotesRapport) -> Optional['EncoderNotesRapport']:
+    def get(cls, rapport_identity: IdentiteEncoderNotesRapport) -> Optional['EncoderNotesRapport']:
         raise NotImplementedError
 
     @classmethod

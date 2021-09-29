@@ -69,9 +69,9 @@ from ddd.logic.encodage_des_notes.encodage.use_case.read.get_progression_general
     get_progression_generale_gestionnaire
 from ddd.logic.encodage_des_notes.encodage.use_case.read.rechercher_notes_service import rechercher_notes
 from ddd.logic.encodage_des_notes.encodage.use_case.write.encoder_notes_service import encoder_notes
-from ddd.logic.encodage_des_notes.shared_kernel.commands import GetEncoderNotesReportCommand
-from ddd.logic.encodage_des_notes.shared_kernel.use_case.read.get_encoder_notes_report_service import \
-    get_encoder_notes_report
+from ddd.logic.encodage_des_notes.shared_kernel.commands import GetEncoderNotesRapportCommand
+from ddd.logic.encodage_des_notes.shared_kernel.use_case.read.get_encoder_notes_rapport_service import \
+    get_encoder_notes_rapport
 from ddd.logic.encodage_des_notes.soumission.commands import GetAdresseFeuilleDeNotesServiceCommand, \
     GetChoixEntitesAdresseFeuilleDeNotesCommand, \
     EncoderAdresseFeuilleDeNotesSpecifique, EncoderAdresseEntiteCommeAdresseFeuilleDeNotes, \
@@ -426,7 +426,7 @@ class MessageBus:
             cmd,
             ResponsableDeNotesRepository(),
         ),
-        GetEncoderNotesReportCommand: lambda cmd: get_encoder_notes_report(
+        GetEncoderNotesRapportCommand: lambda cmd: get_encoder_notes_rapport(
             cmd,
             EncoderNotesRapportRepository()
         )

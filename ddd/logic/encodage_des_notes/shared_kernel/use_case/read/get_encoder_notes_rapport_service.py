@@ -25,14 +25,15 @@
 ##############################################################################
 from typing import Optional
 
-from ddd.logic.encodage_des_notes.shared_kernel.commands import GetEncoderNotesReportCommand
-from ddd.logic.encodage_des_notes.shared_kernel.domain.model.encoder_notes_rapport import EncoderNotesRapport, IdentiteEncoderNotesRapport
-from ddd.logic.encodage_des_notes.shared_kernel.repository.i_report import IEncoderNotesRapportRepository
+from ddd.logic.encodage_des_notes.shared_kernel.commands import GetEncoderNotesRapportCommand
+from ddd.logic.encodage_des_notes.shared_kernel.domain.model.encoder_notes_rapport import EncoderNotesRapport, \
+    IdentiteEncoderNotesRapport
+from ddd.logic.encodage_des_notes.shared_kernel.repository.i_encoder_notes_rapport import IEncoderNotesRapportRepository
 
 
-def get_encoder_notes_report(
-        cmd: 'GetEncoderNotesReportCommand',
+def get_encoder_notes_rapport(
+        cmd: 'GetEncoderNotesRapportCommand',
         report_repository: 'IEncoderNotesRapportRepository'
 ) -> Optional['EncoderNotesRapport']:
     report_identity = IdentiteEncoderNotesRapport(transaction_id=cmd.from_transaction_id)
-    return report_repository.get(report_identity=report_identity)
+    return report_repository.get(rapport_identity=report_identity)

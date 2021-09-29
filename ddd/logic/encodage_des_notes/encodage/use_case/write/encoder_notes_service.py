@@ -46,7 +46,7 @@ from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_et
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_personne import \
     ISignaletiquePersonneTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.periode_encodage_ouverte import PeriodeEncodageOuverte
-from ddd.logic.encodage_des_notes.shared_kernel.repository.i_report import IEncoderNotesRapportRepository
+from ddd.logic.encodage_des_notes.shared_kernel.repository.i_encoder_notes_rapport import IEncoderNotesRapportRepository
 from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_notes import \
     IAdresseFeuilleDeNotesRepository
 

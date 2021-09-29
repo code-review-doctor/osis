@@ -33,7 +33,7 @@ from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodag
     IPeriodeEncodageNotesTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.periode_encodage_ouverte import \
     PeriodeEncodageOuverte
-from ddd.logic.encodage_des_notes.shared_kernel.repository.i_report import IEncoderNotesRapportRepository
+from ddd.logic.encodage_des_notes.shared_kernel.repository.i_encoder_notes_rapport import IEncoderNotesRapportRepository
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderNotesEtudiantCommand
 from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import IdentiteNoteEtudiant
 from ddd.logic.encodage_des_notes.soumission.domain.service.encoder_notes_en_lot import EncoderNotesEtudiantEnLot

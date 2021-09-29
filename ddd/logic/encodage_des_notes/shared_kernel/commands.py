@@ -29,5 +29,5 @@ from osis_common.ddd import interface
 
 
 @attr.s(frozen=True, slots=True)
-class GetEncoderNotesReportCommand(interface.CommandRequest):
+class GetEncoderNotesRapportCommand(interface.CommandRequest):
     from_transaction_id = attr.ib(type=str)

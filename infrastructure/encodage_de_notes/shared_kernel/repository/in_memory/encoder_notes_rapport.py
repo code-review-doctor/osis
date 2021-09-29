@@ -27,7 +27,7 @@ from typing import List
 
 from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
 from ddd.logic.encodage_des_notes.shared_kernel.domain.model.encoder_notes_rapport import EncoderNotesRapport
-from ddd.logic.encodage_des_notes.shared_kernel.repository.i_report import IEncoderNotesRapportRepository
+from ddd.logic.encodage_des_notes.shared_kernel.repository.i_encoder_notes_rapport import IEncoderNotesRapportRepository
 
 
 class EncoderNotesRapportInMemoryRepository(InMemoryGenericRepository, IEncoderNotesRapportRepository):

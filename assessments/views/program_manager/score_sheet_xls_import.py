@@ -31,7 +31,7 @@ from django.utils.translation import gettext_lazy as _
 from assessments.views.common.score_sheet_xls_import import ScoreSheetXLSImportBaseView
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from ddd.logic.encodage_des_notes.encodage.commands import EncoderNotesCommand, EncoderNoteCommand
-from ddd.logic.encodage_des_notes.shared_kernel.commands import GetEncoderNotesReportCommand
+from ddd.logic.encodage_des_notes.shared_kernel.commands import GetEncoderNotesRapportCommand
 from infrastructure.messages_bus import message_bus_instance
 
 
@@ -52,10 +52,10 @@ class ScoreSheetXLSImportProgramManagerView(ScoreSheetXLSImportBaseView):
         with contextlib.suppress(MultipleBusinessExceptions):
             message_bus_instance.invoke(cmd)
 
-        get_report_cmd = GetEncoderNotesReportCommand(from_transaction_id=cmd.transaction_id)
-        report = message_bus_instance.invoke(get_report_cmd)
+        get_rapport_cmd = GetEncoderNotesRapportCommand(from_transaction_id=cmd.transaction_id)
+        rapport = message_bus_instance.invoke(get_rapport_cmd)
 
-        for note_non_enregistrees in report.get_notes_non_enregistrees():
+        for note_non_enregistrees in rapport.get_notes_non_enregistrees():
             row_number = next(
                 note_etudiant['row_number'] for note_etudiant in score_sheet_serialized['notes_etudiants']
                 if note_etudiant['noma'] == note_non_enregistrees.noma
@@ -63,7 +63,7 @@ class ScoreSheetXLSImportProgramManagerView(ScoreSheetXLSImportBaseView):
             error_message = "{} : {} {}".format(note_non_enregistrees.cause, _('Row'), str(row_number))
             messages.error(self.request, error_message)
 
-        nombre_notes_enregistrees = len(report.get_notes_enregistrees())
+        nombre_notes_enregistrees = len(rapport.get_notes_enregistrees())
         if nombre_notes_enregistrees:
             messages.success(self.request, "{} {}".format(str(nombre_notes_enregistrees), _("Score(s) saved")))
         else:
