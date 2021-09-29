@@ -30,15 +30,15 @@ from attribution import models as mdl_attr
 from base.models.learning_unit_year import LearningUnitYear
 
 
-def get_learning_unit_year_managed_by_user_from_id(user, learning_unit_year_id):
+def get_learning_unit_year_managed_by_user_from_id(user, learning_unit_year_id, academic_year):
     qs = LearningUnitYear.objects.filter(pk=learning_unit_year_id)
-    if scores_responsible.filter_learning_unit_year_according_person(qs, user.person).exists():
+    if scores_responsible.filter_learning_unit_year_according_person(qs, user.person, academic_year).exists():
         return qs.get()
     raise PermissionDenied("User is not an entity manager of the requirement entity of the learning unit")
 
 
-def get_attributions_data(user, learning_unit_year_id, responsibles_order):
-    a_learning_unit_year = get_learning_unit_year_managed_by_user_from_id(user, learning_unit_year_id)
+def get_attributions_data(user, learning_unit_year_id, responsibles_order, academic_year):
+    a_learning_unit_year = get_learning_unit_year_managed_by_user_from_id(user, learning_unit_year_id, academic_year)
     return {
         'learning_unit_year': a_learning_unit_year,
         'attributions': mdl_attr.attribution.find_all_responsible_by_learning_unit_year(

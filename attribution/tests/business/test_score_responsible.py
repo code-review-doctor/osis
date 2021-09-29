@@ -48,7 +48,8 @@ class TestGetAttributionsData(TestCase):
         result = score_responsible.get_attributions_data(
             UserFactory(),
             learning_unit_year.id,
-            '-summary_responsible'
+            '-summary_responsible',
+            learning_unit_year.academic_year
         )
         self.assertIsInstance(result, dict)
         self.assertDictEqual(result, expected_result)

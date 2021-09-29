@@ -92,6 +92,9 @@ INSTALLED_APPS = (
     'reversion',
     'django.contrib.gis',
     'ddd',
+    'infrastructure',
+    'osis_document',
+    'osis_history'
 )
 
 
@@ -172,6 +175,10 @@ TEMPLATES = [
             ],
         },
     },
+]
+
+FORMAT_MODULE_PATH = [
+    'backoffice.formats',
 ]
 
 DATABASES = {
@@ -429,14 +436,6 @@ ESB_REFRESH_LEARNING_UNIT_PEDAGOGY_ENDPOINT = os.environ.get('ESB_REFRESH_LEARNI
 ESB_GEOCODING_ENDPOINT = os.environ.get('ESB_GEOCODING_ENDPOINT')
 ESB_ENTITIES_HISTORY_ENDPOINT = os.environ.get('ESB_ENTITIES_HISTORY_ENDPOINT')
 ESB_ENTITY_ADDRESS_ENDPOINT = os.environ.get('ESB_ENTITY_ADDRESS_ENDPOINT')
-
-# EPC Configuration
-EPC_API_URL = os.environ.get('EPC_API_URL')
-EPC_API_USER = os.environ.get('EPC_API_USER')
-EPC_API_PASSWORD = os.environ.get('EPC_API_PASSWORD')
-EPC_ATTRIBUTIONS_TUTOR_ENDPOINT = os.environ.get(
-    'EPC_ATTRIBUTIONS_TUTOR_ENDPOINT', "resources/AllocationCharges/tutors/{global_id}/{year}"
-)
 
 RELEASE_TAG = os.environ.get('RELEASE_TAG')
 

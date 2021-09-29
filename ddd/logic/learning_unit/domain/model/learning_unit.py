@@ -33,11 +33,13 @@ from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.models.enums.learning_unit_year_session import DerogationSession
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from ddd.logic.learning_unit.commands import CreatePartimCommand
+from ddd.logic.learning_unit.domain.model._mobility import Mobility
 from ddd.logic.learning_unit.domain.model._partim import Partim, PartimBuilder
 from ddd.logic.learning_unit.domain.model._remarks import Remarks
 from ddd.logic.learning_unit.domain.model._titles import Titles
 from ddd.logic.learning_unit.domain.model._volumes_repartition import LecturingPart, PracticalPart
 from ddd.logic.learning_unit.domain.model.responsible_entity import UCLEntityIdentity
+from ddd.logic.learning_unit.dtos import LearningUnitPartimDTO
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 from ddd.logic.shared_kernel.campus.domain.model.uclouvain_campus import UclouvainCampusIdentity
 from ddd.logic.shared_kernel.language.domain.model.language import LanguageIdentity
@@ -51,7 +53,7 @@ class LearningUnitIdentity(interface.EntityIdentity):
     code = attr.ib(type=str)
 
     def __str__(self):
-        return "{} - ({})".format(self.code, self.academic_year)
+        return "{} - ({})".format(self.code, self.academic_year.year)
 
     @property
     def year(self) -> int:
@@ -80,6 +82,10 @@ class LearningUnit(interface.RootEntity):
     practical_part = attr.ib(type=PracticalPart)
     professional_integration = attr.ib(type=bool)
     is_active = attr.ib(type=bool)
+    type = None
+    individual_loan = attr.ib(type=bool)
+    mobility = attr.ib(type=Mobility)
+    stage_dimona = attr.ib(type=bool)
 
     @property
     def academic_year(self) -> 'AcademicYearIdentity':
@@ -125,6 +131,15 @@ class LearningUnit(interface.RootEntity):
 
     def has_lecturing_volume(self) -> bool:
         return self.lecturing_part and self.lecturing_part.volumes.volume_annual
+
+    def get_partims_information(self) -> List[LearningUnitPartimDTO]:
+        return [
+            LearningUnitPartimDTO(
+                code="{}{}".format(self.code, partim.subdivision),
+                full_title=partim.title_fr,
+            )
+            for partim in self.partims
+        ]
 
 
 class CourseLearningUnit(LearningUnit):

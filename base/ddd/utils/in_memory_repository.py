@@ -46,7 +46,8 @@ class InMemoryGenericRepository(interface.AbstractRepository, metaclass=Singleto
 
     @classmethod
     def search(cls, entity_ids: Optional[List['EntityIdentity']] = None, **kwargs) -> List['RootEntity']:
-        raise NotImplementedError
+        entity_ids = entity_ids or set()
+        return [entity for entity in cls.entities if entity.entity_id in entity_ids]
 
     @classmethod
     def delete(cls, entity_id: 'EntityIdentity', **kwargs: ApplicationService) -> None:
@@ -54,8 +55,9 @@ class InMemoryGenericRepository(interface.AbstractRepository, metaclass=Singleto
 
     @classmethod
     def save(cls, entity: 'RootEntity') -> None:
-        if entity in cls.entities:
-            cls.entities.remove(entity)
+        to_remove = cls.get(entity.entity_id)
+        if to_remove:
+            cls.entities.remove(to_remove)
         cls.entities.append(entity)
 
     @classmethod
