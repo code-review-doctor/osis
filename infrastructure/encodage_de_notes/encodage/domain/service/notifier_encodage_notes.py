@@ -34,6 +34,7 @@ from base.models.person import Person
 from base.utils.send_mail import _get_txt_complementary_first_col_header
 from ddd.logic.encodage_des_notes.encodage.domain.model.gestionnaire_parcours import GestionnaireParcours
 from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import IdentiteNoteEtudiant, NoteEtudiant
+from ddd.logic.encodage_des_notes.encodage.domain.service.cohorte_non_complete import CodeUniteEnseignement, NomCohorte
 from ddd.logic.encodage_des_notes.encodage.domain.service.i_notifier_encodage_notes import INotifierEncodageNotes
 from ddd.logic.encodage_des_notes.encodage.repository.note_etudiant import INoteEtudiantRepository
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_attribution_enseignant import \
@@ -75,7 +76,7 @@ class NotifierEncodageNotes(INotifierEncodageNotes):
     def notifier(
             cls,
             identites_notes_encodees: List['IdentiteNoteEtudiant'],
-            cohortes_non_entierement_encodees_avant_encodage: List[Tuple[str, str]],
+            cohortes_non_entierement_encodees_avant_encodage: List[Tuple[CodeUniteEnseignement, NomCohorte]],
             gestionnaire_parcours: 'GestionnaireParcours',
             note_etudiant_repository: 'INoteEtudiantRepository',
             attribution_enseignant_translator: 'IAttributionEnseignantTranslator',
