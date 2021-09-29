@@ -24,12 +24,13 @@
 #
 ##############################################################################
 from ddd.logic.shared_kernel.campus.builder.uclouvain_campus_identity_builder import UclouvainCampusIdentityBuilder
+from ddd.logic.shared_kernel.campus.commands import GetCampusCommand
 from ddd.logic.shared_kernel.campus.domain.model.uclouvain_campus import UclouvainCampus
 from ddd.logic.shared_kernel.campus.repository.i_uclouvain_campus import IUclouvainCampusRepository
 
 
 def get_campus(
-        cmd: 'GetCampustCommand',
+        cmd: 'GetCampusCommand',
         campus_repository: 'IUclouvainCampusRepository'
 ) -> 'UclouvainCampus':
     campus_identity = UclouvainCampusIdentityBuilder.build_from_uuid(uuid=cmd.uuid)

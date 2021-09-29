@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ from django.conf.urls import url
 from django.urls import include
 
 from learning_unit.api.views.attribution import LearningUnitAttribution
+from learning_unit.api.views.effective_classes import EffectiveClassesList
 from learning_unit.api.views.learning_achievement import LearningAchievementList
 from learning_unit.api.views.learning_unit import LearningUnitDetailed, LearningUnitList, LearningUnitTitle
 from learning_unit.api.views.summary_specification import LearningUnitSummarySpecification
@@ -44,6 +45,7 @@ urlpatterns = [
     ),
     url(r'^learning_units/(?P<year>[0-9]{4})/(?P<acronym>[a-zA-Z0-9]+)/', include([
         url(r'^title$', LearningUnitTitle.as_view(), name=LearningUnitTitle.name),
+        url(r'^classes$', EffectiveClassesList.as_view(), name=EffectiveClassesList.name),
         url(r'^attributions$', LearningUnitAttribution.as_view(), name=LearningUnitAttribution.name),
         url(r'^achievements$', LearningAchievementList.as_view(), name=LearningAchievementList.name),
         url(r'^teaching_materials$', LearningUnitTeachingMaterials.as_view(), name=LearningUnitTeachingMaterials.name),

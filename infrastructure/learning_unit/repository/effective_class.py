@@ -35,7 +35,8 @@ from ddd.logic.learning_unit.builder.effective_class_builder import EffectiveCla
 from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass, EffectiveClassIdentity, \
     LecturingEffectiveClass
-from ddd.logic.learning_unit.dtos import EffectiveClassFromRepositoryDTO
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
+from ddd.logic.learning_unit.dtos import EffectiveClassFromRepositoryDTO, EffectiveClassDTO
 from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
 from learning_unit.models.learning_class_year import LearningClassYear as LearningClassYearDb
 from osis_common.ddd.interface import ApplicationService
@@ -69,6 +70,34 @@ class EffectiveClassRepository(IEffectiveClassRepository):
             )
         builder = EffectiveClassBuilder()
         return [builder.build_from_repository_dto(dto) for dto in dtos]
+
+    @classmethod
+    def search_dtos_by_learning_unit(
+            cls,
+            learning_unit_id: LearningUnitIdentity = None,
+            **kwargs
+    ) -> List[EffectiveClassDTO]:
+        qs = _get_common_queryset()
+        if learning_unit_id:
+            qs = qs.filter(
+                learning_component_year__learning_unit_year__acronym=learning_unit_id.code,
+                learning_component_year__learning_unit_year__academic_year__year=learning_unit_id.year,
+            )
+        qs = _annotate_queryset(qs)
+        qs = _values_queryset(qs)
+        return [
+            EffectiveClassDTO(
+                code=effective_class['class_code'],
+                title_fr=effective_class['title_fr'],
+                title_en=effective_class['title_en'],
+                teaching_place_uuid=effective_class['teaching_place_uuid'],
+                derogation_quadrimester=effective_class['derogation_quadrimester'],
+                session_derogation=effective_class['session_derogation'],
+                volume_q1=effective_class['volume_q1'],
+                volume_q2=effective_class['volume_q2'],
+                type=effective_class['class_type'],
+            ) for effective_class in qs
+        ]
 
     @classmethod
     def delete(cls, entity_id: 'EffectiveClassIdentity', **kwargs: ApplicationService) -> None:

@@ -25,6 +25,8 @@
 ##############################################################################
 from django.utils.translation import gettext_lazy as _
 
+from base.models.utils.utils import ChoiceEnum
+
 LECTURING = "LECTURING"
 PRACTICAL_EXERCISES = "PRACTICAL_EXERCISES"
 
@@ -38,3 +40,8 @@ DEFAULT_ACRONYM_COMPONENT = {
     PRACTICAL_EXERCISES: "PP",
     None: "NT"
 }
+
+
+class ComponentType(ChoiceEnum):
+    LECTURING = _("Lecturing")
+    PRACTICAL_EXERCISES = _("Practical exercises")
