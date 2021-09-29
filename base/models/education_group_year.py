@@ -54,6 +54,9 @@ from osis_common.models.serializable_model import SerializableModel, Serializabl
     SerializableQuerySet
 
 
+FIRST_YEAR_SUFFIX = '11BA'
+
+
 class EducationGroupYearAdmin(VersionAdmin, SerializableModelAdmin):
     list_display = ('acronym', 'partial_acronym', 'title', 'academic_year', 'education_group_type', 'changed')
     list_filter = ('academic_year', 'education_group_type')
@@ -856,7 +859,7 @@ def _find_with_learning_unit_enrollment_count(learning_unit_year):
             filter=Q(offerenrollment__cohort_year__name=CohortName.FIRST_YEAR.name)
         )
     ).exclude(
-        acronym__icontains='11ba',
+        acronym__icontains=FIRST_YEAR_SUFFIX,
     ).order_by(
         'acronym'
     )
