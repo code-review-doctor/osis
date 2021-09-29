@@ -101,7 +101,9 @@ class LearningUnitEnrollmentsListView(generics.ListAPIView):
         ).select_related(
             'offer_enrollment__student__studentspecificprofile',
             'offer_enrollment__student__person',
-            'learning_unit_year__academic_year'
+            'offer_enrollment__education_group_year',
+            'offer_enrollment__cohort_year__education_group_year',
+            'learning_unit_year__academic_year',
         )
 
 
