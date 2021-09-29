@@ -33,7 +33,7 @@ from ddd.logic.encodage_des_notes.shared_kernel.repository.i_encoder_notes_rappo
 
 def get_encoder_notes_rapport(
         cmd: 'GetEncoderNotesRapportCommand',
-        report_repository: 'IEncoderNotesRapportRepository'
+        rapport_repository: 'IEncoderNotesRapportRepository'
 ) -> Optional['EncoderNotesRapport']:
     report_identity = IdentiteEncoderNotesRapport(transaction_id=cmd.from_transaction_id)
-    return report_repository.get(rapport_identity=report_identity)
+    return rapport_repository.get(rapport_identity=report_identity)
