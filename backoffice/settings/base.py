@@ -94,7 +94,8 @@ INSTALLED_APPS = (
     'ddd',
     'infrastructure',
     'osis_document',
-    'osis_history'
+    'osis_history',
+    'silk'
 )
 
 
@@ -123,6 +124,7 @@ MIDDLEWARE = (
     'base.middlewares.extra_http_responses_midleware.ExtraHttpResponsesMiddleware',
     'waffle.middleware.WaffleMiddleware',
     'base.middlewares.reversion_middleware.BaseRevisionMiddleware',
+    'silk.middleware.SilkyMiddleware',
 )
 
 

@@ -102,3 +102,6 @@ if settings.DEBUG and 'debug_toolbar' in settings.INSTALLED_APPS:
     import debug_toolbar
 
     urlpatterns += (url(r'^__debug__/', include(debug_toolbar.urls)),)
+
+if settings.DEBUG and 'silk' in settings.INSTALLED_APPS:
+    urlpatterns += (url(r'^silk/', include('silk.urls', namespace='silk')),)
