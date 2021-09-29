@@ -34,9 +34,11 @@ from ddd.logic.encodage_des_notes.encodage.domain.service.i_cohortes_du_gestionn
 from ddd.logic.encodage_des_notes.encodage.domain.service.i_historiser_notes import IHistoriserEncodageNotesService
 from ddd.logic.encodage_des_notes.encodage.domain.service.i_notifier_encodage_notes import INotifierEncodageNotes
 from ddd.logic.encodage_des_notes.encodage.repository.note_etudiant import INoteEtudiantRepository
-from ddd.logic.encodage_des_notes.shared_kernel.domain.builder.report_builder import ReportBuilder
+from ddd.logic.encodage_des_notes.shared_kernel.domain.builder.encoder_notes_rapport_builder import \
+    EncoderNotesRapportBuilder
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_inscription_examen import IInscriptionExamenTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodage_notes import \
     IPeriodeEncodageNotesTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_etudiant import \
@@ -44,7 +46,7 @@ from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_et
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_personne import \
     ISignaletiquePersonneTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.periode_encodage_ouverte import PeriodeEncodageOuverte
-from ddd.logic.encodage_des_notes.shared_kernel.repository.i_report import IReportRepository
+from ddd.logic.encodage_des_notes.shared_kernel.repository.i_report import IEncoderNotesRapportRepository
 from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_notes import \
     IAdresseFeuilleDeNotesRepository
 
@@ -64,7 +66,7 @@ def encoder_notes(
         adresse_feuille_de_notes_repo: 'IAdresseFeuilleDeNotesRepository',
         historiser_note_service: 'IHistoriserEncodageNotesService',
         inscription_examen_translator: 'IInscriptionExamenTranslator',
-        report_repository: 'IReportRepository'
+        rapport_repository: 'IEncoderNotesRapportRepository'
 ) -> List['IdentiteNoteEtudiant']:
     # Given
     PeriodeEncodageOuverte().verifier(periode_encodage_note_translator)
@@ -82,7 +84,7 @@ def encoder_notes(
         note_etudiant_repo
     )
 
-    report = ReportBuilder.build_from_command(cmd)
+    rapport = EncoderNotesRapportBuilder.build_from_command(cmd)
     notes = EncoderNotesEnLot().execute(
         cmd.notes_encodees,
         gestionnaire_parcours,
@@ -90,8 +92,8 @@ def encoder_notes(
         periode_ouverte,
         historiser_note_service,
         inscription_examen_translator,
-        report,
-        report_repository
+        rapport,
+        rapport_repository
     )
     notifier_notes_domaine_service.notifier(
         notes,

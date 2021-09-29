@@ -36,12 +36,10 @@ from ddd.logic.encodage_des_notes.encodage.domain.service.i_historiser_notes imp
 from ddd.logic.encodage_des_notes.encodage.domain.validator.exceptions import \
     EncoderNotesEnLotLigneBusinessExceptions, EtudiantNonInscritAExamenException
 from ddd.logic.encodage_des_notes.encodage.repository.note_etudiant import INoteEtudiantRepository
-from ddd.logic.encodage_des_notes.shared_kernel.domain.model.report import Report
-from ddd.logic.encodage_des_notes.shared_kernel.domain.model.report_events import NotesEnregistreesEvenement, \
-    NoteNonEnregistreeEvenement, AucuneNotesEnregistreesEvenement
+from ddd.logic.encodage_des_notes.shared_kernel.domain.model.encoder_notes_rapport import EncoderNotesRapport
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_inscription_examen import IInscriptionExamenTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import PeriodeEncodageNotesDTO
-from ddd.logic.encodage_des_notes.shared_kernel.repository.i_report import IReportRepository
+from ddd.logic.encodage_des_notes.shared_kernel.repository.i_report import IEncoderNotesRapportRepository
 from ddd.logic.encodage_des_notes.soumission.dtos import DesinscriptionExamenDTO
 from osis_common.ddd import interface
 
@@ -60,8 +58,8 @@ class EncoderNotesEnLot(interface.DomainService):
             periode_ouverte: 'PeriodeEncodageNotesDTO',
             historiser_note_service: 'IHistoriserEncodageNotesService',
             inscription_examen_translator: 'IInscriptionExamenTranslator',
-            report: Report,
-            report_repository: 'IReportRepository'
+            rapport: 'EncoderNotesRapport',
+            rapport_repository: 'IEncoderNotesRapportRepository'
     ) -> List['IdentiteNoteEtudiant']:
         note_encodee_cmd_par_identite = _associer_nouvelle_note_a_son_identite(notes_encodees, periode_ouverte)
         anciennes_notes_a_modifier = note_etudiant_repo.search(entity_ids=list(note_encodee_cmd_par_identite.keys()))
@@ -90,12 +88,25 @@ class EncoderNotesEnLot(interface.DomainService):
                     if nouvelle_note.note != ancienne_note_etudiant.note:
                         notes_a_persister.append(nouvelle_note)
                 except MultipleBusinessExceptions as e:
-                    exceptions += [
-                        EncoderNotesEnLotLigneBusinessExceptions(note_id=identite, exception=business_exception)
-                        for business_exception in e.exceptions
-                    ]
+                    for business_exception in e.exceptions:
+                        rapport.add_note_non_enregistree(
+                            noma=ancienne_note_etudiant.noma,
+                            numero_session=ancienne_note_etudiant.numero_session,
+                            code_unite_enseignement=ancienne_note_etudiant.code_unite_enseignement,
+                            annee_academique=ancienne_note_etudiant.annee_academique,
+                            cause=str(business_exception.message)
+                        )
+                        exceptions.append(
+                            EncoderNotesEnLotLigneBusinessExceptions(note_id=identite, exception=business_exception)
+                        )
 
         for note in notes_a_persister:
+            rapport.add_note_enregistree(
+                noma=note.noma,
+                numero_session=note.numero_session,
+                code_unite_enseignement=note.code_unite_enseignement,
+                annee_academique=note.annee_academique,
+            )
             note_etudiant_repo.save(note)
 
         if notes_a_persister:
@@ -103,18 +114,11 @@ class EncoderNotesEnLot(interface.DomainService):
                 gestionnaire_parcours.entity_id.matricule_fgs_gestionnaire,
                 notes_a_persister,
             )
-            report.add_success(NotesEnregistreesEvenement(nombre_notes_enregistree=len(notes_a_persister)))
-        else:
-            report.add_error(AucuneNotesEnregistreesEvenement())
 
+        rapport_repository.save(rapport)
         if exceptions:
-            report.add_errors(
-                [NoteNonEnregistreeEvenement(cause=str(exception.message)) for exception in exceptions]
-            )
-            report_repository.save(report)
             raise MultipleBusinessExceptions(exceptions=exceptions)
 
-        report_repository.save(report)
         return [n.entity_id for n in notes_a_persister]
 
 

@@ -1,3 +1,4 @@
+##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -22,37 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import abc
-import uuid
-from typing import List
-
 import attr
 
 from osis_common.ddd import interface
 
 
-class ReportEvent(abc.ABC):
-    def __str__(self):
-        raise NotImplementedError
-
-
 @attr.s(frozen=True, slots=True)
-class ReportIdentity(interface.EntityIdentity):
-    transaction_id = attr.ib(type=uuid.UUID)
-
-
-@attr.s()
-class Report(interface.RootEntity):
-    entity_id = attr.ib(type=ReportIdentity)
-    success = attr.ib(init=False, type=List[ReportEvent], factory=list)
-    errors = attr.ib(init=False, type=List[ReportEvent], factory=list)
-
-    def add_success(self, event: ReportEvent):
-        self.success.append(event)
-
-    def add_error(self, event: ReportEvent):
-        self.add_errors([event])
-
-    def add_errors(self, events: List[ReportEvent]):
-        self.errors.extend(events)
-
+class GetEncoderNotesReportCommand(interface.CommandRequest):
+    from_transaction_id = attr.ib(type=str)

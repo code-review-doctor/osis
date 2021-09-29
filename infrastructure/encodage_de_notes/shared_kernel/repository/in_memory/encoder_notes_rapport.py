@@ -23,21 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Union
+from typing import List
 
-from ddd.logic.encodage_des_notes.encodage.commands import EncoderNotesCommand
-from ddd.logic.encodage_des_notes.shared_kernel.domain.model.report import Report, ReportIdentity
-from ddd.logic.encodage_des_notes.soumission.commands import EncoderNotesEtudiantCommand
-from osis_common.ddd import interface
+from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
+from ddd.logic.encodage_des_notes.shared_kernel.domain.model.encoder_notes_rapport import EncoderNotesRapport
+from ddd.logic.encodage_des_notes.shared_kernel.repository.i_report import IEncoderNotesRapportRepository
 
 
-class ReportBuilder(interface.RootEntityBuilder):
-
-    @classmethod
-    def build_from_repository_dto(cls, dto_object) -> 'Report':
-        raise NotImplementedError
+class EncoderNotesRapportInMemoryRepository(InMemoryGenericRepository, IEncoderNotesRapportRepository):
+    entities = list()  # type: List[EncoderNotesRapport]
 
     @classmethod
-    def build_from_command(cls, cmd: Union['EncoderNotesEtudiantCommand', 'EncoderNotesCommand']) -> 'Report':
-        report_identity = ReportIdentity(transaction_id=cmd.transaction_id)
-        return Report(entity_id=report_identity)
+    def reset(cls):
+        cls.entities.clear()

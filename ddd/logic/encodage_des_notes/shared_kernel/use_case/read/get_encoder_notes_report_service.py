@@ -1,3 +1,4 @@
+##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -22,29 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import attr
-from django.utils.translation import gettext_lazy as _
+from typing import Optional
 
-from ddd.logic.encodage_des_notes.shared_kernel.domain.model.report import ReportEvent
-
-
-@attr.s(frozen=True, slots=True)
-class NotesEnregistreesEvenement(ReportEvent):
-    nombre_notes_enregistree = attr.ib(type=int)
-
-    def __str__(self):
-        return "{} {}".format(str(self.nombre_notes_enregistree), _("Score(s) saved"))
+from ddd.logic.encodage_des_notes.shared_kernel.commands import GetEncoderNotesReportCommand
+from ddd.logic.encodage_des_notes.shared_kernel.domain.model.encoder_notes_rapport import EncoderNotesRapport, IdentiteEncoderNotesRapport
+from ddd.logic.encodage_des_notes.shared_kernel.repository.i_report import IEncoderNotesRapportRepository
 
 
-@attr.s(frozen=True, slots=True)
-class AucuneNotesEnregistreesEvenement(ReportEvent):
-    def __str__(self):
-        return str(_("No score injected"))
-
-
-@attr.s(frozen=True, slots=True)
-class NoteNonEnregistreeEvenement(ReportEvent):
-    cause = attr.ib(type=str)
-
-    def __str__(self):
-        return self.cause
+def get_encoder_notes_report(
+        cmd: 'GetEncoderNotesReportCommand',
+        report_repository: 'IEncoderNotesRapportRepository'
+) -> Optional['EncoderNotesRapport']:
+    report_identity = IdentiteEncoderNotesRapport(transaction_id=cmd.from_transaction_id)
+    return report_repository.get(report_identity=report_identity)

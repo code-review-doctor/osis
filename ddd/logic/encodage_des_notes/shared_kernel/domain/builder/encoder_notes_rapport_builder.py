@@ -15,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,31 +23,24 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Optional, List
+from typing import Union
 
-from ddd.logic.encodage_des_notes.shared_kernel.domain.model.encoder_notes_rapport import IdentiteEncoderNotesRapport, \
-    EncoderNotesRapport
+from ddd.logic.encodage_des_notes.encodage.commands import EncoderNotesCommand
+from ddd.logic.encodage_des_notes.shared_kernel.domain.model.encoder_notes_rapport import EncoderNotesRapport, \
+    IdentiteEncoderNotesRapport
+from ddd.logic.encodage_des_notes.soumission.commands import EncoderNotesEtudiantCommand
 from osis_common.ddd import interface
-from osis_common.ddd.interface import ApplicationService
 
 
-class IEncoderNotesRapportRepository(interface.AbstractRepository):
+class EncoderNotesRapportBuilder(interface.RootEntityBuilder):
+
     @classmethod
-    def save(cls, entity: EncoderNotesRapport) -> None:
+    def build_from_repository_dto(cls, dto_object) -> 'EncoderNotesRapport':
         raise NotImplementedError
 
     @classmethod
-    def get(cls, report_identity: IdentiteEncoderNotesRapport) -> Optional['EncoderNotesRapport']:
-        raise NotImplementedError
-
-    @classmethod
-    def search(
-            cls,
-            entity_ids: Optional[List[IdentiteEncoderNotesRapport]] = None,
-            **kwargs
-    ) -> List['EncoderNotesRapport']:
-        raise NotImplementedError
-
-    @classmethod
-    def delete(cls, entity_id: IdentiteEncoderNotesRapport, **kwargs: ApplicationService) -> None:
-        raise NotImplementedError
+    def build_from_command(
+            cls, cmd: Union['EncoderNotesEtudiantCommand', 'EncoderNotesCommand']
+    ) -> 'EncoderNotesRapport':
+        report_identity = IdentiteEncoderNotesRapport(transaction_id=cmd.transaction_id)
+        return EncoderNotesRapport(entity_id=report_identity)
