@@ -30,96 +30,128 @@ from osis_common.ddd.interface import BusinessException
 
 
 class MaximumPropositionsAtteintException(BusinessException):
+    status_code = "PROPOSITION-1"
+
     def __init__(self, **kwargs):
         message = _("You've reached the maximum authorized propositions.")
         super().__init__(message, **kwargs)
 
 
 class DoctoratNonTrouveException(BusinessException):
+    status_code = "PROPOSITION-2"
+
     def __init__(self, **kwargs):
         message = _("No PhD found.")
         super().__init__(message, **kwargs)
 
 
 class PropositionNonTrouveeException(BusinessException):
+    status_code = "PROPOSITION-3"
+
     def __init__(self, **kwargs):
         message = _("Proposition not found.")
         super().__init__(message, **kwargs)
 
 
 class GroupeDeSupervisionNonTrouveException(BusinessException):
+    status_code = "PROPOSITION-4"
+
     def __init__(self, **kwargs):
         message = _("Supervision group not found.")
         super().__init__(message, **kwargs)
 
 
 class BureauCDEInconsistantException(BusinessException):
+    status_code = "PROPOSITION-5"
+
     def __init__(self, **kwargs):
         message = _("CDE Bureau should be filled in only if the doctorate's entity is CDE")
         super().__init__(message, **kwargs)
 
 
 class ContratTravailInconsistantException(BusinessException):
+    status_code = "PROPOSITION-6"
+
     def __init__(self, **kwargs):
         message = _("Work contract should be set when financing type is set to work contract")
         super().__init__(message, **kwargs)
 
 
 class InstitutionInconsistanteException(BusinessException):
+    status_code = "PROPOSITION-7"
+
     def __init__(self, **kwargs):
         message = _("Institution should be set when PhD has been set to yes or partial")
         super().__init__(message, **kwargs)
 
 
 class MembreGroupeDeSupervisionNonTrouveException(BusinessException):
+    status_code = "PROPOSITION-8"
+
     def __init__(self, **kwargs):
         message = _("Supervision group member not found.")
         super().__init__(message, **kwargs)
 
 
 class PromoteurNonTrouveException(BusinessException):
+    status_code = "PROPOSITION-9"
+
     def __init__(self, **kwargs):
         message = _("Promoter not found.")
         super().__init__(message, **kwargs)
 
 
 class MembreCANonTrouveException(BusinessException):
+    status_code = "PROPOSITION-10"
+
     def __init__(self, **kwargs):
         message = _("Membre CA not found.")
         super().__init__(message, **kwargs)
 
 
 class SignataireNonTrouveException(BusinessException):
+    status_code = "PROPOSITION-11"
+
     def __init__(self, **kwargs):
         message = _("Member of supervision group not found.")
         super().__init__(message, **kwargs)
 
 
 class SignataireDejaInviteException(BusinessException):
+    status_code = "PROPOSITION-12"
+
     def __init__(self, **kwargs):
         message = _("Member of supervision group already invited.")
         super().__init__(message, **kwargs)
 
 
 class SignatairePasInviteException(BusinessException):
+    status_code = "PROPOSITION-13"
+
     def __init__(self, **kwargs):
         message = _("Member of supervision group not invited.")
         super().__init__(message, **kwargs)
 
 
 class DejaPromoteurException(BusinessException):
+    status_code = "PROPOSITION-14"
+
     def __init__(self, **kwargs):
         message = _("Already a promoter.")
         super().__init__(message, **kwargs)
 
 
 class DejaMembreCAException(BusinessException):
+    status_code = "PROPOSITION-15"
+
     def __init__(self, **kwargs):
         message = _("Already a member of CA.")
         super().__init__(message, **kwargs)
 
 
 class JustificationRequiseException(BusinessException):
+    status_code = "PROPOSITION-16"
+
     def __init__(self, **kwargs):
         message = _("A justification is needed when creating a pre-admission.")
         super().__init__(message, **kwargs)
