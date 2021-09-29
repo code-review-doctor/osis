@@ -22,7 +22,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.test import TestCase
+from unittest import mock
+
+from django.test import SimpleTestCase
 
 from ddd.logic.encodage_des_notes.encodage.test.factory.gestionnaire_parcours import GestionnaireParcoursDROI1BAFactory
 from ddd.logic.encodage_des_notes.encodage.test.factory.note_etudiant import NoteEtudiantChiffreeFactory, \
@@ -39,7 +41,8 @@ from infrastructure.encodage_de_notes.soumission.repository.in_memory.adresse_fe
     AdresseFeuilleDeNotesInMemoryRepository
 
 
-class TestNotifierEncodageNotes(TestCase):
+@mock.patch("osis_common.messaging.send_message.send_messages")
+class TestEnvoyerMailEncodageComplet(SimpleTestCase):
 
     def setUp(self):
         self.gestionnaire_parcours_droi1ba = GestionnaireParcoursDROI1BAFactory(
@@ -56,6 +59,16 @@ class TestNotifierEncodageNotes(TestCase):
         self.adresse_feuille_de_notes_repo = AdresseFeuilleDeNotesInMemoryRepository()
 
         self.notes_ldroi1001 = self.generate_notes_for_ldroi1201()
+
+        self._mock_get_person_id_in_db()
+
+    def _mock_get_person_id_in_db(self):
+        patcher_get_person_id = mock.patch(
+            'infrastructure.encodage_de_notes.encodage.domain.service.notifier_encodage_notes.NotifierEncodageNotes._get_receiver_id'
+        )
+        mock_get_person_id = patcher_get_person_id.start()
+        mock_get_person_id.return_value = 123
+        self.addCleanup(patcher_get_person_id.stop)
 
     def generate_notes_for_ldroi1201(self):
         notes = [
@@ -90,10 +103,10 @@ class TestNotifierEncodageNotes(TestCase):
             self.note_etudiant_repo.save(note)
         return notes
 
-    def test_cannot_envoyer_notifications_if_aucune_notes_encodees(self):
+    def test_should_not_envoyer_notifications_si_aucune_notes_encodees(self, mock_send_mail):
         notes_encodees = []
 
-        result = NotifierEncodageNotes()._get_donnees_email(
+        NotifierEncodageNotes().notifier(
             notes_encodees,
             [],
             self.gestionnaire_parcours_droi1ba,
@@ -103,10 +116,9 @@ class TestNotifierEncodageNotes(TestCase):
             self.signaletique_etudiant_repo,
             self.adresse_feuille_de_notes_repo
         )
+        self.assertFalse(mock_send_mail.called)
 
-        self.assertListEqual(result, [])
-
-    def test_should_not_envoyer_email_si_la_cohorte_n_est_pas_complete(self):
+    def test_should_not_envoyer_email_si_la_cohorte_n_est_pas_complete(self, mock_send_mail):
         note_manquante = NoteManquanteEtudiantFactory(
             entity_id__code_unite_enseignement="LDROI1001",
             entity_id__noma="55555555",
@@ -116,7 +128,7 @@ class TestNotifierEncodageNotes(TestCase):
 
         notes_encodees = [self.notes_ldroi1001[0].entity_id]
 
-        result = NotifierEncodageNotes()._get_donnees_email(
+        NotifierEncodageNotes().notifier(
             notes_encodees,
             [],
             self.gestionnaire_parcours_droi1ba,
@@ -127,36 +139,26 @@ class TestNotifierEncodageNotes(TestCase):
             self.adresse_feuille_de_notes_repo
         )
 
-        self.assertEqual(result, [])
+        self.assertFalse(mock_send_mail.called)
 
-    def test_when_note_est_encodee_should_envoyer_notification_pour_la_meme_cohorte_et_meme_unite_enseignement(self):
+    def test_when_note_est_encodee_should_envoyer_notification_pour_la_meme_cohorte_et_meme_unite_enseignement(
+            self,
+            mock_send_mail
+    ):
         notes_encodees = [self.notes_ldroi1001[0].entity_id]
 
-        result = NotifierEncodageNotes()._get_donnees_email(
+        NotifierEncodageNotes().notifier(
             notes_encodees,
-            [],
+            [('LDROI1001', 'DROI1BA')],
             self.gestionnaire_parcours_droi1ba,
             self.note_etudiant_repo,
             self.attribution_translator,
             self.signaletique_personne_repo,
             self.signaletique_etudiant_repo,
-            self.adresse_feuille_de_notes_repo
+            self.adresse_feuille_de_notes_repo,
         )
 
-        self.assertEqual(len(result), 1)
-        self.assertEqual(
-            result[0].code_unite_enseignement,
-            "LDROI1001"
-        )
-        self.assertEqual(
-            result[0].nom_cohorte,
-            "DROI1BA"
-        )
-        self.assertEqual(
-            result[0].encodage_complet_avant_encodage,
-            True
-        )
-        self.assertEqual(
-            result[0].identites_notes_encodees,
-            notes_encodees
-        )
+        args = mock_send_mail.call_args[0][0]
+        self.assertEqual("LDROI1001", args['template_base_data']['learning_unit_acronym'])
+        self.assertEqual("DROI1BA", args['template_base_data']['offer_acronym'])
+        self.assertEqual(4, len(args['tables'][0]['data']['data']))
