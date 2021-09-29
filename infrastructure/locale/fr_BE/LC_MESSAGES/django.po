@@ -32,7 +32,7 @@ msgstr "Nom"
 
 msgctxt "Submission email table header"
 msgid "Program"
-msgstr "Gestionnaires de parcours étudiant"
+msgstr "Sigle"
 
 msgctxt "Submission email table header"
 msgid "Registration number"

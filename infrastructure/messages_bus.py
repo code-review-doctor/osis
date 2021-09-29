@@ -301,7 +301,8 @@ class MessageBus:
             NoteEtudiantRepository(),
             PeriodeEncodageNotesTranslator(),
             AttributionEnseignantTranslator(),
-            HistoriserNotesService()
+            HistoriserNotesService(),
+            InscriptionExamenTranslator(),
         ),
         SoumettreNotesCommand: lambda cmd: soumettre_notes_etudiant(
             cmd,

@@ -27,7 +27,6 @@ from django.conf.urls import url, include
 from django.urls import path, register_converter
 
 from assessments.views import score_encoding, upload_xls_utils, pgm_manager_administration, score_sheet
-from assessments.views import scores_responsible
 from assessments.views.address.score_sheet import ScoreSheetAddressView, FirstYearBachelorScoreSheetAddressView
 from assessments.views.pgm_manager_administration import ProgramManagerListView, ProgramManagerDeleteView, \
     ProgramManagerCreateView, PersonAutocomplete, MainProgramManagerUpdateView, MainProgramManagerPersonUpdateView, \
@@ -40,10 +39,10 @@ from assessments.views.program_manager.pgm_manager_administration import \
     MainProgramManagerPersonUpdateView as MainProgramManagerPersonUpdateViewNew, \
     ProgramManagerPersonDeleteView as ProgramManagerPersonDeleteViewNew
 from assessments.views.program_manager.score_search import ScoreSearchFormView
+from assessments.views.program_manager.scores_responsible import ScoresResponsiblesSearch, SelectScoreResponsible
 from assessments.views.score_encoding import LearningUnitScoreEncodingView, LearningUnitScoreEncodingFormView, \
     ScoreSheetXLSExportView, ScoreSheetXLSImportView, ScoreEncodingProgressOverviewView, \
     ScoreSheetsPDFExportView
-from assessments.views.scores_responsible import ScoresResponsibleSearch
 from assessments.views.tutor.learning_unit_score_encoding_submit import LearningUnitScoreEncodingTutorSubmitView
 from education_group.converters import AcronymConverter
 
@@ -113,6 +112,7 @@ urlpatterns = [
         ]))
     ])),
 
+    # TODO: Remove all suburl pgm_manager because unused (old version)
     url(r'^pgm_manager/', include([
         url(r'^$', pgm_manager_administration.pgm_manager_administration, name='pgm_manager'),
         url(r'^search$', pgm_manager_administration.pgm_manager_search, name='pgm_manager_search'),
@@ -141,13 +141,11 @@ urlpatterns = [
         url(r'^person-autocomplete/$', PersonAutocomplete.as_view(), name='person-autocomplete'),
     ])),
 
-    url(r'^srm_manager/', include([
-        url(r'^list/$', ScoresResponsibleSearch.as_view(), name='scores_responsible_list'),
-        url(r'^scores_responsible_management/edit/$', scores_responsible.scores_responsible_management,
-            name='scores_responsible_management'),
-        url(r'^scores_responsible_add/(?P<pk>[0-9]+)/$', scores_responsible.scores_responsible_add,
-            name='scores_responsible_add'),
+    path('scores_responsibles/', include([
+        path('', ScoresResponsiblesSearch.as_view(), name='scores_responsibles_search'),
+        path('select/<acronym:code>/', SelectScoreResponsible.as_view(), name='score_responsible_select'),
     ])),
+
 
     url(r'^$', score_encoding.assessments, name="assessments"),
 ]

@@ -46,6 +46,8 @@ from ddd.logic.encodage_des_notes.soumission.test.factory.note_etudiant import N
     NoteDecimalesAuthorisees, NoteDejaSoumise
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.attribution_enseignant import \
     AttributionEnseignantTranslatorInMemory
+from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.inscription_examen import \
+    InscriptionExamenTranslatorInMemory
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.periode_encodage_notes import \
     PeriodeEncodageNotesTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.historiser_notes import \
@@ -80,6 +82,7 @@ class EncoderNotesTest(SimpleTestCase):
 
         self.periode_encodage_notes_translator = PeriodeEncodageNotesTranslatorInMemory()
         self.attribution_translator = AttributionEnseignantTranslatorInMemory()
+        self.inscription_examen_translator = InscriptionExamenTranslatorInMemory()
         self.historiser_notes_service = HistoriserNotesServiceInMemory()
         self.historiser_notes_service.appels.clear()
         self.__mock_service_bus()
@@ -90,7 +93,8 @@ class EncoderNotesTest(SimpleTestCase):
             NoteEtudiantRepository=lambda: self.repository,
             PeriodeEncodageNotesTranslator=lambda: self.periode_encodage_notes_translator,
             AttributionEnseignantTranslator=lambda: self.attribution_translator,
-            HistoriserNotesService=lambda: self.historiser_notes_service
+            HistoriserNotesService=lambda: self.historiser_notes_service,
+            InscriptionExamenTranslator=lambda: self.inscription_examen_translator
         )
         message_bus_patcher.start()
         self.addCleanup(message_bus_patcher.stop)
@@ -376,43 +380,89 @@ class EncoderNotesTest(SimpleTestCase):
         self.assertIsInstance(exception, EncoderNotesEtudiantEnLotLigneBusinessExceptions)
         self.assertEqual(exception.message, NoteDejaSoumiseException().message)
 
-    def test_should_encoder_absence_injustifiee(self):
-        for absence_injustifiee in ['A', JustificationTypes.ABSENCE_UNJUSTIFIED.name]:
-            with self.subTest(absence=absence_injustifiee):
-                cmd = attr.evolve(
-                    self.cmd,
-                    notes=[
-                        EncoderNoteCommand(
-                            noma_etudiant=self.note.noma,
-                            email_etudiant=self.note.email,
-                            note=absence_injustifiee
-                        )
-                    ]
+    def test_should_encoder_absence_injustifiee_as_A(self):
+        cmd = attr.evolve(
+            self.cmd,
+            notes=[
+                EncoderNoteCommand(
+                    noma_etudiant=self.note.noma,
+                    email_etudiant=self.note.email,
+                    note='A'
                 )
+            ]
+        )
 
-                entity_id = self.message_bus.invoke(cmd)[0]
+        entity_id = self.message_bus.invoke(cmd)[0]
 
-                expected_result = Justification(value=JustificationTypes.ABSENCE_UNJUSTIFIED)
-                self.assertEqual(self.repository.get(entity_id).note, expected_result)
+        expected_result = Justification(value=JustificationTypes.ABSENCE_UNJUSTIFIED)
+        self.assertEqual(self.repository.get(entity_id).note, expected_result)
 
-    def test_should_encoder_tricherie(self):
-        for tricherie in ['T', JustificationTypes.CHEATING.name]:
-            with self.subTest(tricherie=tricherie):
-                cmd = attr.evolve(
-                    self.cmd,
-                    notes=[
-                        EncoderNoteCommand(
-                            noma_etudiant=self.note.noma,
-                            email_etudiant=self.note.email,
-                            note=tricherie
-                        )
-                    ]
+    def test_should_encoder_absence_injustifiee_as_ABSENCE_UNJUSTIFIED(self):
+        cmd = attr.evolve(
+            self.cmd,
+            notes=[
+                EncoderNoteCommand(
+                    noma_etudiant=self.note.noma,
+                    email_etudiant=self.note.email,
+                    note=JustificationTypes.ABSENCE_UNJUSTIFIED.name
                 )
+            ]
+        )
 
-                entity_id = self.message_bus.invoke(cmd)[0]
+        entity_id = self.message_bus.invoke(cmd)[0]
 
-                expected_result = Justification(value=JustificationTypes.CHEATING)
-                self.assertEqual(self.repository.get(entity_id).note, expected_result)
+        expected_result = Justification(value=JustificationTypes.ABSENCE_UNJUSTIFIED)
+        self.assertEqual(self.repository.get(entity_id).note, expected_result)
+
+    def test_should_encoder_tricherie_as_T(self):
+        cmd = attr.evolve(
+            self.cmd,
+            notes=[
+                EncoderNoteCommand(
+                    noma_etudiant=self.note.noma,
+                    email_etudiant=self.note.email,
+                    note='T'
+                )
+            ]
+        )
+
+        entity_id = self.message_bus.invoke(cmd)[0]
+
+        expected_result = Justification(value=JustificationTypes.CHEATING)
+        self.assertEqual(self.repository.get(entity_id).note, expected_result)
+
+    def test_should_encoder_tricherie_as_CHEATING(self):
+        cmd = attr.evolve(
+            self.cmd,
+            notes=[
+                EncoderNoteCommand(
+                    noma_etudiant=self.note.noma,
+                    email_etudiant=self.note.email,
+                    note=JustificationTypes.CHEATING.name
+                )
+            ]
+        )
+        entity_id = self.message_bus.invoke(cmd)[0]
+
+        expected_result = Justification(value=JustificationTypes.CHEATING)
+        self.assertEqual(self.repository.get(entity_id).note, expected_result)
+
+    def test_should_pas_persister_car_pas_de_modification(self):
+        self.assertEqual(self.repository.get(self.note.entity_id).note.value, "")
+        cmd = attr.evolve(
+            self.cmd,
+            notes=[
+                EncoderNoteCommand(
+                    noma_etudiant=self.note.noma,
+                    email_etudiant=self.note.email,
+                    note=""
+                )
+            ]
+        )
+
+        results = self.message_bus.invoke(cmd)
+        self.assertEqual(len(results), 0)
+        self.assertEqual(self.repository.get(self.note.entity_id).note.value, "")
 
     def test_should_historiser_encodage(self):
         self.message_bus.invoke(self.cmd)

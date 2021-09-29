@@ -151,7 +151,8 @@ class FirstYearBachelorScoreSheetAddressView(ScoreSheetAddressView):
         context.update({
             "addresse_bachelier": self.bachelor_score_sheet_address_dto,
             "nom_cohorte_bachelier": self.nom_cohorte_bachelier,
-            "intitule": convert_title_to_first_year_bachelor_title(self.education_group_year.title)
+            "intitule_page": convert_title_to_first_year_bachelor_title(self.education_group_year.title),
+            "intitule": self.education_group_year.title
         })
 
         return context

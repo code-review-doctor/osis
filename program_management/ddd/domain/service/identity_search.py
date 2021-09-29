@@ -89,6 +89,8 @@ class ProgramTreeVersionIdentitySearch(interface.DomainService):
 
             Business rules: An acronym can be different across year
         """
+        from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, STANDARD, \
+            NOT_A_TRANSITION
         values = EducationGroupVersion.objects.filter(
             root_group__group_id=Subquery(
                 GroupYear.objects.filter(

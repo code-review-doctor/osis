@@ -110,6 +110,8 @@ def _get_tutor_class_repartition_dtos(
         attributions: List['TutorAttributionToLearningUnitDTO'],
         effective_classes: List['EffectiveClass']
 ) -> List['TutorClassRepartitionDTO']:
+    if not attributions:
+        return []
     liste_repartition_dtos = []
     for class_repartition in tutor.distributed_effective_classes:
         attribution = next(

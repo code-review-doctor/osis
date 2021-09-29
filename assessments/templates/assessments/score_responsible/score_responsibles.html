@@ -37,7 +37,7 @@
     </div>
     <div class="panel panel-default">
         <div class="panel-heading">
-             <form id="search_form" method="GET" action="{% url 'scores_responsible_list' %}">
+             <form id="search_form" method="GET">
                  <div class="row">
                     {% bootstrap_field filter.form.acronym form_group_class="col-md-1" %}
                     {% bootstrap_field filter.form.learning_unit_title form_group_class="col-md-3" %}
@@ -118,7 +118,7 @@
                         "targets": 4,
                         "orderable": false,
                         "render" : function (data, type, row, meta) {
-                            const href = "{% url 'scores_responsible_management'%}?{{request.GET.urlencode}}&learning_unit_year=learning_unit_year_" + row['pk'];
+                            const href = row['select_url'];
                             return "<a href='"+ href + "'> <span class='glyphicon glyphicon-edit'></span></a>";
                         }
                     }
@@ -129,7 +129,7 @@
                 "ordering": true,
                 "serverSide": true,
                 "ajax" : {
-                    "url": "{% url 'scores_responsible_list' %}",
+                    "url": "{% url 'scores_responsibles_search' %}",
                     "type": "GET",
                     "dataSrc": "object_list",
                     "data": function(d) {
