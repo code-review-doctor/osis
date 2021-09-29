@@ -31,6 +31,11 @@ from base.models.person import Person
 from ddd.logic.admission.preparation.projet_doctoral.builder.proposition_identity_builder import \
     PropositionIdentityBuilder
 from ddd.logic.admission.preparation.projet_doctoral.domain.model._detail_projet import DetailProjet
+from ddd.logic.admission.preparation.projet_doctoral.domain.model._enums import (
+    ChoixBureauCDE,
+    ChoixStatusProposition,
+    ChoixTypeAdmission,
+)
 from ddd.logic.admission.preparation.projet_doctoral.domain.model._experience_precedente_recherche import (
     ChoixDoctoratDejaRealise,
     ExperiencePrecedenteRecherche,
@@ -40,10 +45,6 @@ from ddd.logic.admission.preparation.projet_doctoral.domain.model.doctorat impor
 from ddd.logic.admission.preparation.projet_doctoral.domain.model.proposition import (
     Proposition,
     PropositionIdentity,
-)
-from ddd.logic.admission.preparation.projet_doctoral.domain.model._enums import (
-    ChoixStatusProposition,
-    ChoixTypeAdmission,
 )
 from ddd.logic.admission.preparation.projet_doctoral.dtos import PropositionDTO, PropositionSearchDTO
 from ddd.logic.admission.preparation.projet_doctoral.repository.i_proposition import IPropositionRepository
@@ -55,6 +56,7 @@ from osis_common.ddd.interface import ApplicationService
 def _instantiate_admission(admission: DoctorateAdmission) -> Proposition:
     return Proposition(
         entity_id=PropositionIdentityBuilder().build_from_uuid(admission.uuid),
+        bureau_CDE=ChoixBureauCDE[admission.bureau] if admission.bureau else '',
         type_admission=ChoixTypeAdmission[admission.type],
         doctorat_id=DoctoratIdentity(admission.doctorate.acronym, admission.doctorate.academic_year.year),
         matricule_candidat=admission.candidate.global_id,
@@ -152,9 +154,9 @@ class PropositionRepository(IPropositionRepository):
                 'type': entity.type_admission.name,
                 'comment': entity.justification,
                 'candidate': Person.objects.get(global_id=entity.matricule_candidat),
-                'bureau': entity.bureau_CDE or '',
+                'bureau': entity.bureau_CDE and entity.bureau_CDE.name,
                 'doctorate': doctorate,
-                'financing_type': entity.financement.type.name,
+                'financing_type': entity.financement.type and entity.financement.type.name,
                 'financing_work_contract': entity.financement.type_contrat_travail,
                 'financing_eft': entity.financement.eft,
                 'scholarship_grant': entity.financement.bourse_recherche,

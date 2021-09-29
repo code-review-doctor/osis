@@ -42,7 +42,7 @@ class PropositionDto(interface.DomainService):
             secteur_ucl_translator: 'ISecteurUclTranslator',
     ) -> 'PropositionDTO':
         proposition = repository.get(PropositionIdentityBuilder.build_from_uuid(uuid_proposition))
-        doctorat = doctorat_translator.search(proposition.doctorat_id.sigle, proposition.doctorat_id.annee)[0]
+        doctorat = doctorat_translator.get_dto(proposition.doctorat_id.sigle, proposition.doctorat_id.annee)
         return PropositionDTO(
             type_admission=proposition.type_admission.name,
             sigle_doctorat=proposition.doctorat_id.sigle,
@@ -50,9 +50,10 @@ class PropositionDto(interface.DomainService):
             intitule_doctorat_fr=doctorat.intitule_fr,
             intitule_doctorat_en=doctorat.intitule_en,
             matricule_candidat=proposition.matricule_candidat,
+            justification=proposition.justification,
             code_secteur_formation=secteur_ucl_translator.get(doctorat.sigle_entite_gestion).sigle,
-            bureau_CDE=proposition.bureau_CDE,
-            type_financement=proposition.financement.type.name,
+            bureau_CDE=proposition.bureau_CDE and proposition.bureau_CDE.name,
+            type_financement=proposition.financement.type and proposition.financement.type.name,
             type_contrat_travail=proposition.financement.type_contrat_travail,
             eft=proposition.financement.eft,
             bourse_recherche=proposition.financement.bourse_recherche,

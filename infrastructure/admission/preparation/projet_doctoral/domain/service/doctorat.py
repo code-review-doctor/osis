@@ -31,10 +31,28 @@ from ddd.logic.admission.preparation.projet_doctoral.domain.service.i_doctorat i
 from ddd.logic.admission.preparation.projet_doctoral.domain.validator.exceptions import DoctoratNonTrouveException
 from ddd.logic.admission.preparation.projet_doctoral.dtos import DoctoratDTO
 from ddd.logic.formation_catalogue.commands import SearchFormationsCommand
+from ddd.logic.formation_catalogue.dtos import TrainingDto
 from ddd.logic.learning_unit.domain.model.responsible_entity import UCLEntityIdentity  # FIXME reuse from shared_kernel
 
 
 class DoctoratTranslator(IDoctoratTranslator):
+    @classmethod
+    def get_dto(cls, sigle: str, annee: int) -> DoctoratDTO:
+        from infrastructure.messages_bus import message_bus_instance
+        dtos = message_bus_instance.invoke(
+            SearchFormationsCommand(sigle=sigle, annee=annee, type=TrainingType.PHD.name)
+        )
+        if dtos:
+            dto = dtos[0]  # type: TrainingDto
+            return DoctoratDTO(
+                sigle=dto.acronym,
+                annee=dto.year,
+                intitule_fr=dto.title_fr,
+                intitule_en=dto.title_en,
+                sigle_entite_gestion=dto.management_entity_acronym,
+            )
+        raise DoctoratNonTrouveException()
+
     @classmethod
     def get(cls, sigle: str, annee: int) -> Doctorat:
         from infrastructure.messages_bus import message_bus_instance
@@ -42,7 +60,7 @@ class DoctoratTranslator(IDoctoratTranslator):
             SearchFormationsCommand(sigle=sigle, annee=annee, type=TrainingType.PHD.name)
         )
         if dtos:
-            dto = dtos[0]
+            dto = dtos[0]  # type: TrainingDto
             return Doctorat(
                 entity_id=DoctoratIdentity(sigle=dto.acronym, annee=dto.year),
                 entite_ucl_id=UCLEntityIdentity(code=dto.management_entity_acronym),

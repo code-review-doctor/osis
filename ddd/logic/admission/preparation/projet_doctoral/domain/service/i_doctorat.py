@@ -39,6 +39,11 @@ class IDoctoratTranslator(interface.DomainService):
 
     @classmethod
     @abstractmethod
+    def get_dto(cls, sigle: str, annee: int) -> DoctoratDTO:
+        pass
+
+    @classmethod
+    @abstractmethod
     def search(cls, sigle_entite_gestion: str, annee: int) -> List['DoctoratDTO']:
         pass
 

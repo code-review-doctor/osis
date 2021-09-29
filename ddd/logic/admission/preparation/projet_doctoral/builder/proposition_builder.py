@@ -70,6 +70,8 @@ class PropositionBuilder(interface.RootEntityBuilder):
             doctorat_id: 'DoctoratIdentity',
     ) -> 'Proposition':
         InitierPropositionValidatorList(
+            type_admission=cmd.type_admission,
+            justification=cmd.justification,
             type_financement=cmd.type_financement,
             type_contrat_travail=cmd.type_contrat_travail,
             doctorat_deja_realise=cmd.doctorat_deja_realise,

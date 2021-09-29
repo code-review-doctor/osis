@@ -26,12 +26,12 @@
 import abc
 from typing import List, Optional
 
-from ddd.logic.admission.preparation.projet_doctoral.domain.model.groupe_de_supervision import \
-    GroupeDeSupervisionIdentity, \
-    GroupeDeSupervision
+from ddd.logic.admission.preparation.projet_doctoral.domain.model.groupe_de_supervision import (
+    GroupeDeSupervision,
+    GroupeDeSupervisionIdentity,
+)
 from ddd.logic.admission.preparation.projet_doctoral.domain.model.proposition import PropositionIdentity
 from ddd.logic.admission.preparation.projet_doctoral.dtos import CotutelleDTO
-from ddd.logic.admission.preparation.projet_doctoral.dtos import GroupeDeSupervisionDTO
 from osis_common.ddd import interface
 from osis_common.ddd.interface import ApplicationService
 

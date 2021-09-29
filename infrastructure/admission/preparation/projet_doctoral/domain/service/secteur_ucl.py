@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 # ##############################################################################
-from admission.contrib.models import EntityProxy
 from base.models.entity import Entity
 from ddd.logic.admission.preparation.projet_doctoral.domain.service.i_secteur_ucl import ISecteurUclTranslator
 from infrastructure.shared_kernel.entite.dtos import EntiteUclDTO

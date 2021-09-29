@@ -34,7 +34,7 @@ import attr
 from rest_framework import serializers
 
 from base.models.utils.utils import ChoiceEnum
-from osis_common.ddd.interface import CommandRequest
+from osis_common.ddd.interface import CommandRequest, DTO, EntityIdentity
 
 
 class DTOSerializer(serializers.Serializer):
@@ -148,9 +148,9 @@ class DTOSerializer(serializers.Serializer):
         elif isinstance(field_type, ChoiceEnum):
             field_class = serializers.ChoiceField
             field_kwargs['choices'] = field_type.choices()
+        elif issubclass(field_type, (DTO, EntityIdentity)):
+            field_class = self.get_nested_serializer(field_type)
         # TODO for Union, convert to ReadOnlyField, custom mapping or not supported
-        # TODO for another DTO, convert to nested serializer
-        # TODO for EntityIdentity, convert to nested serializer
         else:
             try:
                 field_class = field_mapping[field_type]
@@ -213,3 +213,11 @@ class DTOSerializer(serializers.Serializer):
 
     def update(self, instance, validated_data):
         raise NotImplementedError("This serializer should not be used for writing purposes")
+
+    @staticmethod
+    def get_nested_serializer(dto_class):
+        class NestedSerializer(DTOSerializer):
+            class Meta:
+                source = dto_class
+
+        return NestedSerializer

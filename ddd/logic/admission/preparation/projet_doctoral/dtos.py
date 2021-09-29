@@ -93,6 +93,7 @@ class CurriculumDTO(interface.DTO):
 @attr.s(frozen=True, slots=True)
 class PropositionDTO(interface.DTO):
     type_admission = attr.ib(type=str)
+    justification = attr.ib(type=Optional[str])
     sigle_doctorat = attr.ib(type=str)
     annee_doctorat = attr.ib(type=int)
     intitule_doctorat_fr = attr.ib(type=str)
