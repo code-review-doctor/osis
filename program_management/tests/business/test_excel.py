@@ -96,7 +96,7 @@ class TestGeneratePrerequisitesWorkbook(SimpleTestCase):
             empty_col2='',
             credits=link_with_node_is_prerequisite.relative_credits_repr,
             blocks=str(link_with_node_is_prerequisite.block) if link_with_node_is_prerequisite.block else '',
-            is_mandatory=_("Yes") if link_with_node_is_prerequisite.is_mandatory else _("No")
+            mandatory_status=_("Yes") if link_with_node_is_prerequisite.is_mandatory else _("No")
         )
         expected_prerequisite_item_line = PrerequisiteItemLine(
             text='{} :'.format(_('has as prerequisite')),
@@ -135,8 +135,14 @@ class TestGeneratePrerequisitesWorkbook(SimpleTestCase):
             empty_col1='',
             empty_col2='',
             credits=self._expected_credits_repr(link_with_node_is_prerequisite1, link_with_node_is_prerequisite2),
-            blocks=self._expected_blocks_repr(link_with_node_is_prerequisite1, link_with_node_is_prerequisite2),
-            is_mandatory=_("Yes") if link_with_node_is_prerequisite1.is_mandatory else _("No")
+            blocks=self._expected_blocks_repr(
+                link_with_node_is_prerequisite1.block,
+                link_with_node_is_prerequisite2.block
+            ),
+            mandatory_status=self._expected_mandatory_status(
+                link_with_node_is_prerequisite1.is_mandatory,
+                link_with_node_is_prerequisite2.is_mandatory
+            ),
         )
         self.assertEqual(expected_learning_unit_year_line, learning_unit_year_line)
 
@@ -165,10 +171,12 @@ class TestGeneratePrerequisitesWorkbook(SimpleTestCase):
         )
         self.assertEqual(prerequisite_item_line_2, expected_prerequisite_item_line2)
 
-    def _expected_blocks_repr(self, link_with_node_is_prerequisite1, link_with_node_is_prerequisite2):
+    def _expected_blocks_repr(self, block1: str, block2: str):
         blocks = set()
-        blocks.add(str(link_with_node_is_prerequisite1.block) if link_with_node_is_prerequisite1.block else '')
-        blocks.add(str(link_with_node_is_prerequisite2.block) if link_with_node_is_prerequisite2.block else '')
+        if block1:
+            blocks.add(str(block1))
+        if block2:
+            blocks.add(str(block2))
         return " ; ".join(sorted(blocks))
 
     def _expected_credits_repr(self, link_with_node_is_prerequisite1, link_with_node_is_prerequisite2):
@@ -176,3 +184,9 @@ class TestGeneratePrerequisitesWorkbook(SimpleTestCase):
         credits.add(link_with_node_is_prerequisite1.relative_credits_repr)
         credits.add(link_with_node_is_prerequisite2.relative_credits_repr)
         return " ; ".join(sorted(credits))
+
+    def _expected_mandatory_status(self, is_mandatory1: bool, is_mandatory2: bool):
+        mandatory_status = set()
+        mandatory_status.add(str(_("Yes")) if is_mandatory1 else str(_("No")))
+        mandatory_status.add(str(_("Yes")) if is_mandatory2 else str(_("No")))
+        return " ; ".join(sorted(mandatory_status))

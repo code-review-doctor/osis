@@ -66,7 +66,7 @@ HeaderLine = namedtuple('HeaderLine', ['egy_acronym', 'egy_title', 'code_header'
 OfficialTextLine = namedtuple('OfficialTextLine', ['text'])
 LearningUnitYearLine = namedtuple(
     'LearningUnitYearLine',
-    ['luy_acronym', 'luy_title', 'empty_col1', 'empty_col2', 'credits', 'blocks', 'is_mandatory']
+    ['luy_acronym', 'luy_title', 'empty_col1', 'empty_col2', 'credits', 'blocks', 'mandatory_status']
 )
 LearningUnitYearLinePrerequisiteOf = \
     namedtuple(
@@ -134,19 +134,20 @@ def _build_excel_lines(tree: 'ProgramTree') -> List:
     for node in tree.get_nodes_that_have_prerequisites():
         credits = set()
         blocks = set()
-        is_mandatory = None
+        mandatory_status = set()
         for group_number, group in enumerate(tree.get_prerequisite(node).prerequisite_item_groups, start=1):
             for position, prerequisite_item in enumerate(group.prerequisite_items, start=1):
                 prerequisite_item_links = tree.search_links_using_node(
                     tree.get_node_by_code_and_year(code=prerequisite_item.code, year=prerequisite_item.year)
                 )
-                item_link = prerequisite_item_links[0]
-                credit = tree.get_distinct_credits_repr(NodeIdentity(prerequisite_item.code, prerequisite_item.year))
-                credits.update(credit)
-                block = tree.get_blocks(NodeIdentity(prerequisite_item.code, prerequisite_item.year))
-                blocks.update(block)
-                if is_mandatory is None:
-                    is_mandatory = _("Yes") if item_link and item_link.is_mandatory else _("No")
+                for item_link in prerequisite_item_links:
+                    credit = tree.get_distinct_credits_repr(
+                        NodeIdentity(prerequisite_item.code, prerequisite_item.year)
+                    )
+                    credits.update(credit)
+                    block = tree.get_blocks(NodeIdentity(prerequisite_item.code, prerequisite_item.year))
+                    blocks.update(block)
+                    mandatory_status.add(_("Yes") if item_link and item_link.is_mandatory else _("No"))
 
         content.append(
             LearningUnitYearLine(
@@ -156,7 +157,7 @@ def _build_excel_lines(tree: 'ProgramTree') -> List:
                 empty_col2='',
                 credits=" ; ".join(sorted(credits)) if credits else '',
                 blocks=" ; ".join(sorted(blocks)) if blocks else '',
-                is_mandatory=is_mandatory if is_mandatory else ''
+                mandatory_status=" ; ".join(sorted(mandatory_status)) if mandatory_status else '',
             )
         )
         for group_number, group in enumerate(tree.get_prerequisite(node).prerequisite_item_groups, start=1):
@@ -361,14 +362,13 @@ def _build_excel_lines_prerequisited(tree: 'ProgramTree') -> List:
         if tree.is_prerequisite(child_node):
             credits = set()
             blocks = set()
-            is_mandatory = None
+            mandatory_status = set()
             for prerequisite_node in tree.search_is_prerequisite_of(child_node):
                 if child_node.year == prerequisite_node.year:
-                    first_link = tree.get_first_link_occurence_using_node(prerequisite_node)
-                    credits.add(first_link.relative_credits_repr)
-                    blocks.add(first_link.block_repr)
-                    if is_mandatory is None:
-                        is_mandatory = _("Yes") if first_link.is_mandatory else _("No")
+                    for link in tree.search_links_using_node(child_node):
+                        blocks.add(link.block_repr)
+                        credits.add(link.relative_credits_repr)
+                        mandatory_status.add(_("Yes") if link.is_mandatory else _("No"))
 
             content.append(
                 LearningUnitYearLinePrerequisiteOf(
@@ -377,7 +377,7 @@ def _build_excel_lines_prerequisited(tree: 'ProgramTree') -> List:
                     empty_col1='',
                     credits=" ; ".join(credits) if credits else '',
                     blocks=" ; ".join(sorted(blocks)) if blocks else '',
-                    is_mandatory=is_mandatory if is_mandatory else ''
+                    is_mandatory=" ; ".join(sorted(mandatory_status)) if mandatory_status else '',
                 )
             )
 
