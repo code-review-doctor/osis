@@ -934,8 +934,14 @@ msgstr "English-friendly"
 msgid "Enrolled"
 msgstr "Inscrit"
 
+msgid "Enrolled to"
+msgstr "Inscrits à"
+
 msgid "Enrolled to learning unit"
 msgstr "Inscrits à l'UE"
+
+msgid "Enrolled to training"
+msgstr "Inscrits à la formation"
 
 msgid "Enrollment campus"
 msgstr "Lieu d'inscription"
@@ -2952,9 +2958,6 @@ msgstr "Aujourd'hui"
 
 msgid "Total"
 msgstr "Total"
-
-msgid "Total enrollments to training"
-msgstr "Total d'inscrits à la formation"
 
 msgid "Training"
 msgstr "Formation"
