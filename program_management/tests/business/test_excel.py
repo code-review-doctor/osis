@@ -173,8 +173,10 @@ class TestGeneratePrerequisitesWorkbook(SimpleTestCase):
 
     def _expected_blocks_repr(self, block1: str, block2: str):
         blocks = set()
-        blocks.add(str(block1) if block1 and block1 != '' else '')
-        blocks.add(str(block2) if block2 and block2 != '' else '')
+        if block1:
+            blocks.add(str(block1))
+        if block2:
+            blocks.add(str(block2))
         return " ; ".join(sorted(blocks))
 
     def _expected_credits_repr(self, link_with_node_is_prerequisite1, link_with_node_is_prerequisite2):
