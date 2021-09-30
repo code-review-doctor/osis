@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 08:30+0200\n"
+"POT-Creation-Date: 2021-09-28 14:07+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -908,7 +908,13 @@ msgstr ""
 msgid "Enrolled"
 msgstr ""
 
+msgid "Enrolled to"
+msgstr ""
+
 msgid "Enrolled to learning unit"
+msgstr ""
+
+msgid "Enrolled to training"
 msgstr ""
 
 msgid "Enrollment campus"
@@ -1629,6 +1635,9 @@ msgid "Minimum number of permitted relationships"
 msgstr ""
 
 msgid "Minor list choice"
+msgstr ""
+
+msgid "Missing score"
 msgstr ""
 
 msgid "Missing search address"
@@ -2805,9 +2814,6 @@ msgid "Today"
 msgstr ""
 
 msgid "Total"
-msgstr ""
-
-msgid "Total enrollments to training"
 msgstr ""
 
 msgid "Training"

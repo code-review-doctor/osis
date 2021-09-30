@@ -181,8 +181,8 @@ class AnnualVolumeInvalidException(BusinessException):
     def __init__(self, volume_annual: 'DurationUnit', *args, **kwargs):
         message = _(
             "The sum of first/second quadrimesters volumes should be equal to annual volume "
-            "of the learning unit ({})".format(volume_annual)
-        )
+            "of the learning unit ({})"
+        ).format(volume_annual)
         super().__init__(message, **kwargs)
 
 

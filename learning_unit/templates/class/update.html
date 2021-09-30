@@ -56,7 +56,7 @@
         </h2>
         {% if effective_class %}
             <h4>
-                {{ learning_unit.titles.common_fr }} {% if effective_class %}-
+                {{ learning_unit.titles.common_fr | default_if_none:'' }} {% if effective_class %}-
                 {{ effective_class.titles.fr }}{% endif %}
             </h4>
         {% endif %}
