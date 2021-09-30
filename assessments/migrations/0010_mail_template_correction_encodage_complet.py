@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
 
                {% endautoescape off %}
                ''',
-               "[OSIS] Correction de l'encodage complet des notes de {unite_enseignement} pour {cohorte}",
+               "Correction de l'encodage complet des notes de {unite_enseignement} pour {cohorte}",
                'assessments_correction_encodage_complet_html',
                'HTML',
                'fr-be'])], elidable=True
@@ -49,7 +49,7 @@ class Migration(migrations.Migration):
 
                {% endautoescape off %}
                ''',
-               "[OSIS] Correction de l'encodage complet des notes de {unite_enseignement} pour {cohorte}",
+               "Correction de l'encodage complet des notes de {unite_enseignement} pour {cohorte}",
                'assessments_correction_encodage_complet_txt',
                'PLAIN',
                'fr-be'])], elidable=True
@@ -71,7 +71,7 @@ class Migration(migrations.Migration):
 
                {% endautoescape off %}
                ''',
-               '[OSIS] Correction of the complete encoding of {unite_enseignement} for {cohorte}',
+               'Correction of the complete encoding of {unite_enseignement} for {cohorte}',
                'assessments_correction_encodage_complet_html',
                'HTML',
                'en'])], elidable=True
@@ -93,7 +93,7 @@ class Migration(migrations.Migration):
 
                {% endautoescape off %}
                ''',
-               '[OSIS] Correction of the complete encoding of {unite_enseignement} for {cohorte}',
+               'Correction of the complete encoding of {unite_enseignement} for {cohorte}',
                'assessments_correction_encodage_complet_txt',
                'PLAIN',
                'en'])], elidable=True
