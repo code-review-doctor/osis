@@ -27,16 +27,16 @@ from typing import List
 
 from base.ddd.utils.business_validator import BusinessValidator
 from program_management.ddd.domain.exception import TransitionNameExistsCurrentYearAndInFuture
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, ProgramTreeVersion
+from program_management.ddd.business_types import *
 
 
 class TransitionNameExistsValidator(BusinessValidator):
 
     def __init__(
             self,
-            from_specific_version: ProgramTreeVersionIdentity,
+            from_specific_version: 'ProgramTreeVersionIdentity',
             transition_name: str,
-            all_versions: List[ProgramTreeVersion]
+            all_versions: List['ProgramTreeVersion']
     ):
         super(TransitionNameExistsValidator, self).__init__()
         self.from_specific_version = from_specific_version

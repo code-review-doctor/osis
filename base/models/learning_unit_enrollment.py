@@ -30,13 +30,23 @@ from osis_common.models.serializable_model import SerializableModelAdmin, Serial
 
 
 class LearningUnitEnrollmentAdmin(SerializableModelAdmin):
-    list_display = ('student', 'learning_unit_year', 'offer', 'date_enrollment', 'enrollment_state', 'changed')
+    list_display = (
+        'student',
+        'learning_unit_year',
+        'learning_class_year',
+        'offer',
+        'date_enrollment',
+        'enrollment_state',
+        'changed',
+    )
     list_filter = ('learning_unit_year__academic_year', 'enrollment_state',)
-    search_fields = ['learning_unit_year__acronym',
-                     'offer_enrollment__education_group_year__acronym',
-                     'offer_enrollment__student__registration_id',
-                     'offer_enrollment__student__person__first_name',
-                     'offer_enrollment__student__person__last_name']
+    search_fields = [
+        'learning_unit_year__acronym',
+        'offer_enrollment__education_group_year__acronym',
+        'offer_enrollment__student__registration_id',
+        'offer_enrollment__student__person__first_name',
+        'offer_enrollment__student__person__last_name',
+    ]
 
 
 class LearningUnitEnrollment(SerializableModel):
@@ -44,11 +54,17 @@ class LearningUnitEnrollment(SerializableModel):
     changed = models.DateTimeField(null=True, auto_now=True)
     date_enrollment = models.DateField()
     learning_unit_year = models.ForeignKey('LearningUnitYear', on_delete=models.CASCADE)
+    learning_class_year = models.ForeignKey(
+        'learning_unit.LearningClassYear',
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True
+    )
     offer_enrollment = models.ForeignKey('OfferEnrollment', on_delete=models.PROTECT)
     enrollment_state = models.CharField(max_length=20, choices=learning_unit_enrollment_state.STATES, default="")
 
     class Meta:
-        unique_together = ('offer_enrollment', 'learning_unit_year', 'enrollment_state',)
+        unique_together = ('offer_enrollment', 'learning_unit_year', 'learning_class_year', 'enrollment_state',)
 
     @property
     def student(self):

@@ -109,12 +109,14 @@ class Person(SerializableModel):
         max_size=FILE_MAX_SIZE,
         max_files=2,
         min_files=1,
+        null=True
     )
     passport = FileField(
         mimetypes=['image/jpeg', 'image/png', 'application/pdf'],
         max_size=FILE_MAX_SIZE,
         max_files=2,
         min_files=1,
+        null=True
     )
     last_registration_year = models.ForeignKey(
         'base.AcademicYear',
@@ -131,6 +133,7 @@ class Person(SerializableModel):
         max_size=FILE_MAX_SIZE,
         max_files=1,
         min_files=1,
+        null=True
     )
 
     source = models.CharField(max_length=25, blank=True, null=True, choices=person_source_type.CHOICES,

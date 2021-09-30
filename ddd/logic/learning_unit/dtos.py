@@ -27,6 +27,7 @@ from typing import List, Optional
 
 import attr
 
+from base.models.enums import learning_component_year_type
 from ddd.logic.learning_unit.domain.model._financial_volumes_repartition import DurationUnit
 from ddd.logic.learning_unit.domain.model.responsible_entity import EntityCode
 from osis_common.ddd.interface import DTO
@@ -97,6 +98,12 @@ class LearningUnitFromRepositoryDTO(DTO):
 
 
 @attr.s(frozen=True, slots=True)
+class LearningUnitPartimDTO(DTO):
+    code = attr.ib(type=str)
+    full_title = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
 class LearningUnitSearchDTO(DTO):
     year = attr.ib(type=int)
     code = attr.ib(type=str)
@@ -104,6 +111,7 @@ class LearningUnitSearchDTO(DTO):
     type = attr.ib(type=str)
     responsible_entity_code = attr.ib(type=str)
     responsible_entity_title = attr.ib(type=str)
+    partims = attr.ib(type=List[LearningUnitPartimDTO], default=attr.Factory(list))
 
 
 @attr.s(frozen=True, slots=True)
@@ -125,3 +133,22 @@ class EffectiveClassFromRepositoryDTO(DTO):
     volume_q1 = attr.ib(type=DurationUnit)
     volume_q2 = attr.ib(type=DurationUnit)
     class_type = attr.ib(type=str)
+
+    @property
+    def code_complet_classe(self) -> str:
+        if self.class_type == learning_component_year_type.LECTURING:
+            return self.learning_unit_code + "-" + self.class_code
+        return self.learning_unit_code + "_" + self.class_code
+
+
+@attr.s(frozen=True, slots=True)
+class EffectiveClassDTO(DTO):
+    code = attr.ib(type=str)
+    title_fr = attr.ib(type=str)
+    title_en = attr.ib(type=str)
+    teaching_place_uuid = attr.ib(type=str)
+    derogation_quadrimester = attr.ib(type=str)
+    session_derogation = attr.ib(type=str)
+    volume_q1 = attr.ib(type=DurationUnit)
+    volume_q2 = attr.ib(type=DurationUnit)
+    type = attr.ib(type=str)

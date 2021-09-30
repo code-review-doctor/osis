@@ -39,6 +39,7 @@ from ddd.logic.learning_unit.domain.model._remarks import Remarks
 from ddd.logic.learning_unit.domain.model._titles import Titles
 from ddd.logic.learning_unit.domain.model._volumes_repartition import LecturingPart, PracticalPart
 from ddd.logic.learning_unit.domain.model.responsible_entity import UCLEntityIdentity
+from ddd.logic.learning_unit.dtos import LearningUnitPartimDTO
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 from ddd.logic.shared_kernel.campus.domain.model.uclouvain_campus import UclouvainCampusIdentity
 from ddd.logic.shared_kernel.language.domain.model.language import LanguageIdentity
@@ -52,7 +53,7 @@ class LearningUnitIdentity(interface.EntityIdentity):
     code = attr.ib(type=str)
 
     def __str__(self):
-        return "{} - ({})".format(self.code, self.academic_year)
+        return "{} - ({})".format(self.code, self.academic_year.year)
 
     @property
     def year(self) -> int:
@@ -81,6 +82,7 @@ class LearningUnit(interface.RootEntity):
     practical_part = attr.ib(type=PracticalPart)
     professional_integration = attr.ib(type=bool)
     is_active = attr.ib(type=bool)
+    type = None
     individual_loan = attr.ib(type=bool)
     mobility = attr.ib(type=Mobility)
     stage_dimona = attr.ib(type=bool)
@@ -135,6 +137,15 @@ class LearningUnit(interface.RootEntity):
         if self.has_practical_volume() and not self.has_lecturing_volume():
             return self.practical_part.volumes
         return self.lecturing_part.volumes
+
+    def get_partims_information(self) -> List[LearningUnitPartimDTO]:
+        return [
+            LearningUnitPartimDTO(
+                code="{}{}".format(self.code, partim.subdivision),
+                full_title=partim.title_fr,
+            )
+            for partim in self.partims
+        ]
 
 
 class CourseLearningUnit(LearningUnit):

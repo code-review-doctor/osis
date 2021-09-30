@@ -1,0 +1,24 @@
+{% extends "admin/change_list.html" %}
+
+{% block extrastyle %}
+    {{block.super}}
+    <style>
+        .panel-info {
+            font-size: 16px;
+            padding: 1.5em;
+            color: #31708f;
+            background-color: #d9edf7;
+            border-color: #bce8f1;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+    </style>
+{% endblock extrastyle %}
+
+
+{% block search %}
+    {{block.super}}
+    <div class="panel-info">
+        Pour rechercher l'historique d'un cours, il faut effectuer une recherche de type [Code UE]+[Année académique]+[Numero session]. Ex: LDROI120020212
+    </div>
+{% endblock search %}

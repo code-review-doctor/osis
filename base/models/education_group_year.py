@@ -30,7 +30,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
-from django.db.models import Count, Min, When, Case, Max
+from django.db.models import Count, Min, When, Case, Max, OuterRef, Subquery
 from django.urls import reverse
 from django.utils import translation
 from django.utils.functional import cached_property
@@ -106,6 +106,19 @@ class EducationGroupYearQueryset(SerializableQuerySet):
             past=Max(
                 Case(When(academic_year__year__lt=year, then='academic_year__year'))
             )
+        )
+
+    @classmethod
+    def annotate_entity_requirement_acronym(cls, queryset):
+        management_entities_qs = entity_version.EntityVersion.objects.filter(
+            entity=OuterRef('management_entity'),
+        ).current(
+            OuterRef('academic_year__start_date')
+        ).values(
+            'acronym'
+        )[:1]
+        return queryset.annotate(
+            management_entity_acronym=Subquery(management_entities_qs)
         )
 
 
