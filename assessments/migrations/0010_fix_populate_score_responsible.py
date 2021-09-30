@@ -63,6 +63,9 @@ def is_learning_unit_year_a_class(luy):
 
 
 def populate_score_responsible(apps, schema_editor):
+    print("Removing all from ScoreResponsible table...")
+    ScoreResponsible = apps.get_model("assessments", "ScoreResponsible")
+    ScoreResponsible.objects.all().delete()
     print("Populate score responsible table")
     qs = get_queryset(apps)
     for attribution in qs:
