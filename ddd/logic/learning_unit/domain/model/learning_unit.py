@@ -132,6 +132,12 @@ class LearningUnit(interface.RootEntity):
     def has_lecturing_volume(self) -> bool:
         return self.lecturing_part and self.lecturing_part.volumes.volume_annual
 
+    @property
+    def volumes(self) -> 'Volumes':
+        if self.has_practical_volume() and not self.has_lecturing_volume():
+            return self.practical_part.volumes
+        return self.lecturing_part.volumes
+
     def get_partims_information(self) -> List[LearningUnitPartimDTO]:
         return [
             LearningUnitPartimDTO(

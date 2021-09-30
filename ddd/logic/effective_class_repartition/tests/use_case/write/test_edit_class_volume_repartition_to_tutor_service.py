@@ -27,7 +27,7 @@ import random
 from decimal import Decimal
 
 import attr
-from django.test import SimpleTestCase
+from django.test import TestCase
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from ddd.logic.effective_class_repartition.commands import EditClassVolumeRepartitionToTutorCommand
@@ -38,9 +38,10 @@ from ddd.logic.effective_class_repartition.use_case.write.edit_class_volume_repa
 from ddd.logic.learning_unit.tests.factory.effective_class import LecturingEffectiveClassFactory
 from infrastructure.effective_class_repartition.repository.in_memory.tutor import TutorRepository
 from infrastructure.learning_unit.repository.in_memory.effective_class import EffectiveClassRepository
+from infrastructure.application.services.learning_unit_service import LearningUnitTranslator
 
 
-class EditClassVolumeRepartitionToTutorService(SimpleTestCase):
+class EditClassVolumeRepartitionToTutorService(TestCase):
     def setUp(self):
         self.tutor_repository = TutorRepository()
         self.effective_class_repository = EffectiveClassRepository()
@@ -58,12 +59,14 @@ class EditClassVolumeRepartitionToTutorService(SimpleTestCase):
             tutor_personal_id_number=self.tutor.entity_id.personal_id_number,
             distributed_volume=0
         )
+        self.learning_unit_translator = LearningUnitTranslator()
 
     def test_should_edit_class_volume_repartition(self):
         tutor_id = edit_class_volume_repartition_to_tutor(
             self.edit_class_volume_cmd,
             self.tutor_repository,
             self.effective_class_repository,
+            self.learning_unit_translator
         )
         tutor = self.tutor_repository.get(tutor_id)
         class_volume = tutor.distributed_effective_classes[0]
@@ -79,6 +82,7 @@ class EditClassVolumeRepartitionToTutorService(SimpleTestCase):
                 cmd,
                 self.tutor_repository,
                 self.effective_class_repository,
+                self.learning_unit_translator
             )
         self.assertIsInstance(
             e.exception.exceptions.pop(),

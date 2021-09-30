@@ -280,6 +280,7 @@ class MessageBus:
             cmd,
             TutorRepository(),
             EffectiveClassRepository(),
+            LearningUnitTranslator(),
         ),
         SearchDetailClassesEffectivesCommand: lambda cmd: search_detail_classes_effectives(
             cmd,
@@ -289,7 +290,8 @@ class MessageBus:
         EditClassVolumeRepartitionToTutorCommand: lambda cmd: edit_class_volume_repartition_to_tutor(
             cmd,
             TutorRepository(),
-            EffectiveClassRepository()
+            EffectiveClassRepository(),
+            LearningUnitTranslator(),
         ),
         GetTutorRepartitionClassesCommand: lambda cmd: get_tutor_repartition_classes(cmd, TutorRepository()),
         GetClassesEffectivesDepuisUniteDEnseignementCommand: lambda cmd: get_learning_unit_effective_classes(
