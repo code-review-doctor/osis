@@ -154,6 +154,6 @@ class CentralManager(osis_role_models.EntityRoleModel):
             'learning_unit.view_learningclassyear': rules.always_allow,
             'learning_unit.delete_learningclassyear':
                 osis_role_predicates.always_deny(
-                    message=_("You do not have sufficient access rights to update a class.")
+                    message=_("You do not have sufficient access rights to delete a class.")
                 ),
          })
