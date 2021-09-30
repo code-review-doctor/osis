@@ -26,7 +26,7 @@
 import itertools
 from typing import Optional, List, Set
 
-from django.db.models import F, QuerySet
+from django.db.models import F, QuerySet, Q
 
 from base.models.campus import Campus
 from base.models.enums import learning_component_year_type
@@ -182,14 +182,18 @@ def _get_learning_component_year_id_from_entity(entity: 'EffectiveClass') -> int
     learning_unit_identity = entity.entity_id.learning_unit_identity
     component_type = learning_component_year_type.LECTURING if isinstance(entity, LecturingEffectiveClass) \
         else learning_component_year_type.PRACTICAL_EXERCISES
-    learning_component_year_id = LearningComponentYearDb.objects.select_related(
-        'learning_unit_year',
-        'learning_unit_year__academic_year'
-    ).filter(
-        type=component_type,
-        learning_unit_year__academic_year__year=learning_unit_identity.year,
-        learning_unit_year__acronym=learning_unit_identity.code
-    ).values_list('pk', flat=True).get()
+    qs = LearningComponentYearDb.objects\
+        .select_related('learning_unit_year__academic_year')\
+        .filter(
+            learning_unit_year__academic_year__year=learning_unit_identity.year,
+            learning_unit_year__acronym=learning_unit_identity.code
+        )
+    if component_type == learning_component_year_type.PRACTICAL_EXERCISES:
+        qs = qs.filter(type=component_type)
+    else:
+        qs = qs.filter(Q(type=component_type) | Q(type__isnull=True, acronym="NT"))
+
+    learning_component_year_id = qs.values_list('pk', flat=True).get()
     return learning_component_year_id
 
 
