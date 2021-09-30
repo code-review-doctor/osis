@@ -14,7 +14,8 @@ def a_tag_has_perm(url, text, perm, user, obj=None):
         context.update({
             "url": "#",
             "class_a": "disabled",
-            "error_msg": errors.get_permission_error(user, perm) or ""
+            "error_msg": errors.get_permission_error(user, perm) or "",
+            "has_perm": has_perm,
         })
     return context
 
@@ -30,10 +31,11 @@ def a_tag_modal_has_perm(url, text, perm, user, obj=None):
 
 @register.inclusion_tag('osis_role/templatetags/a_template.html')
 def a_tag_modal_target_has_perm(target, text, perm, user, obj=None):
+    context_a_tag_has_perm = a_tag_has_perm("#", text, perm, user, obj)
     return {
-        "load_modal": True,
+        "load_modal": context_a_tag_has_perm.get('has_perm', True),
         "target": target,
-        **a_tag_has_perm("#", text, perm, user, obj),
+        **context_a_tag_has_perm,
     }
 
 
