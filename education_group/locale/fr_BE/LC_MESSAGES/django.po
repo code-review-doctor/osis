@@ -1152,6 +1152,9 @@ msgstr "préfiltrer par rubrique"
 msgid "hops"
 msgstr "ares"
 
+msgid "is empty"
+msgstr "est vide"
+
 msgid "is using in"
 msgstr "est utilisée dans"
 

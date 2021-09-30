@@ -1072,6 +1072,9 @@ msgstr ""
 msgid "hops"
 msgstr ""
 
+msgid "is empty"
+msgstr ""
+
 msgid "is using in"
 msgstr ""
 
