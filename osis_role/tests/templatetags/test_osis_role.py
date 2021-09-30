@@ -30,7 +30,8 @@ class TestATagHasPerm(SimpleTestCase):
             "url": "#",
             "text": self.text,
             "class_a": "disabled",
-            "error_msg": permission_error
+            "error_msg": permission_error,
+            'has_perm': False
         }
         self.assertDictEqual(
             osis_role.a_tag_has_perm(self.url, self.text, "dummy-perm", self.user),
@@ -69,7 +70,8 @@ class TestATagModalHasPerm(SimpleTestCase):
             "text": self.text,
             "class_a": "disabled",
             "error_msg": permission_error,
-            "load_modal": True,
+            "load_modal": False,
+            'has_perm': False
         }
         self.assertDictEqual(
             osis_role.a_tag_modal_has_perm(self.url, self.text, "dummy-perm", self.user),
@@ -109,7 +111,8 @@ class TestATagModalTargetHasPerm(SimpleTestCase):
             "text": self.text,
             "class_a": "disabled",
             "error_msg": permission_error,
-            "load_modal": True,
+            "load_modal": False,
+            'has_perm': False
         }
         self.assertDictEqual(
             osis_role.a_tag_modal_target_has_perm(self.target, self.text, "dummy-perm", self.user),
