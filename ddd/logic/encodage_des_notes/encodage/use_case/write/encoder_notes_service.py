@@ -55,7 +55,7 @@ def encoder_notes(
         note_etudiant_repo: 'INoteEtudiantRepository',
         periode_encodage_note_translator: 'IPeriodeEncodageNotesTranslator',
         cohortes_gestionnaire_translator: 'ICohortesDuGestionnaire',
-        notifier_notes_domaine_service: 'INotifierEncodageNotes',
+        notification_encodage: 'INotifierEncodageNotes',
         attribution_enseignant_translator: 'IAttributionEnseignantTranslator',
         signaletique_personne_repo: 'ISignaletiquePersonneTranslator',
         signaletique_etudiant_repo: 'ISignaletiqueEtudiantTranslator',
@@ -89,7 +89,7 @@ def encoder_notes(
     )
 
     # THEN
-    notifier_notes_domaine_service.notifier(
+    notification_encodage.notifier(
         notes,
         cohortes_non_completes,
         gestionnaire_parcours,
@@ -98,6 +98,7 @@ def encoder_notes(
         signaletique_personne_repo,
         signaletique_etudiant_repo,
         adresse_feuille_de_notes_repo,
+        inscription_examen_translator,
     )
 
     return notes

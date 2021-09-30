@@ -23,7 +23,7 @@
 #
 ##############################################################################
 from collections import defaultdict
-from typing import List, Dict, Iterable, Any, Callable, Tuple, Optional
+from typing import List, Dict, Iterable, Any, Callable, Tuple, Optional, Set
 
 import attr
 from django.conf import settings
@@ -39,6 +39,7 @@ from ddd.logic.encodage_des_notes.encodage.domain.service.i_notifier_encodage_no
 from ddd.logic.encodage_des_notes.encodage.repository.note_etudiant import INoteEtudiantRepository
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_inscription_examen import IInscriptionExamenTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_etudiant import \
     ISignaletiqueEtudiantTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_personne import \
@@ -47,7 +48,7 @@ from ddd.logic.encodage_des_notes.shared_kernel.dtos import DetailContactDTO
 from ddd.logic.encodage_des_notes.soumission.builder.adresse_feuille_de_notes_identity_builder import \
     AdresseFeuilleDeNotesIdentityBuilder
 from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_notes import AdresseFeuilleDeNotes
-from ddd.logic.encodage_des_notes.soumission.dtos import SignaletiqueEtudiantDTO
+from ddd.logic.encodage_des_notes.soumission.dtos import SignaletiqueEtudiantDTO, DesinscriptionExamenDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_notes import \
     IAdresseFeuilleDeNotesRepository
 from osis_common.messaging import message_config, send_message
@@ -85,6 +86,7 @@ class NotifierEncodageNotes(INotifierEncodageNotes):
             signaletique_personne_translator: 'ISignaletiquePersonneTranslator',
             signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
             adresse_feuille_de_notes_repo: 'IAdresseFeuilleDeNotesRepository',
+            inscr_exam_translator: 'IInscriptionExamenTranslator',
     ) -> None:
         liste_donnees_email = cls._get_donnees_email(
             identites_notes_encodees,
@@ -95,6 +97,7 @@ class NotifierEncodageNotes(INotifierEncodageNotes):
             signaletique_personne_translator,
             signaletique_etudiant_translator,
             adresse_feuille_de_notes_repo,
+            inscr_exam_translator,
         )
         for donnees_email in liste_donnees_email:
             if not donnees_email.encodage_complet_avant_encodage and donnees_email.encodage_complet_apres_encodage:
@@ -294,6 +297,7 @@ class NotifierEncodageNotes(INotifierEncodageNotes):
             signaletique_personne_translator: 'ISignaletiquePersonneTranslator',
             signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
             adresse_feuille_de_notes_repository: 'IAdresseFeuilleDeNotesRepository',
+            inscr_exam_translator: 'IInscriptionExamenTranslator',
     ) -> List['DonneesEmail']:
         if not identites_notes_encodees:
             return []
@@ -320,6 +324,12 @@ class NotifierEncodageNotes(INotifierEncodageNotes):
             signaletique_personne_translator
         )
 
+        etudiants_desinscrits_exams = inscr_exam_translator.search_desinscrits_pour_plusieurs_unites_enseignement(
+            codes_unites_enseignement=codes_unite_enseignement,
+            numero_session=numero_session,
+            annee=annee_academique,
+        )
+
         result = []
         for code_unite_enseignement, notes_pour_meme_unite_enseignement in notes_groupees_par_code_unite_enseignement.\
                 items():
@@ -338,7 +348,11 @@ class NotifierEncodageNotes(INotifierEncodageNotes):
                 key=lambda note: note.nom_cohorte
             )
             for nom_cohorte, notes_pour_meme_cohorte in notes_groupes_par_cohorte.items():
-                if not cls._doit_notifier_encodage_pour_la_cohorte(notes_pour_meme_cohorte, identites_notes_encodees):
+                if not cls._doit_notifier_encodage_pour_la_cohorte(
+                        notes_pour_meme_cohorte,
+                        identites_notes_encodees,
+                        etudiants_desinscrits_exams
+                ):
                     continue
                 adresse_feuille_de_notes = cls._get_adresse_feuille_de_notes(
                     nom_cohorte,
@@ -348,7 +362,10 @@ class NotifierEncodageNotes(INotifierEncodageNotes):
                     email_destinataire = [signaletique.email for signaletique in ensemble_de_signaletiques]
                     encodage_complet_avant = (code_unite_enseignement, nom_cohorte) \
                         not in cohortes_non_entierement_encodees_avant_encodage
-                    encodage_complet_apres = all(note.is_encodee for note in notes_pour_meme_cohorte)
+                    encodage_complet_apres = cls._est_encodage_complet(
+                        etudiants_desinscrits_exams,
+                        notes_pour_meme_cohorte,
+                    )
                     result.append(
                         DonneesEmail(
                             code_unite_enseignement=code_unite_enseignement,
@@ -419,15 +436,28 @@ class NotifierEncodageNotes(INotifierEncodageNotes):
     def _doit_notifier_encodage_pour_la_cohorte(
             cls,
             notes_de_la_cohorte: List['NoteEtudiant'],
-            identites_notes_encodees: List['IdentiteNoteEtudiant']
+            identites_notes_encodees: List['IdentiteNoteEtudiant'],
+            etudiants_desinscrits: Set['DesinscriptionExamenDTO']
     ) -> bool:
         a_une_note_nouvellement_encodee = any(
             note for note in notes_de_la_cohorte if note.entity_id in identites_notes_encodees
         )
-        notes_de_la_cohorte_sont_toutes_encodees = all(
-            not note.is_manquant for note in notes_de_la_cohorte
-        )
+        notes_de_la_cohorte_sont_toutes_encodees = cls._est_encodage_complet(etudiants_desinscrits, notes_de_la_cohorte)
         return a_une_note_nouvellement_encodee and notes_de_la_cohorte_sont_toutes_encodees
+
+    @classmethod
+    def _est_encodage_complet(cls, etudiants_desinscrits, notes_de_la_cohorte):
+        return all(
+            (not note.is_manquant or cls._est_desinscrit(etudiants_desinscrits, note))
+            for note in notes_de_la_cohorte
+        )
+
+    @classmethod
+    def _est_desinscrit(cls, etudiants_desinscrits: Set['DesinscriptionExamenDTO'], note: 'NoteEtudiant') -> bool:
+        return any(
+            etd for etd in etudiants_desinscrits
+            if etd.noma == note.noma and etd.code_unite_enseignement == note.code_unite_enseignement
+        )
 
     @classmethod
     def a_une_note_encodee(

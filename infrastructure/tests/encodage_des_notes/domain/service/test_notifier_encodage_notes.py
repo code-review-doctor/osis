@@ -36,6 +36,8 @@ from infrastructure.encodage_de_notes.encodage.domain.service.notifier_encodage_
 from infrastructure.encodage_de_notes.encodage.repository.in_memory.note_etudiant import NoteEtudiantInMemoryRepository
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.attribution_enseignant import \
     AttributionEnseignantTranslatorInMemory
+from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.inscription_examen import \
+    InscriptionExamenTranslatorInMemory
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.signaletique_etudiant import \
     SignaletiqueEtudiantTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.signaletique_personne import \
@@ -56,6 +58,7 @@ class TestEnvoyerMailEncodageComplet(SimpleTestCase):
         self.addCleanup(self.note_etudiant_repo.entities.clear)
 
         self.attribution_translator = AttributionEnseignantTranslatorInMemory()
+        self.inscr_exam_translator = InscriptionExamenTranslatorInMemory()
         self.signaletique_personne_repo = SignaletiquePersonneTranslatorInMemory()
         self.signaletique_etudiant_repo = SignaletiqueEtudiantTranslatorInMemory()
 
@@ -118,7 +121,8 @@ class TestEnvoyerMailEncodageComplet(SimpleTestCase):
             self.attribution_translator,
             self.signaletique_personne_repo,
             self.signaletique_etudiant_repo,
-            self.adresse_feuille_de_notes_repo
+            self.adresse_feuille_de_notes_repo,
+            self.inscr_exam_translator,
         )
         self.assertFalse(mock_send_mail.called)
 
@@ -141,7 +145,8 @@ class TestEnvoyerMailEncodageComplet(SimpleTestCase):
             self.attribution_translator,
             self.signaletique_personne_repo,
             self.signaletique_etudiant_repo,
-            self.adresse_feuille_de_notes_repo
+            self.adresse_feuille_de_notes_repo,
+            self.inscr_exam_translator,
         )
 
         self.assertFalse(mock_send_mail.called)
@@ -159,6 +164,7 @@ class TestEnvoyerMailEncodageComplet(SimpleTestCase):
             self.signaletique_personne_repo,
             self.signaletique_etudiant_repo,
             self.adresse_feuille_de_notes_repo,
+            self.inscr_exam_translator,
         )
         args = mock_send_mail.call_args[0][0]
         self.assertNotIn(ENCODAGE_COMPLET_MAIL_TEMPLATE, args['html_template_ref'])
@@ -180,6 +186,7 @@ class TestEnvoyerMailEncodageComplet(SimpleTestCase):
             self.signaletique_personne_repo,
             self.signaletique_etudiant_repo,
             self.adresse_feuille_de_notes_repo,
+            self.inscr_exam_translator,
         )
         args = mock_send_mail.call_args[0][0]
         self.assertIn(ENCODAGE_COMPLET_MAIL_TEMPLATE, args['html_template_ref'])
@@ -201,6 +208,7 @@ class TestEnvoyerMailEncodageComplet(SimpleTestCase):
             self.signaletique_personne_repo,
             self.signaletique_etudiant_repo,
             self.adresse_feuille_de_notes_repo,
+            self.inscr_exam_translator,
         )
 
         args = mock_send_mail.call_args[0][0]
@@ -228,6 +236,7 @@ class TestEnvoyerMailEncodageComplet(SimpleTestCase):
             self.signaletique_personne_repo,
             self.signaletique_etudiant_repo,
             self.adresse_feuille_de_notes_repo,
+            self.inscr_exam_translator,
         )
 
         args = mock_send_mail.call_args[0][0]
@@ -250,6 +259,7 @@ class TestEnvoyerMailEncodageComplet(SimpleTestCase):
             self.signaletique_personne_repo,
             self.signaletique_etudiant_repo,
             self.adresse_feuille_de_notes_repo,
+            self.inscr_exam_translator,
         )
 
         args = mock_send_mail.call_args[0][0]
@@ -274,6 +284,7 @@ class TestEnvoyerMailEncodageComplet(SimpleTestCase):
             self.signaletique_personne_repo,
             self.signaletique_etudiant_repo,
             self.adresse_feuille_de_notes_repo,
+            self.inscr_exam_translator,
         )
 
         args = mock_send_mail.call_args[0][0]
@@ -297,5 +308,31 @@ class TestEnvoyerMailEncodageComplet(SimpleTestCase):
             self.signaletique_personne_repo,
             self.signaletique_etudiant_repo,
             self.adresse_feuille_de_notes_repo,
+            self.inscr_exam_translator,
         )
         self.assertFalse(mock_send_mail.called)
+
+    def test_should_envoyer_mail_encodage_complet_si_note_manquante_sur_etd_desinscrit(
+            self,
+            mock_send_mail
+    ):
+        etd_desinscrit = self.notes_ldroi1001[1]
+        note_remise_a_note_manquante = attr.evolve(etd_desinscrit, note=NoteManquante())
+        self.note_etudiant_repo.save(note_remise_a_note_manquante)
+        notes_encodees = [self.notes_ldroi1001[0].entity_id]
+        encodage_complet = []
+        NotifierEncodageNotes().notifier(
+            notes_encodees,
+            encodage_complet,
+            self.gestionnaire_parcours_droi1ba,
+            self.note_etudiant_repo,
+            self.attribution_translator,
+            self.signaletique_personne_repo,
+            self.signaletique_etudiant_repo,
+            self.adresse_feuille_de_notes_repo,
+            self.inscr_exam_translator,
+        )
+        args = mock_send_mail.call_args[0][0]
+        self.assertTrue(mock_send_mail.called)
+        self.assertNotIn(ENCODAGE_COMPLET_MAIL_TEMPLATE, args['html_template_ref'])
+        self.assertIn(CORRECTION_ENCODAGE_COMPLET_MAIL_TEMPLATE, args['html_template_ref'])
