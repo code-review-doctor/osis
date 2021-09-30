@@ -141,7 +141,9 @@ def _build_excel_lines(tree: 'ProgramTree') -> List:
                     tree.get_node_by_code_and_year(code=prerequisite_item.code, year=prerequisite_item.year)
                 )
                 for item_link in prerequisite_item_links:
-                    credit = tree.get_distinct_credits_repr(NodeIdentity(prerequisite_item.code, prerequisite_item.year))
+                    credit = tree.get_distinct_credits_repr(
+                        NodeIdentity(prerequisite_item.code, prerequisite_item.year)
+                    )
                     credits.update(credit)
                     block = tree.get_blocks(NodeIdentity(prerequisite_item.code, prerequisite_item.year))
                     blocks.update(block)
