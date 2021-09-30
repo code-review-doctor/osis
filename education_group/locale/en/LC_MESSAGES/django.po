@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-30 11:42+0200\n"
+"POT-Creation-Date: 2021-09-24 14:18+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -663,6 +663,9 @@ msgstr ""
 msgid "No result!"
 msgstr ""
 
+msgid "No weighting(same weight)"
+msgstr ""
+
 msgid "Non university Bachelors"
 msgstr ""
 
@@ -982,6 +985,9 @@ msgid "Web re-registration"
 msgstr ""
 
 msgid "Weighting"
+msgstr ""
+
+msgid "Weighting type"
 msgstr ""
 
 msgid "Yes, I confirm."
