@@ -26,8 +26,10 @@
 from typing import List, Dict, Set
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
+from ddd.logic.encodage_des_notes.shared_kernel.domain.model.encoder_notes_rapport import EncoderNotesRapport
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_inscription_examen import IInscriptionExamenTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import PeriodeEncodageNotesDTO
+from ddd.logic.encodage_des_notes.shared_kernel.repository.i_encoder_notes_rapport import IEncoderNotesRapportRepository
 from ddd.logic.encodage_des_notes.soumission.builder.note_etudiant_builder import NoteEtudiantBuilder
 from ddd.logic.encodage_des_notes.soumission.builder.note_etudiant_identity_builder import NoteEtudiantIdentityBuilder
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderNotesEtudiantCommand
@@ -49,7 +51,9 @@ class EncoderNotesEtudiantEnLot(interface.DomainService):
             note_etudiant_repo: 'INoteEtudiantRepository',
             periode_soumission: 'PeriodeEncodageNotesDTO',
             historiser_note_service: 'IHistoriserNotesService',
-            inscription_examen_translator: 'IInscriptionExamenTranslator'
+            inscription_examen_translator: 'IInscriptionExamenTranslator',
+            rapport: 'EncoderNotesRapport',
+            rapport_repository: 'IEncoderNotesRapportRepository'
     ) -> List['IdentiteNoteEtudiant']:
         identite_builder = NoteEtudiantIdentityBuilder()
         identites_notes_a_encoder = [
@@ -83,17 +87,34 @@ class EncoderNotesEtudiantEnLot(interface.DomainService):
                     if note_a_modifier.note != nouvelle_note.note:
                         notes_a_persister.append(nouvelle_note)
                 except MultipleBusinessExceptions as e:
-                    exceptions += [
-                        EncoderNotesEtudiantEnLotLigneBusinessExceptions(note_id=identite, exception=business_exception)
-                        for business_exception in e.exceptions
-                    ]
+                    for business_exception in e.exceptions:
+                        rapport.add_note_non_enregistree(
+                            noma=note_a_modifier.noma,
+                            numero_session=note_a_modifier.numero_session,
+                            code_unite_enseignement=note_a_modifier.code_unite_enseignement,
+                            annee_academique=note_a_modifier.annee,
+                            cause=str(business_exception.message)
+                        )
+                        exceptions.append(
+                            EncoderNotesEtudiantEnLotLigneBusinessExceptions(
+                                note_id=identite,
+                                exception=business_exception,
+                            )
+                        )
 
         for note in notes_a_persister:
+            rapport.add_note_enregistree(
+                noma=note.noma,
+                numero_session=note.numero_session,
+                code_unite_enseignement=note.code_unite_enseignement,
+                annee_academique=note.annee,
+            )
             note_etudiant_repo.save(note)
 
         if notes_a_persister:
             historiser_note_service.historiser_encodage(cmd.matricule_fgs_enseignant, notes_a_persister)
 
+        rapport_repository.save(rapport)
         if exceptions:
             raise MultipleBusinessExceptions(exceptions=exceptions)
 
