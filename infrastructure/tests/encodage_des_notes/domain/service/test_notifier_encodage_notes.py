@@ -24,12 +24,15 @@
 ##############################################################################
 from unittest import mock
 
+import attr
 from django.test import SimpleTestCase
 
+from ddd.logic.encodage_des_notes.encodage.domain.model._note import NoteManquante
 from ddd.logic.encodage_des_notes.encodage.test.factory.gestionnaire_parcours import GestionnaireParcoursDROI1BAFactory
 from ddd.logic.encodage_des_notes.encodage.test.factory.note_etudiant import NoteEtudiantChiffreeFactory, \
     NoteEtudiantJustificationFactory, NoteManquanteEtudiantFactory
-from infrastructure.encodage_de_notes.encodage.domain.service.notifier_encodage_notes import NotifierEncodageNotes
+from infrastructure.encodage_de_notes.encodage.domain.service.notifier_encodage_notes import NotifierEncodageNotes, \
+    ENCODAGE_COMPLET_MAIL_TEMPLATE, CORRECTION_ENCODAGE_COMPLET_MAIL_TEMPLATE
 from infrastructure.encodage_de_notes.encodage.repository.in_memory.note_etudiant import NoteEtudiantInMemoryRepository
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.attribution_enseignant import \
     AttributionEnseignantTranslatorInMemory
@@ -97,6 +100,11 @@ class TestEnvoyerMailEncodageComplet(SimpleTestCase):
                 entity_id__noma="99999999",
                 nom_cohorte="ECGE1BA"
             ),
+            # NoteManquanteEtudiantFactory(
+            #     entity_id__code_unite_enseignement="LDROI1001",
+            #     entity_id__noma="88888888",
+            #     nom_cohorte="ECGE1BA"
+            # ),
         ]
 
         for note in notes:
@@ -118,7 +126,7 @@ class TestEnvoyerMailEncodageComplet(SimpleTestCase):
         )
         self.assertFalse(mock_send_mail.called)
 
-    def test_should_not_envoyer_email_si_la_cohorte_n_est_pas_complete(self, mock_send_mail):
+    def test_should_not_envoyer_mail_si_encodage_incomplet_apres_encodage(self, mock_send_mail):
         note_manquante = NoteManquanteEtudiantFactory(
             entity_id__code_unite_enseignement="LDROI1001",
             entity_id__noma="55555555",
@@ -140,6 +148,41 @@ class TestEnvoyerMailEncodageComplet(SimpleTestCase):
         )
 
         self.assertFalse(mock_send_mail.called)
+
+    def test_should_not_envoyer_mail_si_encodage_deja_complet_avant_encodage(self, mock_send_mail):
+        notes_encodees = [self.notes_ldroi1001[0].entity_id]
+
+        cohortes_dont_encodage_est_incomplet = []
+        NotifierEncodageNotes().notifier(
+            notes_encodees,
+            cohortes_dont_encodage_est_incomplet,
+            self.gestionnaire_parcours_droi1ba,
+            self.note_etudiant_repo,
+            self.attribution_translator,
+            self.signaletique_personne_repo,
+            self.signaletique_etudiant_repo,
+            self.adresse_feuille_de_notes_repo,
+        )
+        args = mock_send_mail.call_args[0][0]
+        self.assertNotIn(ENCODAGE_COMPLET_MAIL_TEMPLATE, args['html_template_ref'])
+        self.assertIn(CORRECTION_ENCODAGE_COMPLET_MAIL_TEMPLATE, args['html_template_ref'])
+
+    def test_should_envoyer_mail_si_encodage_incomplet_avant_encodage_et_complet_apres_encodage(self, mock_send_mail):
+        notes_encodees = [self.notes_ldroi1001[0].entity_id]
+
+        NotifierEncodageNotes().notifier(
+            notes_encodees,
+            [('LDROI1001', 'DROI1BA')],
+            self.gestionnaire_parcours_droi1ba,
+            self.note_etudiant_repo,
+            self.attribution_translator,
+            self.signaletique_personne_repo,
+            self.signaletique_etudiant_repo,
+            self.adresse_feuille_de_notes_repo,
+        )
+        args = mock_send_mail.call_args[0][0]
+        self.assertIn(ENCODAGE_COMPLET_MAIL_TEMPLATE, args['html_template_ref'])
+        self.assertNotIn(CORRECTION_ENCODAGE_COMPLET_MAIL_TEMPLATE, args['html_template_ref'])
 
     def test_when_note_est_encodee_should_envoyer_notification_pour_la_meme_cohorte_et_meme_unite_enseignement(
             self,
