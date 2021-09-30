@@ -845,7 +845,7 @@ class ProgramTree(interface.RootEntity):
     def get_blocks(self, child_node):
         node = self.get_node_by_code_and_year(child_node.code, child_node.year)
         links = self.search_links_using_node(node)
-        blocks = {str(link.block) for link in links if link.block}
+        blocks = {str(link.block) for link in links if link.block and link.block != ''}
         return sorted(blocks)
 
     def is_empty(self):
