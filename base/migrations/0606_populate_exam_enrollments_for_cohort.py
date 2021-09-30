@@ -79,7 +79,6 @@ def populate_exam_enrollments_for_cohort_11ba(apps, schema_editor):
             dict_education_group_year_by_acronym_year,
             dict_cohort_by_education_group_year
         )
-        print("{}".format(str(enrollment)))
 
 
 class Migration(migrations.Migration):

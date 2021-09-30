@@ -46,3 +46,4 @@ class OfferEnrollmentFactory(factory.django.DjangoModelFactory):
     education_group_year = factory.SubFactory(EducationGroupYearFactory)
     cohort_year = None
     enrollment_state = offer_enrollment_state.SUBSCRIBED
+    cohort_year = None
