@@ -523,6 +523,3 @@ msgstr "volume horaire partiel q1"
 
 msgid "hourly volume partial q2"
 msgstr "volume horaire partiel q2"
-
-#~ msgid "Credits"
-#~ msgstr "Crédits"
