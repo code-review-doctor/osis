@@ -34,6 +34,7 @@ from base.models.person import Person
 from base.utils.send_mail import _get_txt_complementary_first_col_header
 from ddd.logic.encodage_des_notes.encodage.domain.model.gestionnaire_parcours import GestionnaireParcours
 from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import IdentiteNoteEtudiant, NoteEtudiant
+from ddd.logic.encodage_des_notes.encodage.domain.service.cohorte_non_complete import CodeUniteEnseignement, NomCohorte
 from ddd.logic.encodage_des_notes.encodage.domain.service.i_notifier_encodage_notes import INotifierEncodageNotes
 from ddd.logic.encodage_des_notes.encodage.repository.note_etudiant import INoteEtudiantRepository
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_attribution_enseignant import \
@@ -51,7 +52,8 @@ from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_not
     IAdresseFeuilleDeNotesRepository
 from osis_common.messaging import message_config, send_message
 
-MAIL_TEMPLATE_NAME = "assessments_all_scores_by_pgm_manager"
+ENCODAGE_COMPLET_MAIL_TEMPLATE = "assessments_all_scores_by_pgm_manager"
+CORRECTION_ENCODAGE_COMPLET_MAIL_TEMPLATE = "assessments_correction_encodage_complet"
 DEFAULT_LANGUAGE = settings.LANGUAGE_CODE_FR
 
 
@@ -60,6 +62,7 @@ class DonneesEmail:
     code_unite_enseignement = attr.ib(type=str)
     nom_cohorte = attr.ib(type=str)
     encodage_complet_avant_encodage = attr.ib(type=bool)
+    encodage_complet_apres_encodage = attr.ib(type=bool)
     identites_notes_encodees = attr.ib(type=List['IdentiteNoteEtudiant'])
     notes = attr.ib(type=List['NoteEtudiant'])
     emails_destinataires = attr.ib(type=List[str])
@@ -75,7 +78,7 @@ class NotifierEncodageNotes(INotifierEncodageNotes):
     def notifier(
             cls,
             identites_notes_encodees: List['IdentiteNoteEtudiant'],
-            cohortes_non_entierement_encodees_avant_encodage: List[Tuple[str, str]],
+            cohortes_non_entierement_encodees_avant_encodage: List[Tuple[CodeUniteEnseignement, NomCohorte]],
             gestionnaire_parcours: 'GestionnaireParcours',
             note_etudiant_repository: 'INoteEtudiantRepository',
             attribution_enseignant_translator: 'IAttributionEnseignantTranslator',
@@ -94,15 +97,67 @@ class NotifierEncodageNotes(INotifierEncodageNotes):
             adresse_feuille_de_notes_repo,
         )
         for donnees_email in liste_donnees_email:
-            cls._envoyer_mail(donnees_email)
+            if not donnees_email.encodage_complet_avant_encodage and donnees_email.encodage_complet_apres_encodage:
+                cls._envoyer_mail_encodage_complet(donnees_email)
+            elif donnees_email.encodage_complet_avant_encodage and donnees_email.encodage_complet_apres_encodage:
+                cls._envoyer_mail_correction_encodage_complet(donnees_email)
 
     @classmethod
-    def _envoyer_mail(
+    def _envoyer_mail_correction_encodage_complet(cls, donnees_email: 'DonneesEmail') -> None:
+        html_template_ref = '{}_html'.format(CORRECTION_ENCODAGE_COMPLET_MAIL_TEMPLATE)
+        txt_template_ref = '{}_txt'.format(CORRECTION_ENCODAGE_COMPLET_MAIL_TEMPLATE)
+        subject_data = {
+            'unite_enseignement': donnees_email.code_unite_enseignement,
+            'cohorte': donnees_email.nom_cohorte
+        }
+        template_base_data = {
+            'unite_enseignement': donnees_email.code_unite_enseignement,
+            'cohorte': donnees_email.nom_cohorte
+        }
+
+        rows = cls._format_lignes_table(donnees_email.notes, donnees_email.signaletiques_etudiant_par_noma)
+        row_styles = [
+            cls._get_row_style(
+                row,
+                donnees_email.code_unite_enseignement,
+                donnees_email.identites_notes_encodees,
+                donnees_email.encodage_complet_avant_encodage
+            ) for row in rows
+        ]
+        txt_complementary_rows_content = ["*" if row_style else "" for row_style in row_styles]
+        table = message_config.create_table(
+            'enrollments',
+            cls._get_table_headers(donnees_email.langue_email),
+            {
+                "style": row_styles,
+                "data": rows,
+                "txt_complementary_first_col": {
+                    "header": _get_txt_complementary_first_col_header(donnees_email.langue_email),
+                    "rows_content": txt_complementary_rows_content
+                }
+            },
+        )
+
+        message_content = message_config.create_message_content(
+            html_template_ref,
+            txt_template_ref,
+            tables=[table],
+            receivers=cls._get_destinataires_email(donnees_email),
+            template_base_data=template_base_data,
+            subject_data=subject_data,
+            attachment=None,
+            cc=cls._get_destinataires_cc_email(donnees_email),
+
+        )
+        send_message.send_messages(message_content)
+
+    @classmethod
+    def _envoyer_mail_encodage_complet(
             cls,
             donnes_email: 'DonneesEmail'
     ) -> None:
-        html_template_ref = '{}_html'.format(MAIL_TEMPLATE_NAME)
-        txt_template_ref = '{}_txt'.format(MAIL_TEMPLATE_NAME)
+        html_template_ref = '{}_html'.format(ENCODAGE_COMPLET_MAIL_TEMPLATE)
+        txt_template_ref = '{}_txt'.format(ENCODAGE_COMPLET_MAIL_TEMPLATE)
         subject_data = {
             'learning_unit_acronym': donnes_email.code_unite_enseignement,
             'offer_acronym': donnes_email.nom_cohorte
@@ -111,29 +166,10 @@ class NotifierEncodageNotes(INotifierEncodageNotes):
             'learning_unit_acronym': donnes_email.code_unite_enseignement,
             'offer_acronym': donnes_email.nom_cohorte
         }
-        receivers = [
-            message_config.create_receiver(
-                cls._get_receiver_id(email),
-                email,
-                donnes_email.langue_email
-            )
-            for email in donnes_email.emails_destinataires
-        ]
-        cc = [Person(email=donnes_email.email_gestionnaire)]
-        if donnes_email.adresse_feuille_de_notes and donnes_email.adresse_feuille_de_notes.email:
-            cc.append(Person(email=donnes_email.adresse_feuille_de_notes.email))
 
         rows = cls._format_lignes_table(donnes_email.notes, donnes_email.signaletiques_etudiant_par_noma)
-        row_styles = [
-            cls._get_row_style(
-                row,
-                donnes_email.code_unite_enseignement,
-                donnes_email.identites_notes_encodees,
-                donnes_email.encodage_complet_avant_encodage
-            ) for row in rows
-        ]
-        txt_complementary_rows_content = ["*" if row_style else "" for row_style in row_styles]
-
+        row_styles = ['' for row in rows]
+        txt_complementary_rows_content = ["" for row_style in row_styles]
         table = message_config.create_table(
             'enrollments',
             cls._get_table_headers(donnes_email.langue_email),
@@ -150,18 +186,38 @@ class NotifierEncodageNotes(INotifierEncodageNotes):
         message_content = message_config.create_message_content(
             html_template_ref,
             txt_template_ref,
-            [table],
-            receivers,
-            template_base_data,
-            subject_data,
+            tables=[table],
+            receivers=cls._get_destinataires_email(donnes_email),
+            template_base_data=template_base_data,
+            subject_data=subject_data,
             attachment=None,
-            cc=cc
+            cc=cls._get_destinataires_cc_email(donnes_email),
 
         )
         send_message.send_messages(message_content)
 
     @classmethod
+    def _get_destinataires_cc_email(cls, donnes_email):
+        cc = [Person(email=donnes_email.email_gestionnaire)]
+        if donnes_email.adresse_feuille_de_notes and donnes_email.adresse_feuille_de_notes.email:
+            cc.append(Person(email=donnes_email.adresse_feuille_de_notes.email))
+        return cc
+
+    @classmethod
+    def _get_destinataires_email(cls, donnes_email):
+        receivers = [
+            message_config.create_receiver(
+                cls._get_receiver_id(email),
+                email,
+                donnes_email.langue_email
+            )
+            for email in donnes_email.emails_destinataires
+        ]
+        return receivers
+
+    @classmethod
     def _get_receiver_id(cls, email: str) -> Optional[int]:
+        # FIXME :: performances :: 1 hit DB par receiver par cohorte
         person_obj = Person.objects.filter(email=email).only('id').first()
         if person_obj:
             return person_obj.id
@@ -292,6 +348,7 @@ class NotifierEncodageNotes(INotifierEncodageNotes):
                     email_destinataire = [signaletique.email for signaletique in ensemble_de_signaletiques]
                     encodage_complet_avant = (code_unite_enseignement, nom_cohorte) \
                         not in cohortes_non_entierement_encodees_avant_encodage
+                    encodage_complet_apres = all(note.is_encodee for note in notes_pour_meme_cohorte)
                     result.append(
                         DonneesEmail(
                             code_unite_enseignement=code_unite_enseignement,
@@ -303,7 +360,8 @@ class NotifierEncodageNotes(INotifierEncodageNotes):
                             signaletiques_etudiant_par_noma=signaletiques_etudiants_par_noma,
                             email_gestionnaire=email_gestionnaire,
                             adresse_feuille_de_notes=adresse_feuille_de_notes,
-                            encodage_complet_avant_encodage=encodage_complet_avant
+                            encodage_complet_avant_encodage=encodage_complet_avant,
+                            encodage_complet_apres_encodage=encodage_complet_apres,
                         )
                     )
         return result

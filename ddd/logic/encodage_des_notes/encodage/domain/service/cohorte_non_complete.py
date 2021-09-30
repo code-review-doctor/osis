@@ -30,16 +30,20 @@ from ddd.logic.encodage_des_notes.encodage.repository.note_etudiant import INote
 from osis_common.ddd import interface
 
 
+CodeUniteEnseignement = str
+NomCohorte = str
+
+
 class CohorteNonCompleteDomainService(interface.DomainService):
 
     @classmethod
     def search(
             cls,
-            codes_unite_enseignement: List[str],
+            codes_unite_enseignement: List[CodeUniteEnseignement],
             annee_academique: int,
             numero_session: int,
             note_etudiant_repo: 'INoteEtudiantRepository'
-    ) -> List[Tuple[str, str]]:
+    ) -> List[Tuple[CodeUniteEnseignement, NomCohorte]]:
         notes = note_etudiant_repo.search(
             codes_unite_enseignement=codes_unite_enseignement,
             numero_session=numero_session,
