@@ -9,7 +9,7 @@ def get_queryset(apps):
     Attribution = apps.get_model("attribution", "Attribution")
     return Attribution.objects.filter(
         score_responsible=True,
-        learning_unit_year__academic_year__year__gte=ACADEMIC_YEAR
+        learning_unit_year__academic_year__year__gte=ACADEMIC_YEAR,
     ).select_related(
         "learning_unit_year",
         "tutor"
@@ -48,11 +48,11 @@ def create_score_responsible_for_class(apps, score_responsible_obj):
         print('Could not create score responsible for class {}'.format(score_responsible_obj.learning_unit_year.acronym))
         return
     obj, created = ScoreResponsible.objects.update_or_create(
-        learning_unit_year=class_year.learning_component_year.learning_unit_year,
-        learning_class_year=class_year,
+        pk=score_responsible_obj.pk,
         defaults={
-            "tutor": score_responsible_obj.tutor,
-            "external_id": score_responsible_obj.external_id
+            "external_id": score_responsible_obj.external_id,
+            "learning_unit_year": class_year.learning_component_year.learning_unit_year,
+            "learning_class_year": class_year,
         }
     )
     return obj
@@ -75,7 +75,7 @@ def populate_score_responsible(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('assessments', '0006_populate_entity_cohort_of_score_sheet_address'),
+        ('assessments', '0009_email_soumission'),
     ]
 
     operations = [
