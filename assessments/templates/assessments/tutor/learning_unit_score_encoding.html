@@ -114,10 +114,17 @@
 
             <div class="row">
                 <div class="col-md-12">
-                    <a id="lnk_encoding" class="btn btn-default" href="{{ learning_unit_encoding_url }}"
-                       data-toggle="tooltip"
-                       data-placement="bottom"
-                       title="{% trans 'Encode scores' %}">
+                    <a id="lnk_encoding" class="btn btn-default"
+                       {% if not feuille_de_notes.quantite_notes_en_attente_de_soumission == 0 %}
+                            href="{{ learning_unit_encoding_url }}"
+                            data-toggle="tooltip"
+                            data-placement="bottom"
+                       {% else %}
+                            "
+                            disabled
+                       {% endif %}
+                        title="{% trans 'Encode scores' %}"
+                        role="button">
                         <em class="fa fa-hashtag"></em> {% trans 'Encode' %}
                     </a>
                     <a  id="lnk_score_printing" class="btn btn-default download"
@@ -135,11 +142,18 @@
                             <em class="fas fa-download"></em> {% trans 'Get Excel file'%}
                         </a>
                          <a id="lnk_xls_upload"
-                            class="btn btn-default trigger_modal"
-                            data-url="{{ learning_unit_upload_xls_url }}"
-                           data-toggle="tooltip"
-                           data-placement="bottom"
-                           title="{% trans 'Select an excel file to inject scores.' %}">
+                            class="btn btn-default
+                            {% if not feuille_de_notes.quantite_notes_en_attente_de_soumission == 0 %}
+                                trigger_modal"
+                                data-url="{{ learning_unit_upload_xls_url }}"
+                                data-toggle="tooltip"
+                                data-placement="bottom"
+                            {% else %}
+                                "
+                                disabled
+                            {% endif %}
+                            title="{% trans 'Select an excel file to inject scores.' %}"
+                            role="button">
                             <em class="fas fa-upload"></em> {% trans 'Inject XLS file' %}
                         </a>
                     </div>
