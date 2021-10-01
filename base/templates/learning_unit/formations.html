@@ -55,7 +55,6 @@
                 <div class="panel-body">
                     <div class="tab-content" id="tab_content">
                         <div role="tabpanel" class="tab-pane active" id="learning_unit_enrollments">
-                            <div class="alert-warning">{% trans 'Due to a pending change in OSIS, student counters for 1BA, 11BA and learning units containing classes could be distorted(abnormally high). For accurate statistics, please consult the EPC statistics.' %}</div>
                             <div class="table-responsive" >
                                 <table class="table">
                                     <thead>
@@ -97,7 +96,7 @@
                                                 <a href="{{ url_education_group_year }}">
                                                     {{ education_group_year.acronym }}
                                                 </a>
-                                                <br/><span style="margin-left: 1em;">{{ education_group_year.acronym }}-1</span>
+                                                <br/><span data-toggle="tooltip" data-placement="right" title="" data-original-title="{% trans 'Student.s enrolled in block 1' %}" style="margin-left: 1em;">{{ education_group_year.acronym }}-1</span>
                                             </td>
                                             <td>{{ education_group_year.count_formation_enrollments }}
                                                 <br/>{{ education_group_year.count_formation_enrollments_first_year }}
