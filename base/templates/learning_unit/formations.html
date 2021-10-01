@@ -99,16 +99,16 @@
                                                 <br/><span data-toggle="tooltip" data-placement="right" title="" data-original-title="{% trans 'Student.s enrolled in block 1' %}" style="margin-left: 1em;">{{ education_group_year.acronym }}-1</span>
                                             </td>
                                             <td>{{ education_group_year.count_formation_enrollments }}
-                                                <br/>{{ education_group_year.count_formation_enrollments_first_year }}
+                                                <br/><span data-toggle="tooltip" data-placement="right" title="" data-original-title="{% trans 'Student.s enrolled in block 1' %}">{{ education_group_year.count_formation_enrollments_first_year }}</span>
                                             </td>
                                             <td>{{ education_group_year.count_learning_unit_enrollments }}
-                                                <br/>{{ education_group_year.count_learning_unit_enrollments_first_year }}
+                                                <br/><span data-toggle="tooltip" data-placement="right" title="" data-original-title="{% trans 'Student.s enrolled in block 1' %}">{{ education_group_year.count_learning_unit_enrollments_first_year }}</span>
                                             </td>
                                             {% if education_group_year.classes_counter %}
                                                 {% for classe in classes %}
                                                     {% with class_count=education_group_year.classes_counter|get_item_or_zero:classe.pk %}
                                                     <td>{{ class_count|get_item_or_zero:'main' }}
-                                                        <br/>{{ class_count|get_item_or_zero:'first_year' }}
+                                                        <br/><span data-toggle="tooltip" data-placement="right" title="" data-original-title="{% trans 'Student.s enrolled in block 1' %}">{{ class_count|get_item_or_zero:'first_year' }}</span>
                                                     </td>
                                                     {% endwith %}
                                                 {% endfor %}
