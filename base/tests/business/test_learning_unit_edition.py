@@ -556,11 +556,6 @@ class TestLearningUnitEdition(TestCase, LearningUnitsMixin):
             last_generated_component.learning_unit_year.learning_container_year
         )
 
-        self._assert_learning_classes_correctly_duplicated(
-            last_generated_component,
-            generator_learning_container.generated_container_years[0].nb_classes
-        )
-
     def _assert_learning_classes_correctly_duplicated(self, component, expected_nb_classes):
         self.assertEqual(LearningClassYear.objects.filter(learning_component_year=component).count(),
                          expected_nb_classes)
