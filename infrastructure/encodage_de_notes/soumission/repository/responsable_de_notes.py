@@ -190,7 +190,11 @@ class ResponsableDeNotesRepository(IResponsableDeNotesRepository):
 
     @classmethod
     def get(cls, entity_id: 'IdentiteResponsableDeNotes') -> 'ResponsableDeNotes':
-        return cls.search([entity_id])[0]
+        try:
+            responsable_de_note = cls.search([entity_id])[0]
+            return responsable_de_note
+        except IndexError:
+            return None
 
     @classmethod
     def get_for_unite_enseignement(
