@@ -54,5 +54,6 @@ class INotifierEncodageNotes(interface.DomainService):
             signaletique_repo: 'ISignaletiquePersonneTranslator',
             signaletique_etudiant_repo: 'ISignaletiqueEtudiantTranslator',
             adresse_feuille_de_notes_repo: 'IAdresseFeuilleDeNotesRepository',
+            inscr_exam_translator: 'IInscriptionExamenTranslator',
     ) -> None:
         raise NotImplementedError
