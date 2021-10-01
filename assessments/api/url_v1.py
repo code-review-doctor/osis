@@ -5,7 +5,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@ from assessments.api.views.score_sheets_pdf_export import ScoreSheetsPDFExportAP
 app_name = "assessments_api_v1"
 urlpatterns = [
     path('pdf_export', ScoreSheetsPDFExportAPIView.as_view(), name=ScoreSheetsPDFExportAPIView.name),
+    path('pdf_export/<str:learning_unit_code>', ScoreSheetsPDFExportAPIView.as_view(), name=ScoreSheetsPDFExportAPIView.name),
     path(
         '<str:learning_unit_code>/xls_export',
         ScoreSheetXLSExportAPIView.as_view(),

@@ -33,7 +33,7 @@ from base.auth.roles.tutor import Tutor
 from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand, \
     SearchAdressesFeuilleDeNotesCommand
 from infrastructure.messages_bus import message_bus_instance
-from osis_common.document import paper_sheet
+from assessments.export import score_sheet_pdf
 from osis_role.contrib.helper import EntityRoleHelper
 
 
@@ -49,7 +49,11 @@ class ScoreSheetsPDFExportAPIView(APIView):
         return EntityRoleHelper.has_role(self.person, Tutor)
 
     def get(self, request, *args, **kwargs):
-        codes_unites_enseignement = self.request.GET.getlist('codes')
+        if self.kwargs['learning_unit_code']:
+            codes_unites_enseignement = [self.kwargs['learning_unit_code']]
+        else:
+            codes_unites_enseignement = self.request.GET.getlist('codes')
+
         if not len(codes_unites_enseignement):
             raise ValidationError(detail="codes queryparam missing")
 
@@ -62,7 +66,7 @@ class ScoreSheetsPDFExportAPIView(APIView):
             ],
             context={'person': self.person}
         )
-        return paper_sheet.print_notes(score_sheet_serialized.data)
+        return score_sheet_pdf.print_notes(score_sheet_serialized.data)
 
     def get_donnees_administratives(self, code_unite_enseignement: str):
         cmd = SearchAdressesFeuilleDeNotesCommand(

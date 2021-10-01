@@ -192,6 +192,29 @@ class AttributionListView(generics.ListAPIView):
 
                 ).values('volume_global')[:1],
             ),
+            ue_has_classes=Exists(
+                LearningClassYear.objects.filter(
+                    learning_component_year__learning_unit_year_id=OuterRef(
+                        'learning_component_year__learning_unit_year_id'
+                    ),
+                )
+            ),
+            score_responsible=Subquery(
+                AttributionChargeNew.objects.filter(
+                    learning_component_year__learning_unit_year_id=OuterRef(
+                        'learning_component_year__learning_unit_year_id'
+                    )
+                ).values(
+                    'learning_component_year__learning_unit_year_id'
+                ).annotate(
+                    full_name_score_responsible=Concat(
+                                    'attribution__tutor__person__last_name',
+                                    Value(', '),
+                                    'attribution__tutor__person__first_name'
+                                )
+
+                ).values('full_name_score_responsible')[:1],
+            ),
         )
         return attributions
 
