@@ -120,7 +120,7 @@
                             data-toggle="tooltip"
                             data-placement="bottom"
                        {% else %}
-                            "
+                            title="{% trans 'All the scores were submitted. It is not possible to encode scores anymore.' %}"
                             disabled
                        {% endif %}
                         title="{% trans 'Encode scores' %}"
@@ -150,6 +150,7 @@
                                 data-placement="bottom"
                             {% else %}
                                 "
+                                title="{% trans 'All the scores were submitted. It is not possible inject Excel file anymore.' %}"
                                 disabled
                             {% endif %}
                             title="{% trans 'Select an excel file to inject scores.' %}"
