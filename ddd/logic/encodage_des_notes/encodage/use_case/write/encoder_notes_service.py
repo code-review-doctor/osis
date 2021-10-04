@@ -28,7 +28,7 @@ from typing import List
 from ddd.logic.encodage_des_notes.encodage.builder.gestionnaire_parcours_builder import GestionnaireParcoursBuilder
 from ddd.logic.encodage_des_notes.encodage.commands import EncoderNotesCommand
 from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import IdentiteNoteEtudiant
-from ddd.logic.encodage_des_notes.encodage.domain.service.cohorte_non_complete import CohorteNonCompleteDomainService
+from ddd.logic.encodage_des_notes.encodage.domain.service.cohorte_non_complete import CohorteAvecEncodageIncomplet
 from ddd.logic.encodage_des_notes.encodage.domain.service.encoder_notes_en_lot import EncoderNotesEnLot
 from ddd.logic.encodage_des_notes.encodage.domain.service.i_cohortes_du_gestionnaire import ICohortesDuGestionnaire
 from ddd.logic.encodage_des_notes.encodage.domain.service.i_historiser_notes import IHistoriserEncodageNotesService
@@ -71,14 +71,15 @@ def encoder_notes(
     )
     periode_ouverte = periode_encodage_note_translator.get()
 
-    # WHEN
-    cohortes_non_completes = CohorteNonCompleteDomainService().search(
+    cohortes_non_completes = CohorteAvecEncodageIncomplet().search(
         [cmd_note.code_unite_enseignement for cmd_note in cmd.notes_encodees],
         periode_ouverte.annee_concernee,
         periode_ouverte.session_concernee,
-        note_etudiant_repo
+        note_etudiant_repo,
+        inscription_examen_translator,
     )
 
+    # WHEN
     notes = EncoderNotesEnLot().execute(
         cmd.notes_encodees,
         gestionnaire_parcours,
