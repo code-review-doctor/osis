@@ -276,13 +276,13 @@ class TestLoadLearningUnitYearWithAttribution(TestCase):
         teacher_attribution = attributions[0].teacher
         self.assertEqual(teacher_attribution.last_name, "Marchal")
         self.assertEqual(teacher_attribution.first_name, "Cali")
-        self.assertIsNone(teacher_attribution.middle_name)
+        self.assertEqual(teacher_attribution.middle_name, '')
         self.assertEqual(teacher_attribution.email, "cali@gmail.com")
 
         teacher_attribution = attributions[1].teacher
         self.assertEqual(teacher_attribution.last_name, "Marchal")
         self.assertEqual(teacher_attribution.first_name, "Tilia")
-        self.assertIsNone(teacher_attribution.middle_name)
+        self.assertEqual(teacher_attribution.middle_name, '')
         self.assertEqual(teacher_attribution.email, "tilia@gmail.com")
 
 
