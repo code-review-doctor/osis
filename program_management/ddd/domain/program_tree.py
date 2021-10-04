@@ -933,6 +933,13 @@ class ProgramTree(interface.RootEntity):
     def get_prerequisite(self, node: 'NodeLearningUnitYear') -> 'Prerequisite':
         return self.prerequisites.get_prerequisite(node)
 
+    def get_mandatory_status(self, child_node):
+        node = self.get_node_by_code_and_year(child_node.code, child_node.year)
+        for link_obj in self.search_links_using_node(node):
+            if link_obj is not None:
+                return link_obj.is_mandatory
+        return None
+
 
 def is_empty(parent_node: 'Node', relationships: 'AuthorizedRelationshipList'):
     for child_node in parent_node.children_as_nodes:
