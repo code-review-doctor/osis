@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  db:
+    image: postgis/postgis:9.6-2.5
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_USER: osis
+      POSTGRES_DB: osis
+volumes:
+  pgdata:
