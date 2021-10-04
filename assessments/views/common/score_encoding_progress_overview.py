@@ -37,6 +37,9 @@ class ScoreEncodingProgressOverviewBaseView(PermissionRequiredMixin, CacheFilter
     # PermissionRequiredMixin
     permission_required = "assessments.can_access_scoreencoding"
 
+    # CacheFilterMixin
+    timeout = 10800  # seconds = 3 hours
+
     @cached_property
     def person(self):
         return self.request.user.person
