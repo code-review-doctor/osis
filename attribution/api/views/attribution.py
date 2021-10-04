@@ -35,6 +35,7 @@ from django.utils.functional import cached_property
 from rest_framework import generics
 from rest_framework.response import Response
 
+from assessments.models.score_responsible import ScoreResponsible
 from attribution.api.serializers.attribution import AttributionSerializer
 from attribution.calendar.access_schedule_calendar import AccessScheduleCalendar
 from attribution.models.attribution_charge_new import AttributionChargeNew
@@ -192,7 +193,7 @@ class AttributionListView(generics.ListAPIView):
 
                 ).values('volume_global')[:1],
             ),
-            ue_has_classes=Exists(
+            learning_unit_has_classes=Exists(
                 LearningClassYear.objects.filter(
                     learning_component_year__learning_unit_year_id=OuterRef(
                         'learning_component_year__learning_unit_year_id'
@@ -200,18 +201,18 @@ class AttributionListView(generics.ListAPIView):
                 )
             ),
             score_responsible=Subquery(
-                AttributionChargeNew.objects.filter(
-                    learning_component_year__learning_unit_year_id=OuterRef(
+                ScoreResponsible.objects.filter(
+                    learning_unit_year_id=OuterRef(
                         'learning_component_year__learning_unit_year_id'
                     )
                 ).values(
-                    'learning_component_year__learning_unit_year_id'
+                    'learning_unit_year_id'
                 ).annotate(
                     full_name_score_responsible=Concat(
-                                    'attribution__tutor__person__last_name',
-                                    Value(', '),
-                                    'attribution__tutor__person__first_name'
-                                )
+                        F('tutor__person__last_name'),
+                        Value(', '),
+                        F('tutor__person__first_name')
+                    )
 
                 ).values('full_name_score_responsible')[:1],
             ),

@@ -50,7 +50,7 @@ class AttributionSerializer(serializers.Serializer):
     has_peps = serializers.BooleanField()
     is_partim = serializers.BooleanField()
     effective_class_repartition = EffectiveClassRepartitionSerializer(many=True, default=None)
-    ue_has_classes = serializers.BooleanField()
+    learning_unit_has_classes = serializers.BooleanField()
     score_responsible = serializers.CharField()
 
     @staticmethod
