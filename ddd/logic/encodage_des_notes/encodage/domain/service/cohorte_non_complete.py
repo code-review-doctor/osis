@@ -23,10 +23,12 @@
 #
 ##############################################################################
 from collections import defaultdict
-from typing import List, Tuple, Iterable, Callable, Dict, Any
+from typing import List, Tuple, Iterable, Callable, Dict, Any, Set
 
 from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import NoteEtudiant
 from ddd.logic.encodage_des_notes.encodage.repository.note_etudiant import INoteEtudiantRepository
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_inscription_examen import IInscriptionExamenTranslator
+from ddd.logic.encodage_des_notes.soumission.dtos import DesinscriptionExamenDTO
 from osis_common.ddd import interface
 
 
@@ -34,7 +36,7 @@ CodeUniteEnseignement = str
 NomCohorte = str
 
 
-class CohorteNonCompleteDomainService(interface.DomainService):
+class CohorteAvecEncodageIncomplet(interface.DomainService):
 
     @classmethod
     def search(
@@ -42,13 +44,20 @@ class CohorteNonCompleteDomainService(interface.DomainService):
             codes_unite_enseignement: List[CodeUniteEnseignement],
             annee_academique: int,
             numero_session: int,
-            note_etudiant_repo: 'INoteEtudiantRepository'
+            note_etudiant_repo: 'INoteEtudiantRepository',
+            inscr_exam_translator: 'IInscriptionExamenTranslator',
     ) -> List[Tuple[CodeUniteEnseignement, NomCohorte]]:
         notes = note_etudiant_repo.search(
             codes_unite_enseignement=codes_unite_enseignement,
             numero_session=numero_session,
-            annee_academique=annee_academique
+            annee_academique=annee_academique,
         )
+        etds_desinscrits = inscr_exam_translator.search_desinscrits_pour_plusieurs_unites_enseignement(
+            set(codes_unite_enseignement),
+            numero_session,
+            annee_academique,
+        )
+        notes = cls._filtrer_etudiants_inscrits(notes, etds_desinscrits)
         notes_groupees_par_unite_enseignement_et_cohorte = groupby(
             notes,
             key=lambda note: (note.code_unite_enseignement, note.nom_cohorte)
@@ -62,6 +71,19 @@ class CohorteNonCompleteDomainService(interface.DomainService):
     @classmethod
     def _ensemble_de_notes_est_complet(cls, notes: List['NoteEtudiant']) -> bool:
         return all(not note.is_manquant for note in notes)
+
+    @classmethod
+    def _filtrer_etudiants_inscrits(cls, notes, etds_desinscrits):
+        return [
+            n for n in notes if cls._est_inscrit(etds_desinscrits, n)
+        ]
+
+    @classmethod
+    def _est_inscrit(cls, etudiants_desinscrits: Set['DesinscriptionExamenDTO'], note: 'NoteEtudiant') -> bool:
+        return not any(
+            etd for etd in etudiants_desinscrits
+            if etd.noma == note.noma and etd.code_unite_enseignement == note.code_unite_enseignement
+        )
 
 
 def groupby(datas: Iterable[Any], key: Callable) -> Dict:
