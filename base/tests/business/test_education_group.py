@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -36,7 +36,8 @@ from base.business.education_group import ORDER_COL, ORDER_DIRECTION, \
     END_COURSE_REGISTRATION_COL, SESSIONS_COLUMNS, WEIGHTING_COL, DEFAULT_LEARNING_UNIT_ENROLLMENT_COL, \
     CHAIR_OF_THE_EXAM_BOARD_COL, EXAM_BOARD_SECRETARY_COL, EXAM_BOARD_SIGNATORY_COL, SIGNATORY_QUALIFICATION_COL, \
     START_EXAM_REGISTRATION_COL, END_EXAM_REGISTRATION_COL, MARKS_PRESENTATION_COL, DISSERTATION_PRESENTATION_COL, \
-    DELIBERATION_COL, SCORES_DIFFUSION_COL, SESSION_HEADERS, _get_translated_header_titles, _extract_main_data
+    DELIBERATION_COL, SCORES_DIFFUSION_COL, SESSION_HEADERS, _get_translated_header_titles, _extract_main_data, \
+    BOLD_FONT
 from base.models.enums import education_group_categories
 from base.models.enums import mandate_type as mandate_types
 from base.models.enums.academic_calendar_type import AcademicCalendarTypes
@@ -257,7 +258,7 @@ class EducationGroupXlsAdministrativeDataTestCase(TestCase):
             '-',
             '-',
             '-',
-            _('yes'),
+            _('Weighting'),
             _('no'),
             str(self.president.person.full_name),
             '{}, {}'.format(str(self.secretary_1.person.full_name), str(self.secretary_2.person.full_name)),
@@ -276,9 +277,9 @@ def _generate_xls_administrative_data_build_parameter(xls_data, user):
             xls_build.HEADER_TITLES_KEY: _get_translated_header_titles(),
             xls_build.WORKSHEET_TITLE_KEY: _(WORKSHEET_TITLE_ADMINISTRATIVE),
             xls_build.STYLED_CELLS: None,
-            xls_build.FONT_ROWS: None,
+            xls_build.FONT_ROWS: {BOLD_FONT: [0]},
             xls_build.ROW_HEIGHT: None,
             xls_build.FONT_CELLS: None,
-            xls_build.BORDER_CELLS: None
+            xls_build.BORDER_CELLS: None,
         }]
     }

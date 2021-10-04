@@ -23,13 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import uuid as uuid
+
+from django.contrib.admin import ModelAdmin
 from django.db import models
+from django.db.models import Model
 
 from base.models.enums import learning_unit_enrollment_state
-from osis_common.models.serializable_model import SerializableModelAdmin, SerializableModel
 
 
-class LearningUnitEnrollmentAdmin(SerializableModelAdmin):
+class LearningUnitEnrollmentAdmin(ModelAdmin):
     list_display = (
         'student',
         'learning_unit_year',
@@ -49,7 +52,10 @@ class LearningUnitEnrollmentAdmin(SerializableModelAdmin):
     ]
 
 
-class LearningUnitEnrollment(SerializableModel):
+class LearningUnitEnrollment(Model):
+
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, db_index=True)
+
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     date_enrollment = models.DateField()
@@ -62,12 +68,6 @@ class LearningUnitEnrollment(SerializableModel):
     )
     offer_enrollment = models.ForeignKey('OfferEnrollment', on_delete=models.PROTECT)
     enrollment_state = models.CharField(max_length=20, choices=learning_unit_enrollment_state.STATES, default="")
-    learning_class_year = models.ForeignKey(
-        'learning_unit.LearningClassYear',
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True
-    )
 
     class Meta:
         unique_together = ('offer_enrollment', 'learning_unit_year', 'learning_class_year', 'enrollment_state',)

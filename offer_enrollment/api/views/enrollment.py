@@ -46,6 +46,7 @@ class MyOfferEnrollmentsListView(LanguageContextSerializerMixin, generics.ListAP
     """
     name = 'my_enrollments'
     serializer_class = EnrollmentSerializer
+    ordering = ['-education_group_year__academic_year']
 
     def get_queryset(self):
         return OfferEnrollment.objects.filter(student__person=self.person).select_related(

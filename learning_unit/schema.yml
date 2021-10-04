@@ -667,8 +667,10 @@ components:
           nullable: true
         volume_q1:
           type: string
+          nullable: true
         volume_q2:
           type: string
+          nullable: true
         type:
           $ref: '#/components/schemas/ComponentTypeEnum'
         type_text:
