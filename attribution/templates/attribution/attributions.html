@@ -102,11 +102,15 @@
             </span>
         {% endif %}
         {% if learning_unit_year.is_partim %}
-            <a href="{% url "select_attribution" learning_unit_year.id %}" id="manage_repartition"
-               class="btn btn-default {% if not can_add_charge_repartition %}disabled{% endif %}"
-               role="button">
-                {% trans "Manage repartition" %}
-            </a>
+            <span class="{% if not can_add_charge_repartition %}disabled{% endif %}">
+                <a href="{% url "select_attribution" learning_unit_year.id %}" id="manage_repartition"
+                   class="btn btn-default"
+                   {% if not can_add_charge_repartition %}disabled{% endif %}
+                   role="button"
+                   title="{% if not can_add_charge_repartition %}{% trans "cannot add attribution rules" %}{% else %}{% trans "Manage repartition" %}{% endif %}" >
+                    {% trans "Manage repartition" %}
+                </a>
+            </span>
         {% endif %}
     </div>
 {% endblock %}
