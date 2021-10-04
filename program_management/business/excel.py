@@ -134,7 +134,7 @@ def _build_excel_lines(tree: 'ProgramTree') -> List:
     for node in tree.get_nodes_that_have_prerequisites():
         credits = set()
         blocks = set()
-        mandatory_status = set()
+        mandatory_status = None
         for group_number, group in enumerate(tree.get_prerequisite(node).prerequisite_item_groups, start=1):
             for position, prerequisite_item in enumerate(group.prerequisite_items, start=1):
                 prerequisite_item_links = tree.search_links_using_node(
@@ -147,7 +147,8 @@ def _build_excel_lines(tree: 'ProgramTree') -> List:
                     credits.update(credit)
                     block = tree.get_blocks(NodeIdentity(prerequisite_item.code, prerequisite_item.year))
                     blocks.update(block)
-                    mandatory_status.add(_("Yes") if item_link and item_link.is_mandatory else _("No"))
+                    if mandatory_status is None:
+                        mandatory_status = _("Yes") if item_link and item_link.is_mandatory else _("No")
 
         content.append(
             LearningUnitYearLine(
@@ -157,7 +158,7 @@ def _build_excel_lines(tree: 'ProgramTree') -> List:
                 empty_col2='',
                 credits=" ; ".join(sorted(credits)) if credits else '',
                 blocks=" ; ".join(sorted(blocks)) if blocks else '',
-                mandatory_status=" ; ".join(sorted(mandatory_status)) if mandatory_status else '',
+                mandatory_status=mandatory_status if mandatory_status else '',
             )
         )
         for group_number, group in enumerate(tree.get_prerequisite(node).prerequisite_item_groups, start=1):
@@ -362,13 +363,14 @@ def _build_excel_lines_prerequisited(tree: 'ProgramTree') -> List:
         if tree.is_prerequisite(child_node):
             credits = set()
             blocks = set()
-            mandatory_status = set()
+            mandatory_status = None
             for prerequisite_node in tree.search_is_prerequisite_of(child_node):
                 if child_node.year == prerequisite_node.year:
                     for link in tree.search_links_using_node(child_node):
-                        blocks.add(link.block_repr)
+                        blocks.add(str(link.block))
                         credits.add(link.relative_credits_repr)
-                        mandatory_status.add(_("Yes") if link.is_mandatory else _("No"))
+                        if mandatory_status is None:
+                            mandatory_status = _("Yes") if link.is_mandatory else _("No")
 
             content.append(
                 LearningUnitYearLinePrerequisiteOf(
@@ -377,7 +379,7 @@ def _build_excel_lines_prerequisited(tree: 'ProgramTree') -> List:
                     empty_col1='',
                     credits=" ; ".join(credits) if credits else '',
                     blocks=" ; ".join(sorted(blocks)) if blocks else '',
-                    is_mandatory=" ; ".join(sorted(mandatory_status)) if mandatory_status else '',
+                    is_mandatory=mandatory_status if mandatory_status else '',
                 )
             )
 

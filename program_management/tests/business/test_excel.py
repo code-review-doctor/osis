@@ -139,10 +139,7 @@ class TestGeneratePrerequisitesWorkbook(SimpleTestCase):
                 link_with_node_is_prerequisite1.block,
                 link_with_node_is_prerequisite2.block
             ),
-            mandatory_status=self._expected_mandatory_status(
-                link_with_node_is_prerequisite1.is_mandatory,
-                link_with_node_is_prerequisite2.is_mandatory
-            ),
+            mandatory_status=_("Yes") if link_with_node_is_prerequisite1.is_mandatory else _("No")
         )
         self.assertEqual(expected_learning_unit_year_line, learning_unit_year_line)
 
@@ -184,9 +181,3 @@ class TestGeneratePrerequisitesWorkbook(SimpleTestCase):
         credits.add(link_with_node_is_prerequisite1.relative_credits_repr)
         credits.add(link_with_node_is_prerequisite2.relative_credits_repr)
         return " ; ".join(sorted(credits))
-
-    def _expected_mandatory_status(self, is_mandatory1: bool, is_mandatory2: bool):
-        mandatory_status = set()
-        mandatory_status.add(str(_("Yes")) if is_mandatory1 else str(_("No")))
-        mandatory_status.add(str(_("Yes")) if is_mandatory2 else str(_("No")))
-        return " ; ".join(sorted(mandatory_status))
