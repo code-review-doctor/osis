@@ -198,7 +198,8 @@ def _get_q1_q2_warnings(effective_class: 'EffectiveClass') -> List[str]:
     return warnings
 
 
-def _get_volume(learning_unit, volume_attr: str):
-    if learning_unit:
-        return getattr(learning_unit.volumes, volume_attr, 0)
+def _get_volume(learning_unit_part, volume_attr: str):
+    if learning_unit_part:
+        volume = getattr(learning_unit_part.volumes, volume_attr, 0)
+        return volume or 0
     return 0
