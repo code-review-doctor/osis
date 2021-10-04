@@ -446,7 +446,11 @@ class NotifierEncodageNotes(INotifierEncodageNotes):
         return a_une_note_nouvellement_encodee and notes_de_la_cohorte_sont_toutes_encodees
 
     @classmethod
-    def _est_encodage_complet(cls, etudiants_desinscrits, notes_de_la_cohorte):
+    def _est_encodage_complet(
+            cls,
+            etudiants_desinscrits: Set['DesinscriptionExamenDTO'],
+            notes_de_la_cohorte: List['NoteEtudiant']
+    ):
         return all(
             (not note.is_manquant or cls._est_desinscrit(etudiants_desinscrits, note))
             for note in notes_de_la_cohorte

@@ -22,22 +22,31 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.test import TestCase
+from unittest import mock
 
+import attr
+from django.test import SimpleTestCase
+
+from ddd.logic.encodage_des_notes.encodage.domain.model._note import NoteManquante
 from ddd.logic.encodage_des_notes.soumission.test.factory.note_etudiant import NoteChiffreEtudiantFactory, \
-    NoteJustificationEtudiantFactory
+    NoteJustificationEtudiantFactory, NoteManquanteEtudiantFactory, NoteJustificationSoumiseEtudiantFactory, \
+    NoteDejaSoumise
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.attribution_enseignant import \
     AttributionEnseignantTranslatorInMemory
+from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.inscription_examen import \
+    InscriptionExamenTranslatorInMemory
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.signaletique_etudiant import \
     SignaletiqueEtudiantTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.signaletique_personne import \
     SignaletiquePersonneTranslatorInMemory
-from infrastructure.encodage_de_notes.soumission.domain.service.notifier_soumission_notes import NotifierSoumissionNotes
+from infrastructure.encodage_de_notes.soumission.domain.service.notifier_soumission_notes import \
+    NotifierSoumissionNotes, TEMPLATE_MAIL_SOUMISSION_NOTES
 from infrastructure.encodage_de_notes.soumission.repository.in_memory.note_etudiant import \
     NoteEtudiantInMemoryRepository
 
 
-class TestNotifierEncodageNotes(TestCase):
+@mock.patch("osis_common.messaging.send_message.send_messages")
+class TestNotifierEncodageNotes(SimpleTestCase):
 
     def setUp(self):
         self.note_etudiant_repo = NoteEtudiantInMemoryRepository()
@@ -47,32 +56,43 @@ class TestNotifierEncodageNotes(TestCase):
         self.attribution_translator = AttributionEnseignantTranslatorInMemory()
         self.signaletique_personne_repo = SignaletiquePersonneTranslatorInMemory()
         self.signaletique_etudiant_repo = SignaletiqueEtudiantTranslatorInMemory()
+        self.inscr_exam_translator = InscriptionExamenTranslatorInMemory()
 
-        self.notes_ldroi1001 = self.generate_notes_for_ldroi1201()
+        self.notes_ldroi1001 = self.generate_notes_for_ldroi1001()
 
-    def generate_notes_for_ldroi1201(self):
+        self._mock_get_person_id_in_db()
+
+    def _mock_get_person_id_in_db(self):
+        patcher_get_person_id = mock.patch(
+            'infrastructure.encodage_de_notes.soumission.domain.service.notifier_soumission_notes.NotifierSoumissionNotes._get_receiver_id'
+        )
+        mock_get_person_id = patcher_get_person_id.start()
+        mock_get_person_id.return_value = 123
+        self.addCleanup(patcher_get_person_id.stop)
+
+    def generate_notes_for_ldroi1001(self):
         notes = [
-            NoteChiffreEtudiantFactory(
+            NoteDejaSoumise(
                 entity_id__code_unite_enseignement="LDROI1001",
                 entity_id__noma="11111111",
                 nom_cohorte="DROI1BA"
             ),
-            NoteChiffreEtudiantFactory(
+            NoteDejaSoumise(
                 entity_id__code_unite_enseignement="LDROI1001",
                 entity_id__noma="22222222",
                 nom_cohorte="DROI1BA"
             ),
-            NoteChiffreEtudiantFactory(
+            NoteDejaSoumise(
                 entity_id__code_unite_enseignement="LDROI1001",
                 entity_id__noma="33333333",
                 nom_cohorte="DROI1BA"
             ),
-            NoteJustificationEtudiantFactory(
+            NoteJustificationSoumiseEtudiantFactory(
                 entity_id__code_unite_enseignement="LDROI1001",
                 entity_id__noma="44444444",
-                nom_cohorte="DROI1BA"
+                nom_cohorte="DROI1BA",
             ),
-            NoteChiffreEtudiantFactory(
+            NoteDejaSoumise(
                 entity_id__code_unite_enseignement="LDROI1001",
                 entity_id__noma="99999999",
                 nom_cohorte="ECGE1BA"
@@ -83,36 +103,111 @@ class TestNotifierEncodageNotes(TestCase):
             self.note_etudiant_repo.save(note)
         return notes
 
-    def test_cannot_envoyer_notifications_if_aucune_notes_encodees(self):
+    def test_should_envoyer_aucun_mail_si_aucune_note_encodee(self, mock_send_mail):
         notes_encodees = []
 
-        result = NotifierSoumissionNotes()._get_donnees_email(
+        NotifierSoumissionNotes().notifier(
             notes_encodees,
             self.note_etudiant_repo,
             self.attribution_translator,
             self.signaletique_personne_repo,
             self.signaletique_etudiant_repo,
+            self.inscr_exam_translator,
         )
 
-        self.assertListEqual(result, [])
+        self.assertFalse(mock_send_mail.called)
 
-    def test_when_note_est_encodee_should_envoyer_notification_pour_la_meme_cohorte_et_meme_unite_enseignement(self):
+    def test_should_envoyer_mail_soumission_avec_status_notes_restantes_a_encoder(self, mock_send_mail):
         notes_encodees = [self.notes_ldroi1001[0].entity_id]
 
-        result = NotifierSoumissionNotes()._get_donnees_email(
+        note_manquante = NoteManquanteEtudiantFactory(
+            entity_id__code_unite_enseignement="LDROI1001",
+            entity_id__noma="55555555",
+            nom_cohorte="DROI1BA"
+        )
+        self.note_etudiant_repo.save(note_manquante)
+
+        NotifierSoumissionNotes().notifier(
             notes_encodees,
             self.note_etudiant_repo,
             self.attribution_translator,
             self.signaletique_personne_repo,
             self.signaletique_etudiant_repo,
+            self.inscr_exam_translator,
         )
 
-        self.assertEqual(len(result), 1)
-        self.assertEqual(
-            result[0].code_unite_enseignement,
-            "LDROI1001"
+        args = mock_send_mail.call_args[0][0]
+        self.assertIn('Il reste encore des notes à encoder', args['template_base_data']['encoding_status'])
+
+    def test_should_envoyer_mail_soumission_avec_status_toutes_notes_soumises(self, mock_send_mail):
+        notes_encodees = [self.notes_ldroi1001[0].entity_id]
+
+        NotifierSoumissionNotes().notifier(
+            notes_encodees,
+            self.note_etudiant_repo,
+            self.attribution_translator,
+            self.signaletique_personne_repo,
+            self.signaletique_etudiant_repo,
+            self.inscr_exam_translator,
         )
-        self.assertEqual(
-            result[0].notes,
-            [self.notes_ldroi1001[0]]
+
+        args = mock_send_mail.call_args[0][0]
+        self.assertIn('Toutes les notes ont été soumises.', args['template_base_data']['encoding_status'])
+
+    def test_should_envoyer_mail_soumission_avec_status_toutes_notes_soumises_si_note_manquante_sur_etd_desinscrit(
+            self,
+            mock_send_mail
+    ):
+        notes_encodees = [self.notes_ldroi1001[0].entity_id]
+
+        etd_desinscrit = self.notes_ldroi1001[1]
+        note_manquante_sur_etd_desinscrit = attr.evolve(etd_desinscrit, note=NoteManquante())
+        self.note_etudiant_repo.save(note_manquante_sur_etd_desinscrit)
+
+        NotifierSoumissionNotes().notifier(
+            notes_encodees,
+            self.note_etudiant_repo,
+            self.attribution_translator,
+            self.signaletique_personne_repo,
+            self.signaletique_etudiant_repo,
+            self.inscr_exam_translator,
         )
+
+        args = mock_send_mail.call_args[0][0]
+        self.assertIn(TEMPLATE_MAIL_SOUMISSION_NOTES, args['html_template_ref'])
+        self.assertIn('Toutes les notes ont été soumises.', args['template_base_data']['encoding_status'])
+
+    def test_should_afficher_dans_mail_uniquement_note_encodee_et_soumise(self, mock_send_mail):
+        notes_encodees_et_soumises = [self.notes_ldroi1001[0].entity_id]
+
+        NotifierSoumissionNotes().notifier(
+            notes_encodees_et_soumises,
+            self.note_etudiant_repo,
+            self.attribution_translator,
+            self.signaletique_personne_repo,
+            self.signaletique_etudiant_repo,
+            self.inscr_exam_translator,
+        )
+
+        args = mock_send_mail.call_args[0][0]
+        self.assertEqual(len(notes_encodees_et_soumises), len(args['tables'][0]['data']))
+        self.assertEqual(notes_encodees_et_soumises[0].noma, args['tables'][0]['data'][0][2])
+
+    def test_should_injecter_unite_enseignement_et_cohorte_dans_sujet_et_body_du_mail_correction_encodage_complet(
+            self,
+            mock_send_mail
+    ):
+        notes_encodees = [self.notes_ldroi1001[0].entity_id]
+
+        NotifierSoumissionNotes().notifier(
+            notes_encodees,
+            self.note_etudiant_repo,
+            self.attribution_translator,
+            self.signaletique_personne_repo,
+            self.signaletique_etudiant_repo,
+            self.inscr_exam_translator,
+        )
+
+        args = mock_send_mail.call_args[0][0]
+        self.assertEqual("LDROI1001", args['template_base_data']['learning_unit_name'])
+        self.assertEqual("LDROI1001", args['subject_data']['learning_unit_name'])
