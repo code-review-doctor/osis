@@ -23,16 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.urls import path
+from rest_framework import generics
 
-from learning_unit_enrollment.api.views.enrollment import LearningUnitEnrollmentsListView, \
-    MyLearningUnitEnrollmentsListView
+from base.models import session_exam_calendar
+from base.models.academic_year import AcademicYear
 
 
-app_name = "learning_unit_enrollment"
-urlpatterns = [
-    path('enrollments/<str:acronym>/<int:year>/', LearningUnitEnrollmentsListView.as_view(),
-         name=LearningUnitEnrollmentsListView.name),
-    path('my_enrollments/<str:program_code>/<int:year>/', MyLearningUnitEnrollmentsListView.as_view(),
-         name=MyLearningUnitEnrollmentsListView.name),
-]
+class CurrentSessionView(generics.RetrieveAPIView):
+    name = 'current_session'
+
+    def get_queryset(self):
+        current_event = session_exam_calendar.current_session_exam()
+        current_academic_year = AcademicYear.objects.get(year=current_event.authorized_target_year)
+        return {
+            'current_academic_year': current_academic_year,
+            'current_number_session': current_event.session
+        }

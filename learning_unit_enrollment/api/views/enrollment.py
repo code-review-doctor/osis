@@ -31,8 +31,6 @@ from django.db.models.functions import Concat, Replace
 from django.utils.functional import cached_property
 from rest_framework import generics
 
-from base.models import session_exam_calendar
-from base.models.academic_year import AcademicYear
 from base.models.learning_unit_enrollment import LearningUnitEnrollment
 from base.models.person import Person
 from education_group.models.enums.cohort_name import CohortName
@@ -126,17 +124,3 @@ class MyLearningUnitEnrollmentsListView(LearningUnitEnrollmentsListView):
             offer_enrollment__student__person=self.person,
             offer_enrollment__education_group_year__academic_year__year=self.year,
         )
-
-
-class CurrentSessionView(generics.GenericAPIView):
-    name = 'current_session'
-
-    def get_queryset(self):
-        print('ici')
-        current_event = session_exam_calendar.current_session_exam()
-        current_academic_year = AcademicYear.objects.get(year=current_event.authorized_target_year)
-        current_number_session = current_event.session
-        print(current_number_session)
-        return {
-            'current_academic_year': current_academic_year, 'current_number_session': current_event.session
-        }
