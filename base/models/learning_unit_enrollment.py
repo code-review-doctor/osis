@@ -62,5 +62,8 @@ class LearningUnitEnrollment(SerializableModel):
         return u"%s - %s" % (self.learning_unit_year, self.offer_enrollment.student)
 
 
-def find_by_learning_unit_year(a_learning_unit_year):
-    return LearningUnitEnrollment.objects.filter(learning_unit_year=a_learning_unit_year)
+def count_by_learning_unit_year(a_learning_unit_year):
+    return LearningUnitEnrollment.objects.filter(
+        learning_unit_year=a_learning_unit_year,
+        learning_class_year=None,
+    ).count()
