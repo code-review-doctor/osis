@@ -163,10 +163,10 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
             # FIXME: Find a better way to prevent 'max_stack_depth' (= parameters too large)
             notes_identites = list(notes_identites)
             batch_size = 4000
-            for notes_identity_chuncked in [
+            for notes_identites_chunked in [
                 notes_identites[i:i + batch_size] for i in range(0, len(notes_identites), batch_size)
             ]:
-                parameters = _get_dates_echeances_query_parameters(notes_identity_chuncked)
+                parameters = _get_dates_echeances_query_parameters(notes_identites_chunked)
                 with connection.cursor() as cursor:
                     raw_query = '''
                         SELECT 
