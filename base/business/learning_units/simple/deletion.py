@@ -120,8 +120,14 @@ def _check_learning_component_deletion(learning_component_year):
     return msg
 
 
-def _check_learning_class_year_deletion(learning_class_year):
+def _check_learning_class_year_deletion(learning_unit_year, learning_class_year):
     msg = {}
+    class_enrollments_count = learning_unit_enrollment.count_by_learning_class_year(learning_class_year)
+    if class_enrollments_count:
+        msg[learning_unit_year] = _("The effective class %(acronym)s has %(count)d enrollments for the year %(year)s")\
+                                   % {'acronym': learning_unit_year.acronym + learning_class_year.acronym,
+                                      'year': learning_unit_year.academic_year,
+                                      'count': class_enrollments_count}
     for attribution_class in \
             AttributionClass.objects.filter(learning_class_year=learning_class_year):
         attribution = attribution_class.attribution_charge.attribution
@@ -246,7 +252,7 @@ def check_can_delete_ignoring_proposal_validation(learning_unit_year):
     msg = {}
     enrollment_count = learning_unit_enrollment.count_by_learning_unit_year(learning_unit_year)
     if enrollment_count > 0:
-        msg[learning_unit_year] = _("There is %(count)d enrollments in %(subtype)s %(acronym)s for the year %(year)s") \
+        msg[learning_unit_year] = _("The effective class %(acronym)s has %(count)d enrollments for the year %(year)s") \
                                   % {'subtype': _str_partim_or_full(learning_unit_year),
                                      'acronym': learning_unit_year.acronym,
                                      'year': learning_unit_year.academic_year,
@@ -259,7 +265,7 @@ def check_can_delete_ignoring_proposal_validation(learning_unit_year):
         msg.update(_check_learning_component_deletion(component))
         classes = component.learningclassyear_set.all().select_related()
         for classe in classes:
-            msg.update(_check_learning_class_year_deletion(classe))
+            msg.update(_check_learning_class_year_deletion(learning_unit_year, classe))
     for group_element_year in learning_unit_year.find_list_group_element_year():
         msg.update(_check_group_element_year_deletion(group_element_year))
     msg.update(check_tutorings_deletion(learning_unit_year))
