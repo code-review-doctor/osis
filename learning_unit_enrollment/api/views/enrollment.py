@@ -65,15 +65,10 @@ class LearningUnitEnrollmentsListView(generics.ListAPIView):
         return self.kwargs['year']
 
     def get_queryset(self):
-        acronym = self.kwargs['acronym']
-        return self._get_common_qs().filter(
-            learning_unit_acronym=acronym,
-            learning_unit_academic_year=self.year
-        )
-
-    @staticmethod
-    def _get_common_qs():
-        return LearningUnitEnrollment.objects.annotate(
+        return LearningUnitEnrollment.objects.filter(
+            learning_unit_year__academic_year__year=self.year,
+            learning_unit_year__acronym__contains=self.kwargs['acronym'][:-1]
+        ).annotate(
             learning_unit_academic_year=F('learning_unit_year__academic_year__year'),
             learning_unit_acronym=Case(
                 When(
@@ -82,6 +77,8 @@ class LearningUnitEnrollmentsListView(generics.ListAPIView):
                 ),
                 default=F('learning_unit_year__acronym')
             )
+        ).filter(
+            learning_unit_acronym=self.kwargs['acronym'],
         ).annotate(
             student_last_name=F('offer_enrollment__student__person__last_name'),
             student_first_name=F('offer_enrollment__student__person__first_name'),
@@ -118,9 +115,40 @@ class MyLearningUnitEnrollmentsListView(LearningUnitEnrollmentsListView):
         return self.request.user.person
 
     def get_queryset(self):
-        program_code = self.kwargs['program_code']
-        return self._get_common_qs().filter(
-            program=program_code,
+        return LearningUnitEnrollment.objects.filter(
             offer_enrollment__student__person=self.person,
-            offer_enrollment__education_group_year__academic_year__year=self.year,
+            learning_unit_year__academic_year__year=self.year,
+            offer_enrollment__education_group_year__acronym=self.kwargs['program_code'].replace('11', '1')
+        ).annotate(
+            learning_unit_academic_year=F('learning_unit_year__academic_year__year'),
+            learning_unit_acronym=Case(
+                When(
+                    Q(learning_class_year__isnull=False),
+                    then=Concat(F('learning_unit_year__acronym'), F('learning_class_year__acronym'))
+                ),
+                default=F('learning_unit_year__acronym')
+            )
+        ).annotate(
+            student_last_name=F('offer_enrollment__student__person__last_name'),
+            student_first_name=F('offer_enrollment__student__person__first_name'),
+            student_email=F('offer_enrollment__student__person__email'),
+            student_registration_id=F('offer_enrollment__student__registration_id'),
+            program=Case(
+                When(
+                    Q(offer_enrollment__cohort_year__name=CohortName.FIRST_YEAR.name),
+                    then=Replace(
+                        'offer_enrollment__cohort_year__education_group_year__acronym', Value('1'), Value('11')
+                    )
+                ),
+                default=F('offer_enrollment__education_group_year__acronym'),
+                output_field=CharField()
+            ),
+            specific_profile=F('offer_enrollment__student__studentspecificprofile')
+        ).select_related(
+            'offer_enrollment__student__studentspecificprofile',
+            'offer_enrollment__student__person',
+            'offer_enrollment__education_group_year',
+            'offer_enrollment__cohort_year__education_group_year',
+            'learning_unit_year__academic_year',
         )
+

@@ -107,7 +107,10 @@ class MyLearningUnitEnrollmentsListViewTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
         cls.offer_enrollment = OfferEnrollmentFactory()
-        cls.ue_enrollment = LearningUnitEnrollmentFactory(offer_enrollment=cls.offer_enrollment)
+        cls.ue_enrollment = LearningUnitEnrollmentFactory(
+            learning_unit_year__academic_year__year=cls.offer_enrollment.education_group_year.academic_year.year,
+            offer_enrollment=cls.offer_enrollment
+        )
         cls.student = cls.offer_enrollment.student
         cls.url = reverse('learning_unit_enrollment_api_v1:' + MyLearningUnitEnrollmentsListView.name, args=[
             cls.offer_enrollment.education_group_year.acronym,
@@ -156,7 +159,10 @@ class MyLearningUnitEnrollmentsListViewTestCase(APITestCase):
             cohort_year=cohort,
             education_group_year=cohort.education_group_year
         )
-        LearningUnitEnrollmentFactory(offer_enrollment=offer_enrollment_11ba)
+        LearningUnitEnrollmentFactory(
+            learning_unit_year__academic_year__year=offer_enrollment_11ba.education_group_year.academic_year.year,
+            offer_enrollment=offer_enrollment_11ba
+        )
         self.client.force_authenticate(user=offer_enrollment_11ba.student.person.user)
         url = reverse('learning_unit_enrollment_api_v1:' + MyLearningUnitEnrollmentsListView.name, args=[
             offer_enrollment_11ba.education_group_year.acronym.replace('1', '11'),
