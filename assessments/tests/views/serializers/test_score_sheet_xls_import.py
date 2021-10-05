@@ -108,6 +108,21 @@ class ScoreSheetXLSImportViewTest(SimpleTestCase):
         serialized_data = ScoreSheetXLSImportSerializer(self.workbook.active).data
         self.assertEqual(serialized_data['notes_etudiants'][0]['note'], '0')
 
+    def test_assert_convert_comma_to_dot(self):
+        worksheet = self.workbook.active
+        self.__add_row_to_worksheet(
+            worksheet,
+            13,
+            annee_academique="2020-21",
+            numero_session="2",
+            code_cours="LEPL1509",
+            noma="24641600",
+            note="10,6",
+            email="dummy@gmail.com",
+        )
+        serialized_data = ScoreSheetXLSImportSerializer(self.workbook.active).data
+        self.assertEqual(serialized_data['notes_etudiants'][0]['note'], '10.6')
+
     def __add_row_to_worksheet(
             self,
             worksheet,
