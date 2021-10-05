@@ -47,6 +47,7 @@ from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.user import UserFactory
 from cms.models.translated_text import TranslatedText
 from cms.tests.factories.translated_text import OfferTranslatedTextFactory
+from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
 
 
 class EducationGroupYearTest(TestCase):
@@ -337,6 +338,7 @@ class TestFindWithEnrollmentsCount(TestCase):
         result = find_with_enrollments_count(enrol_not_in_education_group.learning_unit_year)
         self.assertEqual(result[0].count_learning_unit_enrollments, 1)
         self.assertEqual(result[0].count_formation_enrollments, 1)
+        self.assertIsNone(result[0].classes_counter)
 
     def test_count_formation_enrollments_with_pending_enrollment(self):
         luy = LearningUnitYearFactory()
@@ -351,6 +353,7 @@ class TestFindWithEnrollmentsCount(TestCase):
         result = find_with_enrollments_count(luy)
         self.assertEqual(result[0].count_learning_unit_enrollments, 5)
         self.assertEqual(result[0].count_formation_enrollments, 2)
+        self.assertIsNone(result[0].classes_counter)
 
     def test_count_learning_unit_enrollments(self):
         LearningUnitEnrollmentFactory(
@@ -359,6 +362,19 @@ class TestFindWithEnrollmentsCount(TestCase):
         )
         result = find_with_enrollments_count(self.learning_unit_year)
         self.assertEqual(result[0].count_learning_unit_enrollments, 1)
+        self.assertIsNone(result[0].classes_counter)
+
+    def test_count_learning_class_enrollments(self):
+        learning_class_yr = LearningClassYearFactory(
+            learning_component_year__learning_unit_year=self.learning_unit_year
+        )
+        LearningUnitEnrollmentFactory(
+            offer_enrollment=OfferEnrollmentFactory(education_group_year=self.education_group_year),
+            learning_unit_year=self.learning_unit_year,
+            learning_class_year=learning_class_yr
+        )
+        result = find_with_enrollments_count(self.learning_unit_year)
+        self.assertEqual(result[0].classes_counter, {learning_class_yr.id: {'main': 1, 'first_year': 0}})
 
     def test_ordered_by_acronym(self):
         education_group_year = EducationGroupYearFactory(acronym='XDRT1234')

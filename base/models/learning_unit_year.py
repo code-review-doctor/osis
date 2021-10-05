@@ -58,8 +58,6 @@ from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit import LEARNING_UNIT_ACRONYM_REGEX_MODEL
 from base.models.prerequisite_item import PrerequisiteItem
 from education_group import publisher
-from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
-from learning_unit.models.learning_class_year import LearningClassYear
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin, SerializableModelManager, \
     SerializableQuerySet
 
@@ -381,6 +379,7 @@ class LearningUnitYear(SerializableModel):
         return u"%s - %s" % (self.academic_year, self.acronym)
 
     def save(self, *args, **kwargs):
+        from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
         super().save(*args, **kwargs)
         publisher.learning_unit_year_created.send(
             None,
@@ -388,6 +387,7 @@ class LearningUnitYear(SerializableModel):
         )
 
     def delete(self, *args, **kwargs):
+        from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
         publisher.learning_unit_year_deleted.send(
             None,
             learning_unit_identity=LearningUnitYearIdentity(code=self.acronym, year=self.academic_year.year)
@@ -672,6 +672,7 @@ class LearningUnitYear(SerializableModel):
         return reverse('learning_unit', args=[self.pk])
 
     def has_class_this_year_or_in_future(self):
+        from learning_unit.models.learning_class_year import LearningClassYear
         return LearningClassYear.objects.filter(
             learning_component_year__learning_unit_year__learning_unit=self.learning_unit,
             learning_component_year__learning_unit_year__academic_year__year__gte=self.academic_year.year
@@ -735,7 +736,8 @@ def _check_classes_session(ue_session, all_components: List[LearningComponentYea
     for learning_component_year in all_components:
         for effective_class in learning_component_year.classes:
             session = effective_class.session
-            if ue_session and session and session not in SESSION_CHECK_RULES[ue_session]['correct_values']:
+            if ue_session and session and ue_session != learning_unit_year_session.SESSION_123 and \
+                    session not in SESSION_CHECK_RULES[ue_session]['correct_values']:
                 _warnings.append(message % {
                     'code_class': effective_class.effective_class_complete_acronym,
                     'should_be_values': SESSION_CHECK_RULES[ue_session]['available_values_str']
@@ -959,7 +961,7 @@ def _learningunityear_delete(sender, instance, **kwargs):
     TranslatedText.objects.filter(entity=LEARNING_UNIT_YEAR, reference=instance.id).delete()
 
 
-def _check_quadrimester_volume(effective_class: LearningClassYear, quadri: str) -> List[str]:
+def _check_quadrimester_volume(effective_class: 'LearningClassYear', quadri: str) -> List[str]:
     q1_q2_warnings = _get_q1_q2_warnings(effective_class, quadri)
     q1and2_q1or2_warnings = _get_q1and2_q1or2_warnings(effective_class, quadri)
     return q1_q2_warnings + q1and2_q1or2_warnings

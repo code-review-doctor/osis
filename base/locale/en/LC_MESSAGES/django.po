@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-31 11:42+0200\n"
+"POT-Creation-Date: 2021-10-01 10:17+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -699,6 +699,7 @@ msgstr ""
 msgid "Delete"
 msgstr ""
 
+msgctxt "learning_unit_achievement_delete"
 msgid "Delete achievement"
 msgstr ""
 
@@ -805,8 +806,9 @@ msgid "Down"
 msgstr ""
 
 msgid ""
-"Due to a pending change in OSIS, student counters for 1BA, 11BA and learning units containing classes could be "
-"distorted(abnormally high). For accurate statistics, please consult the EPC statistics."
+"Due to a pending change in OSIS, student counters for 1BA, 11BA and learning "
+"units containing classes could be distorted(abnormally high). For accurate "
+"statistics, please consult the EPC statistics."
 msgstr ""
 
 msgid "Duration"
@@ -906,7 +908,13 @@ msgstr ""
 msgid "Enrolled"
 msgstr ""
 
+msgid "Enrolled to"
+msgstr ""
+
 msgid "Enrolled to learning unit"
+msgstr ""
+
+msgid "Enrolled to training"
 msgstr ""
 
 msgid "Enrollment campus"
@@ -1629,6 +1637,9 @@ msgstr ""
 msgid "Minor list choice"
 msgstr ""
 
+msgid "Missing score"
+msgstr ""
+
 msgid "Missing search address"
 msgstr ""
 
@@ -1732,6 +1743,9 @@ msgid "No proposals was selected."
 msgstr ""
 
 msgid "No result!"
+msgstr ""
+
+msgid "No weighting(same weight)"
 msgstr ""
 
 msgid "No. Session"
@@ -2194,6 +2208,9 @@ msgstr ""
 
 msgctxt "Submission email table header"
 msgid "Registration number"
+msgstr ""
+
+msgid "Relative credits"
 msgstr ""
 
 msgid "Remarks, comments and constraints"
@@ -2802,9 +2819,6 @@ msgstr ""
 msgid "Total"
 msgstr ""
 
-msgid "Total enrollments to training"
-msgstr ""
-
 msgid "Training"
 msgstr ""
 
@@ -2991,6 +3005,9 @@ msgid "Week"
 msgstr ""
 
 msgid "Weighting"
+msgstr ""
+
+msgid "Weighting type"
 msgstr ""
 
 msgctxt "section title"
