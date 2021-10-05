@@ -28,6 +28,7 @@ from typing import Iterable, List
 import attr
 from django.db.models import Q, Value, F
 from django.db.models.functions import Replace
+from django.urls import reverse
 from django.utils.functional import cached_property
 from django.views.generic import ListView
 
@@ -47,6 +48,7 @@ class OfferSearchDTO:
     acronym = attr.ib(type=str)
     title = attr.ib(type=str)
     management_entity_acronym = attr.ib(type=str)
+    url = attr.ib(type=str)
 
     @property
     def is_first_year_bachelor(self):
@@ -55,7 +57,7 @@ class OfferSearchDTO:
 
 class OffersSearch(PermissionRequiredMixin, CacheFilterMixin, ListView):
     model = EducationGroupYear
-    template_name = "base/offers/list.html"
+    template_name = "assessments/address/list.html"
     permission_required = "base.can_access_offer"
 
     @cached_property
@@ -131,8 +133,14 @@ def convert_queryset_to_dto(qs) -> List[OfferSearchDTO]:
     return [
         OfferSearchDTO(
             acronym=row['sigle'],
-            title=convert_title_to_first_year_bachelor_title(row['title']) if "11BA" in row["sigle"] else row['title'],
-            management_entity_acronym=row['management_entity_acronym']
+            title=convert_title_to_first_year_bachelor_title(
+                row['title']
+            ) if "11BA" in row["sigle"] else row['title'],
+            management_entity_acronym=row['management_entity_acronym'],
+            url=reverse(
+                'first_year_bachelor_score_sheet_address',
+                args=[row['sigle'].replace('11BA', '1BA')]
+            ) if '11BA' in row['sigle'] else reverse('score_sheet_address', args=[row['sigle']])
         )
         for row in qs
     ]

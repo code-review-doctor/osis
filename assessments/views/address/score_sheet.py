@@ -23,7 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import re
+
 from django.contrib import messages
+from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
@@ -33,7 +36,7 @@ from base.auth.roles import program_manager
 from base.forms.exceptions import InvalidFormException
 from base.models import academic_year
 from base.models.education_group_year import EducationGroupYear
-from base.views.education_groups.search import convert_title_to_first_year_bachelor_title
+from assessments.views.address.search import convert_title_to_first_year_bachelor_title
 from ddd.logic.encodage_des_notes.soumission.commands import GetAdresseFeuilleDeNotesServiceCommand
 from ddd.logic.encodage_des_notes.soumission.dtos import AdresseFeuilleDeNotesDTO
 from education_group.models.cohort_year import CohortYear
@@ -106,7 +109,7 @@ class ScoreSheetAddressView(PermissionRequiredMixin, FormView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        return ""
+        return reverse('score_sheet_address', args=[self.nom_cohorte])
 
 
 class FirstYearBachelorScoreSheetAddressView(ScoreSheetAddressView):
@@ -114,8 +117,12 @@ class FirstYearBachelorScoreSheetAddressView(ScoreSheetAddressView):
     template_name = "assessments/address/first_year_bachelor_score_sheet.html"
 
     @property
+    def nom_cohorte_premiere_annee(self) -> str:
+        return re.sub(r"(1BA)", "11BA", self.nom_cohorte)
+
+    @property
     def nom_cohorte_bachelier(self) -> str:
-        return self.nom_cohorte.replace("11BA", "1BA")
+        return self.nom_cohorte
 
     @cached_property
     def first_year_bachelor(self) -> 'CohortYear':
@@ -130,7 +137,7 @@ class FirstYearBachelorScoreSheetAddressView(ScoreSheetAddressView):
 
     @cached_property
     def bachelor_score_sheet_address_dto(self) -> 'AdresseFeuilleDeNotesDTO':
-        cmd = GetAdresseFeuilleDeNotesServiceCommand(nom_cohorte=self.nom_cohorte_bachelier)
+        cmd = GetAdresseFeuilleDeNotesServiceCommand(nom_cohorte=self.nom_cohorte_premiere_annee)
         return message_bus_instance.invoke(cmd)
 
     def get_initial(self):
@@ -143,6 +150,7 @@ class FirstYearBachelorScoreSheetAddressView(ScoreSheetAddressView):
     def get_form_kwargs(self):
         form_kwargs = super().get_form_kwargs()
         form_kwargs['adresse_bachelier'] = self.bachelor_score_sheet_address_dto
+        form_kwargs['nom_cohorte_premiere_annee'] = self.nom_cohorte_premiere_annee
         return form_kwargs
 
     def get_context_data(self, **kwargs):
@@ -152,7 +160,11 @@ class FirstYearBachelorScoreSheetAddressView(ScoreSheetAddressView):
             "addresse_bachelier": self.bachelor_score_sheet_address_dto,
             "nom_cohorte_bachelier": self.nom_cohorte_bachelier,
             "intitule_page": convert_title_to_first_year_bachelor_title(self.education_group_year.title),
-            "intitule": self.education_group_year.title
+            "intitule": self.education_group_year.title,
+            "nom_cohorte_premiere_annee": self.nom_cohorte_premiere_annee,
         })
 
         return context
+
+    def get_success_url(self):
+        return reverse('first_year_bachelor_score_sheet_address', args=[self.nom_cohorte_bachelier])
