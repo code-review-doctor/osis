@@ -68,8 +68,7 @@ msgstr "Le type de l'UE ne peut être ni de type mobilité, ni de type externe"
 
 msgid "Class of learning unit having enrollment can't be delete"
 msgstr ""
-"Il y a des inscriptions sur l'unité d'enseignement de la classe. Vous ne "
-"pouvez pas supprimer cette classe."
+"Il y a des inscriptions sur la classe. Vous ne pouvez pas supprimer cette classe."
 
 msgid "Credits should be greather than 0"
 msgstr "Les crédits doivent être > 0"
