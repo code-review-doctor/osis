@@ -23,21 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from rest_framework import generics
-
-from assessments.api.serializers.current_session import CurrentSessionSerializer
-from base.models import session_exam_calendar
-from base.models.academic_year import AcademicYear
+from rest_framework import serializers
 
 
-class CurrentSessionView(generics.RetrieveAPIView):
-    name = 'current_session'
-    serializer_class = CurrentSessionSerializer
+class CurrentSessionSerializer(serializers.Serializer):
+    academic_year = serializers.CharField()
+    month_session_name = serializers.CharField()
 
-    def get_object(self):
-        current_event = session_exam_calendar.current_session_exam()
-        current_academic_year = AcademicYear.objects.get(year=current_event.authorized_target_year)
-        return {
-            'academic_year': str(current_academic_year),
-            'month_session_name': current_event.month_session_name()
-        }

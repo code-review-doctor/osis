@@ -49,10 +49,7 @@ class ScoreSheetsPDFExportAPIView(APIView):
         return EntityRoleHelper.has_role(self.person, Tutor)
 
     def get(self, request, *args, **kwargs):
-        if self.kwargs['learning_unit_code']:
-            codes_unites_enseignement = [self.kwargs['learning_unit_code']]
-        else:
-            codes_unites_enseignement = self.request.GET.getlist('codes')
+        codes_unites_enseignement = self.request.GET.getlist('codes')
 
         if not len(codes_unites_enseignement):
             raise ValidationError(detail="codes queryparam missing")

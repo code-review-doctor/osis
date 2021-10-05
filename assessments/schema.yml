@@ -79,6 +79,29 @@ paths:
           $ref: '#/components/responses/Unauthorized'
       tags:
         - score_encoding
+  /current_session/:
+      get:
+        description: Return current session
+        operationId: get_current_session
+        parameters:
+          - $ref: '#/components/parameters/Accept-Language'
+          - $ref: '#/components/parameters/X-User-FirstName'
+          - $ref: '#/components/parameters/X-User-LastName'
+          - $ref: '#/components/parameters/X-User-Email'
+          - $ref: '#/components/parameters/X-User-GlobalID'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/CurrentSession'
+          '400':
+            $ref: '#/components/responses/BadRequest'
+          '401':
+            $ref: '#/components/responses/Unauthorized'
+        tags:
+          - score_encoding
 components:
   securitySchemes:
     Token:
@@ -154,5 +177,14 @@ components:
       required:
         - code
         - message
+    CurrentSession:
+      type: object
+      properties:
+        academic_year:
+          type: string
+          example: "2021-22"
+        month_session_name:
+          type: string
+          example: "January"
 security:
   - Token: []
