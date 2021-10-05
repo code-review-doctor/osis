@@ -160,71 +160,77 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
     ) -> List[DateEcheanceNoteDTO]:
         dates_echeances_dto = []
         if notes_identites:
-            parameters = _get_dates_echeances_query_parameters(notes_identites)
-            with connection.cursor() as cursor:
-                raw_query = '''
-                    SELECT 
-                        CASE WHEN base_learningcomponentyear.type = 'LECTURING' THEN CONCAT(base_learningunityear.acronym, '-' , learning_unit_learningclassyear.acronym)
-                             WHEN base_learningcomponentyear.type = 'PRACTICAL_EXERCISES' THEN CONCAT(base_learningunityear.acronym, '_' , learning_unit_learningclassyear.acronym)
-                             ELSE base_learningunityear.acronym
-                        END AS code_unite_enseignement, 
-                        base_academicyear.year AS annee_academique, 
-                        base_sessionexam.number_session AS numero_session, 
-                        base_student.registration_id AS noma,
-                        CASE
-                            WHEN score_final IS NOT NULL THEN true
-                            WHEN justification_final IS NOT NULL THEN true
-                            ELSE false
-                        END note_soumise,
-                        CASE
-                            WHEN score_final IS NOT NULL OR justification_final IS NOT NULL THEN false
-                            WHEN score_draft IS NOT NULL OR justification_draft IS NOT NULL THEN true
-                            ELSE false
-                        END note_brouillon,
-                        (
-                            SELECT CASE
-                                    WHEN deadline_tutor IS NULL THEN deadline
-                                    ELSE deadline - deadline_tutor
-                                END echeance
-                            FROM base_sessionexamdeadline
-                            WHERE base_sessionexamdeadline.number_session = base_sessionexam.number_session 
-                                  and base_sessionexamdeadline.offer_enrollment_id = base_learningunitenrollment.offer_enrollment_id
-                            LIMIT 1
-                        ) AS echeance
-                    FROM base_examenrollment
-                    JOIN base_learningunitenrollment on base_learningunitenrollment.id = base_examenrollment.learning_unit_enrollment_id
-                    JOIN base_learningunityear on base_learningunityear.id = base_learningunitenrollment.learning_unit_year_id and base_learningunityear.acronym in %(simplified_acronyms)s
-                    LEFT JOIN learning_unit_learningclassyear on learning_unit_learningclassyear.id = base_learningunitenrollment.learning_class_year_id
-                    LEFT JOIN base_learningcomponentyear on base_learningcomponentyear.id = learning_unit_learningclassyear.learning_component_year_id
-                    JOIN base_academicyear on base_academicyear.id = base_learningunityear.academic_year_id
-                    JOIN base_sessionexam on base_sessionexam.id = base_examenrollment.session_exam_id       
-                    JOIN base_offerenrollment on base_offerenrollment.id = base_learningunitenrollment.offer_enrollment_id
-                    JOIN base_student on base_student.id = base_offerenrollment.student_id and base_student.registration_id in %(registration_ids)s     
-                    WHERE base_academicyear.year = %(academic_year)s AND
-                        base_sessionexam.number_session = %(number_session)s  AND 
-                        (base_student.registration_id,
-                        CASE WHEN base_learningcomponentyear.type = 'LECTURING' THEN CONCAT(base_learningunityear.acronym, '-' , learning_unit_learningclassyear.acronym)
-                             WHEN base_learningcomponentyear.type = 'PRACTICAL_EXERCISES' THEN CONCAT(base_learningunityear.acronym, '_' , learning_unit_learningclassyear.acronym)
-                             ELSE base_learningunityear.acronym
-                        END 
-                        ) in %(acronym_registration_ids)s
-                    ORDER BY code_unite_enseignement, annee_academique, echeance
-                '''
-                cursor.execute(raw_query, parameters)
-                for row in cursor.fetchall():
-                    dates_echeances_dto.append(
-                        DateEcheanceNoteDTO(
-                            code_unite_enseignement=row[0],
-                            annee_unite_enseignement=row[1],
-                            numero_session=row[2],
-                            noma=row[3],
-                            note_soumise=row[4],
-                            note_brouillon=row[5],
-                            jour=row[6].day,
-                            mois=row[6].month,
-                            annee=row[6].year,
+            # FIXME: Find a better way to prevent 'max_stack_depth' (= parameters too large)
+            notes_identites = list(notes_identites)
+            batch_size = 4000
+            for notes_identites_chunked in [
+                notes_identites[i:i + batch_size] for i in range(0, len(notes_identites), batch_size)
+            ]:
+                parameters = _get_dates_echeances_query_parameters(notes_identites_chunked)
+                with connection.cursor() as cursor:
+                    raw_query = '''
+                        SELECT 
+                            CASE WHEN base_learningcomponentyear.type = 'LECTURING' THEN CONCAT(base_learningunityear.acronym, '-' , learning_unit_learningclassyear.acronym)
+                                 WHEN base_learningcomponentyear.type = 'PRACTICAL_EXERCISES' THEN CONCAT(base_learningunityear.acronym, '_' , learning_unit_learningclassyear.acronym)
+                                 ELSE base_learningunityear.acronym
+                            END AS code_unite_enseignement, 
+                            base_academicyear.year AS annee_academique, 
+                            base_sessionexam.number_session AS numero_session, 
+                            base_student.registration_id AS noma,
+                            CASE
+                                WHEN score_final IS NOT NULL THEN true
+                                WHEN justification_final IS NOT NULL THEN true
+                                ELSE false
+                            END note_soumise,
+                            CASE
+                                WHEN score_final IS NOT NULL OR justification_final IS NOT NULL THEN false
+                                WHEN score_draft IS NOT NULL OR justification_draft IS NOT NULL THEN true
+                                ELSE false
+                            END note_brouillon,
+                            (
+                                SELECT CASE
+                                        WHEN deadline_tutor IS NULL THEN deadline
+                                        ELSE deadline - deadline_tutor
+                                    END echeance
+                                FROM base_sessionexamdeadline
+                                WHERE base_sessionexamdeadline.number_session = base_sessionexam.number_session 
+                                      and base_sessionexamdeadline.offer_enrollment_id = base_learningunitenrollment.offer_enrollment_id
+                                LIMIT 1
+                            ) AS echeance
+                        FROM base_examenrollment
+                        JOIN base_learningunitenrollment on base_learningunitenrollment.id = base_examenrollment.learning_unit_enrollment_id
+                        JOIN base_learningunityear on base_learningunityear.id = base_learningunitenrollment.learning_unit_year_id and base_learningunityear.acronym in %(simplified_acronyms)s
+                        LEFT JOIN learning_unit_learningclassyear on learning_unit_learningclassyear.id = base_learningunitenrollment.learning_class_year_id
+                        LEFT JOIN base_learningcomponentyear on base_learningcomponentyear.id = learning_unit_learningclassyear.learning_component_year_id
+                        JOIN base_academicyear on base_academicyear.id = base_learningunityear.academic_year_id
+                        JOIN base_sessionexam on base_sessionexam.id = base_examenrollment.session_exam_id       
+                        JOIN base_offerenrollment on base_offerenrollment.id = base_learningunitenrollment.offer_enrollment_id
+                        JOIN base_student on base_student.id = base_offerenrollment.student_id and base_student.registration_id in %(registration_ids)s     
+                        WHERE base_academicyear.year = %(academic_year)s AND
+                            base_sessionexam.number_session = %(number_session)s  AND 
+                            (base_student.registration_id,
+                            CASE WHEN base_learningcomponentyear.type = 'LECTURING' THEN CONCAT(base_learningunityear.acronym, '-' , learning_unit_learningclassyear.acronym)
+                                 WHEN base_learningcomponentyear.type = 'PRACTICAL_EXERCISES' THEN CONCAT(base_learningunityear.acronym, '_' , learning_unit_learningclassyear.acronym)
+                                 ELSE base_learningunityear.acronym
+                            END 
+                            ) in %(acronym_registration_ids)s
+                        ORDER BY code_unite_enseignement, annee_academique, echeance
+                    '''
+                    cursor.execute(raw_query, parameters)
+                    for row in cursor.fetchall():
+                        dates_echeances_dto.append(
+                            DateEcheanceNoteDTO(
+                                code_unite_enseignement=row[0],
+                                annee_unite_enseignement=row[1],
+                                numero_session=row[2],
+                                noma=row[3],
+                                note_soumise=row[4],
+                                note_brouillon=row[5],
+                                jour=row[6].day,
+                                mois=row[6].month,
+                                annee=row[6].year,
+                            )
                         )
-                    )
         return dates_echeances_dto
 
     @classmethod
@@ -373,7 +379,6 @@ def _fetch_session_exams():
 
 
 def _get_dates_echeances_query_parameters(notes_identites: Set[IdentiteNoteEtudiant]) -> Dict:
-    acronyms = set()
     simplified_acronyms = set()
     registration_ids = set()
     academic_year = None
@@ -383,7 +388,6 @@ def _get_dates_echeances_query_parameters(notes_identites: Set[IdentiteNoteEtudi
     for note_identite in notes_identites:
         simplified_acronyms.add(note_identite.code_unite_enseignement.replace('_', '').replace('-', '')[:-1])
         simplified_acronyms.add(note_identite.code_unite_enseignement)
-        acronyms.add(note_identite.code_unite_enseignement)
         registration_ids.add(note_identite.noma)
         academic_year = note_identite.annee_academique
         number_session = note_identite.numero_session
@@ -391,7 +395,6 @@ def _get_dates_echeances_query_parameters(notes_identites: Set[IdentiteNoteEtudi
 
     return {
         "simplified_acronyms": tuple(simplified_acronyms),
-        "acronyms": tuple(acronyms),
         "academic_year": academic_year,
         "number_session": number_session,
         "registration_ids": tuple(registration_ids),
