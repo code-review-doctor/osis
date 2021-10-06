@@ -83,7 +83,7 @@ class EtudiantPepsDTO(interface.DTO):
 class NoteEtudiantDTO(interface.DTO):
     est_soumise = attr.ib(type=bool)
     echeance_enseignant = attr.ib(type=DateDTO)
-    date_remise_de_notes = attr.ib(type=DateDTO)
+    date_remise_de_notes = attr.ib(type=DateDTO)  # FIXME :: quelle différence entre echeance_enseignant et  date_remise_de_notes ???
     code_unite_enseignement = attr.ib(type=str)
     annee_unite_enseignement = attr.ib(type=int)
     intitule_complet_unite_enseignement = attr.ib(type=str)
