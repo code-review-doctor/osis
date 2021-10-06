@@ -78,7 +78,7 @@ def populate_score_responsible(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('assessments', '0009_email_soumission'),
+        ('assessments', '0010_mail_template_correction_encodage_complet'),
     ]
 
     operations = [
