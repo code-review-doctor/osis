@@ -65,7 +65,7 @@
                 {% for educ_group_year in object_list %}
                     <tr>
                         <td>
-                            <a href="{{ educ_group_year.url }}">
+                            <a href="{{ educ_group_year.url }}" id="lnk_offer_{{educ_group_year.acronym}}">
                             {{ educ_group_year.acronym }}
                             </a>
                         </td>
