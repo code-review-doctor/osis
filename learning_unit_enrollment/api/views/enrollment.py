@@ -31,6 +31,7 @@ from django.db.models.functions import Concat, Replace
 from django.utils.functional import cached_property
 from rest_framework import generics
 
+from base.models.enums.offer_enrollment_state import SUBSCRIBED, PROVISORY
 from base.models.learning_unit_enrollment import LearningUnitEnrollment
 from base.models.person import Person
 from education_group.models.enums.cohort_name import CohortName
@@ -41,7 +42,7 @@ logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 class LearningUnitEnrollmentsListView(generics.ListAPIView):
     """
-       Return all enrollments of a learning unit year
+       Return all enrollments in valid state of a learning unit year
     """
     name = 'enrollments'
     serializer_class = EnrollmentSerializer
@@ -67,7 +68,8 @@ class LearningUnitEnrollmentsListView(generics.ListAPIView):
     def get_queryset(self):
         return LearningUnitEnrollment.objects.filter(
             learning_unit_year__academic_year__year=self.year,
-            learning_unit_year__acronym__contains=self.kwargs['acronym'][:-1]
+            learning_unit_year__acronym__contains=self.kwargs['acronym'][:-1],
+            offer_enrollment__enrollment_state__in=[SUBSCRIBED, PROVISORY]
         ).annotate(
             learning_unit_academic_year=F('learning_unit_year__academic_year__year'),
             learning_unit_acronym=Case(
