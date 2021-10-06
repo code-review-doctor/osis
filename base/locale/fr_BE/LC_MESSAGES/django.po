@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-28 14:07+0200\n"
+"POT-Creation-Date: 2021-10-01 14:14+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -826,16 +826,6 @@ msgstr "Documentation"
 
 msgid "Down"
 msgstr "Descendre"
-
-msgid ""
-"Due to a pending change in OSIS, student counters for 1BA, 11BA and learning "
-"units containing classes could be distorted(abnormally high). For accurate "
-"statistics, please consult the EPC statistics."
-msgstr ""
-"Suite à un changement en cours d'implémentation dans OSIS, les compteurs "
-"relatifs aux étudiants de 1BA, 11BA et aux cours qui contiennent des classes "
-"pourraient être faussés (anormalement élevés). Pour une statistique précise, "
-"veuillez consulter les statistiques d'EPC."
 
 msgid "Duration"
 msgstr "Durée"
@@ -1801,6 +1791,9 @@ msgstr "Aucune proposition n'a été sélectionnée."
 msgid "No result!"
 msgstr "Aucun résultat !"
 
+msgid "No weighting(same weight)"
+msgstr "Pas de pondération (même poids)"
+
 msgid "No. Session"
 msgstr "No. session"
 
@@ -2487,6 +2480,9 @@ msgstr "Recherche étudiants"
 msgid "Student's dissertations management"
 msgstr "Gestion des mémoires des étudiants"
 
+msgid "Student.s enrolled in block 1"
+msgstr "Etudiant.e.s inscrit.e.s au bloc 1"
+
 msgid "Students"
 msgstr "Étudiants"
 
@@ -3153,6 +3149,9 @@ msgstr "Semaine"
 
 msgid "Weighting"
 msgstr "Pondération par crédit"
+
+msgid "Weighting type"
+msgstr "Type de pondération"
 
 msgctxt "section title"
 msgid "Welcome"

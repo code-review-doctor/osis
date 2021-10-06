@@ -33,7 +33,7 @@ from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_inscription_exa
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_etudiant import \
     ISignaletiqueEtudiantTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_unite_enseignement import IUniteEnseignementTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.dtos import NoteEtudiantDTO, DateDTO, PeriodeEncodageNotesDTO
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import PeriodeEncodageNotesDTO, RechercheNoteEtudiantDTO
 from ddd.logic.encodage_des_notes.soumission.dtos import UniteEnseignementDTO, InscriptionExamenDTO, \
     DesinscriptionExamenDTO, SignaletiqueEtudiantDTO
 from osis_common.ddd import interface
@@ -56,7 +56,7 @@ class RechercheNotesEtudiant(interface.DomainService):
             signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
             unite_enseignement_translator: 'IUniteEnseignementTranslator',
             inscription_examen_translator: 'IInscriptionExamenTranslator',
-    ) -> List['NoteEtudiantDTO']:
+    ) -> List['RechercheNoteEtudiantDTO']:
         note_etudiant_filtered = cls._get_notes_etudiants_filtered(
             nom_cohorte=nom_cohorte,
             noma=noma,
@@ -106,25 +106,24 @@ class RechercheNotesEtudiant(interface.DomainService):
                 inscription_examen_dto.date_inscription.to_date() > ouverture_periode_soumission
 
             notes_etudiants_dto.append(
-                NoteEtudiantDTO(
+                RechercheNoteEtudiantDTO(
                     code_unite_enseignement=getattr(unite_enseignement_dto, 'code', ''),
                     intitule_complet_unite_enseignement=getattr(unite_enseignement_dto, 'intitule_complet', ''),
                     annee_unite_enseignement=getattr(unite_enseignement_dto, 'annee', ''),
                     est_soumise=not note_etudiant.is_manquant,
                     date_remise_de_notes=note_etudiant.echeance_gestionnaire,
-                    echeance_enseignant=note_etudiant.echeance_enseignant,
                     nom_cohorte=note_etudiant.nom_cohorte,
                     noma=note_etudiant.noma,
                     nom=getattr(signaletique_etudiant_dto, 'nom', ''),
                     prenom=getattr(signaletique_etudiant_dto, 'prenom', ''),
-                    peps=getattr(signaletique_etudiant_dto, 'peps', ''),
                     email=note_etudiant.email,
                     note=str(note_etudiant.note),
                     inscrit_tardivement=inscrit_tardivement,
                     desinscrit_tardivement=any(
                         desinscription for desinscription in desinscriptions_examens_dto if
                         desinscription.code_unite_enseignement == note_etudiant.code_unite_enseignement
-                    )
+                    ),
+                    note_decimale_est_autorisee=note_etudiant.note_decimale_autorisee
                 )
             )
         return sorted(

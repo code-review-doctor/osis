@@ -95,6 +95,12 @@
                                         title="{% trans 'Refresh list' %}">
                                     <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
                                  </button>
+                                <button type="button" id="btn_clear_filter"
+                                        style="margin-top: 4px"
+                                        class="btn btn-default" role="button"
+                                        onclick="$('#form_clear_filter').submit();">
+                                    <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+                                </button>
                             </div>
                         </form>
                     </div>
@@ -379,7 +385,6 @@
                                             </tbody>
                                         </table>
                                     </div>
-
                                 </div>
                             </div>
                         </div>
@@ -387,6 +392,8 @@
                 </div>
         </div>
     </div>
+
+    {% include 'assessments/common/clear_filter.html' %}
 {% endblock %}
 
 

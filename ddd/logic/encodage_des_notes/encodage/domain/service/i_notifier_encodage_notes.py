@@ -27,6 +27,7 @@ from typing import List, Tuple
 
 from ddd.logic.encodage_des_notes.encodage.domain.model.gestionnaire_parcours import GestionnaireParcours
 from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import IdentiteNoteEtudiant
+from ddd.logic.encodage_des_notes.encodage.domain.service.cohorte_non_complete import CodeUniteEnseignement, NomCohorte
 from ddd.logic.encodage_des_notes.encodage.repository.note_etudiant import INoteEtudiantRepository
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
@@ -46,12 +47,13 @@ class INotifierEncodageNotes(interface.DomainService):
     def notifier(
             cls,
             notes_encodees: List['IdentiteNoteEtudiant'],
-            cohortes_non_entierement_encodees_avant_encodage: List[Tuple[str, str]],
+            cohortes_non_entierement_encodees_avant_encodage: List[Tuple[CodeUniteEnseignement, NomCohorte]],
             gestionnaire_parcours: 'GestionnaireParcours',
             note_etudiant_repo: 'INoteEtudiantRepository',
             translator: 'IAttributionEnseignantTranslator',
             signaletique_repo: 'ISignaletiquePersonneTranslator',
             signaletique_etudiant_repo: 'ISignaletiqueEtudiantTranslator',
             adresse_feuille_de_notes_repo: 'IAdresseFeuilleDeNotesRepository',
+            inscr_exam_translator: 'IInscriptionExamenTranslator',
     ) -> None:
         raise NotImplementedError

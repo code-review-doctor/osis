@@ -51,7 +51,8 @@ class _XLSNoteEtudiantRowImportSerializer(serializers.Serializer):
 
     def get_note(self, obj: tuple):
         col_note = HEADER.index(_('Numbered scores'))
-        return str(obj[col_note].value) if obj[col_note].value else ''
+        raw_value = str(obj[col_note].value) if obj[col_note].value is not None else ''
+        return raw_value.replace(",", ".")
 
     def get_email(self, obj: tuple):
         col_email = HEADER.index(_('Email'))
