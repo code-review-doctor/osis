@@ -130,20 +130,25 @@ def get_queryset(acronym: str, management_entity: str) -> Iterable:
 
 
 def convert_queryset_to_dto(qs) -> List[OfferSearchDTO]:
-    return [
-        OfferSearchDTO(
-            acronym=row['sigle'],
-            title=convert_title_to_first_year_bachelor_title(
-                row['title']
-            ) if "11BA" in row["sigle"] else row['title'],
-            management_entity_acronym=row['management_entity_acronym'],
-            url=reverse(
-                'first_year_bachelor_score_sheet_address',
-                args=[row['sigle'].replace('11BA', '1BA')]
-            ) if '11BA' in row['sigle'] else reverse('score_sheet_address', args=[row['sigle']])
+    offer_search_dtos = []
+    for row in qs:
+        if "11BA" in row['sigle']:
+            title = convert_title_to_first_year_bachelor_title(row['title'])
+            url = reverse('first_year_bachelor_score_sheet_address', args=[row['sigle'].replace('11BA', '1BA')])
+        else:
+            title = row['title']
+            url = reverse('score_sheet_address', args=[row['sigle']])
+
+        offer_search_dtos.append(
+            OfferSearchDTO(
+                acronym=row['sigle'],
+                title=title,
+                management_entity_acronym=row['management_entity_acronym'],
+                url=url
+            )
         )
-        for row in qs
-    ]
+
+    return offer_search_dtos
 
 
 # fixme will be solved by read service
