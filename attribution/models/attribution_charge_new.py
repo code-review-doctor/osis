@@ -26,6 +26,10 @@
 from django.contrib import admin
 from django.core import validators
 from django.db import models
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
+
+from assessments.models.score_responsible import ScoreResponsible
 
 MIN_ALLOCATION_CHARGE = 0
 
@@ -50,3 +54,15 @@ class AttributionChargeNew(models.Model):
 
     def __str__(self):
         return u"%s" % self.attribution
+
+
+@receiver(post_delete, sender=AttributionChargeNew)
+def _attribution_new_delete(sender, instance, **kwargs):
+    if AttributionChargeNew.objects.filter(
+            attribution=instance.attribution,
+            learning_component_year__learning_unit_year__learning_container_year=
+            instance.learning_component_year.learning_unit_year.learning_container_year
+    ).count() == 0:
+        ScoreResponsible.objects.filter(
+            learning_unit_year=instance.learning_component_year.learning_unit_year,
+            tutor=instance.attribution.tutor).delete()
