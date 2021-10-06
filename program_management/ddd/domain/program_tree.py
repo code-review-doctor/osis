@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -827,22 +827,26 @@ class ProgramTree(interface.RootEntity):
             prerequisites=copy.deepcopy(self.prerequisites)
         )
 
-    def get_relative_credits_values(self, child_node: 'NodeIdentity'):
-        distinct_credits_repr = []
-        node = self.get_node_by_code_and_year(child_node.code, child_node.year)
-
-        for link_obj in self.search_links_using_node(node):
-            if link_obj.relative_credits_repr not in distinct_credits_repr:
-                distinct_credits_repr.append(link_obj.relative_credits_repr)
+    def get_relative_credits_values(self, child_node: 'NodeIdentity') -> str:
         return " ; ".join(
-            set(["{}".format(credits) for credits in distinct_credits_repr])
+            ["{}".format(credits) for credits in self.get_distinct_credits_repr(child_node)]
         )
 
-    def get_blocks_values(self, child_node: 'NodeIdentity'):
+    def get_distinct_credits_repr(self, child_node):
         node = self.get_node_by_code_and_year(child_node.code, child_node.year)
+        distinct_credits_repr = {link_obj.relative_credits_repr for link_obj in self.search_links_using_node(node)}
+        return sorted(distinct_credits_repr)
+
+    def get_blocks_values(self, child_node: 'NodeIdentity') -> str:
         return " ; ".join(
-            [str(grp.block) for grp in self.search_links_using_node(node) if grp.block]
+            [block for block in self.get_blocks(child_node)]
         )
+
+    def get_blocks(self, child_node):
+        node = self.get_node_by_code_and_year(child_node.code, child_node.year)
+        links = self.search_links_using_node(node)
+        blocks = {str(link.block) for link in links if link.block}
+        return sorted(blocks)
 
     def is_empty(self):
         """
@@ -928,6 +932,13 @@ class ProgramTree(interface.RootEntity):
 
     def get_prerequisite(self, node: 'NodeLearningUnitYear') -> 'Prerequisite':
         return self.prerequisites.get_prerequisite(node)
+
+    def get_mandatory_status(self, child_node):
+        node = self.get_node_by_code_and_year(child_node.code, child_node.year)
+        for link_obj in self.search_links_using_node(node):
+            if link_obj is not None:
+                return link_obj.is_mandatory
+        return None
 
 
 def is_empty(parent_node: 'Node', relationships: 'AuthorizedRelationshipList'):
