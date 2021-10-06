@@ -252,7 +252,7 @@ def check_can_delete_ignoring_proposal_validation(learning_unit_year):
     msg = {}
     enrollment_count = learning_unit_enrollment.count_by_learning_unit_year(learning_unit_year)
     if enrollment_count > 0:
-        msg[learning_unit_year] = _("The effective class %(acronym)s has %(count)d enrollments for the year %(year)s") \
+        msg[learning_unit_year] = _("There is %(count)d enrollments in %(subtype)s %(acronym)s for the year %(year)s") \
                                   % {'subtype': _str_partim_or_full(learning_unit_year),
                                      'acronym': learning_unit_year.acronym,
                                      'year': learning_unit_year.academic_year,
