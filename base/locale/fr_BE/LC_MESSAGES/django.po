@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-28 14:07+0200\n"
+"POT-Creation-Date: 2021-10-06 08:17+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1801,6 +1801,9 @@ msgstr "Aucune proposition n'a été sélectionnée."
 msgid "No result!"
 msgstr "Aucun résultat !"
 
+msgid "No weighting(same weight)"
+msgstr "Pas de pondération (identique)"
+
 msgid "No. Session"
 msgstr "No. session"
 
@@ -3152,6 +3155,9 @@ msgid "Week"
 msgstr "Semaine"
 
 msgid "Weighting"
+msgstr "Pondération par crédit"
+
+msgid "Weighting type"
 msgstr "Pondération par crédit"
 
 msgctxt "section title"
