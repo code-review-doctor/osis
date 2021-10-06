@@ -46,7 +46,13 @@ class LearningUnitEnrollmentsListView(generics.ListAPIView):
     """
     name = 'enrollments'
     serializer_class = EnrollmentSerializer
-    search_fields = ['student_first_name', 'student_last_name']
+    search_fields = [
+        'student_first_name',
+        'student_last_name',
+        'student_registration_id',
+        'program',
+        'specific_profile'
+    ]
     ordering_fields = [
         'student_last_name',
         'student_first_name',
@@ -96,7 +102,7 @@ class LearningUnitEnrollmentsListView(generics.ListAPIView):
                 default=F('offer_enrollment__education_group_year__acronym'),
                 output_field=CharField()
             ),
-            specific_profile=F('offer_enrollment__student__studentspecificprofile')
+            specific_profile=F('offer_enrollment__student__studentspecificprofile__type')
         ).select_related(
             'offer_enrollment__student__studentspecificprofile',
             'offer_enrollment__student__person',
