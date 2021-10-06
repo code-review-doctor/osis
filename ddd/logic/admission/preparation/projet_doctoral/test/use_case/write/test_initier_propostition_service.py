@@ -99,13 +99,13 @@ class TestInitierPropositionService(SimpleTestCase):
         self.assertEqual(self.cmd.institution, proposition.experience_precedente_recherche.institution)
 
     def test_should_initier_bureau_cde_vide_et_non_CDE(self):
-        cmd = attr.evolve(self.cmd, bureau_CDE=None, sigle_formation=self.doctorat_non_CDE)
+        cmd = attr.evolve(self.cmd, bureau_CDE='', sigle_formation=self.doctorat_non_CDE)
         proposition_id = self.message_bus.invoke(cmd)
         proposition = self.proposition_repository.get(proposition_id)  # type: Proposition
         self.assertIsNone(proposition.bureau_CDE)
 
     def test_should_pas_initier_bureau_cde_vide_et_CDE(self):
-        cmd = attr.evolve(self.cmd, bureau_CDE=None)
+        cmd = attr.evolve(self.cmd, bureau_CDE='')
         with self.assertRaises(BureauCDEInconsistantException):
             self.message_bus.invoke(cmd)
 
