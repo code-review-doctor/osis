@@ -27,6 +27,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from base.models.enums import offer_enrollment_state
 from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
 from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
 from base.tests.factories.user import UserFactory
@@ -101,6 +102,21 @@ class LearningUnitEnrollmentsListViewTestCase(APITestCase):
             results[0]['learning_unit_acronym'],
             ue_enrollment_class.learning_unit_year.acronym + class_year.acronym
         )
+
+    def test_should_get_no_results_when_offer_enrollment_state_not_valid(self):
+        offer_enrollment = OfferEnrollmentFactory(enrollment_state=offer_enrollment_state.TERMINATION)
+        LearningUnitEnrollmentFactory(
+            learning_unit_year__academic_year__year=offer_enrollment.education_group_year.academic_year.year,
+            offer_enrollment=offer_enrollment
+        )
+        url = reverse('learning_unit_enrollment_api_v1:' + LearningUnitEnrollmentsListView.name, args=[
+            offer_enrollment.education_group_year.acronym,
+            offer_enrollment.education_group_year.academic_year.year
+        ])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.json()['results']
+        self.assertEqual(len(results), 0)
 
 
 class MyLearningUnitEnrollmentsListViewTestCase(APITestCase):
