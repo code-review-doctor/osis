@@ -752,6 +752,7 @@ components:
           type: string
           description: 'Total charge for learning unit year'
           example: '55.5'
+          nullable: true
         start_year:
           type: integer
           example: 2018
