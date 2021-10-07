@@ -59,7 +59,9 @@ class AttributionSerializerTestCase(TestCase):
             practical_charge="10.5",
             has_peps=False,
             total_learning_unit_charge="55.5",
-            is_partim=False
+            is_partim=False,
+            learning_unit_has_classes=False,
+            score_responsible=None
         )
 
         cls.academic_event = AcademicEvent(
@@ -102,7 +104,9 @@ class AttributionSerializerTestCase(TestCase):
             'links',
             'has_peps',
             'effective_class_repartition',
-            'is_partim'
+            'is_partim',
+            'learning_unit_has_classes',
+            'score_responsible'
         ]
         self.assertCountEqual(list(self.serializer.data.keys()), expected_fields)
 

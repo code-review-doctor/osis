@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -34,8 +34,8 @@ from rest_framework.test import APITestCase
 from assessments.api.views.score_sheets_pdf_export import ScoreSheetsPDFExportAPIView
 from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.tutor import TutorFactory
-from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO, FeuilleDeNotesDTO, EnseignantDTO, DetailContactDTO, \
-    NoteEtudiantDTO
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO, FeuilleDeNotesDTO, EnseignantDTO, \
+    DetailContactDTO, NoteEtudiantDTO
 from ddd.logic.encodage_des_notes.soumission.commands import SearchAdressesFeuilleDeNotesCommand, \
     GetFeuilleDeNotesCommand
 from ddd.logic.encodage_des_notes.soumission.dtos import DonneesAdministrativesFeuilleDeNotesDTO, \
