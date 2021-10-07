@@ -74,13 +74,11 @@ class ClassDistributionWithAttribution(interface.DomainService):
 
         effective_classes = _get_effective_classes_from_tutors([tutor], effective_class_repository)
         attribution_uuids = {
-            distributed_class.attribution.uuid
-            for distributed_class in tutor.distributed_effective_classes
-            if distributed_class.effective_class.learning_unit_identity.year == annee
-            # FIXME :: ajouter 'annee' dans l'aggregat Tutor ????
+            distributed_class.attribution.uuid for distributed_class in tutor.distributed_effective_classes
         }
         attributions = tutor_attribution_translator.search_learning_unit_attributions(attribution_uuids)
-        return _get_tutor_class_repartition_dtos(tutor, attributions, effective_classes)
+        tutor_class_repartition_dtos = _get_tutor_class_repartition_dtos(tutor, attributions, effective_classes)
+        return [dto for dto in tutor_class_repartition_dtos if dto.annee == annee]
 
 
 def _get_effective_classes_from_tutors(

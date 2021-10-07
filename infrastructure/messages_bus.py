@@ -42,9 +42,12 @@ from ddd.logic.application.use_case.write.send_applications_summary import send_
 from ddd.logic.application.use_case.write.update_application_service import update_application
 from ddd.logic.effective_class_repartition.commands import SearchAttributionsToLearningUnitCommand, \
     SearchTutorsDistributedToClassCommand, SearchAttributionCommand, DistributeClassToTutorCommand, \
+    GetTutorRepartitionClassesCommand, \
     UnassignTutorClassCommand, EditClassVolumeRepartitionToTutorCommand, SearchClassesEnseignantCommand, \
     SearchAttributionsEnseignantCommand
 from ddd.logic.effective_class_repartition.use_case.read.get_attribution_service import get_attribution
+from ddd.logic.effective_class_repartition.use_case.read.get_tutor_repartition_classes_service import \
+    get_tutor_repartition_classes
 from ddd.logic.effective_class_repartition.use_case.read.search_attributions_enseignant_service import \
     search_attributions_enseignant
 from ddd.logic.effective_class_repartition.use_case.read.search_attributions_to_learning_unit_service import \
@@ -69,6 +72,9 @@ from ddd.logic.encodage_des_notes.encodage.use_case.read.get_progression_general
     get_progression_generale_gestionnaire
 from ddd.logic.encodage_des_notes.encodage.use_case.read.rechercher_notes_service import rechercher_notes
 from ddd.logic.encodage_des_notes.encodage.use_case.write.encoder_notes_service import encoder_notes
+from ddd.logic.encodage_des_notes.shared_kernel.commands import GetEncoderNotesRapportCommand
+from ddd.logic.encodage_des_notes.shared_kernel.use_case.read.get_encoder_notes_rapport_service import \
+    get_encoder_notes_rapport
 from ddd.logic.encodage_des_notes.soumission.commands import GetAdresseFeuilleDeNotesServiceCommand, \
     GetChoixEntitesAdresseFeuilleDeNotesCommand, \
     EncoderAdresseFeuilleDeNotesSpecifique, EncoderAdresseEntiteCommeAdresseFeuilleDeNotes, \
@@ -105,11 +111,14 @@ from ddd.logic.encodage_des_notes.soumission.use_case.write.soumettre_notes_etud
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, GetLearningUnitCommand, \
     CreateEffectiveClassCommand, CanCreateEffectiveClassCommand, GetEffectiveClassCommand, \
     UpdateEffectiveClassCommand, DeleteEffectiveClassCommand, CanDeleteEffectiveClassCommand, \
+    GetClassesEffectivesDepuisUniteDEnseignementCommand, \
     GetEffectiveClassWarningsCommand, LearningUnitSearchCommand, SearchDetailClassesEffectivesCommand
 from ddd.logic.learning_unit.use_case.read.check_can_create_class_service import check_can_create_effective_class
 from ddd.logic.learning_unit.use_case.read.check_can_delete_class_service import check_can_delete_effective_class
 from ddd.logic.learning_unit.use_case.read.get_effective_class_service import get_effective_class
 from ddd.logic.learning_unit.use_case.read.get_effective_class_warnings_service import get_effective_class_warnings
+from ddd.logic.learning_unit.use_case.read.get_learning_unit_effective_classes_service import \
+    get_learning_unit_effective_classes
 from ddd.logic.learning_unit.use_case.read.get_learning_unit_service import get_learning_unit
 from ddd.logic.learning_unit.use_case.read.search_detail_classes_effectives import search_detail_classes_effectives
 from ddd.logic.learning_unit.use_case.read.search_learning_units_service import search_learning_units
@@ -160,6 +169,8 @@ from infrastructure.encodage_de_notes.soumission.repository.note_etudiant import
 from infrastructure.encodage_de_notes.soumission.repository.responsable_de_notes import ResponsableDeNotesRepository
 from infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class import \
     StudentEnrollmentsTranslator
+from infrastructure.encodage_de_notes.shared_kernel.repository.encoder_notes_rapport import \
+    EncoderNotesRapportRepository
 from infrastructure.learning_unit.domain.service.tutor_distributed_to_class import TutorAssignedToClassTranslator
 from infrastructure.learning_unit.repository.effective_class import EffectiveClassRepository
 from infrastructure.learning_unit.repository.entity import UclEntityRepository
@@ -274,6 +285,7 @@ class MessageBus:
             cmd,
             TutorRepository(),
             EffectiveClassRepository(),
+            LearningUnitTranslator(),
         ),
         SearchDetailClassesEffectivesCommand: lambda cmd: search_detail_classes_effectives(
             cmd,
@@ -283,7 +295,12 @@ class MessageBus:
         EditClassVolumeRepartitionToTutorCommand: lambda cmd: edit_class_volume_repartition_to_tutor(
             cmd,
             TutorRepository(),
-            EffectiveClassRepository()
+            EffectiveClassRepository(),
+            LearningUnitTranslator(),
+        ),
+        GetTutorRepartitionClassesCommand: lambda cmd: get_tutor_repartition_classes(cmd, TutorRepository()),
+        GetClassesEffectivesDepuisUniteDEnseignementCommand: lambda cmd: get_learning_unit_effective_classes(
+            cmd, EffectiveClassRepository()
         ),
         GetFeuilleDeNotesCommand: lambda cmd: get_feuille_de_notes(
             cmd,
@@ -303,6 +320,7 @@ class MessageBus:
             AttributionEnseignantTranslator(),
             HistoriserNotesService(),
             InscriptionExamenTranslator(),
+            EncoderNotesRapportRepository()
         ),
         SoumettreNotesCommand: lambda cmd: soumettre_notes_etudiant(
             cmd,
@@ -313,7 +331,8 @@ class MessageBus:
             AttributionEnseignantTranslator(),
             SignaletiquePersonneTranslator(),
             SignaletiqueEtudiantTranslator(),
-            HistoriserNotesService()
+            HistoriserNotesService(),
+            InscriptionExamenTranslator(),
         ),
         GetProgressionGeneraleCommand: lambda cmd: get_progression_generale(
             cmd,
@@ -361,6 +380,7 @@ class MessageBus:
             AdresseFeuilleDeNotesRepository(),
             HistoriserEncodageNotesService(),
             InscriptionExamenTranslator(),
+            EncoderNotesRapportRepository()
         ),
         GetCohortesGestionnaireCommand: lambda cmd: get_cohortes_gestionnaire(
             cmd,
@@ -418,6 +438,10 @@ class MessageBus:
         GetResponsableDeNotesCommand: lambda cmd: get_responsable_de_notes(
             cmd,
             ResponsableDeNotesRepository(),
+        ),
+        GetEncoderNotesRapportCommand: lambda cmd: get_encoder_notes_rapport(
+            cmd,
+            EncoderNotesRapportRepository()
         )
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 

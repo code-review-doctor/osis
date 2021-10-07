@@ -210,11 +210,24 @@ class TestGetByEnseignantTranslator(TestCase):
             learning_component_year__learning_unit_year=self.learning_unit_year,
         )
         result = self.function_to_test(self.matricule_fgs_enseignant, self.annee)[0]
-        self.assertEqual(result.learning_unit_code, self.learning_unit_year.learning_container_year.acronym)
-        self.assertEqual(
-            result.learning_unit_year,
-            self.learning_unit_year.learning_container_year.academic_year.year
+        self.assertEqual(result.learning_unit_code, self.learning_unit_year.acronym)
+        self.assertEqual(result.learning_unit_year, self.learning_unit_year.academic_year.year)
+
+    def test_should_renvoyer_code_partim_si_volume_est_present_sur_partim(self):
+        partim = LearningUnitYearFactory(
+            learning_container_year=self.learning_unit_year.learning_container_year,
+            acronym=self.learning_unit_year.acronym + "A",
+            academic_year=self.learning_unit_year.academic_year,
         )
+
+        AttributionChargeNewFactory(
+            attribution__tutor__person__global_id=self.matricule_fgs_enseignant,
+            learning_component_year__learning_unit_year=partim,
+        )
+
+        result = self.function_to_test(self.matricule_fgs_enseignant, self.annee)[0]
+        self.assertEqual(result.learning_unit_code, partim.acronym)
+        self.assertEqual(result.learning_unit_year, partim.academic_year.year)
 
     def test_should_renvoyer_detail_attribution(self):
         attribution_charge = AttributionChargeNewFactory(
