@@ -86,12 +86,12 @@ class AttributionListViewTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         results = response.json()
-        self.assertEqual(results[0]['lecturing_charge'], str(self.attribution_charge.allocation_charge))
+        self.assertEqual(results[0]['lecturing_charge'], "{:.2f}".format(self.attribution_charge.allocation_charge))
         self.assertIsNone(results[0]['practical_charge'])
         components = self.attribution_charge.learning_component_year.learning_unit_year.learningcomponentyear_set.all()
         self.assertEqual(
             results[0]['total_learning_unit_charge'],
-            "{:.1f}".format(
+            "{:.2f}".format(
                 sum(component.hourly_volume_total_annual * component.planned_classes for component in components)
             )
         )
@@ -152,12 +152,12 @@ class MyAttributionListViewTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         results = response.json()
-        self.assertEqual(results[0]['lecturing_charge'], str(self.attribution_charge.allocation_charge))
+        self.assertEqual(results[0]['lecturing_charge'], "{:.2f}".format(self.attribution_charge.allocation_charge))
         self.assertIsNone(results[0]['practical_charge'])
         components = self.attribution_charge.learning_component_year.learning_unit_year.learningcomponentyear_set.all()
         self.assertEqual(
             results[0]['total_learning_unit_charge'],
-            "{:.1f}".format(
+            "{:.2f}".format(
                 sum(component.hourly_volume_total_annual * component.planned_classes for component in components)
             )
         )
