@@ -176,3 +176,10 @@ class TestRechercherNotes(SimpleTestCase):
             len(result),
             1
         )
+
+    def test_should_return_notes_avec_propriete_decimal_autorisee(self):
+        result = message_bus_instance.invoke(self.cmd)
+
+        self.assertTrue(
+            all([hasattr(note_dto, 'note_decimale_est_autorisee') for note_dto in result])
+        )
