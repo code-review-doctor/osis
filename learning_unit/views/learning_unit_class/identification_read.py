@@ -58,7 +58,7 @@ class ClassIdentificationView(CommonClassView, TemplateView):
                 'effective_class': self.effective_class,
                 'show_button': True,
                 'class_type': get_class_type(self.learning_unit),
-                'volumes': get_volumes(self.learning_unit),
+                'volumes': self.learning_unit.volumes,
                 'history': get_related_history(self.learning_unit_year, self.effective_class),
                 'language':
                     message_bus_instance.invoke(

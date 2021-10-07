@@ -53,7 +53,7 @@ class LearningUnitIdentity(interface.EntityIdentity):
     code = attr.ib(type=str)
 
     def __str__(self):
-        return "{} - ({})".format(self.code, self.academic_year)
+        return "{} - ({})".format(self.code, self.academic_year.year)
 
     @property
     def year(self) -> int:
@@ -131,6 +131,12 @@ class LearningUnit(interface.RootEntity):
 
     def has_lecturing_volume(self) -> bool:
         return self.lecturing_part and self.lecturing_part.volumes.volume_annual
+
+    @property
+    def volumes(self) -> 'Volumes':
+        if self.has_practical_volume() and not self.has_lecturing_volume():
+            return self.practical_part.volumes
+        return self.lecturing_part.volumes
 
     def get_partims_information(self) -> List[LearningUnitPartimDTO]:
         return [

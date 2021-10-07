@@ -25,6 +25,7 @@
 ##############################################################################
 from typing import List
 
+from ddd.logic.encodage_des_notes.shared_kernel.domain.builder.encoder_notes_rapport_builder import EncoderNotesRapportBuilder
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_inscription_examen import IInscriptionExamenTranslator
@@ -32,6 +33,7 @@ from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodag
     IPeriodeEncodageNotesTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.periode_encodage_ouverte import \
     PeriodeEncodageOuverte
+from ddd.logic.encodage_des_notes.shared_kernel.repository.i_encoder_notes_rapport import IEncoderNotesRapportRepository
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderNotesEtudiantCommand
 from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import IdentiteNoteEtudiant
 from ddd.logic.encodage_des_notes.soumission.domain.service.encoder_notes_en_lot import EncoderNotesEtudiantEnLot
@@ -47,7 +49,8 @@ def encoder_notes_etudiant(
         periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
         attribution_translator: 'IAttributionEnseignantTranslator',
         historiser_note_service: 'IHistoriserNotesService',
-        inscription_examen_translator: 'IInscriptionExamenTranslator'
+        inscription_examen_translator: 'IInscriptionExamenTranslator',
+        rapport_repository: 'IEncoderNotesRapportRepository'
 ) -> List['IdentiteNoteEtudiant']:
     # Given
     PeriodeEncodageOuverte().verifier(periode_soumission_note_translator)
@@ -61,12 +64,15 @@ def encoder_notes_etudiant(
     )
 
     # When
+    rapport = EncoderNotesRapportBuilder.build_from_command(cmd)
     identites_notes_encodees = EncoderNotesEtudiantEnLot().execute(
         cmd,
         note_etudiant_repo,
         periode_soumission,
         historiser_note_service,
-        inscription_examen_translator
+        inscription_examen_translator,
+        rapport,
+        rapport_repository
     )
 
     return identites_notes_encodees

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-28 07:44+0200\n"
+"POT-Creation-Date: 2021-10-01 14:14+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -805,12 +805,6 @@ msgstr ""
 msgid "Down"
 msgstr ""
 
-msgid ""
-"Due to a pending change in OSIS, student counters for 1BA, 11BA and learning "
-"units containing classes could be distorted(abnormally high). For accurate "
-"statistics, please consult the EPC statistics."
-msgstr ""
-
 msgid "Duration"
 msgstr ""
 
@@ -908,7 +902,13 @@ msgstr ""
 msgid "Enrolled"
 msgstr ""
 
+msgid "Enrolled to"
+msgstr ""
+
 msgid "Enrolled to learning unit"
+msgstr ""
+
+msgid "Enrolled to training"
 msgstr ""
 
 msgid "Enrollment campus"
@@ -1739,6 +1739,9 @@ msgstr ""
 msgid "No result!"
 msgstr ""
 
+msgid "No weighting(same weight)"
+msgstr ""
+
 msgid "No. Session"
 msgstr ""
 
@@ -2406,6 +2409,9 @@ msgstr ""
 msgid "Student's dissertations management"
 msgstr ""
 
+msgid "Student.s enrolled in block 1"
+msgstr ""
+
 msgid "Students"
 msgstr ""
 
@@ -2810,9 +2816,6 @@ msgstr ""
 msgid "Total"
 msgstr ""
 
-msgid "Total enrollments to training"
-msgstr ""
-
 msgid "Training"
 msgstr ""
 
@@ -2999,6 +3002,9 @@ msgid "Week"
 msgstr ""
 
 msgid "Weighting"
+msgstr ""
+
+msgid "Weighting type"
 msgstr ""
 
 msgctxt "section title"

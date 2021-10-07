@@ -139,3 +139,16 @@ class EffectiveClassFromRepositoryDTO(DTO):
         if self.class_type == learning_component_year_type.LECTURING:
             return self.learning_unit_code + "-" + self.class_code
         return self.learning_unit_code + "_" + self.class_code
+
+
+@attr.s(frozen=True, slots=True)
+class EffectiveClassDTO(DTO):
+    code = attr.ib(type=str)
+    title_fr = attr.ib(type=str)
+    title_en = attr.ib(type=str)
+    teaching_place_uuid = attr.ib(type=str)
+    derogation_quadrimester = attr.ib(type=str)
+    session_derogation = attr.ib(type=str)
+    volume_q1 = attr.ib(type=DurationUnit)
+    volume_q2 = attr.ib(type=DurationUnit)
+    type = attr.ib(type=str)

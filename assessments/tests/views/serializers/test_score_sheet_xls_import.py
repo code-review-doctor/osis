@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Union
+
 from django.test import SimpleTestCase
 from openpyxl import Workbook
 
@@ -90,6 +92,37 @@ class ScoreSheetXLSImportViewTest(SimpleTestCase):
         with self.assertRaises(ScoreSheetXLSImportSerializerError):
             ScoreSheetXLSImportSerializer(self.workbook.active).data
 
+    def test_assert_serialize_zero_as_value(self):
+        worksheet = self.workbook.active
+        self.__add_row_to_worksheet(
+            worksheet,
+            13,
+            annee_academique="2020-21",
+            numero_session="2",
+            code_cours="LEPL1509",
+            noma="24641600",
+            note=0,
+            email="dummy@gmail.com",
+        )
+
+        serialized_data = ScoreSheetXLSImportSerializer(self.workbook.active).data
+        self.assertEqual(serialized_data['notes_etudiants'][0]['note'], '0')
+
+    def test_assert_convert_comma_to_dot(self):
+        worksheet = self.workbook.active
+        self.__add_row_to_worksheet(
+            worksheet,
+            13,
+            annee_academique="2020-21",
+            numero_session="2",
+            code_cours="LEPL1509",
+            noma="24641600",
+            note="10,6",
+            email="dummy@gmail.com",
+        )
+        serialized_data = ScoreSheetXLSImportSerializer(self.workbook.active).data
+        self.assertEqual(serialized_data['notes_etudiants'][0]['note'], '10.6')
+
     def __add_row_to_worksheet(
             self,
             worksheet,
@@ -98,7 +131,7 @@ class ScoreSheetXLSImportViewTest(SimpleTestCase):
             numero_session: str,
             code_cours: str,
             noma: str,
-            note: str,
+            note: Union[str, int],
             email: str
     ):
         worksheet['A' + str(row_number)].value = annee_academique

@@ -89,7 +89,7 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
     learning_unit_internship_subtype = forms.ChoiceField(disabled=True, label=_('Internship subtype'), required=False)
     learning_unit_credits = forms.CharField(
         disabled=True,
-        label=_('Credits'),
+        label=_('Learning unit credits'),
         required=False,
         widget=DecimalFormatInput(render_value=True)
     )

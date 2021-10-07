@@ -25,17 +25,20 @@
 ##############################################################################
 import functools
 import operator
+from decimal import Decimal
 from typing import List
 
 from django.db import models
-from django.db.models import Q, F, Subquery, OuterRef
+from django.db.models import Q, F, Subquery, OuterRef, Case, When, fields, Sum
 
 from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.attribution_new import AttributionNew
 from base.models.enums import learning_component_year_type
+from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import LearningUnitYear
 from ddd.logic.application.domain.service.i_learning_unit_service import ILearningUnitService
-from ddd.logic.application.dtos import LearningUnitVolumeFromServiceDTO, LearningUnitTutorAttributionFromServiceDTO
+from ddd.logic.application.dtos import LearningUnitVolumeFromServiceDTO, LearningUnitTutorAttributionFromServiceDTO, \
+    LearningUnitAnnualVolumeFromServiceDTO
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 
 
@@ -106,3 +109,19 @@ class LearningUnitTranslator(ILearningUnitService):
             'practical_volume',
         )
         return [LearningUnitTutorAttributionFromServiceDTO(**row_as_dict) for row_as_dict in qs]
+
+    def search_learning_unit_annual_volume_dto(
+            self,
+            entity_id: LearningUnitIdentity
+    ) -> LearningUnitAnnualVolumeFromServiceDTO:
+        qs = LearningComponentYear.objects.filter(
+            learning_unit_year__acronym=entity_id.code,
+            learning_unit_year__academic_year__year=entity_id.academic_year.year
+        ).annotate(
+            hourly_volume_total_annual_casted=Case(
+                When(hourly_volume_total_annual__isnull=True, then=Decimal(0.0)),
+                default=F('hourly_volume_total_annual'),
+                output_field=fields.DecimalField()
+            )
+        ).aggregate(Sum('hourly_volume_total_annual_casted'))['hourly_volume_total_annual_casted__sum']
+        return LearningUnitAnnualVolumeFromServiceDTO(volume=qs)
