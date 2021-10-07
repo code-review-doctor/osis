@@ -805,12 +805,6 @@ msgstr ""
 msgid "Down"
 msgstr ""
 
-msgid ""
-"Due to a pending change in OSIS, student counters for 1BA, 11BA and learning "
-"units containing classes could be distorted(abnormally high). For accurate "
-"statistics, please consult the EPC statistics."
-msgstr ""
-
 msgid "Duration"
 msgstr ""
 
@@ -2413,6 +2407,9 @@ msgid "Student search"
 msgstr ""
 
 msgid "Student's dissertations management"
+msgstr ""
+
+msgid "Student.s enrolled in block 1"
 msgstr ""
 
 msgid "Students"

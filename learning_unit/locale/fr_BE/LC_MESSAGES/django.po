@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-17 09:42+0200\n"
+"POT-Creation-Date: 2021-09-30 14:16+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -109,9 +109,6 @@ msgstr "Origine de la copie"
 
 msgid "Copy to next year"
 msgstr "Copier en N+1"
-
-msgid "Credits"
-msgstr "Crédits"
 
 msgid "Delete"
 msgstr "Supprimer"
@@ -506,6 +503,9 @@ msgstr "Vous ne pouvez pas modifier ce type d'unité d'enseignement"
 msgid "You cannot modify a learning unit of a previous year"
 msgstr ""
 "Vous ne pouvez pas modifier l'unité d'enseignement d'une année dans le passé"
+
+msgid "You do not have sufficient access rights to delete a class."
+msgstr "Vous n'avez pas les droits nécessaires pour supprimer une classe."
 
 msgid "You do not have sufficient access rights to update a class."
 msgstr "Vous n'avez pas les droits nécessaires pour modifier une classe."

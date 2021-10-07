@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db.models import F
+from django.db.models import F, Q
 from django.shortcuts import redirect
 from django.urls import reverse
 
@@ -106,4 +106,6 @@ class TrainingReadAdministrativeData(TrainingRead):
         return ProgramManager.objects.filter(
             education_group__educationgroupyear__acronym=self.training_identity.acronym,
             education_group__educationgroupyear__academic_year__year=self.training_identity.year,
+        ).filter(
+            Q(cohort__isnull=True) | Q(cohort__exact='')
         ).order_by("person__last_name", "person__first_name")

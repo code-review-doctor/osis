@@ -27,6 +27,7 @@ from typing import List
 
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_inscription_examen import IInscriptionExamenTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodage_notes import \
     IPeriodeEncodageNotesTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_etudiant import \
@@ -53,7 +54,8 @@ def soumettre_notes_etudiant(
         translator: 'IAttributionEnseignantTranslator',
         signaletique_repo: 'ISignaletiquePersonneTranslator',
         signaletique_etudiant_repo: 'ISignaletiqueEtudiantTranslator',
-        historiser_note_service: 'IHistoriserNotesService'
+        historiser_note_service: 'IHistoriserNotesService',
+        inscr_exam_translator: 'IInscriptionExamenTranslator',
 ) -> List['IdentiteNoteEtudiant']:
     # Given
     PeriodeEncodageOuverte().verifier(periode_soumission_note_translator)
@@ -76,6 +78,7 @@ def soumettre_notes_etudiant(
         translator,
         signaletique_repo,
         signaletique_etudiant_repo,
+        inscr_exam_translator,
     )
 
     return notes_soumises

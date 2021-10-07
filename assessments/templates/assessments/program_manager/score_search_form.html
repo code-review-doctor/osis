@@ -92,7 +92,7 @@
 
                             <div class="row">
                                 <div class="col-md-12">
-                                    <button id="lnk_submit_down" class="btn btn-primary" type="submit">
+                                    <button id="lnk_submit_up" class="btn btn-primary" type="submit">
                                         <em class="fas fa-save"></em> {% trans 'Save' %}
                                     </button>
                                 </div>
@@ -149,6 +149,7 @@
                                                         {% bootstrap_field score_encoding_form.note show_label=False %}
                                                         {% bootstrap_field score_encoding_form.noma %}
                                                         {% bootstrap_field score_encoding_form.code_unite_enseignement %}
+                                                        <input type="hidden" name="note_decimale_est_autorisee" value="{% if note_etudiant.note_decimale_est_autorisee %}true{% else %}false{% endif %}">
                                                     {% endwith %}
                                                 {% else %}
                                                     {{ note_etudiant.note|default:"-" }}
@@ -175,4 +176,55 @@
             </div>
         </div>
     </div>
+{% endblock %}
+
+
+{% block script %}
+    <script>
+        $(document).ready(function() {
+            const SCORE_INPUTS = $("input[id^='id_form'][class='form-control']");
+            const SUBMIT_LINKS = $("#lnk_submit_up, #lnk_submit_down");
+
+            const is_valid_score = function(score, is_decimal) {
+                score = score.replace(',','.');
+
+                const regex = (is_decimal) ? /^\d+(\.\d{0,2})?$/ : /^\d+$/;
+                if(!regex.test(score)){
+                    return false;
+                }
+                score = parseFloat(score).toFixed(2)
+                return !(score > 20 || score < 0);
+            }
+
+            const is_valid_justification = function (justification) {
+                const justificationAvailables = ['M', 'S', 'T'];
+                return justificationAvailables.indexOf(justification) > -1;
+            }
+
+            const validate_form = function() {
+                let has_error = false;
+                SCORE_INPUTS.each(function(){
+                    const value_encoded = $(this).val();
+                    const is_decimal = (
+                        $(this).parents("td").find("input[name=note_decimale_est_autorisee]").val() === 'true'
+                    );
+
+                    if (
+                        value_encoded === "" ||
+                        is_valid_justification(value_encoded) ||
+                        is_valid_score(value_encoded, is_decimal)
+                    ) {
+                        $(this).css("border", "1px solid #D3D3D3");
+                    } else {
+
+                        $(this).css("border", "1px solid #ff0000");
+                        has_error = true;
+                    }
+                });
+                SUBMIT_LINKS.prop('disabled', has_error);
+            }
+            SCORE_INPUTS.change(validate_form);
+        });
+        $(document).on('keypress', function(e) { disable_enter(e); });
+    </script>
 {% endblock %}
