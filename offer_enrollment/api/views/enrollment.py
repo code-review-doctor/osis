@@ -27,7 +27,7 @@ import logging
 
 from django.conf import settings
 from django.db.models import Case, When, Q, F, Value, CharField
-from django.db.models.functions import Replace, Concat
+from django.db.models.functions import Replace, Concat, Lower, Substr
 from django.utils.functional import cached_property
 from rest_framework import generics
 
@@ -66,7 +66,11 @@ class MyOfferEnrollmentsListView(LanguageContextSerializerMixin, generics.ListAP
             title_fr=Case(
                 When(
                     Q(cohort_year__name=CohortName.FIRST_YEAR.name),
-                    then=Concat(Value('Première année de '), 'education_group_year__title')
+                    then=Concat(
+                        Value('Première année de '),
+                        Lower(Substr('education_group_year__title', 1, 1)),
+                        Substr('education_group_year__title', 2)
+                    )
                 ),
                 default=F('education_group_year__title'),
                 output_field=CharField()
@@ -76,7 +80,11 @@ class MyOfferEnrollmentsListView(LanguageContextSerializerMixin, generics.ListAP
                     Q(cohort_year__name=CohortName.FIRST_YEAR.name) &
                     Q(education_group_year__title_english__isnull=False) &
                     ~Q(education_group_year__title_english=''),
-                    then=Concat(Value('First year of '), 'education_group_year__title_english')
+                    then=Concat(
+                        Value('First year of '),
+                        Lower(Substr('education_group_year__title_english', 1, 1)),
+                        Substr('education_group_year__title_english', 2)
+                    )
                 ),
                 default=F('education_group_year__title_english'),
                 output_field=CharField()
