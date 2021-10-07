@@ -50,6 +50,15 @@ class AttributionSerializer(serializers.Serializer):
     has_peps = serializers.BooleanField()
     is_partim = serializers.BooleanField()
     effective_class_repartition = EffectiveClassRepartitionSerializer(many=True, default=None)
+    percentage_allocation_charge = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_percentage_allocation_charge(obj):
+        if (obj.lecturing_charge or obj.practical_charge) and obj.total_learning_unit_charge > 0:
+            percentage = ((obj.lecturing_charge or 0) + (
+                        obj.practical_charge or 0)) * 100 / obj.total_learning_unit_charge
+            return "%0.1f" % (percentage,)
+        return None
 
     @staticmethod
     def get_type_text(obj) -> str:
