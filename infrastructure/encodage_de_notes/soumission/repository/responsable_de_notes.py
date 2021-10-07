@@ -161,15 +161,15 @@ class ResponsableDeNotesRepository(IResponsableDeNotesRepository):
             entity_id: 'IdentiteResponsableDeNotes',
             unite_enseignement: 'UniteEnseignementIdentite'
     ):
-        is_class = unite_enseignement.code_unite_enseignement[-1] in string.ascii_letters
+        is_class = unite_enseignement.est_classe()
         tutor = Tutor.objects.get(person__global_id=entity_id.matricule_fgs_enseignant)
         if is_class:
             luy = LearningUnitYear.objects.get(
-                acronym=unite_enseignement.code_unite_enseignement[:-2],
+                acronym=unite_enseignement.get_code_unite_enseignement_sans_code_classe(),
                 academic_year__year=unite_enseignement.annee_academique
             )
             class_year = LearningClassYear.objects.get(
-                acronym=unite_enseignement.code_unite_enseignement[-1],
+                acronym=unite_enseignement.get_code_classe(),
                 learning_component_year__learning_unit_year=luy
             )
         else:
