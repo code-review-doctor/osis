@@ -39,7 +39,7 @@ class AcademicYearRepository(IAcademicYearRepository):
         raise NotImplementedError
 
     @classmethod
-    def search(cls, year: Optional[int], **kwargs) -> List['AcademicYear']:
+    def search(cls, year: int = None, **kwargs) -> List['AcademicYear']:
         objects = _get_common_queryset()
         if year:
             objects = objects.filter(year__gte=year)

@@ -29,7 +29,7 @@ from django.utils.translation import pgettext_lazy, gettext_lazy as _
 
 
 from base.forms.utils import choice_field
-from base.models.enums.exam_enrollment_justification_type import JustificationTypes, StateTypes
+from base.models.enums.exam_enrollment_justification_type import StateTypes
 from ddd.logic.encodage_des_notes.encodage.commands import GetCohortesGestionnaireCommand
 from infrastructure.messages_bus import message_bus_instance
 
@@ -42,6 +42,12 @@ class ScoreEncodingFormSet(BaseFormSet):
 class ScoreEncodingForm(forms.Form):
     note = forms.CharField(max_length=100, required=False)
     noma = forms.CharField(widget=HiddenInput())
+
+    def clean_note(self):
+        note = self.cleaned_data['note']
+        if note:
+            return note.replace(",", ".")
+        return note
 
 
 class ScoreSearchEncodingForm(forms.Form):

@@ -103,6 +103,10 @@ class NoteJustificationEtudiantFactory(NoteManquanteEtudiantFactory):
     note = factory.LazyFunction(generate_note_justification)
 
 
+class NoteJustificationSoumiseEtudiantFactory(NoteManquanteEtudiantFactory):
+    est_soumise = True
+
+
 class NoteDecimalesAuthorisees(NoteManquanteEtudiantFactory):
     credits_unite_enseignement = CREDITS_MIN_POUR_NOTE_DECIMALE
 
