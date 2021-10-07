@@ -132,12 +132,17 @@ class FirstYearBachelorScoreSheetAddressView(ScoreSheetAddressView):
         )
 
     @cached_property
+    def score_sheet_address(self) -> 'AdresseFeuilleDeNotesDTO':
+        cmd = GetAdresseFeuilleDeNotesServiceCommand(nom_cohorte=self.nom_cohorte_premiere_annee)
+        return message_bus_instance.invoke(cmd)
+
+    @cached_property
     def education_group_year(self) -> 'EducationGroupYear':
         return self.first_year_bachelor.education_group_year
 
     @cached_property
     def bachelor_score_sheet_address_dto(self) -> 'AdresseFeuilleDeNotesDTO':
-        cmd = GetAdresseFeuilleDeNotesServiceCommand(nom_cohorte=self.nom_cohorte_premiere_annee)
+        cmd = GetAdresseFeuilleDeNotesServiceCommand(nom_cohorte=self.nom_cohorte_bachelier)
         return message_bus_instance.invoke(cmd)
 
     def get_initial(self):
