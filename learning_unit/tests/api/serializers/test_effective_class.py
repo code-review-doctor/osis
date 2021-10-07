@@ -48,7 +48,8 @@ class EffectiveClassSerializerTestCase(TestCase):
             volume_q2=10.0,
             type=LECTURING,
             campus_name="Campus",
-            organization_name="UCLouvain"
+            organization_name="UCLouvain",
+            full_code="LDROI1001_Z"
         )
 
         cls.serializer = EffectiveClassSerializer(ns, context={'language': settings.LANGUAGE_CODE_EN})
@@ -68,5 +69,6 @@ class EffectiveClassSerializerTestCase(TestCase):
             'type_text',
             'campus_name',
             'organization_name',
+            "full_code"
         ]
         self.assertCountEqual(list(self.serializer.data.keys()), expected_fields)
