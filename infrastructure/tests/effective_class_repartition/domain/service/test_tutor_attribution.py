@@ -27,7 +27,6 @@ import uuid
 
 from django.test import TestCase
 
-from attribution.models.attribution_new import AttributionNew
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from base.models.enums import learning_component_year_type
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory

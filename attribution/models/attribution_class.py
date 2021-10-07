@@ -25,7 +25,10 @@
 ##############################################################################
 from django.core import validators
 from django.db import models
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
 
+from assessments.models.score_responsible import ScoreResponsible
 from attribution.models.attribution_charge_new import MIN_ALLOCATION_CHARGE
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
@@ -57,3 +60,15 @@ class AttributionClass(models.Model):
             self.attribution_charge,
             self.learning_class_year
         )
+
+
+@receiver(post_delete, sender=AttributionClass)
+def _attribution_class_delete(sender, instance, **kwargs):
+    if AttributionClass.objects.filter(
+            attribution_charge__attribution=instance.attribution_charge.attribution,
+            learning_class_year__learning_component_year__learning_unit_year__learning_container_year=
+            instance.attribution_charge.learning_component_year.learning_unit_year.learning_container_year
+    ).count() == 0:
+        ScoreResponsible.objects.filter(
+            learning_unit_year=instance.learning_class_year.learning_component_year.learning_unit_year,
+            tutor=instance.attribution_charge.attribution.tutor).delete()

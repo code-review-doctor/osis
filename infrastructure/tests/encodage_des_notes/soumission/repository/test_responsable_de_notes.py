@@ -87,7 +87,7 @@ class ResponsableDeNotesRepositoryTest(TestCase):
 
         assert_attrs_instances_are_equal(responsable, responsable_retrieved)
 
-    def test_should_save_desassignation_pour_tout_les_unite_enseignements(self):
+    def test_should_save_desassignation_tout_les_responsable_de_notes_pour_une_unite_enseignements(self):
         responsable = ResponsableDeNotesPourClasse()
         self._create_necessary_data(responsable)
 
@@ -98,8 +98,7 @@ class ResponsableDeNotesRepositoryTest(TestCase):
 
         self.responsable_de_notes_repository.save(responsable)
 
-        with self.assertRaises(IndexError):
-            self.responsable_de_notes_repository.get(responsable.entity_id)
+        self.assertEqual(self.responsable_de_notes_repository.get(responsable.entity_id), None)
 
     def test_should_get_responsable_de_notes_par_cours(self):
         responsable = ResponsableDeNotesPourUneUniteEnseignement()
