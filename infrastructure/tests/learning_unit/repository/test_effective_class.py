@@ -148,7 +148,7 @@ class SearchDtosTest(TestCase):
 
     def test_should_renvoyer_intitules_complets(self):
         dto = self.class_repository.search_dtos(codes={self.code_complet_classe}, annee=self.annee)[0]
-        intitule_complet_fr = "{}-{}".format(
+        intitule_complet_fr = "{} - {}".format(
             self.class_db.learning_component_year.learning_unit_year.learning_container_year.common_title,
             self.class_db.title_fr,
         )
@@ -156,7 +156,7 @@ class SearchDtosTest(TestCase):
             dto.full_title_fr,
             intitule_complet_fr,
         )
-        intitule_complet_en = "{}-{}".format(
+        intitule_complet_en = "{} - {}".format(
             self.class_db.learning_component_year.learning_unit_year.learning_container_year.common_title_english,
             self.class_db.title_en,
         )

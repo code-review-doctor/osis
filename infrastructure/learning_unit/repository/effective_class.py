@@ -211,12 +211,12 @@ def _annotate_queryset(qs: QuerySet) -> QuerySet:
         class_type=F('learning_component_year__type'),
         full_title_fr=Concat(
             'learning_component_year__learning_unit_year__learning_container_year__common_title',
-            Value('-'),
+            Value(' - '),
             'title_fr',
         ),
         full_title_en=Concat(
             'learning_component_year__learning_unit_year__learning_container_year__common_title_english',
-            Value('-'),
+            Value(' - '),
             'title_en',
         ),
     )
