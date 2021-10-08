@@ -125,7 +125,7 @@ def _check_learning_class_year_deletion(learning_unit_year, learning_class_year)
     class_enrollments_count = learning_unit_enrollment.count_by_learning_class_year(learning_class_year)
     if class_enrollments_count:
         msg[learning_unit_year] = _("The effective class %(acronym)s has %(count)d enrollments for the year %(year)s")\
-                                   % {'acronym': learning_unit_year.acronym + learning_class_year.acronym,
+                                   % {'acronym': learning_class_year.effective_class_complete_acronym,
                                       'year': learning_unit_year.academic_year,
                                       'count': class_enrollments_count}
     for attribution_class in \
