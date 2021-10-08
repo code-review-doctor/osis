@@ -36,7 +36,7 @@ from base.tests.factories.tutor import TutorFactory
 ATTRIBUTRES_OF_ATTRIBUTION_SERIALIZER = [
     "code", "title_fr", "title_en", "year", "type", "type_text", "credits", "start_year", "function",
     "function_text", "lecturing_charge", "practical_charge", "total_learning_unit_charge", "links",
-    "has_peps", "effective_class_repartition", "is_partim", "learning_unit_has_classes", "score_responsible"
+    "has_peps", "effective_class_repartition", "is_partim"
 ]
 
 

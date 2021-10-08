@@ -50,8 +50,6 @@ class AttributionSerializer(serializers.Serializer):
     has_peps = serializers.BooleanField()
     is_partim = serializers.BooleanField()
     effective_class_repartition = EffectiveClassRepartitionSerializer(many=True, default=None)
-    learning_unit_has_classes = serializers.BooleanField()
-    score_responsible = serializers.CharField()
 
     @staticmethod
     def get_type_text(obj) -> str:

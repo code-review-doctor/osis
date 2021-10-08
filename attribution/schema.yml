@@ -780,12 +780,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/EffectiveClassRepartition'
-        learning_unit_has_classes:
-          type: boolean
-        score_responsible:
-          type: string
-          example: 'MARTIN, Tom'
-          nullable: true
     EffectiveClassRepartition:
       type: object
       properties:
