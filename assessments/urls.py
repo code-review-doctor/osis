@@ -82,7 +82,11 @@ urlpatterns = [
         # New URL's
         path('overview', ScoreEncodingProgressOverviewView.as_view(), name="score_encoding_progress_overview"),
         path('search', ScoreSearchFormView.as_view(), name='score_search'),
-        path('search_learning_unit_code', CodeUniteEnseignementAutocomplete.as_view(), name='learning-unit-code-autocomplete'),
+        path(
+            'search_learning_unit_code',
+            CodeUniteEnseignementAutocomplete.as_view(),
+            name='learning-unit-code-autocomplete',
+        ),
         path('<str:learning_unit_code>/', include(([
             path('', LearningUnitScoreEncodingView.as_view(), name='learning_unit_score_encoding'),
             path('form', LearningUnitScoreEncodingFormView.as_view(), name='learning_unit_score_encoding_form'),
