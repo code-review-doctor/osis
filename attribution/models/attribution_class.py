@@ -65,7 +65,7 @@ class AttributionClass(models.Model):
 @receiver(post_delete, sender=AttributionClass)
 def _attribution_class_delete(sender, instance, **kwargs):
     if AttributionClass.objects.filter(
-            attribution_charge__attribution=instance.attribution_charge.attribution,
+            attribution_charge__attribution__tutor=instance.attribution_charge.attribution.tutor,
             learning_class_year__learning_component_year__learning_unit_year__learning_container_year=
             instance.attribution_charge.learning_component_year.learning_unit_year.learning_container_year
     ).count() == 0:

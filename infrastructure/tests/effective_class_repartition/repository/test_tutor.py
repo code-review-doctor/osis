@@ -34,7 +34,6 @@ from attribution.tests.factories.attribution_charge_new import AttributionCharge
 from attribution.tests.factories.attribution_class import AttributionClassFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
-from base.tests.factories.tutor import TutorFactory
 from ddd.logic.effective_class_repartition.builder.tutor_identity_builder import TutorIdentityBuilder
 from ddd.logic.effective_class_repartition.tests.factory.tutor import TutorWithDistributedEffectiveClassesFactory, \
     Tutor9999IdentityFactory

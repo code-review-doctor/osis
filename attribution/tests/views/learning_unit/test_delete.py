@@ -28,9 +28,14 @@ from django.http import HttpResponse
 from django.test import TestCase
 from django.urls import reverse
 
+from assessments.models.score_responsible import ScoreResponsible
 from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.attribution_new import AttributionNew
+from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
+from attribution.tests.factories.attribution_new import AttributionNewFactory
 from attribution.tests.views.charge_repartition.common import TestChargeRepartitionMixin
+from base.tests.factories.learning_component_year import PracticalLearningComponentYearFactory, \
+    LecturingLearningComponentYearFactory
 
 
 class TestRemoveChargeRepartition(TestChargeRepartitionMixin, TestCase):
@@ -56,6 +61,33 @@ class TestRemoveChargeRepartition(TestChargeRepartitionMixin, TestCase):
         self.assertFalse(
             AttributionChargeNew.objects.filter(id__in=(self.charge_lecturing.id, self.charge_practical.id)).exists()
         )
+        self.assertFalse(ScoreResponsible.objects.filter(id=self.score_responsible.id).exists())
+
+    def test_delete_data_with_second_attribution_for_the_learning_unit(self):
+        attribution = AttributionNewFactory(
+            tutor=self.attribution.tutor,
+            learning_container_year=self.learning_unit_year.learning_container_year
+        )
+        charge_lecturing2 = AttributionChargeNewFactory(
+            attribution__tutor=attribution.tutor,
+            learning_component_year__learning_unit_year__learning_container_year=
+            self.learning_unit_year.learning_container_year
+        )
+        charge_practical2 = AttributionChargeNewFactory(
+            attribution__tutor=attribution.tutor,
+            learning_component_year__learning_unit_year__learning_container_year=
+            self.learning_unit_year.learning_container_year
+        )
+        self.client.delete(self.url)
+
+        self.assertFalse(AttributionNew.objects.filter(id=self.attribution.id).exists())
+        self.assertFalse(
+            AttributionChargeNew.objects.filter(id__in=(self.charge_lecturing.id, self.charge_practical.id)).exists()
+        )
+        self.assertTrue(
+            AttributionChargeNew.objects.filter(id__in=(charge_lecturing2.id, charge_practical2.id)).exists()
+        )
+        self.assertTrue(ScoreResponsible.objects.filter(id=self.score_responsible.id).exists())
 
     def test_delete_redirection(self):
         response = self.client.delete(self.url, follow=False)

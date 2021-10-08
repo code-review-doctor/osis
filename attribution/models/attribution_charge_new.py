@@ -59,7 +59,7 @@ class AttributionChargeNew(models.Model):
 @receiver(post_delete, sender=AttributionChargeNew)
 def _attribution_new_delete(sender, instance, **kwargs):
     if AttributionChargeNew.objects.filter(
-            attribution=instance.attribution,
+            attribution__tutor=instance.attribution.tutor,
             learning_component_year__learning_unit_year__learning_container_year=
             instance.learning_component_year.learning_unit_year.learning_container_year
     ).count() == 0:
