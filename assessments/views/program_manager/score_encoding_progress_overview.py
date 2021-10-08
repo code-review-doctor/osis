@@ -23,15 +23,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from dal import autocomplete
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.postgres.aggregates import ArrayAgg
+from django.db.models import F, CharField, Value, When, Case
+from django.db.models.functions import Concat
 from django.urls import reverse
 from django.utils.functional import cached_property
 
 from assessments.forms.score_encoding import ScoreEncodingProgressFilterForm
 from assessments.views.common.score_encoding_progress_overview import ScoreEncodingProgressOverviewBaseView
 from base.models import synchronization
+from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
+from base.models.learning_unit_year import LearningUnitYear
 from ddd.logic.encodage_des_notes.encodage.commands import GetProgressionGeneraleGestionnaireCommand, \
     GetPeriodeEncodageCommand
 from infrastructure.messages_bus import message_bus_instance
+from learning_unit.models.learning_class_year import LearningClassYear
 
 
 class ScoreEncodingProgressOverviewProgramManagerView(ScoreEncodingProgressOverviewBaseView):
@@ -92,3 +100,45 @@ class ScoreEncodingProgressOverviewProgramManagerView(ScoreEncodingProgressOverv
 
     def get_score_search_url(self):
         return reverse('score_search')
+
+
+class CodeUniteEnseignementAutocomplete(LoginRequiredMixin, autocomplete.Select2ListView):
+    def get_list(self):
+        default_choice = [self.q]
+        minimum_chars_to_search = 2
+        if self.q and len(self.q) > minimum_chars_to_search:
+            periode_encodage = message_bus_instance.invoke(GetPeriodeEncodageCommand())
+            qs = LearningUnitYear.objects.filter(
+                academic_year__year=periode_encodage.annee_concernee,
+                acronym__icontains=self.q,
+            ).values_list(
+                'pk',
+                'acronym',
+            )
+            codes_classes = LearningClassYear.objects.filter(
+                learning_component_year__learning_unit_year_id__in={pk for pk, ___ in qs},
+            ).annotate(
+                code_classe=Case(
+                    When(
+                        learning_component_year__type=PRACTICAL_EXERCISES,
+                        then=Concat(
+                            'learning_component_year__learning_unit_year__acronym',
+                            Value('_'),
+                            'acronym',
+                            output_field=CharField()
+                        )
+                    ),
+                    default=Concat(
+                        'learning_component_year__learning_unit_year__acronym',
+                        Value('-'),
+                        'acronym',
+                        output_field=CharField()
+                    ),
+                    output_field=CharField(),
+                )
+            ).values_list('code_classe', flat=True)
+
+            return default_choice + list(sorted([code_ue for __, code_ue in qs] + list(codes_classes)))
+
+        else:
+            return default_choice
