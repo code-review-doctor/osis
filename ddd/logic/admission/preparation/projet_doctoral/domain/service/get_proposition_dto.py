@@ -32,7 +32,7 @@ from ddd.logic.admission.preparation.projet_doctoral.repository.i_proposition im
 from osis_common.ddd import interface
 
 
-class PropositionDto(interface.DomainService):
+class GetPropositionDTODomainService(interface.DomainService):
     @classmethod
     def get(
             cls,
