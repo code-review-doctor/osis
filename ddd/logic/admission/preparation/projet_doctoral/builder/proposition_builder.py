@@ -91,7 +91,7 @@ class PropositionBuilder(interface.RootEntityBuilder):
         )
 
 
-def _build_financement(cmd: 'InitierPropositionCommand'):
+def _build_financement(cmd: 'InitierPropositionCommand') -> 'Financement':
     if cmd.type_financement:
         return Financement(
             type=ChoixTypeFinancement[cmd.type_financement],
