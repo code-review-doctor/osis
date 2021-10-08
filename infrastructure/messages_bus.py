@@ -331,7 +331,8 @@ class MessageBus:
             AttributionEnseignantTranslator(),
             SignaletiquePersonneTranslator(),
             SignaletiqueEtudiantTranslator(),
-            HistoriserNotesService()
+            HistoriserNotesService(),
+            InscriptionExamenTranslator(),
         ),
         GetProgressionGeneraleCommand: lambda cmd: get_progression_generale(
             cmd,

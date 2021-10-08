@@ -102,7 +102,8 @@ class AttributionSerializerTestCase(TestCase):
             'links',
             'has_peps',
             'effective_class_repartition',
-            'is_partim'
+            'is_partim',
+            'percentage_allocation_charge'
         ]
         self.assertCountEqual(list(self.serializer.data.keys()), expected_fields)
 

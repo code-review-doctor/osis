@@ -35,7 +35,6 @@ from ddd.logic.learning_unit.builder.effective_class_identity_builder import Eff
 from ddd.logic.learning_unit.domain.model._financial_volumes_repartition import DurationUnit
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass, EffectiveClassIdentity
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
-from ddd.logic.learning_unit.dtos import EffectiveClassDTO
 from ddd.logic.learning_unit.dtos import EffectiveClassFromRepositoryDTO
 from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
 
@@ -102,12 +101,14 @@ class EffectiveClassRepository(InMemoryGenericRepository, IEffectiveClassReposit
             cls,
             learning_unit_id: Optional['LearningUnitIdentity'] = None,
             **kwargs
-    ) -> List['EffectiveClassDTO']:
+    ) -> List['EffectiveClassFromRepositoryDTO']:
         class_to_return = []
         for effective_class in cls.entities:
             if effective_class.learning_unit_identity == learning_unit_id:
-                dto = EffectiveClassDTO(
-                    code=effective_class.class_code,
+                dto = EffectiveClassFromRepositoryDTO(
+                    class_code=effective_class.class_code,
+                    learning_unit_code=effective_class.learning_unit_code,
+                    learning_unit_year=effective_class.year,
                     title_fr=effective_class.titles.fr,
                     title_en=effective_class.titles.en,
                     teaching_place_uuid=effective_class.teaching_place.uuid,
@@ -115,7 +116,7 @@ class EffectiveClassRepository(InMemoryGenericRepository, IEffectiveClassReposit
                     session_derogation=effective_class.session_derogation,
                     volume_q1=effective_class.volumes.volume_first_quadrimester,
                     volume_q2=effective_class.volumes.volume_second_quadrimester,
-                    type=LECTURING if effective_class.is_lecturing else PRACTICAL_EXERCISES,
+                    class_type=LECTURING if effective_class.is_lecturing else PRACTICAL_EXERCISES,
                 )
                 class_to_return.append(dto)
         return class_to_return

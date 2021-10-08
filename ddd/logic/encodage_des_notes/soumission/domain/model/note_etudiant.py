@@ -42,9 +42,9 @@ CREDITS_MIN_POUR_NOTE_DECIMALE = 15.0
 @attr.s(frozen=True, slots=True)
 class IdentiteNoteEtudiant(interface.EntityIdentity):
     noma = attr.ib(type=Noma)
-    numero_session = attr.ib(type=int)
     code_unite_enseignement = attr.ib(type=str)
     annee_academique = attr.ib(type=int)
+    numero_session = attr.ib(type=int)
 
 
 @attr.s(slots=True, eq=False)

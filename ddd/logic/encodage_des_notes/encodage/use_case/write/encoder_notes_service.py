@@ -28,7 +28,7 @@ from typing import List
 from ddd.logic.encodage_des_notes.encodage.builder.gestionnaire_parcours_builder import GestionnaireParcoursBuilder
 from ddd.logic.encodage_des_notes.encodage.commands import EncoderNotesCommand
 from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import IdentiteNoteEtudiant
-from ddd.logic.encodage_des_notes.encodage.domain.service.cohorte_non_complete import CohorteNonCompleteDomainService
+from ddd.logic.encodage_des_notes.encodage.domain.service.cohorte_non_complete import CohorteAvecEncodageIncomplet
 from ddd.logic.encodage_des_notes.encodage.domain.service.encoder_notes_en_lot import EncoderNotesEnLot
 from ddd.logic.encodage_des_notes.encodage.domain.service.i_cohortes_du_gestionnaire import ICohortesDuGestionnaire
 from ddd.logic.encodage_des_notes.encodage.domain.service.i_historiser_notes import IHistoriserEncodageNotesService
@@ -59,9 +59,9 @@ def encoder_notes(
         note_etudiant_repo: 'INoteEtudiantRepository',
         periode_encodage_note_translator: 'IPeriodeEncodageNotesTranslator',
         cohortes_gestionnaire_translator: 'ICohortesDuGestionnaire',
-        notifier_notes_domaine_service: 'INotifierEncodageNotes',
-        translator: 'IAttributionEnseignantTranslator',
-        signaletique_repo: 'ISignaletiquePersonneTranslator',
+        notification_encodage: 'INotifierEncodageNotes',
+        attribution_enseignant_translator: 'IAttributionEnseignantTranslator',
+        signaletique_personne_repo: 'ISignaletiquePersonneTranslator',
         signaletique_etudiant_repo: 'ISignaletiqueEtudiantTranslator',
         adresse_feuille_de_notes_repo: 'IAdresseFeuilleDeNotesRepository',
         historiser_note_service: 'IHistoriserEncodageNotesService',
@@ -76,14 +76,15 @@ def encoder_notes(
     )
     periode_ouverte = periode_encodage_note_translator.get()
 
-    # WHEN
-    cohortes_non_completes = CohorteNonCompleteDomainService().search(
+    cohortes_non_completes = CohorteAvecEncodageIncomplet().search(
         [cmd_note.code_unite_enseignement for cmd_note in cmd.notes_encodees],
         periode_ouverte.annee_concernee,
         periode_ouverte.session_concernee,
-        note_etudiant_repo
+        note_etudiant_repo,
+        inscription_examen_translator,
     )
 
+    # WHEN
     rapport = EncoderNotesRapportBuilder.build_from_command(cmd)
     notes = EncoderNotesEnLot().execute(
         cmd.notes_encodees,
@@ -95,15 +96,18 @@ def encoder_notes(
         rapport,
         rapport_repository
     )
-    notifier_notes_domaine_service.notifier(
+
+    # THEN
+    notification_encodage.notifier(
         notes,
         cohortes_non_completes,
         gestionnaire_parcours,
         note_etudiant_repo,
-        translator,
-        signaletique_repo,
+        attribution_enseignant_translator,
+        signaletique_personne_repo,
         signaletique_etudiant_repo,
         adresse_feuille_de_notes_repo,
+        inscription_examen_translator,
     )
 
     return notes

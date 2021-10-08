@@ -31,6 +31,7 @@ from base.models.enums.quadrimesters import DerogationQuadrimester
 
 class EffectiveClassSerializer(serializers.Serializer):
     code = serializers.CharField()
+    full_code = serializers.CharField()
     title_fr = serializers.CharField()
     title_en = serializers.CharField()
     teaching_place_uuid = serializers.CharField()
