@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
 from typing import List, Optional
 
 import attr
@@ -72,6 +73,7 @@ class Proposition(interface.RootEntity):
         type=ExperiencePrecedenteRecherche,
         default=aucune_experience_precedente_recherche,
     )
+    creee_le = attr.ib(type=Optional[datetime.datetime], default=None)
 
     @property
     def sigle_formation(self):

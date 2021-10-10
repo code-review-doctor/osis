@@ -71,6 +71,7 @@ class _PropositionFactory(factory.Factory):
     doctorat_id = factory.SubFactory(_DoctoratIdentityFactory)
     status = ChoixStatusProposition.IN_PROGRESS
     projet = factory.SubFactory(_DetailProjetFactory)
+    creee_le = factory.Faker('past_datetime')
     financement = financement_non_rempli
     experience_precedente_recherche = aucune_experience_precedente_recherche
 

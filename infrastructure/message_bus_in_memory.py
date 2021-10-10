@@ -64,6 +64,8 @@ from infrastructure.admission.preparation.projet_doctoral.domain.service.in_memo
     MembreCAInMemoryTranslator
 from infrastructure.admission.preparation.projet_doctoral.domain.service.in_memory.promoteur import \
     PromoteurInMemoryTranslator
+from infrastructure.admission.preparation.projet_doctoral.domain.service.in_memory.secteur_ucl import \
+    SecteurUclInMemoryTranslator
 from infrastructure.admission.preparation.projet_doctoral.repository.in_memory.groupe_de_supervision import \
     GroupeDeSupervisionInMemoryRepository
 from infrastructure.admission.preparation.projet_doctoral.repository.in_memory.proposition import \
@@ -123,6 +125,8 @@ class MessageBusInMemory:
         SearchPropositionsCommand: lambda cmd: rechercher_propositions(
             cmd,
             PropositionInMemoryRepository(),
+            DoctoratInMemoryTranslator(),
+            SecteurUclInMemoryTranslator(),
         ),
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 

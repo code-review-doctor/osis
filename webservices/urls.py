@@ -51,7 +51,6 @@ webservice_apps = [
     'continuing_education',
     'base',
     'program_management',
-    'internship',
     'offer_enrollment',
     'learning_unit_enrollment',
     'internship',

@@ -26,9 +26,7 @@
 import abc
 from typing import List, Optional
 
-from ddd.logic.admission.preparation.projet_doctoral.domain.model.proposition import PropositionIdentity, Proposition
-from ddd.logic.admission.preparation.projet_doctoral.dtos import PropositionDTO
-from ddd.logic.admission.preparation.projet_doctoral.dtos import PropositionSearchDTO
+from ddd.logic.admission.preparation.projet_doctoral.domain.model.proposition import Proposition, PropositionIdentity
 from osis_common.ddd import interface
 from osis_common.ddd.interface import ApplicationService
 
@@ -52,20 +50,10 @@ class IPropositionRepository(interface.AbstractRepository):
 
     @classmethod
     @abc.abstractmethod
-    def search_dto(cls, matricule_candidat: str = None, **kwargs) -> List['PropositionSearchDTO']:
-        pass
-
-    @classmethod
-    @abc.abstractmethod
     def delete(cls, entity_id: 'PropositionIdentity', **kwargs: ApplicationService) -> None:
         pass
 
     @classmethod
     @abc.abstractmethod
     def save(cls, entity: 'Proposition') -> None:
-        pass
-
-    @classmethod
-    @abc.abstractmethod
-    def get_dto(cls, uuid_proposition: str) -> 'PropositionDTO':
         pass

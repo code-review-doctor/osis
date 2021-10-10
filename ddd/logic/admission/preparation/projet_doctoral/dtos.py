@@ -134,7 +134,7 @@ class PropositionSearchDTO(interface.DTO):
     bureau_CDE = attr.ib(
         type=Optional[str],
     )  # CDE = Comission Doctorale du domaine Sciences Economique et de Gestion
-    created_at = attr.ib(type=datetime.datetime)
+    creee_le = attr.ib(type=datetime.datetime)
 
 
 @attr.s(frozen=True, slots=True)

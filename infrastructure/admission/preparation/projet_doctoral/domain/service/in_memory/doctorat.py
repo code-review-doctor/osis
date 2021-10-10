@@ -56,5 +56,18 @@ class DoctoratInMemoryTranslator(IDoctoratTranslator):
             raise DoctoratNonTrouveException()
 
     @classmethod
+    def get_dto(cls, sigle: str, annee: int) -> DoctoratDTO:
+        try:
+            return next(DoctoratDTO(
+                doc.entity_id.sigle,
+                doc.entity_id.annee,
+                doc.intitule_fr,
+                doc.intitule_en,
+                doc.entite_ucl_id.code,
+            ) for doc in cls.doctorats if doc.entity_id.sigle == sigle and doc.entity_id.annee == annee)
+        except StopIteration:
+            raise DoctoratNonTrouveException()
+
+    @classmethod
     def search(cls, sigle_entite_gestion: str, annee: int) -> List['DoctoratDTO']:
         raise NotImplementedError

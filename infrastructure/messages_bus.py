@@ -508,6 +508,8 @@ class MessageBus:
         SearchPropositionsCommand: lambda cmd: rechercher_propositions(
             cmd,
             PropositionRepository(),
+            DoctoratTranslator(),
+            SecteurUclTranslator(),
         ),
         GetPropositionCommand: lambda cmd: get_proposition(
             cmd,

@@ -25,9 +25,10 @@
 ##############################################################################
 from ddd.logic.admission.preparation.projet_doctoral.builder.proposition_identity_builder import \
     PropositionIdentityBuilder
+from ddd.logic.admission.preparation.projet_doctoral.domain.model.proposition import Proposition
 from ddd.logic.admission.preparation.projet_doctoral.domain.service.i_doctorat import IDoctoratTranslator
 from ddd.logic.admission.preparation.projet_doctoral.domain.service.i_secteur_ucl import ISecteurUclTranslator
-from ddd.logic.admission.preparation.projet_doctoral.dtos import PropositionDTO
+from ddd.logic.admission.preparation.projet_doctoral.dtos import PropositionDTO, PropositionSearchDTO
 from ddd.logic.admission.preparation.projet_doctoral.repository.i_proposition import IPropositionRepository
 from osis_common.ddd import interface
 
@@ -70,4 +71,25 @@ class GetPropositionDTODomainService(interface.DomainService):
             institution=proposition.experience_precedente_recherche.institution,
             date_soutenance=proposition.experience_precedente_recherche.date_soutenance,
             raison_non_soutenue=proposition.experience_precedente_recherche.raison_non_soutenue,
+        )
+
+    @classmethod
+    def search_dto(
+            cls,
+            proposition: 'Proposition',
+            doctorat_translator: 'IDoctoratTranslator',
+            secteur_ucl_translator: 'ISecteurUclTranslator',
+    ) -> 'PropositionSearchDTO':
+        doctorat = doctorat_translator.search(proposition.doctorat_id.sigle, proposition.doctorat_id.annee)[0]
+        secteur = secteur_ucl_translator.get(doctorat.sigle_entite_gestion)
+        return PropositionSearchDTO(
+            uuid=proposition.entity_id.uuid,
+            type_admission=proposition.type_admission,
+            sigle_doctorat=doctorat.sigle,
+            matricule_candidat=proposition.matricule_candidat,
+            code_secteur_formation=secteur.sigle,
+            bureau_CDE=proposition.bureau_CDE,
+            intitule_doctorat_en=doctorat.intitule_en,
+            intitule_doctorat_fr=doctorat.intitule_fr,
+            creee_le=proposition.creee_le,
         )

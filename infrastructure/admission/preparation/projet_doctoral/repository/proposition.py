@@ -46,10 +46,7 @@ from ddd.logic.admission.preparation.projet_doctoral.domain.model.proposition im
     Proposition,
     PropositionIdentity,
 )
-from ddd.logic.admission.preparation.projet_doctoral.dtos import PropositionDTO, PropositionSearchDTO
 from ddd.logic.admission.preparation.projet_doctoral.repository.i_proposition import IPropositionRepository
-from infrastructure.admission.preparation.projet_doctoral.domain.service.doctorat import DoctoratTranslator
-from infrastructure.admission.preparation.projet_doctoral.domain.service.secteur_ucl import SecteurUclTranslator
 from osis_common.ddd.interface import ApplicationService
 
 
@@ -85,22 +82,7 @@ def _instantiate_admission(admission: DoctorateAdmission) -> Proposition:
             date_soutenance=admission.phd_already_done_defense_date,
             raison_non_soutenue=admission.phd_already_done_no_defense_reason,
         ),
-    )
-
-
-def _instantiate_admission_dto(admission: DoctorateAdmission) -> PropositionSearchDTO:
-    doctorat = DoctoratTranslator().search(admission.doctorate.acronym, 2020)[0]
-    secteur = SecteurUclTranslator().get(doctorat.sigle_entite_gestion)
-    return PropositionSearchDTO(
-        uuid=admission.uuid,
-        type_admission=admission.type,
-        sigle_doctorat=doctorat.sigle,
-        matricule_candidat=admission.candidate.global_id,
-        code_secteur_formation=secteur.sigle,
-        bureau_CDE=admission.bureau,
-        intitule_doctorat_en=doctorat.intitule_en,
-        intitule_doctorat_fr=doctorat.intitule_fr,
-        created_at=admission.created,
+        creee_le=admission.created,
     )
 
 
@@ -110,17 +92,7 @@ def load_admissions(matricule) -> List['Proposition']:
     return [_instantiate_admission(a) for a in qs]
 
 
-def search_admissions(matricule) -> List['PropositionSearchDTO']:
-    qs = DoctorateAdmission.objects.filter(candidate__global_id=matricule)
-
-    return [_instantiate_admission_dto(a) for a in qs]
-
-
 class PropositionRepository(IPropositionRepository):
-    @classmethod
-    def get_dto(cls, uuid_proposition: str) -> 'PropositionDTO':
-        raise NotImplementedError
-
     @classmethod
     def get(cls, entity_id: 'PropositionIdentity') -> 'Proposition':
         return _instantiate_admission(DoctorateAdmission.objects.get(uuid=entity_id.uuid))
@@ -130,12 +102,6 @@ class PropositionRepository(IPropositionRepository):
                **kwargs) -> List['Proposition']:
         if matricule_candidat is not None:
             return load_admissions(matricule_candidat)
-        return []
-
-    @classmethod
-    def search_dto(cls, matricule_candidat: str = None, **kwargs) -> List['PropositionSearchDTO']:
-        if matricule_candidat is not None:
-            return search_admissions(matricule_candidat)
         return []
 
     @classmethod

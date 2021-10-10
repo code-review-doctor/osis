@@ -102,7 +102,7 @@ class TestInitierPropositionService(SimpleTestCase):
         cmd = attr.evolve(self.cmd, bureau_CDE='', sigle_formation=self.doctorat_non_CDE)
         proposition_id = self.message_bus.invoke(cmd)
         proposition = self.proposition_repository.get(proposition_id)  # type: Proposition
-        self.assertIsNone(proposition.bureau_CDE)
+        self.assertEqual(proposition.bureau_CDE, '')
 
     def test_should_pas_initier_bureau_cde_vide_et_CDE(self):
         cmd = attr.evolve(self.cmd, bureau_CDE='')

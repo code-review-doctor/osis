@@ -23,23 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 # ##############################################################################
-from typing import List
-
-from ddd.logic.admission.preparation.projet_doctoral.commands import SearchPropositionsCommand
-from ddd.logic.admission.preparation.projet_doctoral.domain.service.get_proposition_dto import \
-    GetPropositionDTODomainService
-from ddd.logic.admission.preparation.projet_doctoral.domain.service.i_doctorat import IDoctoratTranslator
 from ddd.logic.admission.preparation.projet_doctoral.domain.service.i_secteur_ucl import ISecteurUclTranslator
-from ddd.logic.admission.preparation.projet_doctoral.dtos import PropositionSearchDTO
-from ddd.logic.admission.preparation.projet_doctoral.repository.i_proposition import IPropositionRepository
+from ddd.logic.shared_kernel.entite.tests.factory.entiteucl import SSTEntiteFactory
+from infrastructure.shared_kernel.entite.dtos import EntiteUclDTO
 
 
-def rechercher_propositions(
-        cmd: 'SearchPropositionsCommand',
-        proposition_repository: 'IPropositionRepository',
-        doctorat_translator: 'IDoctoratTranslator',
-        secteur_ucl_translator: 'ISecteurUclTranslator',
-) -> List['PropositionSearchDTO']:
-    propositions = proposition_repository.search(matricule_candidat=cmd.matricule_candidat)
-    return [GetPropositionDTODomainService.search_dto(proposition, doctorat_translator, secteur_ucl_translator)
-            for proposition in propositions]
+class SecteurUclInMemoryTranslator(ISecteurUclTranslator):
+    entites = [
+        SSTEntiteFactory(),
+    ]
+
+    @classmethod
+    def get(cls, sigle_entite: str) -> 'EntiteUclDTO':
+        return next(EntiteUclDTO(
+            e.entity_id.sigle,
+            e.intitule_fr,
+        ) for e in cls.entites if e.entity_id.sigle == sigle_entite)
