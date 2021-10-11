@@ -256,28 +256,6 @@ class OnlineEncodingTest(MixinSetupOnlineEncoding, TestCase):
         self.assert_exam_enrollments(self.enrollments[0], 15, None, None, None)
         self.assert_exam_enrollments(self.enrollments[1], None, None, exam_enrollment_justification_type.CHEATING, None)
 
-    def test_encoding_by_specific_criteria(self):
-        self.client.force_login(self.program_managers[0].person.user)
-        url = reverse('specific_criteria_submission')
-        self.client.post(url, data=self.get_form_for_specific_criteria())
-
-        self.assert_exam_enrollments(self.enrollments[0], 15, 15, None, None)
-        self.assert_exam_enrollments(self.enrollments[1], None, None, None, None)
-
-    @patch("assessments.views.score_encoding._extract_id_from_post_data")
-    @patch("assessments.business.score_encoding_list.get_scores_encoding_list")
-    def test_encoding_by_specific_criteria_case_no_changes_in_form(
-            self,
-            mock_scores_encoding_list,
-            mock_id_from_post_data
-    ):
-        mock_scores_encoding_list.return_value = ScoresEncodingList()
-        mock_id_from_post_data.return_value = []
-        request = self.client.get(reverse('specific_criteria_submission'))
-        request.user = self.tutor.person.user
-        scores_encoding_object = score_encoding._get_score_encoding_list_with_only_enrollment_modified(request)
-        self.assertEqual(scores_encoding_object.enrollments, [])
-
     @patch("base.utils.send_mail.send_message_after_all_encoded_by_manager")
     def test_email_after_encoding_all_students_for_education_group_year(self, mock_send_email):
         self.client.force_login(self.program_managers[0].person.user)

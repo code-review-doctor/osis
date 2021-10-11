@@ -30,7 +30,7 @@
 {% if notes_list != None and notes_list|length >= 0 %}
 <ul class="nav nav-tabs nav-justified" id="tabs">
     <li class="active"><a data-toggle="tab" role="tab" href="#tab_scores_encoding" id="lnk_scores_encoding">{% trans 'By learning unit' %}</a></li>
-    <li><a href="{% url 'specific_criteria' %}" id="lnk_justifications">{% trans 'By specific criteria' %}</a></li>
+    <li><a href="#" id="lnk_justifications">{% trans 'By specific criteria' %}</a></li>
 </ul>
 <div class="tab-content">
     <div id="tab_scores_encoding" class="tab-pane fade in active">

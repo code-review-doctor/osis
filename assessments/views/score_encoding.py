@@ -328,44 +328,6 @@ def online_encoding_submission(request, learning_unit_year_id):
     return HttpResponseRedirect(reverse('online_encoding', args=(learning_unit_year_id,)))
 
 
-@login_required
-@permission_required('assessments.can_access_scoreencoding', raise_exception=True)
-@user_passes_test(_is_inside_scores_encodings_period, login_url=reverse_lazy('outside_scores_encodings_period'))
-def specific_criteria(request):
-    template_name = "scores_encoding_by_specific_criteria.html"
-    context = _get_specific_criteria_context(request)
-    return render(request, template_name, context)
-
-
-@login_required
-@permission_required('assessments.can_access_scoreencoding', raise_exception=True)
-def search_by_specific_criteria(request):
-    if request.method == "POST" and request.POST.get('action') == 'save':
-        return specific_criteria_submission(request)
-    else:
-        return specific_criteria(request)
-
-
-@login_required
-@permission_required('assessments.can_access_scoreencoding', raise_exception=True)
-@user_passes_test(_is_inside_scores_encodings_period, login_url=reverse_lazy('outside_scores_encodings_period'))
-def specific_criteria_submission(request):
-    updated_enrollments = None
-    scores_list_encoded = _get_score_encoding_list_with_only_enrollment_modified(request)
-
-    updated_enrollments = _update_enrollments(request, scores_list_encoded, updated_enrollments)
-
-    if messages.get_messages(request):
-        context = _get_specific_criteria_context(request)
-        context = _preserve_encoded_values(request, context)
-        return render(request, "scores_encoding_by_specific_criteria.html", context)
-    else:
-        bulk_send_messages_to_notify_encoding_progress(request.user, updated_enrollments)
-        if updated_enrollments:
-            messages.add_message(request, messages.SUCCESS, "%s %s" % (len(updated_enrollments), _('score(s) saved')))
-        return specific_criteria(request)
-
-
 def _update_enrollments(request, scores_list_encoded, updated_enrollments):
     try:
         updated_enrollments = score_encoding_list.update_enrollments(
@@ -494,35 +456,6 @@ def _extract_encoded_values_from_post_data(request, enrollments):
     return enrollment_with_encoded_values
 
 
-def bulk_send_messages_to_notify_encoding_progress(logged_user, updated_enrollments):
-    is_program_manager = program_manager.is_program_manager(logged_user)
-    if is_program_manager:
-        pgm_manager = mdl.person.find_by_user(logged_user)
-        mail_already_sent_by_learning_unit = set()
-        for enrollment in updated_enrollments:
-            learning_unit_year = enrollment.learning_unit_enrollment.learning_unit_year
-            scores_list_before_update = score_encoding_list.get_scores_encoding_list(
-                user=logged_user,
-                learning_unit_year_id=learning_unit_year.id
-            )
-            if learning_unit_year in mail_already_sent_by_learning_unit:
-                continue
-            scores_list = score_encoding_list.get_scores_encoding_list(
-                user=logged_user,
-                learning_unit_year_id=learning_unit_year.id
-            )
-            send_messages_to_notify_encoding_progress(
-                all_enrollments=scores_list.enrollments,
-                learning_unit_year=learning_unit_year,
-                is_program_manager=is_program_manager,
-                updated_enrollments=updated_enrollments,
-                pgm_manager=pgm_manager,
-                encoding_already_completed_before_update=scores_list_before_update.
-                educ_groups_which_encoding_was_complete_before_update
-            )
-            mail_already_sent_by_learning_unit.add(learning_unit_year)
-
-
 def send_messages_to_notify_encoding_progress(
         all_enrollments,
         learning_unit_year,
@@ -539,15 +472,6 @@ def send_messages_to_notify_encoding_progress(
             pgm_manager,
             encoding_already_completed_before_update
         )
-
-
-def online_double_encoding_get_form(request, data=None, learning_unit_year_id=None):
-    if len(data['enrollments']) > 0:
-        return render(request, "online_double_encoding_form.html", data)
-    else:
-        messages.add_message(request, messages.WARNING,
-                             _("No new scores encoded. The double encoding needs new scores."))
-        return online_encoding(request, learning_unit_year_id=learning_unit_year_id)
 
 
 def _get_common_encoding_context(request, learning_unit_year_id):
@@ -575,66 +499,6 @@ def _get_common_encoding_context(request, learning_unit_year_id):
     }
     context.update(scores_list.__dict__)
     return context
-
-
-def _get_specific_criteria_context(request):
-    post_data = request.POST
-    registration_id = post_data.get('registration_id')
-    last_name = post_data.get('last_name')
-    first_name = post_data.get('first_name')
-    justification = post_data.get('justification')
-    educ_group_year_id = post_data.get('education_group_year_id')
-    current_academic_year = session_exam_calendar.current_opened_academic_year()
-    educ_group_years_managed = mdl.education_group_year.find_by_user(request.user, current_academic_year)
-    is_program_manager = program_manager.is_program_manager(request.user)
-
-    context = {
-        'education_group_year_id': int(educ_group_year_id) if educ_group_year_id else None,
-        'registration_id': registration_id,
-        'last_name': last_name,
-        'first_name': first_name,
-        'justification': justification,
-        'offer_list': educ_group_years_managed,
-        'is_program_manager': is_program_manager
-    }
-
-    if request.method == 'POST':
-        # Make a search
-        if not registration_id and not last_name and not first_name and not justification and not educ_group_year_id:
-            messages.add_message(request, messages.WARNING, _("Please choose at least one criteria!"))
-        else:
-            _append_search_to_specific_criteria_context(request, context)
-    return context
-
-
-def _append_search_to_specific_criteria_context(request, context):
-    scores_list = score_encoding_list.get_scores_encoding_list(
-        user=request.user,
-        registration_id=context['registration_id'],
-        student_last_name=context['last_name'],
-        student_first_name=context['first_name'],
-        justification=context['justification'],
-        education_group_year_id=context['education_group_year_id']
-    )
-    context.update(scores_list.__dict__)
-    if not scores_list.enrollments:
-        messages.add_message(request, messages.WARNING, _('No result!'))
-
-
-def _get_score_encoding_list_with_only_enrollment_modified(request, learning_unit_year_id=None):
-    encoded_enrollment_ids = _extract_id_from_post_data(request)
-    scores_list_encoded = score_encoding_list.get_scores_encoding_list(
-        user=request.user,
-        learning_unit_year_id=learning_unit_year_id,
-        enrollments_ids=encoded_enrollment_ids)
-    if encoded_enrollment_ids:
-        scores_list_encoded.enrollments = _extract_encoded_values_from_post_data(
-            request,
-            scores_list_encoded.enrollments)
-    else:
-        scores_list_encoded.enrollments = []
-
-    return scores_list_encoded
 
 
 def get_json_data_scores_sheets(tutor_global_id):
@@ -670,6 +534,7 @@ def get_json_data_scores_sheets(tutor_global_id):
         close_old_connections()
 
 
+# TODO :: to remove ?
 def send_json_scores_sheets_to_response_queue(global_id):
     data = get_json_data_scores_sheets(global_id)
     credentials = pika.PlainCredentials(settings.QUEUES.get('QUEUE_USER'),

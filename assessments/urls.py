@@ -56,12 +56,6 @@ urlpatterns = [
             score_encoding.online_encoding_form, name='online_encoding_form'),
         url(r'^online/([0-9]+)/submission$',
             score_encoding.online_encoding_submission, name='online_encoding_submission'),
-        url(r'^specific_criteria/$',
-            score_encoding.specific_criteria, name='specific_criteria'),
-        url(r'^specific_criteria/submission/$',
-            score_encoding.specific_criteria_submission, name='specific_criteria_submission'),
-        url(r'^specific_criteria/search/$',
-            score_encoding.search_by_specific_criteria, name='search_by_specific_criteria'),
 
         # New URL's
         path('overview', ScoreEncodingProgressOverviewView.as_view(), name="score_encoding_progress_overview"),
