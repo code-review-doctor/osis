@@ -182,7 +182,7 @@
                     <div role="tabpanel" class="tab-pane fade" id="tab_via_paper_{{forloop.counter0}}">
                         <br>
                         <a class="btn btn-default download"
-                           href="{% url 'notes_printing_all' %}"
+                           href="#"
                            role="button" id="lnk_notes_printing_all_{{learning_unit_year.id}}">
                             <span class="glyphicon glyphicon-print" aria-hidden="true"></span> {% trans 'Print all courses' %}</a>
                         <br><br>
@@ -217,7 +217,7 @@
                                 </td>
                                 <td>
                                     <a class="btn btn-default download"
-                                       href="{% url 'notes_printing' note_detail.learning_unit_year_id %}"
+                                       href="#"
                                        role="button" id="lnk_notes_printing_{{note_detail.learning_unit_year_id}}"
                                        data-toggle="tooltip" data-placement="right"
                                        title="{% trans 'Print the scores' %}"

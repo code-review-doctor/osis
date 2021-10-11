@@ -377,28 +377,6 @@ def _update_enrollments(request, scores_list_encoded, updated_enrollments):
     return updated_enrollments
 
 
-@login_required
-@permission_required('assessments.can_access_scoreencoding', raise_exception=True)
-def notes_printing_all(request, tutor_id=None, education_group_year_id=None):
-    return notes_printing(request, tutor_id=tutor_id, education_group_year_id=education_group_year_id)
-
-
-@login_required
-@permission_required('assessments.can_access_scoreencoding', raise_exception=True)
-@user_passes_test(_is_inside_scores_encodings_period, login_url=reverse_lazy('outside_scores_encodings_period'))
-def notes_printing(request, learning_unit_year_id=None, tutor_id=None, education_group_year_id=None):
-    is_program_manager = base.auth.roles.program_manager.is_program_manager(request.user)
-    scores_list_encoded = score_encoding_list.get_scores_encoding_list(
-        user=request.user,
-        learning_unit_year_id=learning_unit_year_id,
-        tutor_id=tutor_id,
-        education_group_year_id=education_group_year_id
-    )
-    tutor = tutor_mdl.find_by_user(request.user) if not is_program_manager else None
-    sheet_data = score_encoding_sheet.scores_sheet_data(scores_list_encoded.enrollments, tutor=tutor)
-    return paper_sheet.print_notes(sheet_data)
-
-
 def __send_messages_for_each_education_group_year(
         all_enrollments,
         learning_unit_year,

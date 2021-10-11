@@ -324,14 +324,14 @@
             <br>
             <a class="btn btn-default download {% if not tutor_id or tutor_id == -1 %}disabled{%endif%}"
                href="{%if tutor_id and tutor_id != -1 and education_group_year_id %}
-                        {% url 'notes_printing_all' tutor_id=tutor_id education_group_year_id=education_group_year_id %}
+                        #
                      {%else%}
                         {%if tutor_id and tutor_id != -1 %}
-                            {% url 'notes_printing_all' tutor_id=tutor_id %}
+                            #
                         {%elif education_group_year_id %}
-                            {% url 'notes_printing_all' education_group_year_id=education_group_year_id %}
+                            #
                         {% else %}
-                            {% url 'notes_printing_all' %}
+                            #
                         {%endif%}
                     {%endif%}"
                role="button" id="lnk_notes_printing_all_{{learning_unit.id}}">
@@ -395,7 +395,7 @@
                     </td>
                     <td>
                         <a class="btn btn-default download"
-                           href="{% url 'notes_printing' note_detail.learning_unit_year_id%}"
+                           href="#"
                            role="button" id="lnk_notes_printing_{{note_detail.learning_unit_year_id}}"
                            data-toggle="tooltip" data-placement="right"
                            title="{% trans 'Print the scores' %}"
