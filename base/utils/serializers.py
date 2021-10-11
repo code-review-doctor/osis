@@ -131,24 +131,27 @@ class DTOSerializer(serializers.Serializer):
         field_kwargs = {}
         field_mapping = self.serializer_field_mapping
 
-        # Check if it is optional
-        # FIXME use get_origin() on python3.8
         if (getattr(field_type, '__origin__', None) is typing.Union
                 and len(field_type.__args__) == 2
                 and field_type.__args__[-1] is type(None)):
+            # Check if it is optional (for example Optional[str])
+            # FIXME use get_origin() on python3.8
             field_class = field_mapping[field_type.__args__[0]]
             field_kwargs['required'] = False
             if field_type.__args__[0] == str:
                 field_kwargs['allow_blank'] = True
             else:
                 field_kwargs['allow_null'] = True
-        elif getattr(field_type, '__origin__', None) is list:
+        elif getattr(field_type, '__origin__', None) in (list, typing.List):
+            # Check if it's a list (for example List[str])
             field_class = serializers.ListField
             field_kwargs['child'] = self.get_field_type(field_type.__args__[0])[0]()
         elif isinstance(field_type, ChoiceEnum):
+            # Check if it's a ChoiceEnum
             field_class = serializers.ChoiceField
             field_kwargs['choices'] = field_type.choices()
         elif issubclass(field_type, (DTO, EntityIdentity)):
+            # Check if it's a complex structure
             field_class = self.get_nested_serializer(field_type)
         # TODO for Union, convert to ReadOnlyField, custom mapping or not supported
         else:
