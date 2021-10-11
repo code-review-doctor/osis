@@ -126,7 +126,7 @@ paths:
             description: Search by city name. It can be partial/full name
             type: string
         - in: query
-          name: iso_code
+          name: country_iso_code
           schema:
             description: Search by ISO 3166-1 2-letter country code
             type: string
@@ -308,7 +308,7 @@ components:
           type: string
           description: The name of the city
           example: "Louvain-la-Neuve"
-        iso_code:
+        country_iso_code:
           type: string
           description: The country code according to ISO 3166-1 specification
           example: "BE"
