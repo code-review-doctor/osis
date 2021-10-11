@@ -23,38 +23,41 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
 from datetime import timedelta
 from unittest import mock
 from unittest.mock import patch
 
-from django.contrib.auth.models import Permission, Group
+from django.contrib.auth.models import Group
+from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.http import Http404
 from django.test import TestCase, TransactionTestCase
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
-from django.utils.translation import pgettext_lazy
 
 from assessments.business.score_encoding_list import ScoresEncodingList
-from assessments.tests.views.test_upload_xls_utils import generate_exam_enrollments
 from assessments.views import score_encoding
 from assessments.views.score_encoding import online_encoding_submission
-from assessments.views.upload_xls_utils import UploadValueError, _extract_session_number
-from base.models.enums import exam_enrollment_justification_type
+from attribution.tests.factories.attribution import AttributionFactory
 from base.models.enums import exam_enrollment_state
-from base.models.enums import number_session
+from base.models.enums import number_session, exam_enrollment_justification_type
 from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.models.exam_enrollment import ExamEnrollment
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.exam_enrollment import ExamEnrollmentFactory
+from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory
+from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
 from base.tests.factories.offer_year_calendar import OfferYearCalendarFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
+from base.tests.factories.session_examen import SessionExamFactory
 from base.tests.factories.student import StudentFactory
 from base.tests.mixin.session_exam_calendar import SessionExamCalendarMockMixin
 from base.tests.models import test_exam_enrollment, test_offer_enrollment, test_learning_unit_enrollment, \
@@ -515,45 +518,6 @@ class GetScoreEncodingViewProgramManagerTest(SessionExamCalendarMockMixin, TestC
                 test_exam_enrollment.create_exam_enrollment(self.first_session_exam_3, learning_unit_enrollment)
 
 
-class UploadXLSTest(TestCase):
-    def setUp(self):
-        self.user = User.objects.create_user(username='score_encoding', password='score_encoding')
-        add_permission(self.user, "can_access_scoreencoding")
-        self.client.force_login(self.user)
-
-    def test_method_not_allowed_upload_xlsx(self):
-        from assessments.views.upload_xls_utils import upload_scores_file
-        url = reverse(upload_scores_file, kwargs={
-            'learning_unit_year_id': '1',
-        })
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 405)
-
-
-class UploadXLSExtractSessionTest(TestCase):
-    def test_extract_session_number_many_values(self):
-        with self.assertRaisesMessage(
-                UploadValueError,
-                gettext("File error : Different values in the column Session. No scores injected.")
-        ):
-            _extract_session_number(
-                {
-                    'sessions': [1, 2]
-                }
-            )
-
-    def test_extract_session_number_no_value(self):
-        with self.assertRaisesMessage(
-                UploadValueError,
-                gettext("File error : No value in the column Session. No scores injected.")
-        ):
-            _extract_session_number(
-                {
-                    'sessions': []
-                }
-            )
-
-
 def prepare_exam_enrollment_for_double_encoding_validation(exam_enrollment):
     exam_enrollment.score_reencoded = 14
     exam_enrollment.score_draft = 14
@@ -576,3 +540,47 @@ def add_permission(user, codename):
 
 def get_permission(codename):
     return Permission.objects.filter(codename=codename).first()
+
+
+OFFER_ACRONYM = "OSIS2MA"
+LEARNING_UNIT_ACRONYM = "LOSIS1211"
+
+
+def generate_exam_enrollments(year, with_different_offer=False):
+    number_enrollments = 2
+    academic_year = AcademicYearFactory(year=year)
+
+    an_academic_calendar = AcademicCalendarFactory(
+        data_year=academic_year,
+        start_date=(datetime.datetime.today() - datetime.timedelta(days=20)).date(),
+        end_date=(datetime.datetime.today() + datetime.timedelta(days=20)).date(),
+        reference=AcademicCalendarTypes.SCORES_EXAM_SUBMISSION.name
+    )
+    session_exam_calendar = SessionExamCalendarFactory(number_session=number_session.ONE,
+                                                       academic_calendar=an_academic_calendar)
+
+    learning_unit_year = LearningUnitYearFakerFactory(academic_year=academic_year,
+                                                      learning_container_year__academic_year=academic_year,
+                                                      acronym=LEARNING_UNIT_ACRONYM)
+    attribution = AttributionFactory(learning_unit_year=learning_unit_year)
+
+    if with_different_offer:
+        session_exams = [SessionExamFactory(number_session=number_session.ONE, learning_unit_year=learning_unit_year,
+                                            education_group_year__academic_year=academic_year)
+                         for _ in range(0, number_enrollments)]
+    else:
+        session_exams = [SessionExamFactory(number_session=number_session.ONE, learning_unit_year=learning_unit_year,
+                                            education_group_year__academic_year=academic_year)] * number_enrollments
+    education_group_years = [session_exam.education_group_year for session_exam in session_exams]
+
+    exam_enrollments = list()
+    for i in range(0, number_enrollments):
+        student = StudentFactory()
+        offer_enrollment = OfferEnrollmentFactory(education_group_year=education_group_years[i], student=student)
+        learning_unit_enrollment = LearningUnitEnrollmentFactory(learning_unit_year=learning_unit_year,
+                                                                 offer_enrollment=offer_enrollment)
+        exam_enrollments.append(ExamEnrollmentFactory(session_exam=session_exams[i],
+                                                      learning_unit_enrollment=learning_unit_enrollment,
+                                                      enrollment_state=exam_enrollment_state.ENROLLED,
+                                                      date_enrollment=an_academic_calendar.start_date))
+    return locals()

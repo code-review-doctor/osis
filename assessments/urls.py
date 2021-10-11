@@ -26,7 +26,7 @@
 from django.conf.urls import url, include
 from django.urls import path, register_converter
 
-from assessments.views import score_encoding, upload_xls_utils, score_sheet
+from assessments.views import score_encoding, score_sheet
 from assessments.views.address.score_sheet import ScoreSheetAddressView, FirstYearBachelorScoreSheetAddressView
 from assessments.views.program_manager import pgm_manager_administration as pgm_manager_administration_new
 from assessments.views.program_manager.pgm_manager_administration import \
@@ -66,8 +66,6 @@ urlpatterns = [
             score_encoding.notes_printing_all, name='notes_printing_all'),
         url(r'^notes_printing/(?P<learning_unit_year_id>[0-9]+)(?:/(?P<tutor_id>[0-9]+))?/$',
             score_encoding.notes_printing, name='notes_printing'),
-        url(r'^upload/(?P<learning_unit_year_id>[0-9]+)/$',
-            upload_xls_utils.upload_scores_file, name='upload_encoding'),
 
         # New URL's
         path('overview', ScoreEncodingProgressOverviewView.as_view(), name="score_encoding_progress_overview"),
