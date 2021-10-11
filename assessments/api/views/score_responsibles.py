@@ -23,9 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db.models import F
+
+from django.db.models import F, Value
 from django.db.models.functions import Concat
 from rest_framework import generics
+from rest_framework.response import Response
 
 from assessments.api.serializers.scores_responsible import ScoreResponsiblePersonListSerializer
 from assessments.models.score_responsible import ScoreResponsible
@@ -42,11 +44,13 @@ class ScoreResponsibleList(LanguageContextSerializerMixin, generics.ListAPIView)
     search_fields = None
     ordering_fields = None
 
-    def get_queryset(self, *args, **kwargs):
-        filters = {key + '__in': value for key, value in dict(self.request.GET).items()}
+    def list(self, request, *args, **kwargs):
+        codes_unites_enseignement = self.request.GET.getlist('learning_unit_codes')
         queryset = ScoreResponsible.objects.all().select_related('learning_unit_year', 'tutor') \
             .annotate(acronym=F('learning_unit_year__acronym')) \
-            .annotate(full_name=Concat(F('tutor__person__last_name'), F('tutor__person__first_name'))) \
+            .annotate(full_name=Concat(F('tutor__person__last_name'), Value(' '), F('tutor__person__first_name'))) \
             .annotate(year=F('learning_unit_year__academic_year__year'))\
-            .filter(**filters)
-        return queryset
+            .filter(year=self.request.GET['year']) \
+            .filter(acronym__in=codes_unites_enseignement)
+        serializer = ScoreResponsiblePersonListSerializer(list(queryset), many=True)
+        return Response(serializer.data)

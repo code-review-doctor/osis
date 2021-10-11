@@ -107,6 +107,20 @@ paths:
         description: Return a list of score responsibles for several learning units.
         operationId: get_score_responsible_list
         parameters:
+          - in: query
+            name: learning_unit_codes
+            schema:
+              description: Get score responsibles of learning unit codes
+              type: array
+              items:
+                type: string
+            style: form
+            explode: true
+          - in: query
+            name: year
+            schema:
+              description: 'Query parameter to filter by year'
+              type: integer
           - $ref: '#/components/parameters/Accept-Language'
           - $ref: '#/components/parameters/X-User-FirstName'
           - $ref: '#/components/parameters/X-User-LastName'
@@ -118,7 +132,9 @@ paths:
             content:
               application/json:
                 schema:
-                  $ref: '#/components/schemas/ArrayOfScoreResponsiblePerson'
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ScoreResponsiblePerson'
           '400':
             $ref: '#/components/responses/BadRequest'
           '401':
@@ -209,10 +225,6 @@ components:
         month_session_name:
           type: string
           example: "January"
-    ArrayOfScoreResponsiblePerson:
-      type: array
-      items:
-        $ref: '#/components/schemas/ScoreResponsiblePerson'
     ScoreResponsiblePerson:
       type: object
       properties:
