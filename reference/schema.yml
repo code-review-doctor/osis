@@ -126,9 +126,9 @@ paths:
             description: Search by city name. It can be partial/full name
             type: string
         - in: query
-          name: country_name
+          name: iso_code
           schema:
-            description: Search by country name. It can be partial/full name
+            description: Search by ISO 3166-1 2-letter country code
             type: string
         - $ref: '#/components/parameters/Accept-Language'
         - $ref: '#/components/parameters/X-User-FirstName'
@@ -308,10 +308,10 @@ components:
           type: string
           description: The name of the city
           example: "Louvain-la-Neuve"
-        country_name:
+        iso_code:
           type: string
-          description: The name of the country
-          example: "Belgique"
+          description: The country code according to ISO 3166-1 specification
+          example: "BE"
         zipcode:
           type: string
           description: The zipcode of the city
