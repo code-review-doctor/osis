@@ -39,9 +39,23 @@ OPTIONAL_APPS = (
     'offer_enrollment',
     'learning_unit_enrollment',
     'backoffice',
+    # 'legacy_sync',
 )
 OPTIONAL_MIDDLEWARES = ()
 OPTIONAL_INTERNAL_IPS = ()
+
+
+# DATABASES['legacy_sync_db'] = {
+#     'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#     'NAME': os.environ.get("LEGACY_DATABASE_NAME", 'osis_legacy_local'),
+#     'USER': os.environ.get("LEGACY_POSTGRES_USER", 'osis'),
+#     'PASSWORD': os.environ.get("LEGACY_POSTGRES_PASSWORD", 'osis'),
+#     'HOST': os.environ.get("LEGACY_POSTGRES_HOST", '127.0.0.1'),
+#     'PORT': os.environ.get("LEGACY_POSTGRES_PORT", '5432'),
+#     'ATOMIC_REQUESTS':  os.environ.get('LEGACY_DATABASE_ATOMIC_REQUEST', 'True').lower() == 'true'
+# }
+# DATABASE_ROUTERS = ['backoffice.settings.database_routers.LegacySyncRouter']
+
 
 if os.environ.get("ENABLE_DEBUG_TOOLBAR", "False").lower() == "true":
     OPTIONAL_APPS += ('debug_toolbar',)

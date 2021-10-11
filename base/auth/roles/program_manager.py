@@ -133,6 +133,7 @@ def find_by_person(a_person):
     )
 
 
+# TODO :: to remove ?
 def is_program_manager(user, learning_unit_year=None, education_group=None):
     """
     Args:

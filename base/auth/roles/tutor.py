@@ -80,14 +80,6 @@ class Tutor(RoleModel, serializable_model.SerializableModel):
         })
 
 
-def find_by_user(user):
-    try:
-        pers = person.find_by_user(user)
-        return Tutor.objects.get(person=pers)
-    except Tutor.DoesNotExist:
-        return None
-
-
 def find_by_person(a_person):
     try:
         return Tutor.objects.get(person=a_person)
@@ -102,6 +94,7 @@ def find_by_id(tutor_id):
         return None
 
 
+# TODO :: to remove
 # To refactor because it is not in the right place.
 def find_by_learning_unit(learning_unit_year):
     """

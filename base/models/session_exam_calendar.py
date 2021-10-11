@@ -67,6 +67,7 @@ def current_sessions_academic_year() -> Optional['AcademicYear']:
     ) if event else None
 
 
+# TODO :: to remove ?
 def current_session_exam(date=None) -> Optional['AcademicSessionEvent']:
     from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmissionCalendar
     calendar = ScoresExamSubmissionCalendar()

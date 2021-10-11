@@ -47,15 +47,8 @@ register_converter(AcronymConverter, 'acronym')
 
 urlpatterns = [
     url(r'^scores_encoding/', include([
-        url(r'^$', score_encoding.scores_encoding, name='scores_encoding'),
         url(r'^outside_period/$',
             score_encoding.outside_period, name='outside_scores_encodings_period'),
-        url(r'^online/(?P<learning_unit_year_id>[0-9]+)/$',
-            score_encoding.online_encoding, name='online_encoding'),
-        url(r'^online/(?P<learning_unit_year_id>[0-9]+)/form$',
-            score_encoding.online_encoding_form, name='online_encoding_form'),
-        url(r'^online/([0-9]+)/submission$',
-            score_encoding.online_encoding_submission, name='online_encoding_submission'),
 
         # New URL's
         path('overview', ScoreEncodingProgressOverviewView.as_view(), name="score_encoding_progress_overview"),

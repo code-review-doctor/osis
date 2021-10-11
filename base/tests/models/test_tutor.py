@@ -63,9 +63,6 @@ class TestTutor(TestCase):
         user_unknown = UserFactory()
         self.assertFalse(tutor.is_tutor(user_unknown))
 
-    def test_find_by_user(self):
-        self.assertEqual(self.tutor, tutor.find_by_user(self.user))
-
     def test_find_by_id(self):
         self.assertEqual(self.tutor, tutor.find_by_id(self.tutor.id))
 

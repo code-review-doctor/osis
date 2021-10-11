@@ -196,16 +196,6 @@ def is_absence_justification(justification):
     return justification in [justification_types.ABSENCE_UNJUSTIFIED, justification_types.ABSENCE_JUSTIFIED]
 
 
-def calculate_exam_enrollment_progress(enrollments):
-    enrollment_enrolled = _get_enrolled_enrollments(enrollments)
-    if enrollment_enrolled:
-        progress = len([e for e in enrollment_enrolled if e.score_final is not None or e.justification_final]) / len(
-            enrollment_enrolled)
-    else:
-        progress = 0
-    return progress * 100
-
-
 def justification_label_authorized():
     return "%s, %s" % (_('A=Absent'),
                        _('T=Cheating'))
@@ -248,100 +238,7 @@ def create_exam_enrollment_historic(user, enrollment):
     exam_enrollment_history.save()
 
 
-def get_progress_by_learning_unit_years_and_offer_years(user,
-                                                        session_exam_number,
-                                                        learning_unit_year_id=None,
-                                                        learning_unit_year_ids=None,
-                                                        education_group_year_id=None,
-                                                        academic_year=None,
-                                                        only_enrolled=False):
-    if education_group_year_id:
-        education_group_year_ids = [education_group_year_id]
-    else:
-        education_group_year_ids = education_group_year.find_by_user(user, academic_year).values_list('id', flat=True)
-
-    tutor_user = None
-    from base.auth.roles import program_manager, tutor
-    if not program_manager.is_program_manager(user):
-        tutor_user = tutor.find_by_user(user)
-
-    queryset = find_for_score_encodings(session_exam_number=session_exam_number,
-                                        learning_unit_year_id=learning_unit_year_id,
-                                        learning_unit_year_ids=learning_unit_year_ids,
-                                        education_group_years=education_group_year_ids,
-                                        tutor=tutor_user,
-                                        academic_year=academic_year,
-                                        with_session_exam_deadline=False,
-                                        only_enrolled=only_enrolled)
-
-    queryset = queryset.annotate(
-        total_exam_enrollments=Count('id'),
-        learning_unit_year_id=F('learning_unit_enrollment__learning_unit_year_id'),
-        education_group_year_id=F('learning_unit_enrollment__offer_enrollment__education_group_year_id'),
-        learning_unit_year_acronym=F('learning_unit_enrollment__learning_unit_year__acronym'),
-        learning_unit_year_specific_title=F('learning_unit_enrollment__learning_unit_year__specific_title'),
-        learning_container_year_common_title=F(
-            'learning_unit_enrollment__learning_unit_year__learning_container_year__common_title'
-        ),
-        exam_enrollments_encoded=Sum(
-            Case(
-                When(
-                    Q(score_final__isnull=False) | Q(justification_final__isnull=False),
-                    then=1
-                ),
-                default=0,
-                output_field=IntegerField()
-            )
-        ),
-        draft_scores=Sum(
-            Case(
-                When(
-                    (
-                        Q(score_draft__isnull=False)
-                        & Q(score_final__isnull=True)
-                        & Q(justification_final__isnull=True)
-                    ) | (
-                        Q(justification_draft__isnull=False)
-                        & Q(score_final__isnull=True)
-                        & Q(justification_final__isnull=True)
-                    ),
-                    then=1
-                ),
-                default=0,
-                output_field=IntegerField())
-        ),
-        scores_not_yet_submitted=Sum(
-            Case(
-                When(
-                    Q(score_final__isnull=True) & Q(justification_final__isnull=True),
-                    then=1
-                ),
-                default=0,
-                output_field=IntegerField()
-            )
-        ),
-        deadline=Subquery(
-            session_exam_deadline.SessionExamDeadline.objects.filter(
-                offer_enrollment_id=OuterRef('learning_unit_enrollment__offer_enrollment_id'),
-                number_session=session_exam_number,
-            ).distinct().values('deadline')[:1]
-        ),
-        deadline_tutor=Subquery(
-            session_exam_deadline.SessionExamDeadline.objects.filter(
-                offer_enrollment_id=OuterRef('learning_unit_enrollment__offer_enrollment_id'),
-                number_session=session_exam_number,
-            ).distinct().values('deadline_tutor')[:1]
-        ),
-        has_student_specific_profile=Exists(
-            StudentSpecificProfile.objects.filter(
-                student_id=OuterRef('learning_unit_enrollment__offer_enrollment__student_id')
-            )
-        ),
-    )
-
-    return queryset
-
-
+# TODO :: to remove
 def find_for_score_encodings(session_exam_number,
                              learning_unit_year_id=None,
                              learning_unit_year_ids=None,
@@ -432,9 +329,3 @@ def find_for_score_encodings(session_exam_number,
         .select_related('session_exam') \
         .select_related('learning_unit_enrollment__offer_enrollment__student__person') \
         .select_related('learning_unit_enrollment__learning_unit_year')
-
-
-def _get_enrolled_enrollments(enrollments):
-    if enrollments:
-        return list(filter(lambda enrollment: enrollment.enrollment_state == enrollment_states.ENROLLED, enrollments))
-    return None
