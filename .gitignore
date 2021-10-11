@@ -1,13 +1,3 @@
-legacy_sync/
-backoffice/settings/database_routers.py
-
-base/static/
-.github/unit_tests.md
-open-api-gen/
-log_migration_refacto_encodage_notes
-notes_release_refacto_encodage_notes
-.idea/vcs.xml
-
 os
 sys
 *.pdf
