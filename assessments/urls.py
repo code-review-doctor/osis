@@ -66,8 +66,6 @@ urlpatterns = [
             score_encoding.notes_printing_all, name='notes_printing_all'),
         url(r'^notes_printing/(?P<learning_unit_year_id>[0-9]+)(?:/(?P<tutor_id>[0-9]+))?/$',
             score_encoding.notes_printing, name='notes_printing'),
-        url(r'^xlsdownload/([0-9]+)/$',
-            score_encoding.export_xls, name='scores_encoding_download'),
         url(r'^upload/(?P<learning_unit_year_id>[0-9]+)/$',
             upload_xls_utils.upload_scores_file, name='upload_encoding'),
 

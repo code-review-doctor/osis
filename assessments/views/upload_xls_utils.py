@@ -37,8 +37,8 @@ from django.views.decorators.http import require_http_methods
 from openpyxl import load_workbook
 
 from assessments.business import score_encoding_list
-from assessments.business.score_encoding_export import HEADER
 from assessments.forms.score_file import ScoreFileForm
+from assessments.views.serializers.score_sheet_xls_import import HEADER
 from attribution import models as mdl_attr
 from base import models as mdl
 from base.auth.roles import program_manager

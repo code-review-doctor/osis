@@ -45,7 +45,7 @@ from psycopg2._psycopg import OperationalError as PsycopOperationalError, Interf
 from rules.contrib.views import LoginRequiredMixin
 
 import base
-from assessments.business import score_encoding_progress, score_encoding_list, score_encoding_export
+from assessments.business import score_encoding_progress, score_encoding_list
 from assessments.business import score_encoding_sheet
 from assessments.models import score_sheet_address as score_sheet_address_mdl
 from assessments.views.program_manager.learning_unit_score_encoding import LearningUnitScoreEncodingProgramManagerView
@@ -381,21 +381,6 @@ def _update_enrollments(request, scores_list_encoded, updated_enrollments):
 @permission_required('assessments.can_access_scoreencoding', raise_exception=True)
 def notes_printing_all(request, tutor_id=None, education_group_year_id=None):
     return notes_printing(request, tutor_id=tutor_id, education_group_year_id=education_group_year_id)
-
-
-@login_required
-@permission_required('assessments.can_access_scoreencoding', raise_exception=True)
-@user_passes_test(_is_inside_scores_encodings_period, login_url=reverse_lazy('outside_scores_encodings_period'))
-def export_xls(request, learning_unit_year_id):
-    is_program_manager = base.auth.roles.program_manager.is_program_manager(request.user)
-    scores_list = score_encoding_list.get_scores_encoding_list(request.user,
-                                                               learning_unit_year_id=learning_unit_year_id)
-    scores_list = score_encoding_list.filter_without_closed_exam_enrollments(scores_list, is_program_manager)
-    if scores_list.enrollments:
-        return score_encoding_export.export_xls(scores_list.enrollments, is_program_manager)
-    else:
-        messages.add_message(request, messages.WARNING, _("No students to encode by excel"))
-        return HttpResponseRedirect(reverse('online_encoding', args=(learning_unit_year_id,)))
 
 
 @login_required

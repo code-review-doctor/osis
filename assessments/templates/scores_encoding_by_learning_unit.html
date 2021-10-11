@@ -314,13 +314,6 @@
                         </div>
                     </td>
                     <td>
-                        <a class="btn btn-default download"
-                           href="{% url 'scores_encoding_download' note_detail.learning_unit_year_id %}"
-                           role="button"
-                           id="lnk_scores_encoding_download_{{note_detail.learning_unit_year_id}}"
-                           data-toggle="tooltip" data-placement="right"
-                           title="{% trans 'Download the Excel file' %}"
-                        ><span class="glyphicon glyphicon-download" aria-hidden="true"></span> {% trans 'Get Excel file'%}</a>
                     </td>
                 </tr>
                 {% endfor %}

@@ -135,11 +135,6 @@
             role="button"><span class="glyphicon glyphicon-print" aria-hidden="true"></span> {% trans 'Print' %}</a>
         &nbsp;
         <div class="btn-group" role="group" aria-label="Excel">
-            <a id="lnk_scores_excel" class="btn btn-default download"
-               href="{% url 'scores_encoding_download' learning_unit_year.id %}"
-               role="button"
-               data-toggle="tooltip" data-placement="bottom"
-               title="{% trans 'Download the Excel file' %}"><span class="glyphicon glyphicon-download" aria-hidden="true"></span> {% trans 'Get Excel file'%}</a>
             <span data-toggle="modal" data-target="#pnl_upload_score_modal">
             <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom"
                     id="bt_upload_score_modal"

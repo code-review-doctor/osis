@@ -529,18 +529,6 @@ class UploadXLSTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 405)
 
-    def test_header_not_changed(self):
-        from assessments.business.score_encoding_export import HEADER
-        header_expected_list = [_('Academic year'), _('Session'), _('Learning unit'),
-                                pgettext_lazy('encoding', 'Program'),
-                                _('Registration number'), _('Lastname'), _('Firstname'), _('Email'),
-                                _('Numbered scores'), _('Justification (A,T)'), _('End date Prof'),
-                                _('Type of specific profile'), _('Extra time (33% generally)'), _('Large print'),
-                                _('Specific room of examination'), _('Other educational facilities'),
-                                _('Details other educational facilities'), _('Educational tutor'),
-                                ]
-        self.assertListEqual(HEADER, header_expected_list)
-
 
 class UploadXLSExtractSessionTest(TestCase):
     def test_extract_session_number_many_values(self):
