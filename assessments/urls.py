@@ -26,7 +26,7 @@
 from django.conf.urls import url, include
 from django.urls import path, register_converter
 
-from assessments.views import score_encoding, score_sheet
+from assessments.views import score_encoding
 from assessments.views.address.score_sheet import ScoreSheetAddressView, FirstYearBachelorScoreSheetAddressView
 from assessments.views.program_manager import pgm_manager_administration as pgm_manager_administration_new
 from assessments.views.program_manager.pgm_manager_administration import \
@@ -68,12 +68,6 @@ urlpatterns = [
     ])),
 
     url(r'^offers/', include([
-        url(r'^(?P<education_group_id>[0-9]+)/', include([
-            url(r'^score_encoding/$', score_sheet.offer_score_encoding_tab, name='offer_score_encoding_tab'),
-            url(r'^score_sheet_address/save/$', score_sheet.save_score_sheet_address, name='save_score_sheet_address'),
-        ])),
-
-        # New URL's
         path('<acronym:acronym>/', include([
             url(r'^score_encoding/$', ScoreSheetAddressView.as_view(), name='score_sheet_address'),
             url(

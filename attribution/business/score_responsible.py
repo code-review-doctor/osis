@@ -37,6 +37,7 @@ def get_learning_unit_year_managed_by_user_from_id(user, learning_unit_year_id, 
     raise PermissionDenied("User is not an entity manager of the requirement entity of the learning unit")
 
 
+# TODO to remove
 def get_attributions_data(user, learning_unit_year_id, responsibles_order, academic_year):
     a_learning_unit_year = get_learning_unit_year_managed_by_user_from_id(user, learning_unit_year_id, academic_year)
     return {

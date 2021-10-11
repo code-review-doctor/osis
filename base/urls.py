@@ -46,7 +46,7 @@ import base.views.learning_units.update
 from attribution.views import attribution
 from base.views import geocoding
 from base.views import learning_achievement, search, user_list
-from base.views import learning_unit, offer, common, institution, organization, academic_calendar, \
+from base.views import learning_unit, common, institution, organization, academic_calendar, \
     my_osis, student
 from base.views import teaching_material
 from base.views.autocomplete import OrganizationAutocomplete, CountryAutocomplete, CampusAutocomplete, \
@@ -285,10 +285,6 @@ urlpatterns = [
     url(r'^noscript/$', common.noscript, name='noscript'),
 
     url(r'^offers/', include([
-        url(r'^$', offer.offers, name='offers'),
-        url(r'^search$', offer.offers_search, name='offers_search'),
-
-        # New URL's
         url(r'^new/$', OffersSearch.as_view(), name='offers_search_new'),
     ])),
 
