@@ -94,31 +94,6 @@ def find_by_id(tutor_id):
         return None
 
 
-# TODO :: to remove
-# To refactor because it is not in the right place.
-def find_by_learning_unit(learning_unit_year):
-    """
-    :param learning_unit_year:
-    :return: All tutors of the learningUnit passed in parameter.
-    """
-    if isinstance(learning_unit_year, list):
-        queryset = attribution.search(list_learning_unit_year=learning_unit_year)
-    else:
-        queryset = attribution.search(learning_unit_year=learning_unit_year)
-    tutor_ids = queryset.values_list('tutor').distinct('tutor')
-    return Tutor.objects.filter(pk__in=tutor_ids)\
-                        .select_related('person')\
-                        .order_by('person__last_name', 'person__first_name')
-
-
-def is_tutor(user):
-    """
-    :param user:
-    :return: True if the user is a tutor. False if the user is not a tutor.
-    """
-    return Tutor.objects.filter(person__user=user).count() > 0
-
-
 def search(**criterias):
     queryset = Tutor.objects.all()
     if "name" in criterias:
