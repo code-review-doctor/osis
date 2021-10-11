@@ -11,7 +11,7 @@ servers:
  - url: https://osis.uclouvain.be/api/v1/learning_unit/
    description: 'Production server'
 info:
-  version: '1.07'
+  version: '1.09'
   title: 'Learning Unit Service'
   description: |-
     A set of API endpoints that allow you to get information about learning unit
@@ -646,6 +646,10 @@ components:
       properties:
         code:
           type: string
+          example: 'Z'
+        full_code:
+          type: string
+          example: 'LDROI1001_Z'
         title_fr:
           type: string
         title_en:
@@ -667,8 +671,10 @@ components:
           nullable: true
         volume_q1:
           type: string
+          nullable: true
         volume_q2:
           type: string
+          nullable: true
         type:
           $ref: '#/components/schemas/ComponentTypeEnum'
         type_text:

@@ -35,6 +35,6 @@ class EnrollmentSerializer(serializers.Serializer):
     def get_title(self, enrollment):
         language = self.context['language']
         return getattr(
-            enrollment.education_group_year,
-            'title' + ('_english' if language != settings.LANGUAGE_CODE_FR else '')
+            enrollment,
+            'title' + ('_en' if language != settings.LANGUAGE_CODE_FR else '_fr')
         )

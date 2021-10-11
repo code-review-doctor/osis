@@ -36,7 +36,7 @@ from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodag
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_etudiant import \
     ISignaletiqueEtudiantTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_unite_enseignement import IUniteEnseignementTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.dtos import NoteEtudiantDTO
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import RechercheNoteEtudiantDTO
 
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.periode_encodage_ouverte import PeriodeEncodageOuverte
 
@@ -49,7 +49,7 @@ def rechercher_notes(
         signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
         unite_enseignement_translator: 'IUniteEnseignementTranslator',
         inscription_examen_translator: 'IInscriptionExamenTranslator',
-) -> List['NoteEtudiantDTO']:
+) -> List['RechercheNoteEtudiantDTO']:
     PeriodeEncodageOuverte().verifier(periode_encodage_note_translator)
     periode_encodage = periode_encodage_note_translator.get()
     gestionnaire_parcours = GestionnaireParcoursBuilder().get(

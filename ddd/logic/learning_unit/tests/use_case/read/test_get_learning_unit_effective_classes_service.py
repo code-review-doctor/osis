@@ -28,7 +28,7 @@ from django.test import SimpleTestCase
 
 from base.models.enums.learning_component_year_type import PRACTICAL_EXERCISES, LECTURING
 from ddd.logic.learning_unit.commands import GetClassesEffectivesDepuisUniteDEnseignementCommand
-from ddd.logic.learning_unit.dtos import EffectiveClassDTO
+from ddd.logic.learning_unit.dtos import EffectiveClassFromRepositoryDTO
 from ddd.logic.learning_unit.tests.factory.effective_class import LecturingEffectiveClassFactory
 from ddd.logic.learning_unit.use_case.read import get_learning_unit_effective_classes_service
 from infrastructure.learning_unit.repository.in_memory.effective_class import EffectiveClassRepository
@@ -44,8 +44,8 @@ class TestGetLearningUnitEffectiveClassesService(SimpleTestCase):
             code_unite_enseignement=self.effective_class.learning_unit_identity.code,
             annee_unite_enseignement=self.effective_class.learning_unit_identity.year
         )
-        self.dto = EffectiveClassDTO(
-            code=self.effective_class.class_code,
+        self.dto = EffectiveClassFromRepositoryDTO(
+            class_code=self.effective_class.class_code,
             title_fr=self.effective_class.titles.fr,
             title_en=self.effective_class.titles.en,
             teaching_place_uuid=self.effective_class.teaching_place.uuid,
@@ -53,7 +53,9 @@ class TestGetLearningUnitEffectiveClassesService(SimpleTestCase):
             session_derogation=self.effective_class.session_derogation,
             volume_q1=self.effective_class.volumes.volume_first_quadrimester,
             volume_q2=self.effective_class.volumes.volume_second_quadrimester,
-            type=LECTURING if self.effective_class.is_lecturing else PRACTICAL_EXERCISES,
+            class_type=LECTURING if self.effective_class.is_lecturing else PRACTICAL_EXERCISES,
+            learning_unit_year=self.effective_class.learning_unit_identity.year,
+            learning_unit_code=self.effective_class.learning_unit_identity.code
         )
 
     def test_get_correct_learning_unit(self):

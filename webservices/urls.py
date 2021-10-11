@@ -53,7 +53,6 @@ webservice_apps = [
     'program_management',
     'offer_enrollment',
     'learning_unit_enrollment',
-    'internship',
     'assessments'
 ]
 
