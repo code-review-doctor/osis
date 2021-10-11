@@ -113,10 +113,10 @@ paths:
         - in: query
           name: search
           schema:
-            description: A search term which will look up at city name, zipcode or country name
+            description: A search term which will look up at city name, zipcode or country iso code
             type: string
         - in: query
-          name: zipcode
+          name: zip_code
           schema:
             description: Search by zip code
             type: string
@@ -312,7 +312,7 @@ components:
           type: string
           description: The country code according to ISO 3166-1 specification
           example: "BE"
-        zipcode:
+        zip_code:
           type: string
           description: The zipcode of the city
           example: "1348"

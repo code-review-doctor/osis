@@ -25,19 +25,17 @@
 ##############################################################################
 from rest_framework import serializers
 
-from reference.models.country import Country
+from reference.models.zipcode import ZipCode
 
 
-class CountrySerializer(serializers.HyperlinkedModelSerializer):
-    url = serializers.HyperlinkedIdentityField(view_name='reference_api_v1:country-detail', lookup_field='uuid')
-    name = serializers.CharField(required=False)
+class CitySerializer(serializers.ModelSerializer):
+    country_iso_code = serializers.CharField()
+    name = serializers.CharField()
 
     class Meta:
-        model = Country
+        model = ZipCode
         fields = (
-            'url',
-            'uuid',
-            'iso_code',
+            'country_iso_code',
             'name',
-            'nationality'
+            'zip_code'
         )

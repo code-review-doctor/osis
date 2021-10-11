@@ -23,21 +23,40 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from rest_framework import serializers
+from django.db.models import F
+from django_filters import rest_framework as filters
+from rest_framework import generics
 
-from reference.models.country import Country
+from reference.api.serializers.city import CitySerializer
+from reference.models.zipcode import ZipCode
 
 
-class CountrySerializer(serializers.HyperlinkedModelSerializer):
-    url = serializers.HyperlinkedIdentityField(view_name='reference_api_v1:country-detail', lookup_field='uuid')
-    name = serializers.CharField(required=False)
+class CityFilter(filters.FilterSet):
+    name = filters.CharFilter(field_name="municipality", lookup_expr='icontains')
+    country_iso_code = filters.CharFilter(field_name="country__iso_code", lookup_expr="icontains")
+    zip_code = filters.CharFilter(field_name="zip_code", lookup_expr="icontains")
 
-    class Meta:
-        model = Country
-        fields = (
-            'url',
-            'uuid',
-            'iso_code',
-            'name',
-            'nationality'
-        )
+
+class CityList(generics.ListAPIView):
+    """
+       Return a list of all the city.
+    """
+    name = 'city-list'
+    queryset = ZipCode.objects.all().annotate(
+        country_iso_code=F('country__iso_code'),
+        name=F('municipality')
+    )
+    serializer_class = CitySerializer
+    filterset_class = CityFilter
+    search_fields = (
+        'zip_code',
+        'country_iso_code',
+        'name',
+    )
+    ordering_fields = (
+        'zip_code',
+        'name',
+    )
+    ordering = (
+        'zip_code',
+    )  # Default ordering
