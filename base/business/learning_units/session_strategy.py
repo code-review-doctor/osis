@@ -33,8 +33,7 @@ CORRECT_VALUES_23 = [
     learning_unit_year_session.SESSION_X2X,
     learning_unit_year_session.SESSION_XX3,
     learning_unit_year_session.SESSION_X23,
-    learning_unit_year_session.SESSION_P23,
-    learning_unit_year_session.SESSION_123
+    learning_unit_year_session.SESSION_P23
 ]
 
 AVAILABLE_VALUES_STR_23 = "2, 3, 23 {} P23".format(_('or'))
