@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-11 09:22+0200\n"
+"POT-Creation-Date: 2021-10-11 17:19+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -162,9 +162,6 @@ msgstr "Absence justifiée"
 
 msgid "Absence unjustified"
 msgstr "Absence injustifiée"
-
-msgid "Absent"
-msgstr "Absent"
 
 msgid "Ac yr."
 msgstr "Anac."
@@ -3434,9 +3431,6 @@ msgstr "rôle (anglais)"
 
 msgid "role (french)"
 msgstr "rôle (français)"
-
-msgid "score(s) saved"
-msgstr "note(s) enregistrée(s)"
 
 msgid "search"
 msgstr "recherche"
