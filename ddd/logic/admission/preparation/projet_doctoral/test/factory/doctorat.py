@@ -39,7 +39,7 @@ class _DoctoratIdentityFactory(factory.Factory):
         model = DoctoratIdentity
         abstract = False
 
-    sigle = factory.Sequence(lambda n: 'ACRONYM%02d' % n)
+    sigle = factory.Sequence(lambda n: 'SIGLE%02d' % n)
     annee = factory.fuzzy.FuzzyInteger(1999, 2099)
 
 

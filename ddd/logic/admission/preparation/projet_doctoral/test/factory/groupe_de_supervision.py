@@ -48,7 +48,7 @@ class _PromoteurIdentityFactory(factory.Factory):
         model = PromoteurIdentity
         abstract = False
 
-    matricule = factory.Sequence(lambda n: 'ACRONYM%02d' % n)
+    matricule = factory.Sequence(lambda n: 'MATRICULE%02d' % n)
 
 
 class _MembreCAIdentityFactory(factory.Factory):
@@ -56,7 +56,7 @@ class _MembreCAIdentityFactory(factory.Factory):
         model = MembreCAIdentity
         abstract = False
 
-    matricule = factory.Sequence(lambda n: 'ACRONYM%02d' % n)
+    matricule = factory.Sequence(lambda n: 'MATRICULE%02d' % n)
 
 
 class _SignaturePromoteurFactory(factory.Factory):
