@@ -366,68 +366,6 @@ def specific_criteria_submission(request):
         return specific_criteria(request)
 
 
-@login_required
-@permission_required('assessments.can_access_scoreencoding', raise_exception=True)
-@user_passes_test(_is_inside_scores_encodings_period, login_url=reverse_lazy('outside_scores_encodings_period'))
-def online_double_encoding_form(request, learning_unit_year_id=None):
-    if request.method == 'GET':
-        context = _get_double_encoding_context(request, learning_unit_year_id)
-        return online_double_encoding_get_form(request, context, learning_unit_year_id)
-    elif request.method == 'POST':
-        scores_list = _get_score_encoding_list_with_only_enrollment_modified(request, learning_unit_year_id)
-
-        try:
-            scores_list = score_encoding_list.assign_encoded_to_reencoded_enrollments(scores_list)
-        except Exception as e:
-            error_msg = e.messages[0] if isinstance(e, ValidationError) else e.args[0]
-            messages.add_message(request, messages.ERROR, _(error_msg))
-
-        if messages.get_messages(request):
-            context = _get_double_encoding_context(request, learning_unit_year_id)
-            context = _preserve_encoded_values(request, context)
-            return online_double_encoding_get_form(request, context, learning_unit_year_id)
-        elif not scores_list:
-            messages.add_message(request, messages.WARNING, _("No double score encoded ; nothing to compare."))
-            return online_encoding(request, learning_unit_year_id=learning_unit_year_id)
-        else:
-            context = _get_double_encoding_context(request, learning_unit_year_id)
-            context['enrollments'] = scores_list.enrollments
-            return render(request, "online_double_encoding_validation.html", context)
-
-
-@login_required
-@permission_required('assessments.can_access_scoreencoding', raise_exception=True)
-@user_passes_test(_is_inside_scores_encodings_period, login_url=reverse_lazy('outside_scores_encodings_period'))
-@transaction.non_atomic_requests
-def online_double_encoding_validation(request, learning_unit_year_id=None):
-    if request.method == 'POST':
-        updated_enrollments = None
-        scores_list_before_update = score_encoding_list.get_scores_encoding_list(
-            user=request.user,
-            learning_unit_year_id=learning_unit_year_id
-        )
-        scores_list_encoded = _get_score_encoding_list_with_only_enrollment_modified(request, learning_unit_year_id)
-
-        updated_enrollments = _update_enrollments(request, scores_list_encoded, updated_enrollments)
-
-        if updated_enrollments:
-            is_program_manager = program_manager.is_program_manager(request.user)
-            scores_list_encoded = score_encoding_list.get_scores_encoding_list(
-                user=request.user,
-                learning_unit_year_id=learning_unit_year_id)
-            send_messages_to_notify_encoding_progress(
-                all_enrollments=scores_list_encoded.enrollments,
-                learning_unit_year=scores_list_encoded.learning_unit_year,
-                is_program_manager=is_program_manager,
-                updated_enrollments=updated_enrollments,
-                pgm_manager=mdl.person.find_by_user(request.user),
-                encoding_already_completed_before_update=scores_list_before_update.
-                educ_groups_which_encoding_was_complete_before_update
-            )
-
-    return HttpResponseRedirect(reverse('online_encoding', args=(learning_unit_year_id,)))
-
-
 def _update_enrollments(request, scores_list_encoded, updated_enrollments):
     try:
         updated_enrollments = score_encoding_list.update_enrollments(
@@ -718,16 +656,6 @@ def _append_search_to_specific_criteria_context(request, context):
     context.update(scores_list.__dict__)
     if not scores_list.enrollments:
         messages.add_message(request, messages.WARNING, _('No result!'))
-
-
-def _get_double_encoding_context(request, learning_unit_year_id):
-    context = _get_common_encoding_context(request, learning_unit_year_id)
-    if context['is_program_manager']:
-        context['enrollments'] = list(filter(lambda e: e.is_final, context['enrollments']))
-    else:
-        context['enrollments'] = list(filter(lambda e: e.is_draft and not e.is_final, context['enrollments']))
-    context['total_exam_enrollments'] = len(context['enrollments'])
-    return context
 
 
 def _get_score_encoding_list_with_only_enrollment_modified(request, learning_unit_year_id=None):

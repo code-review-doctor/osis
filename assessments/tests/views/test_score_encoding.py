@@ -154,16 +154,6 @@ class TestOnlineEncodingTransaction(MixinSetupOnlineEncoding, TransactionTestCas
         self.assert_exam_enrollments(self.enrollments[0], 15, None, None, None)
         self.assert_exam_enrollments(self.enrollments[1], 18, None, None, None)
 
-    @mock.patch("assessments.views.score_encoding.send_messages_to_notify_encoding_progress", side_effect=Http404)
-    def test_view_online_double_encoding_validation_is_non_atomic(self, mock_method_to_raise_error):
-        self.client.force_login(self.program_managers[0].person.user)
-        url = reverse('online_double_encoding_validation', args=[self.learning_unit_year.id])
-        prepare_exam_enrollment_for_double_encoding_validation(self.enrollments[0])
-        self.client.post(url, data=self.get_form_with_one_student_filled())
-
-        self.assert_exam_enrollments(self.enrollments[0], 15, 15, None, None)
-        self.assert_exam_enrollments(self.enrollments[1], None, None, None, None)
-
     def test_get_json_data_scores_sheets_with_global_id_is_none(self):
         self.assertEqual(score_encoding.get_json_data_scores_sheets(None), {})
 
@@ -262,15 +252,6 @@ class OnlineEncodingTest(MixinSetupOnlineEncoding, TestCase):
 
         self.assert_exam_enrollments(self.enrollments[0], 15, None, None, None)
         self.assert_exam_enrollments(self.enrollments[1], None, None, exam_enrollment_justification_type.CHEATING, None)
-
-    def test_pgm_double_encoding_for_a_student(self):
-        self.client.force_login(self.program_managers[0].person.user)
-        url = reverse('online_double_encoding_validation', args=[self.learning_unit_year.id])
-        prepare_exam_enrollment_for_double_encoding_validation(self.enrollments[0])
-        self.client.post(url, data=self.get_form_with_one_student_filled())
-
-        self.assert_exam_enrollments(self.enrollments[0], 15, 15, None, None)
-        self.assert_exam_enrollments(self.enrollments[1], None, None, None, None)
 
     def test_encoding_by_specific_criteria(self):
         self.client.force_login(self.program_managers[0].person.user)
