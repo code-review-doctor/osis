@@ -146,9 +146,32 @@ class RechercheCodeUeEtClasseAutocompleteTestCase(TestCase):
         response = self.client.get(self.url, {'q': 'LD'})
         results = response.json()['results']
         self.assertEqual(len(results), 1)
-        response = self.client.get(self.url, {'q': 'LDR'})
+
+    def test_should_inclure_recherche_premiere_position(self):
+        LearningClassYearFactory(
+            learning_component_year__learning_unit_year__academic_year__year=self.year,
+            learning_component_year__learning_unit_year__acronym='LDROI1234',
+            learning_component_year__type=LECTURING,
+            acronym='F',
+        )
+        self.client.force_login(self.user)
+        response = self.client.get(self.url, {'q': 'ldr'})
         results = response.json()['results']
         self.assertEqual(len(results), 3)
+        self.assertEqual(results[0]['text'], 'ldr', "l'élément tapé dans la recherche doit être le 1er de la liste")
+
+    def test_should_ignorer_recherche_si_fait_partie_du_resultat(self):
+        LearningClassYearFactory(
+            learning_component_year__learning_unit_year__academic_year__year=self.year,
+            learning_component_year__learning_unit_year__acronym='LDROI1234',
+            learning_component_year__type=LECTURING,
+            acronym='F',
+        )
+        self.client.force_login(self.user)
+        response = self.client.get(self.url, {'q': 'ldroi1234-f'})
+        results = response.json()['results']
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['text'], 'LDROI1234-F')
 
     def test_should_trouver_une_classe_magistrale(self):
         LearningClassYearFactory(

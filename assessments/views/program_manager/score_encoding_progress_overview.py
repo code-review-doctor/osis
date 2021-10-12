@@ -142,14 +142,14 @@ class CodeUniteEnseignementAutocomplete(LoginRequiredMixin, autocomplete.Select2
             ).values_list('code_classe', flat=True)
 
             codes_ues_et_classes_trouves = {code_ue for __, code_ue in qs} | set(codes_classes)
+            if has_filtre_sur_classe:
+                codes_ues_et_classes_trouves = {
+                    code for code in codes_ues_et_classes_trouves if recherche.upper() in code
+                }
             if codes_ues_et_classes_trouves:
-                if has_filtre_sur_classe:
-                    codes_ues_et_classes_trouves = {
-                        code for code in codes_ues_et_classes_trouves if recherche.upper() in code
-                    }
-                if codes_ues_et_classes_trouves:
-                    codes_ues_et_classes_trouves.add(recherche)
-                    return list(sorted(codes_ues_et_classes_trouves))
+                if recherche.upper() not in codes_ues_et_classes_trouves:
+                    return [recherche] + list(sorted(codes_ues_et_classes_trouves))
+                return list(sorted(codes_ues_et_classes_trouves))
             return []
 
         else:
