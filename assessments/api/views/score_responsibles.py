@@ -41,8 +41,6 @@ class ScoreResponsibleList(LanguageContextSerializerMixin, generics.ListAPIView)
     name = 'score_responsible_list'
 
     serializer_class = ScoreResponsiblePersonListSerializer
-    search_fields = None
-    ordering_fields = None
 
     def list(self, request, *args, **kwargs):
         codes_unites_enseignement = self.request.GET.getlist('learning_unit_codes')

@@ -281,7 +281,7 @@ class LearningUnitDetailedTestCase(APITestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        luy_with_full_title = LearningUnitYear.objects.filter(pk=self.luy.pk).annotate_full_title()
+        luy_with_full_title = LearningUnitYear.objects.filter(pk=self.luy.pk).annotate_full_title().annotate_has_classes()
         luy_with_full_title = LearningUnitYearQuerySet.annotate_entities_allocation_and_requirement_acronym(
             luy_with_full_title
         ).get()

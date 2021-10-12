@@ -33,7 +33,7 @@ from attribution.tests.factories.attribution_charge_new import AttributionCharge
 from base.models.enums import learning_component_year_type
 from base.tests.factories.tutor import TutorFactory
 
-ATTRIBUTRES_OF_ATTRIBUTION_SERIALIZER = [
+ATTRIBUTES_OF_ATTRIBUTION_SERIALIZER = [
     "code", "title_fr", "title_en", "year", "type", "type_text", "credits", "start_year", "function",
     "function_text", "lecturing_charge", "practical_charge", "total_learning_unit_charge", "links",
     "has_peps", "effective_class_repartition", "is_partim"
@@ -78,7 +78,7 @@ class AttributionListViewTestCase(APITestCase):
         results = response.json()
         self.assertEqual(len(results), 1)
 
-        self.assertCountEqual(list(results[0].keys()), ATTRIBUTRES_OF_ATTRIBUTION_SERIALIZER)
+        self.assertCountEqual(list(results[0].keys()), ATTRIBUTES_OF_ATTRIBUTION_SERIALIZER)
 
     def test_get_results_correct_volumes(self):
         response = self.client.get(self.url)
@@ -137,7 +137,7 @@ class MyAttributionListViewTestCase(APITestCase):
         results = response.json()
         self.assertEqual(len(results), 1)
 
-        self.assertCountEqual(list(results[0].keys()), ATTRIBUTRES_OF_ATTRIBUTION_SERIALIZER)
+        self.assertCountEqual(list(results[0].keys()), ATTRIBUTES_OF_ATTRIBUTION_SERIALIZER)
 
     def test_get_results_correct_volumes(self):
         response = self.client.get(self.url)

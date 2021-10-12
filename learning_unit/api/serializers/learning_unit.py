@@ -72,7 +72,7 @@ class LearningUnitSerializer(LearningUnitTitleSerializer):
     type_text = serializers.CharField(source='get_container_type_display', read_only=True)
     subtype_text = serializers.CharField(source='get_subtype_display', read_only=True)
     has_proposal = serializers.SerializerMethodField()
-    has_classes = serializers.BooleanField()
+    has_classes = serializers.BooleanField(default=False)
 
     class Meta(LearningUnitTitleSerializer.Meta):
         model = LearningUnitYear
