@@ -28,9 +28,13 @@ import logging
 from django.conf import settings
 from django.db.models import Case, When, Q, F, Value, CharField
 from django.db.models.functions import Concat, Replace
+from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
+from django.views.decorators.cache import cache_page
+from django.views.decorators.vary import vary_on_headers
 from rest_framework import generics
 
+from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.offer_enrollment_state import SUBSCRIBED, PROVISORY
 from base.models.learning_unit_enrollment import LearningUnitEnrollment
 from base.models.person import Person
@@ -38,6 +42,8 @@ from education_group.models.enums.cohort_name import CohortName
 from learning_unit_enrollment.api.serializers.enrollment import EnrollmentSerializer
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
+
+CACHE_DURATION = 60*10  # 10 minutes
 
 
 class LearningUnitEnrollmentsListView(generics.ListAPIView):
@@ -61,6 +67,11 @@ class LearningUnitEnrollmentsListView(generics.ListAPIView):
         'specific_profile',
         'program'
     ]
+
+    @method_decorator(cache_page(CACHE_DURATION))
+    @method_decorator(vary_on_headers("Authorization",))
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
     def get_paginated_response(self, data):
         response = super().get_paginated_response(data)
@@ -102,7 +113,29 @@ class LearningUnitEnrollmentsListView(generics.ListAPIView):
                 default=F('offer_enrollment__education_group_year__acronym'),
                 output_field=CharField()
             ),
-            specific_profile=F('offer_enrollment__student__studentspecificprofile__type')
+            specific_profile=F('offer_enrollment__student__studentspecificprofile__type'),
+            learning_unit_acronym=Case(
+                When(
+                    learning_class_year__learning_component_year__type=LECTURING,
+                    then=Concat(
+                        'learning_unit_year__acronym',
+                        Value('-'),
+                        'learning_class_year__acronym',
+                        output_field=CharField()
+                    )
+                ),
+                When(
+                    learning_class_year__learning_component_year__type=PRACTICAL_EXERCISES,
+                    then=Concat(
+                        'learning_unit_year__acronym',
+                        Value('_'),
+                        'learning_class_year__acronym',
+                        output_field=CharField()
+                    )
+                ),
+                default=F('learning_unit_year__acronym'),
+                output_field=CharField()
+            )
         ).select_related(
             'offer_enrollment__student__studentspecificprofile',
             'offer_enrollment__student__person',
