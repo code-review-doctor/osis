@@ -289,11 +289,10 @@ class LearningUnitYearQuerySet(SerializableQuerySet):
 
     @classmethod
     def annotate_has_classes_class_method(cls, queryset):
-        return queryset.annotate(has_classes=Exists(
-            LearningClassYear.objects.filter(
-                learning_component_year__learning_unit_year=OuterRef('id')
+        return queryset.annotate(
+            has_classes=Exists(
+                LearningClassYear.objects.filter(learning_component_year__learning_unit_year=OuterRef('id'))
             )
-        )
         )
 
 
