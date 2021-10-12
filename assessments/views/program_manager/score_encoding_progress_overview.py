@@ -144,12 +144,12 @@ class CodeUniteEnseignementAutocomplete(LoginRequiredMixin, autocomplete.Select2
             codes_ues_et_classes_trouves = {code_ue for __, code_ue in qs} | set(codes_classes)
             if codes_ues_et_classes_trouves:
                 if has_filtre_sur_classe:
-                    codes_ues_et_classes_trouves = filter(
-                        lambda code: recherche.upper() in code,
-                        codes_ues_et_classes_trouves
-                    )
+                    codes_ues_et_classes_trouves = {
+                        code for code in codes_ues_et_classes_trouves if recherche.upper() in code
+                    }
                 if codes_ues_et_classes_trouves:
-                    return [recherche] + list(sorted(codes_ues_et_classes_trouves))
+                    codes_ues_et_classes_trouves.add(recherche)
+                    return list(sorted(codes_ues_et_classes_trouves))
             return []
 
         else:
