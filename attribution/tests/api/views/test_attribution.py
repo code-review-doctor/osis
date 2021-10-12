@@ -36,7 +36,7 @@ from base.tests.factories.tutor import TutorFactory
 ATTRIBUTES_OF_ATTRIBUTION_SERIALIZER = [
     "code", "title_fr", "title_en", "year", "type", "type_text", "credits", "start_year", "function",
     "function_text", "lecturing_charge", "practical_charge", "total_learning_unit_charge", "links",
-    "has_peps", "effective_class_repartition", "is_partim"
+    "has_peps", "effective_class_repartition", "is_partim", "percentage_allocation_charge"
 ]
 
 
@@ -79,7 +79,6 @@ class AttributionListViewTestCase(APITestCase):
         self.assertEqual(len(results), 1)
 
         self.assertCountEqual(list(results[0].keys()), ATTRIBUTES_OF_ATTRIBUTION_SERIALIZER)
-
 
     def test_get_results_correct_volumes(self):
         response = self.client.get(self.url)
