@@ -126,21 +126,7 @@ class MyLearningUnitEnrollmentsListView(LearningUnitEnrollmentsListView):
         return LearningUnitEnrollment.objects.filter(
             offer_enrollment__student__person=self.person,
             learning_unit_year__academic_year__year=self.year,
-            offer_enrollment__education_group_year__acronym=self.kwargs['program_code'].replace('11', '1')
         ).annotate(
-            learning_unit_academic_year=F('learning_unit_year__academic_year__year'),
-            learning_unit_acronym=Case(
-                When(
-                    Q(learning_class_year__isnull=False),
-                    then=Concat(F('learning_unit_year__acronym'), F('learning_class_year__acronym'))
-                ),
-                default=F('learning_unit_year__acronym')
-            )
-        ).annotate(
-            student_last_name=F('offer_enrollment__student__person__last_name'),
-            student_first_name=F('offer_enrollment__student__person__first_name'),
-            student_email=F('offer_enrollment__student__person__email'),
-            student_registration_id=F('offer_enrollment__student__registration_id'),
             program=Case(
                 When(
                     Q(offer_enrollment__cohort_year__name=CohortName.FIRST_YEAR.name),
@@ -150,7 +136,22 @@ class MyLearningUnitEnrollmentsListView(LearningUnitEnrollmentsListView):
                 ),
                 default=F('offer_enrollment__education_group_year__acronym'),
                 output_field=CharField()
+            )
+        ).filter(
+            program=self.kwargs['program_code']
+        ).annotate(
+            learning_unit_academic_year=F('learning_unit_year__academic_year__year'),
+            learning_unit_acronym=Case(
+                When(
+                    Q(learning_class_year__isnull=False),
+                    then=Concat(F('learning_unit_year__acronym'), F('learning_class_year__acronym'))
+                ),
+                default=F('learning_unit_year__acronym')
             ),
+            student_last_name=F('offer_enrollment__student__person__last_name'),
+            student_first_name=F('offer_enrollment__student__person__first_name'),
+            student_email=F('offer_enrollment__student__person__email'),
+            student_registration_id=F('offer_enrollment__student__registration_id'),
             specific_profile=F('offer_enrollment__student__studentspecificprofile')
         ).select_related(
             'offer_enrollment__student__studentspecificprofile',
@@ -159,4 +160,3 @@ class MyLearningUnitEnrollmentsListView(LearningUnitEnrollmentsListView):
             'offer_enrollment__cohort_year__education_group_year',
             'learning_unit_year__academic_year',
         )
-
