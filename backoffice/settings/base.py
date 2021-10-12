@@ -96,6 +96,7 @@ INSTALLED_APPS = (
     'osis_document',
     'osis_history',
     'osis_signature',
+    'admission',
 )
 
 
