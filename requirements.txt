@@ -11,7 +11,7 @@ django-statici18n==1.8.3
 factory_boy==2.8.1
 django-dotenv==1.4.2
 pendulum==1.2.0
-djangorestframework==3.9.4
+djangorestframework==3.12.4
 gitpython==2.1.9
 requests==2.20.0
 django-bootstrap3==11.1.0
@@ -44,6 +44,8 @@ numpy==1.17.4
 # setuptools 50.0 causes issues
 setuptools==49.6.0
 tblib==1.7.0
+uritemplate==3.0.1
+pyyaml==5.4.1
 
 # Modules transverses
 git+https://github.com/uclouvain/osis-async.git@dev#egg=osis_async

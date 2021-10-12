@@ -94,7 +94,9 @@ INSTALLED_APPS = (
     'ddd',
     'infrastructure',
     'osis_document',
-    'osis_history'
+    'osis_history',
+    'osis_signature',
+    'admission',
 )
 
 
