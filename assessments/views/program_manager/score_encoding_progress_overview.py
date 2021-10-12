@@ -23,10 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
+
 from dal import autocomplete
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.postgres.aggregates import ArrayAgg
-from django.db.models import F, CharField, Value, When, Case
+from django.contrib.postgres.aggregates import ArrayAgg, StringAgg
+from django.db.models import F, CharField, Value, When, Case, OuterRef, Subquery
 from django.db.models.functions import Concat
 from django.urls import reverse
 from django.utils.functional import cached_property
@@ -104,13 +106,14 @@ class ScoreEncodingProgressOverviewProgramManagerView(ScoreEncodingProgressOverv
 
 class CodeUniteEnseignementAutocomplete(LoginRequiredMixin, autocomplete.Select2ListView):
     def get_list(self):
-        default_choice = [self.q]
+        recherche = self.q
         minimum_chars_to_search = 2
-        if self.q and len(self.q) > minimum_chars_to_search:
+        if recherche and len(recherche) > minimum_chars_to_search:
+            filtre_sur_ue, has_filtre_sur_classe = self.__separer_filtre_ue_et_classe(recherche)
             periode_encodage = message_bus_instance.invoke(GetPeriodeEncodageCommand())
             qs = LearningUnitYear.objects.filter(
                 academic_year__year=periode_encodage.annee_concernee,
-                acronym__icontains=self.q,
+                acronym__icontains=filtre_sur_ue,
             ).values_list(
                 'pk',
                 'acronym',
@@ -138,7 +141,29 @@ class CodeUniteEnseignementAutocomplete(LoginRequiredMixin, autocomplete.Select2
                 )
             ).values_list('code_classe', flat=True)
 
-            return default_choice + list(sorted([code_ue for __, code_ue in qs] + list(codes_classes)))
+            codes_ues_et_classes_trouves = {code_ue for __, code_ue in qs} | set(codes_classes)
+            if codes_ues_et_classes_trouves:
+                if has_filtre_sur_classe:
+                    codes_ues_et_classes_trouves = filter(
+                        lambda code: recherche.upper() in code,
+                        codes_ues_et_classes_trouves
+                    )
+                if codes_ues_et_classes_trouves:
+                    return [recherche] + list(sorted(codes_ues_et_classes_trouves))
+            return []
 
         else:
-            return default_choice
+            return [recherche]
+
+    def __separer_filtre_ue_et_classe(self, recherche):
+        filtre_sur_ue = recherche
+        has_filtre_sur_classe = False
+        if '-' in filtre_sur_ue:
+            index = filtre_sur_ue.index('-')
+            has_filtre_sur_classe = True
+            filtre_sur_ue = filtre_sur_ue[:index]
+        elif '_' in filtre_sur_ue:
+            index = filtre_sur_ue.index('_')
+            has_filtre_sur_classe = True
+            filtre_sur_ue = filtre_sur_ue[:index]
+        return filtre_sur_ue, has_filtre_sur_classe
