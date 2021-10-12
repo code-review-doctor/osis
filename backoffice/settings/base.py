@@ -411,6 +411,7 @@ LOGGING = {
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
+        'backoffice.settings.rest_framework.authentication.ESBAuthentication'
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
@@ -425,6 +426,7 @@ REST_FRAMEWORK = {
         'rest_framework.filters.SearchFilter',   # Search based on admin
     ),
 }
+REST_FRAMEWORK_ESB_AUTHENTICATION_SECRET_KEY = os.environ.get('REST_FRAMEWORK_ESB_AUTHENTICATION_SECRET_KEY')
 
 # ESB Configuration
 ESB_API_URL = os.environ.get('ESB_API_URL')
