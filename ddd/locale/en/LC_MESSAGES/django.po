@@ -192,9 +192,6 @@ msgstr ""
 msgid "Subdivision should be one character A-Z or 0-9"
 msgstr ""
 
-msgid "Supervision group member not found."
-msgstr ""
-
 msgid "Supervision group not found."
 msgstr ""
 

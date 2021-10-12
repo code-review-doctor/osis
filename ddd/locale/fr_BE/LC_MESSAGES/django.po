@@ -52,7 +52,8 @@ msgid "CANCELLED"
 msgstr "Annulé"
 
 msgid "CDE Bureau should be filled in only if the doctorate's entity is CDE"
-msgstr "Le bureau CDE doit être rempli uniquement si l'entité du doctorat est CDE"
+msgstr ""
+"Le bureau CDE doit être rempli uniquement si l'entité du doctorat est CDE"
 
 msgid "Can't create a learning unit lower than 2019-20"
 msgstr "On ne peut pas créer une UE avec une année inférieure à 2019-20"
@@ -123,7 +124,9 @@ msgid "IN_PROGRESS"
 msgstr "En cours"
 
 msgid "Institution should be set when PhD has been set to yes or partial"
-msgstr "L'institution doit être renseignée quand le doctorat a déjà été réalisé partiellement ou complétement."
+msgstr ""
+"L'institution doit être renseignée quand le doctorat a déjà été réalisé "
+"partiellement ou complétement."
 
 msgid "Internship subtype is a mandatory field"
 msgstr "Le sous-type de stage est obligatoire"
@@ -349,7 +352,9 @@ msgid "WORK_CONTRACT"
 msgstr "Contrat de travail"
 
 msgid "Work contract should be set when financing type is set to work contract"
-msgstr "Le contrat de travail doit être renseigné quand le type de financement est un contrat de travail."
+msgstr ""
+"Le contrat de travail doit être renseigné quand le type de financement est "
+"un contrat de travail."
 
 msgid "YES"
 msgstr "Oui"
