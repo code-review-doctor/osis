@@ -32,7 +32,7 @@ from rest_framework.response import Response
 
 from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
 from ddd.logic.learning_unit.commands import GetClassesEffectivesDepuisUniteDEnseignementCommand
-from ddd.logic.learning_unit.dtos import EffectiveClassDTO
+from ddd.logic.learning_unit.dtos import EffectiveClassFromRepositoryDTO
 from ddd.logic.shared_kernel.campus.commands import GetCampusCommand
 from ddd.logic.shared_kernel.campus.domain.model.uclouvain_campus import UclouvainCampus
 from infrastructure.messages_bus import message_bus_instance
@@ -60,16 +60,16 @@ class EffectiveClassesList(LanguageContextSerializerMixin, generics.ListAPIView)
                 code_unite_enseignement=self.kwargs['acronym'].upper(),
                 annee_unite_enseignement=self.kwargs['year']
             )
-        )  # type: List[EffectiveClassDTO]
+        )  # type: List[EffectiveClassFromRepositoryDTO]
         return self._add_campus_info_to_classes(classes)
 
-    def _add_campus_info_to_classes(self, classes: List['EffectiveClassDTO']) -> List[SimpleNamespace]:
+    def _add_campus_info_to_classes(self, classes: List['EffectiveClassFromRepositoryDTO']) -> List[SimpleNamespace]:
         to_return = []
         for effective_class in classes:
             campus = self._get_campus(effective_class)
             to_return.append(
                 SimpleNamespace(
-                    code=effective_class.code,
+                    code=effective_class.class_code,
                     title_fr=effective_class.title_fr,
                     title_en=effective_class.title_en,
                     teaching_place_uuid=effective_class.teaching_place_uuid,
@@ -77,15 +77,16 @@ class EffectiveClassesList(LanguageContextSerializerMixin, generics.ListAPIView)
                     session_derogation=effective_class.session_derogation,
                     volume_q1=effective_class.volume_q1,
                     volume_q2=effective_class.volume_q2,
-                    type=effective_class.type,
+                    type=effective_class.class_type,
                     campus_name=campus.name,
-                    organization_name=campus.organization_name
+                    organization_name=campus.organization_name,
+                    full_code=effective_class.code_complet_classe
                 )
             )
         return to_return
 
     @staticmethod
-    def _get_campus(effective_class: 'EffectiveClassDTO') -> 'UclouvainCampus':
+    def _get_campus(effective_class: 'EffectiveClassFromRepositoryDTO') -> 'UclouvainCampus':
         return message_bus_instance.invoke(
             GetCampusCommand(effective_class.teaching_place_uuid)
         )

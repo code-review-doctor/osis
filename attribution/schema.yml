@@ -469,10 +469,10 @@ components:
           example: "Candidature aux cours vacants"
         lecturing_volume:
           type: string
-          example: '10.0'
+          example: '10.00'
         practical_volume:
           type: string
-          example: '15.0'
+          example: '15.00'
         remark:
           type: string
         course_summary:
@@ -488,10 +488,10 @@ components:
       properties:
         lecturing_volume:
           type: string
-          example: '10.0'
+          example: '10.00'
         practical_volume:
           type: string
-          example: '15.0'
+          example: '15.00'
         remark:
           type: string
         course_summary:
@@ -543,19 +543,19 @@ components:
           example: '10.0'
         practical_volume:
           type: string
-          example: '10.0'
+          example: '10.00'
         lecturing_volume_available:
           type: string
-          example: '15.0'
+          example: '15.00'
         practical_volume_available:
           type: string
-          example: '10.5'
+          example: '10.50'
         total_lecturing_volume_course:
           type: string
-          example: '30.0'
+          example: '30.00'
         total_practical_volume_course:
           type: string
-          example: '30.0'
+          example: '30.00'
         tutors:
           type: array
           items:
@@ -751,7 +751,12 @@ components:
         total_learning_unit_charge:
           type: string
           description: 'Total charge for learning unit year'
-          example: '55.5'
+          example: '55.50'
+          nullable: true
+        percentage_allocation_charge:
+          type: string
+          example: '50.5'
+          nullable: true
         start_year:
           type: integer
           example: 2018
@@ -764,11 +769,11 @@ components:
           example: 'Coordinateur'
         lecturing_charge:
           type: string
-          example: '15.0'
+          example: '15.00'
           nullable: true
         practical_charge:
           type: string
-          example: '10.5'
+          example: '10.50'
           nullable: true
         links:
           $ref: '#/components/schemas/AttributionLinks'
@@ -813,11 +818,11 @@ components:
           example: 'Coordinateur'
         lecturing_volume:
           type: string
-          example: '15.0'
+          example: '15.00'
           nullable: true
         practical_volume:
           type: string
-          example: '10.5'
+          example: '10.50'
           nullable: true
     AttributionFunctionEnum:
       type: string

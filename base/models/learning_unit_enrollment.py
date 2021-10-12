@@ -50,6 +50,11 @@ class LearningUnitEnrollmentAdmin(ModelAdmin):
         'offer_enrollment__student__person__first_name',
         'offer_enrollment__student__person__last_name',
     ]
+    raw_id_fields = (
+        'offer_enrollment',
+        'learning_unit_year',
+        'learning_class_year',
+    )
 
 
 class LearningUnitEnrollment(Model):

@@ -34,6 +34,17 @@ from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from osis_common.ddd.interface import BusinessException
 
 
+def get_error_data(data, exception, field_name_by_exception):
+    formatted_exception = __format_exception(exception)
+    field_names = field_name_by_exception.get(type(exception), [])
+    if field_names:
+        errors_dict = dict.fromkeys(field_names, [formatted_exception])
+        data = {field: exceptions + data[field] for field, exceptions in errors_dict.items()}
+    else:
+        data.setdefault(api_settings.NON_FIELD_ERRORS_KEY, []).append(formatted_exception)
+    return data
+
+
 def handle(exc, context):
     # Call REST framework's default exception handler first,
     # to get the standard error response.
@@ -42,17 +53,16 @@ def handle(exc, context):
     if isinstance(exc, MultipleBusinessExceptions):
         field_name_by_exception = context.get('field_name_by_exception', {})
         data = defaultdict(list)
-
         for exception in exc.exceptions:
-            exception_formated = __format_exception(exception)
-
-            field_names = field_name_by_exception.get(type(exception), [])
-            if field_names:
-                errors_dict = dict.fromkeys(field_names, [exception_formated])
-                data = {field: exceptions + data[field] for field, exceptions in errors_dict.items()}
-            else:
-                data.setdefault(api_settings.NON_FIELD_ERRORS_KEY, []).append(exception_formated)
+            data = get_error_data(data, exception, field_name_by_exception)
         return Response(data, status=status.HTTP_400_BAD_REQUEST)
+
+    if isinstance(exc, BusinessException):
+        field_name_by_exception = context.get('field_name_by_exception', {})
+        data = defaultdict(list)
+        data = get_error_data(data, exc, field_name_by_exception)
+        return Response(data, status=status.HTTP_400_BAD_REQUEST)
+
     return response
 
 

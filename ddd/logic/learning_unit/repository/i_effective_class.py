@@ -28,7 +28,7 @@ from typing import List, Optional, Set
 
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity, EffectiveClass
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
-from ddd.logic.learning_unit.dtos import EffectiveClassDTO
+from ddd.logic.learning_unit.dtos import EffectiveClassFromRepositoryDTO
 from osis_common.ddd import interface
 from osis_common.ddd.interface import ApplicationService
 
@@ -46,7 +46,7 @@ class IEffectiveClassRepository(interface.AbstractRepository):
             cls,
             learning_unit_id: Optional[LearningUnitIdentity] = None,
             **kwargs
-    ) -> List[EffectiveClassDTO]:
+    ) -> List['EffectiveClassFromRepositoryDTO']:
         pass
 
     @classmethod

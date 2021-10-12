@@ -23,7 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import contextlib
+import datetime
 from gettext import ngettext
+from typing import Optional
+
+import attr
 from django.utils.translation import gettext_lazy as _
 
 from django.contrib import messages
@@ -41,12 +46,28 @@ class LearningUnitScoreEncodingTutorFormView(LearningUnitScoreEncodingBaseFormVi
     template_name = "assessments/tutor/learning_unit_score_encoding_form.html"
 
     @cached_property
+    def echeance_enseignant_filter(self) -> Optional[datetime.date]:
+        with contextlib.suppress(TypeError, ValueError):
+            echeance_enseignant_queryparams = self.request.GET.get('echeance_enseignant')
+            return datetime.datetime.strptime(echeance_enseignant_queryparams, "%d/%m/%Y").date()
+        return None
+
+    @cached_property
     def feuille_de_notes(self):
         cmd = GetFeuilleDeNotesCommand(
             matricule_fgs_enseignant=self.person.global_id,
             code_unite_enseignement=self.kwargs['learning_unit_code'].upper()
         )
-        return message_bus_instance.invoke(cmd)
+        feuille_de_notes = message_bus_instance.invoke(cmd)
+        if self.echeance_enseignant_filter:
+            feuille_de_notes = attr.evolve(
+                feuille_de_notes,
+                notes_etudiants=[
+                    n for n in feuille_de_notes.notes_etudiants
+                    if n.echeance_enseignant.to_date() == self.echeance_enseignant_filter
+                ]
+            )
+        return feuille_de_notes
 
     def form_valid(self, formset):
         cmd = EncoderNotesEtudiantCommand(

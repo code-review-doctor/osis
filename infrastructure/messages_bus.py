@@ -23,12 +23,46 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Dict, Callable, List
+from typing import Callable, Dict, List
 
-from ddd.logic.application.commands import ApplyOnVacantCourseCommand, UpdateApplicationCommand, \
-    DeleteApplicationCommand, SearchApplicationByApplicantCommand, SearchVacantCoursesCommand, \
-    RenewMultipleAttributionsCommand, GetAttributionsAboutToExpireCommand, SendApplicationsSummaryCommand, \
-    GetChargeSummaryCommand
+from ddd.logic.admission.preparation.projet_doctoral.commands import (
+    ApprouverPropositionCommand,
+    CompleterPropositionCommand,
+    DemanderSignatureCommand, GetPropositionCommand, IdentifierPromoteurCommand,
+    InitierPropositionCommand,
+    SearchDoctoratCommand,
+    SearchPropositionsCommand, SupprimerMembreCACommand,
+    SupprimerPromoteurCommand,
+)
+from ddd.logic.admission.preparation.projet_doctoral.use_case.read.get_proposition_service import get_proposition
+from ddd.logic.admission.preparation.projet_doctoral.use_case.read.rechercher_doctorats_service import \
+    rechercher_doctorats
+from ddd.logic.admission.preparation.projet_doctoral.use_case.read.rechercher_propositions_service import \
+    rechercher_propositions
+from ddd.logic.admission.preparation.projet_doctoral.use_case.write.approuver_proposition_service import \
+    approuver_proposition
+from ddd.logic.admission.preparation.projet_doctoral.use_case.write.completer_proposition_service import \
+    completer_proposition
+from ddd.logic.admission.preparation.projet_doctoral.use_case.write.demander_signature_service import demander_signature
+from ddd.logic.admission.preparation.projet_doctoral.use_case.write.identifier_promoteur_service import \
+    identifier_promoteur
+from ddd.logic.admission.preparation.projet_doctoral.use_case.write.initier_proposition_service import \
+    initier_proposition
+from ddd.logic.admission.preparation.projet_doctoral.use_case.write.supprimer_membre_CA_service import \
+    supprimer_membre_CA
+from ddd.logic.admission.preparation.projet_doctoral.use_case.write.supprimer_promoteur_service import \
+    supprimer_promoteur
+from ddd.logic.application.commands import (
+    ApplyOnVacantCourseCommand,
+    DeleteApplicationCommand,
+    GetAttributionsAboutToExpireCommand,
+    GetChargeSummaryCommand,
+    RenewMultipleAttributionsCommand,
+    SearchApplicationByApplicantCommand,
+    SearchVacantCoursesCommand,
+    SendApplicationsSummaryCommand,
+    UpdateApplicationCommand,
+)
 from ddd.logic.application.use_case.read.get_attributions_about_to_expire_service import \
     get_attributions_about_to_expire
 from ddd.logic.application.use_case.read.get_charge_summary_service import get_charge_summary
@@ -40,11 +74,17 @@ from ddd.logic.application.use_case.write.delete_application_service import dele
 from ddd.logic.application.use_case.write.renew_multiple_attributions_service import renew_multiple_attributions
 from ddd.logic.application.use_case.write.send_applications_summary import send_applications_summary
 from ddd.logic.application.use_case.write.update_application_service import update_application
-from ddd.logic.effective_class_repartition.commands import SearchAttributionsToLearningUnitCommand, \
-    SearchTutorsDistributedToClassCommand, SearchAttributionCommand, DistributeClassToTutorCommand, \
-    GetTutorRepartitionClassesCommand, \
-    UnassignTutorClassCommand, EditClassVolumeRepartitionToTutorCommand, SearchClassesEnseignantCommand, \
-    SearchAttributionsEnseignantCommand
+from ddd.logic.effective_class_repartition.commands import (
+    DistributeClassToTutorCommand,
+    EditClassVolumeRepartitionToTutorCommand,
+    GetTutorRepartitionClassesCommand,
+    SearchAttributionCommand,
+    SearchAttributionsEnseignantCommand,
+    SearchAttributionsToLearningUnitCommand,
+    SearchClassesEnseignantCommand,
+    SearchTutorsDistributedToClassCommand,
+    UnassignTutorClassCommand,
+)
 from ddd.logic.effective_class_repartition.use_case.read.get_attribution_service import get_attribution
 from ddd.logic.effective_class_repartition.use_case.read.get_tutor_repartition_classes_service import \
     get_tutor_repartition_classes
@@ -61,9 +101,14 @@ from ddd.logic.effective_class_repartition.use_case.write.distribute_class_to_tu
 from ddd.logic.effective_class_repartition.use_case.write.edit_class_volume_repartition_to_tutor_service import \
     edit_class_volume_repartition_to_tutor
 from ddd.logic.effective_class_repartition.use_case.write.unassign_tutor_class_service import unassign_tutor_class
-from ddd.logic.encodage_des_notes.encodage.commands import GetFeuilleDeNotesGestionnaireCommand, EncoderNotesCommand, \
-    GetCohortesGestionnaireCommand, RechercherNotesCommand, GetProgressionGeneraleGestionnaireCommand, \
-    GetPeriodeEncodageCommand
+from ddd.logic.encodage_des_notes.encodage.commands import (
+    EncoderNotesCommand,
+    GetCohortesGestionnaireCommand,
+    GetFeuilleDeNotesGestionnaireCommand,
+    GetPeriodeEncodageCommand,
+    GetProgressionGeneraleGestionnaireCommand,
+    RechercherNotesCommand,
+)
 from ddd.logic.encodage_des_notes.encodage.use_case.read.get_cohortes_gestionnaire import get_cohortes_gestionnaire
 from ddd.logic.encodage_des_notes.encodage.use_case.read.get_feuille_de_notes_service import \
     get_feuille_de_notes_gestionnaire
@@ -75,14 +120,20 @@ from ddd.logic.encodage_des_notes.encodage.use_case.write.encoder_notes_service 
 from ddd.logic.encodage_des_notes.shared_kernel.commands import GetEncoderNotesRapportCommand
 from ddd.logic.encodage_des_notes.shared_kernel.use_case.read.get_encoder_notes_rapport_service import \
     get_encoder_notes_rapport
-from ddd.logic.encodage_des_notes.soumission.commands import GetAdresseFeuilleDeNotesServiceCommand, \
-    GetChoixEntitesAdresseFeuilleDeNotesCommand, \
-    EncoderAdresseFeuilleDeNotesSpecifique, EncoderAdresseEntiteCommeAdresseFeuilleDeNotes, \
-    EcraserAdresseFeuilleDeNotesPremiereAnneeDeBachelier, GetResponsableDeNotesCommand, EncoderNotesEtudiantCommand
-from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand, GetProgressionGeneraleCommand, \
-    AssignerResponsableDeNotesCommand, \
-    SearchAdressesFeuilleDeNotesCommand
-from ddd.logic.encodage_des_notes.soumission.commands import SoumettreNotesCommand
+from ddd.logic.encodage_des_notes.soumission.commands import (
+    AssignerResponsableDeNotesCommand,
+    EcraserAdresseFeuilleDeNotesPremiereAnneeDeBachelier,
+    EncoderAdresseEntiteCommeAdresseFeuilleDeNotes,
+    EncoderAdresseFeuilleDeNotesSpecifique,
+    EncoderNotesEtudiantCommand,
+    GetAdresseFeuilleDeNotesServiceCommand,
+    GetChoixEntitesAdresseFeuilleDeNotesCommand,
+    GetFeuilleDeNotesCommand,
+    GetProgressionGeneraleCommand,
+    GetResponsableDeNotesCommand,
+    SearchAdressesFeuilleDeNotesCommand,
+    SoumettreNotesCommand,
+)
 from ddd.logic.encodage_des_notes.soumission.use_case.read.get_addresse_feuille_de_notes_service import \
     get_adresse_feuille_de_notes
 from ddd.logic.encodage_des_notes.soumission.use_case.read.get_choix_entites_adresse_feuille_de_notes_service import \
@@ -108,11 +159,22 @@ from ddd.logic.encodage_des_notes.soumission.use_case.write.encoder_adresse_feui
 from ddd.logic.encodage_des_notes.soumission.use_case.write.encoder_notes_etudiant_service import encoder_notes_etudiant
 from ddd.logic.encodage_des_notes.soumission.use_case.write.soumettre_notes_etudiant_service import \
     soumettre_notes_etudiant
-from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, GetLearningUnitCommand, \
-    CreateEffectiveClassCommand, CanCreateEffectiveClassCommand, GetEffectiveClassCommand, \
-    UpdateEffectiveClassCommand, DeleteEffectiveClassCommand, CanDeleteEffectiveClassCommand, \
-    GetClassesEffectivesDepuisUniteDEnseignementCommand, \
-    GetEffectiveClassWarningsCommand, LearningUnitSearchCommand, SearchDetailClassesEffectivesCommand
+from ddd.logic.formation_catalogue.commands import SearchFormationsCommand
+from ddd.logic.formation_catalogue.use_case.read.search_formation_service import search_formations
+from ddd.logic.learning_unit.commands import (
+    CanCreateEffectiveClassCommand,
+    CanDeleteEffectiveClassCommand,
+    CreateEffectiveClassCommand,
+    CreateLearningUnitCommand,
+    DeleteEffectiveClassCommand,
+    GetClassesEffectivesDepuisUniteDEnseignementCommand,
+    GetEffectiveClassCommand,
+    GetEffectiveClassWarningsCommand,
+    GetLearningUnitCommand,
+    LearningUnitSearchCommand,
+    SearchDetailClassesEffectivesCommand,
+    UpdateEffectiveClassCommand,
+)
 from ddd.logic.learning_unit.use_case.read.check_can_create_class_service import check_can_create_effective_class
 from ddd.logic.learning_unit.use_case.read.check_can_delete_class_service import check_can_delete_effective_class
 from ddd.logic.learning_unit.use_case.read.get_effective_class_service import get_effective_class
@@ -128,12 +190,21 @@ from ddd.logic.learning_unit.use_case.write.delete_effective_class_service impor
 from ddd.logic.learning_unit.use_case.write.update_effective_class_service import update_effective_class
 from ddd.logic.shared_kernel.academic_year.commands import SearchAcademicYearCommand
 from ddd.logic.shared_kernel.academic_year.use_case.read.search_academic_years_service import search_academic_years
-from ddd.logic.shared_kernel.campus.commands import SearchUclouvainCampusesCommand, GetCampusCommand
+from ddd.logic.shared_kernel.campus.commands import GetCampusCommand, SearchUclouvainCampusesCommand
 from ddd.logic.shared_kernel.campus.use_case.read.get_campus_service import get_campus
 from ddd.logic.shared_kernel.campus.use_case.read.search_uclouvain_campuses_service import search_uclouvain_campuses
-from ddd.logic.shared_kernel.language.commands import SearchLanguagesCommand, GetLanguageCommand
+from ddd.logic.shared_kernel.language.commands import GetLanguageCommand, SearchLanguagesCommand
 from ddd.logic.shared_kernel.language.use_case.read.get_language_service import get_language
 from ddd.logic.shared_kernel.language.use_case.read.search_languages_service import search_languages
+from education_group.ddd.repository.training import TrainingRepository
+from infrastructure.admission.preparation.projet_doctoral.domain.service.constitution_supervision import \
+    ConstitutionSupervisionService
+from infrastructure.admission.preparation.projet_doctoral.domain.service.doctorat import DoctoratTranslator
+from infrastructure.admission.preparation.projet_doctoral.domain.service.promoteur import PromoteurTranslator
+from infrastructure.admission.preparation.projet_doctoral.domain.service.secteur_ucl import SecteurUclTranslator
+from infrastructure.admission.preparation.projet_doctoral.repository.groupe_de_supervision import \
+    GroupeDeSupervisionRepository
+from infrastructure.admission.preparation.projet_doctoral.repository.proposition import PropositionRepository
 from infrastructure.application.repository.applicant import ApplicantRepository
 from infrastructure.application.repository.application import ApplicationRepository
 from infrastructure.application.repository.application_calendar import ApplicationCalendarRepository
@@ -179,7 +250,7 @@ from infrastructure.shared_kernel.academic_year.repository.academic_year import 
 from infrastructure.shared_kernel.campus.repository.uclouvain_campus import UclouvainCampusRepository
 from infrastructure.shared_kernel.entite.repository.entiteucl import EntiteUCLRepository
 from infrastructure.shared_kernel.language.repository.language import LanguageRepository
-from osis_common.ddd.interface import CommandRequest, ApplicationServiceResult
+from osis_common.ddd.interface import ApplicationServiceResult, CommandRequest
 from program_management.ddd.command import BulkUpdateLinkCommand, GetReportCommand
 from program_management.ddd.repositories import program_tree as program_tree_repo
 from program_management.ddd.repositories.report import ReportRepository
@@ -331,7 +402,8 @@ class MessageBus:
             AttributionEnseignantTranslator(),
             SignaletiquePersonneTranslator(),
             SignaletiqueEtudiantTranslator(),
-            HistoriserNotesService()
+            HistoriserNotesService(),
+            InscriptionExamenTranslator(),
         ),
         GetProgressionGeneraleCommand: lambda cmd: get_progression_generale(
             cmd,
@@ -438,10 +510,67 @@ class MessageBus:
             cmd,
             ResponsableDeNotesRepository(),
         ),
+        InitierPropositionCommand: lambda cmd: initier_proposition(
+            cmd,
+            PropositionRepository(),
+            DoctoratTranslator(),
+        ),
+        SearchPropositionsCommand: lambda cmd: rechercher_propositions(
+            cmd,
+            PropositionRepository(),
+            DoctoratTranslator(),
+            SecteurUclTranslator(),
+        ),
+        GetPropositionCommand: lambda cmd: get_proposition(
+            cmd,
+            PropositionRepository(),
+            DoctoratTranslator(),
+            SecteurUclTranslator(),
+        ),
+        CompleterPropositionCommand: lambda cmd: completer_proposition(
+            cmd,
+            PropositionRepository(),
+            DoctoratTranslator(),
+        ),
+        IdentifierPromoteurCommand: lambda cmd: identifier_promoteur(
+            cmd,
+            PropositionRepository(),
+            GroupeDeSupervisionRepository(),
+            PromoteurTranslator(),
+        ),
+        SupprimerPromoteurCommand: lambda cmd: supprimer_promoteur(
+            cmd,
+            PropositionRepository(),
+            GroupeDeSupervisionRepository(),
+        ),
+        SupprimerMembreCACommand: lambda cmd: supprimer_membre_CA(
+            cmd,
+            PropositionRepository(),
+            GroupeDeSupervisionRepository(),
+        ),
+        DemanderSignatureCommand: lambda cmd: demander_signature(
+            cmd,
+            PropositionRepository(),
+            GroupeDeSupervisionRepository(),
+            ConstitutionSupervisionService(),
+        ),
+        ApprouverPropositionCommand: lambda cmd: approuver_proposition(
+            cmd,
+            PropositionRepository(),
+            GroupeDeSupervisionRepository(),
+        ),
+        SearchFormationsCommand: lambda cmd: search_formations(
+            cmd,
+            TrainingRepository(),
+        ),
+        SearchDoctoratCommand: lambda cmd: rechercher_doctorats(
+            cmd,
+            DoctoratTranslator(),
+        ),
         GetEncoderNotesRapportCommand: lambda cmd: get_encoder_notes_rapport(
             cmd,
             EncoderNotesRapportRepository()
-        )
+        ),
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 
     def invoke(self, command: CommandRequest) -> ApplicationServiceResult:
