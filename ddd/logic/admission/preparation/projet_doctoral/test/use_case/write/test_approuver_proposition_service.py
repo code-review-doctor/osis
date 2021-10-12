@@ -38,7 +38,7 @@ from ddd.logic.admission.preparation.projet_doctoral.domain.model._signature_pro
 )
 from ddd.logic.admission.preparation.projet_doctoral.domain.validator.exceptions import (
     GroupeDeSupervisionNonTrouveException,
-    MembreGroupeDeSupervisionNonTrouveException, SignatairePasInviteException,
+    SignataireNonTrouveException, SignatairePasInviteException,
 )
 from infrastructure.admission.preparation.projet_doctoral.repository.in_memory.groupe_de_supervision import \
     GroupeDeSupervisionInMemoryRepository
@@ -76,7 +76,7 @@ class TestApprouverPropositionService(SimpleTestCase):
 
     def test_should_pas_approuve_si_pas_dans_groupe(self):
         cmd = attr.evolve(self.cmd, matricule='paspromoteur')
-        with self.assertRaises(MembreGroupeDeSupervisionNonTrouveException):
+        with self.assertRaises(SignataireNonTrouveException):
             self.message_bus.invoke(cmd)
 
     def test_should_pas_approuve_si_pas_invite(self):

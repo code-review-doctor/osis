@@ -85,14 +85,6 @@ class InstitutionInconsistanteException(BusinessException):
         super().__init__(message, **kwargs)
 
 
-class MembreGroupeDeSupervisionNonTrouveException(BusinessException):
-    status_code = "PROPOSITION-8"
-
-    def __init__(self, **kwargs):
-        message = _("Supervision group member not found.")
-        super().__init__(message, **kwargs)
-
-
 class PromoteurNonTrouveException(BusinessException):
     status_code = "PROPOSITION-9"
 
