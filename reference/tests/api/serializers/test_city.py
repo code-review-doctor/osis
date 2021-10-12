@@ -23,21 +23,26 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from rest_framework import serializers
+from django.test import TestCase, RequestFactory
+from django.urls import reverse
 
-from reference.models.country import Country
+from reference.api.serializers.city import CitySerializer
+from reference.tests.factories.city import ZipCodeFactory
 
 
-class CountrySerializer(serializers.HyperlinkedModelSerializer):
-    url = serializers.HyperlinkedIdentityField(view_name='reference_api_v1:country-detail', lookup_field='uuid')
-    name = serializers.CharField(required=False)
+class CityListSerializerTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.city = ZipCodeFactory()
+        cls.city.country_iso_code = cls.city.country.iso_code
+        cls.city.name = cls.city.municipality
+        url = reverse('reference_api_v1:city-list')
+        cls.serializer = CitySerializer(cls.city, context={'request': RequestFactory().get(url)})
 
-    class Meta:
-        model = Country
-        fields = (
-            'url',
-            'uuid',
-            'iso_code',
+    def test_contains_expected_fields(self):
+        expected_fields = [
+            'country_iso_code',
             'name',
-            'nationality'
-        )
+            'zip_code'
+        ]
+        self.assertCountEqual(list(self.serializer.data.keys()), expected_fields)
