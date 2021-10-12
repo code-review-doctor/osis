@@ -65,8 +65,8 @@
                 {% for educ_group_year in object_list %}
                     <tr>
                         <td>
-                            <a href="{% if educ_group_year.is_first_year_bachelor %}{% url 'first_year_bachelor_score_sheet_address' acronym=educ_group_year.acronym %}{%else %}{% url 'score_sheet_address' acronym=educ_group_year.acronym %}{% endif %}" id="lnk_offer_{{educ_group_year.acronym}}">
-                                {{ educ_group_year.acronym }}
+                            <a href="{{ educ_group_year.url }}" id="lnk_offer_{{educ_group_year.acronym}}">
+                            {{ educ_group_year.acronym }}
                             </a>
                         </td>
                         <td>{{ educ_group_year.title }}</td>

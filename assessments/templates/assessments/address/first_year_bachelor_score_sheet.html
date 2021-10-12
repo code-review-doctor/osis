@@ -28,13 +28,13 @@
 {% block breadcrumb %}
     <li><a href="{% url 'studies' %}" id="lnk_studies">{% trans 'Student path' %}</a></li>
     <li><a href="{% url 'offers_search_new' %}" id="lnk_offers">{% trans 'Addresses' %}</a></li>
-    <li class="active">{{ nom_cohorte }}</li>
+    <li class="active">{{ nom_cohorte_premiere_annee }}</li>
 {% endblock %}
 
 {% block content %}
 
     <div class="page-header">
-        <h2>{{ nom_cohorte }} - {{ intitule_page }}</h2>
+        <h2>{{ nom_cohorte_premiere_annee }} - {{ intitule_page }}</h2>
     </div>
 
     <div class="panel panel-default">
