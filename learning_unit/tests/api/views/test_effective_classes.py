@@ -90,5 +90,6 @@ class EffectiveClassesListTestCase(APITestCase):
                 "type_text",
                 "campus_name",
                 "organization_name",
+                "full_code"
             ]
         )
