@@ -35,20 +35,20 @@ def delete_element(apps, luy):
 
 def delete_class_from_learning_unit_year(apps, schema_editor):
     print("Populate learning class year table")
-    LearningComponentYear = apps.get_model('base', 'LearningComponentYear')
-
     qs = get_learning_unit_year_of_type_class_queryset(apps)
-
     errors = []
+    cpt = 0
     for luy in qs:
         try:
             delete_group_element_years(apps, luy)
             delete_element(apps, luy)
-            # luy.delete()
-
+            print("deleting {}...".format(luy))
+            luy.delete()
+            cpt += 1
         except Exception as e:
             print("ERROR :: {} {}".format(str(luy), str(e)))
             errors.append(luy)
+    print("Total deleted : {}".format(cpt))
 
 
 class Migration(migrations.Migration):
