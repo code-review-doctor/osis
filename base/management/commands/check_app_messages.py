@@ -23,6 +23,8 @@
 # ############################################################################
 import subprocess
 
+from django.conf import settings
+
 from base.management.commands import makemessages
 
 
@@ -39,6 +41,10 @@ class Command(makemessages.Command):
         options['keep_pot'] = True
         options['verbosity'] = 0
 
+        # Override LOCALE_PATHS so that it is taken by makemessages
+        settings.LOCALE_PATHS = (
+            "{}/locale".format(options['directory']),
+        )
         super().handle(*args, **options)
 
         self.check_all_messages_are_translated(options['directory'])
