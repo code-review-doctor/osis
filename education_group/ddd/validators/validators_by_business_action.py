@@ -150,7 +150,7 @@ class DeleteOrphanTrainingValidatorList(business_validator.BusinessListValidator
     ):
         self.validators = [
             TrainingEnrollmentsValidator(training.entity_id),
-            CohortEnrollmentsValidator(training.entity_id),
+            CohortEnrollmentsValidator(training),
             TrainingLinkWithEPCValidator(training.entity_id)
         ]
         super().__init__()

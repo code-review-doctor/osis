@@ -39,15 +39,17 @@ class TrainingEnrollmentsValidator(business_validator.BusinessValidator):
 
 
 class CohortEnrollmentsValidator(business_validator.BusinessValidator):
-    def __init__(self, training_id: 'TrainingIdentity'):
+    def __init__(self, training: 'Training'):
         super().__init__()
-        self.training_id = training_id
+        self.training = training
 
     def validate(self, *args, **kwargs):
-        enrollments_count = EnrollmentCounter().get_11BA_enrollments_count(self.training_id)
-        if enrollments_count > 0:
-            acronym_11BA = self.training_id.acronym.replace('1BA', '11BA')
-            raise TrainingHaveEnrollments(acronym_11BA, self.training_id.year, enrollments_count)
+        if self.training.is_bachelor():
+            enrollments_count = EnrollmentCounter().get_11BA_enrollments_count(self.training.entity_id)
+            if enrollments_count > 0:
+                # FIXME :: centraliser la construction du sigle 11BA à un seul endroit
+                acronym_11BA = self.training.entity_id.acronym + '-1'
+                raise TrainingHaveEnrollments(acronym_11BA, self.training.entity_id.year, enrollments_count)
 
 
 class MiniTrainingEnrollmentsValidator(business_validator.BusinessValidator):
