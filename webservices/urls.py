@@ -43,6 +43,7 @@ url_api_v1 = [
 ]
 
 webservice_apps = [
+    'admission',
     'attribution',
     'education_group',
     'learning_unit',
@@ -50,11 +51,10 @@ webservice_apps = [
     'continuing_education',
     'base',
     'program_management',
-    'internship',
     'offer_enrollment',
     'learning_unit_enrollment',
-    'internship',
-    'assessments'
+    'assessments',
+    'internship'
 ]
 
 for appname in webservice_apps:

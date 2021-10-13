@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-05 18:00+0200\n"
+"POT-Creation-Date: 2021-10-11 09:22+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -641,6 +641,9 @@ msgstr "Consolider"
 
 msgid "Consolidate the proposal"
 msgstr "Consolider la proposition"
+
+msgid "Contact"
+msgstr "Contact"
 
 msgid "Continuing Education"
 msgstr "Formations Continues"

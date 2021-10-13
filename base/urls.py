@@ -52,7 +52,6 @@ from base.views import teaching_material
 from base.views.autocomplete import OrganizationAutocomplete, CountryAutocomplete, CampusAutocomplete, \
     EntityAutocomplete, AllocationEntityAutocomplete, AdditionnalEntity1Autocomplete, AdditionnalEntity2Autocomplete, \
     EntityRequirementAutocomplete, EmployeeAutocomplete, AcademicCalendarTypeAutocomplete
-from base.views.education_groups.search import OffersSearch
 from base.views.learning_units.detail import DetailLearningUnitYearView, DetailLearningUnitYearViewBySlug
 from base.views.learning_units.external import create as create_external
 from base.views.learning_units.pedagogy.publish import publish_and_access_publication
@@ -287,9 +286,6 @@ urlpatterns = [
     url(r'^offers/', include([
         url(r'^$', offer.offers, name='offers'),
         url(r'^search$', offer.offers_search, name='offers_search'),
-
-        # New URL's
-        url(r'^new/$', OffersSearch.as_view(), name='offers_search_new'),
     ])),
 
     url(r'^educationgroups/', include(education_group_urls.urlpatterns)),
