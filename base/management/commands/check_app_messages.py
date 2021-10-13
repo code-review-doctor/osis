@@ -45,12 +45,12 @@ class Command(makemessages.Command):
         os.chdir(options['directory'])
         super().handle(*args, **options)
 
-        self.check_all_messages_are_translated(options['directory'])
+        self.check_all_messages_are_translated()
         os.chdir(previous_dir)
 
-    def check_all_messages_are_translated(self, directory):
-        fr_po_file_location = "{}/locale/fr_BE/LC_MESSAGES/django.po".format(directory)
-        pot_file_location = "{}/locale/django.pot".format(directory)
+    def check_all_messages_are_translated(self):
+        fr_po_file_location = "locale/fr_BE/LC_MESSAGES/django.po"
+        pot_file_location = "locale/django.pot"
 
         try:
             subprocess.run(
