@@ -21,9 +21,8 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+import os
 import subprocess
-
-from django.conf import settings
 
 from base.management.commands import makemessages
 
@@ -41,13 +40,13 @@ class Command(makemessages.Command):
         options['keep_pot'] = True
         options['verbosity'] = 0
 
-        # Override LOCALE_PATHS so that it is taken by makemessages
-        settings.LOCALE_PATHS = (
-            "{}/locale".format(options['directory']),
-        )
+        # Change dir for makemessage execution
+        previous_dir = os.getcwd()
+        os.chdir(options['directory'])
         super().handle(*args, **options)
 
         self.check_all_messages_are_translated(options['directory'])
+        os.chdir(previous_dir)
 
     def check_all_messages_are_translated(self, directory):
         fr_po_file_location = "{}/locale/fr_BE/LC_MESSAGES/django.po".format(directory)
