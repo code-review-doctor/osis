@@ -23,12 +23,39 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+from typing import List, Optional
 
 from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
-from ddd.logic.effective_class_repartition.domain.model.tutor import Tutor
+from ddd.logic.effective_class_repartition.domain.model.tutor import Tutor, TutorIdentity
 from ddd.logic.effective_class_repartition.repository.i_tutor import ITutorRepository
+from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
 
 
 class TutorRepository(InMemoryGenericRepository, ITutorRepository):
     entities = list()  # type: List[Tutor]
+
+    @classmethod
+    def search(
+            cls,
+            entity_ids: Optional[List['TutorIdentity']] = None,
+            effective_class_identity: 'EffectiveClassIdentity' = None,
+    ) -> List['Tutor']:
+        return list(
+            filter(
+                lambda tutor: _filter(tutor, entity_ids, effective_class_identity),
+                cls.entities
+            )
+        )
+
+
+def _filter(
+        tutor: 'Tutor',
+        entity_ids: Optional[List['TutorIdentity']],
+        effective_class_identity: 'EffectiveClassIdentity'
+):
+    class_identities = [class_repartition.effective_class for class_repartition in tutor.distributed_effective_classes]
+    if effective_class_identity and effective_class_identity in class_identities:
+        return True
+    if entity_ids and tutor.entity_id in entity_ids:
+        return True
+    return False

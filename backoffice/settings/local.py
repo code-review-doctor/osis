@@ -36,6 +36,8 @@ OPTIONAL_APPS = (
     'webservices',
     'behave_django',
     'osis_role',
+    'offer_enrollment',
+    'learning_unit_enrollment',
     'backoffice',
 )
 OPTIONAL_MIDDLEWARES = ()

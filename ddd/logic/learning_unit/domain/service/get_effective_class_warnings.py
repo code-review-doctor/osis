@@ -29,6 +29,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from base.business.learning_units.quadrimester_strategy import QUADRIMESTER_CHECK_RULES
 from base.business.learning_units.session_strategy import SESSION_CHECK_RULES
+from base.models.enums.learning_unit_year_session import SESSION_123
 from base.models.enums.quadrimesters import LearningUnitYearQuadrimester
 from ddd.logic.learning_unit.domain.model.effective_class import LecturingEffectiveClass, EffectiveClass
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
@@ -72,7 +73,8 @@ def _check_classes_session(effective_class: 'EffectiveClass', learning_unit: 'Le
 
     session = effective_class.session_derogation
     lu_session = learning_unit.derogation_session
-    if lu_session and session and session not in SESSION_CHECK_RULES[lu_session.value]['correct_values']:
+    if lu_session and session and lu_session.value != SESSION_123 and \
+            session not in SESSION_CHECK_RULES[lu_session.value]['correct_values']:
         _warnings.append(message % {
             'code_class': effective_class.complete_acronym,
             'should_be_values': SESSION_CHECK_RULES[lu_session.value]['available_values_str']
@@ -114,9 +116,9 @@ def _class_volume_exceeds_learning_unit_volume(
     learning_unit_part = learning_unit.lecturing_part \
         if type(effective_class) == LecturingEffectiveClass else learning_unit.practical_part
     return effective_class.is_volume_first_quadrimester_greater_than(
-        learning_unit_part.volumes.volume_first_quadrimester or 0
+        _get_volume(learning_unit_part, 'volume_first_quadrimester')
     ) or effective_class.is_volume_second_quadrimester_greater_than(
-        learning_unit_part.volumes.volume_second_quadrimester or 0
+        _get_volume(learning_unit_part, 'volume_second_quadrimester')
     )
 
 
@@ -128,7 +130,7 @@ def _class_volumes_sum_in_q1_and_q2_exceeds_annual_volume(
         if type(effective_class) == LecturingEffectiveClass else learning_unit.practical_part
     class_sum_q1_q2 = (effective_class.volumes.volume_first_quadrimester or 0) + \
                       (effective_class.volumes.volume_second_quadrimester or 0)
-    return class_sum_q1_q2 > (learning_unit_part.volumes.volume_annual or 0)
+    return class_sum_q1_q2 > (_get_volume(learning_unit_part, 'volume_annual'))
 
 
 def _check_quadrimester_volume(effective_class: 'EffectiveClass') -> List[str]:
@@ -196,3 +198,10 @@ def _get_q1_q2_warnings(effective_class: 'EffectiveClass') -> List[str]:
                 }
             )
     return warnings
+
+
+def _get_volume(learning_unit_part, volume_attr: str):
+    if learning_unit_part:
+        volume = getattr(learning_unit_part.volumes, volume_attr, 0)
+        return volume or 0
+    return 0

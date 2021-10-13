@@ -23,9 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Optional, List
+from typing import Optional, List, Set, Tuple
 
-from django.db.models import F, OuterRef, Subquery, Case, When, Q, CharField, Value, QuerySet
+from django.db.models import F, OuterRef, Subquery, Case, When, Q, CharField, Value, QuerySet, Prefetch
 from django.db.models.functions import Concat, Substr, Length
 
 from base.models.academic_year import AcademicYear as AcademicYearDatabase
@@ -41,11 +41,15 @@ from base.models.learning_unit_year import LearningUnitYear as LearningUnitYearD
 from base.models.proposal_learning_unit import ProposalLearningUnit as ProposalLearningUnitDatabase
 from ddd.logic.learning_unit.builder.learning_unit_builder import LearningUnitBuilder
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit, LearningUnitIdentity
-from ddd.logic.learning_unit.dtos import LearningUnitFromRepositoryDTO, LearningUnitSearchDTO, PartimFromRepositoryDTO
+from ddd.logic.learning_unit.dtos import LearningUnitFromRepositoryDTO, LearningUnitSearchDTO, \
+    PartimFromRepositoryDTO, \
+    LearningUnitPartimDTO
 from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepository
 from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
 from osis_common.ddd.interface import EntityIdentity, ApplicationService, Entity
 from reference.models.language import Language as LanguageDatabase
+
+UNTYPED_COMPONENT_ACRONYM = 'NT'
 
 
 class LearningUnitRepository(ILearningUnitRepository):
@@ -65,37 +69,32 @@ class LearningUnitRepository(ILearningUnitRepository):
         ).exists()
 
     @classmethod
-    def search_learning_units_dto(
-            cls,
-            code: str = None,
-            year: int = None,
-            full_title: str = None,
-            type: str = None,
-            responsible_entity_code: str = None
-    ) -> List['LearningUnitSearchDTO']:
+    def search_learning_units_dto(cls, code_annee_values: Set[Tuple[str, int]] = None) -> List['LearningUnitSearchDTO']:
         qs = _get_common_queryset()
         # FIXME :: reuse Django filter
-        if code is not None:
+        if code_annee_values is not None:
             qs = qs.filter(
-                acronym__icontains=code,
+                academic_year__year__in={annee for _, annee in code_annee_values},
+                acronym__in={code for code, _ in code_annee_values}
             )
-        if year is not None:
-            qs = qs.filter(
-                academic_year__year=year,
-            )
-        if type is not None:
-            qs = qs.filter(
-                learning_container_year__container_type=type,
-            )
-        if responsible_entity_code is not None:
-            qs = qs.filter(
-                requirement_entity__entityversion__acronym__icontains=responsible_entity_code,
-            )
-        if full_title is not None:
-            qs = qs.filter(
-                Q(learning_container_year__common_title__icontains=full_title)
-                | Q(specific_title__icontains=full_title),
-            )
+
+        partims_prefetch = LearningUnitYearDatabase.objects.filter(
+            subtype=learning_unit_year_subtypes.PARTIM,
+        ).annotate(
+            full_title=Case(
+                When(
+                    Q(learning_container_year__common_title__isnull=True) |
+                    Q(learning_container_year__common_title__exact=''),
+                    then='specific_title'
+                ),
+                When(
+                    Q(specific_title__isnull=True) | Q(specific_title__exact=''),
+                    then='learning_container_year__common_title'
+                ),
+                default=Concat('learning_container_year__common_title', Value(' - '), 'specific_title'),
+                output_field=CharField(),
+            ),
+        )
 
         qs = qs.annotate(
             code=F('acronym'),
@@ -116,25 +115,46 @@ class LearningUnitRepository(ILearningUnitRepository):
             ),
             responsible_entity_code=Subquery(
                 EntityVersionDatabase.objects.filter(
-                    entity__id=OuterRef('requirement_entity_id')
+                    entity__id=OuterRef('learning_container_year__requirement_entity_id')
                 ).order_by('-start_date').values('acronym')[:1]
             ),
             responsible_entity_title=Subquery(
                 EntityVersionDatabase.objects.filter(
-                    entity__id=OuterRef('requirement_entity_id')
+                    entity__id=OuterRef('learning_container_year__requirement_entity_id')
                 ).order_by('-start_date').values('title')[:1]
             ),
-        ).values(
-            "year",
-            "code",
-            "full_title",
-            "type",
-            "responsible_entity_code",
-            "responsible_entity_title",
+        ).select_related(
+            "learning_container_year"
+        ).prefetch_related(
+            Prefetch("learning_container_year__learningunityear_set", queryset=partims_prefetch, to_attr='partims'),
+        ).only(
+            "learning_container_year",
+            "language",
+            "academic_year"
         )
         result = []
-        for data_dict in qs.values():
-            result.append(LearningUnitSearchDTO(**data_dict))
+        for learning_unit_year_db_obj in qs:
+            if code_annee_values is None or (
+                learning_unit_year_db_obj.code, learning_unit_year_db_obj.year
+            ) in code_annee_values:
+                result.append(
+                    LearningUnitSearchDTO(
+                        year=learning_unit_year_db_obj.year,
+                        code=learning_unit_year_db_obj.code,
+                        full_title=learning_unit_year_db_obj.full_title,
+                        type=learning_unit_year_db_obj.type,
+                        responsible_entity_code=learning_unit_year_db_obj.responsible_entity_code,
+                        responsible_entity_title=learning_unit_year_db_obj.responsible_entity_title,
+                        partims=[
+                            LearningUnitPartimDTO(
+                                code=partim.acronym,
+                                full_title=partim.full_title
+                            )
+                            for partim
+                            in learning_unit_year_db_obj.learning_container_year.partims
+                        ]
+                    )
+                )
         return result
 
     @classmethod
@@ -277,6 +297,7 @@ def _annotate_queryset(queryset: QuerySet) -> QuerySet:
         learning_unit_year_id=OuterRef('pk'),
         hourly_volume_total_annual__gt=0.0,
     )
+    non_practical_component_filter = (Q(type=LECTURING) | Q(type__isnull=True, acronym=UNTYPED_COMPONENT_ACRONYM))
     queryset = queryset.annotate(
         code=F('acronym'),
         year=F('academic_year__year'),
@@ -311,18 +332,38 @@ def _annotate_queryset(queryset: QuerySet) -> QuerySet:
             ).order_by('-start_date').values('acronym')[:1]
         ),
 
-        lecturing_volume_q1=Subquery(components.filter(type=LECTURING).values('hourly_volume_partial_q1')),
-        lecturing_volume_q2=Subquery(components.filter(type=LECTURING).values('hourly_volume_partial_q2')),
-        lecturing_volume_annual=Subquery(components.filter(type=LECTURING).values('hourly_volume_total_annual')),
-        lecturing_planned_classes=Subquery(components.filter(type=LECTURING).values('planned_classes')),
+        lecturing_volume_q1=Subquery(
+            components.filter(
+                non_practical_component_filter
+            ).values('hourly_volume_partial_q1')
+        ),
+        lecturing_volume_q2=Subquery(
+            components.filter(
+                non_practical_component_filter
+            ).values('hourly_volume_partial_q2')
+        ),
+        lecturing_volume_annual=Subquery(
+            components.filter(
+                non_practical_component_filter
+            ).values('hourly_volume_total_annual')
+        ),
+        lecturing_planned_classes=Subquery(
+            components.filter(non_practical_component_filter).values('planned_classes')
+        ),
         lecturing_volume_repartition_responsible_entity=Subquery(  # TODO :: to unit test
-            components.filter(type=LECTURING).values('repartition_volume_requirement_entity')
+            components.filter(
+                non_practical_component_filter
+            ).values('repartition_volume_requirement_entity')
         ),
         lecturing_volume_repartition_entity_2=Subquery(  # TODO :: to unit test
-            components.filter(type=LECTURING).values('repartition_volume_additional_entity_1')
+            components.filter(
+                non_practical_component_filter
+            ).values('repartition_volume_additional_entity_1')
         ),
         lecturing_volume_repartition_entity_3=Subquery(  # TODO :: to unit test
-            components.filter(type=LECTURING).values('repartition_volume_additional_entity_2')
+            components.filter(
+                non_practical_component_filter
+            ).values('repartition_volume_additional_entity_2')
         ),
 
         practical_volume_q1=Subquery(components.filter(type=PRACTICAL_EXERCISES).values('hourly_volume_partial_q1')),

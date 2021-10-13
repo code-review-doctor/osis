@@ -125,6 +125,7 @@ urlpatterns = [
         ])),
         url(r'^(?P<entity_acronym>[A-Z]+)/', include([
             url(r'^$', institution.entity_read_by_acronym, name='entity_read'),
+            url(r'^address/$', institution.get_entity_address_by_acronym, name='entity_address'),
         ])),
     ])),
 

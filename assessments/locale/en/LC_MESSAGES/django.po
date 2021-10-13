@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-12 14:17+0200\n"
+"POT-Creation-Date: 2021-10-06 08:20+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,6 +15,14 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#, python-format
+msgid ""
+"\n"
+"                                        Address of reference for "
+"%(nom_cohorte_bachelier)s - %(intitule)s\n"
+"                                    "
+msgstr ""
 
 #, python-format
 msgid ""
@@ -29,6 +37,28 @@ msgid ""
 "                                "
 msgstr ""
 
+msgid ""
+"\n"
+"                                For first year bachelor, the address of "
+"reference is by default the one from the bachelor.\n"
+"                                It is possible to define a specific address "
+"for the first year of the bachelor by checking the box.\n"
+"                            "
+msgstr ""
+
+#, python-format
+msgid ""
+"\n"
+"                                If you customize one of the field below, it "
+"only change the address displayed on the\n"
+"                                score encodings sheets for the program "
+"%(acronym)s.\n"
+"                                It will never change the address of any "
+"structure. The list below will help you to\n"
+"                                pre-fill in the form.\n"
+"                            "
+msgstr ""
+
 #, python-format
 msgid ""
 "\n"
@@ -38,7 +68,21 @@ msgid ""
 "                    "
 msgstr ""
 
+#, python-format
+msgid ""
+"\n"
+"                You will submit %(draft_scores_not_submitted)s notes to "
+"faculty(ies). Warning : submitted scores <b>can't be modified anymore.</b>\n"
+"            "
+msgstr ""
+
+msgid "Absence justified"
+msgstr ""
+
 msgid "Absence justified cannot be remplaced by absence unjustified"
+msgstr ""
+
+msgid "Absence unjustified"
 msgstr ""
 
 msgid "Absent"
@@ -61,12 +105,22 @@ msgctxt "UE acronym"
 msgid "Acronym"
 msgstr ""
 
+msgid "Acronym/Short title"
+msgstr ""
+
 msgid "Add"
 msgstr ""
 
 msgid "Add manager"
 msgstr ""
 
+msgid "Addresses"
+msgstr ""
+
+msgid "All"
+msgstr ""
+
+msgctxt "male plural"
 msgid "All"
 msgstr ""
 
@@ -122,6 +176,9 @@ msgstr ""
 msgid "Country"
 msgstr ""
 
+msgid "Creation date"
+msgstr ""
+
 msgid "Customized"
 msgstr ""
 
@@ -146,7 +203,13 @@ msgstr ""
 msgid "Decimals authorized for this learning unit"
 msgstr ""
 
+msgid "Define a specific address for the first year of bachelor"
+msgstr ""
+
 msgid "Definitive submission (Submit to faculty)"
+msgstr ""
+
+msgid "Deliberation date"
 msgstr ""
 
 msgid "Details other educational facilities"
@@ -159,6 +222,9 @@ msgid "Display all tutors for this learning unit"
 msgstr ""
 
 msgid "Display scores for this learning unit"
+msgstr ""
+
+msgid "Done at"
 msgstr ""
 
 msgid "Double encode scores"
@@ -197,6 +263,9 @@ msgstr ""
 msgid "Entity"
 msgstr ""
 
+msgid "Entity of reference"
+msgstr ""
+
 msgid "Evaluations"
 msgstr ""
 
@@ -224,6 +293,11 @@ msgid "Get Excel file"
 msgstr ""
 
 msgid "If you try to put decimal values, it will be ignored."
+msgstr ""
+
+msgid ""
+"In accordance to regulation's rules 104, 109 and 111. Complete rules "
+"avalaible here"
 msgstr ""
 
 msgid "Include subordinate entities"
@@ -297,6 +371,9 @@ msgstr ""
 msgid ""
 "NOTE : the 'Email' field is optional. You can fill in this field if you want "
 "it to appear on the score sheet."
+msgstr ""
+
+msgid "Name"
 msgstr ""
 
 msgid "No address found for the selected entity."
@@ -404,6 +481,9 @@ msgstr ""
 msgid "Refresh list"
 msgstr ""
 
+msgid "Reg. No."
+msgstr ""
+
 msgid "Registration ID"
 msgstr ""
 
@@ -451,11 +531,18 @@ msgstr ""
 msgid "Score have more than 2 decimal places"
 msgstr ""
 
+msgid "Score legend"
+msgstr ""
+
 #, python-format
 msgid "Score legend: %(score_legend)s (0=Score of presence)"
 msgstr ""
 
-msgid "Score responsible should be link to one attribution"
+#, python-brace-format
+msgid "Score legend: A=Absent, T=Cheating, {score} (0=Score of presence)"
+msgstr ""
+
+msgid "Score sheet"
 msgstr ""
 
 msgid "Score sheet address was successfully saved."
@@ -509,6 +596,9 @@ msgstr ""
 msgid "Session number"
 msgstr ""
 
+msgid "Signature"
+msgstr ""
+
 msgid ""
 "Some of the students enrolled to this course have a PEPS status (Program for "
 "Students with a Specific Profile). You will find detailled information in "
@@ -542,10 +632,19 @@ msgstr ""
 msgid "Submission"
 msgstr ""
 
+msgid "Submit data"
+msgstr ""
+
 msgid "Teacher deadline"
 msgstr ""
 
 msgid "Temporary save (not submitted to the faculty yet)"
+msgstr ""
+
+#, python-format
+msgid ""
+"The data presented on this document correspond to the state of the system "
+"dated %(creation_date)s and are likely to evolve"
 msgstr ""
 
 #, python-format
@@ -586,6 +685,12 @@ msgstr ""
 msgid "The selected entity no longer exists today (end date passed)."
 msgstr ""
 
+#, python-format
+msgid "There is %(error_counter)s error in form"
+msgid_plural "There are %(error_counter)s errors in form"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "This process helps tutor while encoding notes for the exams sessions."
 msgstr ""
 
@@ -617,6 +722,9 @@ msgid "UE title"
 msgstr ""
 
 msgid "Unauthorized decimal for this learning unit"
+msgstr ""
+
+msgid "Université catholique de Louvain"
 msgstr ""
 
 msgid "Unjustified absence"
@@ -673,7 +781,19 @@ msgstr ""
 msgid "date_format"
 msgstr "%d %b %Y"
 
+msgid "https://uclouvain.be/fr/decouvrir/rgee.html"
+msgstr ""
+
 msgid "learning units in"
+msgstr ""
+
+msgid "more_than_one_academic_year_error"
+msgstr ""
+
+msgid "no_valid_academic_year_error"
+msgstr ""
+
+msgid "number between 0-20 (0=Score of presence)"
 msgstr ""
 
 msgid "of"
@@ -683,4 +803,13 @@ msgid "program(s)"
 msgstr ""
 
 msgid "score(s) saved"
+msgstr ""
+
+msgid "student"
+msgstr ""
+
+msgid "students"
+msgstr ""
+
+msgid "the"
 msgstr ""
