@@ -22,7 +22,6 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 import subprocess
-import sys
 
 from base.management.commands import makemessages
 
@@ -32,17 +31,21 @@ class MessagesNotTranslatedException(Exception):
 
 
 class Command(makemessages.Command):
+    def add_arguments(self, parser):
+        super().add_arguments(parser)
+        parser.add_argument('directory')
+
     def handle(self, *args, **options):
         options['keep_pot'] = True
         options['verbosity'] = 0
 
         super().handle(*args, **options)
 
-        self.check_all_messages_are_translated()
+        self.check_all_messages_are_translated(options['directory'])
 
-    def check_all_messages_are_translated(self):
-        fr_po_file_location = "locale/fr_BE/LC_MESSAGES/django.po"
-        pot_file_location = "locale/django.pot"
+    def check_all_messages_are_translated(self, directory):
+        fr_po_file_location = "{}/locale/fr_BE/LC_MESSAGES/django.po".format(directory)
+        pot_file_location = "{}/locale/django.pot".format(directory)
 
         try:
             subprocess.run(
