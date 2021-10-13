@@ -38,6 +38,18 @@ class TrainingEnrollmentsValidator(business_validator.BusinessValidator):
             raise TrainingHaveEnrollments(self.training_id.acronym, self.training_id.year, enrollments_count)
 
 
+class CohortEnrollmentsValidator(business_validator.BusinessValidator):
+    def __init__(self, training_id: 'TrainingIdentity'):
+        super().__init__()
+        self.training_id = training_id
+
+    def validate(self, *args, **kwargs):
+        enrollments_count = EnrollmentCounter().get_11BA_enrollments_count(self.training_id)
+        if enrollments_count > 0:
+            acronym_11BA = self.training_id.acronym.replace('1BA', '11BA')
+            raise TrainingHaveEnrollments(acronym_11BA, self.training_id.year, enrollments_count)
+
+
 class MiniTrainingEnrollmentsValidator(business_validator.BusinessValidator):
     def __init__(self, mini_training_id: 'MiniTrainingIdentity'):
         super().__init__()

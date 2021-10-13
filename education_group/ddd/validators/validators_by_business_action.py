@@ -34,7 +34,8 @@ from education_group.ddd.validators._content_constraint import ContentConstraint
 from education_group.ddd.validators._copy_check_mini_training_end_date import CheckMiniTrainingEndDateValidator
 from education_group.ddd.validators._copy_check_training_end_date import CheckTrainingEndDateValidator
 from education_group.ddd.validators._credits import CreditsValidator
-from education_group.ddd.validators._enrollments import TrainingEnrollmentsValidator, MiniTrainingEnrollmentsValidator
+from education_group.ddd.validators._enrollments import TrainingEnrollmentsValidator, MiniTrainingEnrollmentsValidator,\
+    CohortEnrollmentsValidator
 from education_group.ddd.validators._link_with_epc import TrainingLinkWithEPCValidator, MiniTrainingLinkWithEPCValidator
 from education_group.ddd.validators._start_year_end_year import StartYearEndYearValidator
 from education_group.ddd.validators._unique_code import UniqueCodeValidator
@@ -149,6 +150,7 @@ class DeleteOrphanTrainingValidatorList(business_validator.BusinessListValidator
     ):
         self.validators = [
             TrainingEnrollmentsValidator(training.entity_id),
+            CohortEnrollmentsValidator(training.entity_id),
             TrainingLinkWithEPCValidator(training.entity_id)
         ]
         super().__init__()
