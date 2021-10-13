@@ -25,33 +25,6 @@
 ##############################################################################
 from typing import Callable, Dict, List
 
-from ddd.logic.admission.preparation.projet_doctoral.commands import (
-    ApprouverPropositionCommand,
-    CompleterPropositionCommand,
-    DemanderSignatureCommand, GetPropositionCommand, IdentifierPromoteurCommand,
-    InitierPropositionCommand,
-    SearchDoctoratCommand,
-    SearchPropositionsCommand, SupprimerMembreCACommand,
-    SupprimerPromoteurCommand,
-)
-from ddd.logic.admission.preparation.projet_doctoral.use_case.read.get_proposition_service import get_proposition
-from ddd.logic.admission.preparation.projet_doctoral.use_case.read.rechercher_doctorats_service import \
-    rechercher_doctorats
-from ddd.logic.admission.preparation.projet_doctoral.use_case.read.rechercher_propositions_service import \
-    rechercher_propositions
-from ddd.logic.admission.preparation.projet_doctoral.use_case.write.approuver_proposition_service import \
-    approuver_proposition
-from ddd.logic.admission.preparation.projet_doctoral.use_case.write.completer_proposition_service import \
-    completer_proposition
-from ddd.logic.admission.preparation.projet_doctoral.use_case.write.demander_signature_service import demander_signature
-from ddd.logic.admission.preparation.projet_doctoral.use_case.write.identifier_promoteur_service import \
-    identifier_promoteur
-from ddd.logic.admission.preparation.projet_doctoral.use_case.write.initier_proposition_service import \
-    initier_proposition
-from ddd.logic.admission.preparation.projet_doctoral.use_case.write.supprimer_membre_CA_service import \
-    supprimer_membre_CA
-from ddd.logic.admission.preparation.projet_doctoral.use_case.write.supprimer_promoteur_service import \
-    supprimer_promoteur
 from ddd.logic.application.commands import (
     ApplyOnVacantCourseCommand,
     DeleteApplicationCommand,
@@ -197,14 +170,6 @@ from ddd.logic.shared_kernel.language.commands import GetLanguageCommand, Search
 from ddd.logic.shared_kernel.language.use_case.read.get_language_service import get_language
 from ddd.logic.shared_kernel.language.use_case.read.search_languages_service import search_languages
 from education_group.ddd.repository.training import TrainingRepository
-from infrastructure.admission.preparation.projet_doctoral.domain.service.constitution_supervision import \
-    ConstitutionSupervisionService
-from infrastructure.admission.preparation.projet_doctoral.domain.service.doctorat import DoctoratTranslator
-from infrastructure.admission.preparation.projet_doctoral.domain.service.promoteur import PromoteurTranslator
-from infrastructure.admission.preparation.projet_doctoral.domain.service.secteur_ucl import SecteurUclTranslator
-from infrastructure.admission.preparation.projet_doctoral.repository.groupe_de_supervision import \
-    GroupeDeSupervisionRepository
-from infrastructure.admission.preparation.projet_doctoral.repository.proposition import PropositionRepository
 from infrastructure.application.repository.applicant import ApplicantRepository
 from infrastructure.application.repository.application import ApplicationRepository
 from infrastructure.application.repository.application_calendar import ApplicationCalendarRepository
@@ -510,62 +475,9 @@ class MessageBus:
             cmd,
             ResponsableDeNotesRepository(),
         ),
-        InitierPropositionCommand: lambda cmd: initier_proposition(
-            cmd,
-            PropositionRepository(),
-            DoctoratTranslator(),
-        ),
-        SearchPropositionsCommand: lambda cmd: rechercher_propositions(
-            cmd,
-            PropositionRepository(),
-            DoctoratTranslator(),
-            SecteurUclTranslator(),
-        ),
-        GetPropositionCommand: lambda cmd: get_proposition(
-            cmd,
-            PropositionRepository(),
-            DoctoratTranslator(),
-            SecteurUclTranslator(),
-        ),
-        CompleterPropositionCommand: lambda cmd: completer_proposition(
-            cmd,
-            PropositionRepository(),
-            DoctoratTranslator(),
-        ),
-        IdentifierPromoteurCommand: lambda cmd: identifier_promoteur(
-            cmd,
-            PropositionRepository(),
-            GroupeDeSupervisionRepository(),
-            PromoteurTranslator(),
-        ),
-        SupprimerPromoteurCommand: lambda cmd: supprimer_promoteur(
-            cmd,
-            PropositionRepository(),
-            GroupeDeSupervisionRepository(),
-        ),
-        SupprimerMembreCACommand: lambda cmd: supprimer_membre_CA(
-            cmd,
-            PropositionRepository(),
-            GroupeDeSupervisionRepository(),
-        ),
-        DemanderSignatureCommand: lambda cmd: demander_signature(
-            cmd,
-            PropositionRepository(),
-            GroupeDeSupervisionRepository(),
-            ConstitutionSupervisionService(),
-        ),
-        ApprouverPropositionCommand: lambda cmd: approuver_proposition(
-            cmd,
-            PropositionRepository(),
-            GroupeDeSupervisionRepository(),
-        ),
         SearchFormationsCommand: lambda cmd: search_formations(
             cmd,
             TrainingRepository(),
-        ),
-        SearchDoctoratCommand: lambda cmd: rechercher_doctorats(
-            cmd,
-            DoctoratTranslator(),
         ),
         GetEncoderNotesRapportCommand: lambda cmd: get_encoder_notes_rapport(
             cmd,
