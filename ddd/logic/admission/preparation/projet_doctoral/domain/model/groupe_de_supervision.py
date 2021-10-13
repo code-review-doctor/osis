@@ -36,8 +36,7 @@ from ddd.logic.admission.preparation.projet_doctoral.domain.model._signature_pro
     ChoixEtatSignature,
     SignaturePromoteur,
 )
-from ddd.logic.admission.preparation.projet_doctoral.domain.validator.exceptions import \
-    MembreGroupeDeSupervisionNonTrouveException
+from ddd.logic.admission.preparation.projet_doctoral.domain.validator.exceptions import SignataireNonTrouveException
 from ddd.logic.admission.preparation.projet_doctoral.domain.validator.validator_by_business_action import (
     ApprouverValidatorList,
     IdentifierMembreCAValidatorList,
@@ -87,7 +86,7 @@ class GroupeDeSupervision(interface.Entity):
         with contextlib.suppress(StopIteration):
             return next(s.membre_CA_id for s in self.signatures_membres_CA
                         if s.membre_CA_id.matricule == matricule_signataire)
-        raise MembreGroupeDeSupervisionNonTrouveException
+        raise SignataireNonTrouveException
 
     def inviter_a_signer(self, signataire_id: Union['PromoteurIdentity', 'MembreCAIdentity']) -> None:
         InviterASignerValidatorList(

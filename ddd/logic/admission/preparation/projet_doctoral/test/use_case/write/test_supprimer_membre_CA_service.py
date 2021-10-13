@@ -36,7 +36,7 @@ from ddd.logic.admission.preparation.projet_doctoral.commands import (
 from ddd.logic.admission.preparation.projet_doctoral.domain.validator.exceptions import (
     GroupeDeSupervisionNonTrouveException,
     MembreCANonTrouveException,
-    MembreGroupeDeSupervisionNonTrouveException,
+    SignataireNonTrouveException,
 )
 from infrastructure.admission.preparation.projet_doctoral.repository.in_memory.groupe_de_supervision import \
     GroupeDeSupervisionInMemoryRepository
@@ -66,7 +66,7 @@ class TestSupprimerMembreCAService(SimpleTestCase):
 
     def test_should_pas_supprimer_personne_si_pas_membre_CA(self):
         cmd = attr.evolve(self.cmd, matricule='pasmembre_CA')
-        with self.assertRaises(MembreGroupeDeSupervisionNonTrouveException):
+        with self.assertRaises(SignataireNonTrouveException):
             self.message_bus.invoke(cmd)
 
     def test_should_pas_supprimer_promoteur(self):

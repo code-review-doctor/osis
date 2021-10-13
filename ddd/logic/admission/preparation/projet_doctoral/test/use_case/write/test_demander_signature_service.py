@@ -38,7 +38,7 @@ from ddd.logic.admission.preparation.projet_doctoral.domain.model._signature_pro
 )
 from ddd.logic.admission.preparation.projet_doctoral.domain.validator.exceptions import (
     GroupeDeSupervisionNonTrouveException,
-    MembreGroupeDeSupervisionNonTrouveException, SignataireDejaInviteException,
+    SignataireDejaInviteException, SignataireNonTrouveException,
 )
 from infrastructure.admission.preparation.projet_doctoral.repository.in_memory.groupe_de_supervision import \
     GroupeDeSupervisionInMemoryRepository
@@ -76,7 +76,7 @@ class TestDemanderSignatureService(SimpleTestCase):
 
     def test_should_pas_demander_si_pas_dans_groupe(self):
         cmd = attr.evolve(self.cmd, matricule_signataire='paspromoteur')
-        with self.assertRaises(MembreGroupeDeSupervisionNonTrouveException):
+        with self.assertRaises(SignataireNonTrouveException):
             self.message_bus.invoke(cmd)
 
     def test_should_pas_demander_si_deja_invite(self):

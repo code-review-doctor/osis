@@ -83,7 +83,7 @@ class UniteEnseignementTest(TestCase):
             UniteEnseignementDTO(
                 annee=self.classe_dto.learning_unit_year,
                 code=self.classe_dto.code_complet_classe,
-                intitule_complet=self.classe_dto.title_fr,
+                intitule_complet=self.classe_dto.full_title_fr,
             )
         }
         self.assertEqual(expected_result, result)
