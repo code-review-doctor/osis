@@ -49,6 +49,7 @@ class PersonAdmin(SerializableModelAdmin):
                     'changed', 'source', 'employee')
     search_fields = ['first_name', 'middle_name', 'last_name', 'user__username', 'email', 'global_id']
     list_filter = ('gender', 'language')
+    exclude = ('id_card', 'passport', 'id_photo',)
 
 
 class EmployeeManager(SerializableModelManager):

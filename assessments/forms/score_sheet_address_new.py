@@ -131,9 +131,16 @@ class FirstYearBachelorScoreSheetAddressForm(ScoreSheetAddressForm):
         required=False
     )
 
-    def __init__(self, *args, adresse_bachelier: 'AdresseFeuilleDeNotesDTO', **kwargs):
+    def __init__(
+            self,
+            *args,
+            adresse_bachelier: 'AdresseFeuilleDeNotesDTO',
+            nom_cohorte_premiere_annee: str,
+            **kwargs
+    ):
         super().__init__(*args, **kwargs)
         self.adresse_bachelier = adresse_bachelier
+        self.nom_cohorte = nom_cohorte_premiere_annee
 
     def save(self):
         if not self.cleaned_data['specific_address']:
