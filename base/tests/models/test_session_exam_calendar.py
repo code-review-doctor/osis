@@ -91,22 +91,6 @@ class SessionExamCalendarTest(TestCase):
         with self.assertRaises(IntegrityError):
             SessionExamCalendarFactory(academic_calendar=self.academic_calendar_1, number_session=number_session.ONE)
 
-    def test_current_session_exam(self):
-        session = SessionExamCalendarFactory(academic_calendar=self.academic_calendar_1,
-                                             number_session=number_session.ONE)
-
-        result = session_exam_calendar.current_session_exam(date=datetime.date(self.current_academic_yr.year, 11, 9))
-        self.assertEqual(session.academic_calendar.start_date, result.start_date)
-        self.assertEqual(session.academic_calendar.end_date, result.end_date)
-        self.assertEqual(session.number_session, result.session)
-
-    def test_current_session_exam_none(self):
-        SessionExamCalendarFactory(academic_calendar=self.academic_calendar_1,
-                                   number_session=number_session.ONE)
-
-        self.assertIsNone(
-            session_exam_calendar.current_session_exam(date=datetime.date(self.current_academic_yr.year + 1, 1, 5)))
-
     def test_get_latest_session_exam(self):
         #
         first = SessionExamCalendarFactory(academic_calendar=self.academic_calendar_1,

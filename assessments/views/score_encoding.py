@@ -52,6 +52,8 @@ from assessments.views.tutor.score_sheet_xls_import import ScoreSheetXLSImportTu
 from base import models as mdl
 from base.auth.roles.program_manager import ProgramManager
 from base.auth.roles.tutor import Tutor
+from ddd.logic.encodage_des_notes.encodage.commands import GetPeriodeEncodageCommand
+from infrastructure.messages_bus import message_bus_instance
 from osis_role.contrib.helper import EntityRoleHelper
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
@@ -59,7 +61,7 @@ queue_exception_logger = logging.getLogger(settings.QUEUE_EXCEPTION_LOGGER)
 
 
 def _is_inside_scores_encodings_period(user):
-    return bool(mdl.session_exam_calendar.current_session_exam())
+    return bool(message_bus_instance.invoke(GetPeriodeEncodageCommand()))
 
 
 def _is_not_inside_scores_encodings_period(user):
