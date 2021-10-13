@@ -28,6 +28,7 @@ from django.urls import path, register_converter
 
 from assessments.views import score_encoding, upload_xls_utils, pgm_manager_administration, score_sheet
 from assessments.views.address.score_sheet import ScoreSheetAddressView, FirstYearBachelorScoreSheetAddressView
+from assessments.views.address.search import OffersSearch
 from assessments.views.pgm_manager_administration import ProgramManagerListView, ProgramManagerDeleteView, \
     ProgramManagerCreateView, PersonAutocomplete, MainProgramManagerUpdateView, MainProgramManagerPersonUpdateView, \
     ProgramManagerPersonDeleteView
@@ -108,6 +109,7 @@ urlpatterns = [
         ])),
 
         # New URL's
+        url(r'^new/$', OffersSearch.as_view(), name='offers_search_new'),
         path('<acronym:acronym>/', include([
             url(r'^score_encoding/$', ScoreSheetAddressView.as_view(), name='score_sheet_address'),
             url(

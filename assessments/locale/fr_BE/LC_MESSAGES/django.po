@@ -140,6 +140,9 @@ msgctxt "UE acronym"
 msgid "Acronym"
 msgstr "Code"
 
+msgid "Acronym/Short title"
+msgstr "Sigle/Int.abr"
+
 msgid "Add"
 msgstr "Ajouter"
 

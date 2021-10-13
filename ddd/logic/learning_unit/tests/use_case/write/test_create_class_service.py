@@ -25,6 +25,7 @@
 ##############################################################################
 
 import attr
+import mock
 from django.test import SimpleTestCase
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
@@ -189,10 +190,12 @@ class CreateEffectiveClassService(SimpleTestCase):
             ClassTypeInvalidException
         )
 
-    def test_should_learning_unit_not_have_proposal(self):
-        learning_unit_repository = LearningUnitRepository()
-        learning_unit_repository.has_proposal_this_year_or_in_past = lambda *args, **kwargs: True
-
+    @mock.patch(
+        'infrastructure.learning_unit.repository.in_memory.learning_unit.LearningUnitRepository.'
+        'has_proposal_this_year_or_in_past',
+        return_value=True
+    )
+    def test_should_learning_unit_not_have_proposal(self, mock_proposal):
         cmd = attr.evolve(
             self.create_class_cmd,
             class_code="Z",
@@ -200,7 +203,7 @@ class CreateEffectiveClassService(SimpleTestCase):
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             create_effective_class(
                 cmd,
-                learning_unit_repository,
+                self.learning_unit_repository,
                 self.effective_class_repository,
                 self.student_enrollment_translator
             )

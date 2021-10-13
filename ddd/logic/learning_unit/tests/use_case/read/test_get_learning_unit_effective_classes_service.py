@@ -47,7 +47,9 @@ class TestGetLearningUnitEffectiveClassesService(SimpleTestCase):
         self.dto = EffectiveClassFromRepositoryDTO(
             class_code=self.effective_class.class_code,
             title_fr=self.effective_class.titles.fr,
+            full_title_fr='Intitulé unité enseignement' + ' - ' + self.effective_class.titles.fr,
             title_en=self.effective_class.titles.en,
+            full_title_en='Title of learning unit' + ' - ' + self.effective_class.titles.en,
             teaching_place_uuid=self.effective_class.teaching_place.uuid,
             derogation_quadrimester=self.effective_class.derogation_quadrimester,
             session_derogation=self.effective_class.session_derogation,
