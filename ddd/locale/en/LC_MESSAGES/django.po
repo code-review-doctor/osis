@@ -32,10 +32,10 @@ msgid "A substitute can not renew his function of substitute"
 msgstr ""
 
 msgid "ADMISSION"
-msgstr ""
+msgstr "Admission"
 
 msgid "APPROVED"
-msgstr ""
+msgstr "Approved"
 
 msgid "Already a member of CA."
 msgstr ""
@@ -48,7 +48,7 @@ msgid ""
 msgstr ""
 
 msgid "CANCELLED"
-msgstr ""
+msgstr "Cancelled"
 
 msgid "CDE Bureau should be filled in only if the doctorate's entity is CDE"
 msgstr ""
@@ -94,7 +94,7 @@ msgid "Distributed volume should be filled in and be greater than 0"
 msgstr ""
 
 msgid "ECONOMY"
-msgstr ""
+msgstr "Economy"
 
 msgid "English"
 msgstr ""
@@ -106,10 +106,10 @@ msgid "French"
 msgstr ""
 
 msgid "INVITED"
-msgstr ""
+msgstr "Invited"
 
 msgid "IN_PROGRESS"
-msgstr ""
+msgstr "In progress"
 
 msgid "Institution should be set when PhD has been set to yes or partial"
 msgstr ""
@@ -127,7 +127,7 @@ msgid "Lecturing charge or practical charge must be filled"
 msgstr ""
 
 msgid "MANAGEMENT"
-msgstr ""
+msgstr "Management"
 
 msgid "Member of supervision group already invited."
 msgstr ""
@@ -142,10 +142,10 @@ msgid "Membre CA not found."
 msgstr ""
 
 msgid "NO"
-msgstr ""
+msgstr "No"
 
 msgid "NOT_INVITED"
-msgstr ""
+msgstr "Not invited"
 
 msgid "No PhD found."
 msgstr ""
@@ -154,10 +154,10 @@ msgid "No vacant corresponding activity"
 msgstr ""
 
 msgid "PARTIAL"
-msgstr ""
+msgstr "Partial"
 
 msgid "PRE_ADMISSION"
-msgstr ""
+msgstr "Pre-admission"
 
 msgid "Promoter not found."
 msgstr ""
@@ -166,19 +166,19 @@ msgid "Proposition not found."
 msgstr ""
 
 msgid "REFUSED"
-msgstr ""
+msgstr "Refused"
 
 msgid "Registration ID does not match email"
 msgstr ""
 
 msgid "SEARCH_SCHOLARSHIP"
-msgstr ""
+msgstr "Search scholarship"
 
 msgid "SELF_FUNDING"
-msgstr ""
+msgstr "Self-funding"
 
 msgid "SUBMITTED"
-msgstr ""
+msgstr "Submitted"
 
 msgid "Score already submitted"
 msgstr ""
@@ -190,9 +190,6 @@ msgid "Student not registered for exam"
 msgstr ""
 
 msgid "Subdivision should be one character A-Z or 0-9"
-msgstr ""
-
-msgid "Supervision group member not found."
 msgstr ""
 
 msgid "Supervision group not found."
@@ -312,13 +309,13 @@ msgid "Volumes of {} are inconsistent"
 msgstr ""
 
 msgid "WORK_CONTRACT"
-msgstr ""
+msgstr "Work contract"
 
 msgid "Work contract should be set when financing type is set to work contract"
 msgstr ""
 
 msgid "YES"
-msgstr ""
+msgstr "Yes"
 
 msgid ""
 "You cannot create a class on this learning unit because it is in proposal "
