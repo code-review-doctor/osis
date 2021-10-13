@@ -63,7 +63,7 @@ class TestGetLearningUnitEffectiveClassesService(SimpleTestCase):
     def test_get_correct_learning_unit(self):
         effective_classes = get_learning_unit_effective_classes_service.get_learning_unit_effective_classes(
             self.command,
-            self.effective_class_repository,
+            self.effective_class_repository,test_should_envoyer_mail_correction_si_encodage_deja_complet_avant_encodage
         )
         self.assertEqual(effective_classes, [self.dto])
         fields = vars(self.effective_class)
