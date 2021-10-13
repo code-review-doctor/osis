@@ -41,7 +41,9 @@ class EffectiveClassRepositoryTestCase(TestCase):
             learning_unit_code=self.learning_unit_year.acronym,
             learning_unit_year=self.learning_unit_year.academic_year.year,
             title_fr='Titre en francais',
+            full_title_fr="Titre de l'UE + Titre en francais",
             title_en='TItle in english',
+            full_title_en='Title of LearningUnit + TItle in english',
             teaching_place_uuid=self.campus.uuid,
             derogation_quadrimester=DerogationQuadrimester.Q1.name,
             session_derogation=DerogationSession.DEROGATION_SESSION_123.value,
@@ -142,6 +144,25 @@ class SearchDtosTest(TestCase):
         self.assertNotEqual(
             dto.title_en,
             self.class_db.learning_component_year.learning_unit_year.specific_title_english
+        )
+
+    def test_should_renvoyer_intitules_complets(self):
+        dto = self.class_repository.search_dtos(codes={self.code_complet_classe}, annee=self.annee)[0]
+        intitule_complet_fr = "{} - {}".format(
+            self.class_db.learning_component_year.learning_unit_year.learning_container_year.common_title,
+            self.class_db.title_fr,
+        )
+        self.assertEqual(
+            dto.full_title_fr,
+            intitule_complet_fr,
+        )
+        intitule_complet_en = "{} - {}".format(
+            self.class_db.learning_component_year.learning_unit_year.learning_container_year.common_title_english,
+            self.class_db.title_en,
+        )
+        self.assertEqual(
+            dto.full_title_en,
+            intitule_complet_en,
         )
 
     def test_should_renvoyer_volumes(self):

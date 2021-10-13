@@ -66,7 +66,7 @@ def _search_classes_effectives(code_annee_values, message_bus_instance):
         UniteEnseignementDTO(
             annee=dto.learning_unit_year,
             code=dto.code_complet_classe,
-            intitule_complet=dto.title_fr,
+            intitule_complet=dto.full_title_fr,
         ) for dto in classes
     }
 
