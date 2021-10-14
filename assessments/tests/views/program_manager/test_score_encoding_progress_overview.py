@@ -79,8 +79,8 @@ class ScoreEncodingProgressOverviewProgramManagerViewTest(TestCase):
 
         response = self.client.get(self.url)
 
-        expected_redirect_url = reverse('outside_scores_encodings_period')
-        self.assertRedirects(response, expected_redirect_url)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse('outside_scores_encodings_period'))
 
     def test_assert_template_used(self):
         response = self.client.get(self.url)
