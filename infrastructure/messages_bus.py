@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Callable, Dict, List
+from typing import Callable, Dict
 
 from ddd.logic.application.commands import (
     ApplyOnVacantCourseCommand,
@@ -170,6 +170,7 @@ from ddd.logic.shared_kernel.language.commands import GetLanguageCommand, Search
 from ddd.logic.shared_kernel.language.use_case.read.get_language_service import get_language
 from ddd.logic.shared_kernel.language.use_case.read.search_languages_service import search_languages
 from education_group.ddd.repository.training import TrainingRepository
+from infrastructure import AbstractMessageBusCommands, load_message_bus_instance
 from infrastructure.application.repository.applicant import ApplicantRepository
 from infrastructure.application.repository.application import ApplicationRepository
 from infrastructure.application.repository.application_calendar import ApplicationCalendarRepository
@@ -185,6 +186,8 @@ from infrastructure.encodage_de_notes.encodage.domain.service.historiser_notes i
 from infrastructure.encodage_de_notes.encodage.domain.service.notifier_encodage_notes import NotifierEncodageNotes
 from infrastructure.encodage_de_notes.encodage.repository.note_etudiant import NoteEtudiantRepository as \
     NoteEtudiantGestionnaireRepository
+from infrastructure.encodage_de_notes.shared_kernel.repository.encoder_notes_rapport import \
+    EncoderNotesRapportRepository
 from infrastructure.encodage_de_notes.shared_kernel.service.attribution_enseignant import \
     AttributionEnseignantTranslator
 from infrastructure.encodage_de_notes.shared_kernel.service.inscription_examen import InscriptionExamenTranslator
@@ -205,8 +208,6 @@ from infrastructure.encodage_de_notes.soumission.repository.note_etudiant import
 from infrastructure.encodage_de_notes.soumission.repository.responsable_de_notes import ResponsableDeNotesRepository
 from infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class import \
     StudentEnrollmentsTranslator
-from infrastructure.encodage_de_notes.shared_kernel.repository.encoder_notes_rapport import \
-    EncoderNotesRapportRepository
 from infrastructure.learning_unit.domain.service.tutor_distributed_to_class import TutorAssignedToClassTranslator
 from infrastructure.learning_unit.repository.effective_class import EffectiveClassRepository
 from infrastructure.learning_unit.repository.entity import UclEntityRepository
@@ -223,7 +224,7 @@ from program_management.ddd.service.read.get_report_service import get_report
 from program_management.ddd.service.write.bulk_update_link_service import bulk_update_and_postpone_links
 
 
-class MessageBus:
+class MessageBusCommands(AbstractMessageBusCommands):
     command_handlers = {
         CreateLearningUnitCommand: lambda cmd: create_learning_unit(
             cmd, LearningUnitRepository(), UclEntityRepository()
@@ -485,11 +486,5 @@ class MessageBus:
         ),
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 
-    def invoke(self, command: CommandRequest) -> ApplicationServiceResult:
-        return self.command_handlers[command.__class__](command)
 
-    def invoke_multiple(self, commands: List['CommandRequest']) -> List[ApplicationServiceResult]:
-        return [self.invoke(command) for command in commands]
-
-
-message_bus_instance = MessageBus()
+message_bus_instance = load_message_bus_instance('message_bus')
