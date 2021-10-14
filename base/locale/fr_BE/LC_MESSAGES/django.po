@@ -2357,7 +2357,7 @@ msgid "Scores exam submission"
 msgstr "Encodage de notes"
 
 msgid "Scores must be between 0 and 20"
-msgstr "Les scores doivent être compris entre 0 et 20"
+msgstr "Les notes doivent être comprises entre 0 et 20"
 
 msgid "Scores responsibles"
 msgstr "Responsables de notes"

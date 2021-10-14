@@ -23,23 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from decimal import *
 
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.db.models import When, Case, Q, Sum, Count, IntegerField, F, OuterRef, Subquery, Exists
 from django.utils.translation import gettext as _
 
-from attribution.models import attribution
-from base.models import person, session_exam_deadline, \
-    academic_year as academic_yr, education_group_year
+from base.models import person
 from base.models.enums import exam_enrollment_justification_type as justification_types
 from base.models.enums import exam_enrollment_state as enrollment_states
-from base.models.enums.exam_enrollment_justification_type import JustificationTypes
 from base.models.exceptions import JustificationValueException
 from base.models.utils.admin_extentions import remove_delete_action
 from osis_common.models.osis_model_admin import OsisModelAdmin
-from base.models.student_specific_profile import StudentSpecificProfile
 
 SCORE_BETWEEN_0_AND_20 = _("Scores must be between 0 and 20")
 
