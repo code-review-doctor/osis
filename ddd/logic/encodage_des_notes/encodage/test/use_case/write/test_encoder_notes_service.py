@@ -473,12 +473,12 @@ class EncoderNoteTest(SimpleTestCase):
 
     @mock.patch("infrastructure.messages_bus.NoteEtudiantGestionnaireRepository")
     def test_should_sauvegarder_note_meme_si_autre_note_en_erreur(self, mock_note_repo):
+        note = NoteManquanteEtudiantFactory()
+        self.repository.save(note)
         appels_save = []
         fake_repo = NoteEtudiantInMemoryRepository()
         fake_repo.save = lambda *args, **kwargs: appels_save.append(1)
         mock_note_repo.return_value = fake_repo
-        note = NoteManquanteEtudiantFactory()
-        self.repository.save(note)
         cmd = EncoderNotesCommand(
             matricule_fgs_gestionnaire=self.matricule_gestionnaire,
             notes_encodees=[

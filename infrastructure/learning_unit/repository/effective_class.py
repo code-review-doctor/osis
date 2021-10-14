@@ -26,7 +26,8 @@
 import itertools
 from typing import Optional, List, Set
 
-from django.db.models import F, QuerySet, Q
+from django.db.models import F, QuerySet, Q, Value
+from django.db.models.functions import Concat
 
 from base.models.campus import Campus
 from base.models.enums import learning_component_year_type
@@ -91,7 +92,9 @@ class EffectiveClassRepository(IEffectiveClassRepository):
                 learning_unit_code=effective_class['learning_unit_code'],
                 learning_unit_year=effective_class['learning_unit_year'],
                 title_fr=effective_class['title_fr'],
+                full_title_fr=effective_class['full_title_fr'],
                 title_en=effective_class['title_en'],
+                full_title_en=effective_class['full_title_en'],
                 teaching_place_uuid=effective_class['teaching_place_uuid'],
                 derogation_quadrimester=effective_class['derogation_quadrimester'],
                 session_derogation=effective_class['session_derogation'],
@@ -209,7 +212,17 @@ def _annotate_queryset(qs: QuerySet) -> QuerySet:
         session_derogation=F('session'),
         volume_q1=F('hourly_volume_partial_q1'),
         volume_q2=F('hourly_volume_partial_q2'),
-        class_type=F('learning_component_year__type')
+        class_type=F('learning_component_year__type'),
+        full_title_fr=Concat(
+            'learning_component_year__learning_unit_year__learning_container_year__common_title',
+            Value(' - '),
+            'title_fr',
+        ),
+        full_title_en=Concat(
+            'learning_component_year__learning_unit_year__learning_container_year__common_title_english',
+            Value(' - '),
+            'title_en',
+        ),
     )
 
 
@@ -225,7 +238,9 @@ def _values_queryset(qs: QuerySet) -> QuerySet:
         'session_derogation',
         'volume_q1',
         'volume_q2',
-        'class_type'
+        'class_type',
+        'full_title_fr',
+        'full_title_en',
     )
 
 
