@@ -231,8 +231,15 @@ components:
         learning_unit_acronym:
           type: string
           example: "LPSP1210"
+        year:
+          type: integer
+          example: 2020
+          description: 'Year of learning unit'
         full_name:
           type: string
           example: "Martin Tom"
+        global_id:
+          type: string
+          example: "00015847"
 security:
   - Token: []

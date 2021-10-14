@@ -24,7 +24,7 @@
 #
 ##############################################################################
 
-from django.db.models import F, Value
+from django.db.models import F, Value, Case, When, CharField
 from django.db.models.functions import Concat
 from rest_framework import generics
 from rest_framework.response import Response
@@ -32,6 +32,7 @@ from rest_framework.response import Response
 from assessments.api.serializers.scores_responsible import ScoreResponsiblePersonListSerializer
 from assessments.models.score_responsible import ScoreResponsible
 from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
+from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 
 
 class ScoreResponsibleList(LanguageContextSerializerMixin, generics.ListAPIView):
@@ -45,10 +46,35 @@ class ScoreResponsibleList(LanguageContextSerializerMixin, generics.ListAPIView)
     def list(self, request, *args, **kwargs):
         codes_unites_enseignement = self.request.GET.getlist('learning_unit_codes')
         queryset = ScoreResponsible.objects.all().select_related('learning_unit_year', 'tutor') \
-            .annotate(acronym=F('learning_unit_year__acronym')) \
+            .annotate(
+            learning_unit_full_acronym=Case(
+                When(
+                    learning_class_year__learning_component_year__type=LECTURING,
+                    then=Concat(
+                        'learning_unit_year__acronym',
+                        Value('-'),
+                        'learning_class_year__acronym',
+                        output_field=CharField()
+                    )
+                ),
+                When(
+                    learning_class_year__learning_component_year__type=PRACTICAL_EXERCISES,
+                    then=Concat(
+                        'learning_unit_year__acronym',
+                        Value('_'),
+                        'learning_class_year__acronym',
+                        output_field=CharField()
+                    )
+                ),
+                default=F('learning_unit_year__acronym'),
+                output_field=CharField()
+            ),
+        ) \
             .annotate(full_name=Concat(F('tutor__person__last_name'), Value(' '), F('tutor__person__first_name'))) \
-            .annotate(year=F('learning_unit_year__academic_year__year'))\
+            .annotate(year=F('learning_unit_year__academic_year__year')) \
+            .annotate(global_id=F('tutor__person__global_id')) \
             .filter(year=self.request.GET['year']) \
-            .filter(acronym__in=codes_unites_enseignement)
+            .filter(learning_unit_year__acronym__in=codes_unites_enseignement)
         serializer = ScoreResponsiblePersonListSerializer(list(queryset), many=True)
+        print(serializer.data)
         return Response(serializer.data)

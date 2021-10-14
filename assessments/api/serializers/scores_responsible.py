@@ -58,5 +58,8 @@ class ScoresResponsibleListSerializer(serializers.Serializer):
 
 
 class ScoreResponsiblePersonListSerializer(serializers.Serializer):
-    learning_unit_acronym = serializers.CharField(source='acronym')
+    learning_unit_acronym = serializers.CharField(source='learning_unit_full_acronym')
+    year = serializers.IntegerField()
     full_name = serializers.CharField()
+    global_id = serializers.CharField()
+
