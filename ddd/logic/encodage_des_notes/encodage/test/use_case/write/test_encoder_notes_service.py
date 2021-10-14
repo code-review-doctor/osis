@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import contextlib
 import datetime
 from decimal import Decimal
 from unittest import mock
@@ -40,6 +41,7 @@ from ddd.logic.encodage_des_notes.encodage.domain.validator.exceptions import No
 from ddd.logic.encodage_des_notes.encodage.dtos import CohorteGestionnaireDTO
 from ddd.logic.encodage_des_notes.encodage.test.factory.note_etudiant import NoteManquanteEtudiantFactory, \
     NoteDecimalesAuthorisees
+from ddd.logic.encodage_des_notes.shared_kernel.domain.model.encoder_notes_rapport import IdentiteEncoderNotesRapport
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO, PeriodeEncodageNotesDTO
 from ddd.logic.encodage_des_notes.shared_kernel.validator.exceptions import DateEcheanceNoteAtteinteException, \
     NomaNeCorrespondPasEmailException, NoteDecimaleNonAutoriseeException, PeriodeEncodageNotesFermeeException
@@ -52,6 +54,8 @@ from infrastructure.encodage_de_notes.encodage.domain.service.in_memory.historis
 from infrastructure.encodage_de_notes.encodage.domain.service.in_memory.notifier_encodage_notes import \
     NotifierEncodageNotesInMemory
 from infrastructure.encodage_de_notes.encodage.repository.in_memory.note_etudiant import NoteEtudiantInMemoryRepository
+from infrastructure.encodage_de_notes.shared_kernel.repository.in_memory.encoder_notes_rapport import \
+    EncoderNotesRapportInMemoryRepository
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.inscription_examen import \
     InscriptionExamenTranslatorInMemory
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.periode_encodage_notes import \
@@ -87,6 +91,8 @@ class EncoderNoteTest(SimpleTestCase):
         self.notifier_notes_domain_service.notifications.clear()
         self.historiser_note_service = HistoriserEncodageNotesServiceInMemory()
         self.historiser_note_service.appels.clear()
+        self.rapport_repository = EncoderNotesRapportInMemoryRepository()
+        self.rapport_repository.reset()
 
         self.__mock_service_bus()
 
@@ -98,7 +104,8 @@ class EncoderNoteTest(SimpleTestCase):
             CohortesDuGestionnaireTranslator=lambda: self.cohortes_gestionnaire_trans,
             NotifierEncodageNotes=lambda: self.notifier_notes_domain_service,
             HistoriserEncodageNotesService=lambda: self.historiser_note_service,
-            InscriptionExamenTranslator=lambda: self.inscription_examen_trans
+            InscriptionExamenTranslator=lambda: self.inscription_examen_trans,
+            EncoderNotesRapportRepository=lambda: self.rapport_repository
         )
         message_bus_patcher.start()
         self.addCleanup(message_bus_patcher.stop)
@@ -357,6 +364,58 @@ class EncoderNoteTest(SimpleTestCase):
         self.message_bus.invoke(self.cmd)
         self.assertEqual(len(self.historiser_note_service.appels), 1)
 
+    def test_should_ajouter_notes_enregistree_dans_rapport(self):
+        self.message_bus.invoke(self.cmd)
+
+        rapport = self.rapport_repository.get(IdentiteEncoderNotesRapport(transaction_id=self.cmd.transaction_id))
+
+        notes_enregistrees = rapport.get_notes_enregistrees()
+        self.assertEqual(len(notes_enregistrees), 1)
+        self.assertEqual(notes_enregistrees[0].noma, self.note.noma)
+        self.assertEqual(notes_enregistrees[0].code_unite_enseignement, self.note.code_unite_enseignement)
+        self.assertEqual(notes_enregistrees[0].numero_session, self.note.entity_id.numero_session)
+        self.assertEqual(notes_enregistrees[0].annee_academique, self.note.entity_id.annee_academique)
+
+    def test_should_ajouter_notes_non_enregistree_dans_rapport(self):
+        note1 = NoteManquanteEtudiantFactory()
+        self.repository.save(note1)
+
+        note2 = NoteManquanteEtudiantFactory()
+        self.repository.save(note2)
+
+        cmd = EncoderNotesCommand(
+            matricule_fgs_gestionnaire=self.matricule_gestionnaire,
+            notes_encodees=[
+                EncoderNoteCommand(  # Email ne correspond pas au noma
+                    noma=note1.noma,
+                    email="email@ne_correspond_pas.be",
+                    code_unite_enseignement=note1.code_unite_enseignement,
+                    note="19",
+                ),
+                EncoderNoteCommand(  # Note inchangee
+                    noma=note2.noma,
+                    email=note2.email,
+                    code_unite_enseignement=note2.code_unite_enseignement,
+                    note="",
+                ),
+            ]
+        )
+
+        with contextlib.suppress(MultipleBusinessExceptions):
+            self.message_bus.invoke(cmd)
+
+        rapport = self.rapport_repository.get(IdentiteEncoderNotesRapport(transaction_id=cmd.transaction_id))
+
+        self.assertEqual(len(rapport.get_notes_enregistrees()), 0)
+
+        notes_non_enregistrees = rapport.get_notes_non_enregistrees()
+        self.assertEqual(len(notes_non_enregistrees), 1)
+        self.assertEqual(notes_non_enregistrees[0].noma, note1.noma)
+        self.assertEqual(notes_non_enregistrees[0].code_unite_enseignement, note1.code_unite_enseignement)
+        self.assertEqual(notes_non_enregistrees[0].numero_session, note1.entity_id.numero_session)
+        self.assertEqual(notes_non_enregistrees[0].annee_academique, note1.entity_id.annee_academique)
+        self.assertEqual(notes_non_enregistrees[0].cause, str(NomaNeCorrespondPasEmailException().message))
+
     def test_should_afficher_rapport_plusieurs_notes_erreurs(self):
         note1 = NoteManquanteEtudiantFactory()
         self.repository.save(note1)
@@ -414,12 +473,12 @@ class EncoderNoteTest(SimpleTestCase):
 
     @mock.patch("infrastructure.messages_bus.NoteEtudiantGestionnaireRepository")
     def test_should_sauvegarder_note_meme_si_autre_note_en_erreur(self, mock_note_repo):
+        note = NoteManquanteEtudiantFactory()
+        self.repository.save(note)
         appels_save = []
         fake_repo = NoteEtudiantInMemoryRepository()
         fake_repo.save = lambda *args, **kwargs: appels_save.append(1)
         mock_note_repo.return_value = fake_repo
-        note = NoteManquanteEtudiantFactory()
-        self.repository.save(note)
         cmd = EncoderNotesCommand(
             matricule_fgs_gestionnaire=self.matricule_gestionnaire,
             notes_encodees=[

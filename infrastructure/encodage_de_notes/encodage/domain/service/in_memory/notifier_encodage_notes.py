@@ -52,6 +52,7 @@ class NotifierEncodageNotesInMemory(INotifierEncodageNotes):
             signaletique_repo: 'ISignaletiquePersonneTranslator',
             signaletique_etudiant_repo: 'ISignaletiqueEtudiantTranslator',
             adresse_feuille_de_notes_repo: 'IAdresseFeuilleDeNotesRepository',
+            inscr_exam_translator: 'IInscriptionExamenTranslator',
     ) -> None:
         cls.notifications.append(
             {
