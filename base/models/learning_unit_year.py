@@ -61,7 +61,7 @@ from education_group import publisher
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin, SerializableModelManager, \
     SerializableQuerySet
 
-MIN_VALUE_FOR_DECIMAL_SCORE = 15
+CREDITS_FOR_DECIMAL_SCORES = 15
 
 AUTHORIZED_REGEX_CHARS = "$*+.^"
 REGEX_ACRONYM_CHARSET = "[A-Z0-9" + AUTHORIZED_REGEX_CHARS + "]+"
@@ -692,7 +692,7 @@ class LearningUnitYear(SerializableModel):
 
     @property
     def decimal_scores(self):
-        if self.credits >= MIN_VALUE_FOR_DECIMAL_SCORE:
+        if self.credits >= CREDITS_FOR_DECIMAL_SCORES:
             return True
         return False
 
