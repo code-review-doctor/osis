@@ -76,5 +76,4 @@ class ScoreResponsibleList(LanguageContextSerializerMixin, generics.ListAPIView)
             .filter(year=self.request.GET['year']) \
             .filter(learning_unit_year__acronym__in=codes_unites_enseignement)
         serializer = ScoreResponsiblePersonListSerializer(list(queryset), many=True)
-        print(serializer.data)
         return Response(serializer.data)
