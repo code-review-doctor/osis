@@ -92,6 +92,7 @@ INSTALLED_APPS = (
     'reversion',
     'django.contrib.gis',
     'ddd',
+    'infrastructure',
     'osis_document',
     'osis_history',
     'osis_signature',
