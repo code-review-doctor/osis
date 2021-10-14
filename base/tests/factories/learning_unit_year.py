@@ -89,7 +89,6 @@ class LearningUnitYearFactory(DjangoModelFactory):
 
     internship_subtype = factory.LazyAttribute(_generate_internship_subtype)
     credits = factory.fuzzy.FuzzyDecimal(MINIMUM_CREDITS, MAXIMUM_CREDITS, precision=0)
-    decimal_scores = False
     status = True
     session = factory.Iterator(learning_unit_year_session.LEARNING_UNIT_YEAR_SESSION, getter=operator.itemgetter(0))
     quadrimester = factory.Iterator(quadrimesters.LearningUnitYearQuadrimester.choices(),
@@ -146,7 +145,6 @@ class LearningUnitYearFakerFactory(DjangoModelFactory):
     subtype = factory.Iterator(learning_unit_year_subtypes.LEARNING_UNIT_YEAR_SUBTYPES, getter=operator.itemgetter(0))
     internship_subtype = factory.Iterator(internship_subtypes.INTERNSHIP_SUBTYPES, getter=operator.itemgetter(0))
     credits = factory.fuzzy.FuzzyDecimal(MINIMUM_CREDITS, MAXIMUM_CREDITS, precision=0)
-    decimal_scores = False
     status = True
     session = factory.Iterator(learning_unit_year_session.LEARNING_UNIT_YEAR_SESSION, getter=operator.itemgetter(0))
     quadrimester = factory.Iterator(quadrimesters.LearningUnitYearQuadrimester.choices(),
