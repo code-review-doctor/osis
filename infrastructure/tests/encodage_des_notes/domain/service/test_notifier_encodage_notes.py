@@ -54,8 +54,6 @@ class TestEnvoyerMailEncodageComplet(SimpleTestCase):
             entity_id__matricule_fgs_gestionnaire="00321234"
         )
         self.note_etudiant_repo = NoteEtudiantInMemoryRepository()
-        self.note_etudiant_repo.entities.clear()
-        self.addCleanup(self.note_etudiant_repo.entities.clear)
 
         self.attribution_translator = AttributionEnseignantTranslatorInMemory()
         self.inscr_exam_translator = InscriptionExamenTranslatorInMemory()
@@ -150,6 +148,7 @@ class TestEnvoyerMailEncodageComplet(SimpleTestCase):
         )
 
         self.assertFalse(mock_send_mail.called)
+        self.note_etudiant_repo.delete(note_manquante.entity_id)
 
     def test_should_envoyer_mail_correction_si_encodage_deja_complet_avant_encodage(self, mock_send_mail):
         notes_encodees = [self.notes_ldroi1001[0].entity_id]
