@@ -2634,6 +2634,12 @@ msgstr ""
 
 #, python-format
 msgid ""
+"The effective class %(acronym)s has %(count)d enrollments for the year "
+"%(year)s"
+msgstr "La classe %(acronym)s fait l'objet de %(count)d inscription(s) pour l'année %(year)s"
+
+#, python-format
+msgid ""
 "The entity %(entity_acronym)s does not exist for the selected academic year "
 "%(academic_year)s"
 msgstr ""

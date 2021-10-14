@@ -37,6 +37,7 @@ from osis_common.models.osis_model_admin import OsisModelAdmin
 class ScoreSheetAddressAdmin(OsisModelAdmin):
     list_display = (
         'offer_acronym',
+        'cohort_name',
         'entity_address_choice',
         'location',
         'postal_code',
@@ -46,7 +47,7 @@ class ScoreSheetAddressAdmin(OsisModelAdmin):
         'email',
     )
     search_fields = ['location', 'education_group__educationgroupyear__acronym']
-    list_filter = ('entity_address_choice', )
+    list_filter = ('entity_address_choice', 'cohort_name',)
 
 
 class ScoreSheetAddress(models.Model):

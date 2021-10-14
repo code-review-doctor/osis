@@ -28,6 +28,7 @@ from django.urls import path, register_converter
 
 from assessments.views import score_encoding
 from assessments.views.address.score_sheet import ScoreSheetAddressView, FirstYearBachelorScoreSheetAddressView
+from assessments.views.address.search import OffersSearch
 from assessments.views.program_manager import pgm_manager_administration as pgm_manager_administration_new
 from assessments.views.program_manager.pgm_manager_administration import \
     ProgramManagerListView as ProgramManagerListViewNew, ProgramManagerDeleteView as ProgramManagerDeleteViewNew, \
@@ -35,6 +36,7 @@ from assessments.views.program_manager.pgm_manager_administration import \
     MainProgramManagerUpdateView as MainProgramManagerUpdateViewNew, \
     MainProgramManagerPersonUpdateView as MainProgramManagerPersonUpdateViewNew, \
     ProgramManagerPersonDeleteView as ProgramManagerPersonDeleteViewNew, PersonAutocomplete
+from assessments.views.program_manager.score_encoding_progress_overview import CodeUniteEnseignementAutocomplete
 from assessments.views.program_manager.score_search import ScoreSearchFormView
 from assessments.views.program_manager.scores_responsible import ScoresResponsiblesSearch, SelectScoreResponsible
 from assessments.views.score_encoding import LearningUnitScoreEncodingView, LearningUnitScoreEncodingFormView, \
@@ -53,6 +55,11 @@ urlpatterns = [
         # New URL's
         path('overview', ScoreEncodingProgressOverviewView.as_view(), name="score_encoding_progress_overview"),
         path('search', ScoreSearchFormView.as_view(), name='score_search'),
+        path(
+            'search_learning_unit_code',
+            CodeUniteEnseignementAutocomplete.as_view(),
+            name='learning-unit-code-autocomplete',
+        ),
         path('<str:learning_unit_code>/', include(([
             path('', LearningUnitScoreEncodingView.as_view(), name='learning_unit_score_encoding'),
             path('form', LearningUnitScoreEncodingFormView.as_view(), name='learning_unit_score_encoding_form'),
@@ -68,6 +75,7 @@ urlpatterns = [
     ])),
 
     url(r'^offers/', include([
+        url(r'^new/$', OffersSearch.as_view(), name='offers_search_new'),
         path('<acronym:acronym>/', include([
             url(r'^score_encoding/$', ScoreSheetAddressView.as_view(), name='score_sheet_address'),
             url(
