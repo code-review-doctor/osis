@@ -29,7 +29,7 @@ from typing import List
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
 from django.db import models
-from django.db.models import Q, When, CharField, Value, Case, Subquery, OuterRef, F, fields
+from django.db.models import Q, When, CharField, Value, Case, Subquery, OuterRef, F, fields, Exists
 from django.db.models.functions import Concat
 from django.db.models.signals import post_delete
 from django.dispatch.dispatcher import receiver
@@ -58,6 +58,7 @@ from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit import LEARNING_UNIT_ACRONYM_REGEX_MODEL
 from base.models.prerequisite_item import PrerequisiteItem
 from education_group import publisher
+from learning_unit.models.learning_class_year import LearningClassYear
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin, SerializableModelManager, \
     SerializableQuerySet
 
@@ -150,6 +151,9 @@ class LearningUnitYearQuerySet(SerializableQuerySet):
 
     def annotate_full_title(self):
         return self.annotate_full_title_class_method(self)
+
+    def annotate_has_classes(self):
+        return self.annotate_has_classes_class_method(self)
 
     @classmethod
     def annotate_full_title_class_method(cls, queryset):
@@ -281,6 +285,14 @@ class LearningUnitYearQuerySet(SerializableQuerySet):
                 When(practical_volume_available__isnull=False, then='practical_volume_available'),
                 default=Decimal(0.0)
             ),
+        )
+
+    @classmethod
+    def annotate_has_classes_class_method(cls, queryset):
+        return queryset.annotate(
+            has_classes=Exists(
+                LearningClassYear.objects.filter(learning_component_year__learning_unit_year=OuterRef('id'))
+            )
         )
 
 

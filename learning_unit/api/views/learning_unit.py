@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 ##############################################################################
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
-from django_filters import rest_framework as filters
+from django_filters import rest_framework as filters, Filter
 from rest_framework import generics
 
 from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
@@ -34,8 +34,19 @@ from learning_unit.api.serializers.learning_unit import LearningUnitDetailedSeri
     LearningUnitTitleSerializer, ExternalLearningUnitDetailedSerializer
 
 
+class ListFilter(Filter):
+    def filter(self, qs, value):
+        if not value:
+            return qs
+
+        self.lookup_expr = 'in'
+        values = value.split(',')
+        return super(ListFilter, self).filter(qs, values)
+
+
 class LearningUnitFilter(filters.FilterSet):
-    acronym_like = filters.CharFilter(field_name="acronym", lookup_expr='icontains')
+    learning_unit_codes = ListFilter(field_name='acronym')
+    acronym_like = filters.CharFilter(field_name='acronym', lookup_expr='icontains')
     year = filters.NumberFilter(field_name="academic_year__year")
     campus = filters.CharFilter(field_name='campus__name', lookup_expr='icontains')
     stage_dimona = filters.BooleanFilter(field_name='stage_dimona')
@@ -58,7 +69,8 @@ class LearningUnitList(LanguageContextSerializerMixin, generics.ListAPIView):
         'learning_container_year'
     ).prefetch_related(
         'learning_container_year__requirement_entity__entityversion_set',
-    ).annotate_full_title()
+    ).annotate_full_title().annotate_has_classes()
+
     serializer_class = LearningUnitSerializer
     filterset_class = LearningUnitFilter
     search_fields = None
@@ -87,7 +99,8 @@ class LearningUnitDetailed(LanguageContextSerializerMixin, generics.RetrieveAPIV
         ).prefetch_related(
             'learning_container_year__requirement_entity__entityversion_set',
             'learningcomponentyear_set',
-        ).annotate_full_title()
+        ).annotate_full_title().annotate_has_classes()
+
         luy = get_object_or_404(
             LearningUnitYearQuerySet.annotate_entities_allocation_and_requirement_acronym(queryset),
             acronym__iexact=acronym,

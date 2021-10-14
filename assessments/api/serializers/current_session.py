@@ -1,3 +1,4 @@
+##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -22,22 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.urls import path
+from rest_framework import serializers
 
-from assessments.api.views.assessments import CurrentSessionView
-from assessments.api.views.score_responsibles import ScoreResponsibleList
-from assessments.api.views.score_sheet_xls_export import ScoreSheetXLSExportAPIView
-from assessments.api.views.score_sheets_pdf_export import ScoreSheetsPDFExportAPIView
 
-app_name = "assessments_api_v1"
-urlpatterns = [
-    path('pdf_export', ScoreSheetsPDFExportAPIView.as_view(), name=ScoreSheetsPDFExportAPIView.name),
-    path(
-        '<str:learning_unit_code>/xls_export',
-        ScoreSheetXLSExportAPIView.as_view(),
-        name=ScoreSheetXLSExportAPIView.name,
-    ),
-    path('current_session/', CurrentSessionView.as_view(),
-         name=CurrentSessionView.name),
-    path('score_responsibles/', ScoreResponsibleList.as_view(), name=ScoreResponsibleList.name),
-]
+class CurrentSessionSerializer(serializers.Serializer):
+    academic_year = serializers.CharField()
+    month_session_name = serializers.CharField()

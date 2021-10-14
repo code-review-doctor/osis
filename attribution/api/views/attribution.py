@@ -35,6 +35,7 @@ from django.utils.functional import cached_property
 from rest_framework import generics
 from rest_framework.response import Response
 
+from assessments.models.score_responsible import ScoreResponsible
 from attribution.api.serializers.attribution import AttributionSerializer
 from attribution.calendar.access_schedule_calendar import AccessScheduleCalendar
 from attribution.models.attribution_charge_new import AttributionChargeNew
@@ -191,7 +192,7 @@ class AttributionListView(generics.ListAPIView):
                     ),
 
                 ).values('volume_global')[:1],
-            ),
+            )
         )
         return attributions
 

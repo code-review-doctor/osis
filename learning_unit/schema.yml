@@ -58,6 +58,12 @@ paths:
           name: stage_dimona
           schema:
             type: boolean
+        - in: query
+          name: learning_unit_codes
+          schema:
+            type: string
+          style: form
+          explode: true
         - $ref: '#/components/parameters/Accept-Language'
         - $ref: '#/components/parameters/X-User-FirstName'
         - $ref: '#/components/parameters/X-User-LastName'

@@ -1,3 +1,4 @@
+##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -22,22 +23,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.urls import path
+from rest_framework import generics
 
-from assessments.api.views.assessments import CurrentSessionView
-from assessments.api.views.score_responsibles import ScoreResponsibleList
-from assessments.api.views.score_sheet_xls_export import ScoreSheetXLSExportAPIView
-from assessments.api.views.score_sheets_pdf_export import ScoreSheetsPDFExportAPIView
+from assessments.api.serializers.current_session import CurrentSessionSerializer
+from base.models import session_exam_calendar
+from base.models.academic_year import AcademicYear
 
-app_name = "assessments_api_v1"
-urlpatterns = [
-    path('pdf_export', ScoreSheetsPDFExportAPIView.as_view(), name=ScoreSheetsPDFExportAPIView.name),
-    path(
-        '<str:learning_unit_code>/xls_export',
-        ScoreSheetXLSExportAPIView.as_view(),
-        name=ScoreSheetXLSExportAPIView.name,
-    ),
-    path('current_session/', CurrentSessionView.as_view(),
-         name=CurrentSessionView.name),
-    path('score_responsibles/', ScoreResponsibleList.as_view(), name=ScoreResponsibleList.name),
-]
+
+class CurrentSessionView(generics.RetrieveAPIView):
+    name = 'current_session'
+    serializer_class = CurrentSessionSerializer
+
+    def get_object(self):
+        current_event = session_exam_calendar.current_session_exam()
+        current_academic_year = AcademicYear.objects.get(year=current_event.authorized_target_year)
+        return {
+            'academic_year': str(current_academic_year),
+            'month_session_name': current_event.month_session_name()
+        }
