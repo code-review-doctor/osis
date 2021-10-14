@@ -61,7 +61,7 @@ def build_xls(feuille_de_notes_serialized):
     _define_worksheet_column_size(worksheet)
     _build_headers(worksheet)
     _build_rows(worksheet, feuille_de_notes_serialized)
-
+    worksheet.auto_filter.ref = "A11:Q{}".format(str(worksheet.max_row))
     return save_virtual_workbook(workbook)
 
 
