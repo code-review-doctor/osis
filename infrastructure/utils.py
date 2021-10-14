@@ -51,9 +51,9 @@ class MessageBus:
         return [self.invoke(command) for command in commands]
 
 
-def load_message_bus_instance(bus_type):
+def load_message_bus_instance(bus_type: str):
     # Load `bus_type` python files of installed apps
-    autodiscover_modules(bus_type)
+    autodiscover_modules('infrastructure.' + bus_type)
 
     command_handlers = {}
     for kls in AbstractMessageBusCommands.__subclasses__():
