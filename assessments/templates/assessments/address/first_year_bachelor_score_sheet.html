@@ -205,8 +205,8 @@
         $('#id_entity').change(loadEntityAddress);
 
         function loadEntityAddress(e) {
-            var entity_version_acronym = $('#id_entity').val();
-            if (entity_version_acronym != "") {
+            var entity_version_acronym = $('#id_entity :selected').text().split(' - ')[0];
+            if ($('#id_entity').val() !== '') {
                 $.ajax({
                     url: "/entities/" + entity_version_acronym + "/address/",
                     data: null,
@@ -215,7 +215,7 @@
                         if (!data.entity_version_exists_now) {
                             showEntityVersionNotExistsMsg();
                         }
-                        if (Object.keys(data.address).length != 0) {
+                        if (Object.keys(data.address).length !== 0) {
                             disableFormInputs();
                             setFormFieldsValues(data);
                         } else {

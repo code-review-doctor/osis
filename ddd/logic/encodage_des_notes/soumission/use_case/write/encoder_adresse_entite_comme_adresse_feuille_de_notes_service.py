@@ -29,8 +29,6 @@ from ddd.logic.encodage_des_notes.soumission.domain.service\
     EntiteAdresseFeuilleDeNotesPremiereAnneeDeBachelierEstDifferenteDeCelleDuBachelier
 from ddd.logic.encodage_des_notes.soumission.domain.service.encoder_adresse_feuille_de_notes import \
     EncoderAdresseFeuilleDeNotesDomainService
-from ddd.logic.encodage_des_notes.soumission.domain.service.entites_adresse_feuille_de_notes import \
-    EntiteAdresseFeuilleDeNotes
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_entites_cohorte import IEntitesCohorteTranslator
 from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_notes import \
     IAdresseFeuilleDeNotesRepository
@@ -44,15 +42,10 @@ def encoder_adresse_entite_comme_adresse_feuille_de_notes(
         entites_cohorte_translator: 'IEntitesCohorteTranslator'
 ) -> 'IdentiteAdresseFeuilleDeNotes':
     EntiteAdresseFeuilleDeNotesPremiereAnneeDeBachelierEstDifferenteDeCelleDuBachelier().verifier(cmd, repo)
-    EntiteAdresseFeuilleDeNotes().verifier_est_valide(
-        cmd.nom_cohorte,
-        cmd.entite,
-        entite_repository,
-        entites_cohorte_translator
-    )
 
     return EncoderAdresseFeuilleDeNotesDomainService().encoder_adresse_entite_comme_adresse(
         cmd,
         repo,
-        entite_repository
+        entite_repository,
+        entites_cohorte_translator
     )

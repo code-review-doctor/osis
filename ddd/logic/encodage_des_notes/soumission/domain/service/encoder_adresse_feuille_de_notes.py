@@ -25,6 +25,7 @@
 ##############################################################################
 import attr
 
+from assessments.models.enums.score_sheet_address_choices import ScoreSheetAddressEntityType
 from ddd.logic.encodage_des_notes.soumission.builder.adresse_feuille_de_notes_builder import \
     AdresseFeuilleDeNotesBuilder
 from ddd.logic.encodage_des_notes.soumission.builder.adresse_feuille_de_notes_identity_builder import \
@@ -32,10 +33,14 @@ from ddd.logic.encodage_des_notes.soumission.builder.adresse_feuille_de_notes_id
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderAdresseFeuilleDeNotesSpecifique, \
     EncoderAdresseEntiteCommeAdresseFeuilleDeNotes, EcraserAdresseFeuilleDeNotesPremiereAnneeDeBachelier
 from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_notes import IdentiteAdresseFeuilleDeNotes
+from ddd.logic.encodage_des_notes.soumission.domain.service.entites_adresse_feuille_de_notes import \
+    EntiteAdresseFeuilleDeNotes
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_entites_cohorte import IEntitesCohorteTranslator
+from ddd.logic.encodage_des_notes.soumission.domain.validator.validators_by_business_action import \
+    EncoderAdresseFeuilleDeNotes
 from ddd.logic.encodage_des_notes.soumission.dtos import AdresseFeuilleDeNotesDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_notes import \
     IAdresseFeuilleDeNotesRepository
-from ddd.logic.shared_kernel.entite.builder.identite_entite_builder import IdentiteEntiteBuilder
 from ddd.logic.shared_kernel.entite.repository.entiteucl import IEntiteUCLRepository
 from osis_common.ddd import interface
 
@@ -63,9 +68,26 @@ class EncoderAdresseFeuilleDeNotesDomainService(interface.DomainService):
             cmd: EncoderAdresseEntiteCommeAdresseFeuilleDeNotes,
             repo: IAdresseFeuilleDeNotesRepository,
             entite_repository: 'IEntiteUCLRepository',
+            entites_cohorte_translator: 'IEntitesCohorteTranslator'
     ) -> 'IdentiteAdresseFeuilleDeNotes':
-        identite_entite = IdentiteEntiteBuilder().build_from_sigle(cmd.entite)
-        entite = entite_repository.get(identite_entite)
+        EncoderAdresseFeuilleDeNotes(
+            entite=cmd.entite
+        ).validate()
+
+        entites_possibles = EntiteAdresseFeuilleDeNotes.search(
+            cmd.nom_cohorte,
+            entite_repository,
+            entites_cohorte_translator
+        )
+
+        if cmd.entite == ScoreSheetAddressEntityType.ENTITY_ADMINISTRATION.value:
+            entite = entites_possibles.administration
+        elif cmd.entite == ScoreSheetAddressEntityType.ENTITY_MANAGEMENT.value:
+            entite = entites_possibles.gestion
+        elif cmd.entite == ScoreSheetAddressEntityType.ENTITY_ADMINISTRATION_PARENT.value:
+            entite = entites_possibles.administration_faculte
+        else:
+            entite = entites_possibles.gestion_faculte
 
         dto = AdresseFeuilleDeNotesDTO(
             nom_cohorte=cmd.nom_cohorte,
@@ -88,6 +110,9 @@ class EncoderAdresseFeuilleDeNotesDomainService(interface.DomainService):
             cmd: EncoderAdresseFeuilleDeNotesSpecifique,
             repo: IAdresseFeuilleDeNotesRepository,
     ) -> 'IdentiteAdresseFeuilleDeNotes':
+        EncoderAdresseFeuilleDeNotes(
+            entite=""
+        ).validate()
         dto = AdresseFeuilleDeNotesDTO(
             nom_cohorte=cmd.nom_cohorte,
             entite="",

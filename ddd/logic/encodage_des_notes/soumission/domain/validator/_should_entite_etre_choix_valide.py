@@ -1,3 +1,4 @@
+##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -14,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -22,24 +23,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import abc
-from typing import Set, List, Optional
 
 import attr
 
-from ddd.logic.shared_kernel.entite.domain.model.entiteucl import IdentiteUCLEntite
-from osis_common.ddd import interface
+from assessments.models.enums.score_sheet_address_choices import ScoreSheetAddressEntityType
+from base.ddd.utils.business_validator import BusinessValidator
+from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import EntiteNonValidePourAdresseException
 
 
 @attr.s(frozen=True, slots=True)
-class EntitesCohorteDTO:
-    administration = attr.ib(type=Optional[IdentiteUCLEntite])
-    gestion = attr.ib(type=Optional[IdentiteUCLEntite])
+class ShouldEntiteEtreChoixValide(BusinessValidator):
+    entite = attr.ib(type=str)
 
+    def validate(self, *args, **kwargs):
+        if not self.entite:
+            return
 
-class IEntitesCohorteTranslator(interface.DomainService):
-
-    @classmethod
-    @abc.abstractmethod
-    def search_entite_administration_et_gestion(cls, nom_cohorte: str) -> EntitesCohorteDTO:
-        raise NotImplementedError()
+        try:
+            ScoreSheetAddressEntityType[self.entite]
+        except KeyError:
+            raise EntiteNonValidePourAdresseException()

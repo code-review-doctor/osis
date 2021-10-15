@@ -27,6 +27,7 @@ from django.test import SimpleTestCase
 
 from base.models.enums.entity_type import EntityType
 from ddd.logic.encodage_des_notes.soumission.commands import GetChoixEntitesAdresseFeuilleDeNotesCommand
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_entites_cohorte import EntitesCohorteDTO
 from ddd.logic.shared_kernel.entite.dtos import EntiteDTO
 from ddd.logic.shared_kernel.entite.builder.identite_entite_builder import IdentiteEntiteBuilder
 from ddd.logic.shared_kernel.entite.tests.factory.entiteucl import INFOEntiteFactory, EPLEntiteFactory, SSTEntiteFactory
@@ -62,20 +63,27 @@ class TestGetChoixEntitesAdresseFeuilleDeNotes(SimpleTestCase):
         self.message_bus = message_bus_instance
 
     def test_should_return_entites_de_la_cohorte_si_celui_n_a_pas_de_parents_de_type_faculte(self):
-        self.entites_cohorte_translator.datas.append(IdentiteEntiteBuilder().build_from_sigle("EPL"))
+        self.entites_cohorte_translator.datas.append(EntitesCohorteDTO(
+            administration=IdentiteEntiteBuilder().build_from_sigle("EPL"),
+            gestion=IdentiteEntiteBuilder().build_from_sigle("EPL")
+        ))
 
         result = self.message_bus.invoke(self.cmd)
 
-        expected = [EntiteDTO(sigle="EPL", intitule="Ecole Polytechnique", sigle_parent="SST", type=EntityType.FACULTY)]
-        self.assertListEqual(result, expected)
+        self.assertEqual(result.administration.sigle, 'EPL')
+        self.assertEqual(result.gestion.sigle, 'EPL')
+        self.assertIsNone(result.administration_faculte)
+        self.assertIsNone(result.gestion_faculte)
 
     def test_should_return_entites_de_la_cohorte_avec_son_parent_de_type_de_faculte(self):
-        self.entites_cohorte_translator.datas.append(IdentiteEntiteBuilder().build_from_sigle("INFO"))
+        self.entites_cohorte_translator.datas.append(EntitesCohorteDTO(
+            administration=IdentiteEntiteBuilder().build_from_sigle("INFO"),
+            gestion=IdentiteEntiteBuilder().build_from_sigle("INFO")
+        ))
 
         result = self.message_bus.invoke(self.cmd)
 
-        expected = [
-            EntiteDTO(sigle="INFO", intitule="Ecole Informatique", sigle_parent="EPL", type=EntityType.SCHOOL),
-            EntiteDTO(sigle="EPL", intitule="Ecole Polytechnique", sigle_parent="SST", type=EntityType.FACULTY)
-        ]
-        self.assertCountEqual(result, expected)
+        self.assertEqual(result.administration.sigle, 'INFO')
+        self.assertEqual(result.gestion.sigle, 'INFO')
+        self.assertEqual(result.administration_faculte.sigle, 'EPL')
+        self.assertEqual(result.gestion_faculte.sigle, 'EPL')

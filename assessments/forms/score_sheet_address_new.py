@@ -25,6 +25,7 @@
 from django import forms
 from django.utils.translation import gettext_lazy
 
+from assessments.models.enums.score_sheet_address_choices import ScoreSheetAddressEntityType
 from base.forms.exceptions import InvalidFormException
 from base.models.entity_version import EntityVersion
 from ddd.logic.encodage_des_notes.soumission.commands import GetChoixEntitesAdresseFeuilleDeNotesCommand, \
@@ -69,13 +70,37 @@ class ScoreSheetAddressForm(forms.Form):
         cmd = GetChoixEntitesAdresseFeuilleDeNotesCommand(nom_cohorte=self.nom_cohorte)
         entite_dtos = message_bus_instance.invoke(cmd)
         entity_choices = [
-            (entite_dto.sigle, "{} - {}".format(entite_dto.sigle, entite_dto.intitule))
-            for entite_dto in entite_dtos
+            (
+                ScoreSheetAddressEntityType.ENTITY_MANAGEMENT.value,
+                "{} - {}".format(entite_dtos.gestion.sigle, entite_dtos.gestion.intitule)
+            )
         ]
+        if entite_dtos.administration.sigle != entite_dtos.gestion.sigle:
+            entity_choices.append(
+                (
+                    ScoreSheetAddressEntityType.ENTITY_ADMINISTRATION.value,
+                    "{} - {}".format(entite_dtos.administration.sigle, entite_dtos.administration.intitule)),
+            )
+        if entite_dtos.gestion_faculte:
+            entity_choices.append(
+                (
+                    ScoreSheetAddressEntityType.ENTITY_MANAGEMENT_PARENT.value,
+                    "{} - {}".format(entite_dtos.gestion_faculte.sigle, entite_dtos.gestion_faculte.intitule)
+                )
+            )
+        if entite_dtos.administration_faculte and entite_dtos.gestion_faculte and entite_dtos.administration_faculte.sigle != entite_dtos.gestion_faculte.sigle:
+            entity_choices.append(
+                (
+                    ScoreSheetAddressEntityType.ENTITY_ADMINISTRATION_PARENT.value,
+                    entite_dtos.administration_faculte.sigle, "{} - {}".format(
+                        entite_dtos.administration_faculte.sigle,
+                        entite_dtos.administration_faculte.intitule
+                    )
+                ),
+            )
+        entity_choices.append((None, gettext_lazy('Customized')))
 
-        empty_choice = (None, gettext_lazy('Customized'))
-
-        self.fields['entity'].choices = tuple([empty_choice] + entity_choices)
+        self.fields['entity'].choices = tuple(entity_choices)
 
     def clean(self):
         cleaned_data = super().clean()

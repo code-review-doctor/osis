@@ -52,10 +52,6 @@ class AdresseFeuilleDeNotes(interface.RootEntity):
     def nom_cohorte(self):
         return self.entity_id.nom_cohorte
 
-    @property
-    def sigle_entite(self) -> str:
-        return self.entite.sigle if self.entite else ""
-
     def est_identique_a(self, autre_adresse: 'AdresseFeuilleDeNotes') -> bool:
         return self.entite == autre_adresse.entite and \
                self.destinataire == autre_adresse.destinataire and \

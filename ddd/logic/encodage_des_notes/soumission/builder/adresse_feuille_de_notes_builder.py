@@ -41,7 +41,7 @@ class AdresseFeuilleDeNotesBuilder(interface.RootEntityBuilder):
     def build_from_repository_dto(cls, dto_object: 'AdresseFeuilleDeNotesDTO') -> 'AdresseFeuilleDeNotes':
         return AdresseFeuilleDeNotes(
             entity_id=AdresseFeuilleDeNotesIdentityBuilder().build_from_repository_dto(dto_object),
-            entite=IdentiteEntiteBuilder().build_from_sigle(dto_object.entite) if dto_object.entite else None,
+            entite=dto_object.entite,
             destinataire=dto_object.destinataire,
             rue_numero=dto_object.rue_numero,
             code_postal=dto_object.code_postal,

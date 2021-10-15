@@ -74,7 +74,7 @@ class TestEncoderAddressFeuilleDeNotesSpecifique(SimpleTestCase):
         self.assertEqual(adresse_sauvegardee.telephone, self.cmd.telephone)
         self.assertEqual(adresse_sauvegardee.fax, self.cmd.fax)
         self.assertEqual(adresse_sauvegardee.email, self.cmd.email)
-        self.assertIsNone(adresse_sauvegardee.entite)
+        self.assertEqual(adresse_sauvegardee.entite, '')
 
     def test_should_aussi_encoder_pour_la_premiere_annee_de_bachelier_when_encode_adresse_de_bachelier(self):
         result = message_bus_instance.invoke(self.cmd)

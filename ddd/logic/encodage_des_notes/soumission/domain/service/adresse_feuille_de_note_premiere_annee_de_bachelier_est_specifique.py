@@ -58,4 +58,4 @@ class EntiteAdresseFeuilleDeNotesPremiereAnneeDeBachelierEstDifferenteDeCelleDuB
             adresse_bachelier: AdresseFeuilleDeNotes,
             cmd: EncoderAdresseEntiteCommeAdresseFeuilleDeNotes
     ) -> bool:
-        return adresse_bachelier.sigle_entite == cmd.entite and cmd.entite
+        return adresse_bachelier.entite == cmd.entite and cmd.entite

@@ -24,7 +24,8 @@
 ##############################################################################
 from typing import Set, List
 
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_entites_cohorte import IEntitesCohorteTranslator
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_entites_cohorte import IEntitesCohorteTranslator, \
+    EntitesCohorteDTO
 from ddd.logic.shared_kernel.entite.domain.model.entiteucl import IdentiteUCLEntite
 
 
@@ -32,5 +33,5 @@ class EntitesCohorteTranslatorInMemory(IEntitesCohorteTranslator):
     datas = []
 
     @classmethod
-    def search_entite_administration_et_gestion(cls, nom_cohorte: str) -> List['IdentiteUCLEntite']:
-        return cls.datas
+    def search_entite_administration_et_gestion(cls, nom_cohorte: str) -> EntitesCohorteDTO:
+        return cls.datas[0]

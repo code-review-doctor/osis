@@ -26,7 +26,10 @@ import attr
 import mock
 from django.test import SimpleTestCase
 
+from assessments.models.enums.score_sheet_address_choices import ScoreSheetAddressEntityType
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderAdresseEntiteCommeAdresseFeuilleDeNotes
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_entites_cohorte import EntitesCohorteDTO
 from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import \
     AdressePremiereAnneeDeBachelierIdentiqueAuBachlierException, EntiteNonValidePourAdresseException
 from ddd.logic.encodage_des_notes.tests.factory.adresse_feuille_de_notes import \
@@ -45,7 +48,7 @@ class TestEncoderAddressEntiteCommeAdresseFeuilleDeNotes(SimpleTestCase):
     def setUp(self) -> None:
         self.cmd = EncoderAdresseEntiteCommeAdresseFeuilleDeNotes(
             nom_cohorte="SINF1BA",
-            entite="EPL",
+            entite=ScoreSheetAddressEntityType.ENTITY_ADMINISTRATION.value,
             email="temp@temp.com",
         )
 
@@ -59,7 +62,12 @@ class TestEncoderAddressEntiteCommeAdresseFeuilleDeNotes(SimpleTestCase):
 
         self.entites_cohorte_translator = EntitesCohorteTranslatorInMemory()
         self.entites_cohorte_translator.datas.clear()
-        self.entites_cohorte_translator.datas.append(IdentiteEntiteBuilder().build_from_sigle("EPL"))
+        self.entites_cohorte_translator.datas.append(
+            EntitesCohorteDTO(
+                administration=IdentiteEntiteBuilder().build_from_sigle("EPL"),
+                gestion=IdentiteEntiteBuilder().build_from_sigle("EPL")
+            )
+        )
 
         self.__mock_service_bus()
 
@@ -81,7 +89,6 @@ class TestEncoderAddressEntiteCommeAdresseFeuilleDeNotes(SimpleTestCase):
         cmd = attr.evolve(
             self.cmd,
             nom_cohorte=adresse_bachelier.nom_cohorte.replace('1BA', '11BA'),
-            entite=adresse_bachelier.sigle_entite
         )
 
         with self.assertRaises(AdressePremiereAnneeDeBachelierIdentiqueAuBachlierException):
@@ -90,7 +97,7 @@ class TestEncoderAddressEntiteCommeAdresseFeuilleDeNotes(SimpleTestCase):
     def test_cannot_encoder_une_entite_ne_faisant_pas_partie_de_la_cohorte(self):
         cmd = attr.evolve(self.cmd, entite="OSIS")
 
-        with self.assertRaises(EntiteNonValidePourAdresseException):
+        with self.assertRaises(MultipleBusinessExceptions):
             message_bus_instance.invoke(cmd)
 
     def test_should_encoder_valeur_adresse_de_entite(self):
@@ -98,7 +105,7 @@ class TestEncoderAddressEntiteCommeAdresseFeuilleDeNotes(SimpleTestCase):
 
         adresse = self.repo.get(result)
         self.assertEqual(adresse.email, self.cmd.email)
-        self.assertEqual(adresse.sigle_entite, self.cmd.entite)
+        self.assertEqual(adresse.entite, self.cmd.entite)
         self.assertEqual(adresse.rue_numero, self.epl_entite.adresse.rue_numero)
         self.assertEqual(adresse.code_postal, self.epl_entite.adresse.code_postal)
         self.assertEqual(adresse.ville, self.epl_entite.adresse.ville)

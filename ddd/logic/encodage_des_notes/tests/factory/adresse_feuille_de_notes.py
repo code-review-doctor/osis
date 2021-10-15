@@ -25,6 +25,7 @@
 
 import factory
 
+from assessments.models.enums.score_sheet_address_choices import ScoreSheetAddressEntityType
 from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_notes import \
     IdentiteAdresseFeuilleDeNotes, \
     AdresseFeuilleDeNotes
@@ -45,7 +46,7 @@ class AdresseFeuilleDeNotesVideFactory(factory.Factory):
         abstract = False
 
     entity_id = factory.SubFactory(_IdentiteAdresseFeuilleDeNotesFactory)
-    entite = None
+    entite = ""
     destinataire = ""
     rue_numero = ""
     code_postal = ""
@@ -58,7 +59,7 @@ class AdresseFeuilleDeNotesVideFactory(factory.Factory):
 
 class AdresseFeuilleDeNotesSpecifiqueFactory(AdresseFeuilleDeNotesVideFactory):
     entity_id = factory.SubFactory(_IdentiteAdresseFeuilleDeNotesFactory)
-    entite = None
+    entite = ""
     destinataire = "Faculté de Droit"
     rue_numero = "Rue de la Fac, 19"
     code_postal = "1321"
@@ -76,7 +77,7 @@ class PremiereAnneeBachelierAdresseFeuilleDeNotesSpecifiqueFactory(AdresseFeuill
 
 class AdresseFeuilleDeNotesBaseeSurEntiteFactory(AdresseFeuilleDeNotesVideFactory):
     entity_id = factory.SubFactory(_IdentiteAdresseFeuilleDeNotesFactory)
-    entite = factory.SubFactory(_IdentiteEntiteFactory, sigle="EPL")
+    entite = ScoreSheetAddressEntityType.ENTITY_ADMINISTRATION.value
     destinataire = "Faculté de EPL"
     rue_numero = "Rue de EPL, 19"
     code_postal = "1321"
