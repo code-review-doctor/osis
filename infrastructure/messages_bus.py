@@ -23,35 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Callable, Dict, List
+from typing import Callable, Dict
 
-from ddd.logic.admission.preparation.projet_doctoral.commands import (
-    ApprouverPropositionCommand,
-    CompleterPropositionCommand,
-    DemanderSignatureCommand, GetPropositionCommand, IdentifierPromoteurCommand,
-    InitierPropositionCommand,
-    SearchDoctoratCommand,
-    SearchPropositionsCommand, SupprimerMembreCACommand,
-    SupprimerPromoteurCommand,
-)
-from ddd.logic.admission.preparation.projet_doctoral.use_case.read.get_proposition_service import get_proposition
-from ddd.logic.admission.preparation.projet_doctoral.use_case.read.rechercher_doctorats_service import \
-    rechercher_doctorats
-from ddd.logic.admission.preparation.projet_doctoral.use_case.read.rechercher_propositions_service import \
-    rechercher_propositions
-from ddd.logic.admission.preparation.projet_doctoral.use_case.write.approuver_proposition_service import \
-    approuver_proposition
-from ddd.logic.admission.preparation.projet_doctoral.use_case.write.completer_proposition_service import \
-    completer_proposition
-from ddd.logic.admission.preparation.projet_doctoral.use_case.write.demander_signature_service import demander_signature
-from ddd.logic.admission.preparation.projet_doctoral.use_case.write.identifier_promoteur_service import \
-    identifier_promoteur
-from ddd.logic.admission.preparation.projet_doctoral.use_case.write.initier_proposition_service import \
-    initier_proposition
-from ddd.logic.admission.preparation.projet_doctoral.use_case.write.supprimer_membre_CA_service import \
-    supprimer_membre_CA
-from ddd.logic.admission.preparation.projet_doctoral.use_case.write.supprimer_promoteur_service import \
-    supprimer_promoteur
 from ddd.logic.application.commands import (
     ApplyOnVacantCourseCommand,
     DeleteApplicationCommand,
@@ -197,14 +170,6 @@ from ddd.logic.shared_kernel.language.commands import GetLanguageCommand, Search
 from ddd.logic.shared_kernel.language.use_case.read.get_language_service import get_language
 from ddd.logic.shared_kernel.language.use_case.read.search_languages_service import search_languages
 from education_group.ddd.repository.training import TrainingRepository
-from infrastructure.admission.preparation.projet_doctoral.domain.service.constitution_supervision import \
-    ConstitutionSupervisionService
-from infrastructure.admission.preparation.projet_doctoral.domain.service.doctorat import DoctoratTranslator
-from infrastructure.admission.preparation.projet_doctoral.domain.service.promoteur import PromoteurTranslator
-from infrastructure.admission.preparation.projet_doctoral.domain.service.secteur_ucl import SecteurUclTranslator
-from infrastructure.admission.preparation.projet_doctoral.repository.groupe_de_supervision import \
-    GroupeDeSupervisionRepository
-from infrastructure.admission.preparation.projet_doctoral.repository.proposition import PropositionRepository
 from infrastructure.application.repository.applicant import ApplicantRepository
 from infrastructure.application.repository.application import ApplicationRepository
 from infrastructure.application.repository.application_calendar import ApplicationCalendarRepository
@@ -220,6 +185,8 @@ from infrastructure.encodage_de_notes.encodage.domain.service.historiser_notes i
 from infrastructure.encodage_de_notes.encodage.domain.service.notifier_encodage_notes import NotifierEncodageNotes
 from infrastructure.encodage_de_notes.encodage.repository.note_etudiant import NoteEtudiantRepository as \
     NoteEtudiantGestionnaireRepository
+from infrastructure.encodage_de_notes.shared_kernel.repository.encoder_notes_rapport import \
+    EncoderNotesRapportRepository
 from infrastructure.encodage_de_notes.shared_kernel.service.attribution_enseignant import \
     AttributionEnseignantTranslator
 from infrastructure.encodage_de_notes.shared_kernel.service.inscription_examen import InscriptionExamenTranslator
@@ -240,8 +207,6 @@ from infrastructure.encodage_de_notes.soumission.repository.note_etudiant import
 from infrastructure.encodage_de_notes.soumission.repository.responsable_de_notes import ResponsableDeNotesRepository
 from infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class import \
     StudentEnrollmentsTranslator
-from infrastructure.encodage_de_notes.shared_kernel.repository.encoder_notes_rapport import \
-    EncoderNotesRapportRepository
 from infrastructure.learning_unit.domain.service.tutor_distributed_to_class import TutorAssignedToClassTranslator
 from infrastructure.learning_unit.repository.effective_class import EffectiveClassRepository
 from infrastructure.learning_unit.repository.entity import UclEntityRepository
@@ -250,6 +215,7 @@ from infrastructure.shared_kernel.academic_year.repository.academic_year import 
 from infrastructure.shared_kernel.campus.repository.uclouvain_campus import UclouvainCampusRepository
 from infrastructure.shared_kernel.entite.repository.entiteucl import EntiteUCLRepository
 from infrastructure.shared_kernel.language.repository.language import LanguageRepository
+from infrastructure.utils import AbstractMessageBusCommands, load_message_bus_instance
 from osis_common.ddd.interface import ApplicationServiceResult, CommandRequest
 from program_management.ddd.command import BulkUpdateLinkCommand, GetReportCommand
 from program_management.ddd.repositories import program_tree as program_tree_repo
@@ -258,7 +224,7 @@ from program_management.ddd.service.read.get_report_service import get_report
 from program_management.ddd.service.write.bulk_update_link_service import bulk_update_and_postpone_links
 
 
-class MessageBus:
+class MessageBusCommands(AbstractMessageBusCommands):
     command_handlers = {
         CreateLearningUnitCommand: lambda cmd: create_learning_unit(
             cmd, LearningUnitRepository(), UclEntityRepository()
@@ -510,62 +476,9 @@ class MessageBus:
             cmd,
             ResponsableDeNotesRepository(),
         ),
-        InitierPropositionCommand: lambda cmd: initier_proposition(
-            cmd,
-            PropositionRepository(),
-            DoctoratTranslator(),
-        ),
-        SearchPropositionsCommand: lambda cmd: rechercher_propositions(
-            cmd,
-            PropositionRepository(),
-            DoctoratTranslator(),
-            SecteurUclTranslator(),
-        ),
-        GetPropositionCommand: lambda cmd: get_proposition(
-            cmd,
-            PropositionRepository(),
-            DoctoratTranslator(),
-            SecteurUclTranslator(),
-        ),
-        CompleterPropositionCommand: lambda cmd: completer_proposition(
-            cmd,
-            PropositionRepository(),
-            DoctoratTranslator(),
-        ),
-        IdentifierPromoteurCommand: lambda cmd: identifier_promoteur(
-            cmd,
-            PropositionRepository(),
-            GroupeDeSupervisionRepository(),
-            PromoteurTranslator(),
-        ),
-        SupprimerPromoteurCommand: lambda cmd: supprimer_promoteur(
-            cmd,
-            PropositionRepository(),
-            GroupeDeSupervisionRepository(),
-        ),
-        SupprimerMembreCACommand: lambda cmd: supprimer_membre_CA(
-            cmd,
-            PropositionRepository(),
-            GroupeDeSupervisionRepository(),
-        ),
-        DemanderSignatureCommand: lambda cmd: demander_signature(
-            cmd,
-            PropositionRepository(),
-            GroupeDeSupervisionRepository(),
-            ConstitutionSupervisionService(),
-        ),
-        ApprouverPropositionCommand: lambda cmd: approuver_proposition(
-            cmd,
-            PropositionRepository(),
-            GroupeDeSupervisionRepository(),
-        ),
         SearchFormationsCommand: lambda cmd: search_formations(
             cmd,
             TrainingRepository(),
-        ),
-        SearchDoctoratCommand: lambda cmd: rechercher_doctorats(
-            cmd,
-            DoctoratTranslator(),
         ),
         GetEncoderNotesRapportCommand: lambda cmd: get_encoder_notes_rapport(
             cmd,
@@ -573,11 +486,5 @@ class MessageBus:
         ),
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 
-    def invoke(self, command: CommandRequest) -> ApplicationServiceResult:
-        return self.command_handlers[command.__class__](command)
 
-    def invoke_multiple(self, commands: List['CommandRequest']) -> List[ApplicationServiceResult]:
-        return [self.invoke(command) for command in commands]
-
-
-message_bus_instance = MessageBus()
+message_bus_instance = load_message_bus_instance('message_bus')
