@@ -23,31 +23,45 @@
 #    see http://www.gnu.org/licenses/.
 #
 # ##############################################################################
-from abc import abstractmethod
+import logging
 from typing import List
 
-from ddd.logic.admission.preparation.projet_doctoral.domain.model._membre_CA import MembreCAIdentity
-from ddd.logic.admission.preparation.projet_doctoral.dtos import MembreCADTO
-from ddd.logic.shared_kernel.personne_connue_ucl.domain.service.personne_connue_ucl import IPersonneConnueUclTranslator
-from osis_common.ddd import interface
+from django.utils.module_loading import autodiscover_modules
+
+from osis_common.ddd.interface import ApplicationServiceResult, CommandRequest
 
 
-class IMembreCATranslator(interface.DomainService):
-    @classmethod
-    @abstractmethod
-    def get(cls, matricule: str) -> 'MembreCAIdentity':
-        pass
+class AbstractMessageBusCommands:
+    command_handlers = {}
 
     @classmethod
-    @abstractmethod
-    def search(cls, matricules: List[str]) -> List['MembreCAIdentity']:
-        pass
+    def get_command_handlers(cls):
+        return cls.command_handlers
 
-    @classmethod
-    @abstractmethod
-    def search_dto(
-            cls,
-            terme_de_recherche: str,
-            personne_connue_ucl_translator: 'IPersonneConnueUclTranslator',
-    ) -> List['MembreCADTO']:
-        pass
+
+class MessageBus:
+    def __init__(self, command_handlers) -> None:
+        super().__init__()
+        self.command_handlers = command_handlers
+
+    def invoke(self, command: CommandRequest) -> ApplicationServiceResult:
+        return self.command_handlers[command.__class__](command)
+
+    def invoke_multiple(self, commands: List['CommandRequest']) -> List[ApplicationServiceResult]:
+        return [self.invoke(command) for command in commands]
+
+
+def load_message_bus_instance(bus_type: str):
+    # Load `bus_type` python files of installed apps
+    autodiscover_modules('infrastructure.' + bus_type)
+
+    command_handlers = {}
+    for kls in AbstractMessageBusCommands.__subclasses__():
+        add_handlers = kls.get_command_handlers()
+
+        # Detect command conflicts
+        for command in set(command_handlers.keys()) & set(add_handlers.keys()):
+            logging.warning("Message bus conflict on command %s", command.__name__)
+
+        command_handlers.update(add_handlers)
+    return MessageBus(command_handlers)
