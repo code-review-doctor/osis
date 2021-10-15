@@ -50,13 +50,14 @@ from infrastructure.learning_unit.repository.in_memory.learning_unit import Lear
 class CreateEffectiveClassService(SimpleTestCase):
     def setUp(self):
         self.learning_unit_repository = LearningUnitRepository()
-        self.learning_unit_repository.entities.clear()
+        self.learning_unit_repository.reset()
         self.ue_with_lecturing_and_practical_volumes = CourseWithLecturingAndPracticalVolumes()
         self.learning_unit_repository.save(self.ue_with_lecturing_and_practical_volumes)
         self.student_enrollment_translator = StudentEnrollmentsTranslator()
         self.student_enrollment_translator.has_enrollments_to_learning_unit = lambda *args: False
 
         self.effective_class_repository = EffectiveClassRepository()
+        self.effective_class_repository.reset()
 
         self.create_class_cmd = CreateEffectiveClassCommand(
             class_code="A",
