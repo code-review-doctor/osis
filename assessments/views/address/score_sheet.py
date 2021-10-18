@@ -31,7 +31,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 
-from assessments.forms.score_sheet_address_new import ScoreSheetAddressForm, FirstYearBachelorScoreSheetAddressForm
+from assessments.forms.score_sheet_address import ScoreSheetAddressForm, FirstYearBachelorScoreSheetAddressForm
 from base.auth.roles import program_manager
 from base.forms.exceptions import InvalidFormException
 from base.models import academic_year

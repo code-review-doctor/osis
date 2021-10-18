@@ -26,7 +26,7 @@
 from django.conf.urls import url, include
 from django.urls import path, register_converter
 
-from assessments.views import score_encoding, upload_xls_utils, pgm_manager_administration, score_sheet
+from assessments.views import score_encoding, upload_xls_utils, pgm_manager_administration
 from assessments.views.address.score_sheet import ScoreSheetAddressView, FirstYearBachelorScoreSheetAddressView
 from assessments.views.address.search import OffersSearch
 from assessments.views.pgm_manager_administration import ProgramManagerListView, ProgramManagerDeleteView, \
@@ -102,18 +102,12 @@ urlpatterns = [
         path('pdf_export', ScoreSheetsPDFExportView.as_view(), name='score_sheets_pdf_export'),
     ])),
 
-    url(r'^offers/', include([
-        url(r'^(?P<education_group_id>[0-9]+)/', include([
-            url(r'^score_encoding/$', score_sheet.offer_score_encoding_tab, name='offer_score_encoding_tab'),
-            url(r'^score_sheet_address/save/$', score_sheet.save_score_sheet_address, name='save_score_sheet_address'),
-        ])),
-
-        # New URL's
-        url(r'^new/$', OffersSearch.as_view(), name='offers_search_new'),
+    path('offers/', include([
+        path('', OffersSearch.as_view(), name='offers_search_new'),
         path('<acronym:acronym>/', include([
-            url(r'^score_encoding/$', ScoreSheetAddressView.as_view(), name='score_sheet_address'),
-            url(
-                r'^first_year_bachelor/score_encoding/$',
+            path('score_encoding', ScoreSheetAddressView.as_view(), name='score_sheet_address'),
+            path(
+                'first_year_bachelor/score_encoding',
                 FirstYearBachelorScoreSheetAddressView.as_view(),
                 name='first_year_bachelor_score_sheet_address'
             ),
