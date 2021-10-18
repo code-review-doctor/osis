@@ -74,6 +74,7 @@ class ScoreResponsibleList(LanguageContextSerializerMixin, generics.ListAPIView)
             .annotate(year=F('learning_unit_year__academic_year__year')) \
             .annotate(global_id=F('tutor__person__global_id')) \
             .filter(year=self.request.GET['year']) \
-            .filter(learning_unit_year__acronym__in=codes_unites_enseignement)
+            .filter(learning_unit_year__acronym__in=codes_unites_enseignement) \
+            .order_by('full_name')
         serializer = ScoreResponsiblePersonListSerializer(list(queryset), many=True)
         return Response(serializer.data)
