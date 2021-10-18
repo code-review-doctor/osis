@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -113,8 +113,11 @@ class ScoreSheetAddressTest(TestCase):
 class ScoreSheetDataTest(TestCase):
     def setUp(self):
         self.academic_year = AcademicYearFactory()
-        self.learning_unit_year = LearningUnitYearFactory(academic_year=self.academic_year, acronym="LBIR1100",
-                                                          decimal_scores=False)
+        self.learning_unit_year = LearningUnitYearFactory(
+            academic_year=self.academic_year,
+            acronym="LBIR1100",
+            credits=10
+        )
         # Create tutor and score responsible
         _create_attribution(self.learning_unit_year, person=PersonFactory(last_name='Alibra', first_name='Paul'))
         _create_attribution(self.learning_unit_year, person=PersonFactory(last_name='Durant', first_name='Thomas'),

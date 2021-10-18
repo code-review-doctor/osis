@@ -55,13 +55,11 @@ from base.models.enums.entity_container_year_link_type import EntityContainerYea
 from base.models.enums.learning_component_year_type import LEARNING_COMPONENT_YEAR_TYPES
 from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
 from base.models.enums.vacant_declaration_type import DECLARATION_TYPE
-from base.models.learning_unit_enrollment import LearningUnitEnrollment
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.views.common import display_success_messages
-from base.views.learning_units.common import get_common_context_learning_unit_year, get_text_label_translated, \
-    get_common_context_to_publish
+from base.views.learning_units.common import get_common_context_learning_unit_year, get_text_label_translated
 from cms.models.text_label import TextLabel
 from cms.models.translated_text_label import TranslatedTextLabel
 from learning_unit.models.learning_class_year import LearningClassYear
@@ -149,7 +147,6 @@ def learning_unit_specifications(request, learning_unit_year_id=None, code=None,
         'base.can_update_learning_achievement', learning_unit_year
     )
     context['tab_active'] = 'learning_unit_specifications'  # Corresponds to url_name
-    context.update(get_common_context_to_publish(person, learning_unit_year))
     return render(request, "learning_unit/specifications.html", context)
 
 

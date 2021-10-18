@@ -65,7 +65,7 @@ pour fonctions à redéfinir dans un Form
 
 ```python
 
-class MessageBus:
+class MessageBusCommands(AbstractMessageBusCommands):
     command_handlers = {
         command.CreateOrphanGroupCommand: lambda cmd: create_group_service.create_orphan_group(cmd, GroupRepository())
     }
