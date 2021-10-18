@@ -62,8 +62,6 @@ def read_learning_unit_pedagogy(request, learning_unit_year_id: int, context, te
     context.update(get_common_context_learning_unit_year(person, learning_unit_year_id, code, year))
     learning_unit_year = context['learning_unit_year']
 
-    context.update(get_common_context_to_publish(person, learning_unit_year))
-
     user_language = mdl.person.get_user_interface_language(request.user)
 
     cms_pedagogy_labels_translated = _get_cms_pedagogy_labels_translated(learning_unit_year.id, user_language)

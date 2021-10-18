@@ -25,22 +25,22 @@ msgid "'{value}' is not a valid derogation session."
 msgstr "'{value}' n'est pas une session dérogation valide"
 
 msgid "A justification is needed when creating a pre-admission."
-msgstr ""
+msgstr "Une justification est requise pour une pré-admission."
 
 msgid "A substitute can not renew his function of substitute"
 msgstr "Un suppléant ne peut pas reconduire sa fonction de suppléant"
 
 msgid "ADMISSION"
-msgstr ""
+msgstr "Admission"
 
 msgid "APPROVED"
-msgstr ""
+msgstr "Approuvé"
 
 msgid "Already a member of CA."
-msgstr ""
+msgstr "Déjà membre du CA"
 
 msgid "Already a promoter."
-msgstr ""
+msgstr "Déjà promoteur"
 
 msgid ""
 "Application on this vacant course is not reserved for interns/open for extern"
@@ -49,10 +49,11 @@ msgstr ""
 "ouvert pour les externes"
 
 msgid "CANCELLED"
-msgstr ""
+msgstr "Annulé"
 
 msgid "CDE Bureau should be filled in only if the doctorate's entity is CDE"
 msgstr ""
+"Le bureau CDE doit être rempli uniquement si l'entité du doctorat est CDE"
 
 msgid "Can't create a learning unit lower than 2019-20"
 msgstr "On ne peut pas créer une UE avec une année inférieure à 2019-20"
@@ -105,25 +106,27 @@ msgid "Distributed volume should be filled in and be greater than 0"
 msgstr "Le volume attribué doit être supérieur à 0"
 
 msgid "ECONOMY"
-msgstr ""
+msgstr "Economie"
 
 msgid "English"
-msgstr ""
+msgstr "Anglais"
 
 msgid "Following fields are required : {}"
 msgstr "Les champs suivants sont requis : {}"
 
 msgid "French"
-msgstr ""
+msgstr "Français"
 
 msgid "INVITED"
-msgstr ""
+msgstr "Invité"
 
 msgid "IN_PROGRESS"
-msgstr ""
+msgstr "En cours"
 
 msgid "Institution should be set when PhD has been set to yes or partial"
 msgstr ""
+"L'institution doit être renseignée quand le doctorat a déjà été réalisé "
+"partiellement ou complétement."
 
 msgid "Internship subtype is a mandatory field"
 msgstr "Le sous-type de stage est obligatoire"
@@ -138,58 +141,58 @@ msgid "Lecturing charge or practical charge must be filled"
 msgstr "Le vol.1 postulé ou le vol.2 postulé doit être rempli"
 
 msgid "MANAGEMENT"
-msgstr ""
+msgstr "Gestion"
 
 msgid "Member of supervision group already invited."
-msgstr ""
+msgstr "Membre du groupe de supervision déjà invité."
 
 msgid "Member of supervision group not found."
-msgstr ""
+msgstr "Membre du groupe de supervision non trouvé."
 
 msgid "Member of supervision group not invited."
-msgstr ""
+msgstr "Membre du groupe de supervision non invité"
 
 msgid "Membre CA not found."
-msgstr ""
+msgstr "Membre du CA non trouvé"
 
 msgid "NO"
-msgstr ""
+msgstr "Non"
 
 msgid "NOT_INVITED"
-msgstr ""
+msgstr "Non invité"
 
 msgid "No PhD found."
-msgstr ""
+msgstr "Pas de doctorat trouvé"
 
 msgid "No vacant corresponding activity"
 msgstr "Pas d'activité vacante correspondante"
 
 msgid "PARTIAL"
-msgstr ""
+msgstr "Partiel"
 
 msgid "PRE_ADMISSION"
-msgstr ""
+msgstr "Pre-admission"
 
 msgid "Promoter not found."
-msgstr ""
+msgstr "Promoteur non trouvé."
 
 msgid "Proposition not found."
-msgstr ""
+msgstr "Proposition non trouvée."
 
 msgid "REFUSED"
-msgstr ""
+msgstr "Refusé"
 
 msgid "Registration ID does not match email"
 msgstr "Le noma ne corresond pas à l'adresse de messagerie"
 
 msgid "SEARCH_SCHOLARSHIP"
-msgstr ""
+msgstr "Bourse de recherche"
 
 msgid "SELF_FUNDING"
-msgstr ""
+msgstr "Auto-financement"
 
 msgid "SUBMITTED"
-msgstr ""
+msgstr "Soumis"
 
 msgid "Score already submitted"
 msgstr "Note déjà soumise"
@@ -203,11 +206,8 @@ msgstr "L'étudiant n'est plus inscrit à l'examen"
 msgid "Subdivision should be one character A-Z or 0-9"
 msgstr "Subdivision devrait être un caractère A-Z ou 0-9"
 
-msgid "Supervision group member not found."
-msgstr ""
-
 msgid "Supervision group not found."
-msgstr ""
+msgstr "Groupe de supervision non trouvé."
 
 #, python-format
 msgid ""
@@ -320,10 +320,10 @@ msgid "Tutor already assigned to the class"
 msgstr "L'enseignant est déjà assigné à cette classe"
 
 msgid "UCL Person not found."
-msgstr ""
+msgstr "Personne de l'UCLouvain non trouvée."
 
 msgid "Undecided"
-msgstr ""
+msgstr "Non décidé"
 
 #, python-format
 msgid ""
@@ -349,13 +349,15 @@ msgid "Volumes of {} are inconsistent"
 msgstr "Les volumes de {} sont incohérents"
 
 msgid "WORK_CONTRACT"
-msgstr ""
+msgstr "Contrat de travail"
 
 msgid "Work contract should be set when financing type is set to work contract"
 msgstr ""
+"Le contrat de travail doit être renseigné quand le type de financement est "
+"un contrat de travail."
 
 msgid "YES"
-msgstr ""
+msgstr "Oui"
 
 msgid ""
 "You cannot create a class on this learning unit because it is in proposal "
@@ -405,7 +407,7 @@ msgid "You're not attributed to the learning unit {}"
 msgstr "Vous n'êtes pas attribué(e) à l'unité d'enseignement {}"
 
 msgid "You've reached the maximum authorized propositions."
-msgstr ""
+msgstr "Vous avez atteint le maximum de propositions."
 
 msgid "at least one class volume is greater than the volume of the LU"
 msgstr ""

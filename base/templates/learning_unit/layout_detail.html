@@ -59,8 +59,17 @@
                     </label>
                 {% endif %}
                 <div class="pull-right" style="margin-right: 15px;">
-                    {% block action_top %}
-                    {% endblock %}
+                     <table>
+                         <tr>
+                             <td style="padding:0 5px 0 0;">
+                                 {% include 'learning_unit/blocks/visualize_refreshed_publication.html' %}
+                             </td>
+                             <td>
+                                {% block action_top %}
+                                {% endblock %}
+                             </td>
+                         </tr>
+                     </table>
                 </div>
             </div>
         </div>
