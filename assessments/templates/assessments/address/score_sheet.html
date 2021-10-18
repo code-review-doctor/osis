@@ -1,4 +1,4 @@
-{% extends "layout.html" %}
+{% extends "assessments/address/common.html" %}
 {% load format bootstrap3 %}
 {% load static i18n%}
 {% comment "License" %}
@@ -24,12 +24,6 @@
 * at the root of the source code of this program.  If not,
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
-
-{% block breadcrumb %}
-    <li><a href="{% url 'studies' %}" id="lnk_studies">{% trans 'Student path' %}</a></li>
-    <li><a href="{% url 'offers_search_new' %}" id="lnk_offers">{% trans 'Addresses' %}</a></li>
-    <li class="active">{{ nom_cohorte }}</li>
-{% endblock %}
 
 {% block content %}
 
@@ -119,111 +113,4 @@
             </div>
         </div>
     </div>
-{% endblock %}
-
-
-{% block script %}
-
-    <script type="text/javascript">
-
-        $('#warning_no_address_found').hide();
-        $('#warning_no_current_entity_version_found').hide();
-
-        window.onload = disableFormInputsIfReuseAddress;
-
-        var form_inputs = [
-            $('#id_recipient'),
-            $('#id_location'),
-            $('#id_postal_code'),
-            $('#id_city'),
-            $('#id_country'),
-            $('#id_phone'),
-            $('#id_fax')
-        ];
-
-
-        function disableFormInputsIfReuseAddress() {
-            if ($('#id_entity').val() != "")
-                disableFormInputs();
-        }
-
-        $('#id_entity').change(loadEntityAddress);
-
-        function loadEntityAddress(e) {
-            var entity_version_acronym = $('#id_entity :selected').text().split(' - ')[0];
-            if ($('#id_entity').val() !== '') {
-                $.ajax({
-                    url: "/entities/" + entity_version_acronym + "/address/",
-                    data: null,
-                    dataType: 'json',
-                    success: function (data) {
-                        if (!data.entity_version_exists_now) {
-                            showEntityVersionNotExistsMsg();
-                        }
-                        if (Object.keys(data.address).length !== 0) {
-                            disableFormInputs();
-                            setFormFieldsValues(data);
-                        } else {
-                            setFormFieldsValuesToNone();
-                            disableFormInputs();
-                            showNoAddressFoundMsg();
-                        }
-                        $('#id_recipient').val(data.recipient);
-                    },
-                    error: function (xhr, status, error) {
-                        setFormFieldsValuesToNone();
-                        disableFormInputs();
-                        showNoAddressFoundMsg();
-                    }
-                });
-
-
-            } else {
-                setFormFieldsValuesToNone();
-                enableFormInputs();
-            }
-        }
-
-        function showNoAddressFoundMsg() {
-            $('#warning_no_address_found').show().delay(5000).hide(400);
-        }
-
-
-        function showEntityVersionNotExistsMsg() {
-            $('#warning_no_current_entity_version_found').show().delay(10000).hide(400);
-        }
-
-
-        function setFormFieldsValuesToNone() {
-            for (var i = 0; i < form_inputs.length; i++) {
-                form_inputs[i].val(null);
-            }
-        }
-
-
-        function setFormFieldsValues(data) {
-            $('#id_recipient').val(data.recipient);
-            $('#id_location').val(data.address.location);
-            $('#id_postal_code').val(data.address.postal_code);
-            $('#id_city').val(data.address.city);
-            $('#id_country').val(data.address.country);
-            $('#id_phone').val(data.address.phone);
-            $('#id_fax').val(data.address.fax);
-        }
-
-
-        function disableFormInputs() {
-            for (var i = 0; i < form_inputs.length; i++) {
-                form_inputs[i].prop('disabled', true);
-            }
-        }
-
-
-        function enableFormInputs() {
-            for (var i = 0; i < form_inputs.length; i++) {
-                form_inputs[i].prop('disabled', false);
-            }
-        }
-
-    </script>
 {% endblock %}

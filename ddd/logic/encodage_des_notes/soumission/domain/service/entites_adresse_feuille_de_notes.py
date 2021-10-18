@@ -22,10 +22,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 import attr
 
+from assessments.models.enums.score_sheet_address_choices import ScoreSheetAddressEntityType
+from base.utils.itertools import filter_duplicate
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_entites_cohorte import IEntitesCohorteTranslator
 from ddd.logic.shared_kernel.entite.domain.model.entiteucl import EntiteUCL
 from ddd.logic.shared_kernel.entite.dtos import EntiteDTO
@@ -39,6 +41,24 @@ class EntitesPossiblesAdresseFeuilleDeNotesDTO:
     gestion_faculte = attr.ib(type=Optional['EntiteUCL'])
     administration = attr.ib(type='EntiteUCL')
     administration_faculte = attr.ib(type=Optional['EntiteUCL'])
+
+    @property
+    def choix(self) -> List[Tuple[str, str]]:
+        entites_possibles = [self.gestion, self.administration, self.gestion_faculte, self.administration_faculte]
+        types_entites_possibles = [
+            ScoreSheetAddressEntityType.ENTITY_MANAGEMENT.value,
+            ScoreSheetAddressEntityType.ENTITY_ADMINISTRATION.value,
+            ScoreSheetAddressEntityType.ENTITY_MANAGEMENT_PARENT.value,
+            ScoreSheetAddressEntityType.ENTITY_ADMINISTRATION_PARENT.value,
+        ]
+
+        choix = [
+            (type_entite, "{} - {}".format(entite.sigle, entite.intitule))
+            for entite, type_entite in zip(entites_possibles, types_entites_possibles)
+            if entite
+        ]
+
+        return filter_duplicate(choix, lambda option: option[1])
 
 
 class EntiteAdresseFeuilleDeNotes(interface.DomainService):
@@ -61,7 +81,7 @@ class EntiteAdresseFeuilleDeNotes(interface.DomainService):
         )
         faculte_entite_administration = next(
             (entite for entite in entite_administration_avec_sa_hierarchie
-            if entite.est_faculte() and entite.entity_id != identites_administration_et_gestion.administration),
+             if entite.est_faculte() and entite.entity_id != identites_administration_et_gestion.administration),
             None
         )
 

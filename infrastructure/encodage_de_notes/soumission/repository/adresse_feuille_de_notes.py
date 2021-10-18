@@ -122,7 +122,7 @@ class AdresseFeuilleDeNotesRepository(IAdresseFeuilleDeNotesRepository):
                 entity for entity in flat_entity_hierarchy
                 if entity['entity_id'] == int(row['entite_gestion'])
             )
-        if row['entite'] == ScoreSheetAddressEntityType.ENTITY_ADMINISTRATION_PARENT.value:
+        if row['entite'] == ScoreSheetAddressEntityType.ENTITY_MANAGEMENT_PARENT.value:
             return next(
                 (entity for entity in flat_entity_hierarchy
                  if entity['entity_id'] != int(row['entite_gestion']) and int(row['entite_gestion']) in
@@ -324,4 +324,4 @@ def _get_flat_entity_hierarchy(cohortes: List[str]):
         'entity__fax',
         entity__id__in=entity_ids
     )
-    return cte.queryset().with_cte(cte).distinct('acronym').order_by('acronym')
+    return cte.queryset().with_cte(cte).order_by('acronym')

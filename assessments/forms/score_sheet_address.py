@@ -69,38 +69,11 @@ class ScoreSheetAddressForm(forms.Form):
     def _init_entity_field(self):
         cmd = GetChoixEntitesAdresseFeuilleDeNotesCommand(nom_cohorte=self.nom_cohorte)
         entite_dtos = message_bus_instance.invoke(cmd)
-        entity_choices = [
-            (
-                ScoreSheetAddressEntityType.ENTITY_MANAGEMENT.value,
-                "{} - {}".format(entite_dtos.gestion.sigle, entite_dtos.gestion.intitule)
-            )
-        ]
-        if entite_dtos.administration.sigle != entite_dtos.gestion.sigle:
-            entity_choices.append(
-                (
-                    ScoreSheetAddressEntityType.ENTITY_ADMINISTRATION.value,
-                    "{} - {}".format(entite_dtos.administration.sigle, entite_dtos.administration.intitule)),
-            )
-        if entite_dtos.gestion_faculte:
-            entity_choices.append(
-                (
-                    ScoreSheetAddressEntityType.ENTITY_MANAGEMENT_PARENT.value,
-                    "{} - {}".format(entite_dtos.gestion_faculte.sigle, entite_dtos.gestion_faculte.intitule)
-                )
-            )
-        if entite_dtos.administration_faculte and entite_dtos.gestion_faculte and entite_dtos.administration_faculte.sigle != entite_dtos.gestion_faculte.sigle:
-            entity_choices.append(
-                (
-                    ScoreSheetAddressEntityType.ENTITY_ADMINISTRATION_PARENT.value,
-                    entite_dtos.administration_faculte.sigle, "{} - {}".format(
-                        entite_dtos.administration_faculte.sigle,
-                        entite_dtos.administration_faculte.intitule
-                    )
-                ),
-            )
-        entity_choices.append((None, gettext_lazy('Customized')))
 
-        self.fields['entity'].choices = tuple(entity_choices)
+        choices = entite_dtos.choix
+        choices.append((None, gettext_lazy('Customized')))
+
+        self.fields['entity'].choices = tuple(choices)
 
     def clean(self):
         cleaned_data = super().clean()
