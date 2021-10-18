@@ -171,5 +171,17 @@ class TestAdresseFeuilleDeNotesRepository(TestCase):
                 CohortYearFactory(education_group_year=egy, first_year_bachelor=True)
 
         CountryFactory(name=adresse.pays)
-        if adresse.sigle_entite:
-            EntityVersionFactory(acronym=adresse.sigle_entite)
+        if adresse.entite:
+            egy.administration_entity.location = adresse.rue_numero
+            egy.administration_entity.postal_code = adresse.code_postal
+            egy.administration_entity.city = adresse.ville
+            egy.administration_entity.country = CountryFactory(name=adresse.pays)
+            egy.administration_entity.phone = adresse.telephone
+            egy.administration_entity.fax = adresse.fax
+            egy.administration_entity.save()
+
+            EntityVersionFactory(
+                entity=egy.administration_entity,
+                acronym=adresse.destinataire.split(' - ')[0],
+                title=adresse.destinataire.split(' - ')[1],
+            )

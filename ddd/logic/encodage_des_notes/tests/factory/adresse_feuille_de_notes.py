@@ -78,7 +78,7 @@ class PremiereAnneeBachelierAdresseFeuilleDeNotesSpecifiqueFactory(AdresseFeuill
 class AdresseFeuilleDeNotesBaseeSurEntiteFactory(AdresseFeuilleDeNotesVideFactory):
     entity_id = factory.SubFactory(_IdentiteAdresseFeuilleDeNotesFactory)
     entite = ScoreSheetAddressEntityType.ENTITY_ADMINISTRATION.value
-    destinataire = "Faculté de EPL"
+    destinataire = "EPL - Faculté de EPL"
     rue_numero = "Rue de EPL, 19"
     code_postal = "1321"
     ville = "Louvain-La-Neuve"

@@ -175,7 +175,7 @@ class AdresseFeuilleDeNotesRepository(IAdresseFeuilleDeNotesRepository):
                     "country": None,
                     "phone": "",
                     "fax": "",
-                    "email": ""
+                    "email": entity.email
                 }
             )
         else:
