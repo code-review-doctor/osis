@@ -30,18 +30,15 @@ from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
 class SessionExamAdmin(OsisModelAdmin):
-    list_display = ('education_group_year', 'learning_unit_year', 'number_session', 'changed')
-    list_filter = ('learning_unit_year__academic_year', 'number_session',)
-    search_fields = ['learning_unit_year__acronym', 'education_group_year__acronym']
+    list_display = ('number_session', 'changed')
+    list_filter = ('number_session',)
 
 
 class SessionExam(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     number_session = models.IntegerField(choices=number_session.NUMBERS_SESSION)
-    learning_unit_year = models.ForeignKey('LearningUnitYear', on_delete=models.CASCADE)
-    education_group_year = models.ForeignKey('EducationGroupYear', on_delete=models.CASCADE)
     progress = None
 
     def __str__(self):
-        return u"%s - %d" % (self.learning_unit_year, self.number_session)
+        return str(self.number_session)
