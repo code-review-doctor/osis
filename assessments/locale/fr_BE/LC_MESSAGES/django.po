@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-06 08:20+0200\n"
+"POT-Creation-Date: 2021-10-18 15:27+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -299,6 +299,8 @@ msgstr "Entité de référence"
 msgid "Evaluations"
 msgstr "Evaluations"
 
+#, fuzzy, python-format
+#| msgid "Extra time (33% generally)"
 msgid "Extra time (33% generally)"
 msgstr "Tiers-Temps"
 
@@ -440,6 +442,12 @@ msgstr "Aucune note injectée"
 
 msgid "No scores injected"
 msgstr "Aucune note injectée"
+
+msgid "No student"
+msgstr "Aucun étudiant"
+
+msgid "No student for {}"
+msgstr "Aucun étudiant pour {}"
 
 msgid "No students to encode by excel"
 msgstr "Aucun étudiant à encoder par excel"

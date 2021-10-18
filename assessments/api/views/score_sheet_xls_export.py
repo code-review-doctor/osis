@@ -47,15 +47,19 @@ class ScoreSheetXLSExportAPIView(APIView):
         return self.request.user.person
 
     def get(self, request, *args, **kwargs):
-        score_sheet_serialized = TutorScoreSheetXLSSerializer(instance={
-            'feuille_de_notes': self.feuille_de_notes,
-            'donnees_administratives': self.donnees_administratives,
-        }).data
+        feuille_de_notes = self.feuille_de_notes
+        if feuille_de_notes:
+            score_sheet_serialized = TutorScoreSheetXLSSerializer(instance={
+                'feuille_de_notes': feuille_de_notes,
+                'donnees_administratives': self.donnees_administratives,
+            }).data
 
-        if len(score_sheet_serialized['rows']):
-            virtual_workbook = score_sheet_xls.build_xls(score_sheet_serialized)
-            return XLSResponse(xls_file=virtual_workbook, filename=self.get_filename())
-        raise ValidationError(detail=_("No students to encode by excel"))
+            if len(score_sheet_serialized['rows']):
+                virtual_workbook = score_sheet_xls.build_xls(score_sheet_serialized)
+                return XLSResponse(xls_file=virtual_workbook, filename=self.get_filename())
+            raise ValidationError(detail=_("No students to encode by excel"))
+        else:
+            raise ValidationError(detail=_('No student'))
 
     @cached_property
     def donnees_administratives(self):

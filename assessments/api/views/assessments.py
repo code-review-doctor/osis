@@ -39,5 +39,6 @@ class CurrentSessionView(generics.RetrieveAPIView):
         current_academic_year = AcademicYear.objects.get(year=current_event.authorized_target_year)
         return {
             'academic_year': str(current_academic_year),
+            'year': current_academic_year.year,
             'month_session_name': current_event.month_session_name()
         }

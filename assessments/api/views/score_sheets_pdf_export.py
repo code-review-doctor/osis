@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.utils.translation import gettext_lazy as _
 from django.utils.functional import cached_property
 from rest_framework import exceptions
 from rest_framework.exceptions import ValidationError
@@ -54,15 +55,27 @@ class ScoreSheetsPDFExportAPIView(APIView):
         if not len(codes_unites_enseignement):
             raise ValidationError(detail="codes queryparam missing")
 
+        validation_errors = []
+        documents = []
+        for code in codes_unites_enseignement:
+            feuille_de_notes = self.get_feuille_de_notes(code)
+            if feuille_de_notes:
+                documents.append(
+                    {
+                        'feuille_de_notes': feuille_de_notes,
+                        'donnees_administratives': self.get_donnees_administratives(code),
+                    }
+                )
+            else:
+                validation_errors.append(_('No student for {}').format(code))
+        if validation_errors:
+            raise ValidationError(detail=", ".join((validation_errors)))
+
         score_sheet_serialized = ScoreSheetPDFSerializer(
-            instance=[
-                {
-                    'feuille_de_notes': self.get_feuille_de_notes(code),
-                    'donnees_administratives': self.get_donnees_administratives(code)
-                } for code in codes_unites_enseignement
-            ],
+            instance=documents,
             context={'person': self.person}
         )
+
         return score_sheet_pdf.print_notes(score_sheet_serialized.data)
 
     def get_donnees_administratives(self, code_unite_enseignement: str):
