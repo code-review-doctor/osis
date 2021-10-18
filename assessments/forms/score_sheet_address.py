@@ -117,7 +117,7 @@ class ScoreSheetAddressForm(forms.Form):
     def _encoder_adresse_entite_comme_adresse(self):
         cmd = EncoderAdresseEntiteCommeAdresseFeuilleDeNotes(
             nom_cohorte=self.nom_cohorte,
-            entite=self.cleaned_data['entity'],
+            type_entite=self.cleaned_data['entity'],
             email=self.cleaned_data['email']
         )
         return message_bus_instance.invoke(cmd)

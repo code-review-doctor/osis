@@ -37,7 +37,7 @@ from ddd.logic.encodage_des_notes.soumission.domain.service.entites_adresse_feui
     EntiteAdresseFeuilleDeNotes
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_entites_cohorte import IEntitesCohorteTranslator
 from ddd.logic.encodage_des_notes.soumission.domain.validator.validators_by_business_action import \
-    EncoderAdresseFeuilleDeNotes
+    EncoderAdresseFeuilleDeNotesValidatorLIst
 from ddd.logic.encodage_des_notes.soumission.dtos import AdresseFeuilleDeNotesDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_notes import \
     IAdresseFeuilleDeNotesRepository
@@ -70,9 +70,7 @@ class EncoderAdresseFeuilleDeNotesDomainService(interface.DomainService):
             entite_repository: 'IEntiteUCLRepository',
             entites_cohorte_translator: 'IEntitesCohorteTranslator'
     ) -> 'IdentiteAdresseFeuilleDeNotes':
-        EncoderAdresseFeuilleDeNotes(
-            entite=cmd.entite
-        ).validate()
+        EncoderAdresseFeuilleDeNotesValidatorLIst(type_entite=cmd.type_entite).validate()
 
         entites_possibles = EntiteAdresseFeuilleDeNotes.search(
             cmd.nom_cohorte,
@@ -80,18 +78,18 @@ class EncoderAdresseFeuilleDeNotesDomainService(interface.DomainService):
             entites_cohorte_translator
         )
 
-        if cmd.entite == ScoreSheetAddressEntityType.ENTITY_ADMINISTRATION.value:
+        if cmd.type_entite == ScoreSheetAddressEntityType.ENTITY_ADMINISTRATION.value:
             entite = entites_possibles.administration
-        elif cmd.entite == ScoreSheetAddressEntityType.ENTITY_MANAGEMENT.value:
+        elif cmd.type_entite == ScoreSheetAddressEntityType.ENTITY_MANAGEMENT.value:
             entite = entites_possibles.gestion
-        elif cmd.entite == ScoreSheetAddressEntityType.ENTITY_ADMINISTRATION_PARENT.value:
+        elif cmd.type_entite == ScoreSheetAddressEntityType.ENTITY_ADMINISTRATION_PARENT.value:
             entite = entites_possibles.administration_faculte
         else:
             entite = entites_possibles.gestion_faculte
 
         dto = AdresseFeuilleDeNotesDTO(
             nom_cohorte=cmd.nom_cohorte,
-            entite=cmd.entite,
+            type_entite=cmd.type_entite,
             destinataire="{} - {}".format(entite.sigle, entite.intitule),
             rue_numero=entite.adresse.rue_numero,
             code_postal=entite.adresse.code_postal,
@@ -110,12 +108,12 @@ class EncoderAdresseFeuilleDeNotesDomainService(interface.DomainService):
             cmd: EncoderAdresseFeuilleDeNotesSpecifique,
             repo: IAdresseFeuilleDeNotesRepository,
     ) -> 'IdentiteAdresseFeuilleDeNotes':
-        EncoderAdresseFeuilleDeNotes(
-            entite=""
+        EncoderAdresseFeuilleDeNotesValidatorLIst(
+            type_entite=""
         ).validate()
         dto = AdresseFeuilleDeNotesDTO(
             nom_cohorte=cmd.nom_cohorte,
-            entite="",
+            type_entite="",
             destinataire=cmd.destinataire,
             rue_numero=cmd.rue_numero,
             code_postal=cmd.code_postal,

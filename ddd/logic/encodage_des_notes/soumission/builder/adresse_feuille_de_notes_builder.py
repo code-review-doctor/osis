@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from assessments.models.enums.score_sheet_address_choices import ScoreSheetAddressEntityType
 from ddd.logic.encodage_des_notes.soumission.builder.adresse_feuille_de_notes_identity_builder import \
     AdresseFeuilleDeNotesIdentityBuilder
 from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_notes import AdresseFeuilleDeNotes
@@ -41,7 +42,7 @@ class AdresseFeuilleDeNotesBuilder(interface.RootEntityBuilder):
     def build_from_repository_dto(cls, dto_object: 'AdresseFeuilleDeNotesDTO') -> 'AdresseFeuilleDeNotes':
         return AdresseFeuilleDeNotes(
             entity_id=AdresseFeuilleDeNotesIdentityBuilder().build_from_repository_dto(dto_object),
-            entite=dto_object.entite,
+            type_entite=ScoreSheetAddressEntityType[dto_object.type_entite] if dto_object.type_entite else None,
             destinataire=dto_object.destinataire,
             rue_numero=dto_object.rue_numero,
             code_postal=dto_object.code_postal,

@@ -69,7 +69,7 @@ class ScoreSheetAddressView(PermissionRequiredMixin, FormView):
     def get_initial(self):
         initial = super().get_initial()
         initial.update({
-            "entity": self.score_sheet_address.entite,
+            "entity": self.score_sheet_address.type_entite,
             "recipient": self.score_sheet_address.destinataire,
             "location": self.score_sheet_address.rue_numero,
             "postal_code": self.score_sheet_address.code_postal,

@@ -33,13 +33,13 @@ from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import 
 
 @attr.s(frozen=True, slots=True)
 class ShouldEntiteEtreChoixValide(BusinessValidator):
-    entite = attr.ib(type=str)
+    type_entite = attr.ib(type=str)
 
     def validate(self, *args, **kwargs):
-        if not self.entite:
+        if not self.type_entite:
             return
 
         try:
-            ScoreSheetAddressEntityType[self.entite]
+            ScoreSheetAddressEntityType[self.type_entite]
         except KeyError:
             raise EntiteNonValidePourAdresseException()

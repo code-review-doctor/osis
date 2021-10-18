@@ -190,7 +190,7 @@ class AdresseFeuilleDeNotesFromRepositoryDTO(interface.DTO):
 @attr.s(frozen=True, slots=True)
 class AdresseFeuilleDeNotesDTO(interface.DTO):
     nom_cohorte = attr.ib(type=str)
-    entite = attr.ib(type=str, default="")
+    type_entite = attr.ib(type=str, default="")
     destinataire = attr.ib(type=str, default="")
     rue_numero = attr.ib(type=str, default="")
     code_postal = attr.ib(type=str, default="")

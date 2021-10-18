@@ -26,7 +26,7 @@ from typing import Optional
 
 import attr
 
-from ddd.logic.shared_kernel.entite.domain.model.entiteucl import IdentiteUCLEntite
+from assessments.models.enums.score_sheet_address_choices import ScoreSheetAddressEntityType
 from osis_common.ddd import interface
 
 
@@ -38,7 +38,7 @@ class IdentiteAdresseFeuilleDeNotes(interface.EntityIdentity):
 @attr.s(slots=True)
 class AdresseFeuilleDeNotes(interface.RootEntity):
     entity_id = attr.ib(type=IdentiteAdresseFeuilleDeNotes)
-    entite = attr.ib(type=Optional[IdentiteUCLEntite])
+    type_entite = attr.ib(type=Optional[ScoreSheetAddressEntityType])
     destinataire = attr.ib(type=str)
     rue_numero = attr.ib(type=str)
     code_postal = attr.ib(type=str)
@@ -53,7 +53,7 @@ class AdresseFeuilleDeNotes(interface.RootEntity):
         return self.entity_id.nom_cohorte
 
     def est_identique_a(self, autre_adresse: 'AdresseFeuilleDeNotes') -> bool:
-        return self.entite == autre_adresse.entite and \
+        return self.type_entite == autre_adresse.type_entite and \
                self.destinataire == autre_adresse.destinataire and \
                self.rue_numero == autre_adresse.rue_numero and \
                self.code_postal == autre_adresse.code_postal and \

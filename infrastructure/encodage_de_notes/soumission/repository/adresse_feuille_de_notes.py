@@ -75,11 +75,11 @@ class AdresseFeuilleDeNotesRepository(IAdresseFeuilleDeNotesRepository):
 
     @classmethod
     def _convert_row_to_dto(cls, row, flat_entity_hierarchy) -> AdresseFeuilleDeNotesDTO:
-        if row['entite']:
+        if row['type_entite']:
             entite_data = cls._get_corresponding_entite(row, flat_entity_hierarchy)
             return AdresseFeuilleDeNotesDTO(
                 nom_cohorte=row["nom_cohorte"],
-                entite=row["entite"],
+                type_entite=row["type_entite"],
                 destinataire='{} - {}'.format(entite_data['acronym'], entite_data['title']),
                 rue_numero=entite_data["entity__location"] or "",
                 code_postal=entite_data["entity__postal_code"] or "",
@@ -92,7 +92,7 @@ class AdresseFeuilleDeNotesRepository(IAdresseFeuilleDeNotesRepository):
         else:
             return AdresseFeuilleDeNotesDTO(
                 nom_cohorte=row["nom_cohorte"],
-                entite="",
+                type_entite="",
                 destinataire=row["destinataire"] or "",
                 rue_numero=row["rue_numero"] or "",
                 code_postal=row["code_postal"] or "",
@@ -105,24 +105,24 @@ class AdresseFeuilleDeNotesRepository(IAdresseFeuilleDeNotesRepository):
 
     @classmethod
     def _get_corresponding_entite(cls, row, flat_entity_hierarchy):
-        if row['entite'] == ScoreSheetAddressEntityType.ENTITY_ADMINISTRATION.value:
+        if row['type_entite'] == ScoreSheetAddressEntityType.ENTITY_ADMINISTRATION.value:
             return next(
                 entity for entity in flat_entity_hierarchy
                 if entity['entity_id'] == int(row['entite_administration'])
             )
-        if row['entite'] == ScoreSheetAddressEntityType.ENTITY_ADMINISTRATION_PARENT.value:
+        if row['type_entite'] == ScoreSheetAddressEntityType.ENTITY_ADMINISTRATION_PARENT.value:
             return next(
                 (entity for entity in flat_entity_hierarchy
                  if entity['entity_id'] != int(row['entite_administration']) and int(row['entite_administration']) in
                  entity['children']),
                 dict()
             )
-        if row['entite'] == ScoreSheetAddressEntityType.ENTITY_MANAGEMENT.value:
+        if row['type_entite'] == ScoreSheetAddressEntityType.ENTITY_MANAGEMENT.value:
             return next(
                 entity for entity in flat_entity_hierarchy
                 if entity['entity_id'] == int(row['entite_gestion'])
             )
-        if row['entite'] == ScoreSheetAddressEntityType.ENTITY_MANAGEMENT_PARENT.value:
+        if row['type_entite'] == ScoreSheetAddressEntityType.ENTITY_MANAGEMENT_PARENT.value:
             return next(
                 (entity for entity in flat_entity_hierarchy
                  if entity['entity_id'] != int(row['entite_gestion']) and int(row['entite_gestion']) in
@@ -162,12 +162,12 @@ class AdresseFeuilleDeNotesRepository(IAdresseFeuilleDeNotesRepository):
                 educationgroupyear__acronym=entity.nom_cohorte
             ).first()
 
-        if entity.entite:
+        if entity.type_entite:
             ScoreSheetAddress.objects.update_or_create(
                 education_group=education_group,
                 cohort_name=cohort_name,
                 defaults={
-                    "entity_address_choice": entity.entite,
+                    "entity_address_choice": entity.type_entite.name,
                     "recipient": "",
                     "location": "",
                     "postal_code": "",
@@ -252,12 +252,12 @@ def get_addresse_feuille_notes(cohortes: List[str]):
         ville=F("city"),
         pays=F("country__name"),
         telephone=F("phone"),
-        entite=F('entity_address_choice')
+        type_entite=F('entity_address_choice')
     ).filter(
         nom_cohorte__in=cohortes
     ).values(
         "nom_cohorte",
-        "entite",
+        "type_entite",
         "destinataire",
         "rue_numero",
         "code_postal",
@@ -283,12 +283,12 @@ def get_addresse_feuille_notes(cohortes: List[str]):
             ville=F("city"),
             pays=F("country__name"),
             telephone=F("phone"),
-            entite=F('entity_address_choice')
+            type_entite=F('entity_address_choice')
         ).filter(
             nom_cohorte__in=cohortes
         ).values(
             "nom_cohorte",
-            "entite",
+            "type_entite",
             "destinataire",
             "rue_numero",
             "code_postal",

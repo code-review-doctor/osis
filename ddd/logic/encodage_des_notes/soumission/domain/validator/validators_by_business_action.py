@@ -64,13 +64,13 @@ class EncoderNoteEtudiantValidatorList(TwoStepsMultipleBusinessExceptionListVali
 
 
 @attr.s(frozen=True, slots=True)
-class EncoderAdresseFeuilleDeNotes(TwoStepsMultipleBusinessExceptionListValidator):
-    entite = attr.ib(type=str)
+class EncoderAdresseFeuilleDeNotesValidatorLIst(TwoStepsMultipleBusinessExceptionListValidator):
+    type_entite = attr.ib(type=str)
 
     def get_data_contract_validators(self) -> List[BusinessValidator]:
         return []
 
     def get_invariants_validators(self) -> List[BusinessValidator]:
         return [
-            ShouldEntiteEtreChoixValide(self.entite)
+            ShouldEntiteEtreChoixValide(self.type_entite)
         ]

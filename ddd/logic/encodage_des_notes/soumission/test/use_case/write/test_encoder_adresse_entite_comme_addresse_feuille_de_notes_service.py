@@ -48,7 +48,7 @@ class TestEncoderAddressEntiteCommeAdresseFeuilleDeNotes(SimpleTestCase):
     def setUp(self) -> None:
         self.cmd = EncoderAdresseEntiteCommeAdresseFeuilleDeNotes(
             nom_cohorte="SINF1BA",
-            entite=ScoreSheetAddressEntityType.ENTITY_ADMINISTRATION.value,
+            type_entite=ScoreSheetAddressEntityType.ENTITY_ADMINISTRATION.value,
             email="temp@temp.com",
         )
 
@@ -94,8 +94,8 @@ class TestEncoderAddressEntiteCommeAdresseFeuilleDeNotes(SimpleTestCase):
         with self.assertRaises(AdressePremiereAnneeDeBachelierIdentiqueAuBachlierException):
             message_bus_instance.invoke(cmd)
 
-    def test_cannot_encoder_une_entite_ne_faisant_pas_partie_de_la_cohorte(self):
-        cmd = attr.evolve(self.cmd, entite="OSIS")
+    def test_cannot_encoder_une_entite_ne_faisant_pas_partie_des_choix_possibles(self):
+        cmd = attr.evolve(self.cmd, type_entite="CHOIX_NON_POSSIBLE")
 
         with self.assertRaises(MultipleBusinessExceptions):
             message_bus_instance.invoke(cmd)
@@ -105,7 +105,7 @@ class TestEncoderAddressEntiteCommeAdresseFeuilleDeNotes(SimpleTestCase):
 
         adresse = self.repo.get(result)
         self.assertEqual(adresse.email, self.cmd.email)
-        self.assertEqual(adresse.entite, self.cmd.entite)
+        self.assertEqual(adresse.type_entite.name, self.cmd.type_entite)
         self.assertEqual(adresse.rue_numero, self.epl_entite.adresse.rue_numero)
         self.assertEqual(adresse.code_postal, self.epl_entite.adresse.code_postal)
         self.assertEqual(adresse.ville, self.epl_entite.adresse.ville)

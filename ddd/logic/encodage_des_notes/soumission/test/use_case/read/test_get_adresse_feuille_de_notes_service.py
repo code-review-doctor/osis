@@ -96,7 +96,7 @@ class TestGetAdresseFeuilleDeNotesService(SimpleTestCase):
             adresse: AdresseFeuilleDeNotes,
     ):
         self.assertEqual(dto_obj.nom_cohorte, adresse.nom_cohorte)
-        self.assertEqual(dto_obj.entite, adresse.sigle_entite)
+        self.assertEqual(dto_obj.type_entite, adresse.type_entite.name if adresse.type_entite else "")
         self.assertEqual(dto_obj.destinataire, adresse.destinataire)
         self.assertEqual(dto_obj.rue_numero, adresse.rue_numero)
         self.assertEqual(dto_obj.code_postal, adresse.code_postal)

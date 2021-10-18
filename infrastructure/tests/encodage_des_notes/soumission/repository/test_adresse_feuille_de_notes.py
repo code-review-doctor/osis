@@ -171,7 +171,7 @@ class TestAdresseFeuilleDeNotesRepository(TestCase):
                 CohortYearFactory(education_group_year=egy, first_year_bachelor=True)
 
         CountryFactory(name=adresse.pays)
-        if adresse.entite:
+        if adresse.type_entite:
             egy.administration_entity.location = adresse.rue_numero
             egy.administration_entity.postal_code = adresse.code_postal
             egy.administration_entity.city = adresse.ville
