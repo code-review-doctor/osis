@@ -169,6 +169,10 @@ class FeuilleDeNotesDTO(interface.DTO):
     def nombre_inscriptions(self) -> int:
         return self.quantite_total_notes
 
+    @property
+    def quantite_notes_editables(self) -> int:
+        return sum(1 for note in self.notes_etudiants_inscrits if not note.date_echeance_atteinte)
+
     def get_email_for_noma(self, noma: str) -> str:
         return next(note_etudiant.email for note_etudiant in self.notes_etudiants if note_etudiant.noma == noma)
 
