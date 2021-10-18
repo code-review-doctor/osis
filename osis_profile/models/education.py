@@ -36,40 +36,43 @@ from osis_profile.models.enums.education import (
     ForeignDiplomaTypes,
 )
 from reference.models.country import Country
+from reference.models.language import Language
 
 
 class Schedule(models.Model):
     # ancient language
-    latin = models.PositiveIntegerField(_("Latin"))
-    greek = models.PositiveIntegerField(_("Greek"))
+    latin = models.PositiveIntegerField(_("Latin"), default=0)
+    greek = models.PositiveIntegerField(_("Greek"), default=0)
     # sciences
-    chemistry = models.PositiveIntegerField(_("Chemistry"))
-    physic = models.PositiveIntegerField(_("Physic"))
-    biology = models.PositiveIntegerField(_("Biology"))
+    chemistry = models.PositiveIntegerField(_("Chemistry"), default=0)
+    physic = models.PositiveIntegerField(_("Physic"), default=0)
+    biology = models.PositiveIntegerField(_("Biology"), default=0)
     # modern languages
-    german = models.PositiveIntegerField(_("German"))
-    dutch = models.PositiveIntegerField(_("Dutch"))
-    english = models.PositiveIntegerField(_("English"))
-    french = models.PositiveIntegerField(_("french"))
+    german = models.PositiveIntegerField(_("German"), default=0)
+    dutch = models.PositiveIntegerField(_("Dutch"), default=0)
+    english = models.PositiveIntegerField(_("English"), default=0)
+    french = models.PositiveIntegerField(_("french"), default=0)
     modern_languages_other_label = models.CharField(
         _("Other"),
         max_length=25,
         default="",
         help_text=_("If other language, please specify"),
+        blank=True,
     )
-    modern_languages_other_hours = models.PositiveIntegerField(null=True)
+    modern_languages_other_hours = models.PositiveIntegerField(null=True, blank=True)
     # other disciplines
-    mathematics = models.PositiveIntegerField(_("Mathematics"))
-    it = models.PositiveIntegerField(_("IT"))
-    social_sciences = models.PositiveIntegerField(_("Social sciences"))
-    economic_sciences = models.PositiveIntegerField(_("Economic sciences"))
+    mathematics = models.PositiveIntegerField(_("Mathematics"), default=0)
+    it = models.PositiveIntegerField(_("IT"), default=0)
+    social_sciences = models.PositiveIntegerField(_("Social sciences"), default=0)
+    economic_sciences = models.PositiveIntegerField(_("Economic sciences"), default=0)
     other_label = models.CharField(
         _("Other"),
         max_length=25,
         default="",
         help_text=_("If other optional domains, please specify"),
+        blank=True,
     )
-    other_hours = models.PositiveIntegerField(null=True)
+    other_hours = models.PositiveIntegerField(null=True, blank=True)
 
 
 class HighSchoolDiploma(models.Model):
@@ -103,29 +106,30 @@ class BelgianHighSchoolDiploma(HighSchoolDiploma):
         choices=EducationalTransition.choices(),
         max_length=50,
         null=True,
+        blank=True,
     )
     educational_qualification = models.CharField(
         _("Educational qualification"),
         choices=EducationalQualification.choices(),
         max_length=50,
         null=True,
+        blank=True,
     )
     educational_other = models.CharField(
         _("Other education, to specify"),
         max_length=50,
         default="",
+        blank=True,
     )
     course_repeat = models.BooleanField(
-        _("Did you repeat certain study years during your studies?"), null=True
+        _("Did you repeat certain study years during your studies?"), default=False
     )
     course_orientation = models.BooleanField(
-        _("Did you change of orientation during your studies?"), null=True
+        _("Did you change of orientation during your studies?"), default=False
     )
-    # TODO Does all of the institute details come from an other table?
-    institute_community = models.CharField(_("Community"), max_length=25, null=True)
-    institute_postal_code = models.CharField(_("Postal code"), max_length=25, null=True)
-    institute_name = models.CharField(_("Institute"), max_length=25, null=True)
-    other_institute_name = models.CharField(
+    # TODO change by a FK when we got the related service to look for institutes
+    institute = models.CharField(_("Institute"), default="", max_length=25)
+    other_institute = models.CharField(
         _("Another institute"),
         max_length=500,
         default="",
@@ -133,6 +137,7 @@ class BelgianHighSchoolDiploma(HighSchoolDiploma):
             "In case you could not find your institute in the list, please mention it "
             "below. "
         ),
+        blank=True,
     )
     schedule = models.OneToOneField(
         Schedule,
@@ -153,13 +158,17 @@ class ForeignHighSchoolDiploma(HighSchoolDiploma):
         max_length=25,
         null=True,
     )
-    linguistic_regime = models.CharField(
-        _("Linguistic regime"), max_length=25, default=""
+    linguistic_regime = models.ForeignKey(
+        Language,
+        verbose_name=_("Linguistic regime"),
+        on_delete=models.CASCADE,
+        related_name="+",
     )
     other_linguistic_regime = models.CharField(
         _("If other linguistic regime, please clarify"),
         max_length=25,
         default="",
+        blank=True,
     )
     country = models.ForeignKey(
         Country,
