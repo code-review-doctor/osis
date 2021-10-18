@@ -33,7 +33,8 @@ from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO, EnseignantD
 from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand
 from ddd.logic.encodage_des_notes.shared_kernel.validator.exceptions import PeriodeEncodageNotesFermeeException
 from ddd.logic.encodage_des_notes.soumission.dtos import InscriptionExamenDTO, AttributionEnseignantDTO
-from ddd.logic.encodage_des_notes.soumission.test.factory.note_etudiant import NoteManquanteEtudiantFactory
+from ddd.logic.encodage_des_notes.soumission.test.factory.note_etudiant import NoteManquanteEtudiantFactory, \
+    NoteManquanteEtudiantDateLimiteDepasseeFactory
 from ddd.logic.encodage_des_notes.soumission.test.factory.responsable_de_notes import \
     ResponsableDeNotesLDROI1001Annee2020Factory
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.attribution_enseignant import \
@@ -262,3 +263,13 @@ class GetFeuilleDeNotesTest(SimpleTestCase):
         result = self.message_bus.invoke(self.cmd)
         self.assertIsNone(result.contact_responsable_notes)
         self.resp_notes_repository.save(self.responsable_notes)
+
+    def test_should_return_quantite_notes_editables(self):
+        self.repository.delete(self.note_etudiant.entity_id)
+
+        self.repository.save(NoteManquanteEtudiantFactory(entity_id__noma=self.noma))
+        self.repository.save(NoteManquanteEtudiantFactory(entity_id__noma='99999999'))
+        self.repository.save(NoteManquanteEtudiantDateLimiteDepasseeFactory(entity_id__noma='22222222'))
+
+        feuille_de_note = self.message_bus.invoke(self.cmd)
+        self.assertEqual(feuille_de_note.quantite_notes_editables, 2)
