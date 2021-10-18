@@ -25,10 +25,12 @@
 ##############################################################################
 from django.urls import path
 
-from offer_enrollment.api.views.enrollment import MyOfferEnrollmentsListView, MyOfferYearEnrollmentsListView
+from offer_enrollment.api.views.enrollment import MyOfferEnrollmentsListView, MyOfferYearEnrollmentsListView, \
+    OfferEnrollmentsListView
 
 app_name = "offer_enrollment"
 urlpatterns = [
+    path('enrollments/<str:registration_id>', OfferEnrollmentsListView.as_view(), name=OfferEnrollmentsListView.name),
     path('my_enrollments/', MyOfferEnrollmentsListView.as_view(), name=MyOfferEnrollmentsListView.name),
     path(
         'my_enrollments/<int:year>',
