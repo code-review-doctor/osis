@@ -25,20 +25,21 @@
 ##############################################################################
 from django.test import TestCase
 
-from base.api.serializers.student import StudentSerializer
-from base.tests.factories.student import StudentFactory
+from base.api.serializers.academic_year import AcademicYearSerializer
+from base.tests.factories.academic_year import AcademicYearFactory
 
 
-class StudentSerializerTestCase(TestCase):
+class AcademicYearSerializerTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.student = StudentFactory()
-        cls.serializer = StudentSerializer(cls.student)
+        cls.anac = AcademicYearFactory()
+        cls.serializer = AcademicYearSerializer(cls.anac)
 
     def test_contains_expected_fields(self):
         expected_fields = [
             'uuid',
-            'registration_id',
-            'person'
+            'year',
+            'start_date',
+            'end_date'
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
