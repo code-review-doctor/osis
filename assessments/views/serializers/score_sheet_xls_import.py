@@ -143,7 +143,7 @@ class ProgramManagerScoreSheetXLSImportSerializer(ScoreSheetXLSImportSerializer)
     def get_notes_etudiants(self, worksheet: Worksheet):
         notes_etudiants = []
         for row in super().get_notes_etudiants(worksheet):
-            if row['note'] == "A":
+            if row['note'] in ["A", "a"]:
                 row['note'] = "S"
             notes_etudiants.append(row)
         return notes_etudiants
