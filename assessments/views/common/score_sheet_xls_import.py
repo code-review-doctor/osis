@@ -59,7 +59,7 @@ class ScoreSheetXLSImportBaseView(AjaxPermissionRequiredMixin, AjaxTemplateMixin
     def form_valid(self, form):
         xls_workbook = form.cleaned_data['file']
         try:
-            score_sheet_serialized = ScoreSheetXLSImportSerializer(xls_workbook.active).data
+            score_sheet_serialized = self.get_xls_import_serializer_cls()(xls_workbook.active).data
             self.call_command(self.person.global_id, score_sheet_serialized)
         except ScoreSheetXLSImportSerializerError as e:
             messages.add_message(self.request, messages.ERROR, e.message)
@@ -69,6 +69,9 @@ class ScoreSheetXLSImportBaseView(AjaxPermissionRequiredMixin, AjaxTemplateMixin
         return reverse('learning_unit_score_encoding', kwargs={
             'learning_unit_code': self.kwargs['learning_unit_code']
         })
+
+    def get_xls_import_serializer_cls(self):
+        return ScoreSheetXLSImportSerializer
 
     def call_command(self, matricule, score_sheet_serialized):
         pass
