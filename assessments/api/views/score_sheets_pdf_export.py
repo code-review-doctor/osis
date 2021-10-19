@@ -55,10 +55,8 @@ class ScoreSheetsPDFExportAPIView(APIView):
         if not len(codes_unites_enseignement):
             raise ValidationError(detail="codes queryparam missing")
 
-        validation_errors = []
-
         score_sheet_serialized = ScoreSheetPDFSerializer(
-            instance=self._get_documents(codes_unites_enseignement, validation_errors),
+            instance=self._get_documents(codes_unites_enseignement),
             context={'person': self.person}
         )
 
@@ -79,8 +77,9 @@ class ScoreSheetsPDFExportAPIView(APIView):
             return message_bus_instance.invoke(cmd)
         raise exceptions.PermissionDenied()
 
-    def _get_documents(self, codes_unites_enseignement, validation_errors):
+    def _get_documents(self, codes_unites_enseignement):
         documents = []
+        validation_errors = []
         for code in codes_unites_enseignement:
             feuille_de_notes = self.get_feuille_de_notes(code)
             if feuille_de_notes:
