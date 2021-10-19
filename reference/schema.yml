@@ -322,6 +322,9 @@ components:
         url:
           type: string
           format: uri
+        uuid:
+          type: string
+          format: uuid
         iso_code:
           type: string
           description: |
@@ -332,6 +335,9 @@ components:
         name_en:
           type: string
           description: The english name of the country
+        nationality:
+          type: string
+          description: The nationality of the country
     ArrayOfStudyDomain:
       type: array
       items:
