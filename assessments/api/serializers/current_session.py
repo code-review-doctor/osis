@@ -29,3 +29,4 @@ from rest_framework import serializers
 class CurrentSessionSerializer(serializers.Serializer):
     academic_year = serializers.CharField()
     month_session_name = serializers.CharField()
+    year = serializers.IntegerField()
