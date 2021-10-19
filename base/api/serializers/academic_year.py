@@ -32,6 +32,7 @@ class AcademicYearSerializer(serializers.ModelSerializer):
     class Meta:
         model = AcademicYear
         fields = (
+            'uuid',
             'year',
             'start_date',
             'end_date'

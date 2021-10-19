@@ -214,6 +214,9 @@ components:
     AcademicYear:
       type: object
       properties:
+        uuid:
+          type: string
+          format: uuid
         year:
           type: integer
           example: 2021
