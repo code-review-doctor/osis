@@ -57,6 +57,7 @@ class CreateEffectiveClassService(SimpleTestCase):
         self.student_enrollment_translator.has_enrollments_to_learning_unit = lambda *args: False
 
         self.effective_class_repository = EffectiveClassRepository()
+        self.effective_class_repository.entities.clear()
 
         self.create_class_cmd = CreateEffectiveClassCommand(
             class_code="A",

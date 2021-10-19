@@ -112,9 +112,14 @@ def _get_tutor_class_repartition_dtos(
         return []
     liste_repartition_dtos = []
     for class_repartition in tutor.distributed_effective_classes:
-        attribution = next(
-            att for att in attributions if att.attribution_uuid == class_repartition.attribution.uuid
-        )
+        try:
+            attribution = next(
+                att for att in attributions if att.attribution_uuid == class_repartition.attribution.uuid
+            )
+        except StopIteration:
+            print(attributions)
+            print(class_repartition)
+            raise Exception
         effective_class = next(
             class_obj for class_obj in effective_classes
             if class_obj.entity_id == class_repartition.effective_class

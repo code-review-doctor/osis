@@ -103,7 +103,7 @@ urlpatterns = [
     ])),
 
     path('offers/', include([
-        path('', OffersSearch.as_view(), name='offers_search_new'),
+        path('', OffersSearch.as_view(), name='offers_search'),
         path('<acronym:acronym>/', include([
             path('score_encoding', ScoreSheetAddressView.as_view(), name='score_sheet_address'),
             path(
