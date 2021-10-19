@@ -25,6 +25,7 @@
 ##############################################################################
 from django.conf.urls import url
 
+from reference.api.views.academic_year import AcademicYears
 from reference.api.views.city import CityList
 from reference.api.views.country import CountryList, CountryDetail
 from reference.api.views.language import LanguageList
@@ -37,4 +38,6 @@ urlpatterns = [
     url(r'^countries/(?P<uuid>[0-9a-f-]+)$', CountryDetail.as_view(), name=CountryDetail.name),
     url(r'^study-domains$', StudyDomainList.as_view(), name=StudyDomainList.name),
     url(r'^languages$', LanguageList.as_view(), name=LanguageList.name),
+    url(r'^academic_years$', AcademicYears.as_view(), name=AcademicYears.name),
+
 ]

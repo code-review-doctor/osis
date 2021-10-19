@@ -23,23 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.test import TestCase
+from rest_framework import generics
 
-from base.api.serializers.academic_year import AcademicYearSerializer
-from base.tests.factories.academic_year import AcademicYearFactory
+from base.models.academic_year import AcademicYear
+from reference.api.serializers.academic_year import AcademicYearSerializer
 
 
-class AcademicYearSerializerTestCase(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.anac = AcademicYearFactory()
-        cls.serializer = AcademicYearSerializer(cls.anac)
-
-    def test_contains_expected_fields(self):
-        expected_fields = [
-            'uuid',
-            'year',
-            'start_date',
-            'end_date'
-        ]
-        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
+class AcademicYears(generics.ListAPIView):
+    """
+       Return the list of academic years.
+    """
+    name = 'academic_years'
+    queryset = AcademicYear.objects.all()
+    ordering = ('-year',)
+    serializer_class = AcademicYearSerializer
