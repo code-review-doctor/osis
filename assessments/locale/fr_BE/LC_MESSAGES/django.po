@@ -165,7 +165,7 @@ msgstr "Toute la hiérarchie de "
 msgid ""
 "All the scores were submitted. It is not possible inject Excel file anymore."
 msgstr ""
-"Toues les notes ont été soumises. Il n'est plus possible d'injecter un "
+"Toutes les notes ont été soumises. Il n'est plus possible d'injecter un "
 "fichier Excel."
 
 msgid ""
