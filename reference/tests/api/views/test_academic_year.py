@@ -36,7 +36,7 @@ class AcademicYearsTestCase(APITestCase):
     def setUpTestData(cls):
         cls.anac = AcademicYearFactory()
         cls.user = UserFactory()
-        cls.url = reverse('base_api_v1:academic_years')
+        cls.url = reverse('reference_api_v1:academic_years')
 
     def setUp(self):
         self.client.force_authenticate(user=self.user)
