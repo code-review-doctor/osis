@@ -29,7 +29,7 @@ from base.api.serializers.academic_year import AcademicYearSerializer
 from base.models.academic_year import AcademicYear
 
 
-class AcademicYear(generics.ListAPIView):
+class AcademicYears(generics.ListAPIView):
     """
        Return the list of academic years.
     """

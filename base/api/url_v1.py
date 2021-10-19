@@ -25,11 +25,11 @@
 ##############################################################################
 from django.conf.urls import url
 
-from base.api.views.academic_year import AcademicYear
+from base.api.views.academic_year import AcademicYears
 from base.api.views.person import PersonRoles
 
 app_name = "base"
 urlpatterns = [
     url(r'^person/(?P<global_id>[0-9]+)/roles$', PersonRoles.as_view(), name=PersonRoles.name),
-    url(r'^academic_years$', AcademicYear.as_view(), name=AcademicYear.name),
+    url(r'^academic_years$', AcademicYears.as_view(), name=AcademicYears.name),
 ]
