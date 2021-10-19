@@ -161,3 +161,26 @@
         </div>
     </div>
 {% endblock %}
+
+{% block script %}
+
+    {{ block.super }}
+
+    <script type="text/javascript">
+
+        $(document).ready(function() {
+            if ($('#id_specific_address').get(0).checked) {
+                $('#div_address_fields').show();
+            }
+        });
+
+        $('#id_specific_address').click(function(){
+            if (this.checked) {
+                $('#div_address_fields').show();
+            } else {
+                $('#div_address_fields').hide()
+            }
+        });
+
+    </script>
+{% endblock %}
