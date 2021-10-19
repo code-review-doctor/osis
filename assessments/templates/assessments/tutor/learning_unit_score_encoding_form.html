@@ -55,16 +55,14 @@
                 <div class="col-md-3">
                     <div class="form-group">
                         <label class="w-100">{% trans 'Scores responsible' %}</label>
+                        <span> {{ feuille_de_notes.responsable_note.nom|upper }}, {{ feuille_de_notes.responsable_note.prenom }}</span>
                         {% if feuille_de_notes.autres_enseignants %}
                             <a role="button" data-toggle="collapse" data-target="#other_tutors"
-                               aria-expanded="false" class="pull-right"
+                               aria-expanded="false"
                                aria-controls="other_tutors"
                                title="{% trans 'Display all tutors for this learning unit' %}">
                               <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
                             </a>
-                        {% endif %}
-                        <span> {{ feuille_de_notes.responsable_note.nom|upper }}, {{ feuille_de_notes.responsable_note.prenom }}</span>
-                        {% if feuille_de_notes.autres_enseignants %}
                             <div class="collapse" id="other_tutors">
                                 <label class="w-100">{% trans 'Other tutors' %}</label>
                                 <ul>
