@@ -93,9 +93,6 @@ class LearningUnitYearTest(TestCase):
             learning_container_year=learning_container_yr
         )
 
-    def test_find_by_tutor_with_none_argument(self):
-        self.assertEqual(attribution.find_by_tutor(None), None)
-
     def test_subdivision_computation(self):
         l_container_year = LearningContainerYearFactory(acronym="LBIR1212", academic_year=self.academic_year)
         l_unit_1 = LearningUnitYearFactory(acronym="LBIR1212", learning_container_year=l_container_year,
