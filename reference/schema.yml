@@ -11,7 +11,7 @@ servers:
  - url: https://osis.uclouvain.be/api/v1/reference/
    description: Production server
 info:
-  version: '1.12'
+  version: '1.13'
   title: Reference Service
   description: |-
     A set of API endpoints that allow you to get reference data.
@@ -349,6 +349,9 @@ components:
         url:
           type: string
           format: uri
+        uuid:
+          type: string
+          format: uuid
         iso_code:
           type: string
           description: |
@@ -359,6 +362,9 @@ components:
         name_en:
           type: string
           description: The english name of the country
+        nationality:
+          type: string
+          description: The nationality of the country
     ArrayOfStudyDomain:
       type: array
       items:
