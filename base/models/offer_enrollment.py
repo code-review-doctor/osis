@@ -58,5 +58,6 @@ class OfferEnrollment(SerializableModel):
 def count_enrollments(acronym: str, year: int) -> int:
     return OfferEnrollment.objects.filter(
         education_group_year__acronym=acronym,
-        education_group_year__academic_year__year=year
+        education_group_year__academic_year__year=year,
+        cohort_year__isnull=True,
     ).count()

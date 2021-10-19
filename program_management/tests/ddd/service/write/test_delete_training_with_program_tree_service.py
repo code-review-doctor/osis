@@ -35,6 +35,8 @@ from education_group.tests.ddd.factories.domain.training import TrainingFactory
 from program_management.ddd.command import DeleteTrainingWithProgramTreeCommand
 from program_management.ddd.domain.exception import ProgramTreeNonEmpty
 from program_management.ddd.service.write import delete_training_with_program_tree_service
+from program_management.tests.ddd.factories.domain.program_tree.LDROI100B_DROI1BA import ProgramTreeDROI1BAFactory
+from program_management.tests.ddd.factories.domain.program_tree_version.training.OSIS1BA import OSIS1BAFactory
 from program_management.tests.ddd.factories.domain.program_tree_version.training.OSIS2M import OSIS2MFactory
 from testing.testcases import DDDTestCase
 
@@ -62,9 +64,33 @@ class DeleteTrainingWithProgramTreeTestCase(DDDTestCase):
         "education_group.ddd.domain.service.enrollment_counter.EnrollmentCounter.get_training_enrollments_count",
         return_value=5
     )
-    def test_cannot_delete_training_for_which_there_is_enrolments(self, mock_get_training_enrollments_count):
+    @mock.patch(
+        "education_group.ddd.domain.service.enrollment_counter.EnrollmentCounter.get_cohort_enrollments_count",
+        return_value=0
+    )
+    def test_cannot_delete_training_for_which_there_is_enrolments(self, *mocks):
         with self.assertRaisesBusinessException(TrainingHaveEnrollments):
             delete_training_with_program_tree_service.delete_training_with_program_tree(self.cmd)
+
+    @mock.patch(
+        "education_group.ddd.domain.service.enrollment_counter.EnrollmentCounter.get_training_enrollments_count",
+        return_value=0
+    )
+    @mock.patch(
+        "education_group.ddd.domain.service.enrollment_counter.EnrollmentCounter.get_11BA_enrollments_count",
+        return_value=5
+    )
+    def test_cannot_delete_11BA_for_which_there_is_enrolments(self, *mocks):
+        bachelor = OSIS1BAFactory()[0]
+        cmd = DeleteTrainingWithProgramTreeCommand(
+            code=bachelor.program_tree_identity.code,
+            offer_acronym=bachelor.entity_id.offer_acronym,
+            version_name=bachelor.version_name,
+            transition_name=bachelor.transition_name,
+            from_year=bachelor.entity_id.year + 2
+        )
+        with self.assertRaisesBusinessException(TrainingHaveEnrollments):
+            delete_training_with_program_tree_service.delete_training_with_program_tree(cmd)
 
     @mock.patch(
         "education_group.ddd.domain.service.link_with_epc.LinkWithEPC.is_training_have_link_with_epc",

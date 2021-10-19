@@ -124,4 +124,6 @@ class LearningUnitScoreEncodingTutorViewTest(TestCase):
         self.assertIsInstance(response.context['learning_unit_upload_xls_url'], str)
         self.assertIsInstance(response.context['learning_unit_submit_url'], str)
         self.assertIsInstance(response.context['can_submit_scores'], bool)
+        self.assertIsInstance(response.context['can_encode_scores'], bool)
+        self.assertIsInstance(response.context['can_upload_scores_xls'], bool)
         self.assertIsInstance(response.context['feuille_de_notes'], FeuilleDeNotesDTO)
