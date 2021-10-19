@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('base', '0609_auto_20211011_0908'),
+        ('base', '0610_remove_learningunityear_decimal_scores'),
     ]
 
     operations = [
