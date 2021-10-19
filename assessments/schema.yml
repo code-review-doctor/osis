@@ -222,6 +222,9 @@ components:
         academic_year:
           type: string
           example: "2021-22"
+        year:
+          type: integer
+          example: "2021"
         month_session_name:
           type: string
           example: "January"
