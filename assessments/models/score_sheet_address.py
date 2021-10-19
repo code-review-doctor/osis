@@ -72,13 +72,6 @@ class ScoreSheetAddress(models.Model):
         null=True,
         choices=score_sheet_address_choices.CHOICES
     )
-    entity = models.ForeignKey(
-        "base.Entity",
-        blank=True,
-        null=True,
-        verbose_name=gettext_lazy('Entity of reference'),
-        on_delete=models.PROTECT
-    )
     # Address fields
     recipient = models.CharField(max_length=255, blank=True, null=True)
     location = models.CharField(max_length=255, blank=True, null=True)  # Address for scores sheets
@@ -107,7 +100,7 @@ class ScoreSheetAddress(models.Model):
         return self.location and self.postal_code and self.city and not self.entity_address_choice
 
     def save(self, *args, **kwargs):
-        if self.customized or self.entity_address_choice or self.entity:
+        if self.customized or self.entity_address_choice:
             super(ScoreSheetAddress, self).save(*args, **kwargs)
         else:
             raise Exception(
