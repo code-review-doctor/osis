@@ -22,16 +22,6 @@ paths:
       operationId: countries_list
       parameters:
         - in: query
-          name: limit
-          schema:
-            description: Number of results to return per page.
-            type: integer
-        - in: query
-          name: offset
-          schema:
-            description: The initial index from which to return the results.
-            type: integer
-        - in: query
           name: search
           schema:
             description: A search term which will look up at country name
@@ -103,16 +93,6 @@ paths:
       operationId: cities_list
       parameters:
         - in: query
-          name: limit
-          schema:
-            description: Number of results to return per page.
-            type: integer
-        - in: query
-          name: offset
-          schema:
-            description: The initial index from which to return the results.
-            type: integer
-        - in: query
           name: search
           schema:
             description: A search term which will look up at city name, zipcode or country iso code
@@ -158,16 +138,6 @@ paths:
       operationId: study_domains_list
       parameters:
         - in: query
-          name: limit
-          schema:
-            description: Number of results to return per page.
-            type: integer
-        - in: query
-          name: offset
-          schema:
-            description: The initial index from which to return the results.
-            type: integer
-        - in: query
           name: search
           schema:
             description: A search term which will look up at study domain name
@@ -206,16 +176,6 @@ paths:
       description: Return a list of languages
       operationId: languages_list
       parameters:
-        - in: query
-          name: limit
-          schema:
-            description: Number of results to return per page.
-            type: integer
-        - in: query
-          name: offset
-          schema:
-            description: The initial index from which to return the results.
-            type: integer
         - in: query
           name: search
           schema:
