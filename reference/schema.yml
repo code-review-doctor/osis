@@ -51,13 +51,15 @@ paths:
         - $ref: '#/components/parameters/X-User-LastName'
         - $ref: '#/components/parameters/X-User-Email'
         - $ref: '#/components/parameters/X-User-GlobalID'
+        - $ref: '#/components/parameters/PaginationLimit'
+        - $ref: '#/components/parameters/PaginationOffset'
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ArrayOfCountry'
+                $ref: '#/components/schemas/PaginatedCountry'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -135,13 +137,15 @@ paths:
         - $ref: '#/components/parameters/X-User-LastName'
         - $ref: '#/components/parameters/X-User-Email'
         - $ref: '#/components/parameters/X-User-GlobalID'
+        - $ref: '#/components/parameters/PaginationLimit'
+        - $ref: '#/components/parameters/PaginationOffset'
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ArrayOfCity'
+                $ref: '#/components/schemas/PaginatedCity'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -182,13 +186,15 @@ paths:
         - $ref: '#/components/parameters/X-User-LastName'
         - $ref: '#/components/parameters/X-User-Email'
         - $ref: '#/components/parameters/X-User-GlobalID'
+        - $ref: '#/components/parameters/PaginationLimit'
+        - $ref: '#/components/parameters/PaginationOffset'
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ArrayOfStudyDomain'
+                $ref: '#/components/schemas/PaginatedStudyDomain'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -220,13 +226,15 @@ paths:
         - $ref: '#/components/parameters/X-User-LastName'
         - $ref: '#/components/parameters/X-User-Email'
         - $ref: '#/components/parameters/X-User-GlobalID'
+        - $ref: '#/components/parameters/PaginationLimit'
+        - $ref: '#/components/parameters/PaginationOffset'
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ArrayOfLanguages'
+                $ref: '#/components/schemas/PaginatedLanguage'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -241,6 +249,20 @@ components:
       name: Authorization
       description: Enter your token in the format **Token &lt;token>**
   parameters:
+    PaginationLimit:
+      in: query
+      name: limit
+      description: Limit of paginated results
+      schema:
+        type: integer
+        example: 25
+    PaginationOffset:
+      in: query
+      name: offset
+      description: Offset of paginated results
+      schema:
+        type: integer
+        example: 25
     X-User-FirstName:
       in: header
       name: X-User-FirstName
@@ -293,14 +315,37 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
   schemas:
-    ArrayOfCountry:
-      type: array
-      items:
-        $ref: '#/components/schemas/Country'
-    ArrayOfCity:
-      type: array
-      items:
-        $ref: '#/components/schemas/City'
+    Paging:
+      type: object
+      properties:
+        count:
+          type: integer
+        next:
+          type: string
+          format: uri
+          nullable: true
+        previous:
+          type: string
+          format: uri
+          nullable: true
+    PaginatedCountry:
+      allOf:
+        - $ref: '#/components/schemas/Paging'
+        - type: object
+          properties:
+            results:
+              type: array
+              items:
+                $ref: '#/components/schemas/Country'
+    PaginatedCity:
+      allOf:
+        - $ref: '#/components/schemas/Paging'
+        - type: object
+          properties:
+            results:
+              type: array
+              items:
+                $ref: '#/components/schemas/City'
     City:
       type: object
       properties:
@@ -338,10 +383,15 @@ components:
         nationality:
           type: string
           description: The nationality of the country
-    ArrayOfStudyDomain:
-      type: array
-      items:
-        $ref: '#/components/schemas/StudyDomain'
+    PaginatedStudyDomain:
+      allOf:
+        - $ref: '#/components/schemas/Paging'
+        - type: object
+          properties:
+            results:
+              type: array
+              items:
+                $ref: '#/components/schemas/StudyDomain'
     StudyDomain:
       type: object
       properties:
@@ -354,10 +404,15 @@ components:
         name:
           type: string
           description: The name of study domain
-    ArrayOfLanguages:
-      type: array
-      items:
-        $ref: '#/components/schemas/Language'
+    PaginatedLanguage:
+      allOf:
+        - $ref: '#/components/schemas/Paging'
+        - type: object
+          properties:
+            results:
+              type: array
+              items:
+                $ref: '#/components/schemas/Language'
     Language:
       type: object
       properties:
