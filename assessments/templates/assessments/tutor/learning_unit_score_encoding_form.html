@@ -175,7 +175,9 @@
                                     {% endif %}
                                 </td>
                                 <td headers="deadline">
-                                    {{note_etudiant.echeance_enseignant.to_date|date:"d/m/Y"}}
+                                    {% if not note_etudiant.desinscrit_tardivement %}
+                                        {{note_etudiant.echeance_enseignant.to_date|date:"d/m/Y"}}
+                                    {% endif %}
                                 </td>
                             </tr>
                          {% endfor %}
