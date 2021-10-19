@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import logging
+import operator
 from decimal import Decimal
 from typing import Dict, Union, List, Tuple
 
@@ -265,6 +266,7 @@ class AttributionListView(generics.ListAPIView):
                     'has_peps': next(peps for code, peps in classes_peps if code == clean_code)
                 }
             )
+        ordered_effective_class_repartition = effective_class_repartition.sort(key=operator.itemgetter('code'))
         return effective_class_repartition
 
     @cached_property
