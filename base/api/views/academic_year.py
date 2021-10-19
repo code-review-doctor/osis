@@ -25,16 +25,15 @@
 ##############################################################################
 from rest_framework import generics
 
-from base.api.serializers.person import PersonRolesSerializer
-from base.models.person import Person
+from base.api.serializers.academic_year import AcademicYearSerializer
+from base.models.academic_year import AcademicYear
 
 
-class PersonRoles(generics.RetrieveAPIView):
+class AcademicYear(generics.ListAPIView):
     """
-       Return the roles of a Person.
+       Return the list of academic years.
     """
-    name = 'person-roles'
-    queryset = Person.objects.all()
-
-    serializer_class = PersonRolesSerializer
-    lookup_field = 'global_id'
+    name = 'academic_years'
+    queryset = AcademicYear.objects.all()
+    ordering = ('-year',)
+    serializer_class = AcademicYearSerializer

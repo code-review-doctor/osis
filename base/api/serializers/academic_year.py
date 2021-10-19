@@ -23,18 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from rest_framework import generics
+from rest_framework import serializers
 
-from base.api.serializers.person import PersonRolesSerializer
-from base.models.person import Person
+from base.models.academic_year import AcademicYear
 
 
-class PersonRoles(generics.RetrieveAPIView):
-    """
-       Return the roles of a Person.
-    """
-    name = 'person-roles'
-    queryset = Person.objects.all()
-
-    serializer_class = PersonRolesSerializer
-    lookup_field = 'global_id'
+class AcademicYearSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AcademicYear
+        fields = (
+            'year',
+            'start_date',
+            'end_date'
+        )
