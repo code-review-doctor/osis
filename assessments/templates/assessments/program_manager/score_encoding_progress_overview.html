@@ -76,6 +76,7 @@
                         </div>
                     </div>
                     <div class="row">
+                        {{ search_form.media }}
                         <form method="GET" action="{{ request.path }}" id="form_search_scores_by_offer">
                             <div class="col-md-3">
                                 {% bootstrap_field search_form.cohorte_name %}
@@ -84,7 +85,30 @@
                                 {% bootstrap_field search_form.tutor %}
                             </div>
                             <div class="col-md-3">
-                                {% bootstrap_field search_form.learning_unit_code %}
+                                {% bootstrap_label search_form.learning_unit_code.label label_class="control-label" %}
+                                <span
+                                        class="glyphicon glyphicon-question-sign"
+                                        data-toggle="tooltip"
+                                        data-placement="top"
+                                        data-html="true"
+                                        title="
+                                            {% blocktrans trimmed %}
+                                            <p>
+                                            For a lecturing effective class (PM), use '-' <br/>
+                                            <i>Example : LCOPS1113-A</i>
+                                            </p>
+                                            <p>
+                                            For a practical effective class (PP), use '_' <br/>
+                                            <i>Example : LCOPS1113-A</i>
+                                            </p>
+                                            <p>
+                                            For a partim, put the letter against the the acronym <br/>
+                                            <i>Example : LCOPS1113A</i>
+                                            </p>
+                                            {% endblocktrans %}
+                                        "
+                                ></span>
+                                {% bootstrap_field search_form.learning_unit_code show_label=False %}
                             </div>
                             <div class="col-md-2" style="margin-top: 30px;">
                                 {% bootstrap_field search_form.incomplete_encodings_only %}
