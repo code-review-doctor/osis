@@ -90,12 +90,12 @@ def copy_to_next_year(modeladmin, request, queryset):
 
             except MultipleBusinessExceptions as multiple_exceptions:
                 copy_exception = ", ". join([str(ex.message) for ex in list(multiple_exceptions.exceptions)])
-        except ObjectDoesNotExist as can_copy_exception:
+        except ObjectDoesNotExist:
             message = _(
                 "You cannot create class in %(year)s because there is no learning unit corresponding in %(year)s"
             ) % {
-                          'year': destination_year,
-                      }
+                'year': destination_year,
+            }
             copy_exception = "{}".format(message)
 
         report.append({
