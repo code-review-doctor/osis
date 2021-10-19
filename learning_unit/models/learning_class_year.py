@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import RegexValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -32,6 +33,7 @@ from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.enums import quadrimesters, learning_unit_year_session
 from base.models.enums.component_type import LECTURING
 from base.models.enums.learning_component_year_type import PRACTICAL_EXERCISES
+from base.models.learning_unit_year import LearningUnitYear
 from learning_unit.business.create_class_copy_report import create_class_copy_report
 from osis_common.models import osis_model_admin
 
@@ -52,35 +54,49 @@ def copy_to_next_year(modeladmin, request, queryset):
         )
         classe_result = ''
         copy_exception = ''
-
-        cmd = CreateEffectiveClassCommand(
-            class_code=obj.acronym,
-            learning_unit_code=obj.learning_component_year.learning_unit_year.acronym,
-            year=obj.learning_component_year.learning_unit_year.academic_year.year+1,
-            title_fr=obj.title_fr,
-            title_en=obj.title_en,
-            teaching_place_uuid=obj.campus.uuid,
-            derogation_quadrimester=obj.quadrimester,
-            session_derogation=obj.session,
-            volume_first_quadrimester=obj.hourly_volume_partial_q1,
-            volume_second_quadrimester=obj.hourly_volume_partial_q2
-
-        )
+        # Have to check if the ue's acronym is the same in the destination year
+        lc = obj.learning_component_year.learning_unit_year.learning_container_year.learning_container
+        destination_year = obj.learning_component_year.learning_unit_year.academic_year.year + 1
         try:
-            new_classe_identity = message_bus_instance.invoke(cmd)
-            cmd_get_effective_class_created = GetEffectiveClassCommand(
-                class_code=new_classe_identity.class_code,
-                learning_unit_code=new_classe_identity.learning_unit_identity.code,
-                learning_unit_year=new_classe_identity.learning_unit_identity.academic_year.year
+            destination_luy = LearningUnitYear.objects.get(
+                academic_year__year=599999,
+                learning_container_year__learning_container=lc
             )
-            effective_class_created = message_bus_instance.invoke(cmd_get_effective_class_created)
-            classe_result = "{} — {}".format(
-                effective_class_created.complete_acronym,
-                effective_class_created.entity_id.learning_unit_identity.academic_year
-            )
+            cmd = CreateEffectiveClassCommand(
+                class_code=obj.acronym,
+                learning_unit_code=destination_luy.acronym,
+                year=destination_year,
+                title_fr=obj.title_fr,
+                title_en=obj.title_en,
+                teaching_place_uuid=obj.campus.uuid,
+                derogation_quadrimester=obj.quadrimester,
+                session_derogation=obj.session,
+                volume_first_quadrimester=obj.hourly_volume_partial_q1,
+                volume_second_quadrimester=obj.hourly_volume_partial_q2
 
-        except MultipleBusinessExceptions as multiple_exceptions:
-            copy_exception = ", ". join([str(ex.message) for ex in list(multiple_exceptions.exceptions)])
+            )
+            try:
+                new_classe_identity = message_bus_instance.invoke(cmd)
+                cmd_get_effective_class_created = GetEffectiveClassCommand(
+                    class_code=new_classe_identity.class_code,
+                    learning_unit_code=new_classe_identity.learning_unit_identity.code,
+                    learning_unit_year=new_classe_identity.learning_unit_identity.academic_year.year
+                )
+                effective_class_created = message_bus_instance.invoke(cmd_get_effective_class_created)
+                classe_result = "{} — {}".format(
+                    effective_class_created.complete_acronym,
+                    effective_class_created.entity_id.learning_unit_identity.academic_year
+                )
+
+            except MultipleBusinessExceptions as multiple_exceptions:
+                copy_exception = ", ". join([str(ex.message) for ex in list(multiple_exceptions.exceptions)])
+        except ObjectDoesNotExist:
+            message = _(
+                "You cannot create class in %(year)s because there is no learning unit corresponding in %(year)s"
+            ) % {
+                'year': destination_year,
+            }
+            copy_exception = "{}".format(message)
 
         report.append({
             'source': classe_source,
@@ -97,6 +113,8 @@ class LearningClassYearAdmin(VersionAdmin, osis_model_admin.OsisModelAdmin):
     list_display = ('learning_component_year', 'acronym', 'get_academic_year')
     list_filter = ('learning_component_year__learning_unit_year__academic_year',)
     search_fields = ['acronym', 'learning_component_year__learning_unit_year__acronym']
+
+    actions = [copy_to_next_year]
 
     def get_academic_year(self, obj: 'LearningClassYear'):
         return obj.learning_component_year.learning_unit_year.academic_year
