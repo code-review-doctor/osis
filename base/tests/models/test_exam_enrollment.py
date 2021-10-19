@@ -55,7 +55,7 @@ def create_exam_enrollment_with_student(num_id, registration_id, educ_group_year
     offer_enrollment = test_offer_enrollment.create_offer_enrollment(student, educ_group_year)
     learning_unit_enrollment = test_learning_unit_enrollment.create_learning_unit_enrollment(learning_unit_year,
                                                                                              offer_enrollment)
-    session_exam = test_session_exam.create_session_exam(1, learning_unit_year, educ_group_year)
+    session_exam = test_session_exam.create_session_exam(1)
     return create_exam_enrollment(session_exam, learning_unit_enrollment)
 
 
@@ -71,7 +71,7 @@ class ExamEnrollmentTest(TestCase):
         cls.learn_unit_year = LearningUnitYearFactory(acronym='LSINF1010',
                                                       specific_title='Introduction to algorithmic',
                                                       academic_year=cls.academic_year)
-        cls.session_exam = test_session_exam.create_session_exam(1, cls.learn_unit_year, cls.educ_group_yaer)
+        cls.session_exam = test_session_exam.create_session_exam(1)
         cls.student = test_student.create_student('Pierre', 'Lacazette', '12345678')
         cls.offer_enrollment = test_offer_enrollment.create_offer_enrollment(cls.student, cls.educ_group_yaer)
         cls.learn_unit_enrol = test_learning_unit_enrollment.create_learning_unit_enrollment(cls.learn_unit_year,

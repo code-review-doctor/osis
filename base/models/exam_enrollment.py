@@ -31,6 +31,7 @@ from django.utils.translation import gettext as _
 from base.models import person
 from base.models.enums import exam_enrollment_justification_type as justification_types
 from base.models.enums import exam_enrollment_state as enrollment_states
+from base.models.enums import number_session
 from base.models.exceptions import JustificationValueException
 from base.models.utils.admin_extentions import remove_delete_action
 from osis_common.models.osis_model_admin import OsisModelAdmin
@@ -41,8 +42,7 @@ SCORE_BETWEEN_0_AND_20 = _("Scores must be between 0 and 20")
 class ExamEnrollmentAdmin(OsisModelAdmin):
     list_display = ('student', 'enrollment_state', 'session_exam', 'score_draft', 'justification_draft', 'score_final',
                     'justification_final', 'score_reencoded', 'justification_reencoded', 'changed')
-    list_filter = ('session_exam__number_session', 'session_exam__learning_unit_year__academic_year')
-    raw_id_fields = ('session_exam', 'learning_unit_enrollment')
+    list_filter = ('session_exam__number_session', 'learning_unit_enrollment__learning_unit_year__academic_year')
     search_fields = ['learning_unit_enrollment__offer_enrollment__student__person__first_name',
                      'learning_unit_enrollment__offer_enrollment__student__person__last_name',
                      'learning_unit_enrollment__offer_enrollment__student__registration_id',
