@@ -30,8 +30,6 @@ from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
 
-from attribution.models import attribution
-from base.models import person
 from attribution.auth import predicates as attribution_predicates
 from osis_common.models import serializable_model
 from osis_role.contrib.admin import RoleModelAdmin
