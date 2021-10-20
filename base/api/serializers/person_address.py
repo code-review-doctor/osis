@@ -1,4 +1,4 @@
-##############################################################################
+# ##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -22,33 +22,26 @@
 #    at the root of the source code of this program.  If not,
 #    see http://www.gnu.org/licenses/.
 #
-##############################################################################
-from functools import partial
-
+# ##############################################################################
 from rest_framework import serializers
 
-from reference.models.country import Country
+from base.models.person_address import PersonAddress
+from reference.api.serializers.country import RelatedCountryField
 
 
-RelatedCountryField = partial(
-    serializers.SlugRelatedField,
-    slug_field='iso_code',
-    queryset=Country.objects.all(),
-    allow_null=True,
-)
-
-
-class CountrySerializer(serializers.HyperlinkedModelSerializer):
-    url = serializers.HyperlinkedIdentityField(view_name='reference_api_v1:country-detail', lookup_field='uuid')
-    name = serializers.CharField(required=False)
+class PersonAddressSerializer(serializers.ModelSerializer):
+    country = RelatedCountryField(required=False)
 
     class Meta:
-        model = Country
+        model = PersonAddress
         fields = (
-            'url',
-            'uuid',
-            'iso_code',
-            'name',
-            'name_en',
-            'nationality'
+            "location",
+            "postal_code",
+            "city",
+            "country",
+            "street",
+            "street_number",
+            "postal_box",
+            "place",
         )
+
