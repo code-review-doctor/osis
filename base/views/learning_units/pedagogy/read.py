@@ -68,7 +68,7 @@ def read_learning_unit_pedagogy(request, learning_unit_year_id: int, context, te
     cms_force_majeure_labels_translated = _get_cms_force_majeure_labels_translated(learning_unit_year.id, user_language)
     teaching_materials = TeachingMaterial.objects.filter(learning_unit_year=learning_unit_year).order_by('order')
     attributions = AttributionNew.objects.filter(
-        attributioncharge__learning_component_year__learning_unit_year=learning_unit_year
+        attributionchargenew__learning_component_year__learning_unit_year=learning_unit_year
     ).select_related(
         "tutor__person"
     ).distinct().order_by("tutor__person")

@@ -25,7 +25,6 @@
 ##############################################################################
 from django.test import TestCase
 
-from attribution.tests.models import test_attribution
 from base.auth.roles import tutor
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
@@ -42,9 +41,6 @@ class TestTutor(TestCase):
         TutorFactory()  # Create fake Tutor
         TutorFactory()  # Create fake Tutor
         cls.learning_unit_year = LearningUnitYearFactory()
-        cls.attribution = test_attribution.create_attribution(tutor=cls.tutor,
-                                                               learning_unit_year=cls.learning_unit_year,
-                                                               score_responsible=False)
 
     def test_find_by_person(self):
         self.assertEqual(self.tutor, tutor.find_by_person(self.person))
