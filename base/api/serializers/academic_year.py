@@ -1,4 +1,4 @@
-##############################################################################
+# ##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -22,33 +22,23 @@
 #    at the root of the source code of this program.  If not,
 #    see http://www.gnu.org/licenses/.
 #
-##############################################################################
-from functools import partial
-
+# ##############################################################################
 from rest_framework import serializers
 
-from reference.models.country import Country
+from base.models.academic_year import AcademicYear
 
 
-RelatedCountryField = partial(
-    serializers.SlugRelatedField,
-    slug_field='iso_code',
-    queryset=Country.objects.all(),
-    allow_null=True,
-)
+class RelatedAcademicYearField(serializers.IntegerField, serializers.SlugRelatedField):
+    def __init__(self, **kwargs):
+        kwargs.setdefault('slug_field', 'year')
+        kwargs.setdefault('queryset', AcademicYear.objects.all())
+        kwargs.setdefault('allow_null', True)
+        super().__init__(min_value=1000, max_value=2999, **kwargs)
 
+    def to_internal_value(self, data):
+        # Chain integer casting and related treatment
+        int_value = super(serializers.SlugRelatedField, self).to_internal_value(data)
+        return super(serializers.SlugRelatedField, self).to_internal_value(int_value)
 
-class CountrySerializer(serializers.HyperlinkedModelSerializer):
-    url = serializers.HyperlinkedIdentityField(view_name='reference_api_v1:country-detail', lookup_field='uuid')
-    name = serializers.CharField(required=False)
-
-    class Meta:
-        model = Country
-        fields = (
-            'url',
-            'uuid',
-            'iso_code',
-            'name',
-            'name_en',
-            'nationality'
-        )
+    def to_representation(self, value):
+        return int(super(serializers.SlugRelatedField, self).to_representation(value))
