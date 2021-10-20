@@ -29,13 +29,13 @@ from education_group.converters import MiniTrainingAcronymConverter
 from learning_unit_enrollment.api.views.enrollment import LearningUnitEnrollmentsListView, \
     MyLearningUnitEnrollmentsListView
 
-register_converter(MiniTrainingAcronymConverter, 'acronym')
+register_converter(MiniTrainingAcronymConverter, 'program_acronym')
 
 app_name = "learning_unit_enrollment"
 urlpatterns = [
     path('enrollments/<str:acronym>/<int:year>/', LearningUnitEnrollmentsListView.as_view(),
          name=LearningUnitEnrollmentsListView.name),
-    path('my_enrollments/<acronym:program_code>/<int:year>/',
+    path('my_enrollments/<program_acronym:program_code>/<int:year>/',
          MyLearningUnitEnrollmentsListView.as_view(),
          name=MyLearningUnitEnrollmentsListView.name)
 ]
