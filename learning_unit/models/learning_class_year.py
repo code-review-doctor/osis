@@ -109,6 +109,7 @@ class LearningClassYearAdmin(VersionAdmin, osis_model_admin.OsisModelAdmin):
 
     def get_academic_year(self, obj: 'LearningClassYear'):
         return obj.learning_component_year.learning_unit_year.academic_year
+
     get_academic_year.admin_order_field = 'academic_year'
     get_academic_year.short_description = 'Academic Year'
 

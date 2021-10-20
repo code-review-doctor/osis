@@ -201,6 +201,33 @@ paths:
           $ref: '#/components/responses/Unauthorized'
       tags:
         - languages
+  /academic_years:
+    get:
+      description: 'Return the list of academic years'
+      operationId: get_academic_years
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
+        - $ref: '#/components/parameters/PaginationLimit'
+        - $ref: '#/components/parameters/PaginationOffset'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAcademicYears'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - academic_years
 components:
   securitySchemes:
     Token:
@@ -373,6 +400,32 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/Language'
+    PaginatedAcademicYears:
+      allOf:
+        - $ref: '#/components/schemas/Paging'
+        - type: object
+          properties:
+            results:
+              type: array
+              items:
+                $ref: '#/components/schemas/AcademicYear'
+    AcademicYear:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        year:
+          type: integer
+          example: 2021
+        start_date:
+          type: string
+          format: date
+          example: '2021-09-17'
+        end_date:
+          type: string
+          format: date
+          example: '2021-09-17'
     Language:
       type: object
       properties:

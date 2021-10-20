@@ -24,10 +24,9 @@
 #
 ##############################################################################
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from openpyxl import Workbook
 from openpyxl.styles import Font, colors, Color, PatternFill, Border, Side
-
-from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from openpyxl.styles.borders import BORDER_MEDIUM
 from openpyxl.writer.excel import save_virtual_workbook
 
