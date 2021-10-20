@@ -28,6 +28,7 @@ from typing import List, Dict, Optional
 
 import attr
 
+from base.utils.string import unaccent
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import FeuilleDeNotesDTO, NoteEtudiantDTO, EnseignantDTO, \
     PeriodeEncodageNotesDTO, DateDTO
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_attribution_enseignant import \
@@ -131,7 +132,7 @@ class FeuilleDeNotesParUniteEnseignement(interface.DomainService):
                 )
             )
 
-        notes_etudiants.sort(key=lambda note: (note.nom_cohorte, note.nom, note.prenom))
+        notes_etudiants.sort(key=lambda note: (note.nom_cohorte, unaccent(note.nom), unaccent(note.prenom)))
 
         contact_responsable_notes = None
         if resp_notes:
