@@ -44,4 +44,3 @@ class PersonAddressSerializer(serializers.ModelSerializer):
             "postal_box",
             "place",
         )
-
