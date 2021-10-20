@@ -24,12 +24,16 @@
 #
 # ##############################################################################
 from abc import ABCMeta
+import os
+import inspect
 
 
 class SingletonMeta(ABCMeta):
     _instance = {}
 
     def __call__(cls, *args, **kwargs):
+        # To prevent case repositories class have same name than other repositories class in other contexts
+        abs_path_to_class = os.path.abspath(inspect.getfile(cls)) + cls.__name__
         if cls not in cls._instance:
-            cls._instance[cls] = super(SingletonMeta, cls).__call__(*args, **kwargs)
-        return cls._instance[cls]
+            cls._instance[abs_path_to_class] = super(SingletonMeta, cls).__call__(*args, **kwargs)
+        return cls._instance[abs_path_to_class]

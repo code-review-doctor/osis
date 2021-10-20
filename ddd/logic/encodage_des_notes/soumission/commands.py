@@ -129,3 +129,8 @@ class GetChoixEntitesAdresseFeuilleDeNotesCommand(interface.CommandRequest):
 class GetResponsableDeNotesCommand(interface.CommandRequest):
     code_unite_enseignement = attr.ib(type=str)
     annee_unite_enseignement = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class SearchResponsableDeNotesCommand(interface.CommandRequest):
+    unites_enseignement = attr.ib(type=List[GetResponsableDeNotesCommand])

@@ -35,9 +35,9 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from waffle.testutils import override_flag
 
-from attribution.tests.factories.attribution import AttributionNewFactory
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from attribution.tests.factories.attribution_class import AttributionClassFactory
+from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.models.enums import entity_type
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.academic_calendar_type import AcademicCalendarTypes

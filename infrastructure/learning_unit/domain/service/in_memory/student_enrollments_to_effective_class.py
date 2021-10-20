@@ -23,15 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import attr
 
-from osis_common.ddd.interface import DTO
+from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
+from ddd.logic.learning_unit.domain.service.i_student_enrollments import \
+    IStudentEnrollmentsTranslator
 
 
-@attr.s(frozen=True, slots=True)
-class ScoreResponsibleDTO(DTO):
-    last_name = attr.ib(type=str)
-    first_name = attr.ib(type=str)
-    email = attr.ib(type=str)
-    code_of_learning_unit = attr.ib(type=str)
-    year_of_learning_unit = attr.ib(type=int)
+class StudentEnrollmentsTranslatorInMemory(IStudentEnrollmentsTranslator):
+
+    @classmethod
+    def has_enrollments_to_class(cls, class_identity: 'EffectiveClassIdentity') -> bool:
+        return False
+
+    @classmethod
+    def has_enrollments_to_learning_unit(cls, learning_unit_id: 'LearningUnitIdentity') -> bool:
+        return False
