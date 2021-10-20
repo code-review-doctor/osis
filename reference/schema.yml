@@ -11,7 +11,7 @@ servers:
  - url: https://osis.uclouvain.be/api/v1/reference/
    description: Production server
 info:
-  version: '1.12'
+  version: '1.13'
   title: Reference Service
   description: |-
     A set of API endpoints that allow you to get reference data.
@@ -21,16 +21,6 @@ paths:
       description: Return a list of countries with optional filtering.
       operationId: countries_list
       parameters:
-        - in: query
-          name: limit
-          schema:
-            description: Number of results to return per page.
-            type: integer
-        - in: query
-          name: offset
-          schema:
-            description: The initial index from which to return the results.
-            type: integer
         - in: query
           name: search
           schema:
@@ -51,13 +41,15 @@ paths:
         - $ref: '#/components/parameters/X-User-LastName'
         - $ref: '#/components/parameters/X-User-Email'
         - $ref: '#/components/parameters/X-User-GlobalID'
+        - $ref: '#/components/parameters/PaginationLimit'
+        - $ref: '#/components/parameters/PaginationOffset'
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ArrayOfCountry'
+                $ref: '#/components/schemas/PaginatedCountry'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -101,16 +93,6 @@ paths:
       operationId: cities_list
       parameters:
         - in: query
-          name: limit
-          schema:
-            description: Number of results to return per page.
-            type: integer
-        - in: query
-          name: offset
-          schema:
-            description: The initial index from which to return the results.
-            type: integer
-        - in: query
           name: search
           schema:
             description: A search term which will look up at city name, zipcode or country iso code
@@ -135,13 +117,15 @@ paths:
         - $ref: '#/components/parameters/X-User-LastName'
         - $ref: '#/components/parameters/X-User-Email'
         - $ref: '#/components/parameters/X-User-GlobalID'
+        - $ref: '#/components/parameters/PaginationLimit'
+        - $ref: '#/components/parameters/PaginationOffset'
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ArrayOfCity'
+                $ref: '#/components/schemas/PaginatedCity'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -153,16 +137,6 @@ paths:
       description: Return a list of study domains. By default, it will return all official main study domains.
       operationId: study_domains_list
       parameters:
-        - in: query
-          name: limit
-          schema:
-            description: Number of results to return per page.
-            type: integer
-        - in: query
-          name: offset
-          schema:
-            description: The initial index from which to return the results.
-            type: integer
         - in: query
           name: search
           schema:
@@ -182,13 +156,15 @@ paths:
         - $ref: '#/components/parameters/X-User-LastName'
         - $ref: '#/components/parameters/X-User-Email'
         - $ref: '#/components/parameters/X-User-GlobalID'
+        - $ref: '#/components/parameters/PaginationLimit'
+        - $ref: '#/components/parameters/PaginationOffset'
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ArrayOfStudyDomain'
+                $ref: '#/components/schemas/PaginatedStudyDomain'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -201,16 +177,6 @@ paths:
       operationId: languages_list
       parameters:
         - in: query
-          name: limit
-          schema:
-            description: Number of results to return per page.
-            type: integer
-        - in: query
-          name: offset
-          schema:
-            description: The initial index from which to return the results.
-            type: integer
-        - in: query
           name: search
           schema:
             description: A search term which will look up at country name
@@ -220,13 +186,15 @@ paths:
         - $ref: '#/components/parameters/X-User-LastName'
         - $ref: '#/components/parameters/X-User-Email'
         - $ref: '#/components/parameters/X-User-GlobalID'
+        - $ref: '#/components/parameters/PaginationLimit'
+        - $ref: '#/components/parameters/PaginationOffset'
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ArrayOfLanguages'
+                $ref: '#/components/schemas/PaginatedLanguage'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -241,6 +209,20 @@ components:
       name: Authorization
       description: Enter your token in the format **Token &lt;token>**
   parameters:
+    PaginationLimit:
+      in: query
+      name: limit
+      description: Limit of paginated results
+      schema:
+        type: integer
+        example: 25
+    PaginationOffset:
+      in: query
+      name: offset
+      description: Offset of paginated results
+      schema:
+        type: integer
+        example: 25
     X-User-FirstName:
       in: header
       name: X-User-FirstName
@@ -293,14 +275,37 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
   schemas:
-    ArrayOfCountry:
-      type: array
-      items:
-        $ref: '#/components/schemas/Country'
-    ArrayOfCity:
-      type: array
-      items:
-        $ref: '#/components/schemas/City'
+    Paging:
+      type: object
+      properties:
+        count:
+          type: integer
+        next:
+          type: string
+          format: uri
+          nullable: true
+        previous:
+          type: string
+          format: uri
+          nullable: true
+    PaginatedCountry:
+      allOf:
+        - $ref: '#/components/schemas/Paging'
+        - type: object
+          properties:
+            results:
+              type: array
+              items:
+                $ref: '#/components/schemas/Country'
+    PaginatedCity:
+      allOf:
+        - $ref: '#/components/schemas/Paging'
+        - type: object
+          properties:
+            results:
+              type: array
+              items:
+                $ref: '#/components/schemas/City'
     City:
       type: object
       properties:
@@ -322,6 +327,9 @@ components:
         url:
           type: string
           format: uri
+        uuid:
+          type: string
+          format: uuid
         iso_code:
           type: string
           description: |
@@ -332,10 +340,18 @@ components:
         name_en:
           type: string
           description: The english name of the country
-    ArrayOfStudyDomain:
-      type: array
-      items:
-        $ref: '#/components/schemas/StudyDomain'
+        nationality:
+          type: string
+          description: The nationality of the country
+    PaginatedStudyDomain:
+      allOf:
+        - $ref: '#/components/schemas/Paging'
+        - type: object
+          properties:
+            results:
+              type: array
+              items:
+                $ref: '#/components/schemas/StudyDomain'
     StudyDomain:
       type: object
       properties:
@@ -348,10 +364,15 @@ components:
         name:
           type: string
           description: The name of study domain
-    ArrayOfLanguages:
-      type: array
-      items:
-        $ref: '#/components/schemas/Language'
+    PaginatedLanguage:
+      allOf:
+        - $ref: '#/components/schemas/Paging'
+        - type: object
+          properties:
+            results:
+              type: array
+              items:
+                $ref: '#/components/schemas/Language'
     Language:
       type: object
       properties:

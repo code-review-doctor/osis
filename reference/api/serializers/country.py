@@ -39,5 +39,6 @@ class CountrySerializer(serializers.HyperlinkedModelSerializer):
             'uuid',
             'iso_code',
             'name',
+            'name_en',
             'nationality'
         )
