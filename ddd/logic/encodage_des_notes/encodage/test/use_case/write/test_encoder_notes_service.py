@@ -111,6 +111,15 @@ class EncoderNoteTest(SimpleTestCase):
         self.addCleanup(message_bus_patcher.stop)
         self.message_bus = message_bus_instance
 
+    def test_command_should_upper_case_note_field(self):
+        cmd = EncoderNoteCommand(
+            noma=self.note.noma,
+            email=self.note.email,
+            code_unite_enseignement=self.note.code_unite_enseignement,
+            note="a",
+        )
+        self.assertEqual(cmd.note, "A")
+
     def test_should_empecher_si_periode_fermee_depuis_hier(self):
         hier = datetime.date.today() - datetime.timedelta(days=1)
         date_dans_le_passe = DateDTO(jour=hier.day, mois=hier.month, annee=hier.year)

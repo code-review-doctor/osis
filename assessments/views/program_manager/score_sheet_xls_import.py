@@ -29,6 +29,7 @@ from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
 
 from assessments.views.common.score_sheet_xls_import import ScoreSheetXLSImportBaseView
+from assessments.views.serializers.score_sheet_xls_import import ProgramManagerScoreSheetXLSImportSerializer
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from ddd.logic.encodage_des_notes.encodage.commands import EncoderNotesCommand, EncoderNoteCommand
 from ddd.logic.encodage_des_notes.shared_kernel.commands import GetEncoderNotesRapportCommand
@@ -36,6 +37,9 @@ from infrastructure.messages_bus import message_bus_instance
 
 
 class ScoreSheetXLSImportProgramManagerView(ScoreSheetXLSImportBaseView):
+    def get_xls_import_serializer_cls(self):
+        return ProgramManagerScoreSheetXLSImportSerializer
+
     def call_command(self, matricule, score_sheet_serialized):
         cmd = EncoderNotesCommand(
             matricule_fgs_gestionnaire=self.person.global_id,
