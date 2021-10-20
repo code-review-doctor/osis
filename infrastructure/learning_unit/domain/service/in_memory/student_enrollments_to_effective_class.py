@@ -1,4 +1,4 @@
-# ##############################################################################
+##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -22,18 +22,20 @@
 #    at the root of the source code of this program.  If not,
 #    see http://www.gnu.org/licenses/.
 #
-# ##############################################################################
-from abc import ABCMeta
-import os
-import inspect
+##############################################################################
+
+from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
+from ddd.logic.learning_unit.domain.service.i_student_enrollments import \
+    IStudentEnrollmentsTranslator
 
 
-class SingletonMeta(ABCMeta):
-    _instance = {}
+class StudentEnrollmentsTranslatorInMemory(IStudentEnrollmentsTranslator):
 
-    def __call__(cls, *args, **kwargs):
-        # To prevent case repositories class have same name than other repositories class in other contexts
-        abs_path_to_class = os.path.abspath(inspect.getfile(cls)) + cls.__name__
-        if cls not in cls._instance:
-            cls._instance[abs_path_to_class] = super(SingletonMeta, cls).__call__(*args, **kwargs)
-        return cls._instance[abs_path_to_class]
+    @classmethod
+    def has_enrollments_to_class(cls, class_identity: 'EffectiveClassIdentity') -> bool:
+        return False
+
+    @classmethod
+    def has_enrollments_to_learning_unit(cls, learning_unit_id: 'LearningUnitIdentity') -> bool:
+        return False
