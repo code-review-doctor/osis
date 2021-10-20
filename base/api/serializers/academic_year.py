@@ -1,4 +1,4 @@
-##############################################################################
+# ##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -22,19 +22,23 @@
 #    at the root of the source code of this program.  If not,
 #    see http://www.gnu.org/licenses/.
 #
-##############################################################################
-from django.urls import path
+# ##############################################################################
+from rest_framework import serializers
 
-from offer_enrollment.api.views.enrollment import MyOfferEnrollmentsListView, MyOfferYearEnrollmentsListView, \
-    OfferEnrollmentsListView
+from base.models.academic_year import AcademicYear
 
-app_name = "offer_enrollment"
-urlpatterns = [
-    path('enrollments/<str:registration_id>', OfferEnrollmentsListView.as_view(), name=OfferEnrollmentsListView.name),
-    path('my_enrollments/', MyOfferEnrollmentsListView.as_view(), name=MyOfferEnrollmentsListView.name),
-    path(
-        'my_enrollments/<int:year>',
-        MyOfferYearEnrollmentsListView.as_view(),
-        name=MyOfferYearEnrollmentsListView.name
-    ),
-]
+
+class RelatedAcademicYearField(serializers.IntegerField, serializers.SlugRelatedField):
+    def __init__(self, **kwargs):
+        kwargs.setdefault('slug_field', 'year')
+        kwargs.setdefault('queryset', AcademicYear.objects.all())
+        kwargs.setdefault('allow_null', True)
+        super().__init__(min_value=1000, max_value=2999, **kwargs)
+
+    def to_internal_value(self, data):
+        # Chain integer casting and related treatment
+        int_value = super(serializers.SlugRelatedField, self).to_internal_value(data)
+        return super(serializers.SlugRelatedField, self).to_internal_value(int_value)
+
+    def to_representation(self, value):
+        return int(super(serializers.SlugRelatedField, self).to_representation(value))

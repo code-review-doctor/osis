@@ -23,9 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from functools import partial
+
 from rest_framework import serializers
 
 from reference.models.country import Country
+
+
+RelatedCountryField = partial(
+    serializers.SlugRelatedField,
+    slug_field='iso_code',
+    queryset=Country.objects.all(),
+    allow_null=True,
+)
 
 
 class CountrySerializer(serializers.HyperlinkedModelSerializer):

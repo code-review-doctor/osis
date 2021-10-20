@@ -29,9 +29,11 @@ from django.conf import settings
 from django.db.models import Case, When, Q, F, Value, CharField
 from django.db.models.functions import Replace, Concat, Lower, Substr
 from django.utils.functional import cached_property
+from django_filters import rest_framework as filters
 from rest_framework import generics
 
 from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
+from base.models.enums import offer_enrollment_state
 from base.models.offer_enrollment import OfferEnrollment
 from base.models.person import Person
 from education_group.models.enums.cohort_name import CohortName
@@ -40,20 +42,39 @@ from offer_enrollment.api.serializers.enrollment import EnrollmentSerializer
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
-class MyOfferEnrollmentsListView(LanguageContextSerializerMixin, generics.ListAPIView):
+class OfferEnrollmentFilter(filters.FilterSet):
+    enrollment_state = filters.MultipleChoiceFilter(
+        field_name='enrollment_state',
+        choices=offer_enrollment_state.STATES
+    )
+
+
+class OfferEnrollmentsListView(LanguageContextSerializerMixin, generics.ListAPIView):
     """
-       Return all offer enrollments of connected user
+       Return all offer enrollments of a specified user by global id
     """
-    name = 'my_enrollments'
+    name = 'enrollments'
     serializer_class = EnrollmentSerializer
-    ordering = ['-education_group_year__academic_year']
+    ordering = ['-education_group_year__academic_year__year']
+    filterset_class = OfferEnrollmentFilter
 
     def get_queryset(self):
-        return OfferEnrollment.objects.filter(student__person=self.person).select_related(
+        qs = self.get_common_queryset().filter(
+            student__registration_id=self.kwargs['registration_id']
+        )
+        return self.annotate_queryset(qs)
+
+    @staticmethod
+    def get_common_queryset():
+        return OfferEnrollment.objects.all().select_related(
             'student__person',
             'education_group_year__academic_year',
             'cohort_year__education_group_year__academic_year'
-        ).annotate(
+        )
+
+    @staticmethod
+    def annotate_queryset(qs):
+        return qs.annotate(
             acronym=Case(
                 When(
                     Q(cohort_year__name=CohortName.FIRST_YEAR.name),
@@ -91,6 +112,19 @@ class MyOfferEnrollmentsListView(LanguageContextSerializerMixin, generics.ListAP
             ),
         )
 
+
+class MyOfferEnrollmentsListView(OfferEnrollmentsListView):
+    """
+       Return all offer enrollments of connected user
+    """
+    name = 'my_enrollments'
+
+    def get_queryset(self):
+        qs = self.get_common_queryset().filter(
+            student__person=self.person
+        )
+        return self.annotate_queryset(qs)
+
     @cached_property
     def person(self) -> Person:
         return self.request.user.person
@@ -101,7 +135,6 @@ class MyOfferYearEnrollmentsListView(MyOfferEnrollmentsListView):
        Return all offer enrollments of connected user for a specific year
     """
     name = 'my_enrollments_year'
-    serializer_class = EnrollmentSerializer
 
     def get_queryset(self):
         qs = super().get_queryset()
