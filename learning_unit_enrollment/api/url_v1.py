@@ -23,17 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf.urls import url
-from django.urls import path
+from django.urls import path, register_converter
 
+from education_group.converters import MiniTrainingAcronymConverter
 from learning_unit_enrollment.api.views.enrollment import LearningUnitEnrollmentsListView, \
     MyLearningUnitEnrollmentsListView
+
+register_converter(MiniTrainingAcronymConverter, 'program_acronym')
 
 app_name = "learning_unit_enrollment"
 urlpatterns = [
     path('enrollments/<str:acronym>/<int:year>/', LearningUnitEnrollmentsListView.as_view(),
          name=LearningUnitEnrollmentsListView.name),
-    url(r'^my_enrollments/(?P<program_code>[0-9A-Za-z_/ ]+)/(?P<year>[0-9]{4})/$',
-        MyLearningUnitEnrollmentsListView.as_view(),
-        name=MyLearningUnitEnrollmentsListView.name)
+    path('my_enrollments/<program_acronym:program_code>/<int:year>/',
+         MyLearningUnitEnrollmentsListView.as_view(),
+         name=MyLearningUnitEnrollmentsListView.name)
 ]

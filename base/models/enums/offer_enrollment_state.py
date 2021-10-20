@@ -37,3 +37,5 @@ STATES = (
     (PENDING, _("Pending")),
     (TERMINATION, _("Termination")),
     (END_OF_CYCLE, _("End of cycle")))
+
+VALID_ENROLLMENT_STATES = (SUBSCRIBED, PROVISORY, TERMINATION, END_OF_CYCLE)
