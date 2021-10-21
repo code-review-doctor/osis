@@ -203,10 +203,10 @@ class ResponsableDeNotesRepository(IResponsableDeNotesRepository):
             annee_academique: int
     ) -> Optional['ResponsableDeNotes']:
         try:
-            matricule_fgs = _fetch_responsable_de_notes().get(
+            matricule_fgs = _fetch_responsable_de_notes().filter(
                 acronym=code_unite_enseignement,
                 year=annee_academique
-            ).global_id
+            )[0].global_id
             return cls.search(matricule_fgs=matricule_fgs)[0]
         except IndexError:
             return None
