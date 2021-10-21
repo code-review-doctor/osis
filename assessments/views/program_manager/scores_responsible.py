@@ -175,15 +175,15 @@ class SelectScoreResponsible(LoginRequiredMixin, PermissionRequiredMixin, Templa
 
         message_bus_instance.invoke(cmd)
 
-        # for classe in self.get_attributions_classes():
-        #     matricule_fgs_classe = self.request.POST.get('matricule_fgs_' + classe)
-        #     cmd = AssignerResponsableDeNotesCommand(
-        #         code_unite_enseignement=classe,
-        #         annee_unite_enseignement=self.academic_year.year,
-        #         matricule_fgs_enseignant=matricule_fgs_classe
-        #     )
-        #
-        #     message_bus_instance.invoke(cmd)
+        for classe in self.get_attributions_classes():
+            matricule_fgs_classe = self.request.POST.get('matricule_fgs_' + classe)
+            cmd = AssignerResponsableDeNotesCommand(
+                code_unite_enseignement=classe,
+                annee_unite_enseignement=self.academic_year.year,
+                matricule_fgs_enseignant=matricule_fgs_classe
+            )
+
+            message_bus_instance.invoke(cmd)
 
         return redirect(reverse('scores_responsibles_search'))
 
