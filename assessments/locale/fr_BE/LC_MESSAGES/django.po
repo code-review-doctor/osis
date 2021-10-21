@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-06 08:20+0200\n"
+"POT-Creation-Date: 2021-10-14 09:48+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -299,6 +299,8 @@ msgstr "Entité de référence"
 msgid "Evaluations"
 msgstr "Evaluations"
 
+#, fuzzy, python-format
+#| msgid "Extra time (33% generally)"
 msgid "Extra time (33% generally)"
 msgstr "Tiers-Temps"
 
@@ -767,7 +769,11 @@ msgid "Tutor deadlines"
 msgstr "Dates d'échéance de l'enseignant"
 
 msgid "Tutors of the course"
-msgstr "Tuteurs du cours"
+msgstr "Enseignant.e.s du cours"
+
+#, python-format
+msgid "Tutors' classes of the course %(code)s (%(annee_academique)s)"
+msgstr "Enseignant.e.s des classes du cours %(code)s (%(annee_academique)s)"
 
 msgid "Type"
 msgstr "Type"
