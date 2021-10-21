@@ -30,3 +30,10 @@ class CurrentSessionSerializer(serializers.Serializer):
     academic_year = serializers.CharField()
     month_session_name = serializers.CharField()
     year = serializers.IntegerField()
+
+
+class SessionSerializer(serializers.Serializer):
+    start_date = serializers.DateField()
+    end_date = serializers.DateField()
+    year = serializers.IntegerField()
+    month_session_name = serializers.CharField()

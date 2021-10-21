@@ -24,7 +24,6 @@
 #
 ##############################################################################
 import logging
-import operator
 from decimal import Decimal
 from typing import Dict, Union, List, Tuple
 
@@ -36,7 +35,6 @@ from django.utils.functional import cached_property
 from rest_framework import generics
 from rest_framework.response import Response
 
-from assessments.models.score_responsible import ScoreResponsible
 from attribution.api.serializers.attribution import AttributionSerializer
 from attribution.calendar.access_schedule_calendar import AccessScheduleCalendar
 from attribution.models.attribution_charge_new import AttributionChargeNew
@@ -249,6 +247,7 @@ class AttributionListView(generics.ListAPIView):
             classes_peps: List[ClassPepsTuple]
     ) -> List[EffectiveClassRepartitionDict]:
         effective_class_repartition = []
+        effective_class_identities = []
         for class_repartition in classes_repartition:
             effective_class = message_bus_instance.invoke(
                 GetEffectiveClassCommand(
@@ -257,16 +256,17 @@ class AttributionListView(generics.ListAPIView):
                     learning_unit_code=class_repartition.effective_class.learning_unit_identity.code
                 )
             )  # type: EffectiveClass
-            clean_code = effective_class.complete_acronym.replace('_', '').replace('-', '')
-            effective_class_repartition.append(
-                {
-                    'code': effective_class.complete_acronym,
-                    'title_fr': effective_class.titles.fr,
-                    'title_en': effective_class.titles.en,
-                    'has_peps': next(peps for code, peps in classes_peps if code == clean_code)
-                }
-            )
-        ordered_effective_class_repartition = effective_class_repartition.sort(key=operator.itemgetter('code'))
+            if effective_class.entity_id not in effective_class_identities:
+                clean_code = effective_class.complete_acronym.replace('_', '').replace('-', '')
+                effective_class_repartition.append(
+                    {
+                        'code': effective_class.complete_acronym,
+                        'title_fr': effective_class.titles.fr,
+                        'title_en': effective_class.titles.en,
+                        'has_peps': next(peps for code, peps in classes_peps if code == clean_code)
+                    }
+                )
+                effective_class_identities.append(effective_class.entity_id)
         return effective_class_repartition
 
     @cached_property

@@ -28,7 +28,7 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
 
-from assessments.api.views.assessments import CurrentSessionView
+from assessments.api.views.assessments import CurrentExamSessionView
 from base.models.enums import number_session
 from base.tests.factories.academic_calendar import AcademicCalendarExamSubmissionFactory
 from base.tests.factories.academic_year import AcademicYearFactory
@@ -46,7 +46,7 @@ class CurrentSessionAPIViewTestCase(APITestCase):
                                                                       data_year=cls.academic_year)
         SessionExamCalendarFactory(academic_calendar=cls.academic_calendar, number_session=number_session.ONE)
 
-        cls.url = reverse('assessments_api_v1:' + CurrentSessionView.name)
+        cls.url = reverse('assessments_api_v1:' + CurrentExamSessionView.name)
 
     def setUp(self):
         self.client.force_authenticate(user=self.tutor.person.user)
