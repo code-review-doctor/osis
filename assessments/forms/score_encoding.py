@@ -34,6 +34,7 @@ from base.forms.utils import choice_field
 from base.models.enums.exam_enrollment_justification_type import StateTypes
 from base.models.learning_unit_year import LearningUnitYear
 from ddd.logic.encodage_des_notes.encodage.commands import GetCohortesGestionnaireCommand
+from education_group.forms.fields import UpperCaseCharField
 from infrastructure.messages_bus import message_bus_instance
 
 
@@ -43,7 +44,7 @@ class ScoreEncodingFormSet(BaseFormSet):
 
 
 class ScoreEncodingForm(forms.Form):
-    note = forms.CharField(max_length=100, required=False)
+    note = UpperCaseCharField(max_length=100, required=False)
     noma = forms.CharField(widget=HiddenInput())
 
     def clean_note(self):
@@ -100,11 +101,13 @@ class ScoreSearchForm(forms.Form):
 
 class ScoreEncodingProgressFilterForm(forms.Form):
     cohorte_name = forms.ChoiceField(required=False, label=pgettext_lazy('encoding', 'Program'))
-    tutor = forms.CharField(
-        max_length=100,
+    tutor = forms.ChoiceField(
         required=False,
         label=_('Tutor'),
-        widget=forms.TextInput(attrs={'placeholder':  _('Name')})
+        widget=autocomplete.ListSelect2(
+            url='enseignants-autocomplete',
+            attrs={'data-html': True, 'data-placeholder': _('Name')},
+        )
     )
     learning_unit_code = forms.ChoiceField(
         required=False, label=_('Learning unit'),
