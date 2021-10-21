@@ -115,14 +115,3 @@ class ScoreSheetAddress(models.Model):
 
     def __str__(self):
         return "{0} - {1}".format(self.education_group, self.entity_address_choice)
-
-
-def search_from_education_group_ids(education_group_ids: List[int]) -> List[ScoreSheetAddress]:
-    return ScoreSheetAddress.objects.filter(education_group_id__in=education_group_ids)
-
-
-def get_from_education_group_id(education_group_id: int) -> Optional[ScoreSheetAddress]:
-    try:
-        return ScoreSheetAddress.objects.get(education_group_id=education_group_id)
-    except ObjectDoesNotExist:
-        return None

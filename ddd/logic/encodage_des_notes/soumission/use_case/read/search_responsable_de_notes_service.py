@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,22 +23,24 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django import forms
-from django.utils.translation import gettext_lazy
+from typing import List
 
-from assessments.models.score_sheet_address import ScoreSheetAddress
-from reference.models.country import Country
+from ddd.logic.encodage_des_notes.soumission.commands import SearchResponsableDeNotesCommand
+from ddd.logic.encodage_des_notes.soumission.domain.model._unite_enseignement_identite import \
+    UniteEnseignementIdentiteBuilder
+from ddd.logic.encodage_des_notes.soumission.dtos import ResponsableDeNotesDTO
+from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
 
 
-class ScoreSheetAddressForm(forms.ModelForm):
-    country = forms.ModelChoiceField(queryset=Country.objects.all(), required=False, label=gettext_lazy('Country'))
-    recipient = forms.CharField(max_length=255, label=gettext_lazy('Recipient'))
-    location = forms.CharField(max_length=255, label=gettext_lazy('Street and number'))
-    postal_code = forms.CharField(max_length=255, label=gettext_lazy('Postal code'))
-    city = forms.CharField(max_length=255, label=gettext_lazy('City'))
-    offer_acronym = forms.CharField()
-    email = forms.EmailField(required=False)
-
-    class Meta:
-        model = ScoreSheetAddress
-        exclude = ['external_id', 'education_group', 'changed']
+def search_responsables_de_notes(
+        command: 'SearchResponsableDeNotesCommand',
+        responsable_notes_repo: 'IResponsableDeNotesRepository',
+) -> List['ResponsableDeNotesDTO']:
+    unite_enseignement_ids = {
+        UniteEnseignementIdentiteBuilder.build_from_code_and_annee(
+            cmd.code_unite_enseignement,
+            cmd.annee_unite_enseignement,
+        )
+        for cmd in command.unites_enseignement
+    }
+    return responsable_notes_repo.search_dto(unite_enseignement_ids)

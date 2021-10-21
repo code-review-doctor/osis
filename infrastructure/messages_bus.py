@@ -106,7 +106,7 @@ from ddd.logic.encodage_des_notes.soumission.commands import (
     GetProgressionGeneraleCommand,
     GetResponsableDeNotesCommand,
     SearchAdressesFeuilleDeNotesCommand,
-    SoumettreNotesCommand,
+    SoumettreNotesCommand, SearchResponsableDeNotesCommand,
 )
 from ddd.logic.encodage_des_notes.soumission.use_case.read.get_addresse_feuille_de_notes_service import \
     get_adresse_feuille_de_notes
@@ -120,6 +120,8 @@ from ddd.logic.encodage_des_notes.soumission.use_case.read.get_responsable_de_no
 from ddd.logic.encodage_des_notes.soumission.use_case.read.search_donnees_administratives_feuille_de_notes_service \
     import \
     search_donnees_administratives_feuille_de_notes
+from ddd.logic.encodage_des_notes.soumission.use_case.read.search_responsable_de_notes_service import \
+    search_responsables_de_notes
 from ddd.logic.encodage_des_notes.soumission.use_case.write.assigner_responsable_de_notes_service import \
     assigner_responsable_de_notes
 from ddd.logic.encodage_des_notes.soumission.use_case.write \
@@ -484,6 +486,10 @@ class MessageBusCommands(AbstractMessageBusCommands):
         GetEncoderNotesRapportCommand: lambda cmd: get_encoder_notes_rapport(
             cmd,
             EncoderNotesRapportRepository()
+        ),
+        SearchResponsableDeNotesCommand: lambda cmd: search_responsables_de_notes(
+            cmd,
+            ResponsableDeNotesRepository()
         ),
         SearchEnseignantsCommand: lambda cmd: rechercher_enseignants(
             cmd,

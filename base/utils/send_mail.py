@@ -28,10 +28,7 @@
 Utility files for mail sending
 """
 import datetime
-import itertools
-from typing import List, Set
 
-from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.contrib.messages import ERROR
 from django.db.models import Q
@@ -40,13 +37,9 @@ from django.utils.translation import gettext as _
 from openpyxl import Workbook
 from openpyxl.writer.excel import save_virtual_workbook
 
-from assessments.business import score_encoding_sheet
-from base.models.education_group_year import EducationGroupYear
 from base.models.enums import proposal_type
-from base.models.enums.exam_enrollment_justification_type import JUSTIFICATION_TYPES
-from base.models.exam_enrollment import ExamEnrollment
 from base.models.person import Person
-from osis_common.document import paper_sheet, xls_build
+from osis_common.document import xls_build
 from osis_common.document.xls_build import _adjust_column_width
 from osis_common.messaging import message_config, send_message as message_service
 
@@ -56,58 +49,6 @@ EDUCATIONAL_INFORMATION_UPDATE_HTML = 'educational_information_update_html'
 
 ASSESSMENTS_SCORES_SUBMISSION_MESSAGE_TEMPLATE = "assessments_scores_submission"
 ASSESSMENTS_ALL_SCORES_BY_PGM_MANAGER = "assessments_all_scores_by_pgm_manager"
-
-
-def send_mail_after_scores_submission(persons: List[Person], learning_unit_name: str,
-                                      submitted_enrollments: List[ExamEnrollment], all_encoded: bool):
-    """
-    Send an email to all the teachers after the scores submission for a learning unit
-    :param persons: The list of the teachers of the learning unit
-    :param learning_unit_name: The name of the learning unit for which scores were submitted
-    :param submitted_enrollments : The list of newly submitted enrollments
-    :param all_encoded : Tell if all the scores are encoded and submitted
-    :return An error message if the template is not in the database
-    """
-
-    html_template_ref = "{}_html".format(ASSESSMENTS_SCORES_SUBMISSION_MESSAGE_TEMPLATE)
-    txt_template_ref = "{}_txt".format(ASSESSMENTS_SCORES_SUBMISSION_MESSAGE_TEMPLATE)
-    subject_data = {'learning_unit_name': learning_unit_name}
-
-    template_base_data = {'learning_unit_name': learning_unit_name,
-                          'encoding_status': _('All the scores are encoded.') if all_encoded
-                          else _('It remains notes to encode.')
-                          }
-    justifications = dict(JUSTIFICATION_TYPES)
-    submitted_enrollments_data = [
-        (
-            enrollment.learning_unit_enrollment.offer_enrollment.education_group_year.acronym,
-            enrollment.session_exam.number_session,
-            enrollment.learning_unit_enrollment.offer_enrollment.student.registration_id,
-            enrollment.learning_unit_enrollment.offer_enrollment.student.person.last_name,
-            enrollment.learning_unit_enrollment.offer_enrollment.student.person.first_name,
-            enrollment.score_final if enrollment.score_final is not None else '',
-            justifications[enrollment.justification_final] if enrollment.justification_final else '',
-        ) for enrollment in submitted_enrollments]
-
-    receivers = [
-        message_config.create_receiver(
-            person.id, person.email, person.language if person.language else settings.LANGUAGE_CODE
-        ) for person in persons
-    ]
-
-    for receiver in receivers:
-        table = message_config.create_table('submitted_enrollments',
-                                            get_enrollment_headers(receiver['receiver_lang']),
-                                            submitted_enrollments_data,
-                                            data_translatable=['Justification'])
-        template_base_data.update(
-            {'encoding_status': _get_encoding_status(receiver['receiver_lang'], all_encoded)
-             }
-        )
-        message_content = message_config.create_message_content(html_template_ref, txt_template_ref, [table],
-                                                                [receiver], template_base_data, subject_data)
-        message_service.send_messages(message_content)
-    return None
 
 
 def send_mail_after_the_learning_unit_year_deletion(managers, acronym: str, academic_year, msg_list):
@@ -274,104 +215,6 @@ def _build_worksheet_parameters(workbook, a_user, operation, research_criteria):
     return worksheet_parameters
 
 
-def send_message_after_all_encoded_by_manager(
-        receivers,
-        enrollments,
-        learning_unit_acronym,
-        offer_acronym,
-        updated_enrollments_ids,
-        encoding_already_completed_before_update,
-        cc=None
-):
-    """
-    Send a message to all tutor from a learning unit when all scores are submitted by program manager
-    :param receivers: The list of the tutor (person) of the learning unit
-    :param enrollments: The enrollments that are encoded and submitted
-    :param learning_unit_acronym The learning unit encoded
-    :param offer_acronym: The offer which is managed
-    :param updated_enrollments_ids: updated enrollments ids
-    :param encoding_already_completed_before_update: Before update encoding was already complete.
-    :param cc: Persons (list) need to be in copy (cc) of the emails sent
-    :return: A message if an error occurred, None if it's ok
-    """
-
-    html_template_ref = '{}_html'.format(ASSESSMENTS_ALL_SCORES_BY_PGM_MANAGER)
-    txt_template_ref = '{}_txt'.format(ASSESSMENTS_ALL_SCORES_BY_PGM_MANAGER)
-    receivers = [message_config.create_receiver(person.id, person.email, person.language) for person in receivers]
-    subject_data = {
-        'learning_unit_acronym': learning_unit_acronym,
-        'offer_acronym': offer_acronym
-    }
-    template_base_data = {
-        'learning_unit_acronym': learning_unit_acronym,
-        'offer_acronym': offer_acronym,
-    }
-    justifications = dict(JUSTIFICATION_TYPES)
-    enrollments_data = [
-        (
-            enrollment.learning_unit_enrollment.offer_enrollment.education_group_year.acronym,
-            enrollment.session_exam.number_session,
-            enrollment.learning_unit_enrollment.offer_enrollment.student.registration_id,
-            enrollment.learning_unit_enrollment.offer_enrollment.student.person.last_name,
-            enrollment.learning_unit_enrollment.offer_enrollment.student.person.first_name,
-            enrollment.score_final if enrollment.score_final is not None else '',
-            justifications[enrollment.justification_final] if enrollment.justification_final else '',
-        ) for enrollment in enrollments]
-
-    rows_styles = _underline_updated_scores_in_green(
-        enrollments,
-        updated_enrollments_ids,
-        encoding_already_completed_before_update
-    )
-    txt_complementary_first_col_content_data = _txt_format_complementary_row_content(
-        enrollments,
-        updated_enrollments_ids,
-        encoding_already_completed_before_update
-    )
-
-    receivers_by_lang = itertools.groupby(sorted(receivers, key=__order_by_lang), __order_by_lang)
-    for receiver_lang, receivers in receivers_by_lang:
-
-        table = message_config.create_table(
-            'enrollments',
-            get_enrollment_headers(receiver_lang),
-            {
-                "style": rows_styles,
-                "data": enrollments_data,
-                "txt_complementary_first_col": {
-                    "header": _get_txt_complementary_first_col_header(receiver_lang),
-                    "rows_content": txt_complementary_first_col_content_data
-                }
-            },
-            data_translatable=['Justification'],
-        )
-
-        attachment = build_scores_sheet_attachment(enrollments)
-        message_content = message_config.create_message_content(
-            html_template_ref,
-            txt_template_ref,
-            [table],
-            receivers,
-            template_base_data,
-            subject_data,
-            attachment,
-            cc=cc,
-        )
-        message_service.send_messages(message_content)
-
-
-def __order_by_lang(receiver):
-    return receiver['receiver_lang']
-
-
-def build_scores_sheet_attachment(list_exam_enrollments):
-    name = "%s.pdf" % _('score(s) saved')
-    mimetype = "application/pdf"
-    content = paper_sheet.build_pdf(
-        score_encoding_sheet.scores_sheet_data(list_exam_enrollments, tutor=None))
-    return name, content, mimetype
-
-
 def send_mail_for_educational_information_update(teachers, learning_units_years):
     html_template_ref = EDUCATIONAL_INFORMATION_UPDATE_HTML
     txt_template_ref = EDUCATIONAL_INFORMATION_UPDATE_TXT
@@ -402,47 +245,6 @@ def _get_encoding_status(language, all_encoded):
         return translation.gettext(message)
 
 
-def _underline_updated_scores_in_green(
-        enrollments: List[ExamEnrollment],
-        updated_enrollments_ids: List[int],
-        encoding_already_completed_before_update: List['ExamEnrollment']
-) -> List[str]:
-    css_style_on_rows = []
-    for enrollment in enrollments:
-        has_to_be_marked = _has_to_be_marked(
-            encoding_already_completed_before_update,
-            enrollment,
-            updated_enrollments_ids
-        )
-        css_style_on_rows.append('background-color: lime;' if has_to_be_marked else '')
-    return css_style_on_rows
-
-
-def _txt_format_complementary_row_content(
-        enrollments: List['ExamEnrollment'],
-        updated_enrollments_ids: List[int],
-        encoding_already_completed_before_update: Set['EducationGroupYear']
-) -> List[str]:
-    complementary_first_cols_contents = []
-    for enrollment in enrollments:
-        has_to_be_marked = _has_to_be_marked(
-            encoding_already_completed_before_update,
-            enrollment,
-            updated_enrollments_ids
-        )
-        complementary_first_cols_contents.append('*' if has_to_be_marked else '')
-    return complementary_first_cols_contents
-
-
 def _get_txt_complementary_first_col_header(lang_code):
     with translation.override(lang_code):
         return _('Updated')
-
-
-def _has_to_be_marked(
-        educ_groups_which_encoding_was_complete_before_update: Set['EducationGroupYear'],
-        enrollment: ExamEnrollment,
-        updated_enrollments_ids: List[int]) -> bool:
-    educ_group_year = enrollment.learning_unit_enrollment.offer_enrollment.education_group_year
-    was_encoding_complete_before_update = educ_group_year in educ_groups_which_encoding_was_complete_before_update
-    return not was_encoding_complete_before_update or enrollment.id in updated_enrollments_ids

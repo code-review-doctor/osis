@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
+
 import mock
 from django.test import TestCase
 from django.urls import reverse
@@ -30,7 +32,9 @@ from django.urls import reverse
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
 from base.tests.factories.tutor import TutorFactory
-from ddd.logic.encodage_des_notes.shared_kernel.dtos import FeuilleDeNotesDTO, EnseignantDTO, DetailContactDTO
+from ddd.logic.encodage_des_notes.encodage.commands import GetPeriodeEncodageCommand
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import FeuilleDeNotesDTO, EnseignantDTO, DetailContactDTO, \
+    PeriodeEncodageNotesDTO, DateDTO
 from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand, GetResponsableDeNotesCommand
 from ddd.logic.encodage_des_notes.soumission.dtos import ResponsableDeNotesDTO
 
@@ -82,6 +86,14 @@ class LearningUnitScoreEncodingTutorViewTest(TestCase):
                 code_unite_enseignement='LEPL1509',
                 annee_unite_enseignement=2020,
             )
+        if isinstance(cmd, GetPeriodeEncodageCommand):
+            hier = datetime.date.today() - datetime.timedelta(days=1)
+            return PeriodeEncodageNotesDTO(
+                annee_concernee=self.academic_year.year,
+                session_concernee=2,
+                debut_periode_soumission=DateDTO.build_from_date(hier),
+                fin_periode_soumission=DateDTO.build_from_date(hier),
+            )
         raise Exception('Bus Command not mocked in test')
 
     def test_case_user_not_logged(self):
@@ -95,8 +107,8 @@ class LearningUnitScoreEncodingTutorViewTest(TestCase):
 
         response = self.client.get(self.url)
 
-        expected_redirect_url = reverse('outside_scores_encodings_period')
-        self.assertRedirects(response, expected_redirect_url)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse('outside_scores_encodings_period'))
 
     def test_assert_template_used(self):
         response = self.client.get(self.url)
