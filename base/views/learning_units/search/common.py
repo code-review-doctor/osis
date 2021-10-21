@@ -169,7 +169,7 @@ def _create_ue_list_with_parameters(context, view_obj, is_external_ue_list=False
     luys = context["filter"].qs.prefetch_related(
         'learningcomponentyear_set__learningclassyear_set',
         'learningcomponentyear_set__learningclassyear_set__attributionclass_set',
-        'learningcomponentyear_set__learningclassyear_set__attributionclass_set__scoreresponsible_set',
+        'learningcomponentyear_set__learningclassyear_set__scoreresponsible_set',
     )
     filters = _get_filter(context["form"], view_obj.search_type)
     other_params = {
