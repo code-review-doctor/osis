@@ -260,7 +260,6 @@ msgstr "Entité de référence"
 msgid "Evaluations"
 msgstr "Evaluations"
 
-#, python-format
 msgid "Extra time (33% generally)"
 msgstr "Tiers-Temps"
 
