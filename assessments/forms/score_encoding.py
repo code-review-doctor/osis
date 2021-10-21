@@ -122,11 +122,17 @@ class ScoreEncodingProgressFilterForm(forms.Form):
         super().__init__(**kwargs)
         self.fields['cohorte_name'].choices = self.get_nom_cohorte_choices(matricule_fgs_gestionnaire)
         self.__set_initial_value_to_learning_unit_code()
+        self.__set_initial_value_to_tutor()
 
     def __set_initial_value_to_learning_unit_code(self):
         value_submitted_from_client = self.data.get('learning_unit_code')
         self.fields['learning_unit_code'].initial = value_submitted_from_client
         self.fields['learning_unit_code'].choices = [(value_submitted_from_client, value_submitted_from_client)] or []
+
+    def __set_initial_value_to_tutor(self):
+        value_submitted_from_client = self.data.get('tutor')
+        self.fields['tutor'].initial = value_submitted_from_client
+        self.fields['tutor'].choices = [(value_submitted_from_client, value_submitted_from_client)] or []
 
     def get_nom_cohorte_choices(self, matricule_fgs_gestionnaire: str):
         cmd = GetCohortesGestionnaireCommand(matricule_fgs_gestionnaire=matricule_fgs_gestionnaire)
