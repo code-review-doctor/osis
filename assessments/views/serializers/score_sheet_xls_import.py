@@ -137,3 +137,13 @@ class ScoreSheetXLSImportSerializer(serializers.Serializer):
         representation = super().to_representation(instance)
         json_str = json.dumps(representation)
         return json.loads(json_str)
+
+
+class ProgramManagerScoreSheetXLSImportSerializer(ScoreSheetXLSImportSerializer):
+    def get_notes_etudiants(self, worksheet: Worksheet):
+        notes_etudiants = []
+        for row in super().get_notes_etudiants(worksheet):
+            if row['note'] in ["A", "a"]:
+                row['note'] = "S"
+            notes_etudiants.append(row)
+        return notes_etudiants

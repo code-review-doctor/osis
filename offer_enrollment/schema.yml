@@ -21,6 +21,57 @@ paths:
       description: 'Return all enrollments of the connected user'
       operationId: my_enrollments_list
       parameters:
+        - in: query
+          name: enrollment_state
+          schema:
+            description: Filter result by specified offer enrollment states
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
+        - $ref: '#/components/parameters/PaginationLimit'
+        - $ref: '#/components/parameters/PaginationOffset'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnrollmentList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - enrollment
+  /enrollments/{registration_id}:
+    get:
+      description: 'Return all enrollments of a student specified by its registration id'
+      operationId: enrollments_list
+      parameters:
+        - in: path
+          name: registration_id
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: query
+          name: enrollment_state
+          schema:
+            description: Filter result by specified offer enrollment states
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
         - $ref: '#/components/parameters/Accept-Language'
         - $ref: '#/components/parameters/X-User-FirstName'
         - $ref: '#/components/parameters/X-User-LastName'
@@ -54,6 +105,15 @@ paths:
           schema:
             description: ''
             type: integer
+        - in: query
+          name: enrollment_state
+          schema:
+            description: Filter result by specified offer enrollment states
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
         - $ref: '#/components/parameters/Accept-Language'
         - $ref: '#/components/parameters/X-User-FirstName'
         - $ref: '#/components/parameters/X-User-LastName'

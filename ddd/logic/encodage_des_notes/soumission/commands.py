@@ -34,7 +34,7 @@ from osis_common.ddd import interface
 class EncoderNoteCommand(interface.CommandRequest):
     noma_etudiant = attr.ib(type=str, validator=attr.validators.instance_of(str))
     email_etudiant = attr.ib(type=str, validator=attr.validators.instance_of(str))
-    note = attr.ib(type=str, validator=attr.validators.instance_of(str))
+    note = attr.ib(type=str, converter=lambda n: n.upper(), validator=attr.validators.instance_of(str))
 
 
 @attr.s(frozen=True, slots=True)

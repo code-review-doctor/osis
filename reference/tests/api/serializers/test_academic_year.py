@@ -23,18 +23,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.urls import path
+from django.test import TestCase
 
-from offer_enrollment.api.views.enrollment import MyOfferEnrollmentsListView, MyOfferYearEnrollmentsListView, \
-    OfferEnrollmentsListView
+from base.tests.factories.academic_year import AcademicYearFactory
+from reference.api.serializers.academic_year import AcademicYearSerializer
 
-app_name = "offer_enrollment"
-urlpatterns = [
-    path('enrollments/<str:registration_id>', OfferEnrollmentsListView.as_view(), name=OfferEnrollmentsListView.name),
-    path('my_enrollments/', MyOfferEnrollmentsListView.as_view(), name=MyOfferEnrollmentsListView.name),
-    path(
-        'my_enrollments/<int:year>',
-        MyOfferYearEnrollmentsListView.as_view(),
-        name=MyOfferYearEnrollmentsListView.name
-    ),
-]
+
+class AcademicYearSerializerTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.anac = AcademicYearFactory()
+        cls.serializer = AcademicYearSerializer(cls.anac)
+
+    def test_contains_expected_fields(self):
+        expected_fields = [
+            'uuid',
+            'year',
+            'start_date',
+            'end_date'
+        ]
+        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)

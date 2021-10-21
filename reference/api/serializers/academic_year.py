@@ -23,18 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.urls import path
+from rest_framework import serializers
 
-from offer_enrollment.api.views.enrollment import MyOfferEnrollmentsListView, MyOfferYearEnrollmentsListView, \
-    OfferEnrollmentsListView
+from base.models.academic_year import AcademicYear
 
-app_name = "offer_enrollment"
-urlpatterns = [
-    path('enrollments/<str:registration_id>', OfferEnrollmentsListView.as_view(), name=OfferEnrollmentsListView.name),
-    path('my_enrollments/', MyOfferEnrollmentsListView.as_view(), name=MyOfferEnrollmentsListView.name),
-    path(
-        'my_enrollments/<int:year>',
-        MyOfferYearEnrollmentsListView.as_view(),
-        name=MyOfferYearEnrollmentsListView.name
-    ),
-]
+
+class AcademicYearSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AcademicYear
+        fields = (
+            'uuid',
+            'year',
+            'start_date',
+            'end_date'
+        )

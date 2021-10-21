@@ -28,6 +28,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from base.models.enums import offer_enrollment_state
+from base.models.enums.learning_component_year_type import LECTURING
 from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
 from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
 from base.tests.factories.user import UserFactory
@@ -83,7 +84,7 @@ class LearningUnitEnrollmentsListViewTestCase(APITestCase):
         ])
 
     def test_get_results_assert_acronym_class_is_correct(self):
-        class_year = LearningClassYearFactory()
+        class_year = LearningClassYearFactory(learning_component_year__type=LECTURING)
         ue_enrollment_class = LearningUnitEnrollmentFactory(
             learning_class_year=class_year,
             learning_unit_year=class_year.learning_component_year.learning_unit_year
@@ -100,7 +101,7 @@ class LearningUnitEnrollmentsListViewTestCase(APITestCase):
 
         self.assertEqual(
             results[0]['learning_unit_acronym'],
-            ue_enrollment_class.learning_unit_year.acronym + class_year.acronym
+            "{}-{}".format(ue_enrollment_class.learning_unit_year.acronym, class_year.acronym)
         )
 
     def test_should_get_no_results_when_offer_enrollment_state_not_valid(self):

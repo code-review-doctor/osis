@@ -150,6 +150,7 @@ class TestEnvoyerMailEncodageComplet(SimpleTestCase):
         )
 
         self.assertFalse(mock_send_mail.called)
+        self.note_etudiant_repo.delete(note_manquante.entity_id)
 
     def test_should_envoyer_mail_correction_si_encodage_deja_complet_avant_encodage(self, mock_send_mail):
         notes_encodees = [self.notes_ldroi1001[0].entity_id]
