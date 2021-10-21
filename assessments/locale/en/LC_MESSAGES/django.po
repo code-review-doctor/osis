@@ -476,6 +476,9 @@ msgstr ""
 msgid "Search"
 msgstr ""
 
+msgid "Search of annual programs"
+msgstr ""
+
 msgid "Select an encoding type"
 msgstr ""
 
