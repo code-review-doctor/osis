@@ -28,12 +28,12 @@ from rest_framework import exceptions
 from rest_framework.exceptions import ValidationError
 from rest_framework.views import APIView
 
+from assessments.export.score_sheet_pdf import print_notes
 from assessments.views.serializers.score_sheet import ScoreSheetPDFSerializer
 from base.auth.roles.tutor import Tutor
 from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand, \
     SearchAdressesFeuilleDeNotesCommand
 from infrastructure.messages_bus import message_bus_instance
-from osis_common.document import paper_sheet
 from osis_role.contrib.helper import EntityRoleHelper
 
 
@@ -62,7 +62,7 @@ class ScoreSheetsPDFExportAPIView(APIView):
             ],
             context={'person': self.person}
         )
-        return paper_sheet.print_notes(score_sheet_serialized.data)
+        return print_notes(score_sheet_serialized.data)
 
     def get_donnees_administratives(self, code_unite_enseignement: str):
         cmd = SearchAdressesFeuilleDeNotesCommand(

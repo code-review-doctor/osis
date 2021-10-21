@@ -25,7 +25,7 @@
 ##############################################################################
 import re
 from collections import namedtuple, defaultdict
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 from django.conf import settings
 from django.template.defaultfilters import yesno
@@ -46,10 +46,12 @@ from base.models.enums.learning_unit_year_subtypes import LEARNING_UNIT_YEAR_SUB
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.models.learning_unit_year import LearningUnitYear
+from base.models.person import Person
 from base.utils.excel import get_html_to_text
-from ddd.logic.score_encoding.commands import SearchScoresResponsibleCommand
-from ddd.logic.score_encoding.dtos import ScoreResponsibleDTO
-from ddd.logic.score_encoding.use_case.read.search_scores_responsibles_service import search_scores_responsibles
+from ddd.logic.encodage_des_notes.soumission.commands import GetResponsableDeNotesCommand, \
+    SearchResponsableDeNotesCommand
+from ddd.logic.encodage_des_notes.soumission.dtos import ResponsableDeNotesDTO
+from infrastructure.messages_bus import message_bus_instance
 from learning_unit.ddd.domain.achievement import Achievement
 from learning_unit.ddd.domain.description_fiche import DescriptionFiche
 from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear as DddLearningUnitYear
@@ -223,11 +225,18 @@ def _build_excel_lines_ues(custom_xls_form: CustomXlsForm, tree: 'ProgramTree'):
                 for learn_unt_child in learning_unit_nodes
             ]
         )
-        score_responsibles = search_scores_responsibles(
-            [
-                SearchScoresResponsibleCommand(code=luy.acronym, year=luy.year) for luy in learning_unit_years
+        cmd = SearchResponsableDeNotesCommand(
+            unites_enseignement=[
+                GetResponsableDeNotesCommand(code_unite_enseignement=luy.acronym, annee_unite_enseignement=luy.year)
+                for luy in learning_unit_years
             ]
         )
+        score_responsibles = message_bus_instance.invoke(cmd)
+        email_by_matricule = dict(
+            Person.objects.filter(
+                global_id__in={resp.matricule for resp in score_responsibles}
+            ).values_list('global_id', 'email')
+        ) if score_responsibles else {}
     else:
         learning_unit_years = []
         score_responsibles = []
@@ -253,7 +262,8 @@ def _build_excel_lines_ues(custom_xls_form: CustomXlsForm, tree: 'ProgramTree'):
                     luy,
                     optional_data_needed,
                     link,
-                    score_responsibles
+                    score_responsibles,
+                    email_by_matricule
                 ))
                 if luy.proposal and luy.proposal.type:
                     font_rows[PROPOSAL_LINE_STYLES.get(luy.proposal.type)].append(idx)
@@ -377,7 +387,8 @@ def _get_optional_data(
         luy: DddLearningUnitYear,
         optional_data_needed: Dict[str, bool],
         link: 'Link',
-        score_responsibles: List[ScoreResponsibleDTO]
+        score_responsibles: List['ResponsableDeNotesDTO'],
+        email_by_matricule: Dict = None
 ):
     if optional_data_needed['has_required_entity']:
         data.append(luy.entities.requirement_entity_acronym)
@@ -418,17 +429,17 @@ def _get_optional_data(
 
         data.append(
             ";".join(
-                ["{} {}".format((teacher.last_name or "").upper(),
-                                teacher.first_name or "")
+                ["{} {}".format((teacher.nom or "").upper(),
+                                teacher.prenom or "")
                  for teacher in luy_score_responsibles
                  ]
             )
         )
         data.append(
             ";".join(
-                [teacher.email
-                 for teacher in luy_score_responsibles
-                 ]
+                [
+                    email_by_matricule[teacher.matricule] for teacher in luy_score_responsibles
+                ]
             )
         )
     if optional_data_needed['has_proposition']:
@@ -664,11 +675,11 @@ def _get_xls_title(tree: 'ProgramTree', program_tree_version: 'ProgramTreeVersio
 
 
 def _get_luy_score_responsibles(
-        score_responsibles: List[ScoreResponsibleDTO],
+        score_responsibles: List['ResponsableDeNotesDTO'],
         luy: DddLearningUnitYear
-) -> List[ScoreResponsibleDTO]:
+) -> List['ResponsableDeNotesDTO']:
 
     return [
         score_resp for score_resp in score_responsibles
-        if luy.acronym == score_resp.code_of_learning_unit and luy.year == score_resp.year_of_learning_unit
+        if luy.acronym == score_resp.code_unite_enseignement and luy.year == score_resp.annee_unite_enseignement
     ]

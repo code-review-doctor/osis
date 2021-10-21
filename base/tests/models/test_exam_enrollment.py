@@ -55,7 +55,7 @@ def create_exam_enrollment_with_student(num_id, registration_id, educ_group_year
     offer_enrollment = test_offer_enrollment.create_offer_enrollment(student, educ_group_year)
     learning_unit_enrollment = test_learning_unit_enrollment.create_learning_unit_enrollment(learning_unit_year,
                                                                                              offer_enrollment)
-    session_exam = test_session_exam.create_session_exam(1, learning_unit_year, educ_group_year)
+    session_exam = test_session_exam.create_session_exam(1)
     return create_exam_enrollment(session_exam, learning_unit_enrollment)
 
 
@@ -71,7 +71,7 @@ class ExamEnrollmentTest(TestCase):
         cls.learn_unit_year = LearningUnitYearFactory(acronym='LSINF1010',
                                                       specific_title='Introduction to algorithmic',
                                                       academic_year=cls.academic_year)
-        cls.session_exam = test_session_exam.create_session_exam(1, cls.learn_unit_year, cls.educ_group_yaer)
+        cls.session_exam = test_session_exam.create_session_exam(1)
         cls.student = test_student.create_student('Pierre', 'Lacazette', '12345678')
         cls.offer_enrollment = test_offer_enrollment.create_offer_enrollment(cls.student, cls.educ_group_yaer)
         cls.learn_unit_enrol = test_learning_unit_enrollment.create_learning_unit_enrollment(cls.learn_unit_year,
@@ -102,112 +102,3 @@ class ExamEnrollmentTest(TestCase):
         ex_enrol = self.exam_enrollment
         ex_enrol.justification_reencoded = 'invalid_justification'
         self.assertRaises(exceptions.JustificationValueException, ex_enrol.save)
-
-    def test_calculate_exam_enrollment_without_progress(self):
-        self.assertEqual(exam_enrollment.calculate_exam_enrollment_progress(None), 0)
-
-    def test_calculate_exam_enrollment_with_progress(self):
-        ex_enrol = [self.exam_enrollment]
-        progress = exam_enrollment.calculate_exam_enrollment_progress(ex_enrol)
-        self.assertTrue(0 <= progress <= 100)
-
-    def test_is_deadline_reached(self):
-        self.exam_enrollment.save()
-        SessionExamDeadlineFactory(deadline=datetime.date.today() - datetime.timedelta(days=1),
-                                   number_session=self.session_exam.number_session,
-                                   offer_enrollment=self.offer_enrollment)
-        self.assertTrue(exam_enrollment.is_deadline_reached(self.exam_enrollment))
-
-    def test_is_deadline_not_reached(self):
-        self.exam_enrollment.save()
-        SessionExamDeadlineFactory(deadline=datetime.date.today() + datetime.timedelta(days=2),
-                                   number_session=self.session_exam.number_session,
-                                   offer_enrollment=self.offer_enrollment)
-        self.assertFalse(exam_enrollment.is_deadline_reached(self.exam_enrollment))
-
-    def test_is_deadline_tutor_reached(self):
-        self.exam_enrollment.save()
-        SessionExamDeadlineFactory(deadline=datetime.date.today() + datetime.timedelta(days=3),
-                                   deadline_tutor=5,
-                                   number_session=self.session_exam.number_session,
-                                   offer_enrollment=self.offer_enrollment)
-        self.assertTrue(exam_enrollment.is_deadline_tutor_reached(self.exam_enrollment))
-
-    def test_is_deadline_tutor_not_reached(self):
-        self.exam_enrollment.save()
-        SessionExamDeadlineFactory(deadline=datetime.date.today() + datetime.timedelta(days=3),
-                                   deadline_tutor=2,
-                                   number_session=self.session_exam.number_session,
-                                   offer_enrollment=self.offer_enrollment)
-        self.assertFalse(exam_enrollment.is_deadline_tutor_reached(self.exam_enrollment))
-
-    def test_is_deadline_tutor_not_set_not_reached(self):
-        self.exam_enrollment.save()
-        SessionExamDeadlineFactory(deadline=datetime.date.today() + datetime.timedelta(days=3),
-                                   deadline_tutor=None,
-                                   number_session=self.session_exam.number_session,
-                                   offer_enrollment=self.offer_enrollment)
-        self.assertFalse(exam_enrollment.is_deadline_tutor_reached(self.exam_enrollment))
-
-    def test_is_deadline_tutor_not_set_reached(self):
-        self.exam_enrollment.save()
-        SessionExamDeadlineFactory(deadline=datetime.date.today() - datetime.timedelta(days=1),
-                                   deadline_tutor=None,
-                                   number_session=self.session_exam.number_session,
-                                   offer_enrollment=self.offer_enrollment)
-        self.assertTrue(exam_enrollment.is_deadline_tutor_reached(self.exam_enrollment))
-
-    def test_find_for_score_encodings_for_all_enrollement_state(self):
-        self.assertCountEqual(exam_enrollment.find_for_score_encodings(
-            session_exam_number=1,
-        ), [self.exam_enrollment, self.exam_enrollment_2])
-
-    def test_find_for_score_encodings_enrolled_state_only(self):
-        self.assertCountEqual(exam_enrollment.find_for_score_encodings(
-            session_exam_number=1,
-            only_enrolled=True
-        ), [self.exam_enrollment])
-
-
-class ExamEnrollmentDisplayPropertyTest(TestCase):
-    def test_justification_draft_display_property_case_is_absence_of_justification(self):
-        exam_enroll = ExamEnrollmentFactory(justification_draft=JustificationTypes.ABSENCE_UNJUSTIFIED.name)
-        self.assertEqual(exam_enroll.justification_draft_display, exam_enrollment.JUSTIFICATION_ABSENT_FOR_TUTOR)
-
-    def test_justification_draft_display_property_case_have_justification(self):
-        exam_enroll = ExamEnrollmentFactory(justification_draft=JustificationTypes.CHEATING.name)
-        self.assertEqual(exam_enroll.justification_draft_display, JustificationTypes.CHEATING.value)
-
-    def test_justification_draft_display_property_case_no_justification(self):
-        exam_enroll = ExamEnrollmentFactory(justification_draft=None)
-        self.assertIsNone(exam_enroll.justification_draft_display)
-
-    def test_justification_final_display_as_tutor_property_case_is_absence_of_justification(self):
-        exam_enroll = ExamEnrollmentFactory(justification_final=JustificationTypes.ABSENCE_UNJUSTIFIED.name)
-        self.assertEqual(
-            exam_enroll.justification_final_display_as_tutor,
-            exam_enrollment.JUSTIFICATION_ABSENT_FOR_TUTOR
-        )
-
-    def test_justification_final_display_as_tutor_property_case_have_justification(self):
-        exam_enroll = ExamEnrollmentFactory(justification_final=JustificationTypes.CHEATING.name)
-        self.assertEqual(exam_enroll.justification_final_display_as_tutor, JustificationTypes.CHEATING.value)
-
-    def test_justification_final_display_as_tutor_property_case_no_justification(self):
-        exam_enroll = ExamEnrollmentFactory(justification_final=None)
-        self.assertIsNone(exam_enroll.justification_final_display_as_tutor)
-
-    def test_justification_reencoded_display_as_tutor_property_case_is_absence_of_justification(self):
-        exam_enroll = ExamEnrollmentFactory(justification_reencoded=JustificationTypes.ABSENCE_UNJUSTIFIED.name)
-        self.assertEqual(
-            exam_enroll.justification_reencoded_display_as_tutor,
-            exam_enrollment.JUSTIFICATION_ABSENT_FOR_TUTOR
-        )
-
-    def test_justification_reencoded_display_as_tutor_property_case_have_justification(self):
-        exam_enroll = ExamEnrollmentFactory(justification_reencoded=JustificationTypes.CHEATING.name)
-        self.assertEqual(exam_enroll.justification_reencoded_display_as_tutor, JustificationTypes.CHEATING.value)
-
-    def test_justification_reencoded_display_as_tutor_property_case_no_justification(self):
-        exam_enroll = ExamEnrollmentFactory(justification_reencoded=None)
-        self.assertIsNone(exam_enroll.justification_reencoded_display_as_tutor)
