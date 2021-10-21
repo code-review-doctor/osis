@@ -40,8 +40,18 @@ SCORE_BETWEEN_0_AND_20 = _("Scores must be between 0 and 20")
 
 
 class ExamEnrollmentAdmin(OsisModelAdmin):
-    list_display = ('learning_unit_enrollment', 'enrollment_state', 'session_exam', 'score_draft', 'justification_draft', 'score_final',
-                    'justification_final', 'score_reencoded', 'justification_reencoded', 'changed')
+    list_display = (
+        'learning_unit_enrollment',
+        'enrollment_state',
+        'session_exam',
+        'score_draft',
+        'justification_draft',
+        'score_final',
+        'justification_final',
+        'score_reencoded',
+        'justification_reencoded',
+        'changed',
+    )
     list_filter = ('session_exam__number_session', 'learning_unit_enrollment__learning_unit_year__academic_year')
     search_fields = ['learning_unit_enrollment__offer_enrollment__student__person__first_name',
                      'learning_unit_enrollment__offer_enrollment__student__person__last_name',
