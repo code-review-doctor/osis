@@ -43,6 +43,7 @@ class CountryListSerializerTestCase(TestCase):
             'uuid',
             'iso_code',
             'name',
+            'name_en',
             'nationality'
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)

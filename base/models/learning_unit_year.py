@@ -61,6 +61,8 @@ from education_group import publisher
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin, SerializableModelManager, \
     SerializableQuerySet
 
+CREDITS_FOR_DECIMAL_SCORES = 15
+
 AUTHORIZED_REGEX_CHARS = "$*+.^"
 REGEX_ACRONYM_CHARSET = "[A-Z0-9" + AUTHORIZED_REGEX_CHARS + "]+"
 MINIMUM_CREDITS = 0.0
@@ -129,7 +131,7 @@ class LearningUnitYearAdmin(VersionAdmin, SerializableModelAdmin):
         'status',
         'changed',
     )
-    list_filter = ('academic_year', 'decimal_scores', 'summary_locked')
+    list_filter = ('academic_year', 'summary_locked')
     search_fields = [
         'acronym',
         'learning_container_year__requirement_entity__entityversion__acronym',
@@ -316,7 +318,6 @@ class LearningUnitYear(SerializableModel):
     credits = models.DecimalField(null=True, max_digits=5, decimal_places=2,
                                   validators=[MinValueValidator(MINIMUM_CREDITS), MaxValueValidator(MAXIMUM_CREDITS)],
                                   verbose_name=_('Credits'))
-    decimal_scores = models.BooleanField(default=False)
     internship_subtype = models.CharField(max_length=250, blank=True, null=True,
                                           verbose_name=_('Internship subtype'),
                                           choices=internship_subtypes.INTERNSHIP_SUBTYPES)
@@ -688,6 +689,12 @@ class LearningUnitYear(SerializableModel):
         _warnings.extend(_check_number_of_classes(all_components))
         _warnings.extend(_check_volume_consistency_with_ue(all_components))
         return _warnings
+
+    @property
+    def decimal_scores(self):
+        if self.credits >= CREDITS_FOR_DECIMAL_SCORES:
+            return True
+        return False
 
 
 def _check_volume_consistency_with_ue(all_components: List[LearningComponentYear]):

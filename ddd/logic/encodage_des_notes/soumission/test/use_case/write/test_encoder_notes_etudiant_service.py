@@ -488,6 +488,10 @@ class EncoderNotesTest(SimpleTestCase):
         self.assertEqual(notes_enregistrees[0].numero_session, self.note.entity_id.numero_session)
         self.assertEqual(notes_enregistrees[0].annee_academique, self.note.entity_id.annee_academique)
 
+    def test_command_should_upper_case_note_field(self):
+        cmd = EncoderNoteCommand(noma_etudiant=self.note.noma, email_etudiant=self.note.email, note="a")
+        self.assertEqual(cmd.note, "A")
+
     def test_should_ajouter_notes_non_enregistree_dans_rapport(self):
         note1 = NoteManquanteEtudiantFactory()
         self.repository.save(note1)

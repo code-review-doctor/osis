@@ -80,7 +80,7 @@ from ddd.logic.encodage_des_notes.encodage.commands import (
     GetFeuilleDeNotesGestionnaireCommand,
     GetPeriodeEncodageCommand,
     GetProgressionGeneraleGestionnaireCommand,
-    RechercherNotesCommand,
+    RechercherNotesCommand, SearchEnseignantsCommand,
 )
 from ddd.logic.encodage_des_notes.encodage.use_case.read.get_cohortes_gestionnaire import get_cohortes_gestionnaire
 from ddd.logic.encodage_des_notes.encodage.use_case.read.get_feuille_de_notes_service import \
@@ -89,6 +89,7 @@ from ddd.logic.encodage_des_notes.encodage.use_case.read.get_periode_encodage_se
 from ddd.logic.encodage_des_notes.encodage.use_case.read.get_progression_generale_encodage_service import \
     get_progression_generale_gestionnaire
 from ddd.logic.encodage_des_notes.encodage.use_case.read.rechercher_notes_service import rechercher_notes
+from ddd.logic.encodage_des_notes.encodage.use_case.read.rechercher_enseignants import rechercher_enseignants
 from ddd.logic.encodage_des_notes.encodage.use_case.write.encoder_notes_service import encoder_notes
 from ddd.logic.encodage_des_notes.shared_kernel.commands import GetEncoderNotesRapportCommand
 from ddd.logic.encodage_des_notes.shared_kernel.use_case.read.get_encoder_notes_rapport_service import \
@@ -105,7 +106,7 @@ from ddd.logic.encodage_des_notes.soumission.commands import (
     GetProgressionGeneraleCommand,
     GetResponsableDeNotesCommand,
     SearchAdressesFeuilleDeNotesCommand,
-    SoumettreNotesCommand,
+    SoumettreNotesCommand, SearchResponsableDeNotesCommand,
 )
 from ddd.logic.encodage_des_notes.soumission.use_case.read.get_addresse_feuille_de_notes_service import \
     get_adresse_feuille_de_notes
@@ -119,6 +120,8 @@ from ddd.logic.encodage_des_notes.soumission.use_case.read.get_responsable_de_no
 from ddd.logic.encodage_des_notes.soumission.use_case.read.search_donnees_administratives_feuille_de_notes_service \
     import \
     search_donnees_administratives_feuille_de_notes
+from ddd.logic.encodage_des_notes.soumission.use_case.read.search_responsable_de_notes_service import \
+    search_responsables_de_notes
 from ddd.logic.encodage_des_notes.soumission.use_case.write.assigner_responsable_de_notes_service import \
     assigner_responsable_de_notes
 from ddd.logic.encodage_des_notes.soumission.use_case.write \
@@ -483,6 +486,15 @@ class MessageBusCommands(AbstractMessageBusCommands):
         GetEncoderNotesRapportCommand: lambda cmd: get_encoder_notes_rapport(
             cmd,
             EncoderNotesRapportRepository()
+        ),
+        SearchResponsableDeNotesCommand: lambda cmd: search_responsables_de_notes(
+            cmd,
+            ResponsableDeNotesRepository()
+        ),
+        SearchEnseignantsCommand: lambda cmd: rechercher_enseignants(
+            cmd,
+            AttributionEnseignantTranslator(),
+            PeriodeEncodageNotesTranslator(),
         ),
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 

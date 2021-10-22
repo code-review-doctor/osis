@@ -30,9 +30,8 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from attribution.models.attribution_new import AttributionNew
-from attribution.models.enums.function import Functions
-from attribution.tests.factories.attribution import AttributionNewFactory
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
+from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.tutor import TutorFactory

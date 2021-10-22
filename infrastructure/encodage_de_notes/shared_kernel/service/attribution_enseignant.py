@@ -23,12 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Set
+import functools
+import operator
+from typing import Set, List
 
+from django.db.models import F, Q
+
+from attribution.models.attribution_new import AttributionNew
 from ddd.logic.effective_class_repartition.commands import SearchTutorsDistributedToClassCommand, \
     SearchAttributionsToLearningUnitCommand, SearchClassesEnseignantCommand, SearchAttributionsEnseignantCommand
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import EnseignantDTO
 from ddd.logic.encodage_des_notes.soumission.dtos import AttributionEnseignantDTO
 
 
@@ -56,6 +62,37 @@ class AttributionEnseignantTranslator(IAttributionEnseignantTranslator):
         dtos = _search_attributions_unite_enseignement(annee=annee, matricule_enseignant=matricule_enseignant)
         dtos |= _search_repartition_classes(annee=annee, matricule_enseignant=matricule_enseignant)
         return dtos
+
+    @classmethod
+    def search_attributions_enseignant_par_nom_prenom_annee(
+            cls,
+            annee: int,
+            nom_prenom: str
+    ) -> List['EnseignantDTO']:
+        filters = [
+            Q(tutor__person__first_name__icontains=mot)
+            | Q(tutor__person__last_name__icontains=mot)
+            for mot in nom_prenom.split(' ')
+        ]
+        qs = AttributionNew.objects.filter(
+            learning_container_year__academic_year__year=annee,
+        ).filter(
+            functools.reduce(
+                operator.and_,
+                filters
+            )
+        ).annotate(
+            nom=F('tutor__person__last_name'),
+            prenom=F('tutor__person__first_name'),
+        ).values(
+            'nom',
+            'prenom',
+        ).distinct().order_by('nom', 'prenom')
+
+        return [
+            EnseignantDTO(nom=obj['nom'], prenom=obj['prenom'])
+            for obj in qs
+        ]
 
 
 def _search_attributions_unite_enseignement(
