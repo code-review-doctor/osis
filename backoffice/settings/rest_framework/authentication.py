@@ -28,7 +28,6 @@ from typing import List
 from django.conf import settings
 from django.contrib.auth import backends
 from django.utils.translation import gettext_lazy
-
 from rest_framework import exceptions
 from rest_framework.authentication import BaseAuthentication, get_authorization_header
 
@@ -101,8 +100,12 @@ class ESBAuthentication(BaseAuthentication):
         )
         if not person.user_id:
             UserModel = backends.get_user_model()
-            user, _ = UserModel.objects.get_or_create({
-                UserModel.USERNAME_FIELD: request.META['HTTP_X_USER_EMAIL']
+            user, _ = UserModel.objects.get_or_create(**{
+                UserModel.USERNAME_FIELD: request.META['HTTP_X_USER_EMAIL'],
+            }, defaults={
+                'first_name': request.META['HTTP_X_USER_FIRSTNAME'],
+                'last_name': request.META['HTTP_X_USER_LASTNAME'],
+                UserModel.EMAIL_FIELD: request.META['HTTP_X_USER_EMAIL'],
             })
             person.user = user
             person.save()

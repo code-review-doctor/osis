@@ -45,7 +45,7 @@ from base.models.enums.proposal_type import ProposalType
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from ddd.logic.score_encoding.dtos import ScoreResponsibleDTO
+from ddd.logic.encodage_des_notes.soumission.dtos import ResponsableDeNotesDTO
 from learning_unit.tests.ddd.factories.achievement import AchievementFactory
 from learning_unit.tests.ddd.factories.description_fiche import DescriptionFicheFactory
 from learning_unit.tests.ddd.factories.entities import EntitiesFactory
@@ -441,19 +441,21 @@ class TestContent(TestCase):
     def test_get_optional_has_teacher_with_score_responsible(self):
         optional_data = initialize_optional_data()
         optional_data['has_teacher_list'] = True
-        responsible_1 = ScoreResponsibleDTO(
-            last_name="Abba",
-            first_name="Léon",
-            email="abba@gmail.com",
-            code_of_learning_unit=self.luy.acronym,
-            year_of_learning_unit=self.luy.year
+        responsible_1 = ResponsableDeNotesDTO(
+            nom="Abba",
+            prenom="Léon",
+            # email="abba@gmail.com",
+            matricule="12345678",
+            code_unite_enseignement=self.luy.acronym,
+            annee_unite_enseignement=self.luy.year
         )
-        responsible_2 = ScoreResponsibleDTO(
-            last_name="Martinot",
-            first_name="Tom",
-            email="martinot.tom@gmail.com",
-            code_of_learning_unit=self.luy.acronym,
-            year_of_learning_unit=self.luy.year
+        responsible_2 = ResponsableDeNotesDTO(
+            nom="Martinot",
+            prenom="Tom",
+            # email="martinot.tom@gmail.com",
+            matricule="12345679",
+            code_unite_enseignement=self.luy.acronym,
+            annee_unite_enseignement=self.luy.year
         )
         teacher_data = _get_optional_data(
             [],
@@ -463,16 +465,17 @@ class TestContent(TestCase):
             [
                 responsible_1,
                 responsible_2
-            ]
+            ],
+            {'12345678': "abba@gmail.com", '12345679': "martinot.tom@gmail.com"}
         )
         self._assert_teachers_data(teacher_data)
         self.assertEqual(teacher_data[2], "{} {};{} {}"
-                         .format(responsible_1.last_name.upper(), responsible_1.first_name,
-                                 responsible_2.last_name.upper(), responsible_2.first_name)
+                         .format(responsible_1.nom.upper(), responsible_1.prenom,
+                                 responsible_2.nom.upper(), responsible_2.prenom)
                          )
         self.assertEqual(teacher_data[3], "{};{}"
-                         .format(responsible_1.email,
-                                 responsible_2.email)
+                         .format("abba@gmail.com",
+                                 "martinot.tom@gmail.com")
                          )
 
     def test_build_validate_html_list_to_string(self):

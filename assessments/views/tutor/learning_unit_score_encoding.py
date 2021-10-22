@@ -40,7 +40,9 @@ class LearningUnitScoreEncodingTutorView(LearningUnitScoreEncodingBaseView):
             **super().get_context_data(),
             'feuille_de_notes': self.feuille_de_notes,
             'learning_unit_submit_url': self.get_learning_unit_submit_url(),
-            'can_submit_scores': self.can_submit_scores()
+            'can_submit_scores': self.can_submit_scores(),
+            'can_encode_scores': self.can_encode_scores(),
+            'can_upload_scores_xls': self.can_upload_scores_xls()
         }
 
     @cached_property
@@ -58,6 +60,12 @@ class LearningUnitScoreEncodingTutorView(LearningUnitScoreEncodingBaseView):
 
     def can_submit_scores(self) -> bool:
         return self.feuille_de_notes.quantite_notes_en_attente_de_soumission > 0 and self.is_score_responsible()
+
+    def can_encode_scores(self) -> bool:
+        return any(not n.date_echeance_atteinte and not n.est_soumise for n in self.feuille_de_notes.notes_etudiants)
+
+    def can_upload_scores_xls(self) -> bool:
+        return any(not n.date_echeance_atteinte and not n.est_soumise for n in self.feuille_de_notes.notes_etudiants)
 
     def is_score_responsible(self) -> bool:
         cmd = GetResponsableDeNotesCommand(

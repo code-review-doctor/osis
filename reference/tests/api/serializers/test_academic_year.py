@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,22 +23,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django import template
+from django.test import TestCase
 
-from assessments.business import enrollment_state
-from base.models.enums import exam_enrollment_state as enrollment_states
-
-register = template.Library()
+from base.tests.factories.academic_year import AcademicYearFactory
+from reference.api.serializers.academic_year import AcademicYearSerializer
 
 
-@register.filter
-def get_line_color(enrollment):
-    return enrollment_state.get_line_color(enrollment)
+class AcademicYearSerializerTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.anac = AcademicYearFactory()
+        cls.serializer = AcademicYearSerializer(cls.anac)
 
-
-@register.filter
-def enrolled_exists(enrollments):
-    for enrollment in enrollments:
-        if enrollment.enrollment_state == enrollment_states.ENROLLED:
-            return True
-    return False
+    def test_contains_expected_fields(self):
+        expected_fields = [
+            'uuid',
+            'year',
+            'start_date',
+            'end_date'
+        ]
+        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)

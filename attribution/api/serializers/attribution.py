@@ -54,11 +54,14 @@ class AttributionSerializer(serializers.Serializer):
 
     @staticmethod
     def get_percentage_allocation_charge(obj):
-        if (obj.lecturing_charge or obj.practical_charge) and float(obj.total_learning_unit_charge) > 0:
+        if (obj.lecturing_charge or obj.practical_charge) \
+                and obj.total_learning_unit_charge and float(obj.total_learning_unit_charge) > 0:
             lecturing_charge = float(obj.lecturing_charge) if obj.lecturing_charge else 0
             practical_charge = float(obj.practical_charge) if obj.practical_charge else 0
             percentage = (lecturing_charge + practical_charge) * 100 / float(obj.total_learning_unit_charge)
             return "%0.1f" % (percentage,)
+        elif obj.lecturing_charge == 0 and obj.practical_charge == 0:
+            return "%0.1f" % 0
         return None
 
     @staticmethod
