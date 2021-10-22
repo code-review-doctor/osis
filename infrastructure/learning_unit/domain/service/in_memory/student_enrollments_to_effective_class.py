@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,19 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from base import models as mdl
-from base.models.enums import exam_enrollment_state as enrollment_states
 
-ENROLLED_LATE_COLOR = '#dff0d8'
-NOT_ENROLLED_COLOR = '#f2dede'
+from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
+from ddd.logic.learning_unit.domain.service.i_student_enrollments import \
+    IStudentEnrollmentsTranslator
 
 
-def get_line_color(enrollment):
-    if enrollment.enrollment_state == enrollment_states.ENROLLED:
-        current_session = mdl.session_exam_calendar.current_session_exam()
-        if enrollment.date_enrollment \
-                and enrollment.date_enrollment > current_session.start_date:
-            return ENROLLED_LATE_COLOR
-        return None
-    else:
-        return NOT_ENROLLED_COLOR
+class StudentEnrollmentsTranslatorInMemory(IStudentEnrollmentsTranslator):
+
+    @classmethod
+    def has_enrollments_to_class(cls, class_identity: 'EffectiveClassIdentity') -> bool:
+        return False
+
+    @classmethod
+    def has_enrollments_to_learning_unit(cls, learning_unit_id: 'LearningUnitIdentity') -> bool:
+        return False

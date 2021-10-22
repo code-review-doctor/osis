@@ -23,15 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import attr
+from rest_framework import serializers
 
-from osis_common.ddd.interface import DTO
+from base.models.academic_year import AcademicYear
 
 
-@attr.s(frozen=True, slots=True)
-class ScoreResponsibleDTO(DTO):
-    last_name = attr.ib(type=str)
-    first_name = attr.ib(type=str)
-    email = attr.ib(type=str)
-    code_of_learning_unit = attr.ib(type=str)
-    year_of_learning_unit = attr.ib(type=int)
+class AcademicYearSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AcademicYear
+        fields = (
+            'uuid',
+            'year',
+            'start_date',
+            'end_date'
+        )

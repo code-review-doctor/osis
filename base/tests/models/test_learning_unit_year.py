@@ -32,7 +32,6 @@ from django.db import models
 from django.test import TestCase
 from django.utils.translation import gettext_lazy as _
 
-from attribution.models import attribution
 from base.business.learning_units.quadrimester_strategy import LearningComponentYearQ1Strategy, \
     LearningComponentYearQ2Strategy, LearningComponentYearQ1and2Strategy, LearningComponentYearQ1or2Strategy, \
     LearningComponentYearQuadriStrategy, LearningComponentYearQuadriNoStrategy
@@ -92,9 +91,6 @@ class LearningUnitYearTest(TestCase):
             subtype=learning_unit_year_subtypes.FULL,
             learning_container_year=learning_container_yr
         )
-
-    def test_find_by_tutor_with_none_argument(self):
-        self.assertEqual(attribution.find_by_tutor(None), None)
 
     def test_subdivision_computation(self):
         l_container_year = LearningContainerYearFactory(acronym="LBIR1212", academic_year=self.academic_year)
@@ -1399,6 +1395,7 @@ class LearningUnitYearAndClassTest(TestCase):
         luy_in_future = LearningUnitYearFactory(learning_unit=luy_this_year.learning_unit, academic_year=next_year)
         LearningClassYearFactory(learning_component_year__learning_unit_year=luy_in_future)
         self.assertTrue(luy_this_year.has_class_this_year_or_in_future())
+
 
 class LearningUnitYearCheckNumberOfClassesWarnings(TestCase):
     @classmethod

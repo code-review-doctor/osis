@@ -34,7 +34,7 @@ from osis_common.ddd import interface
 class EncoderNoteCommand(interface.CommandRequest):
     noma_etudiant = attr.ib(type=str, validator=attr.validators.instance_of(str))
     email_etudiant = attr.ib(type=str, validator=attr.validators.instance_of(str))
-    note = attr.ib(type=str, validator=attr.validators.instance_of(str))
+    note = attr.ib(type=str, converter=lambda n: n.upper(), validator=attr.validators.instance_of(str))
 
 
 @attr.s(frozen=True, slots=True)
@@ -129,3 +129,8 @@ class GetChoixEntitesAdresseFeuilleDeNotesCommand(interface.CommandRequest):
 class GetResponsableDeNotesCommand(interface.CommandRequest):
     code_unite_enseignement = attr.ib(type=str)
     annee_unite_enseignement = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class SearchResponsableDeNotesCommand(interface.CommandRequest):
+    unites_enseignement = attr.ib(type=List[GetResponsableDeNotesCommand])

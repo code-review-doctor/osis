@@ -40,7 +40,7 @@ class EncoderNoteCommand(interface.CommandRequest):
     noma = attr.ib(type=str)
     email = attr.ib(type=str)
     code_unite_enseignement = attr.ib(type=str)
-    note = attr.ib(type=str)
+    note = attr.ib(type=str, converter=lambda n: n.upper())
 
 
 @attr.s(frozen=True, slots=True)

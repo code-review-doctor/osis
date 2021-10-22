@@ -36,7 +36,6 @@ from openpyxl.utils import get_column_letter
 
 from attribution.business import attribution_charge_new
 from attribution.business.attribution_class import create_attributions_dictionary
-from attribution.models.attribution import search as search_attributions
 from attribution.models.enums.function import Functions
 from base.business.xls import get_name_or_username, _get_all_columns_reference
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
@@ -45,6 +44,8 @@ from base.models.group_element_year import GroupElementYear
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS, LearningUnitYear
 from base.models.person import Person
+from ddd.logic.encodage_des_notes.soumission.commands import GetResponsableDeNotesCommand
+from infrastructure.messages_bus import message_bus_instance
 from learning_unit.models.learning_class_year import LearningClassYear
 from osis_common.document import xls_build
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, version_label
@@ -693,11 +694,12 @@ def _get_teachers(learning_unit_yr: LearningUnitYear) -> List[Person]:
 
 
 def _get_score_responsibles(learning_unit_yr: LearningUnitYear) -> List[Person]:
-    attributions = search_attributions(score_responsible=True, learning_unit_year=learning_unit_yr)
-    score_responsibles = set()
-    for attribution in attributions:
-        score_responsibles.add(attribution.tutor.person)
-    return score_responsibles
+    resp_note = message_bus_instance.invoke(
+        GetResponsableDeNotesCommand(learning_unit_yr.acronym, learning_unit_yr.academic_year.year)
+    )
+    if resp_note:
+        return Person.objects.filter(global_id=resp_note.matricule)
+    return []
 
 
 def _get_effective_class_teachers(effective_class: LearningClassYear) -> List[Person]:

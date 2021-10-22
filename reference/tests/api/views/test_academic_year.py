@@ -23,27 +23,47 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.test import TestCase, RequestFactory
 from django.urls import reverse
+from rest_framework import status
+from rest_framework.test import APITestCase
 
-from reference.api.serializers.country import CountrySerializer
-from reference.tests.factories.country import CountryFactory
+from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.user import UserFactory
 
 
-class CountryListSerializerTestCase(TestCase):
+class AcademicYearsTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.country = CountryFactory()
-        url = reverse('reference_api_v1:country-list')
-        cls.serializer = CountrySerializer(cls.country, context={'request': RequestFactory().get(url)})
+        cls.anac = AcademicYearFactory()
+        cls.user = UserFactory()
+        cls.url = reverse('reference_api_v1:academic_years')
 
-    def test_contains_expected_fields(self):
-        expected_fields = [
-            'url',
+    def setUp(self):
+        self.client.force_authenticate(user=self.user)
+
+    def test_get_not_authorized(self):
+        self.client.force_authenticate(user=None)
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_get_method_not_allowed(self):
+        methods_not_allowed = ['post', 'delete', 'put']
+
+        for method in methods_not_allowed:
+            response = getattr(self.client, method)(self.url)
+            self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_get_results_assert_key(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        results = response.json()['results']
+        self.assertEqual(len(results), 1)
+
+        self.assertCountEqual(list(results[0].keys()), [
             'uuid',
-            'iso_code',
-            'name',
-            'name_en',
-            'nationality'
-        ]
-        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
+            'year',
+            'start_date',
+            'end_date'
+        ])
