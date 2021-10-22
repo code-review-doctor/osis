@@ -24,10 +24,13 @@
 ##############################################################################
 from typing import List
 
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodage_notes import \
+    IPeriodeEncodageNotesTranslator
 from ddd.logic.encodage_des_notes.soumission.commands import GetChoixEntitesAdresseFeuilleDeNotesCommand
 from ddd.logic.encodage_des_notes.soumission.domain.service.entites_adresse_feuille_de_notes import \
     EntiteAdresseFeuilleDeNotes, EntitesPossiblesAdresseFeuilleDeNotesDTO
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_entites_cohorte import IEntitesCohorteTranslator
+from ddd.logic.shared_kernel.academic_year.repository.i_academic_year import IAcademicYearRepository
 from ddd.logic.shared_kernel.entite.dtos import EntiteDTO
 from ddd.logic.shared_kernel.entite.repository.entiteucl import IEntiteUCLRepository
 
@@ -35,6 +38,14 @@ from ddd.logic.shared_kernel.entite.repository.entiteucl import IEntiteUCLReposi
 def get_choix_entites_adresse_feuille_de_notes(
         cmd: GetChoixEntitesAdresseFeuilleDeNotesCommand,
         entite_repository: 'IEntiteUCLRepository',
-        entites_cohorte_translator: 'IEntitesCohorteTranslator'
+        entites_cohorte_translator: 'IEntitesCohorteTranslator',
+        periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
+        academic_year_repo: 'IAcademicYearRepository'
 ) -> EntitesPossiblesAdresseFeuilleDeNotesDTO:
-    return EntiteAdresseFeuilleDeNotes().search(cmd.nom_cohorte, entite_repository, entites_cohorte_translator)
+    return EntiteAdresseFeuilleDeNotes().search(
+        cmd.nom_cohorte,
+        entite_repository,
+        entites_cohorte_translator,
+        periode_soumission_note_translator,
+        academic_year_repo
+    )

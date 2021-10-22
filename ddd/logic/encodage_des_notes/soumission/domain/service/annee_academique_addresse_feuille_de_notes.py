@@ -22,26 +22,27 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
+
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodage_notes import \
     IPeriodeEncodageNotesTranslator
-from ddd.logic.encodage_des_notes.soumission.commands import SupprimerAdresseFeuilleDeNotesPremiereAnneeDeBachelier
-from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_notes import IdentiteAdresseFeuilleDeNotes
-from ddd.logic.encodage_des_notes.soumission.domain.service.encoder_adresse_feuille_de_notes import \
-    EncoderAdresseFeuilleDeNotesDomainService
-from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_notes import \
-    IAdresseFeuilleDeNotesRepository
+from ddd.logic.shared_kernel.academic_year.domain.service.get_current_academic_year import GetCurrentAcademicYear
 from ddd.logic.shared_kernel.academic_year.repository.i_academic_year import IAcademicYearRepository
+from osis_common.ddd import interface
 
 
-def supprimer_adresse_feuille_de_note_premiere_annee_de_bachelier(
-        cmd: SupprimerAdresseFeuilleDeNotesPremiereAnneeDeBachelier,
-        repo: IAdresseFeuilleDeNotesRepository,
-        periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
-        academic_year_repo: 'IAcademicYearRepository'
-) -> 'IdentiteAdresseFeuilleDeNotes':
-    return EncoderAdresseFeuilleDeNotesDomainService().supprimer_adresse_premiere_annee_de_bachelier(
-        cmd,
-        repo,
-        periode_soumission_note_translator,
-        academic_year_repo
-    )
+class AnneeAcademiqueAddresseFeuilleDeNotesDomaineService(interface.DomainService):
+    @classmethod
+    def get(
+            cls,
+            periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
+            academic_year_repo: 'IAcademicYearRepository'
+    ) -> int:
+        periode_soumission = periode_soumission_note_translator.get()
+        if periode_soumission:
+            return periode_soumission.annee_concernee
+
+        return GetCurrentAcademicYear().get_starting_academic_year(
+            datetime.date.today(),
+            academic_year_repo
+        ).year

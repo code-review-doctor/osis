@@ -29,7 +29,6 @@ from assessments.models.enums.score_sheet_address_choices import ScoreSheetAddre
 from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_notes import \
     IdentiteAdresseFeuilleDeNotes, \
     AdresseFeuilleDeNotes
-from ddd.logic.shared_kernel.entite.tests.factory.entiteucl import _IdentiteEntiteFactory
 
 
 class _IdentiteAdresseFeuilleDeNotesFactory(factory.Factory):
@@ -38,6 +37,7 @@ class _IdentiteAdresseFeuilleDeNotesFactory(factory.Factory):
         abstract = False
 
     nom_cohorte = "DROI1BA"
+    annee_academique = 2020
 
 
 class AdresseFeuilleDeNotesVideFactory(factory.Factory):

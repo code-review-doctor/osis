@@ -22,16 +22,26 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodage_notes import \
+    IPeriodeEncodageNotesTranslator
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderAdresseFeuilleDeNotesSpecifique
 from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_notes import IdentiteAdresseFeuilleDeNotes
 from ddd.logic.encodage_des_notes.soumission.domain.service.encoder_adresse_feuille_de_notes import \
     EncoderAdresseFeuilleDeNotesDomainService
 from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_notes import \
     IAdresseFeuilleDeNotesRepository
+from ddd.logic.shared_kernel.academic_year.repository.i_academic_year import IAcademicYearRepository
 
 
 def encoder_adresse_feuille_de_notes_specifique(
         cmd: EncoderAdresseFeuilleDeNotesSpecifique,
         repo: IAdresseFeuilleDeNotesRepository,
+        periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
+        academic_year_repo: 'IAcademicYearRepository'
 ) -> 'IdentiteAdresseFeuilleDeNotes':
-    return EncoderAdresseFeuilleDeNotesDomainService().encoder_adresse_specifique(cmd, repo)
+    return EncoderAdresseFeuilleDeNotesDomainService().encoder_adresse_specifique(
+        cmd,
+        repo,
+        periode_soumission_note_translator,
+        academic_year_repo
+    )

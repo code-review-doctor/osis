@@ -356,7 +356,8 @@ class NotifierEncodageNotes(INotifierEncodageNotes):
                     continue
                 adresse_feuille_de_notes = cls._get_adresse_feuille_de_notes(
                     nom_cohorte,
-                    adresse_feuille_de_notes_repository
+                    annee_academique,
+                    adresse_feuille_de_notes_repository,
                 )
                 for langue, ensemble_de_signaletiques in signaletiques_enseignants_groupes_par_langue.items():
                     email_destinataire = [signaletique.email for signaletique in ensemble_de_signaletiques]
@@ -424,9 +425,14 @@ class NotifierEncodageNotes(INotifierEncodageNotes):
     def _get_adresse_feuille_de_notes(
             cls,
             nom_cohorte: str,
+            annee: int,
             adresse_feuille_de_notes_repository: 'IAdresseFeuilleDeNotesRepository'
     ) -> Optional['AdresseFeuilleDeNotes']:
-        identite_adresse_feuille_de_notes = AdresseFeuilleDeNotesIdentityBuilder().build_from_nom_cohorte(nom_cohorte)
+        identite_adresse_feuille_de_notes = AdresseFeuilleDeNotesIdentityBuilder(
+        ).build_from_nom_cohorte_and_annee_academique(
+            nom_cohorte,
+            annee
+        )
         try:
             return adresse_feuille_de_notes_repository.get(identite_adresse_feuille_de_notes)
         except IndexError:

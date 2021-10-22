@@ -23,16 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
 import itertools
 from typing import List, Optional
 
-from django.db.models import F, Value, Subquery, OuterRef, Case, When, CharField, Q, IntegerField
+from django.db.models import F, Value, Subquery, OuterRef, Case, When, CharField, IntegerField
 from django.db.models.functions import Replace, Coalesce
 
 from assessments.models.enums.score_sheet_address_choices import ScoreSheetAddressEntityType
 from assessments.models.score_sheet_address import ScoreSheetAddress
-from base.models.academic_year import current_academic_year
 from base.models.education_group import EducationGroup
 from base.models.education_group_year import EducationGroupYear
 from base.models.entity_version import EntityVersion
@@ -71,7 +69,9 @@ class AdresseFeuilleDeNotesRepository(IAdresseFeuilleDeNotesRepository):
         cohortes = [entity_id.nom_cohorte for entity_id in entity_ids]
         if not cohortes:
             return []
-        return get_addresse_feuille_notes(cohortes)
+
+        annee_academique = next(entity_id.annee_academique for entity_id in entity_ids)
+        return get_addresse_feuille_notes(cohortes, annee_academique)
 
     @classmethod
     def _convert_row_to_dto(cls, row, flat_entity_hierarchy) -> AdresseFeuilleDeNotesDTO:
@@ -79,6 +79,7 @@ class AdresseFeuilleDeNotesRepository(IAdresseFeuilleDeNotesRepository):
             entite_data = cls._get_corresponding_entite(row, flat_entity_hierarchy)
             return AdresseFeuilleDeNotesDTO(
                 nom_cohorte=row["nom_cohorte"],
+                annee_academique=row["annee_academique"],
                 type_entite=row["type_entite"],
                 destinataire='{} - {}'.format(entite_data['acronym'], entite_data['title']),
                 rue_numero=entite_data["entity__location"] or "",
@@ -92,6 +93,7 @@ class AdresseFeuilleDeNotesRepository(IAdresseFeuilleDeNotesRepository):
         else:
             return AdresseFeuilleDeNotesDTO(
                 nom_cohorte=row["nom_cohorte"],
+                annee_academique=row["annee_academique"],
                 type_entite="",
                 destinataire=row["destinataire"] or "",
                 rue_numero=row["rue_numero"] or "",
@@ -204,36 +206,36 @@ class AdresseFeuilleDeNotesRepository(IAdresseFeuilleDeNotesRepository):
         return cls.search([entity_id])[0]
 
 
-def get_addresse_feuille_notes(cohortes: List[str]):
-    flat_entity_hierarchy = _get_flat_entity_hierarchy(cohortes)
+def get_addresse_feuille_notes(cohortes: List[str], year: int):
+    flat_entity_hierarchy = _get_flat_entity_hierarchy(cohortes, year)
 
     nom_cohorte_subqs = EducationGroupYear.objects.filter(
         education_group=OuterRef('education_group'),
-        academic_year=current_academic_year()
+        academic_year__year=year
     ).exclude(
         acronym__contains="11BA"
     ).values('acronym')
     administration_entity_subqs = EducationGroupYear.objects.filter(
         education_group=OuterRef('education_group'),
-        academic_year=current_academic_year()
+        academic_year__year=year
     ).exclude(
         acronym__contains="11BA"
     ).values('administration_entity')
     cohort_administration_entity_subqs = CohortYear.objects.filter(
         education_group_year__education_group=OuterRef('education_group'),
-        education_group_year__academic_year=current_academic_year()
+        education_group_year__academic_year__year=year
     ).annotate(
         cohort_administration_entity=Coalesce("administration_entity", "education_group_year__administration_entity")
     ).values('cohort_administration_entity')
     management_entity_subqs = EducationGroupYear.objects.filter(
         education_group=OuterRef('education_group'),
-        academic_year=current_academic_year()
+        academic_year__year=year
     ).exclude(
         acronym__contains="11BA"
     ).values('management_entity')
     nom_cohorte_first_year_bachelor_subqs = EducationGroupYear.objects.filter(
         education_group=OuterRef('education_group'),
-        academic_year=current_academic_year()
+        academic_year__year=year
     ).annotate(
         nom_cohorte=Replace('acronym', Value('1BA'), Value('11BA'))
     ).values('nom_cohorte')
@@ -262,7 +264,8 @@ def get_addresse_feuille_notes(cohortes: List[str]):
         ville=F("city"),
         pays=F("country__name"),
         telephone=F("phone"),
-        type_entite=F('entity_address_choice')
+        type_entite=F('entity_address_choice'),
+        annee_academique=Value(year, output_field=IntegerField())
     ).filter(
         nom_cohorte__in=cohortes
     ).values(
@@ -277,7 +280,8 @@ def get_addresse_feuille_notes(cohortes: List[str]):
         "fax",
         "email",
         "entite_administration",
-        "entite_gestion"
+        "entite_gestion",
+        "annee_academique"
     )
 
     qs_2 = ScoreSheetAddress.objects.filter(
@@ -293,7 +297,8 @@ def get_addresse_feuille_notes(cohortes: List[str]):
             ville=F("city"),
             pays=F("country__name"),
             telephone=F("phone"),
-            type_entite=F('entity_address_choice')
+            type_entite=F('entity_address_choice'),
+            annee_academique=Value(year, output_field=IntegerField())
         ).filter(
             nom_cohorte__in=cohortes
         ).values(
@@ -308,20 +313,21 @@ def get_addresse_feuille_notes(cohortes: List[str]):
             "fax",
             "email",
             "entite_administration",
-            "entite_gestion"
+            "entite_gestion",
+            "annee_academique"
         )
     rows = list(itertools.chain(qs_1, qs_2))
 
     return [AdresseFeuilleDeNotesRepository._convert_row_to_dto(row, flat_entity_hierarchy) for row in rows]
 
 
-def _get_flat_entity_hierarchy(cohortes: List[str]):
+def _get_flat_entity_hierarchy(cohortes: List[str], year: int):
     entity_ids_qs = EducationGroupYear.objects.filter(
         acronym__in=cohortes,
-        academic_year=current_academic_year()
+        academic_year__year=year
     ).values_list("administration_entity", "management_entity")
     cohort_entity_ids_qs = CohortYear.objects.filter(
-        education_group_year__academic_year=current_academic_year()
+        education_group_year__academic_year__year=year
     ).annotate(
         acronym=Replace('education_group_year__acronym', Value('1BA'), Value('11BA'))
     ).filter(

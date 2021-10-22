@@ -25,6 +25,8 @@
 ##############################################################################
 
 from assessments.models.enums.score_sheet_address_choices import ScoreSheetAddressEntityType
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodage_notes import \
+    IPeriodeEncodageNotesTranslator
 from ddd.logic.encodage_des_notes.soumission.builder.adresse_feuille_de_notes_builder import \
     AdresseFeuilleDeNotesBuilder
 from ddd.logic.encodage_des_notes.soumission.builder.adresse_feuille_de_notes_identity_builder import \
@@ -32,6 +34,11 @@ from ddd.logic.encodage_des_notes.soumission.builder.adresse_feuille_de_notes_id
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderAdresseFeuilleDeNotesSpecifique, \
     EncoderAdresseEntiteCommeAdresseFeuilleDeNotes, SupprimerAdresseFeuilleDeNotesPremiereAnneeDeBachelier
 from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_notes import IdentiteAdresseFeuilleDeNotes
+from ddd.logic.encodage_des_notes.soumission.domain.service\
+    .adresse_feuille_de_note_premiere_annee_de_bachelier_est_specifique import \
+    EntiteAdresseFeuilleDeNotesPremiereAnneeDeBachelierEstDifferenteDeCelleDuBachelier
+from ddd.logic.encodage_des_notes.soumission.domain.service.annee_academique_addresse_feuille_de_notes import \
+    AnneeAcademiqueAddresseFeuilleDeNotesDomaineService
 from ddd.logic.encodage_des_notes.soumission.domain.service.entites_adresse_feuille_de_notes import \
     EntiteAdresseFeuilleDeNotes
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_entites_cohorte import IEntitesCohorteTranslator
@@ -40,6 +47,7 @@ from ddd.logic.encodage_des_notes.soumission.domain.validator.validators_by_busi
 from ddd.logic.encodage_des_notes.soumission.dtos import AdresseFeuilleDeNotesDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_notes import \
     IAdresseFeuilleDeNotesRepository
+from ddd.logic.shared_kernel.academic_year.repository.i_academic_year import IAcademicYearRepository
 from ddd.logic.shared_kernel.entite.repository.entiteucl import IEntiteUCLRepository
 from osis_common.ddd import interface
 
@@ -50,9 +58,15 @@ class EncoderAdresseFeuilleDeNotesDomainService(interface.DomainService):
             cls,
             cmd: SupprimerAdresseFeuilleDeNotesPremiereAnneeDeBachelier,
             repo: IAdresseFeuilleDeNotesRepository,
+            periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
+            academic_year_repo: 'IAcademicYearRepository'
     ) -> 'IdentiteAdresseFeuilleDeNotes':
-        nom_cohorte = cmd.nom_cohorte
-        identite_adresse = AdresseFeuilleDeNotesIdentityBuilder().build_from_nom_cohorte(nom_cohorte)
+        annee_academique = cls._get_annee_academique(periode_soumission_note_translator, academic_year_repo)
+
+        identite_adresse = AdresseFeuilleDeNotesIdentityBuilder().build_from_nom_cohorte_and_annee_academique(
+            cmd.nom_cohorte,
+            annee_academique
+        )
 
         repo.delete(identite_adresse)
 
@@ -64,9 +78,16 @@ class EncoderAdresseFeuilleDeNotesDomainService(interface.DomainService):
             cmd: EncoderAdresseEntiteCommeAdresseFeuilleDeNotes,
             repo: IAdresseFeuilleDeNotesRepository,
             entite_repository: 'IEntiteUCLRepository',
-            entites_cohorte_translator: 'IEntitesCohorteTranslator'
+            entites_cohorte_translator: 'IEntitesCohorteTranslator',
+            periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
+            academic_year_repo: 'IAcademicYearRepository'
     ) -> 'IdentiteAdresseFeuilleDeNotes':
+        annee_academique = cls._get_annee_academique(periode_soumission_note_translator, academic_year_repo)
+
+        EntiteAdresseFeuilleDeNotesPremiereAnneeDeBachelierEstDifferenteDeCelleDuBachelier(
+        ).verifier(cmd, annee_academique, repo)
         EncoderAdresseFeuilleDeNotesValidatorLIst(type_entite=cmd.type_entite).validate()
+
 
         entites_possibles = EntiteAdresseFeuilleDeNotes.search(
             cmd.nom_cohorte,
@@ -85,6 +106,7 @@ class EncoderAdresseFeuilleDeNotesDomainService(interface.DomainService):
 
         dto = AdresseFeuilleDeNotesDTO(
             nom_cohorte=cmd.nom_cohorte,
+            annee_academique=annee_academique,
             type_entite=cmd.type_entite,
             destinataire="{} - {}".format(entite.sigle, entite.intitule),
             rue_numero=entite.adresse.rue_numero,
@@ -103,12 +125,18 @@ class EncoderAdresseFeuilleDeNotesDomainService(interface.DomainService):
             cls,
             cmd: EncoderAdresseFeuilleDeNotesSpecifique,
             repo: IAdresseFeuilleDeNotesRepository,
+            periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
+            academic_year_repo: 'IAcademicYearRepository'
     ) -> 'IdentiteAdresseFeuilleDeNotes':
         EncoderAdresseFeuilleDeNotesValidatorLIst(
             type_entite=""
         ).validate()
+
+        annee_academique = cls._get_annee_academique(periode_soumission_note_translator, academic_year_repo)
+
         dto = AdresseFeuilleDeNotesDTO(
             nom_cohorte=cmd.nom_cohorte,
+            annee_academique=annee_academique,
             type_entite="",
             destinataire=cmd.destinataire,
             rue_numero=cmd.rue_numero,
@@ -131,3 +159,14 @@ class EncoderAdresseFeuilleDeNotesDomainService(interface.DomainService):
         nouvelle_adresse = AdresseFeuilleDeNotesBuilder().build_from_repository_dto(dto)
         repo.save(nouvelle_adresse)
         return nouvelle_adresse.entity_id
+
+    @classmethod
+    def _get_annee_academique(
+            cls,
+            periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
+            academic_year_repo: 'IAcademicYearRepository'
+    ) -> int:
+        return AnneeAcademiqueAddresseFeuilleDeNotesDomaineService().get(
+            periode_soumission_note_translator,
+            academic_year_repo
+        )

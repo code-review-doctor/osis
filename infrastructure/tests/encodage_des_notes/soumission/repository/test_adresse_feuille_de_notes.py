@@ -63,8 +63,9 @@ class TestAdresseFeuilleDeNotesRepository(TestCase):
 
         self.repository.save(adresse)
 
-        entity_11ba = AdresseFeuilleDeNotesIdentityBuilder().build_from_nom_cohorte(
-            adresse.nom_cohorte.replace('1BA', "11BA")
+        entity_11ba = AdresseFeuilleDeNotesIdentityBuilder().build_from_nom_cohorte_and_annee_academique(
+            adresse.nom_cohorte.replace('1BA', "11BA"),
+            adresse.annee_academique
         )
 
         self.assertTrue(self.repository.get(entity_11ba))
@@ -177,12 +178,15 @@ class TestAdresseFeuilleDeNotesRepository(TestCase):
         if "11BA" in adresse.nom_cohorte:
             cohort = CohortYearFactory(
                 education_group_year__acronym=adresse.nom_cohorte.replace('11BA', '1BA'),
-                education_group_year__academic_year__current=True,
+                education_group_year__academic_year__year=adresse.annee_academique,
                 first_year_bachelor=True
             )
             administration_entity = cohort.administration_entity
         else:
-            egy = EducationGroupYearFactory(acronym=adresse.nom_cohorte, academic_year__current=True)
+            egy = EducationGroupYearFactory(
+                acronym=adresse.nom_cohorte,
+                academic_year__year=adresse.annee_academique
+            )
             if with_cohort_year:
                 CohortYearFactory(education_group_year=egy, first_year_bachelor=True)
             administration_entity = egy.administration_entity

@@ -38,14 +38,16 @@ class EntiteAdresseFeuilleDeNotesPremiereAnneeDeBachelierEstDifferenteDeCelleDuB
     def verifier(
             cls,
             cmd: EncoderAdresseEntiteCommeAdresseFeuilleDeNotes,
+            annee_academique: int,
             repo: IAdresseFeuilleDeNotesRepository
     ) -> None:
         if "11BA" not in cmd.nom_cohorte:
             return
 
         nom_cohorte_bachelier = cmd.nom_cohorte.replace("11BA", "1BA")
-        identite_adresse_bachelier = AdresseFeuilleDeNotesIdentityBuilder().build_from_nom_cohorte(
-            nom_cohorte_bachelier
+        identite_adresse_bachelier = AdresseFeuilleDeNotesIdentityBuilder().build_from_nom_cohorte_and_annee_academique(
+            nom_cohorte_bachelier,
+            annee_academique
         )
         adresse_bachelier = repo.get(identite_adresse_bachelier)
 
