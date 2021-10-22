@@ -71,7 +71,7 @@ def _is_not_inside_scores_encodings_period(user):
 @login_required
 @permission_required('base.can_access_evaluation', raise_exception=True)
 def assessments(request):
-    return render(request, "assessments.html", {'section': 'assessments'})
+    return render(request, "assessments/home.html", {'section': 'assessments'})
 
 
 @login_required
@@ -104,7 +104,7 @@ def outside_period(request):
 
     if not messages.get_messages(request):
         messages.add_message(request, messages.WARNING, _("The period of scores' encoding is not opened"))
-    return render(request, "outside_scores_encodings_period.html", {})
+    return render(request, "assessments/outside_scores_encodings_period.html", {})
 
 
 class LearningUnitScoreEncodingView(LoginRequiredMixin, View):
