@@ -44,11 +44,13 @@ class TestEntitesCohorte(TestCase):
             administration_entity=cls.drt.entity
         )
 
+        cls.annee = cls.sinf1ba.academic_year.year
+
     def setUp(self) -> None:
         self.translator = EntitesCohorteTranslator()
 
     def test_should_return_dtos_if_matching_nom_cohorte(self):
-        result = self.translator.search_entite_administration_et_gestion("SINF1BA")
+        result = self.translator.search_entite_administration_et_gestion("SINF1BA", self.annee)
 
         expected = EntitesCohorteDTO(
             administration=IdentiteEntiteBuilder().build_from_sigle("DRT"),
@@ -61,11 +63,10 @@ class TestEntitesCohorte(TestCase):
             acronym="ECGE1BA",
             academic_year__current=True,
         )
-        result = self.translator.search_entite_administration_et_gestion("ECGE1BA")
+        result = self.translator.search_entite_administration_et_gestion("ECGE1BA", self.annee)
 
         expected = EntitesCohorteDTO(
             administration=None,
             gestion=None
         )
         self.assertEqual(result, expected)
-

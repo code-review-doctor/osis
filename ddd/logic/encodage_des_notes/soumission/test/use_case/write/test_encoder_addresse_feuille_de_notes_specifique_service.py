@@ -22,14 +22,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import attr
 import mock
 from django.test import SimpleTestCase
 
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderAdresseFeuilleDeNotesSpecifique
+from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.periode_encodage_notes import \
+    PeriodeEncodageNotesTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.repository.in_memory.adresse_feuille_de_notes import \
     AdresseFeuilleDeNotesInMemoryRepository
 from infrastructure.messages_bus import message_bus_instance
+from infrastructure.shared_kernel.academic_year.repository.in_memory.academic_year import AcademicYearInMemoryRepository
 
 
 class TestEncoderAddressFeuilleDeNotesSpecifique(SimpleTestCase):
@@ -49,12 +51,17 @@ class TestEncoderAddressFeuilleDeNotesSpecifique(SimpleTestCase):
         self.repo = AdresseFeuilleDeNotesInMemoryRepository()
         self.repo.entities.clear()
 
+        self.periode_encodage_notes_translator = PeriodeEncodageNotesTranslatorInMemory()
+        self.academic_year_repository = AcademicYearInMemoryRepository()
+
         self.__mock_service_bus()
 
     def __mock_service_bus(self):
         message_bus_patcher = mock.patch.multiple(
             'infrastructure.messages_bus',
             AdresseFeuilleDeNotesRepository=lambda: self.repo,
+            PeriodeEncodageNotesTranslator=lambda: self.periode_encodage_notes_translator,
+            AcademicYearRepository=lambda: self.academic_year_repository
         )
         message_bus_patcher.start()
         self.addCleanup(message_bus_patcher.stop)
@@ -75,9 +82,3 @@ class TestEncoderAddressFeuilleDeNotesSpecifique(SimpleTestCase):
         self.assertEqual(adresse_sauvegardee.fax, self.cmd.fax)
         self.assertEqual(adresse_sauvegardee.email, self.cmd.email)
         self.assertEqual(adresse_sauvegardee.type_entite, None)
-
-    def test_should_aussi_encoder_pour_la_premiere_annee_de_bachelier_when_encode_adresse_de_bachelier(self):
-        result = message_bus_instance.invoke(self.cmd)
-
-        identite_11ba = attr.evolve(result, nom_cohorte=self.cmd.nom_cohorte.replace("1BA", "11BA"))
-        self.assertTrue(self.repo.get(identite_11ba))

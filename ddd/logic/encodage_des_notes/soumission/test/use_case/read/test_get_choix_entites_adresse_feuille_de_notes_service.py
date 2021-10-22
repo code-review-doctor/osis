@@ -31,9 +31,12 @@ from ddd.logic.encodage_des_notes.soumission.domain.service.i_entites_cohorte im
 from ddd.logic.shared_kernel.entite.dtos import EntiteDTO
 from ddd.logic.shared_kernel.entite.builder.identite_entite_builder import IdentiteEntiteBuilder
 from ddd.logic.shared_kernel.entite.tests.factory.entiteucl import INFOEntiteFactory, EPLEntiteFactory, SSTEntiteFactory
+from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.periode_encodage_notes import \
+    PeriodeEncodageNotesTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.entites_cohorte import \
     EntitesCohorteTranslatorInMemory
 from infrastructure.messages_bus import message_bus_instance
+from infrastructure.shared_kernel.academic_year.repository.in_memory.academic_year import AcademicYearInMemoryRepository
 from infrastructure.shared_kernel.entite.repository.in_memory.entiteucl import EntiteUCLInMemoryRepository
 
 
@@ -50,13 +53,18 @@ class TestGetChoixEntitesAdresseFeuilleDeNotes(SimpleTestCase):
         self.entites_cohorte_translator = EntitesCohorteTranslatorInMemory()
         self.entites_cohorte_translator.datas.clear()
 
+        self.periode_encodage_notes_translator = PeriodeEncodageNotesTranslatorInMemory()
+        self.academic_year_repository = AcademicYearInMemoryRepository()
+
         self.__mock_service_bus()
 
     def __mock_service_bus(self):
         message_bus_patcher = mock.patch.multiple(
             'infrastructure.messages_bus',
             EntiteUCLRepository=lambda: self.entite_repository,
-            EntitesCohorteTranslator=lambda: self.entites_cohorte_translator
+            EntitesCohorteTranslator=lambda: self.entites_cohorte_translator,
+            PeriodeEncodageNotesTranslator=lambda: self.periode_encodage_notes_translator,
+            AcademicYearRepository=lambda: self.academic_year_repository
         )
         message_bus_patcher.start()
         self.addCleanup(message_bus_patcher.stop)

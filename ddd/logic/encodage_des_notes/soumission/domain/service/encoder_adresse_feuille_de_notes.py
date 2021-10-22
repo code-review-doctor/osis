@@ -88,11 +88,12 @@ class EncoderAdresseFeuilleDeNotesDomainService(interface.DomainService):
         ).verifier(cmd, annee_academique, repo)
         EncoderAdresseFeuilleDeNotesValidatorLIst(type_entite=cmd.type_entite).validate()
 
-
         entites_possibles = EntiteAdresseFeuilleDeNotes.search(
             cmd.nom_cohorte,
             entite_repository,
-            entites_cohorte_translator
+            entites_cohorte_translator,
+            periode_soumission_note_translator,
+            academic_year_repo
         )
 
         if cmd.type_entite == ScoreSheetAddressEntityType.ENTITY_ADMINISTRATION.value:

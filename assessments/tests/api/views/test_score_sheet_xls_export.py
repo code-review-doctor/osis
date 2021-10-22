@@ -70,6 +70,7 @@ class ScoreSheetXLSExportAPIViewTestCase(APITestCase):
                     date_deliberation=DateDTO.build_from_date(datetime.date.today()),
                     contact_feuille_de_notes=AdresseFeuilleDeNotesDTO(
                         nom_cohorte='DROI1BA',
+                        annee_academique=2021,
                         type_entite=None,
                         destinataire='',
                         rue_numero='',

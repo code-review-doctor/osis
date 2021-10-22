@@ -36,11 +36,14 @@ from ddd.logic.encodage_des_notes.tests.factory.adresse_feuille_de_notes import 
     AdresseFeuilleDeNotesBaseeSurEntiteFactory
 from ddd.logic.shared_kernel.entite.builder.identite_entite_builder import IdentiteEntiteBuilder
 from ddd.logic.shared_kernel.entite.tests.factory.entiteucl import EPLEntiteFactory
+from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.periode_encodage_notes import \
+    PeriodeEncodageNotesTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.entites_cohorte import \
     EntitesCohorteTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.repository.in_memory.adresse_feuille_de_notes import \
     AdresseFeuilleDeNotesInMemoryRepository
 from infrastructure.messages_bus import message_bus_instance
+from infrastructure.shared_kernel.academic_year.repository.in_memory.academic_year import AcademicYearInMemoryRepository
 from infrastructure.shared_kernel.entite.repository.in_memory.entiteucl import EntiteUCLInMemoryRepository
 
 
@@ -69,6 +72,9 @@ class TestEncoderAddressEntiteCommeAdresseFeuilleDeNotes(SimpleTestCase):
             )
         )
 
+        self.periode_encodage_notes_translator = PeriodeEncodageNotesTranslatorInMemory()
+        self.academic_year_repository = AcademicYearInMemoryRepository()
+
         self.__mock_service_bus()
 
     def __mock_service_bus(self):
@@ -76,7 +82,9 @@ class TestEncoderAddressEntiteCommeAdresseFeuilleDeNotes(SimpleTestCase):
             'infrastructure.messages_bus',
             AdresseFeuilleDeNotesRepository=lambda: self.repo,
             EntiteUCLRepository=lambda: self.entite_repository,
-            EntitesCohorteTranslator=lambda: self.entites_cohorte_translator
+            EntitesCohorteTranslator=lambda: self.entites_cohorte_translator,
+            PeriodeEncodageNotesTranslator=lambda: self.periode_encodage_notes_translator,
+            AcademicYearRepository=lambda: self.academic_year_repository
         )
         message_bus_patcher.start()
         self.addCleanup(message_bus_patcher.stop)
@@ -112,9 +120,3 @@ class TestEncoderAddressEntiteCommeAdresseFeuilleDeNotes(SimpleTestCase):
         self.assertEqual(adresse.pays, self.epl_entite.adresse.pays)
         self.assertEqual(adresse.telephone, self.epl_entite.adresse.telephone)
         self.assertEqual(adresse.fax, self.epl_entite.adresse.fax)
-
-    def test_should_encoder_aussi_pour_la_premiere_annee_de_bachelier_when_encode_pour_bachelier(self):
-        result = message_bus_instance.invoke(self.cmd)
-
-        identite_11ba = attr.evolve(result, nom_cohorte=self.cmd.nom_cohorte.replace("1BA", "11BA"))
-        self.assertTrue(self.repo.get(identite_11ba))

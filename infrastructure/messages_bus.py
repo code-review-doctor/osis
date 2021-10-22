@@ -464,7 +464,7 @@ class MessageBusCommands(AbstractMessageBusCommands):
             PeriodeEncodageNotesTranslator(),
             AcademicYearRepository()
         ),
-        SupprimerAdresseFeuilleDeNotesPremiereAnneeDeBachelier: lambda cmd:
+        SupprimerAdresseFeuilleDeNotesPremiereAnneeDeBachelier: lambda cmd: \
             supprimer_adresse_feuille_de_note_premiere_annee_de_bachelier(
                 cmd,
                 AdresseFeuilleDeNotesRepository(),

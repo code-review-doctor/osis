@@ -97,6 +97,7 @@ class ScoreSheetXLSSerializerTest(SimpleTestCase):
             date_deliberation=DateDTO.build_from_date(datetime.date.today() + datetime.timedelta(days=10)),
             contact_feuille_de_notes=AdresseFeuilleDeNotesDTO(
                 nom_cohorte='DROI2M',
+                annee_academique=2021,
                 type_entite="",
                 destinataire='Durant Thomas',
                 rue_numero='Chemin de lasne',
@@ -319,6 +320,7 @@ class TutorScoreSheetXLSSerilizeTest(SimpleTestCase):
             date_deliberation=DateDTO.build_from_date(datetime.date.today() + datetime.timedelta(days=10)),
             contact_feuille_de_notes=AdresseFeuilleDeNotesDTO(
                 nom_cohorte='DROI2M',
+                annee_academique=2021,
                 type_entite="",
                 destinataire='Durant Thomas',
                 rue_numero='Chemin de lasne',

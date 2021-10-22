@@ -52,6 +52,7 @@ class AdresseFeuilleDeNotesInMemoryRepository(InMemoryGenericRepository, IAdress
     ) -> 'AdresseFeuilleDeNotesDTO':
         return AdresseFeuilleDeNotesDTO(
             nom_cohorte=adresse.nom_cohorte,
+            annee_academique=adresse.annee_academique,
             type_entite=adresse.type_entite.name if adresse.type_entite else "",
             destinataire=adresse.destinataire,
             rue_numero=adresse.rue_numero,
