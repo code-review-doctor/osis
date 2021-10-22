@@ -24,8 +24,9 @@
 #
 ##############################################################################
 import abc
-from typing import Set
+from typing import Set, List
 
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import EnseignantDTO
 from ddd.logic.encodage_des_notes.soumission.dtos import AttributionEnseignantDTO
 from osis_common.ddd import interface
 
@@ -48,4 +49,13 @@ class IAttributionEnseignantTranslator(interface.DomainService):
             annee: int,
             matricule_enseignant: str,
     ) -> Set['AttributionEnseignantDTO']:
+        raise NotImplementedError
+
+    @classmethod
+    @abc.abstractmethod
+    def search_attributions_enseignant_par_nom_prenom_annee(
+            cls,
+            annee: int,
+            nom_prenom: str,
+    ) -> List['EnseignantDTO']:
         raise NotImplementedError

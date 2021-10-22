@@ -179,7 +179,6 @@ class TestNoteEtudiant(TestCase):
 
         enrollment = ExamEnrollmentFactory(
             session_exam__number_session=note_etudiant_to_save.entity_id.numero_session,
-            session_exam__learning_unit_year=luy,
             learning_unit_enrollment__learning_unit_year=luy,
             learning_unit_enrollment__offer_enrollment__student__registration_id=note_etudiant_to_save.noma,
             learning_unit_enrollment__offer_enrollment__student__person__email=note_etudiant_to_save.email,

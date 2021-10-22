@@ -116,8 +116,9 @@ class _ScoreResponsibleSerializer(serializers.Serializer):
 
     def get_address(self, obj):
         instance = {}
-        if obj['feuille_de_notes'].contact_responsable_notes:
-            instance = obj['feuille_de_notes'].contact_responsable_notes.adresse_professionnelle
+        contact_responsable_notes = obj['feuille_de_notes'].contact_responsable_notes
+        if contact_responsable_notes and contact_responsable_notes.adresse_professionnelle:
+            instance = contact_responsable_notes.adresse_professionnelle
         return _ScoreResponsibleAddressSerializer(instance=instance).data
 
 

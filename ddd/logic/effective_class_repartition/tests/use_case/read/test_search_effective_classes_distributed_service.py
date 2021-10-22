@@ -44,6 +44,8 @@ from infrastructure.messages_bus import message_bus_instance
 class SearchClassesEnseignantTest(SimpleTestCase):
 
     def setUp(self) -> None:
+        self.tutor_repository = TutorRepositoryInMemory()
+        self.tutor_repository.reset()
         self.annee = datetime.date.today().year
         self.matricule_enseignant = '00321234'
         self.code_unite_enseignement = 'LDROI1001'
@@ -57,7 +59,6 @@ class SearchClassesEnseignantTest(SimpleTestCase):
         )
 
         self.attributions_translator = TutorAttributionToLearningUnitTranslatorInMemory()
-        self.tutor_repository = TutorRepositoryInMemory()
         self.tutor = TutorWithDistributedEffectiveClassesFactory(
             entity_id__personal_id_number=self.matricule_enseignant,
             distributed_effective_classes=[
@@ -89,11 +90,11 @@ class SearchClassesEnseignantTest(SimpleTestCase):
     def test_should_renvoyer_details_attribution_enseignant(self):
         result = self.message_bus.invoke(self.cmd)
         dto = result[0]
-        self.assertEqual(dto.attribution_uuid, 'attribution_uuid2')
-        self.assertEqual(dto.personal_id_number, '00321235')
-        self.assertEqual(dto.function, Functions.CO_HOLDER.name)
+        self.assertEqual(dto.attribution_uuid, 'attribution_uuid1')
+        self.assertEqual(dto.personal_id_number, '00321234')
+        self.assertEqual(dto.function, Functions.COORDINATOR.name)
         self.assertEqual(dto.last_name, "Smith")
-        self.assertEqual(dto.first_name, "Bastos")
+        self.assertEqual(dto.first_name, "Charles")
 
     def test_should_renvoyer_volume_enseignant_distribue_sur_classe(self):
         result = self.message_bus.invoke(self.cmd)

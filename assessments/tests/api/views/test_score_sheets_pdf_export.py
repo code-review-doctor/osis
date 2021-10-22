@@ -141,7 +141,7 @@ class ScoreSheetsPDFExportAPIViewTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     @mock.patch(
-        'assessments.api.views.score_sheets_pdf_export.paper_sheet.print_notes',
+        'assessments.api.views.score_sheets_pdf_export.print_notes',
         return_value=HttpResponse(content_type='application/pdf')
     )
     def test_get_assert_call_print_pdf(self, mock_print_notes):

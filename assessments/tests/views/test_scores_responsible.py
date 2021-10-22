@@ -34,8 +34,6 @@ from django.urls import reverse
 
 from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmissionCalendar
 from assessments.tests.factories.score_responsible import ScoreResponsibleFactory
-from attribution.models.attribution import Attribution
-from attribution.tests.factories.attribution import AttributionFactory, AttributionNewFactory
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.business.entities import create_entities_hierarchy
