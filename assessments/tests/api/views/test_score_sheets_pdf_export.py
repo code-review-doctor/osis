@@ -68,6 +68,7 @@ class ScoreSheetsPDFExportAPIViewTestCase(APITestCase):
                     date_deliberation=DateDTO.build_from_date(datetime.date.today()),
                     contact_feuille_de_notes=AdresseFeuilleDeNotesDTO(
                         nom_cohorte='DROI1BA',
+                        annee_academique=2020,
                         type_entite=ScoreSheetAddressEntityType.ENTITY_ADMINISTRATION.name,
                         destinataire='',
                         rue_numero='',

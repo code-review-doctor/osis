@@ -33,6 +33,7 @@ from osis_common.ddd import interface
 @attr.s(frozen=True, slots=True)
 class IdentiteAdresseFeuilleDeNotes(interface.EntityIdentity):
     nom_cohorte = attr.ib(type=str)
+    annee_academique = attr.ib(type=int)
 
 
 @attr.s(slots=True)
@@ -51,6 +52,10 @@ class AdresseFeuilleDeNotes(interface.RootEntity):
     @property
     def nom_cohorte(self):
         return self.entity_id.nom_cohorte
+
+    @property
+    def annee_academique(self):
+        return self.entity_id.annee_academique
 
     def est_identique_a(self, autre_adresse: 'AdresseFeuilleDeNotes') -> bool:
         return self.type_entite == autre_adresse.type_entite and \

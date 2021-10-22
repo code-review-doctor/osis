@@ -111,7 +111,7 @@ class EncoderAdresseFeuilleDeNotesSpecifique(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
-class EcraserAdresseFeuilleDeNotesPremiereAnneeDeBachelier(interface.CommandRequest):
+class SupprimerAdresseFeuilleDeNotesPremiereAnneeDeBachelier(interface.CommandRequest):
     nom_cohorte = attr.ib(type=str)
 
 

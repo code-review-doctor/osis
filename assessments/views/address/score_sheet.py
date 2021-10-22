@@ -154,6 +154,7 @@ class FirstYearBachelorScoreSheetAddressView(ScoreSheetAddressView):
 
     def get_form_kwargs(self):
         form_kwargs = super().get_form_kwargs()
+        form_kwargs['nom_cohorte'] = self.nom_cohorte_premiere_annee
         form_kwargs['adresse_bachelier'] = self.bachelor_score_sheet_address_dto
         form_kwargs['nom_cohorte_premiere_annee'] = self.nom_cohorte_premiere_annee
         return form_kwargs

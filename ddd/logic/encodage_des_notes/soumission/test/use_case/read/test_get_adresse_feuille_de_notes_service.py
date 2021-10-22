@@ -32,9 +32,12 @@ from ddd.logic.encodage_des_notes.soumission.dtos import AdresseFeuilleDeNotesDT
 from ddd.logic.encodage_des_notes.tests.factory.adresse_feuille_de_notes import \
     AdresseFeuilleDeNotesSpecifiqueFactory, \
     AdresseFeuilleDeNotesBaseeSurEntiteFactory, AdresseFeuilleDeNotesVideFactory
+from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.periode_encodage_notes import \
+    PeriodeEncodageNotesTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.repository.in_memory.adresse_feuille_de_notes import \
     AdresseFeuilleDeNotesInMemoryRepository
 from infrastructure.messages_bus import message_bus_instance
+from infrastructure.shared_kernel.academic_year.repository.in_memory.academic_year import AcademicYearInMemoryRepository
 
 
 class TestGetAdresseFeuilleDeNotesService(SimpleTestCase):
@@ -45,12 +48,17 @@ class TestGetAdresseFeuilleDeNotesService(SimpleTestCase):
         self.cmd = GetAdresseFeuilleDeNotesServiceCommand(
             nom_cohorte="SINF1BA"
         )
+        self.periode_encodage_notes_translator = PeriodeEncodageNotesTranslatorInMemory()
+        self.academic_year_repository = AcademicYearInMemoryRepository()
+
         self.__mock_service_bus()
 
     def __mock_service_bus(self):
         message_bus_patcher = mock.patch.multiple(
             'infrastructure.messages_bus',
             AdresseFeuilleDeNotesRepository=lambda: self.repository,
+            PeriodeEncodageNotesTranslator=lambda: self.periode_encodage_notes_translator,
+            AcademicYearRepository=lambda: self.academic_year_repository
         )
         message_bus_patcher.start()
         self.addCleanup(message_bus_patcher.stop)

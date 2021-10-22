@@ -30,7 +30,7 @@ from base.forms.exceptions import InvalidFormException
 from base.models.entity_version import EntityVersion
 from ddd.logic.encodage_des_notes.soumission.commands import GetChoixEntitesAdresseFeuilleDeNotesCommand, \
     EncoderAdresseFeuilleDeNotesSpecifique, \
-    EncoderAdresseEntiteCommeAdresseFeuilleDeNotes, EcraserAdresseFeuilleDeNotesPremiereAnneeDeBachelier
+    EncoderAdresseEntiteCommeAdresseFeuilleDeNotes, SupprimerAdresseFeuilleDeNotesPremiereAnneeDeBachelier
 from ddd.logic.encodage_des_notes.soumission.dtos import AdresseFeuilleDeNotesDTO
 from infrastructure.messages_bus import message_bus_instance
 from osis_common.ddd.interface import BusinessException
@@ -142,9 +142,9 @@ class FirstYearBachelorScoreSheetAddressForm(ScoreSheetAddressForm):
 
     def save(self):
         if not self.cleaned_data['specific_address']:
-            return self._ecraser_adresse_par_adresse_bachelier()
+            return self._supprimer_adresse_par_adresse_bachelier()
         return super().save()
 
-    def _ecraser_adresse_par_adresse_bachelier(self):
-        cmd = EcraserAdresseFeuilleDeNotesPremiereAnneeDeBachelier(nom_cohorte=self.nom_cohorte)
+    def _supprimer_adresse_par_adresse_bachelier(self):
+        cmd = SupprimerAdresseFeuilleDeNotesPremiereAnneeDeBachelier(nom_cohorte=self.nom_cohorte)
         return message_bus_instance.invoke(cmd)
