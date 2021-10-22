@@ -183,6 +183,14 @@ class ResponsableDeNotesRepositoryTest(TestCase):
 
         self.assertListEqual(responsables_retrieved, [])
 
+    def test_should_recomposer_responsable_avec_toutes_ses_UEs_si_recherche_sur_1_seule_UE(self):
+        responsable = ResponsableDeNotesPourMultipleUniteEnseignements()
+        self._create_necessary_data(responsable)
+        self.responsable_de_notes_repository.save(responsable)
+
+        responsable_retrieved = self.responsable_de_notes_repository.get_for_unite_enseignement("LOSIS1354", 2020)
+        assert_attrs_instances_are_equal(responsable, responsable_retrieved)
+
     def _create_necessary_data(self, responsable: 'ResponsableDeNotes'):
         tutor = TutorFactory(person__global_id=responsable.entity_id.matricule_fgs_enseignant)
         for identite_ue in responsable.unites_enseignements:
