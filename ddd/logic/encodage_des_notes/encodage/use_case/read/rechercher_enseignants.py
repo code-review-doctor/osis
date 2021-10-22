@@ -23,39 +23,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import abc
-from typing import Set, List
+from typing import List
 
+from ddd.logic.encodage_des_notes.encodage.commands import SearchEnseignantsCommand
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_attribution_enseignant import \
+    IAttributionEnseignantTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodage_notes import \
+    IPeriodeEncodageNotesTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import EnseignantDTO
-from ddd.logic.encodage_des_notes.soumission.dtos import AttributionEnseignantDTO
-from osis_common.ddd import interface
 
 
-class IAttributionEnseignantTranslator(interface.DomainService):
-
-    @classmethod
-    @abc.abstractmethod
-    def search_attributions_enseignant(
-            cls,
-            code_unite_enseignement: str,
-            annee: int,
-    ) -> Set['AttributionEnseignantDTO']:
-        raise NotImplementedError
-
-    @classmethod
-    @abc.abstractmethod
-    def search_attributions_enseignant_par_matricule(
-            cls,
-            annee: int,
-            matricule_enseignant: str,
-    ) -> Set['AttributionEnseignantDTO']:
-        raise NotImplementedError
-
-    @classmethod
-    @abc.abstractmethod
-    def search_attributions_enseignant_par_nom_prenom_annee(
-            cls,
-            annee: int,
-            nom_prenom: str,
-    ) -> List['EnseignantDTO']:
-        raise NotImplementedError
+def rechercher_enseignants(
+        cmd: 'SearchEnseignantsCommand',
+        attribution_enseignant_translator: 'IAttributionEnseignantTranslator',
+        periode_encodage_notes_translator: 'IPeriodeEncodageNotesTranslator',
+) -> List['EnseignantDTO']:
+    periode_encodage = periode_encodage_notes_translator.get()
+    return attribution_enseignant_translator.search_attributions_enseignant_par_nom_prenom_annee(
+        annee=periode_encodage.annee_concernee,
+        nom_prenom=cmd.nom_prenom,
+    )
