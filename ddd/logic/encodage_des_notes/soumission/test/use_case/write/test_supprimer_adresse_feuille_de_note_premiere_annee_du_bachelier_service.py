@@ -25,7 +25,7 @@
 import mock
 from django.test import SimpleTestCase
 
-from ddd.logic.encodage_des_notes.soumission.commands import EcraserAdresseFeuilleDeNotesPremiereAnneeDeBachelier
+from ddd.logic.encodage_des_notes.soumission.commands import SupprimerAdresseFeuilleDeNotesPremiereAnneeDeBachelier
 from ddd.logic.encodage_des_notes.tests.factory.adresse_feuille_de_notes import \
     AdresseFeuilleDeNotesSpecifiqueFactory, \
     AdresseFeuilleDeNotesBaseeSurEntiteFactory
@@ -35,9 +35,9 @@ from infrastructure.messages_bus import message_bus_instance
 from testing.assertions import assert_attrs_instances_are_equal
 
 
-class TestEcraserAdresseFeuilleDeNotePremiereAnneeDuBachlierParAdresseDuBachelier(SimpleTestCase):
+class TestSupprimerAdresseFeuilleDeNotePremiereAnneeDuBachlier(SimpleTestCase):
     def setUp(self) -> None:
-        self.cmd = EcraserAdresseFeuilleDeNotesPremiereAnneeDeBachelier(
+        self.cmd = SupprimerAdresseFeuilleDeNotesPremiereAnneeDeBachelier(
             nom_cohorte="DROI11BA",
         )
 

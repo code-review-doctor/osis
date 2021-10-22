@@ -22,8 +22,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.encodage_des_notes.soumission.commands import EncoderAdresseFeuilleDeNotesSpecifique, \
-    EcraserAdresseFeuilleDeNotesPremiereAnneeDeBachelier
+from ddd.logic.encodage_des_notes.soumission.commands import SupprimerAdresseFeuilleDeNotesPremiereAnneeDeBachelier
 from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_notes import IdentiteAdresseFeuilleDeNotes
 from ddd.logic.encodage_des_notes.soumission.domain.service.encoder_adresse_feuille_de_notes import \
     EncoderAdresseFeuilleDeNotesDomainService
@@ -31,8 +30,8 @@ from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_not
     IAdresseFeuilleDeNotesRepository
 
 
-def ecraser_adresse_feuille_de_note_premiere_annee_de_bachelier_par_adresse_du_bachelier(
-        cmd: EcraserAdresseFeuilleDeNotesPremiereAnneeDeBachelier,
+def supprimer_adresse_feuille_de_note_premiere_annee_de_bachelier(
+        cmd: SupprimerAdresseFeuilleDeNotesPremiereAnneeDeBachelier,
         repo: IAdresseFeuilleDeNotesRepository,
 ) -> 'IdentiteAdresseFeuilleDeNotes':
-    return EncoderAdresseFeuilleDeNotesDomainService().ecraser_adresse_premiere_annee_de_bachelier(cmd, repo)
+    return EncoderAdresseFeuilleDeNotesDomainService().supprimer_adresse_premiere_annee_de_bachelier(cmd, repo)
