@@ -23,15 +23,24 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import attr
+from typing import List
 
-from osis_common.ddd.interface import DTO
+from ddd.logic.encodage_des_notes.soumission.commands import SearchResponsableDeNotesCommand
+from ddd.logic.encodage_des_notes.soumission.domain.model._unite_enseignement_identite import \
+    UniteEnseignementIdentiteBuilder
+from ddd.logic.encodage_des_notes.soumission.dtos import ResponsableDeNotesDTO
+from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
 
 
-@attr.s(frozen=True, slots=True)
-class ScoreResponsibleDTO(DTO):
-    last_name = attr.ib(type=str)
-    first_name = attr.ib(type=str)
-    email = attr.ib(type=str)
-    code_of_learning_unit = attr.ib(type=str)
-    year_of_learning_unit = attr.ib(type=int)
+def search_responsables_de_notes(
+        command: 'SearchResponsableDeNotesCommand',
+        responsable_notes_repo: 'IResponsableDeNotesRepository',
+) -> List['ResponsableDeNotesDTO']:
+    unite_enseignement_ids = {
+        UniteEnseignementIdentiteBuilder.build_from_code_and_annee(
+            cmd.code_unite_enseignement,
+            cmd.annee_unite_enseignement,
+        )
+        for cmd in command.unites_enseignement
+    }
+    return responsable_notes_repo.search_dto(unite_enseignement_ids)

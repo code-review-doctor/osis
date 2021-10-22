@@ -56,7 +56,6 @@ class ResponsableDeNotesRepository(IResponsableDeNotesRepository):
             entity_ids: Optional[List['IdentiteResponsableDeNotes']] = None,
             codes_unites_enseignement: List[str] = None,
             annee_academique: Optional[int] = None,
-            matricule_fgs: Optional[str] = None,
             **kwargs
     ) -> List['ResponsableDeNotes']:
         qs = _fetch_responsable_de_notes()
@@ -71,13 +70,11 @@ class ResponsableDeNotesRepository(IResponsableDeNotesRepository):
         if annee_academique:
             filter["year"] = annee_academique
 
-        if matricule_fgs:
-            filter["global_id"] = matricule_fgs
-
         if not filter:
             return []
 
-        rows = qs.filter(**filter)
+        matricules_fgs = _fetch_responsable_de_notes().filter(**filter).values_list('global_id', flat=True)
+        rows = qs.filter(global_id__in=matricules_fgs)
         rows_grouped_by_global_id = itertools.groupby(rows, key=lambda row: row.global_id)
 
         return [
@@ -203,11 +200,7 @@ class ResponsableDeNotesRepository(IResponsableDeNotesRepository):
             annee_academique: int
     ) -> Optional['ResponsableDeNotes']:
         try:
-            matricule_fgs = _fetch_responsable_de_notes().filter(
-                acronym=code_unite_enseignement,
-                year=annee_academique
-            )[0].global_id
-            return cls.search(matricule_fgs=matricule_fgs)[0]
+            return cls.search(codes_unites_enseignement=[code_unite_enseignement], annee_academique=annee_academique)[0]
         except IndexError:
             return None
 

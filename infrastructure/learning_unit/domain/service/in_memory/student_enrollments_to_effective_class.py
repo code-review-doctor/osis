@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,22 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django import forms
-from django.utils.translation import gettext_lazy
 
-from assessments.models.score_sheet_address import ScoreSheetAddress
-from reference.models.country import Country
+from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
+from ddd.logic.learning_unit.domain.service.i_student_enrollments import \
+    IStudentEnrollmentsTranslator
 
 
-class ScoreSheetAddressForm(forms.ModelForm):
-    country = forms.ModelChoiceField(queryset=Country.objects.all(), required=False, label=gettext_lazy('Country'))
-    recipient = forms.CharField(max_length=255, label=gettext_lazy('Recipient'))
-    location = forms.CharField(max_length=255, label=gettext_lazy('Street and number'))
-    postal_code = forms.CharField(max_length=255, label=gettext_lazy('Postal code'))
-    city = forms.CharField(max_length=255, label=gettext_lazy('City'))
-    offer_acronym = forms.CharField()
-    email = forms.EmailField(required=False)
+class StudentEnrollmentsTranslatorInMemory(IStudentEnrollmentsTranslator):
 
-    class Meta:
-        model = ScoreSheetAddress
-        exclude = ['external_id', 'education_group', 'changed']
+    @classmethod
+    def has_enrollments_to_class(cls, class_identity: 'EffectiveClassIdentity') -> bool:
+        return False
+
+    @classmethod
+    def has_enrollments_to_learning_unit(cls, learning_unit_id: 'LearningUnitIdentity') -> bool:
+        return False

@@ -91,6 +91,7 @@ class SelectScoreResponsible(LoginRequiredMixin, PermissionRequiredMixin, Templa
         return session_exam_calendar.current_sessions_academic_year()
 
     def get_attributions(self):
+        # FIXME :: use DDD instead of query database directly
         qs = AttributionNew.objects.filter(
             attributionchargenew__learning_component_year__learning_unit_year__acronym=self.code,
             attributionchargenew__learning_component_year__learning_unit_year__academic_year=self.academic_year,

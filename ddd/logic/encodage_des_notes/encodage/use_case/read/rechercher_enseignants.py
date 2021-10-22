@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,23 +23,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django import forms
+from typing import List
 
-from assessments.models.score_sheet_address import ScoreSheetAddress
+from ddd.logic.encodage_des_notes.encodage.commands import SearchEnseignantsCommand
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_attribution_enseignant import \
+    IAttributionEnseignantTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodage_notes import \
+    IPeriodeEncodageNotesTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import EnseignantDTO
 
 
-class ScoreSheetAddressEntityForm(forms.ModelForm):
-    email = forms.EmailField(required=False)
-
-    class Meta:
-        model = ScoreSheetAddress
-        exclude = [
-            'external_id',
-            'changed',
-            'country',
-            'recipient',
-            'location',
-            'postal_code',
-            'city',
-            'education_group',
-        ]
+def rechercher_enseignants(
+        cmd: 'SearchEnseignantsCommand',
+        attribution_enseignant_translator: 'IAttributionEnseignantTranslator',
+        periode_encodage_notes_translator: 'IPeriodeEncodageNotesTranslator',
+) -> List['EnseignantDTO']:
+    periode_encodage = periode_encodage_notes_translator.get()
+    return attribution_enseignant_translator.search_attributions_enseignant_par_nom_prenom_annee(
+        annee=periode_encodage.annee_concernee,
+        nom_prenom=cmd.nom_prenom,
+    )

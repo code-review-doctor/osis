@@ -62,15 +62,6 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"                        You will submit %(draft_scores_not_submitted)s notes "
-"to faculty(ies). Warning : submitted scores <b>can't be modified anymore.</"
-"b>\n"
-"                    "
-msgstr ""
-
-#, python-format
-msgid ""
-"\n"
 "                You will submit %(draft_scores_not_submitted)s notes to "
 "faculty(ies). Warning : submitted scores <b>can't be modified anymore.</b>\n"
 "            "
@@ -86,9 +77,6 @@ msgstr ""
 msgid "Absence justified"
 msgstr ""
 
-msgid "Absence justified cannot be remplaced by absence unjustified"
-msgstr ""
-
 msgid "Absence unjustified"
 msgstr ""
 
@@ -98,14 +86,7 @@ msgstr ""
 msgid "Academic actors"
 msgstr ""
 
-msgid "Academic background"
-msgstr ""
-
 msgid "Academic year"
-msgstr ""
-
-#, python-format
-msgid "Accepted value: %(justification_label_authorized)s "
 msgstr ""
 
 msgctxt "UE acronym"
@@ -139,11 +120,6 @@ msgid ""
 msgstr ""
 
 msgid ""
-"All the scores were submitted. It is not possible to double encode scores "
-"anymore."
-msgstr ""
-
-msgid ""
 "All the scores were submitted. It is not possible to encode scores anymore."
 msgstr ""
 
@@ -171,9 +147,6 @@ msgstr ""
 msgid "Code"
 msgstr ""
 
-msgid "Compare"
-msgstr ""
-
 msgid "Complete"
 msgstr ""
 
@@ -196,9 +169,6 @@ msgid "Datatable sort descending"
 msgstr ""
 
 msgid "Deadline reached"
-msgstr ""
-
-msgid "Decimal score not allowed"
 msgstr ""
 
 msgid "Decimal values in scores are NOT accepted."
@@ -228,16 +198,7 @@ msgstr ""
 msgid "Display all tutors for this learning unit"
 msgstr ""
 
-msgid "Display scores for this learning unit"
-msgstr ""
-
 msgid "Done at"
-msgstr ""
-
-msgid "Double encode scores"
-msgstr ""
-
-msgid "Double encoding"
 msgstr ""
 
 msgid "Download the Excel file"
@@ -255,16 +216,10 @@ msgstr ""
 msgid "Encode scores"
 msgstr ""
 
-msgid "Encoding"
-msgstr ""
-
 msgid "End date Prof"
 msgstr ""
 
 msgid "Enrolled lately"
-msgstr ""
-
-msgid "Enter a valid email address."
 msgstr ""
 
 msgid "Entity"
@@ -288,9 +243,6 @@ msgid ""
 msgstr ""
 
 msgid "File error : No value in the column Session. No scores injected."
-msgstr ""
-
-msgid "Final"
 msgstr ""
 
 msgid "Firstname"
@@ -319,26 +271,11 @@ msgstr ""
 msgid "Institution"
 msgstr ""
 
-msgid "Invalid justification value"
-msgstr ""
-
-msgid "January"
-msgstr ""
-
-msgid "June"
-msgstr ""
-
-msgid "Justification"
-msgstr ""
-
 msgid "Justification (A,T)"
 msgstr ""
 
 #, python-format
 msgid "Justification legend: %(justification_label_authorized)s"
-msgstr ""
-
-msgid "Justified absence"
 msgstr ""
 
 msgid "LU code"
@@ -354,9 +291,6 @@ msgid "Lastname"
 msgstr ""
 
 msgid "Learning unit"
-msgstr ""
-
-msgid "Line"
 msgstr ""
 
 msgid "M=Justified Absence"
@@ -386,25 +320,13 @@ msgstr ""
 msgid "No address found for the selected entity."
 msgstr ""
 
-msgid "No data for this academic year"
-msgstr ""
-
-msgid "No double score encoded ; nothing to compare."
-msgstr ""
-
 msgid "No entity associated to your profile"
-msgstr ""
-
-msgid "No new scores encoded. The double encoding needs new scores."
 msgstr ""
 
 msgid "No result!"
 msgstr ""
 
 msgid "No score injected"
-msgstr ""
-
-msgid "No scores injected"
 msgstr ""
 
 msgid "No students to encode by excel"
@@ -425,13 +347,7 @@ msgstr ""
 msgid "Online"
 msgstr ""
 
-msgid "Online double scores encoding"
-msgstr ""
-
 msgid "Online encoding"
-msgstr ""
-
-msgid "Online scores encoding"
 msgstr ""
 
 msgid "Other educational facilities"
@@ -491,12 +407,6 @@ msgstr ""
 msgid "Reg. No."
 msgstr ""
 
-msgid "Registration ID"
-msgstr ""
-
-msgid "Registration ID does not match email"
-msgstr ""
-
 msgid "Registration number"
 msgstr ""
 
@@ -532,17 +442,7 @@ msgstr ""
 msgid "Score"
 msgstr ""
 
-msgid "Score already submitted"
-msgstr ""
-
-msgid "Score have more than 2 decimal places"
-msgstr ""
-
 msgid "Score legend"
-msgstr ""
-
-#, python-format
-msgid "Score legend: %(score_legend)s (0=Score of presence)"
 msgstr ""
 
 #, python-brace-format
@@ -562,12 +462,6 @@ msgid "Score(s) saved"
 msgstr ""
 
 msgid "Scores encoding"
-msgstr ""
-
-msgid "Scores injection"
-msgstr ""
-
-msgid "Scores must be between 0 and 20"
 msgstr ""
 
 msgid "Scores responsible"
@@ -624,16 +518,10 @@ msgstr ""
 msgid "Street and number"
 msgstr ""
 
-msgid "Student not registered for exam"
-msgstr ""
-
 msgid "Student path"
 msgstr ""
 
 msgid "Students deliberated are not shown"
-msgstr ""
-
-msgid "Studies"
 msgstr ""
 
 msgid "Submission"
@@ -660,11 +548,6 @@ msgid ""
 "dated %(printing_date)s and are likely to evolve"
 msgstr ""
 
-#, python-format
-msgid ""
-"The enrollment to the activity %(xls_learning_unit_acronym)s doesn't exist"
-msgstr ""
-
 msgid "The file must be a valid 'XLSX' excel file"
 msgstr ""
 
@@ -684,9 +567,6 @@ msgid ""
 msgstr ""
 
 msgid "The period of scores' encoding is not opened"
-msgstr ""
-
-msgid "The scores responsible must still submit the scores"
 msgstr ""
 
 msgid "The selected entity no longer exists today (end date passed)."
@@ -738,9 +618,6 @@ msgstr ""
 msgid "Université catholique de Louvain"
 msgstr ""
 
-msgid "Unjustified absence"
-msgstr ""
-
 msgid "Unsubscribed lately"
 msgstr ""
 
@@ -753,40 +630,10 @@ msgstr ""
 msgid "Warning : some registered scores have not been submitted yet!"
 msgstr ""
 
-msgid "Without attribution"
-msgstr ""
-
 msgid "Yes"
 msgstr ""
 
-msgid "You can't encode a 'score' and a 'justification' together"
-msgstr ""
-
-msgid ""
-"You don't have access rights for this learning unit or it doesn't exist in "
-"our database"
-msgstr ""
-
-msgid ""
-"You don't have access rights for this offer or it doesn't exist in our "
-"database"
-msgstr ""
-
-msgid ""
-"You encoded scores for more than 1 learning unit in your excel file (column "
-"'Learning unit').Please make one excel file by learning unit."
-msgstr ""
-
 msgid "You have to select a file to upload."
-msgstr ""
-
-msgid "You haven't any score to encode."
-msgstr ""
-
-#, python-format
-msgid ""
-"Your excel file isn't well structured. Please follow the structure of the "
-"excel file provided (button '%(button_value)s')"
 msgstr ""
 
 msgid "date_format"
@@ -811,9 +658,6 @@ msgid "of"
 msgstr ""
 
 msgid "program(s)"
-msgstr ""
-
-msgid "score(s) saved"
 msgstr ""
 
 msgid "student"
