@@ -32,6 +32,7 @@ from django.utils.translation import gettext_lazy
 
 from base.models.person import Person
 from base.utils.send_mail import _get_txt_complementary_first_col_header
+from base.utils.string import unaccent
 from ddd.logic.encodage_des_notes.encodage.domain.model.gestionnaire_parcours import GestionnaireParcours
 from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import IdentiteNoteEtudiant, NoteEtudiant
 from ddd.logic.encodage_des_notes.encodage.domain.service.cohorte_non_complete import CodeUniteEnseignement, NomCohorte
@@ -273,7 +274,7 @@ class NotifierEncodageNotes(INotifierEncodageNotes):
             )
             for note in notes
         ]
-        return sorted(result, key=lambda l: (l[0], l[3], l[4]))
+        return sorted(result, key=lambda l: (l[0], unaccent(l[3]), unaccent(l[4])))
 
     @classmethod
     def _format_score(cls, score: str) -> str:
