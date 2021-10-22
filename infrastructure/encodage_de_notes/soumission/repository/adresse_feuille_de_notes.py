@@ -27,8 +27,8 @@ import datetime
 import itertools
 from typing import List, Optional
 
-from django.db.models import F, Value, Subquery, OuterRef, Case, When, CharField, Q
-from django.db.models.functions import Replace
+from django.db.models import F, Value, Subquery, OuterRef, Case, When, CharField, Q, IntegerField
+from django.db.models.functions import Replace, Coalesce
 
 from assessments.models.enums.score_sheet_address_choices import ScoreSheetAddressEntityType
 from assessments.models.score_sheet_address import ScoreSheetAddress
@@ -219,6 +219,12 @@ def get_addresse_feuille_notes(cohortes: List[str]):
     ).exclude(
         acronym__contains="11BA"
     ).values('administration_entity')
+    cohort_administration_entity_subqs = CohortYear.objects.filter(
+        education_group_year__education_group=OuterRef('education_group'),
+        education_group_year__academic_year=current_academic_year()
+    ).annotate(
+        cohort_administration_entity=Coalesce("administration_entity", "education_group_year__administration_entity")
+    ).values('cohort_administration_entity')
     management_entity_subqs = EducationGroupYear.objects.filter(
         education_group=OuterRef('education_group'),
         academic_year=current_academic_year()
@@ -244,7 +250,11 @@ def get_addresse_feuille_notes(cohortes: List[str]):
             default=Subquery(nom_cohorte_subqs[:1]),
             output_field=CharField()
         ),
-        entite_administration=Subquery(administration_entity_subqs[:1]),
+        entite_administration=Case(
+            When(cohort_name=CohortName.FIRST_YEAR.name, then=Subquery(cohort_administration_entity_subqs[:1])),
+            default=Subquery(administration_entity_subqs[:1]),
+            output_field=IntegerField()
+        ),
         entite_gestion=Subquery(management_entity_subqs[:1]),
         destinataire=F('recipient'),
         rue_numero=F("location"),
@@ -310,7 +320,20 @@ def _get_flat_entity_hierarchy(cohortes: List[str]):
         acronym__in=cohortes,
         academic_year=current_academic_year()
     ).values_list("administration_entity", "management_entity")
-    entity_ids = set(itertools.chain.from_iterable(entity_ids_qs))
+    cohort_entity_ids_qs = CohortYear.objects.filter(
+        education_group_year__academic_year=current_academic_year()
+    ).annotate(
+        acronym=Replace('education_group_year__acronym', Value('1BA'), Value('11BA'))
+    ).filter(
+        acronym__in=cohortes
+    ).annotate(
+        cohort_administration_entity=Coalesce(
+            'administration_entity', 'education_group_year__administration_entity'
+        )
+    ).values_list("cohort_administration_entity", "education_group_year__management_entity")
+    entity_ids = set(itertools.chain.from_iterable(entity_ids_qs)).union(
+        itertools.chain.from_iterable(cohort_entity_ids_qs)
+    )
 
     cte = EntityVersion.objects.with_children(
         'acronym',

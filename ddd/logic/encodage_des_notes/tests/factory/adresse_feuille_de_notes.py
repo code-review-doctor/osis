@@ -86,3 +86,7 @@ class AdresseFeuilleDeNotesBaseeSurEntiteFactory(AdresseFeuilleDeNotesVideFactor
     telephone = "0106605122"
     fax = "0106601123"
     email = "email-epl@email.be"
+
+
+class PremiereAnneeBachelierAdresseFeuilleDeNotesBaseeSurEntiteFactory(AdresseFeuilleDeNotesBaseeSurEntiteFactory):
+    entity_id = factory.SubFactory(_IdentiteAdresseFeuilleDeNotesFactory, nom_cohorte="ECGE11BA")
