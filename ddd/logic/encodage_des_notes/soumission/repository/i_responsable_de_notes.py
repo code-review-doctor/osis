@@ -44,7 +44,6 @@ class IResponsableDeNotesRepository(interface.AbstractRepository):
             entity_ids: Optional[List['IdentiteResponsableDeNotes']] = None,
             codes_unites_enseignement: List[str] = None,
             annee_academique: Optional[int] = None,
-            matricule_fgs: Optional[str] = None,
             **kwargs
     ) -> List['ResponsableDeNotes']:
         pass
