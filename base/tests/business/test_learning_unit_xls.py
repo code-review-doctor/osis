@@ -806,8 +806,8 @@ class TestLearningUnitXlsClassesDetail(TestCase):
             dict(PERIODICITY_TYPES)[luy.periodicity],
             str(_('yes')) if luy.status else str(_('no')),
             effective_class.hourly_volume_partial_q1 + effective_class.hourly_volume_partial_q2,
-            effective_class.hourly_volume_partial_q1,
-            effective_class.hourly_volume_partial_q2,
+            effective_class.hourly_volume_partial_q1 or '',
+            effective_class.hourly_volume_partial_q2 or '',
             '',
             '',
             '',
@@ -824,7 +824,6 @@ class TestLearningUnitXlsClassesDetail(TestCase):
             luy.other_remark,
             luy.other_remark_english,
         ]
-
         self.assertEqual(
             get_data_part2(learning_unit_yr=luy, effective_class=effective_class, with_attributions=False),
             expected_common
