@@ -24,22 +24,25 @@
 #
 ##############################################################################
 import datetime
+import functools
+import operator
 
 from dal import autocomplete
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.postgres.aggregates import ArrayAgg, StringAgg
-from django.db.models import F, CharField, Value, When, Case, OuterRef, Subquery
+from django.db.models import F, CharField, Value, When, Case, OuterRef, Subquery, Q
 from django.db.models.functions import Concat
 from django.urls import reverse
 from django.utils.functional import cached_property
 
 from assessments.forms.score_encoding import ScoreEncodingProgressFilterForm
 from assessments.views.common.score_encoding_progress_overview import ScoreEncodingProgressOverviewBaseView
+from attribution.models.attribution_new import AttributionNew
 from base.models import synchronization
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.learning_unit_year import LearningUnitYear
 from ddd.logic.encodage_des_notes.encodage.commands import GetProgressionGeneraleGestionnaireCommand, \
-    GetPeriodeEncodageCommand
+    GetPeriodeEncodageCommand, SearchEnseignantsCommand
 from infrastructure.messages_bus import message_bus_instance
 from learning_unit.models.learning_class_year import LearningClassYear
 
@@ -167,3 +170,13 @@ class CodeUniteEnseignementAutocomplete(LoginRequiredMixin, autocomplete.Select2
             has_filtre_sur_classe = True
             filtre_sur_ue = filtre_sur_ue[:index]
         return filtre_sur_ue, has_filtre_sur_classe
+
+
+class EnseignantAutocomplete(LoginRequiredMixin, autocomplete.Select2ListView):
+    def get_list(self):
+        recherche = self.q
+        minimum_chars_to_search = 2
+        if recherche and len(recherche) > minimum_chars_to_search:
+            enseignants = message_bus_instance.invoke(SearchEnseignantsCommand(recherche))
+            return [recherche] + ['{} {}'.format(enseignant.nom, enseignant.prenom) for enseignant in enseignants]
+        return [recherche]

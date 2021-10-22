@@ -29,6 +29,7 @@ from rest_framework import exceptions
 from rest_framework.exceptions import ValidationError
 from rest_framework.views import APIView
 
+from assessments.export.score_sheet_pdf import print_notes
 from assessments.views.serializers.score_sheet import ScoreSheetPDFSerializer
 from base.auth.roles.tutor import Tutor
 from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand, \
@@ -51,7 +52,6 @@ class ScoreSheetsPDFExportAPIView(APIView):
 
     def get(self, request, *args, **kwargs):
         codes_unites_enseignement = self.request.GET.getlist('codes')
-
         if not len(codes_unites_enseignement):
             raise ValidationError(detail="codes queryparam missing")
 

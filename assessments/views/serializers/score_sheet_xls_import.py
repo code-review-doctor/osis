@@ -25,12 +25,18 @@
 ##############################################################################
 import json
 
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, pgettext_lazy
 
 from openpyxl.worksheet import Worksheet
 from rest_framework import serializers
 
-from assessments.business.score_encoding_export import HEADER
+
+HEADER = [_('Academic year'), _('Session'), _('Learning unit'), pgettext_lazy('encoding', 'Program'),
+          _('Registration number'), _('Lastname'), _('Firstname'), _('Email'), _('Numbered scores'),
+          _('Justification (A,T)'), _('End date Prof'), _('Type of specific profile'), _('Extra time (33% generally)'),
+          _('Large print'), _('Specific room of examination'), _('Other educational facilities'),
+          _('Details other educational facilities'), _('Educational tutor'),
+          ]
 
 
 class ScoreSheetXLSImportSerializerError(ValueError):
@@ -137,3 +143,13 @@ class ScoreSheetXLSImportSerializer(serializers.Serializer):
         representation = super().to_representation(instance)
         json_str = json.dumps(representation)
         return json.loads(json_str)
+
+
+class ProgramManagerScoreSheetXLSImportSerializer(ScoreSheetXLSImportSerializer):
+    def get_notes_etudiants(self, worksheet: Worksheet):
+        notes_etudiants = []
+        for row in super().get_notes_etudiants(worksheet):
+            if row['note'] in ["A", "a"]:
+                row['note'] = "S"
+            notes_etudiants.append(row)
+        return notes_etudiants

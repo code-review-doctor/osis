@@ -24,10 +24,9 @@
 #
 ##############################################################################
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from openpyxl import Workbook
 from openpyxl.styles import Font, colors, Color, PatternFill, Border, Side
-
-from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from openpyxl.styles.borders import BORDER_MEDIUM
 from openpyxl.writer.excel import save_virtual_workbook
 
@@ -61,7 +60,7 @@ def build_xls(feuille_de_notes_serialized):
     _define_worksheet_column_size(worksheet)
     _build_headers(worksheet)
     _build_rows(worksheet, feuille_de_notes_serialized)
-
+    worksheet.auto_filter.ref = "A11:Q{}".format(str(worksheet.max_row))
     return save_virtual_workbook(workbook)
 
 

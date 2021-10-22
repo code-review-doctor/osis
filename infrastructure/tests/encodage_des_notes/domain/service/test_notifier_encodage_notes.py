@@ -54,8 +54,6 @@ class TestEnvoyerMailEncodageComplet(SimpleTestCase):
             entity_id__matricule_fgs_gestionnaire="00321234"
         )
         self.note_etudiant_repo = NoteEtudiantInMemoryRepository()
-        self.note_etudiant_repo.entities.clear()
-        self.addCleanup(self.note_etudiant_repo.entities.clear)
 
         self.attribution_translator = AttributionEnseignantTranslatorInMemory()
         self.inscr_exam_translator = InscriptionExamenTranslatorInMemory()

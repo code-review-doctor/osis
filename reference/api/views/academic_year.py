@@ -23,12 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import attr
+from rest_framework import generics
 
-from osis_common.ddd import interface
+from base.models.academic_year import AcademicYear
+from reference.api.serializers.academic_year import AcademicYearSerializer
 
 
-@attr.s(frozen=True, slots=True)
-class SearchScoresResponsibleCommand(interface.CommandRequest):
-    code = attr.ib(type=str)
-    year = attr.ib(type=int)
+class AcademicYears(generics.ListAPIView):
+    """
+       Return the list of academic years.
+    """
+    name = 'academic_years'
+    queryset = AcademicYear.objects.all()
+    ordering = ('-year',)
+    serializer_class = AcademicYearSerializer

@@ -52,11 +52,18 @@ def copy_to_next_year(modeladmin, request, queryset):
         )
         classe_result = ''
         copy_exception = ''
-
+        # Have to check if the ue's acronym is the same in the destination year
+        lc = obj.learning_component_year.learning_unit_year.learning_container_year.learning_container
+        destination_year = obj.learning_component_year.learning_unit_year.academic_year.year + 1
+        from base.models.learning_unit_year import LearningUnitYear
+        destination_luy = LearningUnitYear.objects.get(
+            academic_year__year=destination_year,
+            learning_container_year__learning_container=lc
+        )
         cmd = CreateEffectiveClassCommand(
             class_code=obj.acronym,
-            learning_unit_code=obj.learning_component_year.learning_unit_year.acronym,
-            year=obj.learning_component_year.learning_unit_year.academic_year.year+1,
+            learning_unit_code=destination_luy.acronym,
+            year=destination_year,
             title_fr=obj.title_fr,
             title_en=obj.title_en,
             teaching_place_uuid=obj.campus.uuid,
@@ -98,8 +105,11 @@ class LearningClassYearAdmin(VersionAdmin, osis_model_admin.OsisModelAdmin):
     list_filter = ('learning_component_year__learning_unit_year__academic_year',)
     search_fields = ['acronym', 'learning_component_year__learning_unit_year__acronym']
 
+    actions = [copy_to_next_year]
+
     def get_academic_year(self, obj: 'LearningClassYear'):
         return obj.learning_component_year.learning_unit_year.academic_year
+
     get_academic_year.admin_order_field = 'academic_year'
     get_academic_year.short_description = 'Academic Year'
 

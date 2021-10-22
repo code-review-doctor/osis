@@ -1,4 +1,4 @@
-##############################################################################
+# ##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -22,24 +22,25 @@
 #    at the root of the source code of this program.  If not,
 #    see http://www.gnu.org/licenses/.
 #
-##############################################################################
-from django import forms
+# ##############################################################################
+from rest_framework import serializers
 
-from assessments.models.score_sheet_address import ScoreSheetAddress
+from base.models.person_address import PersonAddress
+from reference.api.serializers.country import RelatedCountryField
 
 
-class ScoreSheetAddressEntityForm(forms.ModelForm):
-    email = forms.EmailField(required=False)
+class PersonAddressSerializer(serializers.ModelSerializer):
+    country = RelatedCountryField(required=False)
 
     class Meta:
-        model = ScoreSheetAddress
-        exclude = [
-            'external_id',
-            'changed',
-            'country',
-            'recipient',
-            'location',
-            'postal_code',
-            'city',
-            'education_group',
-        ]
+        model = PersonAddress
+        fields = (
+            "location",
+            "postal_code",
+            "city",
+            "country",
+            "street",
+            "street_number",
+            "postal_box",
+            "place",
+        )
