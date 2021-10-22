@@ -23,27 +23,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.http import Http404
 from rest_framework import generics
 
-from assessments.api.serializers.session import CurrentSessionSerializer, SessionSerializer
+from assessments.api.serializers.session import SessionSerializer
 from base.models import session_exam_calendar
 from base.models.academic_year import AcademicYear
 
 
-class CurrentExamSessionView(generics.RetrieveAPIView):
+class CurrentSessionExamView(generics.RetrieveAPIView):
     name = 'current_session'
-    serializer_class = CurrentSessionSerializer
+    serializer_class = SessionSerializer
 
     def get_object(self):
         current_event = session_exam_calendar.current_session_exam()
-        if current_event:
-            current_academic_year = AcademicYear.objects.get(year=current_event.authorized_target_year)
-            return {
-                'academic_year': str(current_academic_year),
-                'year': current_academic_year.year,
-                'month_session_name': current_event.month_session_name()
-            }
-        return None
+        return _build_session(current_event)
 
 
 class NextSessionExamView(generics.RetrieveAPIView):
@@ -82,4 +76,4 @@ def _build_session(current_event):
             'year': current_academic_year.year,
             'month_session_name': current_event.month_session_name()
         }
-    return None
+    raise Http404

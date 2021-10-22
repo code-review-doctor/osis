@@ -24,7 +24,7 @@
 ##############################################################################
 from django.urls import path
 
-from assessments.api.views.assessments import CurrentExamSessionView, NextSessionExamView, PreviousSessionExamView
+from assessments.api.views.assessments import CurrentSessionExamView, NextSessionExamView, PreviousSessionExamView
 from assessments.api.views.score_responsibles import ScoreResponsibleList
 from assessments.api.views.score_sheet_xls_export import ScoreSheetXLSExportAPIView
 from assessments.api.views.score_sheets_pdf_export import ScoreSheetsPDFExportAPIView
@@ -37,7 +37,7 @@ urlpatterns = [
         ScoreSheetXLSExportAPIView.as_view(),
         name=ScoreSheetXLSExportAPIView.name,
     ),
-    path('current_session/', CurrentExamSessionView.as_view(), name=CurrentExamSessionView.name),
+    path('current_session/', CurrentSessionExamView.as_view(), name=CurrentSessionExamView.name),
     path('next_session/', NextSessionExamView.as_view(), name=NextSessionExamView.name),
     path('previous_session/', PreviousSessionExamView.as_view(), name=PreviousSessionExamView.name),
     path('score_responsibles/', ScoreResponsibleList.as_view(), name=ScoreResponsibleList.name),

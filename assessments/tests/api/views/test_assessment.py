@@ -23,12 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
 
 from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
 
-from assessments.api.views.assessments import CurrentExamSessionView
+from assessments.api.views.assessments import CurrentSessionExamView
 from base.models.enums import number_session
 from base.tests.factories.academic_calendar import AcademicCalendarExamSubmissionFactory
 from base.tests.factories.academic_year import AcademicYearFactory
@@ -44,9 +45,9 @@ class CurrentSessionAPIViewTestCase(APITestCase):
         cls.academic_year = AcademicYearFactory(current=True)
         cls.academic_calendar = AcademicCalendarExamSubmissionFactory(title="Submission of score encoding - 1",
                                                                       data_year=cls.academic_year)
-        SessionExamCalendarFactory(academic_calendar=cls.academic_calendar, number_session=number_session.ONE)
+        cls.session_exam = SessionExamCalendarFactory(academic_calendar=cls.academic_calendar, number_session=number_session.ONE)
 
-        cls.url = reverse('assessments_api_v1:' + CurrentExamSessionView.name)
+        cls.url = reverse('assessments_api_v1:' + CurrentSessionExamView.name)
 
     def setUp(self):
         self.client.force_authenticate(user=self.tutor.person.user)
@@ -59,8 +60,14 @@ class CurrentSessionAPIViewTestCase(APITestCase):
 
     def test_response(self):
         response = self.client.get(self.url)
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn('application/json', response['content-type'])
-        results = response.json()
-        self.assertEqual(results.get('month_session_name'), _('January'))
-        self.assertEqual(results.get('academic_year'), str(self.academic_year))
+
+        result = response.json()
+        self.assertEqual(result.get('month_session_name'), _('January'))
+        self.assertEqual(result.get('year'), self.academic_year.year)
+        formatted_date = datetime.datetime.strptime(result.get('start_date'), "%Y-%m-%d").date()
+        self.assertEqual(formatted_date, self.academic_calendar.start_date)
+        formatted_date = datetime.datetime.strptime(result.get('end_date'), "%Y-%m-%d").date()
+        self.assertEqual(formatted_date, self.academic_calendar.end_date)

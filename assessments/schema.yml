@@ -95,11 +95,13 @@ paths:
             content:
               application/json:
                 schema:
-                  $ref: '#/components/schemas/CurrentSession'
+                  $ref: '#/components/schemas/SessionExam'
           '400':
             $ref: '#/components/responses/BadRequest'
           '401':
             $ref: '#/components/responses/Unauthorized'
+          '404':
+            $ref: '#/components/responses/NotFound'
         tags:
           - score_encoding
   /next_session/:
@@ -123,6 +125,8 @@ paths:
             $ref: '#/components/responses/BadRequest'
           '401':
             $ref: '#/components/responses/Unauthorized'
+          '404':
+            $ref: '#/components/responses/NotFound'
         tags:
           - score_encoding
   /previous_session/:
@@ -146,6 +150,8 @@ paths:
             $ref: '#/components/responses/BadRequest'
           '401':
             $ref: '#/components/responses/Unauthorized'
+          '404':
+            $ref: '#/components/responses/NotFound'
         tags:
           - score_encoding
   /score_responsibles/:
@@ -262,25 +268,8 @@ components:
       required:
         - code
         - message
-    CurrentSession:
-      type: object
-      nullable: true
-      properties:
-        academic_year:
-          type: string
-          example: "2021-22"
-          nullable: true
-        year:
-          type: integer
-          example: "2021"
-          nullable: true
-        month_session_name:
-          type: string
-          example: "January"
-          nullable: true
     SessionExam:
       type: object
-      nullable: true
       properties:
         start_date:
           type: date
