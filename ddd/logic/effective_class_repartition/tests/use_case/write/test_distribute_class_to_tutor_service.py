@@ -56,8 +56,11 @@ class DistributeClassToTutorService(TestCase):
         self.effective_class_repository = EffectiveClassRepository()
         self.tutor = TutorWithoutDistributedEffectiveClassesFactory()
         self.tutor_repository.save(self.tutor)
+
         self.effective_class = LecturingEffectiveClassFactory()
+        self.effective_class_repository.reset()
         self.effective_class_repository.save(self.effective_class)
+
         self.distribute_class_cmd = DistributeClassToTutorCommand(
             class_code=self.effective_class.entity_id.class_code,
             learning_unit_code=self.effective_class.entity_id.learning_unit_identity.code,
