@@ -100,6 +100,7 @@ class SelectScoreResponsible(LoginRequiredMixin, PermissionRequiredMixin, Templa
                 ScoreResponsible.objects.filter(
                     learning_unit_year__acronym=self.code,
                     learning_unit_year__academic_year=self.academic_year,
+                    learning_class_year__isnull=True,
                     tutor=OuterRef('tutor')
                 )
             )
@@ -131,7 +132,7 @@ class SelectScoreResponsible(LoginRequiredMixin, PermissionRequiredMixin, Templa
                 ScoreResponsible.objects.filter(
                     learning_unit_year__acronym=self.code,
                     learning_unit_year__academic_year=self.academic_year,
-                    learning_class_year__isnull=False,
+                    learning_class_year=OuterRef('learning_class_year'),
                     tutor=OuterRef('attribution_charge__attribution__tutor')
                 )
             )
