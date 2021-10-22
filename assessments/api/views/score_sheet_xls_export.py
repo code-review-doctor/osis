@@ -23,16 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.utils.translation import gettext_lazy as _
 from django.utils.functional import cached_property
+from django.utils.translation import gettext_lazy as _
+from rest_framework import exceptions
 from rest_framework.exceptions import ValidationError
 from rest_framework.views import APIView
-from rest_framework import exceptions
 
 from assessments.export import score_sheet_xls
 from assessments.views.common.score_sheet_xls_export import XLSResponse
 from assessments.views.serializers.score_sheet_xls import TutorScoreSheetXLSSerializer
 from base.auth.roles.tutor import Tutor
+from ddd.logic.encodage_des_notes.shared_kernel.validator.exceptions import AucuneNoteException, \
+    AucuneInscriptionAuCoursException, AucuneInscriptionAuExamenException
 from ddd.logic.encodage_des_notes.soumission.commands import SearchAdressesFeuilleDeNotesCommand, \
     GetFeuilleDeNotesCommand
 from infrastructure.messages_bus import message_bus_instance
@@ -47,18 +49,15 @@ class ScoreSheetXLSExportAPIView(APIView):
         return self.request.user.person
 
     def get(self, request, *args, **kwargs):
-        if self.feuille_de_notes:
-            score_sheet_serialized = TutorScoreSheetXLSSerializer(instance={
-                'feuille_de_notes': self.feuille_de_notes,
-                'donnees_administratives': self.donnees_administratives,
-            }).data
+        score_sheet_serialized = TutorScoreSheetXLSSerializer(instance={
+            'feuille_de_notes': self.feuille_de_notes,
+            'donnees_administratives': self.donnees_administratives,
+        }).data
 
-            if len(score_sheet_serialized['rows']):
-                virtual_workbook = score_sheet_xls.build_xls(score_sheet_serialized)
-                return XLSResponse(xls_file=virtual_workbook, filename=self.get_filename())
-            raise ValidationError(detail=_("No student to encode by excel"))
-        else:
-            raise ValidationError(detail=_('No student'))
+        if len(score_sheet_serialized['rows']):
+            virtual_workbook = score_sheet_xls.build_xls(score_sheet_serialized)
+            return XLSResponse(xls_file=virtual_workbook, filename=self.get_filename())
+        raise ValidationError(detail=_("No student to encode by excel"))
 
     @cached_property
     def donnees_administratives(self):
@@ -70,11 +69,14 @@ class ScoreSheetXLSExportAPIView(APIView):
     @cached_property
     def feuille_de_notes(self):
         if EntityRoleHelper.has_role(self.person, Tutor):
-            cmd = GetFeuilleDeNotesCommand(
-                matricule_fgs_enseignant=self.person.global_id,
-                code_unite_enseignement=self.kwargs['learning_unit_code']
-            )
-            return message_bus_instance.invoke(cmd)
+            try:
+                cmd = GetFeuilleDeNotesCommand(
+                    matricule_fgs_enseignant=self.person.global_id,
+                    code_unite_enseignement=self.kwargs['learning_unit_code']
+                )
+                return message_bus_instance.invoke(cmd)
+            except (AucuneNoteException, AucuneInscriptionAuCoursException, AucuneInscriptionAuExamenException) as e:
+                raise ValidationError(detail=e.message)
         raise exceptions.PermissionDenied()
 
     def get_filename(self) -> str:
