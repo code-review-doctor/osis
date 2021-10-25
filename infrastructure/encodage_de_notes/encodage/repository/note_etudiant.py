@@ -217,7 +217,8 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
             autres_cohortes = {nom for nom in noms_cohortes if '11BA' not in nom}
 
             autres_cohortes_q = Q(
-                learning_unit_enrollment__offer_enrollment__education_group_year__acronym__in=autres_cohortes
+                learning_unit_enrollment__offer_enrollment__education_group_year__acronym__in=autres_cohortes,
+                learning_unit_enrollment__offer_enrollment__cohort_year__isnull=True
             ) if autres_cohortes else Q()
 
             equivalents_1ba = {cohorte.replace("11BA", "1BA") for cohorte in cohortes_11ba}
