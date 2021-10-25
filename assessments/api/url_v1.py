@@ -38,7 +38,7 @@ urlpatterns = [
         name=ScoreSheetXLSExportAPIView.name,
     ),
     path('current_session/', CurrentSessionExamView.as_view(), name=CurrentSessionExamView.name),
-    path('next_session/', NextSessionExamView.as_view(), name=NextSessionExamView.name),
-    path('previous_session/', PreviousSessionExamView.as_view(), name=PreviousSessionExamView.name),
+    path('sessions/next/', NextSessionExamView.as_view(), name=NextSessionExamView.name),
+    path('sessions/previous/', PreviousSessionExamView.as_view(), name=PreviousSessionExamView.name),
     path('score_responsibles/', ScoreResponsibleList.as_view(), name=ScoreResponsibleList.name),
 ]

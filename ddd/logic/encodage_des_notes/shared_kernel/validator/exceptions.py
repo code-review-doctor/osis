@@ -51,21 +51,3 @@ class PeriodeEncodageNotesFermeeException(BusinessException):
     def __init__(self, **kwargs):
         message = _("The period of scores' encoding is not opened")
         super().__init__(message, **kwargs)
-
-
-class AucuneNoteException(BusinessException):
-    def __init__(self, **kwargs):
-        message = _("No student to encode by excel")
-        super().__init__(message, **kwargs)
-
-
-class AucuneInscriptionAuCoursException(BusinessException):
-    def __init__(self, **kwargs):
-        message = _("There is no enrollment for this course")
-        super().__init__(message, **kwargs)
-
-
-class AucuneInscriptionAuExamenException(BusinessException):
-    def __init__(self, **kwargs):
-        message = _("There is no enrollment to the exam")
-        super().__init__(message, **kwargs)

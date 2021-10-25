@@ -32,11 +32,6 @@ from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_et
     ISignaletiqueEtudiantTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_personne import \
     ISignaletiquePersonneTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.domain.service.presence_inscriptions_au_cours import \
-    PresenceInscriptionsAuCours
-from ddd.logic.encodage_des_notes.shared_kernel.domain.service.presence_inscriptions_au_examen import \
-    PresenceInscriptionsAuExamen
-from ddd.logic.encodage_des_notes.shared_kernel.domain.service.presence_notes import PresenceNotes
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import FeuilleDeNotesDTO
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.feuille_de_notes_par_unite_enseignement import \
     FeuilleDeNotesParUniteEnseignement, DonneesNotes
@@ -61,17 +56,11 @@ def get_feuille_de_notes(
     # GIVEN
     PeriodeEncodageOuverte().verifier(periode_encodage_note_translator)
     periode_encodage = periode_encodage_note_translator.get()
-    # ??? pas sûre que ce soit au bon endroit?  Peur des impacts sur les écrans de l'encodage de notes
-    # Peut-être à déplacer dans ScoreSheetXLSExportAPIView? Qu'en pensez-vous?
-    PresenceInscriptionsAuCours().verifier(periode_encodage.annee_concernee, cmd.code_unite_enseignement)
-    PresenceInscriptionsAuExamen().verifier(periode_encodage.annee_concernee, cmd.code_unite_enseignement)
-    # ???
     notes = note_etudiant_repo.search_by_code_unite_enseignement_annee_session(
         criterias=[
             (cmd.code_unite_enseignement, periode_encodage.annee_concernee, periode_encodage.session_concernee)
         ]
     )
-    PresenceNotes().verifier(notes)
 
     # WHEN
     donnees_notes = [

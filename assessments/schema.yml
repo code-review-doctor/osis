@@ -79,7 +79,7 @@ paths:
           $ref: '#/components/responses/Unauthorized'
       tags:
         - score_encoding
-  /current_session/:
+  /sessions/current/:
       get:
         description: Return current session
         operationId: get_current_session
@@ -104,7 +104,7 @@ paths:
             $ref: '#/components/responses/NotFound'
         tags:
           - score_encoding
-  /next_session/:
+  /sessions/next/:
       get:
         description: Return next session exam
         operationId: get_next_session
@@ -129,7 +129,7 @@ paths:
             $ref: '#/components/responses/NotFound'
         tags:
           - score_encoding
-  /previous_session/:
+  /sessions/previous/:
       get:
         description: Return previous session exam
         operationId: get_previous_session
