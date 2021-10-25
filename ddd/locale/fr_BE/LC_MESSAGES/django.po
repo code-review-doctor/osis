@@ -111,7 +111,7 @@ msgid "No vacant corresponding activity"
 msgstr "Pas d'activité vacante correspondante"
 
 msgid "Other educational facilities"
-msgstr ""
+msgstr "Autre aménagement"
 
 msgid "Registration ID does not match email"
 msgstr "Le noma ne corresond pas à l'adresse de messagerie"
