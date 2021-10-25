@@ -79,6 +79,120 @@ paths:
           $ref: '#/components/responses/Unauthorized'
       tags:
         - score_encoding
+  /current_session/:
+      get:
+        description: Return current session
+        operationId: get_current_session
+        parameters:
+          - $ref: '#/components/parameters/Accept-Language'
+          - $ref: '#/components/parameters/X-User-FirstName'
+          - $ref: '#/components/parameters/X-User-LastName'
+          - $ref: '#/components/parameters/X-User-Email'
+          - $ref: '#/components/parameters/X-User-GlobalID'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/SessionExam'
+          '400':
+            $ref: '#/components/responses/BadRequest'
+          '401':
+            $ref: '#/components/responses/Unauthorized'
+          '404':
+            $ref: '#/components/responses/NotFound'
+        tags:
+          - score_encoding
+  /next_session/:
+      get:
+        description: Return next session exam
+        operationId: get_next_session
+        parameters:
+          - $ref: '#/components/parameters/Accept-Language'
+          - $ref: '#/components/parameters/X-User-FirstName'
+          - $ref: '#/components/parameters/X-User-LastName'
+          - $ref: '#/components/parameters/X-User-Email'
+          - $ref: '#/components/parameters/X-User-GlobalID'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/SessionExam'
+          '400':
+            $ref: '#/components/responses/BadRequest'
+          '401':
+            $ref: '#/components/responses/Unauthorized'
+          '404':
+            $ref: '#/components/responses/NotFound'
+        tags:
+          - score_encoding
+  /previous_session/:
+      get:
+        description: Return previous session exam
+        operationId: get_previous_session
+        parameters:
+          - $ref: '#/components/parameters/Accept-Language'
+          - $ref: '#/components/parameters/X-User-FirstName'
+          - $ref: '#/components/parameters/X-User-LastName'
+          - $ref: '#/components/parameters/X-User-Email'
+          - $ref: '#/components/parameters/X-User-GlobalID'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/SessionExam'
+          '400':
+            $ref: '#/components/responses/BadRequest'
+          '401':
+            $ref: '#/components/responses/Unauthorized'
+          '404':
+            $ref: '#/components/responses/NotFound'
+        tags:
+          - score_encoding
+  /score_responsibles/:
+      get:
+        description: Return a list of score responsibles for several learning units.
+        operationId: get_score_responsible_list
+        parameters:
+          - in: query
+            name: learning_unit_codes
+            schema:
+              description: Get score responsibles of learning unit codes
+              type: array
+              items:
+                type: string
+            style: form
+            explode: true
+          - in: query
+            name: year
+            schema:
+              description: 'Query parameter to filter by year'
+              type: integer
+          - $ref: '#/components/parameters/Accept-Language'
+          - $ref: '#/components/parameters/X-User-FirstName'
+          - $ref: '#/components/parameters/X-User-LastName'
+          - $ref: '#/components/parameters/X-User-Email'
+          - $ref: '#/components/parameters/X-User-GlobalID'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ScoreResponsiblePerson'
+          '400':
+            $ref: '#/components/responses/BadRequest'
+          '401':
+            $ref: '#/components/responses/Unauthorized'
+        tags:
+          - score_encoding
 components:
   securitySchemes:
     Token:
@@ -154,5 +268,38 @@ components:
       required:
         - code
         - message
+    SessionExam:
+      type: object
+      properties:
+        start_date:
+          type: date
+          nullable: true
+        end_date:
+          type: date
+          nullable: true
+        year:
+          type: integer
+          example: "2021"
+          nullable: true
+        month_session_name:
+          type: string
+          example: "January"
+          nullable: true
+    ScoreResponsiblePerson:
+      type: object
+      properties:
+        learning_unit_acronym:
+          type: string
+          example: "LPSP1210"
+        year:
+          type: integer
+          example: 2020
+          description: 'Year of learning unit'
+        full_name:
+          type: string
+          example: "Martin Tom"
+        global_id:
+          type: string
+          example: "00015847"
 security:
   - Token: []
