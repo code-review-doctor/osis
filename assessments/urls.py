@@ -36,7 +36,8 @@ from assessments.views.program_manager.pgm_manager_administration import \
     MainProgramManagerUpdateView as MainProgramManagerUpdateViewNew, \
     MainProgramManagerPersonUpdateView as MainProgramManagerPersonUpdateViewNew, \
     ProgramManagerPersonDeleteView as ProgramManagerPersonDeleteViewNew, PersonAutocomplete
-from assessments.views.program_manager.score_encoding_progress_overview import CodeUniteEnseignementAutocomplete
+from assessments.views.program_manager.score_encoding_progress_overview import CodeUniteEnseignementAutocomplete, \
+    EnseignantAutocomplete
 from assessments.views.program_manager.score_search import ScoreSearchFormView
 from assessments.views.program_manager.scores_responsible import ScoresResponsiblesSearch, SelectScoreResponsible
 from assessments.views.score_encoding import LearningUnitScoreEncodingView, LearningUnitScoreEncodingFormView, \
@@ -59,6 +60,11 @@ urlpatterns = [
             'search_learning_unit_code',
             CodeUniteEnseignementAutocomplete.as_view(),
             name='learning-unit-code-autocomplete',
+        ),
+        path(
+            'search_enseignants',
+            EnseignantAutocomplete.as_view(),
+            name='enseignants-autocomplete',
         ),
         path('<str:learning_unit_code>/', include(([
             path('', LearningUnitScoreEncodingView.as_view(), name='learning_unit_score_encoding'),
