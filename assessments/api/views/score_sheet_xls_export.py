@@ -33,8 +33,6 @@ from assessments.export import score_sheet_xls
 from assessments.views.common.score_sheet_xls_export import XLSResponse
 from assessments.views.serializers.score_sheet_xls import TutorScoreSheetXLSSerializer
 from base.auth.roles.tutor import Tutor
-from ddd.logic.encodage_des_notes.shared_kernel.validator.exceptions import AucuneNoteException, \
-    AucuneInscriptionAuCoursException, AucuneInscriptionAuExamenException
 from ddd.logic.encodage_des_notes.soumission.commands import SearchAdressesFeuilleDeNotesCommand, \
     GetFeuilleDeNotesCommand
 from infrastructure.messages_bus import message_bus_instance
@@ -75,7 +73,7 @@ class ScoreSheetXLSExportAPIView(APIView):
                     code_unite_enseignement=self.kwargs['learning_unit_code']
                 )
                 return message_bus_instance.invoke(cmd)
-            except (AucuneNoteException, AucuneInscriptionAuCoursException, AucuneInscriptionAuExamenException) as e:
+            except Exception as e:
                 raise ValidationError(detail=e.message)
         raise exceptions.PermissionDenied()
 
