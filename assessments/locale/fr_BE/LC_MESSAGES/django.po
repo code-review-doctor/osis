@@ -228,7 +228,7 @@ msgid "Display all deadlines for this learning unit"
 msgstr "Afficher toutes les dates d'échéance pour cette unité d'enseignement"
 
 msgid "Display all tutors for this learning unit"
-msgstr "Afficher tous les enseignant.e.s pour cette unité d'enseignement"
+msgstr "Afficher l'ensemble des enseignant.e.s pour cette unité d'enseignement"
 
 msgid "Done at"
 msgstr "Fait à"
@@ -467,7 +467,7 @@ msgid ""
 "tutor that aren't submitted yet ('draft' state)"
 msgstr ""
 "Représente la quantité de notes soumises à l'administration. Le nombre "
-"entouré de parenthèses est le nombre de notes encodées par le tuteur qui "
+"entouré de parenthèses est le nombre de notes encodées par l'enseignant.e qui "
 "n'ont pas encore été soumises (état 'brouillon')"
 
 msgid "Req. Entity"
@@ -643,6 +643,7 @@ msgid "This process helps tutor while encoding notes for the exams sessions."
 msgstr ""
 "Cette procédure aide l'enseignant.e durant l'encodage de notes pour les sessions "
 "d'examens."
+
 
 msgid "Title"
 msgstr "Intitulé"
