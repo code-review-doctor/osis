@@ -36,6 +36,7 @@ from ddd.logic.encodage_des_notes.shared_kernel.domain.service.presence_inscript
     PresenceInscriptionsAuCours
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.presence_inscriptions_au_examen import \
     PresenceInscriptionsAuExamen
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.presence_notes import PresenceNotes
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import FeuilleDeNotesDTO
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.feuille_de_notes_par_unite_enseignement import \
     FeuilleDeNotesParUniteEnseignement, DonneesNotes
