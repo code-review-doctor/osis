@@ -74,7 +74,6 @@ class ScoreSheetsPDFExportAPIView(APIView):
             return message_bus_instance.invoke(cmd)
         raise exceptions.PermissionDenied()
 
-
     def _get_documents(self, codes_unites_enseignement):
         documents = []
         validation_errors = []
