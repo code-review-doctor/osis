@@ -46,13 +46,10 @@ class DiplomaResults(ChoiceEnum):
     GT_75_RESULT = _("More than 75%")
 
 
-class EducationalTransition(ChoiceEnum):
+class EducationalType(ChoiceEnum):
     TEACHING_OF_GENERAL_EDUCATION = _("Teaching of general education")
     TRANSITION_METHOD = _("Transition method")
     ARTISTIC_TRANSITION = _("Artistic transition")
-
-
-class EducationalQualification(ChoiceEnum):
     QUALIFICATION_METHOD = _("Qualification method")
     ARTISTIC_QUALIFICATION = _("Artistic qualification")
     PROFESSIONAL_EDUCATION = _("Professional education")

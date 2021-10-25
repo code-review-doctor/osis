@@ -29,10 +29,9 @@ from django.utils.translation import gettext as _
 from base.models.academic_year import AcademicYear
 from base.models.person import Person
 from osis_profile.models.enums.education import (
-    DiplomaResults,
     BelgianCommunitiesOfEducation,
-    EducationalTransition,
-    EducationalQualification,
+    DiplomaResults,
+    EducationalType,
     ForeignDiplomaTypes,
 )
 from reference.models.country import Country
@@ -101,16 +100,9 @@ class BelgianHighSchoolDiploma(HighSchoolDiploma):
         max_length=25,
         null=True,
     )
-    educational_transition = models.CharField(
-        _("Educational transition"),
-        choices=EducationalTransition.choices(),
-        max_length=50,
-        null=True,
-        blank=True,
-    )
-    educational_qualification = models.CharField(
-        _("Educational qualification"),
-        choices=EducationalQualification.choices(),
+    educational_type = models.CharField(
+        _("What type of education did (do) you follow?"),
+        choices=EducationalType.choices(),
         max_length=50,
         null=True,
         blank=True,
