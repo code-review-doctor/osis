@@ -110,6 +110,36 @@ class SignaletiqueEtudiantTranslatorInMemory(ISignaletiqueEtudiantTranslator):
                 accompagnateur="Thomas",
             ),
         ),
+        SignaletiqueEtudiantDTO(
+            noma='45896321',
+            nom="De Pierre",
+            prenom="Adrién",
+            peps=EtudiantPepsDTO(
+                type_peps=PepsTypes.ARRANGEMENT_JURY.name,
+                sous_type_peps='',
+                tiers_temps=False,
+                copie_adaptee=False,
+                local_specifique=True,
+                autre_amenagement=True,
+                details_autre_amenagement="Detail",
+                accompagnateur="Thomas",
+            ),
+        ),
+        SignaletiqueEtudiantDTO(
+            noma='8523645',
+            nom="Déjean",
+            prenom="Morge",
+            peps=EtudiantPepsDTO(
+                type_peps=PepsTypes.ARRANGEMENT_JURY.name,
+                sous_type_peps='',
+                tiers_temps=False,
+                copie_adaptee=False,
+                local_specifique=True,
+                autre_amenagement=True,
+                details_autre_amenagement="Detail",
+                accompagnateur="Thomas",
+            ),
+        ),
     }
 
     @classmethod
