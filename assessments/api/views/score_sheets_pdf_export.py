@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from django.utils.functional import cached_property
+from django.utils.translation import gettext_lazy as _
 from rest_framework import exceptions
 from rest_framework.exceptions import ValidationError
 from rest_framework.views import APIView
@@ -87,7 +88,7 @@ class ScoreSheetsPDFExportAPIView(APIView):
                     }
                 )
             else:
-                validation_errors.append(_('No student for {}').format(code))
+                validation_errors.append(_('There is no enrollment for this course'))
         if validation_errors:
-            raise ValidationError(detail=", ".join((validation_errors)))
+            raise ValidationError(detail=", ".join([str(error) for error in validation_errors]))
         return documents
