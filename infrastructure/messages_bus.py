@@ -445,6 +445,7 @@ class MessageBusCommands(AbstractMessageBusCommands):
             UniteEnseignementTranslator(),
             CohortesDuGestionnaireTranslator(),
             InscriptionExamenTranslator(),
+            AttributionEnseignantTranslator(),
         ),
         GetPeriodeEncodageCommand: lambda cmd: get_periode_encodage(
             cmd,

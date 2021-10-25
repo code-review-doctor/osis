@@ -88,7 +88,6 @@ class NoteEtudiantInMemoryRepository(InMemoryGenericRepository, INoteEtudiantRep
             numero_session: int = None,
             nomas: List[str] = None,
             code_unite_enseignement: str = None,
-            enseignant: str = None,
             note_manquante: bool = False,
             **kwargs
     ) -> Set['IdentiteNoteEtudiant']:
