@@ -49,7 +49,7 @@ from learning_unit.tests.factories.central_manager import CentralManagerFactory
 from learning_unit.tests.factories.faculty_manager import FacultyManagerFactory
 
 
-def create_person(first_name, last_name, email="", language=None):
+def create_person(first_name, last_name, email="", language="en"):
     a_person = person.Person(first_name=first_name, last_name=last_name, email=email, language=language)
     a_person.save()
     return a_person
