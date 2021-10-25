@@ -25,6 +25,7 @@
 ##############################################################################
 from typing import List
 
+from base.utils.string import unaccent
 from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import NoteEtudiant
 from ddd.logic.encodage_des_notes.encodage.domain.service.i_cohortes_du_gestionnaire import ICohortesDuGestionnaire
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.feuille_de_notes_par_unite_enseignement import \
@@ -91,7 +92,7 @@ class FeuilleDeNotesParCohorte(interface.DomainService):
 
         notes_triees = sorted(
             feuille_notes_enseignant.notes_etudiants,
-            key=lambda note: (note.nom_cohorte, note.nom, note.prenom)
+            key=lambda note: (note.nom_cohorte, unaccent(note.nom), unaccent(note.prenom))
         )
         etudiants_gestionnaire = [note for note in notes_triees if note.nom_cohorte in cohortes_gerees_par_gestionnaire]
 

@@ -77,3 +77,8 @@ class GetProgressionGeneraleGestionnaireCommand(interface.CommandRequest):
     code_unite_enseignement = attr.ib(type=str, default='')
     enseignant = attr.ib(type=str, default='')
     seulement_notes_manquantes = attr.ib(type=bool, default=False)
+
+
+@attr.s(frozen=True, slots=True)
+class SearchEnseignantsCommand(interface.CommandRequest):
+    nom_prenom = attr.ib(type=str, default='')

@@ -64,7 +64,7 @@ EXCLUDE_OFFER_TYPE_SEARCH = TrainingType.finality_types()
 
 
 class ProgramManagerListView(TemplateView):
-    template_name = "assessments/programmanager_list.html"
+    template_name = "assessments/program_manager_administration/list.html"
 
     @property
     def nom_cohortes_selected(self) -> List['str']:
@@ -169,7 +169,7 @@ class ProgramManagerMixin(PermissionRequiredMixin, AjaxTemplateMixin):
 
 
 class ProgramManagerDeleteView(ProgramManagerMixin, DeleteView):
-    template_name = 'admin/programmanager_confirm_delete_inner.html'
+    template_name = 'assessments/program_manager_administration/confirm_delete_inner.html'
 
     def get_object(self, queryset=None):
         obj = self.get_queryset().get(
@@ -195,7 +195,7 @@ class ProgramManagerDeleteView(ProgramManagerMixin, DeleteView):
 
 
 class ProgramManagerPersonDeleteView(ProgramManagerMixin, DeleteView):
-    template_name = 'admin/programmanager_confirm_delete_inner.html'
+    template_name = 'assessments/program_manager_administration/confirm_delete_inner.html'
 
     def delete(self, request, *args, **kwargs):
         for obj in self.get_object():
@@ -269,7 +269,7 @@ class ProgramManagerForm(forms.ModelForm):
 
 class ProgramManagerCreateView(ProgramManagerMixin, FormView):
     form_class = ProgramManagerForm
-    template_name = 'admin/manager_add_inner.html'
+    template_name = 'assessments/program_manager_administration/create_inner.html'
 
     def get_context_data(self, **kwargs):
         return {
@@ -317,7 +317,7 @@ class ProgramManagerCreateView(ProgramManagerMixin, FormView):
 @permission_required('base.view_programmanager', raise_exception=True)
 def pgm_manager_administration(request):
     administrator_entities = get_administrator_entities(request.user)
-    return render(request, "assessments/pgm_manager.html", {
+    return render(request, "assessments/program_manager_administration/search.html", {
         'administrator_entities_string': _get_administrator_entities_acronym_list(administrator_entities),
         'entities_managed_root': administrator_entities,
         'offer_types': __search_offer_types(),
@@ -367,7 +367,7 @@ def pgm_manager_search(request):
         'managers': _get_entity_program_managers(administrator_entities),
         'offer_type': pgm_offer_type
     }
-    return render(request, "assessments/pgm_manager.html", data)
+    return render(request, "assessments/program_manager_administration/search.html", data)
 
 
 def get_entity_root(entity_id: int):
