@@ -183,7 +183,7 @@ msgid "REFUSED"
 msgstr "Refusé"
 
 msgid "Registration ID does not match email"
-msgstr "Le noma ne corresond pas à l'adresse de messagerie"
+msgstr "Le noma ne correspond pas à l'adresse de messagerie"
 
 msgid "SEARCH_SCHOLARSHIP"
 msgstr "Bourse de recherche"
