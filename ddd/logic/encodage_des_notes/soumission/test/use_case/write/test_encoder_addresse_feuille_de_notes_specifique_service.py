@@ -28,7 +28,7 @@ from django.test import SimpleTestCase
 
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderAdresseFeuilleDeNotesSpecifique
 from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import \
-    AdressePremiereAnneeDeBachelierIdentiqueAuBachlierException
+    AdresseSpecifiquePremiereAnneeDeBachelierIdentiqueAuBachlierException
 from ddd.logic.encodage_des_notes.tests.factory.adresse_feuille_de_notes import \
     AdresseFeuilleDeNotesBaseeSurEntiteFactory
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.periode_encodage_notes import \
@@ -105,5 +105,5 @@ class TestEncoderAddressFeuilleDeNotesSpecifique(SimpleTestCase):
             fax=adresse_bachelier.fax
         )
 
-        with self.assertRaises(AdressePremiereAnneeDeBachelierIdentiqueAuBachlierException):
+        with self.assertRaises(AdresseSpecifiquePremiereAnneeDeBachelierIdentiqueAuBachlierException):
             message_bus_instance.invoke(cmd)
