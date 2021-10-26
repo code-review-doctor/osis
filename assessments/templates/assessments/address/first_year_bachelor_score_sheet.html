@@ -96,6 +96,7 @@
                             {% csrf_token %}
 
                             {% bootstrap_field form.specific_address %}
+                            {% bootstrap_form_errors form %}
 
                             <div id="div_address_fields" hidden>
                                 {% bootstrap_field form.entity %}

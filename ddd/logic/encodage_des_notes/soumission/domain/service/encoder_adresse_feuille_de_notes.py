@@ -34,9 +34,10 @@ from ddd.logic.encodage_des_notes.soumission.builder.adresse_feuille_de_notes_id
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderAdresseFeuilleDeNotesSpecifique, \
     EncoderAdresseEntiteCommeAdresseFeuilleDeNotes, SupprimerAdresseFeuilleDeNotesPremiereAnneeDeBachelier
 from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_notes import IdentiteAdresseFeuilleDeNotes
-from ddd.logic.encodage_des_notes.soumission.domain.service\
+from ddd.logic.encodage_des_notes.soumission.domain.service \
     .adresse_feuille_de_note_premiere_annee_de_bachelier_est_specifique import \
-    EntiteAdresseFeuilleDeNotesPremiereAnneeDeBachelierEstDifferenteDeCelleDuBachelier
+    EntiteAdresseFeuilleDeNotesPremiereAnneeDeBachelierEstDifferenteDeCelleDuBachelier, \
+    AdresseFeuilleDeNotesSpecifiquePremiereAnneeDeBachelierEstDifferenteDeCelleDuBachelier
 from ddd.logic.encodage_des_notes.soumission.domain.service.annee_academique_addresse_feuille_de_notes import \
     AnneeAcademiqueAddresseFeuilleDeNotesDomaineService
 from ddd.logic.encodage_des_notes.soumission.domain.service.entites_adresse_feuille_de_notes import \
@@ -129,11 +130,17 @@ class EncoderAdresseFeuilleDeNotesDomainService(interface.DomainService):
             periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
             academic_year_repo: 'IAcademicYearRepository'
     ) -> 'IdentiteAdresseFeuilleDeNotes':
+        annee_academique = cls._get_annee_academique(periode_soumission_note_translator, academic_year_repo)
+
+        AdresseFeuilleDeNotesSpecifiquePremiereAnneeDeBachelierEstDifferenteDeCelleDuBachelier().verifier(
+            cmd=cmd,
+            annee_academique=annee_academique,
+            repo=repo
+        )
+
         EncoderAdresseFeuilleDeNotesValidatorLIst(
             type_entite=""
         ).validate()
-
-        annee_academique = cls._get_annee_academique(periode_soumission_note_translator, academic_year_repo)
 
         dto = AdresseFeuilleDeNotesDTO(
             nom_cohorte=cmd.nom_cohorte,

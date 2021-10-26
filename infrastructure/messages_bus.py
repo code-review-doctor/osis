@@ -125,7 +125,7 @@ from ddd.logic.encodage_des_notes.soumission.use_case.read.search_responsable_de
 from ddd.logic.encodage_des_notes.soumission.use_case.write.assigner_responsable_de_notes_service import \
     assigner_responsable_de_notes
 from ddd.logic.encodage_des_notes.soumission.use_case.write \
-    .ecraser_adresse_feuille_de_note_premiere_annee_de_bachelier_par_adresse_du_bachelier_service import \
+    .supprimer_adresse_feuille_de_note_premiere_annee_de_bachelier import \
     supprimer_adresse_feuille_de_note_premiere_annee_de_bachelier
 from ddd.logic.encodage_des_notes.soumission.use_case.write \
     .encoder_adresse_entite_comme_adresse_feuille_de_notes_service import \

@@ -31,6 +31,9 @@ from base.models.entity_version import EntityVersion
 from ddd.logic.encodage_des_notes.soumission.commands import GetChoixEntitesAdresseFeuilleDeNotesCommand, \
     EncoderAdresseFeuilleDeNotesSpecifique, \
     EncoderAdresseEntiteCommeAdresseFeuilleDeNotes, SupprimerAdresseFeuilleDeNotesPremiereAnneeDeBachelier
+from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import \
+    EntiteAdressePremiereAnneeDeBachelierIdentiqueAuBachlierException, \
+    AdresseSpecifiquePremiereAnneeDeBachelierIdentiqueAuBachlierException
 from ddd.logic.encodage_des_notes.soumission.dtos import AdresseFeuilleDeNotesDTO
 from infrastructure.messages_bus import message_bus_instance
 from osis_common.ddd.interface import BusinessException
@@ -96,8 +99,11 @@ class ScoreSheetAddressForm(forms.Form):
             if self.cleaned_data['entity']:
                 return self._encoder_adresse_entite_comme_adresse()
             return self._encoder_adresse_specifique()
-        except BusinessException as e:
+        except EntiteAdressePremiereAnneeDeBachelierIdentiqueAuBachlierException as e:
             self.add_error("entity", e.message)
+            raise InvalidFormException()
+        except AdresseSpecifiquePremiereAnneeDeBachelierIdentiqueAuBachlierException as e:
+            self.add_error(None, e.message)
             raise InvalidFormException()
 
     def _encoder_adresse_specifique(self):

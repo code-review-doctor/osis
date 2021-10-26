@@ -24,10 +24,12 @@
 ##############################################################################
 from ddd.logic.encodage_des_notes.soumission.builder.adresse_feuille_de_notes_identity_builder import \
     AdresseFeuilleDeNotesIdentityBuilder
-from ddd.logic.encodage_des_notes.soumission.commands import EncoderAdresseEntiteCommeAdresseFeuilleDeNotes
+from ddd.logic.encodage_des_notes.soumission.commands import EncoderAdresseEntiteCommeAdresseFeuilleDeNotes, \
+    EncoderAdresseFeuilleDeNotesSpecifique
 from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_notes import AdresseFeuilleDeNotes
 from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import \
-    AdressePremiereAnneeDeBachelierIdentiqueAuBachlierException
+    EntiteAdressePremiereAnneeDeBachelierIdentiqueAuBachlierException, \
+    AdresseSpecifiquePremiereAnneeDeBachelierIdentiqueAuBachlierException
 from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_notes import \
     IAdresseFeuilleDeNotesRepository
 from osis_common.ddd import interface
@@ -52,7 +54,7 @@ class EntiteAdresseFeuilleDeNotesPremiereAnneeDeBachelierEstDifferenteDeCelleDuB
         adresse_bachelier = repo.get(identite_adresse_bachelier)
 
         if cls._is_entite_adresse_bachelier_identique_a_celle_de_la_premiere_annee_de_bachelier(adresse_bachelier, cmd):
-            raise AdressePremiereAnneeDeBachelierIdentiqueAuBachlierException()
+            raise EntiteAdressePremiereAnneeDeBachelierIdentiqueAuBachlierException()
 
     @classmethod
     def _is_entite_adresse_bachelier_identique_a_celle_de_la_premiere_annee_de_bachelier(
@@ -62,3 +64,37 @@ class EntiteAdresseFeuilleDeNotesPremiereAnneeDeBachelierEstDifferenteDeCelleDuB
     ) -> bool:
         return cmd.type_entite and adresse_bachelier.type_entite and adresse_bachelier.type_entite.name == \
                cmd.type_entite
+
+
+class AdresseFeuilleDeNotesSpecifiquePremiereAnneeDeBachelierEstDifferenteDeCelleDuBachelier(interface.DomainService):
+    @classmethod
+    def verifier(
+            cls,
+            cmd: EncoderAdresseFeuilleDeNotesSpecifique,
+            annee_academique: int,
+            repo: IAdresseFeuilleDeNotesRepository
+    ) -> None:
+        if "11BA" not in cmd.nom_cohorte:
+            return
+
+        nom_cohorte_bachelier = cmd.nom_cohorte.replace("11BA", "1BA")
+        identite_adresse_bachelier = AdresseFeuilleDeNotesIdentityBuilder().build_from_nom_cohorte_and_annee_academique(
+            nom_cohorte_bachelier,
+            annee_academique
+        )
+        adresse_bachelier = repo.get(identite_adresse_bachelier)
+
+        if cls._is_adresse_specifique_identique_a_celle_de_la_premiere_annee_de_bachelier(adresse_bachelier, cmd):
+            raise AdresseSpecifiquePremiereAnneeDeBachelierIdentiqueAuBachlierException()
+
+    @classmethod
+    def _is_adresse_specifique_identique_a_celle_de_la_premiere_annee_de_bachelier(
+            cls,
+            adresse_bachelier: AdresseFeuilleDeNotes,
+            cmd: EncoderAdresseFeuilleDeNotesSpecifique
+    ) -> bool:
+        return cmd.fax == adresse_bachelier.fax and cmd.pays == adresse_bachelier.pays and \
+            cmd.ville == adresse_bachelier.ville and cmd.email == adresse_bachelier.email and \
+            cmd.destinataire == adresse_bachelier.destinataire and \
+            cmd.telephone == adresse_bachelier.telephone and cmd.code_postal == adresse_bachelier.code_postal and\
+            cmd.rue_numero == adresse_bachelier.rue_numero
