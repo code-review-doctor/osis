@@ -22,10 +22,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import attr
 import mock
 from django.test import SimpleTestCase
 
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderAdresseFeuilleDeNotesSpecifique
+from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import \
+    AdresseSpecifiquePremiereAnneeDeBachelierIdentiqueAuBachlierException
+from ddd.logic.encodage_des_notes.tests.factory.adresse_feuille_de_notes import \
+    AdresseFeuilleDeNotesBaseeSurEntiteFactory
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.periode_encodage_notes import \
     PeriodeEncodageNotesTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.repository.in_memory.adresse_feuille_de_notes import \
@@ -82,3 +87,23 @@ class TestEncoderAddressFeuilleDeNotesSpecifique(SimpleTestCase):
         self.assertEqual(adresse_sauvegardee.fax, self.cmd.fax)
         self.assertEqual(adresse_sauvegardee.email, self.cmd.email)
         self.assertEqual(adresse_sauvegardee.type_entite, None)
+
+    def test_should_raise_exception_if_encoded_address_of_first_year_bachelor_is_the_same_as_bachelor(self):
+        adresse_bachelier = AdresseFeuilleDeNotesBaseeSurEntiteFactory()
+        self.repo.save(adresse_bachelier)
+
+        cmd = attr.evolve(
+            self.cmd,
+            nom_cohorte=adresse_bachelier.nom_cohorte.replace('1BA', '11BA'),
+            email=adresse_bachelier.email,
+            destinataire=adresse_bachelier.destinataire,
+            rue_numero=adresse_bachelier.rue_numero,
+            code_postal=adresse_bachelier.code_postal,
+            ville=adresse_bachelier.ville,
+            pays=adresse_bachelier.pays,
+            telephone=adresse_bachelier.telephone,
+            fax=adresse_bachelier.fax
+        )
+
+        with self.assertRaises(AdresseSpecifiquePremiereAnneeDeBachelierIdentiqueAuBachlierException):
+            message_bus_instance.invoke(cmd)

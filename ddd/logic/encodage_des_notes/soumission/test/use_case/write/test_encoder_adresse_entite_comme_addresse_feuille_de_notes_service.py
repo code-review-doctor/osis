@@ -31,7 +31,7 @@ from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderAdresseEntiteCommeAdresseFeuilleDeNotes
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_entites_cohorte import EntitesCohorteDTO
 from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import \
-    AdressePremiereAnneeDeBachelierIdentiqueAuBachlierException, EntiteNonValidePourAdresseException
+    EntiteAdressePremiereAnneeDeBachelierIdentiqueAuBachlierException
 from ddd.logic.encodage_des_notes.tests.factory.adresse_feuille_de_notes import \
     AdresseFeuilleDeNotesBaseeSurEntiteFactory
 from ddd.logic.shared_kernel.entite.builder.identite_entite_builder import IdentiteEntiteBuilder
@@ -99,7 +99,7 @@ class TestEncoderAddressEntiteCommeAdresseFeuilleDeNotes(SimpleTestCase):
             nom_cohorte=adresse_bachelier.nom_cohorte.replace('1BA', '11BA'),
         )
 
-        with self.assertRaises(AdressePremiereAnneeDeBachelierIdentiqueAuBachlierException):
+        with self.assertRaises(EntiteAdressePremiereAnneeDeBachelierIdentiqueAuBachlierException):
             message_bus_instance.invoke(cmd)
 
     def test_cannot_encoder_une_entite_ne_faisant_pas_partie_des_choix_possibles(self):
