@@ -147,7 +147,7 @@ class ForeignHighSchoolDiploma(HighSchoolDiploma):
     foreign_diploma_type = models.CharField(
         _("What diploma did you get (or will you get)?"),
         choices=ForeignDiplomaTypes.choices(),
-        max_length=25,
+        max_length=50,
         null=True,
     )
     linguistic_regime = models.ForeignKey(
