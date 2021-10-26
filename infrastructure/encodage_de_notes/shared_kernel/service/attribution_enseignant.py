@@ -23,13 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import functools
-import operator
 from typing import Set, List
 
-from django.db.models import F, Q
-
-from attribution.models.attribution_new import AttributionNew
 from ddd.logic.effective_class_repartition.commands import SearchTutorsDistributedToClassCommand, \
     SearchAttributionsToLearningUnitCommand, SearchClassesEnseignantCommand, SearchAttributionsEnseignantCommand, \
     SearchClassesParNomEnseignantCommand
@@ -37,6 +32,8 @@ from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_attribution_ens
     IAttributionEnseignantTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import EnseignantDTO
 from ddd.logic.encodage_des_notes.soumission.dtos import AttributionEnseignantDTO
+from infrastructure.effective_class_repartition.domain.service.tutor_attribution import \
+    TutorAttributionToLearningUnitTranslator
 
 
 class AttributionEnseignantTranslator(IAttributionEnseignantTranslator):
@@ -159,36 +156,17 @@ def _search_repartitions_classes_par_nom_prenom(annee, nom_prenom):
 
 
 def _search_attributions_unite_enseignement_par_nom_prenom(annee, nom_prenom):
-    filters = [
-        Q(tutor__person__first_name__icontains=mot)
-        | Q(tutor__person__last_name__icontains=mot)
-        for mot in nom_prenom.split(' ')
-    ]
-    qs_attributions_cours = AttributionNew.objects.filter(
-        learning_container_year__academic_year__year=annee,
-    ).filter(
-        functools.reduce(
-            operator.and_,
-            filters
-        )
-    ).annotate(
-        nom=F('tutor__person__last_name'),
-        prenom=F('tutor__person__first_name'),
-        matricule_fgs_enseignant=F('tutor__person__global_id'),
-        code_unite_enseignement=F('learning_container_year__acronym'),
-    ).values(
-        'nom',
-        'prenom',
-        'code_unite_enseignement',
-        'matricule_fgs_enseignant',
-    ).distinct().order_by('nom', 'prenom')
+    attributions = TutorAttributionToLearningUnitTranslator().search_par_nom_prenom_enseignant(
+        annee=annee,
+        nom_prenom=nom_prenom,
+    )  # TODO :: réutiliser message_bus quand le contexte "attribution" sera développé
     return {
         AttributionEnseignantDTO(
-            nom=obj['nom'],
-            prenom=obj['prenom'],
+            nom=obj.last_name,
+            prenom=obj.first_name,
             annee=annee,
-            matricule_fgs_enseignant=obj['matricule_fgs_enseignant'],
-            code_unite_enseignement=obj['code_unite_enseignement'],
+            matricule_fgs_enseignant=obj.personal_id_number,
+            code_unite_enseignement=obj.learning_unit_code,
         )
-        for obj in qs_attributions_cours
+        for obj in attributions
     }

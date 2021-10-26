@@ -88,17 +88,19 @@ class ClassDistributionWithAttribution(interface.DomainService):
             tutor_attribution_translator: 'ITutorAttributionToLearningUnitTranslator',
             tutor_repository: 'ITutorRepository',
     ) -> List['TutorClassRepartitionDTO']:
-        tutor_dtos = tutor_repository.search_dto(annee=annee, nom_prenom_enseignant=nom_prenom)
-        attribution_uuids = list()
-        for tutor in tutor_dtos:
-            for classe_distribuee in tutor.distributed_classes:
-                attribution_uuids.append(classe_distribuee.attribution_uuid)
-        attributions = tutor_attribution_translator.search_learning_unit_attributions(attribution_uuids)
+        attributions = tutor_attribution_translator.search_par_nom_prenom_enseignant(annee, nom_prenom)
+        identites_enseignants = [
+            TutorIdentityBuilder.build_from_personal_id_number(attrib.personal_id_number)
+            for attrib in attributions
+        ]
+        tutor_dtos = tutor_repository.search_dto(entity_ids=identites_enseignants)
 
         attributions_par_uuid = {attrib.attribution_uuid: attrib for attrib in attributions}
         result = []
         for tutor in tutor_dtos:
             for classe_distribuee in tutor.distributed_classes:
+                if classe_distribuee.learning_unit_year != annee:
+                    continue  # FIXME :: l'identité DOIT contenir l'année - code à supprimer...
                 attrib = attributions_par_uuid[classe_distribuee.attribution_uuid]
                 result.append(
                     TutorClassRepartitionDTO(
@@ -108,11 +110,11 @@ class ClassDistributionWithAttribution(interface.DomainService):
                         function=attrib.function,
                         distributed_volume_to_class=classe_distribuee.distributed_volume,
                         personal_id_number=tutor.personal_id_number,
-                        complete_class_code=classe_distribuee.learning_unit_code + classe_distribuee.learning_unit_code,  # FIXME
+                        complete_class_code=classe_distribuee.code_complet_classe,
                         annee=classe_distribuee.learning_unit_year,
                     )
                 )
-        return result
+        return sorted(result, key=lambda dto: (dto.last_name, dto.first_name))
 
 
 def _get_effective_classes_from_tutors(

@@ -23,15 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import functools
 import itertools
-import operator
 from typing import List, Optional
 
-from django.db.models import F, QuerySet, Q
+from django.db.models import F, QuerySet, When, Case, Value, CharField
+from django.db.models.functions import Concat
 
 from attribution.models.attribution_charge_new import AttributionChargeNew as AttributionChargeNewDatabase
 from attribution.models.attribution_class import AttributionClass as AttributionClassDatabase
+from base.models.enums.learning_component_year_type import LECTURING
 from ddd.logic.effective_class_repartition.builder.tutor_builder import TutorBuilder
 from ddd.logic.effective_class_repartition.domain.model.tutor import Tutor, TutorIdentity
 from ddd.logic.effective_class_repartition.dtos import TutorSearchDTO, \
@@ -101,8 +101,6 @@ class TutorRepository(ITutorRepository):
     @classmethod
     def search_dto(
             cls,
-            annee: int = None,
-            nom_prenom_enseignant: str = None,
             entity_ids: Optional[List['TutorIdentity']] = None,
             effective_class_identity: 'EffectiveClassIdentity' = None,
     ) -> List['TutorSearchDTO']:
@@ -114,31 +112,13 @@ class TutorRepository(ITutorRepository):
             year = effective_class_identity.learning_unit_identity.year
             qs = qs.filter(
                 learning_class_year__acronym=effective_class_identity.class_code,
-                learning_class_year__learning_component_year__learning_unit_year__acronym=learning_unit_code,
-                learning_class_year__learning_component_year__learning_unit_year__academic_year__year=year,
+                attribution_charge__learning_component_year__learning_unit_year__acronym=learning_unit_code,
+                attribution_charge__learning_component_year__learning_unit_year__academic_year__year=year,
             )
 
         if entity_ids:
             distinct_ids = {e.personal_id_number for e in entity_ids}
             qs = qs.filter(attribution_charge__attribution__tutor__person__global_id__in=distinct_ids)
-
-        if annee:
-            qs = qs.filter(
-                learning_class_year__learning_component_year__learning_unit_year__academic_year__year=annee,
-            )
-
-        if nom_prenom_enseignant:
-            filters = [
-                Q(attribution_charge__attribution__tutor__person__first_name__icontains=mot)
-                | Q(attribution_charge__attribution__tutor__person__last_name__icontains=mot)
-                for mot in nom_prenom_enseignant.split(' ')
-            ]
-            qs = qs.filter(
-                functools.reduce(
-                    operator.and_,
-                    filters
-                )
-            )
 
         qs = _annotate_queryset(qs)
         qs = _values_qs(qs)
@@ -151,6 +131,7 @@ class TutorRepository(ITutorRepository):
                 DistributedEffectiveClassesDTO(
                     class_code=distributed_class['class_code'],
                     learning_unit_code=distributed_class['learning_unit_code'],
+                    code_complet_classe=distributed_class['code_complet_classe'],
                     learning_unit_year=distributed_class['learning_unit_year'],
                     distributed_volume=distributed_class['volume'],
                     attribution_uuid=distributed_class['attribution_uuid'],
@@ -178,6 +159,24 @@ def _annotate_queryset(qs: QuerySet) -> QuerySet:
         learning_unit_code=F('attribution_charge__learning_component_year__learning_unit_year__acronym'),
         learning_unit_year=F('attribution_charge__learning_component_year__learning_unit_year__academic_year__year'),
         class_code=F('learning_class_year__acronym'),
+        code_complet_classe=Case(
+            When(
+                attribution_charge__learning_component_year__type=LECTURING,
+                then=Concat(
+                    'attribution_charge__learning_component_year__learning_unit_year__acronym',
+                    Value('-'),
+                    'learning_class_year__acronym',
+                    output_field=CharField()
+                )
+            ),
+            default=Concat(
+                'attribution_charge__learning_component_year__learning_unit_year__acronym',
+                Value('_'),
+                'learning_class_year__acronym',
+                output_field=CharField()
+            ),
+            output_field=CharField()
+        ),
     )
 
 
@@ -189,4 +188,5 @@ def _values_qs(qs: QuerySet) -> QuerySet:
         'learning_unit_code',
         'learning_unit_year',
         'class_code',
+        'code_complet_classe',
     )

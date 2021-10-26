@@ -61,8 +61,7 @@ class ITutorRepository(interface.AbstractRepository):
     @classmethod
     @abstractmethod
     def search_dto(
-            cls, annee: int = None,
-            nom_prenom_enseignant: str = None,
+            cls,
             entity_ids: Optional[List['TutorIdentity']] = None,
             effective_class_identity: 'EffectiveClassIdentity' = None,
     ) -> List['TutorSearchDTO']:
