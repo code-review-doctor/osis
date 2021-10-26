@@ -30,6 +30,8 @@ from typing import List, Optional, Iterable
 import attr
 
 from osis_common.ddd import interface
+from base.models.enums import peps_type
+from django.utils.translation import ugettext as _
 
 
 @attr.s(frozen=True, slots=True)
@@ -77,6 +79,26 @@ class EtudiantPepsDTO(interface.DTO):
     details_autre_amenagement = attr.ib(type=str)
     accompagnateur = attr.ib(type=str)
     sous_type_peps = attr.ib(type=str, default='')
+
+    @property
+    def get_type_peps_display(self) -> str:
+        return get_type_peps_display(self.type_peps, self.sous_type_peps)
+
+    @property
+    def get_arrangements_display(self) -> List[str]:
+        arrangements = []
+        if self.tiers_temps:
+            arrangements.append(_('Extra time (33% generally)'))
+        if self.copie_adaptee:
+            arrangements.append(_('Large print'))
+        if self.local_specifique:
+            arrangements.append(_('Specific room of examination'))
+        if self.autre_amenagement:
+            arrangements.append(_('Other educational facilities'))
+            if self.details_autre_amenagement:
+                arrangements.append("{} : {}".format(_('Details other educational facilities'),
+                                                     self.details_autre_amenagement))
+        return arrangements
 
 
 @attr.s(frozen=True, slots=True)
@@ -240,3 +262,19 @@ class ProgressionGeneraleEncodageNotesDTO(interface.DTO):
     annee_academique = attr.ib(type=int)
     numero_session = attr.ib(type=int)
     progression_generale = attr.ib(type=List[ProgressionEncodageNotesUniteEnseignementDTO])
+
+
+def get_type_peps_display(type_peps: str, sous_type_peps: str) -> str:
+    if type_peps == peps_type.PepsTypes.SPORT.name:
+        return "{} - {}".format(
+            str(peps_type.PepsTypes[type_peps].value) or "-",
+            str(peps_type.SportSubtypes[sous_type_peps].value) or "-",
+        )
+    if type_peps == peps_type.PepsTypes.DISABILITY.name:
+        return "{} - {}".format(
+            str(peps_type.PepsTypes[type_peps].value) or "-",
+            str(peps_type.HtmSubtypes[sous_type_peps].value) or "-",
+        )
+    if type_peps == peps_type.PepsTypes.NOT_DEFINED.name:
+        return"-"
+    return str(peps_type.PepsTypes[type_peps].value) or "-"
