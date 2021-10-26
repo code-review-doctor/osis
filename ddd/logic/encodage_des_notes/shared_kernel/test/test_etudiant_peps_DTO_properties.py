@@ -86,10 +86,10 @@ class EtudiantPepsDtoPropertiesTest(SimpleTestCase):
             accompagnateur='SANNA, Alice',
         )
         expected = [
-                _('Extra time (33% generally)'),
-                _('Large print'),
-                _('Specific room of examination'),
-                _('Other educational facilities'),
-                '{} : Allègement du PAE'.format(_('Details other educational facilities'))
-            ]
+            _('Extra time (33% generally)'),
+            _('Large print'),
+            _('Specific room of examination'),
+            _('Other educational facilities'),
+            '{} : Allègement du PAE'.format(_('Details other educational facilities'))
+        ]
         self.assertListEqual(peps.get_arrangements_display, expected)
