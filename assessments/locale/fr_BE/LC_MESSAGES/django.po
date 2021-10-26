@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-12 15:07+0200\n"
+"POT-Creation-Date: 2021-10-25 11:40+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -306,6 +306,9 @@ msgstr "Injecter le fichier XLS"
 msgid "Institution"
 msgstr "Institution"
 
+msgid "January"
+msgstr "Janvier"
+
 msgid "Justification (A,T)"
 msgstr "Justification (A,T)"
 
@@ -366,6 +369,9 @@ msgstr "Aucun résultat!"
 
 msgid "No score injected"
 msgstr "Aucune note injectée"
+
+msgid "No student to encode by excel"
+msgstr "Aucun étudiant à encoder par excel"
 
 msgid "No students to encode by excel"
 msgstr "Aucun étudiant à encoder par excel"
@@ -632,6 +638,9 @@ msgid "There is %(error_counter)s error in form"
 msgid_plural "There are %(error_counter)s errors in form"
 msgstr[0] "Il y a %(error_counter)s erreur dans le formulaire"
 msgstr[1] "Il y a %(error_counter)s erreurs dans le formulaire"
+
+msgid "There is no enrollment for this course"
+msgstr "Il n'y a pas d'inscription pour ce cours"
 
 msgid "This process helps tutor while encoding notes for the exams sessions."
 msgstr ""

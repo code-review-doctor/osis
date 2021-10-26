@@ -74,3 +74,10 @@ def get_closest_new_session_exam(date=None) -> 'AcademicSessionEvent':
 def get_number_session_by_academic_calendar(academic_calendar):
     session = getattr(academic_calendar, 'sessionexamcalendar', None)
     return session.number_session if session else None
+
+
+def current_session_exam(date=None) -> Optional['AcademicSessionEvent']:
+    from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmissionCalendar
+    calendar = ScoresExamSubmissionCalendar()
+    events = calendar.get_opened_academic_events(date=date)
+    return events[0] if events else None
