@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-19 15:08+0200\n"
+"POT-Creation-Date: 2021-10-26 14:22+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -215,9 +215,6 @@ msgstr "Les notes décimales sont autorisées pour ce cours"
 msgid "Define a specific address for the first year of bachelor"
 msgstr "Définir une adresse spécifique à la première année de bachelier"
 
-msgid "Definitive submission (Submit to faculty)"
-msgstr "Soumission définitive (Soumettre à la faculté)"
-
 msgid "Deliberation date"
 msgstr "Date de délibération"
 
@@ -263,6 +260,8 @@ msgstr "Entité de référence"
 msgid "Evaluations"
 msgstr "Evaluations"
 
+#, fuzzy, python-format
+#| msgid "Extra time (33% generally)"
 msgid "Extra time (33% generally)"
 msgstr "Tiers-Temps"
 
@@ -467,8 +466,8 @@ msgid ""
 "tutor that aren't submitted yet ('draft' state)"
 msgstr ""
 "Représente la quantité de notes soumises à l'administration. Le nombre "
-"entouré de parenthèses est le nombre de notes encodées par l'enseignant.e qui "
-"n'ont pas encore été soumises (état 'brouillon')"
+"entouré de parenthèses est le nombre de notes encodées par l'enseignant.e "
+"qui n'ont pas encore été soumises (état 'brouillon')"
 
 msgid "Req. Entity"
 msgstr "Ent. charge"
@@ -577,11 +576,18 @@ msgstr "Parcours de l'étudiant"
 msgid "Students deliberated are not shown"
 msgstr "Les étudiants délibérés ne sont pas montrés"
 
-msgid "Submission"
-msgstr "Soumission"
+msgid "Submit"
+msgstr "Soumettre"
 
 msgid "Submit data"
 msgstr "Date de remise"
+
+msgid ""
+"Submit these scores to faculty. These scores can not be changed after "
+"submission. The unsubmitted scores remain editable."
+msgstr ""
+"Soumettre ces notes à la faculté. Ces notes ne pourront plus être modifiées "
+"après la soumission. Les notes non soumises restent modifiables."
 
 msgid "Teacher deadline"
 msgstr "Date d'échéance de l'enseignant"
@@ -641,9 +647,8 @@ msgstr[1] "Il y a %(error_counter)s erreurs dans le formulaire"
 
 msgid "This process helps tutor while encoding notes for the exams sessions."
 msgstr ""
-"Cette procédure aide l'enseignant.e durant l'encodage de notes pour les sessions "
-"d'examens."
-
+"Cette procédure aide l'enseignant.e durant l'encodage de notes pour les "
+"sessions d'examens."
 
 msgid "Title"
 msgstr "Intitulé"
