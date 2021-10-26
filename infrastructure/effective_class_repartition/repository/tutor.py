@@ -58,47 +58,10 @@ class TutorRepository(ITutorRepository):
             entity_ids: Optional[List['TutorIdentity']] = None,
             effective_class_identity: 'EffectiveClassIdentity' = None,
     ) -> List['Tutor']:
-
-        qs = _get_common_queryset()
-
-        if effective_class_identity:
-            learning_unit_code = effective_class_identity.learning_unit_identity.code
-            year = effective_class_identity.learning_unit_identity.year
-            qs = qs.filter(
-                learning_class_year__acronym=effective_class_identity.class_code,
-                learning_class_year__learning_component_year__learning_unit_year__acronym=learning_unit_code,
-                learning_class_year__learning_component_year__learning_unit_year__academic_year__year=year,
-            )
-
-        if entity_ids:
-            distinct_ids = {e.personal_id_number for e in entity_ids}
-            qs = qs.filter(attribution_charge__attribution__tutor__person__global_id__in=distinct_ids)
-
-        qs = _annotate_queryset(qs)
-        qs = _values_qs(qs)
-
-        result = []
-
-        classes_grouped_by_tutor = itertools.groupby(qs.values(), lambda obj: obj['personal_id_number'])
-        for personal_id_number, distributed_classes_as_dict in classes_grouped_by_tutor:
-            distributed_classes = [
-                DistributedEffectiveClassesDTO(
-                    class_code=distributed_class['class_code'],
-                    learning_unit_code=distributed_class['learning_unit_code'],
-                    learning_unit_year=distributed_class['learning_unit_year'],
-                    distributed_volume=distributed_class['volume'],
-                    attribution_uuid=distributed_class['attribution_uuid'],
-                )
-                for distributed_class in distributed_classes_as_dict
-            ]
-            tutor = TutorBuilder.build_from_repository_dto(
-                TutorSearchDTO(
-                    personal_id_number=personal_id_number,
-                    distributed_classes=distributed_classes
-                )
-            )
-            result.append(tutor)
-        return result
+        return [
+            TutorBuilder.build_from_repository_dto(tutor_dto)
+            for tutor_dto in cls.search_dto(entity_ids=entity_ids, effective_class_identity=effective_class_identity)
+        ]
 
     @classmethod
     def save(cls, entity: 'Tutor') -> None:
@@ -132,6 +95,54 @@ class TutorRepository(ITutorRepository):
                     attribution_charge__attribution__uuid=distributed_class.attribution.uuid,
                     learning_class_year__acronym=distributed_class.effective_class.class_code,
                 ).delete()
+
+    @classmethod
+    def search_dto(
+            cls, annee: int = None,
+            nom_prenom_enseignant: str = None,
+            entity_ids: Optional[List['TutorIdentity']] = None,
+            effective_class_identity: 'EffectiveClassIdentity' = None,
+    ) -> List['TutorSearchDTO']:
+
+        qs = _get_common_queryset()
+
+        if effective_class_identity:
+            learning_unit_code = effective_class_identity.learning_unit_identity.code
+            year = effective_class_identity.learning_unit_identity.year
+            qs = qs.filter(
+                learning_class_year__acronym=effective_class_identity.class_code,
+                learning_class_year__learning_component_year__learning_unit_year__acronym=learning_unit_code,
+                learning_class_year__learning_component_year__learning_unit_year__academic_year__year=year,
+            )
+
+        if entity_ids:
+            distinct_ids = {e.personal_id_number for e in entity_ids}
+            qs = qs.filter(attribution_charge__attribution__tutor__person__global_id__in=distinct_ids)
+
+        qs = _annotate_queryset(qs)
+        qs = _values_qs(qs)
+
+        result = []
+
+        classes_grouped_by_tutor = itertools.groupby(qs.values(), lambda obj: obj['personal_id_number'])
+        for personal_id_number, distributed_classes_as_dict in classes_grouped_by_tutor:
+            distributed_classes = [
+                DistributedEffectiveClassesDTO(
+                    class_code=distributed_class['class_code'],
+                    learning_unit_code=distributed_class['learning_unit_code'],
+                    learning_unit_year=distributed_class['learning_unit_year'],
+                    distributed_volume=distributed_class['volume'],
+                    attribution_uuid=distributed_class['attribution_uuid'],
+                )
+                for distributed_class in distributed_classes_as_dict
+            ]
+            result.append(
+                TutorSearchDTO(
+                    personal_id_number=personal_id_number,
+                    distributed_classes=distributed_classes
+                )
+            )
+        return result
 
 
 def _get_common_queryset() -> QuerySet:

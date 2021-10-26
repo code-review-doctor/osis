@@ -27,6 +27,7 @@ from typing import List, Optional
 
 from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
 from ddd.logic.effective_class_repartition.domain.model.tutor import Tutor, TutorIdentity
+from ddd.logic.effective_class_repartition.dtos import TutorSearchDTO
 from ddd.logic.effective_class_repartition.repository.i_tutor import ITutorRepository
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
 
@@ -46,6 +47,15 @@ class TutorRepository(InMemoryGenericRepository, ITutorRepository):
                 cls.entities
             )
         )
+
+    @classmethod
+    def search_dto(
+            cls, annee: int = None,
+            nom_prenom_enseignant: str = None,
+            entity_ids: Optional[List['TutorIdentity']] = None,
+            effective_class_identity: 'EffectiveClassIdentity' = None,
+    ) -> List['TutorSearchDTO']:
+        raise NotImplementedError
 
 
 def _filter(

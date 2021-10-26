@@ -27,6 +27,7 @@ from abc import abstractmethod
 from typing import Optional, List
 
 from ddd.logic.effective_class_repartition.domain.model.tutor import Tutor, TutorIdentity
+from ddd.logic.effective_class_repartition.dtos import TutorSearchDTO
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
 from osis_common.ddd import interface
 from osis_common.ddd.interface import ApplicationService
@@ -55,4 +56,14 @@ class ITutorRepository(interface.AbstractRepository):
     @classmethod
     @abstractmethod
     def save(cls, entity: 'Tutor') -> None:
+        pass
+
+    @classmethod
+    @abstractmethod
+    def search_dto(
+            cls, annee: int = None,
+            nom_prenom_enseignant: str = None,
+            entity_ids: Optional[List['TutorIdentity']] = None,
+            effective_class_identity: 'EffectiveClassIdentity' = None,
+    ) -> List['TutorSearchDTO']:
         pass
