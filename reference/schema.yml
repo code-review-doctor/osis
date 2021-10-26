@@ -368,6 +368,7 @@ components:
         nationality:
           type: string
           description: The nationality of the country
+          nullable: true
     PaginatedStudyDomain:
       allOf:
         - $ref: '#/components/schemas/Paging'
