@@ -27,14 +27,12 @@ import functools
 import operator
 from typing import Set, List
 
-from django.db.models import F, Q, Case, When, Value, CharField
-from django.db.models.functions import Concat
+from django.db.models import F, Q
 
-from attribution.models.attribution_class import AttributionClass
 from attribution.models.attribution_new import AttributionNew
-from base.models.enums.component_type import LECTURING
 from ddd.logic.effective_class_repartition.commands import SearchTutorsDistributedToClassCommand, \
-    SearchAttributionsToLearningUnitCommand, SearchClassesEnseignantCommand, SearchAttributionsEnseignantCommand
+    SearchAttributionsToLearningUnitCommand, SearchClassesEnseignantCommand, SearchAttributionsEnseignantCommand, \
+    SearchClassesParNomEnseignantCommand
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import EnseignantDTO
@@ -62,83 +60,9 @@ class AttributionEnseignantTranslator(IAttributionEnseignantTranslator):
             annee: int,
             nom_prenom: str,
     ) -> Set['AttributionEnseignantDTO']:
-        filters = [
-            Q(tutor__person__first_name__icontains=mot)
-            | Q(tutor__person__last_name__icontains=mot)
-            for mot in nom_prenom.split(' ')
-        ]
-        qs_attributions_cours = AttributionNew.objects.filter(
-            learning_container_year__academic_year__year=annee,
-        ).filter(
-            functools.reduce(
-                operator.and_,
-                filters
-            )
-        ).annotate(
-            nom=F('tutor__person__last_name'),
-            prenom=F('tutor__person__first_name'),
-            matricule_fgs_enseignant=F('tutor__person__global_id'),
-            code_unite_enseignement=F('learning_container_year__acronym'),
-        ).values(
-            'nom',
-            'prenom',
-            'code_unite_enseignement',
-            'matricule_fgs_enseignant',
-        ).distinct().order_by('nom', 'prenom')
-
-        filters = [
-            Q(attribution_charge__attribution__tutor__person__first_name__icontains=mot)
-            | Q(attribution_charge__attribution__tutor__person__last_name__icontains=mot)
-            for mot in nom_prenom.split(' ')
-        ]
-        qs_repartition_classes = AttributionClass.objects.filter(
-            learning_class_year__learning_component_year__learning_unit_year__academic_year__year=annee,
-        ).filter(
-            functools.reduce(
-                operator.and_,
-                filters
-            )
-        ).annotate(
-            nom=F('attribution_charge__attribution__tutor__person__last_name'),
-            prenom=F('attribution_charge__attribution__tutor__person__first_name'),
-            matricule_fgs_enseignant=F('attribution_charge__attribution__tutor__person__global_id'),
-            code_unite_enseignement=Case(
-                When(
-                    learning_class_year__learning_component_year__type=LECTURING,
-                    then=Concat(
-                        'learning_class_year__learning_component_year__learning_unit_year__acronym',
-                        Value('-'),
-                        'learning_class_year__acronym',
-                        output_field=CharField()
-                    )
-                ),
-                default=Concat(
-                    'learning_class_year__learning_component_year__learning_unit_year__acronym',
-                    Value('_'),
-                    'learning_class_year__acronym',
-                    output_field=CharField()
-                ),
-                output_field=CharField()
-            ),
-        ).values(
-            'nom',
-            'prenom',
-            'code_unite_enseignement',
-            'matricule_fgs_enseignant',
-        ).distinct().order_by('nom', 'prenom')
-
-        results = list(qs_attributions_cours) + list(qs_repartition_classes)
-
-        return {
-            AttributionEnseignantDTO(
-                nom=obj['nom'],
-                prenom=obj['prenom'],
-                annee=annee,
-                matricule_fgs_enseignant=obj['matricule_fgs_enseignant'],
-                code_unite_enseignement=obj['code_unite_enseignement'],
-            )
-            for obj in results
-        }
+        attributions_unites_enseignement = _search_attributions_unite_enseignement_par_nom_prenom(annee, nom_prenom)
+        repartitions_classes = _search_repartitions_classes_par_nom_prenom(annee, nom_prenom)
+        return attributions_unites_enseignement | repartitions_classes
 
     @classmethod
     def search_attributions_enseignant_par_matricule(
@@ -216,4 +140,55 @@ def _search_repartition_classes(
             nom=dto.last_name,
             prenom=dto.first_name,
         ) for dto in dtos
+    }
+
+
+def _search_repartitions_classes_par_nom_prenom(annee, nom_prenom):
+    from infrastructure.messages_bus import message_bus_instance
+    cmd = SearchClassesParNomEnseignantCommand(annee=annee, nom_prenom=nom_prenom)
+    return {
+        AttributionEnseignantDTO(
+            nom=obj.last_name,
+            prenom=obj.first_name,
+            annee=annee,
+            matricule_fgs_enseignant=obj.personal_id_number,
+            code_unite_enseignement=obj.complete_class_code,
+        )
+        for obj in message_bus_instance.invoke(cmd)
+    }
+
+
+def _search_attributions_unite_enseignement_par_nom_prenom(annee, nom_prenom):
+    filters = [
+        Q(tutor__person__first_name__icontains=mot)
+        | Q(tutor__person__last_name__icontains=mot)
+        for mot in nom_prenom.split(' ')
+    ]
+    qs_attributions_cours = AttributionNew.objects.filter(
+        learning_container_year__academic_year__year=annee,
+    ).filter(
+        functools.reduce(
+            operator.and_,
+            filters
+        )
+    ).annotate(
+        nom=F('tutor__person__last_name'),
+        prenom=F('tutor__person__first_name'),
+        matricule_fgs_enseignant=F('tutor__person__global_id'),
+        code_unite_enseignement=F('learning_container_year__acronym'),
+    ).values(
+        'nom',
+        'prenom',
+        'code_unite_enseignement',
+        'matricule_fgs_enseignant',
+    ).distinct().order_by('nom', 'prenom')
+    return {
+        AttributionEnseignantDTO(
+            nom=obj['nom'],
+            prenom=obj['prenom'],
+            annee=annee,
+            matricule_fgs_enseignant=obj['matricule_fgs_enseignant'],
+            code_unite_enseignement=obj['code_unite_enseignement'],
+        )
+        for obj in qs_attributions_cours
     }

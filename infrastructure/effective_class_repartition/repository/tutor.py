@@ -23,10 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import functools
 import itertools
+import operator
 from typing import List, Optional
 
-from django.db.models import F, QuerySet
+from django.db.models import F, QuerySet, Q
 
 from attribution.models.attribution_charge_new import AttributionChargeNew as AttributionChargeNewDatabase
 from attribution.models.attribution_class import AttributionClass as AttributionClassDatabase
@@ -98,7 +100,8 @@ class TutorRepository(ITutorRepository):
 
     @classmethod
     def search_dto(
-            cls, annee: int = None,
+            cls,
+            annee: int = None,
             nom_prenom_enseignant: str = None,
             entity_ids: Optional[List['TutorIdentity']] = None,
             effective_class_identity: 'EffectiveClassIdentity' = None,
@@ -118,6 +121,24 @@ class TutorRepository(ITutorRepository):
         if entity_ids:
             distinct_ids = {e.personal_id_number for e in entity_ids}
             qs = qs.filter(attribution_charge__attribution__tutor__person__global_id__in=distinct_ids)
+
+        if annee:
+            qs = qs.filter(
+                learning_class_year__learning_component_year__learning_unit_year__academic_year__year=annee,
+            )
+
+        if nom_prenom_enseignant:
+            filters = [
+                Q(attribution_charge__attribution__tutor__person__first_name__icontains=mot)
+                | Q(attribution_charge__attribution__tutor__person__last_name__icontains=mot)
+                for mot in nom_prenom_enseignant.split(' ')
+            ]
+            qs = qs.filter(
+                functools.reduce(
+                    operator.and_,
+                    filters
+                )
+            )
 
         qs = _annotate_queryset(qs)
         qs = _values_qs(qs)

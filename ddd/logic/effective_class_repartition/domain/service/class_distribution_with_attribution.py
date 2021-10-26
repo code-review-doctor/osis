@@ -80,6 +80,40 @@ class ClassDistributionWithAttribution(interface.DomainService):
         tutor_class_repartition_dtos = _get_tutor_class_repartition_dtos(tutor, attributions, effective_classes)
         return [dto for dto in tutor_class_repartition_dtos if dto.annee == annee]
 
+    @classmethod
+    def search_par_nom_prenom_enseignant(
+            cls,
+            annee: int,
+            nom_prenom: str,
+            tutor_attribution_translator: 'ITutorAttributionToLearningUnitTranslator',
+            tutor_repository: 'ITutorRepository',
+    ) -> List['TutorClassRepartitionDTO']:
+        tutor_dtos = tutor_repository.search_dto(annee=annee, nom_prenom_enseignant=nom_prenom)
+        attribution_uuids = list()
+        for tutor in tutor_dtos:
+            for classe_distribuee in tutor.distributed_classes:
+                attribution_uuids.append(classe_distribuee.attribution_uuid)
+        attributions = tutor_attribution_translator.search_learning_unit_attributions(attribution_uuids)
+
+        attributions_par_uuid = {attrib.attribution_uuid: attrib for attrib in attributions}
+        result = []
+        for tutor in tutor_dtos:
+            for classe_distribuee in tutor.distributed_classes:
+                attrib = attributions_par_uuid[classe_distribuee.attribution_uuid]
+                result.append(
+                    TutorClassRepartitionDTO(
+                        attribution_uuid=classe_distribuee.attribution_uuid,
+                        last_name=attrib.last_name,
+                        first_name=attrib.first_name,
+                        function=attrib.function,
+                        distributed_volume_to_class=classe_distribuee.distributed_volume,
+                        personal_id_number=tutor.personal_id_number,
+                        complete_class_code=classe_distribuee.learning_unit_code + classe_distribuee.learning_unit_code,  # FIXME
+                        annee=classe_distribuee.learning_unit_year,
+                    )
+                )
+        return result
+
 
 def _get_effective_classes_from_tutors(
         tutors: List['Tutor'],
