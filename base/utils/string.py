@@ -1,4 +1,3 @@
-##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -15,7 +14,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,16 +22,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from rest_framework import serializers
+import re
 
-from reference.models.language import Language
+from unidecode import unidecode
 
 
-class LanguageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Language
-        fields = (
-            'code',
-            'name',
-            'name_en'
-        )
+SPECIAL_CHARACTERS_PATTERN = r"[-'\s]"
+SPECIAL_CHARACTERS_REGEX = re.compile(SPECIAL_CHARACTERS_PATTERN)
+
+
+def unaccent(s: str) -> str:
+    string_without_special_characters = re.sub(SPECIAL_CHARACTERS_REGEX, "", s)
+    lower_cased_character = str.lower(string_without_special_characters)
+    return unidecode(lower_cased_character)

@@ -125,6 +125,10 @@ class MultipleBusinessExceptions(Exception):
     def __init__(self, exceptions: Iterable['BusinessException']):
         self.exceptions = exceptions
 
+        # Needed for the pickle module when tests are runned in parallel
+        # See the following discussion https://stackoverflow.com/questions/41808912/cannot-unpickle-exception-subclass
+        super().__init__(exceptions)
+
 
 class MultipleExceptionBusinessListValidator(BusinessListValidator):
     def validate(self):

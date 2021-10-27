@@ -1,4 +1,3 @@
-##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -15,7 +14,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,16 +22,38 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from rest_framework import serializers
+from django.test import SimpleTestCase
 
-from reference.models.language import Language
+from base.utils.string import unaccent
 
 
-class LanguageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Language
-        fields = (
-            'code',
-            'name',
-            'name_en'
+class TestUnaccent(SimpleTestCase):
+    def setUp(self):
+        pass
+
+    def test_when_uppercased_character_should_lowercased_them(self):
+        self.assert_unaccent_equal(
+            "Hello",
+            "hello"
         )
+
+    def test_when_special_characters_should_remove_them_from_string(self):
+        self.assert_unaccent_equal(
+            "Hello-World Haha'Test",
+            "helloworldhahatest"
+        )
+
+    def test_when_accent_character_should_replace_them_to_unaccent_character(self):
+        self.assert_unaccent_equal(
+            "François",
+            "francois"
+        )
+
+        self.assert_unaccent_equal(
+            "Déflander",
+            "deflander"
+        )
+
+    def assert_unaccent_equal(self, s, expected):
+        result = unaccent(s)
+        self.assertEqual(expected, result)

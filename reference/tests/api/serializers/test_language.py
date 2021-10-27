@@ -39,5 +39,6 @@ class LanguageSerializerTestCase(TestCase):
         expected_fields = [
             'code',
             'name',
+            'name_en'
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)

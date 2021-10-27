@@ -43,6 +43,7 @@ from osis_common.ddd import interface
 
 
 class ProgressionGeneral(interface.DomainService):
+
     @classmethod
     def get(
         cls,

@@ -55,5 +55,14 @@ class ITutorAttributionToLearningUnitTranslator(interface.DomainService):
 
     @classmethod
     @abc.abstractmethod
+    def search_par_nom_prenom_enseignant(
+            cls,
+            annee: int,
+            nom_prenom: str,
+    ) -> List['TutorAttributionToLearningUnitDTO']:
+        pass
+
+    @classmethod
+    @abc.abstractmethod
     def get_by_enseignant(cls, matricule_fgs_enseignant: str, annee: int) -> List['TutorAttributionToLearningUnitDTO']:
         pass

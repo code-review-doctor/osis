@@ -27,6 +27,8 @@ from typing import Optional
 
 from ddd.logic.encodage_des_notes.encodage.domain.model.gestionnaire_parcours import GestionnaireParcours
 from ddd.logic.encodage_des_notes.encodage.repository.note_etudiant import INoteEtudiantRepository
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_attribution_enseignant import \
+    IAttributionEnseignantTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_inscription_examen import IInscriptionExamenTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_etudiant import \
     ISignaletiqueEtudiantTranslator
@@ -52,6 +54,7 @@ class ProgressionGeneraleEncodage(interface.DomainService):
             signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
             unite_enseignement_translator: 'IUniteEnseignementTranslator',
             inscription_examen_translator: 'IInscriptionExamenTranslator',
+            attribution_translator: 'IAttributionEnseignantTranslator',
 
             nom_cohorte: Optional[str],
             code_unite_enseignement: Optional[str],
@@ -68,9 +71,9 @@ class ProgressionGeneraleEncodage(interface.DomainService):
             annee_academique=periode_encodage.annee_concernee,
             numero_session=periode_encodage.session_concernee,
             code_unite_enseignement=code_unite_enseignement,
-            enseignant=enseignant,
             note_manquante=seulement_notes_manquantes
         )
+        notes_identites = _filtrer_par_enseignant(attribution_translator, enseignant, notes_identites, periode_encodage)
 
         return ProgressionGeneral().get(
             notes_identites,
@@ -81,3 +84,16 @@ class ProgressionGeneraleEncodage(interface.DomainService):
             unite_enseignement_translator,
             inscription_examen_translator=inscription_examen_translator
         )
+
+
+def _filtrer_par_enseignant(attribution_translator, enseignant, notes_identites, periode_encodage):
+    if enseignant:
+        attributions = attribution_translator.search_attributions_enseignant_par_nom_prenom_annee(
+            annee=periode_encodage.annee_concernee,
+            nom_prenom=enseignant,
+        )
+        codes_unites_enseignement = {attrib.code_unite_enseignement for attrib in attributions}
+        return {
+            note for note in notes_identites if note.code_unite_enseignement in codes_unites_enseignement
+        }
+    return notes_identites
