@@ -76,7 +76,7 @@ class TutorRepository(InMemoryGenericRepository, ITutorRepository):
     ) -> List['TutorSearchDTO']:
         return list(
             filter(
-                lambda tutor_dto: _filter_dto(tutor_dto, entity_ids, effective_class_identity),
+                lambda tutor_dto: _filter_condition_dto(tutor_dto, entity_ids, effective_class_identity),
                 cls.tutor_dtos
             )
         )
@@ -95,7 +95,7 @@ def _filter(
     return False
 
 
-def _filter_dto(
+def _filter_condition_dto(
         tutor_dto: 'TutorSearchDTO',
         entity_ids: Optional[List['TutorIdentity']],
         effective_class_identity: 'EffectiveClassIdentity',
