@@ -40,7 +40,7 @@ from osis_common.ddd import interface
 
 @attr.s(frozen=True, slots=True)
 class TutorIdentity(interface.EntityIdentity):
-    personal_id_number = attr.ib(type=str)
+    personal_id_number = attr.ib(type=str)  # FIXME :: l'identité DOIT contenir l'année
 
 
 # TODO :: rename context to effective_class_distribution

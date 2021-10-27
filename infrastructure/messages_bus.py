@@ -56,7 +56,7 @@ from ddd.logic.effective_class_repartition.commands import (
     SearchAttributionsToLearningUnitCommand,
     SearchClassesEnseignantCommand,
     SearchTutorsDistributedToClassCommand,
-    UnassignTutorClassCommand,
+    UnassignTutorClassCommand, SearchClassesParNomEnseignantCommand,
 )
 from ddd.logic.effective_class_repartition.use_case.read.get_attribution_service import get_attribution
 from ddd.logic.effective_class_repartition.use_case.read.get_tutor_repartition_classes_service import \
@@ -67,6 +67,8 @@ from ddd.logic.effective_class_repartition.use_case.read.search_attributions_to_
     search_attributions_to_learning_unit
 from ddd.logic.effective_class_repartition.use_case.read.search_classes_enseignant_service import \
     search_classes_enseignant
+from ddd.logic.effective_class_repartition.use_case.read.search_classes_par_nom_enseignant_service import \
+    search_classes_par_nom_prenom
 from ddd.logic.effective_class_repartition.use_case.read.search_effective_classes_distributed_service import \
     search_tutors_distributed_to_class
 from ddd.logic.effective_class_repartition.use_case.write.distribute_class_to_tutor_service import \
@@ -445,6 +447,7 @@ class MessageBusCommands(AbstractMessageBusCommands):
             UniteEnseignementTranslator(),
             CohortesDuGestionnaireTranslator(),
             InscriptionExamenTranslator(),
+            AttributionEnseignantTranslator(),
         ),
         GetPeriodeEncodageCommand: lambda cmd: get_periode_encodage(
             cmd,
@@ -495,6 +498,11 @@ class MessageBusCommands(AbstractMessageBusCommands):
             cmd,
             AttributionEnseignantTranslator(),
             PeriodeEncodageNotesTranslator(),
+        ),
+        SearchClassesParNomEnseignantCommand: lambda cmd: search_classes_par_nom_prenom(
+            cmd,
+            TutorAttributionToLearningUnitTranslator(),
+            TutorRepository(),
         ),
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 
