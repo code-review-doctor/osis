@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-26 14:22+0200\n"
+"POT-Creation-Date: 2021-10-27 14:57+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -631,7 +631,15 @@ msgstr ""
 msgid "Via paper"
 msgstr ""
 
-msgid "Warning : some registered scores have not been submitted yet!"
+#, python-format
+msgid "Warning: %(scores)s scores are ready to be submitted."
+msgstr ""
+
+#, python-format
+msgid ""
+"Warning: %(scores)s scores are ready to be submitted. Only score responsible "
+"(%(responsable_nom)s %(responsable_prenom)s) will be allowed to submit these "
+"scores to faculty."
 msgstr ""
 
 msgid "Yes"
