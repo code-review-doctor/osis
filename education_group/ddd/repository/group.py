@@ -238,7 +238,7 @@ def _convert_db_model_to_ddd_model(obj: GroupYearModelDb) -> 'Group':
             maximum=obj.max_constraint,
         ),
         management_entity=EntityValueObject(
-            acronym=obj.management_entity.most_recent_acronym,
+            acronym=obj.management_entity.most_recent_acronym if obj.management_entity else "",
         ),
         teaching_campus=Campus(
             name=obj.main_teaching_campus.name,
