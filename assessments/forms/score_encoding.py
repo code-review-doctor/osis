@@ -55,7 +55,7 @@ class ScoreEncodingForm(forms.Form):
 
 
 class ScoreSearchEncodingForm(forms.Form):
-    note = forms.CharField(max_length=100, required=False)
+    note = UpperCaseCharField(max_length=100, required=False)
     noma = forms.CharField(widget=HiddenInput())
     code_unite_enseignement = forms.CharField(widget=HiddenInput())
 

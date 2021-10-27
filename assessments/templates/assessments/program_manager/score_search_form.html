@@ -197,6 +197,7 @@
             }
 
             const is_valid_justification = function (justification) {
+                justification = justification.toUpperCase();
                 const justificationAvailables = ['M', 'S', 'T'];
                 return justificationAvailables.indexOf(justification) > -1;
             }
