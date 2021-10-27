@@ -25,11 +25,11 @@
 ##############################################################################
 from django.urls import path, register_converter
 
-from education_group.converters import MiniTrainingAcronymConverter
+from education_group.converters import ProgramAcronymConverter
 from learning_unit_enrollment.api.views.enrollment import LearningUnitEnrollmentsListView, \
     MyLearningUnitEnrollmentsListView
 
-register_converter(MiniTrainingAcronymConverter, 'program_acronym')
+register_converter(ProgramAcronymConverter, 'program_acronym')
 
 app_name = "learning_unit_enrollment"
 urlpatterns = [
