@@ -455,6 +455,10 @@ msgstr ""
 msgid "Score legend: A=Absent, T=Cheating, {score} (0=Score of presence)"
 msgstr ""
 
+#, python-format
+msgid "Score responsible successfully designated on %(code)s."
+msgstr ""
+
 msgid "Score sheet"
 msgstr ""
 

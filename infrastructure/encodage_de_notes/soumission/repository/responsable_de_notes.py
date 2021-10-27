@@ -190,8 +190,10 @@ class ResponsableDeNotesRepository(IResponsableDeNotesRepository):
         raise NotImplementedError
 
     @classmethod
-    def get(cls, entity_id: 'IdentiteResponsableDeNotes') -> 'ResponsableDeNotes':
-        return cls.search([entity_id])[0]
+    def get(cls, entity_id: 'IdentiteResponsableDeNotes') -> Optional['ResponsableDeNotes']:
+        search = cls.search([entity_id])
+        if search:
+            return search[0]
 
     @classmethod
     def get_for_unite_enseignement(
@@ -200,7 +202,8 @@ class ResponsableDeNotesRepository(IResponsableDeNotesRepository):
             annee_academique: int
     ) -> Optional['ResponsableDeNotes']:
         try:
-            return cls.search(codes_unites_enseignement=[code_unite_enseignement], annee_academique=annee_academique)[0]
+            liste = cls.search(codes_unites_enseignement=[code_unite_enseignement], annee_academique=annee_academique)
+            return liste[0]
         except IndexError:
             return None
 

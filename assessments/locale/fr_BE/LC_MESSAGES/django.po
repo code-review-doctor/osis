@@ -467,8 +467,8 @@ msgid ""
 "tutor that aren't submitted yet ('draft' state)"
 msgstr ""
 "Représente la quantité de notes soumises à l'administration. Le nombre "
-"entouré de parenthèses est le nombre de notes encodées par l'enseignant.e qui "
-"n'ont pas encore été soumises (état 'brouillon')"
+"entouré de parenthèses est le nombre de notes encodées par l'enseignant.e "
+"qui n'ont pas encore été soumises (état 'brouillon')"
 
 msgid "Req. Entity"
 msgstr "Ent. charge"
@@ -498,6 +498,10 @@ msgstr "Valeurs acceptées"
 #, python-brace-format
 msgid "Score legend: A=Absent, T=Cheating, {score} (0=Score of presence)"
 msgstr "Valeur acceptée: A=Absent, T=Tricherie, {score} (0=Note de présence)"
+
+#, python-format
+msgid "Score responsible successfully designated on %(code)s."
+msgstr "Responsable de notes désigné avec succès sur %(code)s."
 
 msgid "Score sheet"
 msgstr "Feuille de notes"
@@ -641,9 +645,8 @@ msgstr[1] "Il y a %(error_counter)s erreurs dans le formulaire"
 
 msgid "This process helps tutor while encoding notes for the exams sessions."
 msgstr ""
-"Cette procédure aide l'enseignant.e durant l'encodage de notes pour les sessions "
-"d'examens."
-
+"Cette procédure aide l'enseignant.e durant l'encodage de notes pour les "
+"sessions d'examens."
 
 msgid "Title"
 msgstr "Intitulé"

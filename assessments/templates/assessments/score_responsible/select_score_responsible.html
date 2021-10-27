@@ -64,7 +64,7 @@
                 </tbody>
             </table>
 
-            {% if attributions_classes%}
+            {% if repartitions_classes %}
             <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
                 <div class="panel panel-default">
                     <div class="panel-heading" role="tab" id="headingOne">
@@ -77,7 +77,7 @@
                     </div>
                     <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
                         <div class="panel-body">
-                            {% for class in attributions_classes %}
+                            {% for class in repartitions_classes %}
                             <table class="table table-hover">
                                 <caption><strong>{{class}}</strong></caption>
                                 <thead>
@@ -88,7 +88,7 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {% with attr_classes=attributions_classes|get_item:class%}
+                                {% with attr_classes=repartitions_classes|get_item:class%}
                                 {% for attr in attr_classes %}
                                 <tr>
                                     <td>{{ attr.enseignant }}</td>
