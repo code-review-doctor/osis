@@ -47,6 +47,7 @@ class OfferEnrollmentFilter(filters.FilterSet):
         field_name='enrollment_state',
         choices=offer_enrollment_state.STATES
     )
+    year = filters.NumberFilter(field_name="education_group_year__academic_year__year")
 
 
 class OfferEnrollmentsListView(LanguageContextSerializerMixin, generics.ListAPIView):

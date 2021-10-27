@@ -31,6 +31,7 @@ from offer_enrollment.api.views.enrollment import MyOfferEnrollmentsListView, My
 app_name = "offer_enrollment"
 urlpatterns = [
     path('enrollments/<str:registration_id>', OfferEnrollmentsListView.as_view(), name=OfferEnrollmentsListView.name),
+    # TODO : delete my_enrollments endpoints
     path('my_enrollments/', MyOfferEnrollmentsListView.as_view(), name=MyOfferEnrollmentsListView.name),
     path(
         'my_enrollments/<int:year>',

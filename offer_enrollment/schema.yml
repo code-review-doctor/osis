@@ -11,7 +11,7 @@ servers:
   - url: https://osis.uclouvain.be/api/v1/offer_enrollment/
     description: 'Production server'
 info:
-  version: '1.0'
+  version: '1.1'
   title: 'Offer Enrollment Service'
   description: |-
     A set of API endpoints that allow you to get information about offer enrollment
@@ -72,6 +72,12 @@ paths:
               type: string
           style: form
           explode: true
+        - in: query
+          name: year
+          schema:
+            description: Filter result by year
+            type: integer
+            example: 2020
         - $ref: '#/components/parameters/Accept-Language'
         - $ref: '#/components/parameters/X-User-FirstName'
         - $ref: '#/components/parameters/X-User-LastName'
