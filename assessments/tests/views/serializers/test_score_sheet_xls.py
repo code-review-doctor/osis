@@ -94,7 +94,6 @@ class ScoreSheetXLSSerializerTest(SimpleTestCase):
         cls.donnees_administrative = DonneesAdministrativesFeuilleDeNotesDTO(
             sigle_formation='DROI2M',
             code_unite_enseignement='LDROI1200',
-            date_deliberation=DateDTO.build_from_date(datetime.date.today() + datetime.timedelta(days=10)),
             contact_feuille_de_notes=AdresseFeuilleDeNotesDTO(
                 nom_cohorte='DROI2M',
                 entite="",
@@ -316,7 +315,6 @@ class TutorScoreSheetXLSSerilizeTest(SimpleTestCase):
         cls.donnees_administrative = DonneesAdministrativesFeuilleDeNotesDTO(
             sigle_formation='DROI2M',
             code_unite_enseignement='LDROI1200',
-            date_deliberation=DateDTO.build_from_date(datetime.date.today() + datetime.timedelta(days=10)),
             contact_feuille_de_notes=AdresseFeuilleDeNotesDTO(
                 nom_cohorte='DROI2M',
                 entite="",

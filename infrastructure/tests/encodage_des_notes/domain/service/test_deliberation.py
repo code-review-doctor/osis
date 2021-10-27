@@ -29,7 +29,6 @@ from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.tests.factories.offer_year_calendar import OfferYearCalendarFactory, OfferYearCalendar11BAFactory
 from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
 from ddd.logic.encodage_des_notes.soumission.dtos import DateDTO
-from infrastructure.encodage_de_notes.soumission.domain.service.deliberation import DeliberationTranslator
 
 
 class DeliberationTest(TestCase):

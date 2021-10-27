@@ -64,7 +64,6 @@ class ScoreSheetsPDFExportAPIViewTestCase(APITestCase):
                 DonneesAdministrativesFeuilleDeNotesDTO(
                     sigle_formation="DROI1BA",
                     code_unite_enseignement='LDROI1200',
-                    date_deliberation=DateDTO.build_from_date(datetime.date.today()),
                     contact_feuille_de_notes=AdresseFeuilleDeNotesDTO(
                         nom_cohorte='DROI1BA',
                         entite='BUDR',
