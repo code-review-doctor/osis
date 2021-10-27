@@ -56,6 +56,12 @@ class SearchClassesEnseignantCommand(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
+class SearchClassesParNomEnseignantCommand(interface.CommandRequest):
+    annee = attr.ib(type=int)
+    nom_prenom = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
 class GetTutorRepartitionClassesCommand(interface.CommandRequest):
     tutor_personal_id_number = attr.ib(type=str)
 

@@ -70,7 +70,7 @@ class TestNoteEtudiant(TestCase):
 
         assert_attrs_instances_are_equal(note_chiffree, self.repo.get(note_chiffree.entity_id))
 
-    def test_should_search_notes_etudiant(self):
+    def test_should_search_notes_etudiant_by_entity_id(self):
         note_chiffree = NoteEtudiantChiffreeFactory()
         self._create_save_necessary_data(note_chiffree)
         self.repo.save(note_chiffree)
