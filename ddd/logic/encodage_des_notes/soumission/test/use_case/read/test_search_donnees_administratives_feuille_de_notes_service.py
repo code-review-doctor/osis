@@ -28,15 +28,12 @@ from unittest import mock
 from django.test import SimpleTestCase
 
 from ddd.logic.encodage_des_notes.soumission.commands import SearchAdressesFeuilleDeNotesCommand
-from ddd.logic.encodage_des_notes.soumission.dtos import DateDTO
 from ddd.logic.encodage_des_notes.tests.factory.adresse_feuille_de_notes import \
     AdresseFeuilleDeNotesSpecifiqueFactory
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.inscription_examen import \
     InscriptionExamenTranslatorInMemory
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.periode_encodage_notes import \
     PeriodeEncodageNotesTranslatorInMemory
-from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.deliberation import \
-    DeliberationTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.repository.in_memory.adresse_feuille_de_notes import \
     AdresseFeuilleDeNotesInMemoryRepository
 from infrastructure.messages_bus import message_bus_instance
@@ -62,7 +59,6 @@ class SearchDonneesAdministrativesTest(SimpleTestCase):
 
         self.periode_encodage_translator = PeriodeEncodageNotesTranslatorInMemory()
         self.inscr_examen_translator = InscriptionExamenTranslatorInMemory()
-        self.deliberation_translator = DeliberationTranslatorInMemory()
         self.__mock_service_bus()
 
     def __mock_service_bus(self):
@@ -71,7 +67,6 @@ class SearchDonneesAdministrativesTest(SimpleTestCase):
             PeriodeEncodageNotesTranslator=lambda: self.periode_encodage_translator,
             AdresseFeuilleDeNotesRepository=lambda: self.adresse_feuille_de_notes_repository,
             InscriptionExamenTranslator=lambda: self.inscr_examen_translator,
-            DeliberationTranslator=lambda: self.deliberation_translator,
         )
         message_bus_patcher.start()
         self.addCleanup(message_bus_patcher.stop)
@@ -82,22 +77,6 @@ class SearchDonneesAdministrativesTest(SimpleTestCase):
         cmd = SearchAdressesFeuilleDeNotesCommand(codes_unite_enseignement=['EXISTEPAS'])
         result = self.message_bus.invoke(cmd)
         self.assertEqual(result, list())
-
-    @mock.patch("infrastructure.messages_bus.DeliberationTranslator")
-    def test_should_renvoyer_aucune_date_deliberation(self, mock_delibe_translator):
-        translator = DeliberationTranslatorInMemory()
-        translator.search = lambda *args, **kwargs: set()
-        mock_delibe_translator.return_value = translator
-        result = self.message_bus.invoke(self.cmd)
-        dto = list(result)[0]
-        self.assertEqual(dto.sigle_formation, self.nom_cohorte)
-        self.assertIsNone(dto.date_deliberation)
-
-    def test_should_renvoyer_date_deliberation(self):
-        result = self.message_bus.invoke(self.cmd)
-        dto = list(result)[0]
-        self.assertEqual(dto.sigle_formation, self.nom_cohorte)
-        self.assertEqual(dto.date_deliberation, DateDTO(jour=15, mois=6, annee=2020))
 
     def test_should_renvoyer_contact_feuille_de_notes(self):
         result = self.message_bus.invoke(self.cmd)

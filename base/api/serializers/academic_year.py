@@ -33,12 +33,12 @@ class RelatedAcademicYearField(serializers.IntegerField, serializers.SlugRelated
         kwargs.setdefault('slug_field', 'year')
         kwargs.setdefault('queryset', AcademicYear.objects.all())
         kwargs.setdefault('allow_null', True)
-        super().__init__(min_value=1000, max_value=2999, **kwargs)
+        super().__init__(**kwargs)
 
     def to_internal_value(self, data):
         # Chain integer casting and related treatment
-        int_value = super(serializers.SlugRelatedField, self).to_internal_value(data)
-        return super(serializers.SlugRelatedField, self).to_internal_value(int_value)
+        int_value = serializers.IntegerField.to_internal_value(self, data)
+        return serializers.SlugRelatedField.to_internal_value(self, int_value)
 
     def to_representation(self, value):
-        return int(super(serializers.SlugRelatedField, self).to_representation(value))
+        return int(serializers.SlugRelatedField.to_representation(self, value))

@@ -34,4 +34,5 @@ class LanguageSerializer(serializers.ModelSerializer):
         fields = (
             'code',
             'name',
+            'name_en'
         )

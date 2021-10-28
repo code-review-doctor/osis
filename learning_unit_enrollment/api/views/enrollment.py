@@ -29,8 +29,12 @@ from django.conf import settings
 from django.db.models import Case, When, Q, F, Value, CharField
 from django.db.models.functions import Concat, Replace
 from django.utils.functional import cached_property
+from django_filters import rest_framework as filters
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics
+from rest_framework.filters import SearchFilter
 
+from backoffice.settings.rest_framework.filters import MultipleColumnOrderingFilter
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.offer_enrollment_state import SUBSCRIBED, PROVISORY
 from base.models.learning_unit_enrollment import LearningUnitEnrollment
@@ -39,6 +43,20 @@ from education_group.models.enums.cohort_name import CohortName
 from learning_unit_enrollment.api.serializers.enrollment import EnrollmentSerializer
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
+
+
+class EnrollmentFilter(filters.FilterSet):
+    ordering = MultipleColumnOrderingFilter(
+        fields=(
+            ('student_registration_id', 'student_registration_id'),
+            ('student_email', 'student_email'),
+            ('specific_profile', 'specific_profile'),
+            ('program', 'program'),
+            ('student_last_name', 'student_last_name'),
+            ('student_first_name', 'student_first_name'),
+            (('student_last_name', 'student_first_name'), 'student_full_name'),
+        )
+    )
 
 
 class LearningUnitEnrollmentsListView(generics.ListAPIView):
@@ -54,14 +72,8 @@ class LearningUnitEnrollmentsListView(generics.ListAPIView):
         'program',
         'specific_profile'
     ]
-    ordering_fields = [
-        'student_last_name',
-        'student_first_name',
-        'student_registration_id',
-        'student_email',
-        'specific_profile',
-        'program'
-    ]
+    filterset_class = EnrollmentFilter
+    filter_backends = [DjangoFilterBackend, SearchFilter]
 
     def get_paginated_response(self, data):
         response = super().get_paginated_response(data)

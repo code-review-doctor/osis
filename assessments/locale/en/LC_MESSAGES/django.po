@@ -126,6 +126,9 @@ msgstr ""
 msgid "Are you sure you want to remove the following manager ?"
 msgstr ""
 
+msgid "Arrangements"
+msgstr ""
+
 msgid "By learning unit"
 msgstr ""
 
@@ -249,6 +252,9 @@ msgid "Firstname"
 msgstr ""
 
 msgid "Get Excel file"
+msgstr ""
+
+msgid "Guide"
 msgstr ""
 
 msgid "If you try to put decimal values, it will be ignored."

@@ -112,7 +112,8 @@ class AttributionListView(generics.ListAPIView):
             ),
             practical_charge=Case(
                 When(
-                    Q(learning_component_year__type=learning_component_year_type.LECTURING),
+                    Q(learning_component_year__type=learning_component_year_type.LECTURING) |
+                    Q(learning_component_year__acronym='NT'),
                     then=Subquery(
                         AttributionChargeNew.objects.filter(
                             attribution_id=OuterRef('attribution_id'),
