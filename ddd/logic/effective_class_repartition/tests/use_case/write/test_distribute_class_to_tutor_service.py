@@ -54,6 +54,8 @@ class DistributeClassToTutorService(TestCase):
         self.tutor_repository = TutorRepository()
         self.tutor_repository.entities.clear()
         self.effective_class_repository = EffectiveClassRepository()
+        self.effective_class_repository.reset()
+
         self.tutor = TutorWithoutDistributedEffectiveClassesFactory()
         self.tutor_repository.save(self.tutor)
 

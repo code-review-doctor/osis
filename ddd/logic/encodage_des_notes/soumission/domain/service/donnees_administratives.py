@@ -31,7 +31,6 @@ from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodag
     IPeriodeEncodageNotesTranslator
 from ddd.logic.encodage_des_notes.soumission.builder.adresse_feuille_de_notes_identity_builder import \
     AdresseFeuilleDeNotesIdentityBuilder
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_deliberation import IDeliberationTranslator
 from ddd.logic.encodage_des_notes.soumission.dtos import DonneesAdministrativesFeuilleDeNotesDTO, \
     AdresseFeuilleDeNotesDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_notes import \
@@ -47,7 +46,6 @@ class DonneesAdministratives(interface.DomainService):
             codes_unites_enseignement: List['str'],
             periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
             inscr_exam_translator: 'IInscriptionExamenTranslator',
-            deliberation_translator: 'IDeliberationTranslator',
             adresse_feuille_de_notes_repository: 'IAdresseFeuilleDeNotesRepository',
     ) -> List['DonneesAdministrativesFeuilleDeNotesDTO']:
         periode_soumission_ouverte = periode_soumission_note_translator.get()
@@ -60,12 +58,6 @@ class DonneesAdministratives(interface.DomainService):
         )
         noms_cohortes = set(itertools.chain.from_iterable(cohortes_par_unite_enseignement.values()))
 
-        deliberation_par_cohorte = _get_deliberation_par_cohorte(
-            deliberation_translator,
-            noms_cohortes,
-            periode_soumission_ouverte,
-        )
-
         adresse_par_cohorte = _get_adresse_par_cohorte(
             adresse_feuille_de_notes_repository,
             noms_cohortes,
@@ -75,11 +67,9 @@ class DonneesAdministratives(interface.DomainService):
         result = []
         for code in codes_unites_enseignement:
             for nom_cohorte in cohortes_par_unite_enseignement.get(code, []):
-                deliberation = deliberation_par_cohorte.get(nom_cohorte)
                 dto = DonneesAdministrativesFeuilleDeNotesDTO(
                     sigle_formation=nom_cohorte,
                     code_unite_enseignement=code,
-                    date_deliberation=deliberation.date if deliberation else None,
                     contact_feuille_de_notes=adresse_par_cohorte.get(
                         nom_cohorte,
                         AdresseFeuilleDeNotesDTO(nom_cohorte=nom_cohorte, annee_academique=annee_academique)

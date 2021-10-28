@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,19 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from datetime import date
+from typing import List
 
-from django import template
+from ddd.logic.effective_class_repartition.commands import SearchClassesParNomEnseignantCommand
+from ddd.logic.effective_class_repartition.domain.service.class_distribution_with_attribution import \
+    ClassDistributionWithAttribution
+from ddd.logic.effective_class_repartition.domain.service.i_tutor_attribution import \
+    ITutorAttributionToLearningUnitTranslator
+from ddd.logic.effective_class_repartition.dtos import TutorClassRepartitionDTO
+from ddd.logic.effective_class_repartition.repository.i_tutor import ITutorRepository
 
-CURRENT_EVENT_CSS_STYLE = "font-weight:bold;"
-NOT_CURRENT_EVENT_CSS_STYLE = ""
 
-register = template.Library()
-
-
-@register.filter
-def offer_year_calendar_display(value_start, value_end):
-    if value_start.date() and value_end.date():
-        if value_start.date() <= date.today() <= value_end.date():
-            return CURRENT_EVENT_CSS_STYLE
-    return NOT_CURRENT_EVENT_CSS_STYLE
+def search_classes_par_nom_prenom(
+        cmd: 'SearchClassesParNomEnseignantCommand',
+        tutor_attribution_translator: 'ITutorAttributionToLearningUnitTranslator',
+        tutor_repository: 'ITutorRepository',
+) -> List['TutorClassRepartitionDTO']:
+    return ClassDistributionWithAttribution().search_par_nom_prenom_enseignant(
+        annee=cmd.annee,
+        nom_prenom=cmd.nom_prenom,
+        tutor_attribution_translator=tutor_attribution_translator,
+        tutor_repository=tutor_repository,
+    )
