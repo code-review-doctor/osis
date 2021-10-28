@@ -36,7 +36,8 @@ HEADER = [
     _('Learning unit'),
     pgettext_lazy('encoding', 'Program'),
     _('Registration number'),
-    _('Name'),
+    _('Lastname'),
+    _('Firstname'),
     _('Email'),
     _('Score'),
     _('End date Prof'),
@@ -59,7 +60,7 @@ def build_xls(feuille_de_notes_serialized):
     _define_worksheet_column_size(worksheet)
     _build_headers(worksheet)
     _build_rows(worksheet, feuille_de_notes_serialized)
-    worksheet.auto_filter.ref = "A11:P{}".format(str(worksheet.max_row))
+    worksheet.auto_filter.ref = "A11:Q{}".format(str(worksheet.max_row))
     return save_virtual_workbook(workbook)
 
 
@@ -127,16 +128,17 @@ def _define_worksheet_column_size(worksheet):
     worksheet.column_dimensions['C'].width = 18
     worksheet.column_dimensions['E'].width = 18
     worksheet.column_dimensions['F'].width = 25
-    worksheet.column_dimensions['G'].width = 65
-    worksheet.column_dimensions['H'].width = 20
-    worksheet.column_dimensions['I'].width = 15
+    worksheet.column_dimensions['G'].width = 25
+    worksheet.column_dimensions['H'].width = 40
+    worksheet.column_dimensions['I'].width = 20
     worksheet.column_dimensions['J'].width = 15
-    worksheet.column_dimensions['K'].width = 20
-    worksheet.column_dimensions['L'].width = 25
-    worksheet.column_dimensions['M'].width = 15
-    worksheet.column_dimensions['N'].width = 25
+    worksheet.column_dimensions['K'].width = 15
+    worksheet.column_dimensions['L'].width = 20
+    worksheet.column_dimensions['M'].width = 25
+    worksheet.column_dimensions['N'].width = 15
     worksheet.column_dimensions['O'].width = 25
-    worksheet.column_dimensions['P'].width = 30
+    worksheet.column_dimensions['P'].width = 25
+    worksheet.column_dimensions['Q'].width = 30
 
 
 def _build_headers(worksheet):
@@ -147,14 +149,14 @@ def _build_rows(worksheet, feuille_de_notes_serialized):
     current_row_number = 12
 
     for row in feuille_de_notes_serialized['rows']:
-        full_name = "{}, {}".format(row["nom"] if row["nom"] else "", row["prenom"] if row["prenom"] else "")
         worksheet.append([
             feuille_de_notes_serialized['annee_academique'],
             feuille_de_notes_serialized['numero_session'],
             feuille_de_notes_serialized['code_unite_enseignement'],
             row['nom_cohorte'],
             row['noma'],
-            full_name,
+            row['nom'],
+            row['prenom'],
             row['email'],
             row['note'],
             row['date_remise_de_notes'],
@@ -167,12 +169,12 @@ def _build_rows(worksheet, feuille_de_notes_serialized):
             row['accompagnateur'],
         ])
 
-        for column_number in range(1, 8):
+        for column_number in range(1, 9):
             __set_non_editable_color(worksheet, column_number, current_row_number)
-        for column_number in range(9, len(HEADER) + 1):
+        for column_number in range(10, len(HEADER) + 1):
             __set_non_editable_color(worksheet, column_number, current_row_number)
         if row['est_soumise']:
-            __set_non_editable_color(worksheet, 8, current_row_number)
+            __set_non_editable_color(worksheet, 9, current_row_number)
 
         if row['inscrit_tardivement']:
             __set_late_subscribe_row_color(worksheet, current_row_number)

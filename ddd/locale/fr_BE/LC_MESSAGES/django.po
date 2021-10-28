@@ -114,7 +114,7 @@ msgid "Other educational facilities"
 msgstr "Autre aménagement"
 
 msgid "Registration ID does not match email"
-msgstr "Le noma ne correspond pas à l'adresse de messagerie"
+msgstr "Le noma ne corresond pas à l'adresse de messagerie"
 
 msgid "Score already submitted"
 msgstr "Note déjà soumise"

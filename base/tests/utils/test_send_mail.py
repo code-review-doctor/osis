@@ -166,12 +166,12 @@ class TestSendMessage(TestCase):
                          'Toutes les notes ont été soumises.')
 
     def test_check_table_headers_fr_be(self):
-        expected = ['Sigle', 'Session', 'Noma', 'Nom', 'Note', 'Justification']
+        expected = ['Sigle', 'Session', 'Noma', 'Nom', 'Prénom', 'Note', 'Justification']
         self.assertListEqual(expected, send_mail.get_enrollment_headers('fr-be'))
 
     def test_check_table_headers_en(self):
         expected = [
-            'Program', 'Session number', 'Registration number', 'Name', 'Score', 'Justification'
+            'Program', 'Session number', 'Registration number', 'Last name', 'First name', 'Score', 'Justification'
         ]
         self.assertListEqual(expected, send_mail.get_enrollment_headers('en'))
 
