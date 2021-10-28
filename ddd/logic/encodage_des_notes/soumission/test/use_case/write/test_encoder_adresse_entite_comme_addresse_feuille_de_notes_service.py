@@ -28,12 +28,15 @@ from django.test import SimpleTestCase
 
 from assessments.models.enums.score_sheet_address_choices import ScoreSheetAddressEntityType
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
+from ddd.logic.encodage_des_notes.soumission.builder.adresse_feuille_de_notes_identity_builder import \
+    AdresseFeuilleDeNotesIdentityBuilder
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderAdresseEntiteCommeAdresseFeuilleDeNotes
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_entites_cohorte import EntitesCohorteDTO
 from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import \
     EntiteAdressePremiereAnneeDeBachelierIdentiqueAuBachlierException
 from ddd.logic.encodage_des_notes.tests.factory.adresse_feuille_de_notes import \
-    AdresseFeuilleDeNotesBaseeSurEntiteFactory
+    AdresseFeuilleDeNotesBaseeSurEntiteFactory, PremiereAnneeBachelierAdresseFeuilleDeNotesBaseeSurEntiteFactory, \
+    AdresseFeuilleDeNotesSpecifiqueFactory
 from ddd.logic.shared_kernel.entite.builder.identite_entite_builder import IdentiteEntiteBuilder
 from ddd.logic.shared_kernel.entite.tests.factory.entiteucl import EPLEntiteFactory
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.periode_encodage_notes import \
@@ -107,6 +110,21 @@ class TestEncoderAddressEntiteCommeAdresseFeuilleDeNotes(SimpleTestCase):
 
         with self.assertRaises(MultipleBusinessExceptions):
             message_bus_instance.invoke(cmd)
+
+    def test_should_supprimer_adresse_specifique_11BA_si_equivalente_a_1ba_when_modifier_adresse_1ba(self):
+        self.repo.save(
+            AdresseFeuilleDeNotesSpecifiqueFactory(entity_id__nom_cohorte=self.cmd.nom_cohorte)
+        )
+        cmd = attr.evolve(self.cmd, nom_cohorte=self.cmd.nom_cohorte.replace('1BA', '11BA'))
+        message_bus_instance.invoke(cmd)
+        message_bus_instance.invoke(self.cmd)
+
+        identite_adresse_11ba = AdresseFeuilleDeNotesIdentityBuilder().build_from_nom_cohorte_and_annee_academique(
+            cmd.nom_cohorte,
+            self.periode_encodage_notes_translator.get().annee_concernee
+        )
+
+        self.assertIsNone(self.repo.get(identite_adresse_11ba))
 
     def test_should_encoder_valeur_adresse_de_entite(self):
         result = message_bus_instance.invoke(self.cmd)

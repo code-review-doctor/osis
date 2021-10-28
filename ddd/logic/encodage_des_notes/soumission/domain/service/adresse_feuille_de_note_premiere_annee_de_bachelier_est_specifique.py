@@ -22,16 +22,26 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Optional
+
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodage_notes import \
+    IPeriodeEncodageNotesTranslator
 from ddd.logic.encodage_des_notes.soumission.builder.adresse_feuille_de_notes_identity_builder import \
     AdresseFeuilleDeNotesIdentityBuilder
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderAdresseEntiteCommeAdresseFeuilleDeNotes, \
     EncoderAdresseFeuilleDeNotesSpecifique
 from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_notes import AdresseFeuilleDeNotes
+from ddd.logic.encodage_des_notes.soumission.domain.service.entites_adresse_feuille_de_notes import \
+    EntiteAdresseFeuilleDeNotes
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_entites_cohorte import IEntitesCohorteTranslator
 from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import \
     EntiteAdressePremiereAnneeDeBachelierIdentiqueAuBachlierException, \
     AdresseSpecifiquePremiereAnneeDeBachelierIdentiqueAuBachlierException
 from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_notes import \
     IAdresseFeuilleDeNotesRepository
+from ddd.logic.shared_kernel.academic_year.repository.i_academic_year import IAcademicYearRepository
+from ddd.logic.shared_kernel.entite.domain.model.entiteucl import EntiteUCL
+from ddd.logic.shared_kernel.entite.repository.entiteucl import IEntiteUCLRepository
 from osis_common.ddd import interface
 
 
@@ -41,7 +51,11 @@ class EntiteAdresseFeuilleDeNotesPremiereAnneeDeBachelierEstDifferenteDeCelleDuB
             cls,
             cmd: EncoderAdresseEntiteCommeAdresseFeuilleDeNotes,
             annee_academique: int,
-            repo: IAdresseFeuilleDeNotesRepository
+            repo: IAdresseFeuilleDeNotesRepository,
+            entite_repository: 'IEntiteUCLRepository',
+            entites_cohorte_translator: 'IEntitesCohorteTranslator',
+            periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
+            academic_year_repo: 'IAcademicYearRepository'
     ) -> None:
         if "11BA" not in cmd.nom_cohorte:
             return
@@ -53,17 +67,48 @@ class EntiteAdresseFeuilleDeNotesPremiereAnneeDeBachelierEstDifferenteDeCelleDuB
         )
         adresse_bachelier = repo.get(identite_adresse_bachelier)
 
-        if cls._is_entite_adresse_bachelier_identique_a_celle_de_la_premiere_annee_de_bachelier(adresse_bachelier, cmd):
+        if not adresse_bachelier.type_entite:
+            return
+
+        entite_11BA = cls._get_entite_cohorte(
+            cmd.nom_cohorte,
+            cmd.type_entite,
+            entite_repository,
+            entites_cohorte_translator,
+            periode_soumission_note_translator,
+            academic_year_repo
+        )
+
+        entite_1BA = cls._get_entite_cohorte(
+            adresse_bachelier.nom_cohorte,
+            adresse_bachelier.type_entite.name,
+            entite_repository,
+            entites_cohorte_translator,
+            periode_soumission_note_translator,
+            academic_year_repo
+        )
+
+        if entite_1BA == entite_11BA:
             raise EntiteAdressePremiereAnneeDeBachelierIdentiqueAuBachlierException()
 
     @classmethod
-    def _is_entite_adresse_bachelier_identique_a_celle_de_la_premiere_annee_de_bachelier(
+    def _get_entite_cohorte(
             cls,
-            adresse_bachelier: AdresseFeuilleDeNotes,
-            cmd: EncoderAdresseEntiteCommeAdresseFeuilleDeNotes
-    ) -> bool:
-        return cmd.type_entite and adresse_bachelier.type_entite and adresse_bachelier.type_entite.name == \
-               cmd.type_entite
+            nom_cohorte: str,
+            type_entite: str,
+            entite_repository: 'IEntiteUCLRepository',
+            entites_cohorte_translator: 'IEntitesCohorteTranslator',
+            periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
+            academic_year_repo: 'IAcademicYearRepository'
+    ) -> Optional['EntiteUCL']:
+        entites_possibles = EntiteAdresseFeuilleDeNotes.search(
+            nom_cohorte,
+            entite_repository,
+            entites_cohorte_translator,
+            periode_soumission_note_translator,
+            academic_year_repo
+        )
+        return entites_possibles.get_par_type(type_entite)
 
 
 class AdresseFeuilleDeNotesSpecifiquePremiereAnneeDeBachelierEstDifferenteDeCelleDuBachelier(interface.DomainService):

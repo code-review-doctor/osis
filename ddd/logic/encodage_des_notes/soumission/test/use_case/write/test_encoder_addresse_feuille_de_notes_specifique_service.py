@@ -26,6 +26,8 @@ import attr
 import mock
 from django.test import SimpleTestCase
 
+from ddd.logic.encodage_des_notes.soumission.builder.adresse_feuille_de_notes_identity_builder import \
+    AdresseFeuilleDeNotesIdentityBuilder
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderAdresseFeuilleDeNotesSpecifique
 from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import \
     AdresseSpecifiquePremiereAnneeDeBachelierIdentiqueAuBachlierException
@@ -107,3 +109,18 @@ class TestEncoderAddressFeuilleDeNotesSpecifique(SimpleTestCase):
 
         with self.assertRaises(AdresseSpecifiquePremiereAnneeDeBachelierIdentiqueAuBachlierException):
             message_bus_instance.invoke(cmd)
+
+    def test_should_supprimer_adresse_specifique_11BA_si_equivalente_a_1ba_when_modifier_adresse_1ba(self):
+        self.repo.save(
+            AdresseFeuilleDeNotesBaseeSurEntiteFactory(entity_id__nom_cohorte=self.cmd.nom_cohorte)
+        )
+        cmd = attr.evolve(self.cmd, nom_cohorte=self.cmd.nom_cohorte.replace('1BA', '11BA'))
+        message_bus_instance.invoke(cmd)
+        message_bus_instance.invoke(self.cmd)
+
+        identite_adresse_11ba = AdresseFeuilleDeNotesIdentityBuilder().build_from_nom_cohorte_and_annee_academique(
+            cmd.nom_cohorte,
+            self.periode_encodage_notes_translator.get().annee_concernee
+        )
+
+        self.assertIsNone(self.repo.get(identite_adresse_11ba))

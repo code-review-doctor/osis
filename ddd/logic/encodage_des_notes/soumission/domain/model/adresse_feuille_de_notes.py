@@ -58,12 +58,16 @@ class AdresseFeuilleDeNotes(interface.RootEntity):
         return self.entity_id.annee_academique
 
     def est_identique_a(self, autre_adresse: 'AdresseFeuilleDeNotes') -> bool:
+        if self.type_entite:
+            return self.type_entite == autre_adresse.type_entite and \
+                   self.destinataire == autre_adresse.destinataire
+
         return self.type_entite == autre_adresse.type_entite and \
-               self.destinataire == autre_adresse.destinataire and \
-               self.rue_numero == autre_adresse.rue_numero and \
-               self.code_postal == autre_adresse.code_postal and \
-               self.ville == autre_adresse.ville and \
-               self.pays == autre_adresse.pays and \
-               self.telephone == autre_adresse.telephone and \
-               self.fax == autre_adresse.fax and \
-               self.email == autre_adresse.email
+            self.destinataire == autre_adresse.destinataire and \
+            self.rue_numero == autre_adresse.rue_numero and \
+            self.code_postal == autre_adresse.code_postal and \
+            self.ville == autre_adresse.ville and \
+            self.pays == autre_adresse.pays and \
+            self.telephone == autre_adresse.telephone and \
+            self.fax == autre_adresse.fax and \
+            self.email == autre_adresse.email
