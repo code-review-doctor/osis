@@ -82,6 +82,7 @@
 
                     {% if search_form.is_valid %}
                         {% if notes_etudiant_filtered %}
+                            {% include "template_messages.html" %}
                             <form id="score_submit_form" class="form-inline" method="POST" action="{{ request.path }}?{{ request.GET.urlencode }}">
                             {% csrf_token %}
                             <div class="row">
