@@ -23,48 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import abc
-from typing import Set, List
+from typing import List
 
-from ddd.logic.encodage_des_notes.shared_kernel.dtos import EnseignantDTO
-from ddd.logic.encodage_des_notes.soumission.dtos import AttributionEnseignantDTO
-from osis_common.ddd import interface
+from ddd.logic.effective_class_repartition.commands import SearchClassesParNomEnseignantCommand
+from ddd.logic.effective_class_repartition.domain.service.class_distribution_with_attribution import \
+    ClassDistributionWithAttribution
+from ddd.logic.effective_class_repartition.domain.service.i_tutor_attribution import \
+    ITutorAttributionToLearningUnitTranslator
+from ddd.logic.effective_class_repartition.dtos import TutorClassRepartitionDTO
+from ddd.logic.effective_class_repartition.repository.i_tutor import ITutorRepository
 
 
-class IAttributionEnseignantTranslator(interface.DomainService):
-
-    @classmethod
-    @abc.abstractmethod
-    def search_attributions_enseignant(
-            cls,
-            code_unite_enseignement: str,
-            annee: int,
-    ) -> Set['AttributionEnseignantDTO']:
-        raise NotImplementedError
-
-    @classmethod
-    @abc.abstractmethod
-    def search_attributions_enseignant_par_nom_prenom_annee(
-            cls,
-            annee: int,
-            nom_prenom: str,
-    ) -> Set['AttributionEnseignantDTO']:
-        raise NotImplementedError
-
-    @classmethod
-    @abc.abstractmethod
-    def search_attributions_enseignant_par_matricule(
-            cls,
-            annee: int,
-            matricule_enseignant: str,
-    ) -> Set['AttributionEnseignantDTO']:
-        raise NotImplementedError
-
-    @classmethod
-    @abc.abstractmethod
-    def search_enseignants_par_nom_prenom_annee(
-            cls,
-            annee: int,
-            nom_prenom: str,
-    ) -> List['EnseignantDTO']:
-        raise NotImplementedError
+def search_classes_par_nom_prenom(
+        cmd: 'SearchClassesParNomEnseignantCommand',
+        tutor_attribution_translator: 'ITutorAttributionToLearningUnitTranslator',
+        tutor_repository: 'ITutorRepository',
+) -> List['TutorClassRepartitionDTO']:
+    return ClassDistributionWithAttribution().search_par_nom_prenom_enseignant(
+        annee=cmd.annee,
+        nom_prenom=cmd.nom_prenom,
+        tutor_attribution_translator=tutor_attribution_translator,
+        tutor_repository=tutor_repository,
+    )
