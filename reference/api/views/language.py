@@ -38,6 +38,7 @@ class LanguageList(generics.ListAPIView):
     serializer_class = LanguageSerializer
     search_fields = (
         'name',
+        'name_en'
     )
     ordering_fields = (
         'code',

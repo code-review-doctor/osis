@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-26 14:21+0200\n"
+"POT-Creation-Date: 2021-10-28 10:34+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -80,14 +80,23 @@ msgstr "Date d'échéance atteinte"
 msgid "Decimal scores not authorized"
 msgstr "Notes décimales non autorisées"
 
+msgid "Details other educational facilities"
+msgstr "Détails autre aménagement"
+
 msgid "Distributed volume should be filled in and be greater than 0"
 msgstr "Le volume attribué doit être supérieur à 0"
+
+msgid "Extra time (33% generally)"
+msgstr "Tiers-Temps"
 
 msgid "Following fields are required : {}"
 msgstr "Les champs suivants sont requis : {}"
 
 msgid "Internship subtype is a mandatory field"
 msgstr "Le sous-type de stage est obligatoire"
+
+msgid "Large print"
+msgstr "Copie adaptée"
 
 msgid "Learning unit {} already exists next year"
 msgstr "L'UE {} existe déjà sur l'année suivante"
@@ -101,6 +110,9 @@ msgstr "Le vol.1 postulé ou le vol.2 postulé doit être rempli"
 msgid "No vacant corresponding activity"
 msgstr "Pas d'activité vacante correspondante"
 
+msgid "Other educational facilities"
+msgstr "Autre aménagement"
+
 msgid "Registration ID does not match email"
 msgstr "Le noma ne corresond pas à l'adresse de messagerie"
 
@@ -109,6 +121,9 @@ msgstr "Note déjà soumise"
 
 msgid "Selected entity {} is not an authorized responsible entity"
 msgstr "L'entité sélectionnée {} n'est pas une entité responsable autorisée"
+
+msgid "Specific room of examination"
+msgstr "Local spécifique"
 
 msgid "Student not registered for exam"
 msgstr "L'étudiant n'est plus inscrit à l'examen"
@@ -167,8 +182,8 @@ msgstr ""
 
 msgid "The address cannot be the same between bachelor and first year bachelor"
 msgstr ""
-"L'adresse ne peut pas être la même entre le bachelier et la première année de "
-"bachelier"
+"L'adresse ne peut pas être la même entre le bachelier et la première année "
+"de bachelier"
 
 #, python-format
 msgid ""

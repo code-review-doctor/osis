@@ -44,6 +44,15 @@ class IAttributionEnseignantTranslator(interface.DomainService):
 
     @classmethod
     @abc.abstractmethod
+    def search_attributions_enseignant_par_nom_prenom_annee(
+            cls,
+            annee: int,
+            nom_prenom: str,
+    ) -> Set['AttributionEnseignantDTO']:
+        raise NotImplementedError
+
+    @classmethod
+    @abc.abstractmethod
     def search_attributions_enseignant_par_matricule(
             cls,
             annee: int,
@@ -53,7 +62,7 @@ class IAttributionEnseignantTranslator(interface.DomainService):
 
     @classmethod
     @abc.abstractmethod
-    def search_attributions_enseignant_par_nom_prenom_annee(
+    def search_enseignants_par_nom_prenom_annee(
             cls,
             annee: int,
             nom_prenom: str,

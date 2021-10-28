@@ -33,14 +33,6 @@ from base.tests.factories.learning_container_year import LearningContainerYearFa
 
 
 class LearningContainerTest(TestCase):
-    def test_find_by_id_with_id(self):
-        l_container = LearningContainerFactory()
-        self.assertEqual(l_container, learning_container.find_by_id(l_container.id))
-
-    def test_find_by_id_bad_value(self):
-        with self.assertRaises(ValueError):
-            learning_container.find_by_id("BAD VALUE")
-
     def test_most_recent_acronym(self):
         container = LearningContainerFactory()
         most_recent_year = 2018
