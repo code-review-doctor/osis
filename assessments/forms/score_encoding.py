@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -24,7 +24,6 @@
 #
 ##############################################################################
 from dal import autocomplete
-from dal_select2_tagging.widgets import TaggingSelect2
 from django import forms
 from django.forms import HiddenInput, BaseFormSet
 from django.utils.translation import pgettext_lazy, gettext_lazy as _
@@ -32,7 +31,6 @@ from django.utils.translation import pgettext_lazy, gettext_lazy as _
 
 from base.forms.utils import choice_field
 from base.models.enums.exam_enrollment_justification_type import StateTypes
-from base.models.learning_unit_year import LearningUnitYear
 from ddd.logic.encodage_des_notes.encodage.commands import GetCohortesGestionnaireCommand
 from education_group.forms.fields import UpperCaseCharField
 from infrastructure.messages_bus import message_bus_instance
@@ -53,11 +51,19 @@ class ScoreEncodingForm(forms.Form):
             return note.replace(",", ".")
         return note
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.fields['note'].widget.attrs['style'] = self.fields['note'].widget.attrs['style'] + '; width:70px; '
+
 
 class ScoreSearchEncodingForm(forms.Form):
     note = forms.CharField(max_length=100, required=False)
     noma = forms.CharField(widget=HiddenInput())
     code_unite_enseignement = forms.CharField(widget=HiddenInput())
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.fields['note'].widget.attrs['style'] = 'width:70px; '
 
 
 class ScoreSearchForm(forms.Form):
