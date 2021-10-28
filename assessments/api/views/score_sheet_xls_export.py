@@ -47,15 +47,18 @@ class ScoreSheetXLSExportAPIView(APIView):
         return self.request.user.person
 
     def get(self, request, *args, **kwargs):
-        score_sheet_serialized = TutorScoreSheetXLSSerializer(instance={
-            'feuille_de_notes': self.feuille_de_notes,
-            'donnees_administratives': self.donnees_administratives,
-        }).data
+        if self.feuille_de_notes:
+            score_sheet_serialized = TutorScoreSheetXLSSerializer(instance={
+                'feuille_de_notes': self.feuille_de_notes,
+                'donnees_administratives': self.donnees_administratives,
+            }).data
 
-        if len(score_sheet_serialized['rows']):
-            virtual_workbook = score_sheet_xls.build_xls(score_sheet_serialized)
-            return XLSResponse(xls_file=virtual_workbook, filename=self.get_filename())
-        raise ValidationError(detail=_("No students to encode by excel"))
+            if len(score_sheet_serialized['rows']):
+                virtual_workbook = score_sheet_xls.build_xls(score_sheet_serialized)
+                return XLSResponse(xls_file=virtual_workbook, filename=self.get_filename())
+            raise ValidationError(detail=_("No student to encode by excel"))
+        else:
+            raise ValidationError(detail=_("There is no enrollment for this course"))
 
     @cached_property
     def donnees_administratives(self):
@@ -67,11 +70,14 @@ class ScoreSheetXLSExportAPIView(APIView):
     @cached_property
     def feuille_de_notes(self):
         if EntityRoleHelper.has_role(self.person, Tutor):
-            cmd = GetFeuilleDeNotesCommand(
-                matricule_fgs_enseignant=self.person.global_id,
-                code_unite_enseignement=self.kwargs['learning_unit_code']
-            )
-            return message_bus_instance.invoke(cmd)
+            try:
+                cmd = GetFeuilleDeNotesCommand(
+                    matricule_fgs_enseignant=self.person.global_id,
+                    code_unite_enseignement=self.kwargs['learning_unit_code']
+                )
+                return message_bus_instance.invoke(cmd)
+            except Exception as e:
+                raise ValidationError(detail=e.message)
         raise exceptions.PermissionDenied()
 
     def get_filename(self) -> str:
