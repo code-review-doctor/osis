@@ -32,11 +32,14 @@ from assessments.tests.factories.score_responsible import ScoreResponsibleFactor
 from attribution.models.attribution_class import AttributionClass
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from attribution.tests.factories.attribution_class import AttributionClassFactory
+from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from ddd.logic.effective_class_repartition.builder.tutor_identity_builder import TutorIdentityBuilder
 from ddd.logic.effective_class_repartition.tests.factory.tutor import TutorWithDistributedEffectiveClassesFactory, \
     Tutor9999IdentityFactory
+from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
+from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from ddd.logic.learning_unit.tests.factory.effective_class import LDROI1001XEffectiveClassIdentityFactory
 from infrastructure.effective_class_repartition.repository.tutor import TutorRepository
 from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
@@ -182,3 +185,82 @@ class TutorRepositoryTestCase(TestCase):
         self.tutor_repository.save(tutor)
         self.assertFalse(AttributionClass.objects.filter(pk=distrubuted_class_db.pk).exists())
         self.assertFalse(ScoreResponsible.objects.filter(pk=score_responsible_db.pk).exists())
+
+
+class TutorRepositorySearchDtoTestCase(TestCase):
+    """Unit tests on Tutor.search_dto()"""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.matricule_enseignant = '12341234'
+        cls.repartition_classe = AttributionClassFactory(
+            attribution_charge__attribution__tutor__person__global_id=cls.matricule_enseignant,
+            attribution_charge__learning_component_year__type=LECTURING,
+            learning_class_year__learning_component_year__type=LECTURING,
+            learning_class_year__learning_component_year__learning_unit_year__acronym='LDROI1001',
+            learning_class_year__learning_component_year__learning_unit_year__academic_year__year=2020,
+            learning_class_year__acronym='X',
+        )
+        cls.tutor_identity = TutorIdentityBuilder.build_from_personal_id_number(cls.matricule_enseignant)
+
+    def setUp(self):
+        self.tutor_repository = TutorRepository()
+
+    def test_should_renvoyer_aucun_resultat_par_entity_id(self):
+        matricule_non_existant = "00000000"
+        identity = TutorIdentityBuilder.build_from_personal_id_number(matricule_non_existant)
+        result = self.tutor_repository.search_dto(entity_ids=[identity])
+        self.assertListEqual(list(), result)
+
+    def test_should_renvoyer_aucun_resultat_par_effective_class_identity(self):
+        identity = EffectiveClassIdentityBuilder.build_from_code_and_learning_unit_identity_data('Z', 'LABCD1234', 1987)
+        result = self.tutor_repository.search_dto(effective_class_identity=identity)
+        self.assertListEqual(list(), result)
+
+    def test_should_chercher_par_entity_id(self):
+        result = self.tutor_repository.search_dto(entity_ids=[self.tutor_identity])
+        self.assertEqual(1, len(result))
+
+    def test_should_chercher_par_effective_class_identity(self):
+        identity = EffectiveClassIdentityBuilder.build_from_code_and_learning_unit_identity_data('X', 'LDROI1001', 2020)
+        result = self.tutor_repository.search_dto(effective_class_identity=identity)
+        self.assertEqual(1, len(result))
+
+    def test_should_renvoyer_code_complet_classe_magistrale(self):
+        result = self.tutor_repository.search_dto(entity_ids=[self.tutor_identity])
+        self.assertEqual('LDROI1001-X', result[0].distributed_classes[0].code_complet_classe)
+
+    def test_should_renvoyer_code_complet_classe_pratique(self):
+        AttributionClassFactory(
+            attribution_charge__attribution__tutor__person__global_id='32132132',
+            attribution_charge__learning_component_year__type=PRACTICAL_EXERCISES,
+            learning_class_year__learning_component_year__type=PRACTICAL_EXERCISES,
+            attribution_charge__learning_component_year__learning_unit_year__academic_year__year=2020,
+            learning_class_year__learning_component_year__learning_unit_year__acronym='LDROI1001',
+            learning_class_year__acronym='A',
+        )
+        identity = TutorIdentityBuilder.build_from_personal_id_number('32132132')
+        result = self.tutor_repository.search_dto(entity_ids=[identity])
+        self.assertEqual('LDROI1001_A', result[0].distributed_classes[0].code_complet_classe)
+
+    def test_should_renvoyer_code_unite_enseignement(self):
+        result = self.tutor_repository.search_dto(entity_ids=[self.tutor_identity])
+        self.assertEqual('LDROI1001', result[0].distributed_classes[0].learning_unit_code)
+
+    def test_should_renvoyer_code_classe(self):
+        result = self.tutor_repository.search_dto(entity_ids=[self.tutor_identity])
+        self.assertEqual('X', result[0].distributed_classes[0].class_code)
+
+    def test_should_renvoyer_volume_distribue_sur_classe(self):
+        result = self.tutor_repository.search_dto(entity_ids=[self.tutor_identity])
+        self.assertEqual(
+            self.repartition_classe.attribution_charge.allocation_charge,
+            result[0].distributed_classes[0].distributed_volume
+        )
+
+    def test_should_renvoyer_uuid_attribution(self):
+        result = self.tutor_repository.search_dto(entity_ids=[self.tutor_identity])
+        self.assertEqual(
+            self.repartition_classe.attribution_charge.attribution.uuid,
+            result[0].distributed_classes[0].attribution_uuid
+        )

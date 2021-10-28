@@ -37,6 +37,7 @@ from osis_common.models.osis_model_admin import OsisModelAdmin
 class ScoreSheetAddressAdmin(OsisModelAdmin):
     list_display = (
         'offer_acronym',
+        'cohort_name',
         'entity_address_choice',
         'location',
         'postal_code',
@@ -46,7 +47,7 @@ class ScoreSheetAddressAdmin(OsisModelAdmin):
         'email',
     )
     search_fields = ['location', 'education_group__educationgroupyear__acronym']
-    list_filter = ('entity_address_choice', )
+    list_filter = ('entity_address_choice', 'cohort_name',)
 
 
 class ScoreSheetAddress(models.Model):
@@ -114,14 +115,3 @@ class ScoreSheetAddress(models.Model):
 
     def __str__(self):
         return "{0} - {1}".format(self.education_group, self.entity_address_choice)
-
-
-def search_from_education_group_ids(education_group_ids: List[int]) -> List[ScoreSheetAddress]:
-    return ScoreSheetAddress.objects.filter(education_group_id__in=education_group_ids)
-
-
-def get_from_education_group_id(education_group_id: int) -> Optional[ScoreSheetAddress]:
-    try:
-        return ScoreSheetAddress.objects.get(education_group_id=education_group_id)
-    except ObjectDoesNotExist:
-        return None

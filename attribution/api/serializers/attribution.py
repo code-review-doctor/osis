@@ -43,13 +43,26 @@ class AttributionSerializer(serializers.Serializer):
     start_year = serializers.IntegerField()
     function = serializers.CharField()
     function_text = serializers.SerializerMethodField()
-    lecturing_charge = serializers.DecimalField(max_digits=4, decimal_places=1)
-    practical_charge = serializers.DecimalField(max_digits=4, decimal_places=1)
-    total_learning_unit_charge = serializers.DecimalField(max_digits=4, decimal_places=1)
+    lecturing_charge = serializers.DecimalField(max_digits=5, decimal_places=2)
+    practical_charge = serializers.DecimalField(max_digits=5, decimal_places=2)
+    total_learning_unit_charge = serializers.DecimalField(max_digits=5, decimal_places=2)
     links = serializers.SerializerMethodField()
     has_peps = serializers.BooleanField()
     is_partim = serializers.BooleanField()
     effective_class_repartition = EffectiveClassRepartitionSerializer(many=True, default=None)
+    percentage_allocation_charge = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_percentage_allocation_charge(obj):
+        if (obj.lecturing_charge or obj.practical_charge) \
+                and obj.total_learning_unit_charge and float(obj.total_learning_unit_charge) > 0:
+            lecturing_charge = float(obj.lecturing_charge) if obj.lecturing_charge else 0
+            practical_charge = float(obj.practical_charge) if obj.practical_charge else 0
+            percentage = (lecturing_charge + practical_charge) * 100 / float(obj.total_learning_unit_charge)
+            return "%0.1f" % (percentage,)
+        elif obj.lecturing_charge == 0 and obj.practical_charge == 0:
+            return "%0.1f" % 0
+        return None
 
     @staticmethod
     def get_type_text(obj) -> str:

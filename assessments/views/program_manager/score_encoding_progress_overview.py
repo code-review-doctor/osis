@@ -23,15 +23,28 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
+import functools
+import operator
+
+from dal import autocomplete
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.postgres.aggregates import ArrayAgg, StringAgg
+from django.db.models import F, CharField, Value, When, Case, OuterRef, Subquery, Q
+from django.db.models.functions import Concat
 from django.urls import reverse
 from django.utils.functional import cached_property
 
 from assessments.forms.score_encoding import ScoreEncodingProgressFilterForm
 from assessments.views.common.score_encoding_progress_overview import ScoreEncodingProgressOverviewBaseView
+from attribution.models.attribution_new import AttributionNew
 from base.models import synchronization
+from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
+from base.models.learning_unit_year import LearningUnitYear
 from ddd.logic.encodage_des_notes.encodage.commands import GetProgressionGeneraleGestionnaireCommand, \
-    GetPeriodeEncodageCommand
+    GetPeriodeEncodageCommand, SearchEnseignantsCommand
 from infrastructure.messages_bus import message_bus_instance
+from learning_unit.models.learning_class_year import LearningClassYear
 
 
 class ScoreEncodingProgressOverviewProgramManagerView(ScoreEncodingProgressOverviewBaseView):
@@ -92,3 +105,78 @@ class ScoreEncodingProgressOverviewProgramManagerView(ScoreEncodingProgressOverv
 
     def get_score_search_url(self):
         return reverse('score_search')
+
+
+class CodeUniteEnseignementAutocomplete(LoginRequiredMixin, autocomplete.Select2ListView):
+    def get_list(self):
+        recherche = self.q
+        minimum_chars_to_search = 2
+        if recherche and len(recherche) > minimum_chars_to_search:
+            filtre_sur_ue, has_filtre_sur_classe = self.__separer_filtre_ue_et_classe(recherche)
+            periode_encodage = message_bus_instance.invoke(GetPeriodeEncodageCommand())
+            qs = LearningUnitYear.objects.filter(
+                academic_year__year=periode_encodage.annee_concernee,
+                acronym__icontains=filtre_sur_ue,
+            ).values_list(
+                'pk',
+                'acronym',
+            )
+            codes_classes = LearningClassYear.objects.filter(
+                learning_component_year__learning_unit_year_id__in={pk for pk, ___ in qs},
+            ).annotate(
+                code_classe=Case(
+                    When(
+                        learning_component_year__type=PRACTICAL_EXERCISES,
+                        then=Concat(
+                            'learning_component_year__learning_unit_year__acronym',
+                            Value('_'),
+                            'acronym',
+                            output_field=CharField()
+                        )
+                    ),
+                    default=Concat(
+                        'learning_component_year__learning_unit_year__acronym',
+                        Value('-'),
+                        'acronym',
+                        output_field=CharField()
+                    ),
+                    output_field=CharField(),
+                )
+            ).values_list('code_classe', flat=True)
+
+            codes_ues_et_classes_trouves = {code_ue for __, code_ue in qs} | set(codes_classes)
+            if has_filtre_sur_classe:
+                codes_ues_et_classes_trouves = {
+                    code for code in codes_ues_et_classes_trouves if recherche.upper() in code
+                }
+            if codes_ues_et_classes_trouves:
+                if recherche.upper() not in codes_ues_et_classes_trouves:
+                    return [recherche] + list(sorted(codes_ues_et_classes_trouves))
+                return list(sorted(codes_ues_et_classes_trouves))
+            return []
+
+        else:
+            return [recherche]
+
+    def __separer_filtre_ue_et_classe(self, recherche):
+        filtre_sur_ue = recherche
+        has_filtre_sur_classe = False
+        if '-' in filtre_sur_ue:
+            index = filtre_sur_ue.index('-')
+            has_filtre_sur_classe = True
+            filtre_sur_ue = filtre_sur_ue[:index]
+        elif '_' in filtre_sur_ue:
+            index = filtre_sur_ue.index('_')
+            has_filtre_sur_classe = True
+            filtre_sur_ue = filtre_sur_ue[:index]
+        return filtre_sur_ue, has_filtre_sur_classe
+
+
+class EnseignantAutocomplete(LoginRequiredMixin, autocomplete.Select2ListView):
+    def get_list(self):
+        recherche = self.q
+        minimum_chars_to_search = 2
+        if recherche and len(recherche) > minimum_chars_to_search:
+            enseignants = message_bus_instance.invoke(SearchEnseignantsCommand(recherche))
+            return [recherche] + ['{} {}'.format(enseignant.nom, enseignant.prenom) for enseignant in enseignants]
+        return [recherche]

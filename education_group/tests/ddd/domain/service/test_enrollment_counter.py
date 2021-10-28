@@ -25,6 +25,7 @@
 ##############################################################################
 from django.test import TestCase
 
+from base.tests.factories.cohort_year import CohortYearFactory
 from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
 from education_group.ddd.domain.service.enrollment_counter import EnrollmentCounter
 from education_group.tests.ddd.factories.domain.training import TrainingIdentityFactory
@@ -50,3 +51,21 @@ class TestEnrollmentCounter(TestCase):
         result = EnrollmentCounter().get_training_enrollments_count(identity)
 
         self.assertEqual(4, result)
+
+    def test_should_return_0_when_no_offer_enrollment_to_cohort(self):
+        identity = TrainingIdentityFactory()
+        cohort = CohortYearFactory(
+            education_group_year__acronym=identity.acronym,
+            education_group_year__academic_year__year=identity.year,
+        )
+        OfferEnrollmentFactory(
+            education_group_year=cohort.education_group_year,
+            cohort_year=cohort,
+        )
+
+        result = EnrollmentCounter().get_training_enrollments_count(identity)
+        self.assertEqual(0, result)
+
+        result = EnrollmentCounter().get_11BA_enrollments_count(identity)
+        self.assertEqual(1, result)
+

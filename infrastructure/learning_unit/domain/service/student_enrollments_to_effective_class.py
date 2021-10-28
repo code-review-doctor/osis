@@ -35,15 +35,16 @@ class StudentEnrollmentsTranslator(IStudentEnrollmentsTranslator):
 
     @classmethod
     def has_enrollments_to_class(cls, class_identity: 'EffectiveClassIdentity') -> bool:
-        # TODO :: check the enrollment to the effective class instead of learning unit
         return LearningUnitEnrollmentDatabase.objects.filter(
             learning_unit_year__acronym=class_identity.learning_unit_identity.code,
-            learning_unit_year__academic_year__year=class_identity.learning_unit_identity.year
+            learning_unit_year__academic_year__year=class_identity.learning_unit_identity.year,
+            learning_class_year__acronym=class_identity.class_code,
         ).exists()
 
     @classmethod
     def has_enrollments_to_learning_unit(cls, learning_unit_id: 'LearningUnitIdentity') -> bool:
         return LearningUnitEnrollmentDatabase.objects.filter(
             learning_unit_year__acronym=learning_unit_id.code,
-            learning_unit_year__academic_year__year=learning_unit_id.year
+            learning_unit_year__academic_year__year=learning_unit_id.year,
+            learning_class_year__isnull=True,
         ).exists()

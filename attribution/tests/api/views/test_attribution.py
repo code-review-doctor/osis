@@ -43,9 +43,9 @@ class AttributionListViewTestCase(APITestCase):
             learning_component_year__type=learning_component_year_type.LECTURING,
             allocation_charge=5.0
         )
-
+        cls.year = cls.attribution_charge.learning_component_year.learning_unit_year.academic_year.year
         cls.url = reverse('attribution_api_v1:' + AttributionListView.name, kwargs={
-            'year': cls.attribution_charge.learning_component_year.learning_unit_year.academic_year.year,
+            'year': cls.year,
             'global_id': cls.tutor.person.global_id
         })
 
@@ -77,7 +77,7 @@ class AttributionListViewTestCase(APITestCase):
             [
                 "code", "title_fr", "title_en", "year", "type", "type_text", "credits", "start_year", "function",
                 "function_text", "lecturing_charge", "practical_charge", "total_learning_unit_charge", "links",
-                "has_peps", "effective_class_repartition", "is_partim"
+                "has_peps", "effective_class_repartition", "is_partim", "percentage_allocation_charge"
             ]
         )
 
@@ -86,15 +86,34 @@ class AttributionListViewTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         results = response.json()
-        self.assertEqual(results[0]['lecturing_charge'], str(self.attribution_charge.allocation_charge))
+        self.assertEqual(results[0]['lecturing_charge'], "{:.2f}".format(self.attribution_charge.allocation_charge))
         self.assertIsNone(results[0]['practical_charge'])
         components = self.attribution_charge.learning_component_year.learning_unit_year.learningcomponentyear_set.all()
         self.assertEqual(
             results[0]['total_learning_unit_charge'],
-            "{:.1f}".format(
+            "{:.2f}".format(
                 sum(component.hourly_volume_total_annual * component.planned_classes for component in components)
             )
         )
+
+    def test_get_nt_component_as_pm(self):
+        attribution_charge = AttributionChargeNewFactory(
+            attribution__tutor=self.tutor,
+            learning_component_year__type=None,
+            learning_component_year__acronym='NT',
+            learning_component_year__learning_unit_year__academic_year__year=self.year + 1,
+            allocation_charge=5.0
+        )
+        url = reverse('attribution_api_v1:' + AttributionListView.name, kwargs={
+            'year': attribution_charge.learning_component_year.learning_unit_year.academic_year.year,
+            'global_id': self.tutor.person.global_id
+        })
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.json()
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['lecturing_charge'], "{:.2f}".format(attribution_charge.allocation_charge))
+        self.assertIsNone(results[0]['practical_charge'])
 
 
 class MyAttributionListViewTestCase(APITestCase):
@@ -143,7 +162,7 @@ class MyAttributionListViewTestCase(APITestCase):
             [
                 "code", "title_fr", "title_en", "year", "type", "type_text", "credits", "start_year", "function",
                 "function_text", "lecturing_charge", "practical_charge", "total_learning_unit_charge", "links",
-                "has_peps", "effective_class_repartition", "is_partim"
+                "has_peps", "effective_class_repartition", "is_partim", "percentage_allocation_charge"
             ]
         )
 
@@ -152,12 +171,12 @@ class MyAttributionListViewTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         results = response.json()
-        self.assertEqual(results[0]['lecturing_charge'], str(self.attribution_charge.allocation_charge))
+        self.assertEqual(results[0]['lecturing_charge'], "{:.2f}".format(self.attribution_charge.allocation_charge))
         self.assertIsNone(results[0]['practical_charge'])
         components = self.attribution_charge.learning_component_year.learning_unit_year.learningcomponentyear_set.all()
         self.assertEqual(
             results[0]['total_learning_unit_charge'],
-            "{:.1f}".format(
+            "{:.2f}".format(
                 sum(component.hourly_volume_total_annual * component.planned_classes for component in components)
             )
         )

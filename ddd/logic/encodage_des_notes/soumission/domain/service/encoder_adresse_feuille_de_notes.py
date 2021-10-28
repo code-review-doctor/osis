@@ -177,6 +177,8 @@ class EncoderAdresseFeuilleDeNotesDomainService(interface.DomainService):
             cls,
             nom_cohorte_bachelier: str
     ) -> str:
+        if '11BA' in nom_cohorte_bachelier:
+            return nom_cohorte_bachelier
         return nom_cohorte_bachelier.replace('1BA', '11BA')
 
     @classmethod

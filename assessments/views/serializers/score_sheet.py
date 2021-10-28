@@ -30,7 +30,6 @@ import json
 from django.template.defaultfilters import floatformat
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-
 from rest_framework import serializers
 
 from base.models import exam_enrollment
@@ -86,14 +85,9 @@ class _ProgramAddressSerializer(serializers.Serializer):
 
 
 class _ProgramSerializer(serializers.Serializer):
-    deliberation_date = serializers.SerializerMethodField()
     acronym = serializers.SerializerMethodField()
     address = _ProgramAddressSerializer(source='donnees_administratives_cohorte.contact_feuille_de_notes')
     enrollments = serializers.SerializerMethodField()
-
-    def get_deliberation_date(self, obj):
-        return obj['donnees_administratives_cohorte'].date_deliberation.to_date().strftime("%d/%m/%Y")  \
-            if obj['donnees_administratives_cohorte'].date_deliberation else str(_('Not passed'))
 
     def get_acronym(self, obj):
         return obj['nom_cohorte']
@@ -116,8 +110,9 @@ class _ScoreResponsibleSerializer(serializers.Serializer):
 
     def get_address(self, obj):
         instance = {}
-        if obj['feuille_de_notes'].contact_responsable_notes:
-            instance = obj['feuille_de_notes'].contact_responsable_notes.adresse_professionnelle
+        contact_responsable_notes = obj['feuille_de_notes'].contact_responsable_notes
+        if contact_responsable_notes and contact_responsable_notes.adresse_professionnelle:
+            instance = contact_responsable_notes.adresse_professionnelle
         return _ScoreResponsibleAddressSerializer(instance=instance).data
 
 

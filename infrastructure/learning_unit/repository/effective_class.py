@@ -26,7 +26,8 @@
 import itertools
 from typing import Optional, List, Set
 
-from django.db.models import F, QuerySet, Q
+from django.db.models import F, QuerySet, Q, Value
+from django.db.models.functions import Concat
 
 from base.models.campus import Campus
 from base.models.enums import learning_component_year_type
@@ -36,7 +37,7 @@ from ddd.logic.learning_unit.builder.effective_class_identity_builder import Eff
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass, EffectiveClassIdentity, \
     LecturingEffectiveClass
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
-from ddd.logic.learning_unit.dtos import EffectiveClassFromRepositoryDTO, EffectiveClassDTO
+from ddd.logic.learning_unit.dtos import EffectiveClassFromRepositoryDTO
 from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
 from learning_unit.models.learning_class_year import LearningClassYear as LearningClassYearDb
 from osis_common.ddd.interface import ApplicationService
@@ -76,7 +77,7 @@ class EffectiveClassRepository(IEffectiveClassRepository):
             cls,
             learning_unit_id: LearningUnitIdentity = None,
             **kwargs
-    ) -> List[EffectiveClassDTO]:
+    ) -> List['EffectiveClassFromRepositoryDTO']:
         qs = _get_common_queryset()
         if learning_unit_id:
             qs = qs.filter(
@@ -86,16 +87,20 @@ class EffectiveClassRepository(IEffectiveClassRepository):
         qs = _annotate_queryset(qs)
         qs = _values_queryset(qs)
         return [
-            EffectiveClassDTO(
-                code=effective_class['class_code'],
+            EffectiveClassFromRepositoryDTO(
+                class_code=effective_class['class_code'],
+                learning_unit_code=effective_class['learning_unit_code'],
+                learning_unit_year=effective_class['learning_unit_year'],
                 title_fr=effective_class['title_fr'],
+                full_title_fr=effective_class['full_title_fr'],
                 title_en=effective_class['title_en'],
+                full_title_en=effective_class['full_title_en'],
                 teaching_place_uuid=effective_class['teaching_place_uuid'],
                 derogation_quadrimester=effective_class['derogation_quadrimester'],
                 session_derogation=effective_class['session_derogation'],
                 volume_q1=effective_class['volume_q1'],
                 volume_q2=effective_class['volume_q2'],
-                type=effective_class['class_type'],
+                class_type=effective_class['class_type'],
             ) for effective_class in qs
         ]
 
@@ -182,12 +187,12 @@ def _get_learning_component_year_id_from_entity(entity: 'EffectiveClass') -> int
     learning_unit_identity = entity.entity_id.learning_unit_identity
     component_type = learning_component_year_type.LECTURING if isinstance(entity, LecturingEffectiveClass) \
         else learning_component_year_type.PRACTICAL_EXERCISES
-    qs = LearningComponentYearDb.objects\
-        .select_related('learning_unit_year__academic_year')\
-        .filter(
-            learning_unit_year__academic_year__year=learning_unit_identity.year,
-            learning_unit_year__acronym=learning_unit_identity.code
-        )
+    qs = LearningComponentYearDb.objects.select_related(
+        'learning_unit_year__academic_year'
+    ).filter(
+        learning_unit_year__academic_year__year=learning_unit_identity.year,
+        learning_unit_year__acronym=learning_unit_identity.code
+    )
     if component_type == learning_component_year_type.PRACTICAL_EXERCISES:
         qs = qs.filter(type=component_type)
     else:
@@ -207,7 +212,17 @@ def _annotate_queryset(qs: QuerySet) -> QuerySet:
         session_derogation=F('session'),
         volume_q1=F('hourly_volume_partial_q1'),
         volume_q2=F('hourly_volume_partial_q2'),
-        class_type=F('learning_component_year__type')
+        class_type=F('learning_component_year__type'),
+        full_title_fr=Concat(
+            'learning_component_year__learning_unit_year__learning_container_year__common_title',
+            Value(' - '),
+            'title_fr',
+        ),
+        full_title_en=Concat(
+            'learning_component_year__learning_unit_year__learning_container_year__common_title_english',
+            Value(' - '),
+            'title_en',
+        ),
     )
 
 
@@ -223,7 +238,9 @@ def _values_queryset(qs: QuerySet) -> QuerySet:
         'session_derogation',
         'volume_q1',
         'volume_q2',
-        'class_type'
+        'class_type',
+        'full_title_fr',
+        'full_title_en',
     )
 
 

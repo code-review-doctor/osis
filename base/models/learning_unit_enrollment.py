@@ -30,9 +30,10 @@ from django.db import models
 from django.db.models import Model
 
 from base.models.enums import learning_unit_enrollment_state
+from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
-class LearningUnitEnrollmentAdmin(ModelAdmin):
+class LearningUnitEnrollmentAdmin(OsisModelAdmin):
     list_display = (
         'student',
         'learning_unit_year',
@@ -50,6 +51,11 @@ class LearningUnitEnrollmentAdmin(ModelAdmin):
         'offer_enrollment__student__person__first_name',
         'offer_enrollment__student__person__last_name',
     ]
+    raw_id_fields = (
+        'offer_enrollment',
+        'learning_unit_year',
+        'learning_class_year',
+    )
 
 
 class LearningUnitEnrollment(Model):
@@ -84,5 +90,15 @@ class LearningUnitEnrollment(Model):
         return u"%s - %s" % (self.learning_unit_year, self.offer_enrollment.student)
 
 
-def find_by_learning_unit_year(a_learning_unit_year):
-    return LearningUnitEnrollment.objects.filter(learning_unit_year=a_learning_unit_year)
+def count_by_learning_unit_year(a_learning_unit_year):
+    return LearningUnitEnrollment.objects.filter(
+        learning_unit_year=a_learning_unit_year,
+        learning_class_year=None,
+    ).count()
+
+
+def count_by_learning_class_year(class_year):
+    return LearningUnitEnrollment.objects.filter(
+        learning_unit_year=class_year.learning_component_year.learning_unit_year,
+        learning_class_year=class_year,
+    ).count()

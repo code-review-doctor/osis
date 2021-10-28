@@ -77,7 +77,6 @@ def get_data_schema():
                  Required("decimal_scores"): bool,
                  Required("programs"): [
                     {
-                      Required("deliberation_date"): str,
                       Required("acronym"): str,
                       Required("address"): {},
                       Required("enrollments"): [{
@@ -341,7 +340,6 @@ def _build_program_block_content(learning_unit_year, nb_students, program, style
     text_left_style.alignment = TA_LEFT
     text_left_style.fontSize = 10
     return [
-        Paragraph(_get_deliberation_date_text(program), styles["Normal"]),
         Paragraph(_get_academic_year_text(learning_unit_year), text_left_style),
         Paragraph(_get_learning_unit_year_text(learning_unit_year), styles["Normal"]),
         Paragraph(_get_program_text(nb_students, program), styles["Normal"]),
@@ -358,10 +356,6 @@ def _get_program_text(nb_students, program):
 
 def _get_learning_unit_year_text(learning_unit_year):
     return "<strong>{} : {}</strong>".format(learning_unit_year['acronym'], learning_unit_year['title'])
-
-
-def _get_deliberation_date_text(program):
-    return '%s : %s' % (_('Deliberation date'), program['deliberation_date'] or '')
 
 
 def _get_academic_year_text(learning_unit_year):

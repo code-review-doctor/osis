@@ -28,12 +28,15 @@ import uuid
 from django.test import TestCase
 
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
+from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.models.enums import learning_component_year_type
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from ddd.logic.learning_unit.tests.factory.learning_unit import LDROI1001LearningUnitIdentityFactory, \
     LDROI1002ExternalLearningUnitFactory
 from infrastructure.effective_class_repartition.domain.service.tutor_attribution import \
     TutorAttributionToLearningUnitTranslator
+from infrastructure.encodage_de_notes.shared_kernel.service.attribution_enseignant import \
+    AttributionEnseignantTranslator
 
 
 class TestSearchTutorAttributionToLearningUnitTranslator(TestCase):
@@ -261,3 +264,64 @@ class TestGetByEnseignantTranslator(TestCase):
         result = self.function_to_test(self.matricule_fgs_enseignant, self.annee)[0]
         self.assertIsNone(result.practical_volume_attributed)
         self.assertEqual(result.lecturing_volume_attributed, 20.0)
+
+
+class TestSearchParNomPrenomEnseignantTranslator(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.annee = 2020
+        AttributionNewFactory(
+            learning_container_year__academic_year__year=cls.annee,
+            tutor__person__last_name='Smith',
+            tutor__person__first_name='Charlotte',
+        )
+        cls.translator = TutorAttributionToLearningUnitTranslator()
+
+    def test_should_trouver_aucun_resultat(self):
+        recherche = 'Personne inexistante'
+        result = self.translator.search_par_nom_prenom_enseignant(self.annee, recherche)
+        self.assertListEqual(list(), result)
+
+    def test_should_trouver_enseignant_sur_cours_par_nom(self):
+        recherche = 'Smith'
+        result = self.translator.search_par_nom_prenom_enseignant(self.annee, recherche)
+        self.assertEqual(1, len(result))
+
+    def test_should_trouver_enseignant_sur_cours_par_nom_partiel(self):
+        recherche = 'it'
+        result = self.translator.search_par_nom_prenom_enseignant(self.annee, recherche)
+        self.assertEqual(1, len(result))
+
+    def test_should_trouver_enseignant_sur_cours_par_prenom(self):
+        recherche = 'Charlotte'
+        result = self.translator.search_par_nom_prenom_enseignant(self.annee, recherche)
+        self.assertEqual(1, len(result))
+
+    def test_should_trouver_enseignant_sur_cours_par_prenom_partiel(self):
+        recherche = 'arlo'
+        result = self.translator.search_par_nom_prenom_enseignant(self.annee, recherche)
+        self.assertEqual(1, len(result))
+
+    def test_should_trouver_enseignant_sur_cours_par_nom_partiel_et_prenom_partiel(self):
+        recherche = 'arlo it'
+        result = self.translator.search_par_nom_prenom_enseignant(self.annee, recherche)
+        self.assertEqual(1, len(result))
+
+    def test_should_ordonner_par_ordre_alphabetique(self):
+        AttributionNewFactory(
+            learning_container_year__academic_year__year=self.annee,
+            tutor__person__last_name='Italernuy',
+            tutor__person__first_name='Albert',
+        )
+        AttributionNewFactory(
+            learning_container_year__academic_year__year=self.annee,
+            tutor__person__last_name='Diterzio',
+            tutor__person__first_name='Patrick',
+        )
+        recherche = 'it'
+        result = self.translator.search_par_nom_prenom_enseignant(self.annee, recherche)
+        self.assertEqual(3, len(result))
+        self.assertEqual("Diterzio", result[0].last_name)
+        self.assertEqual("Italernuy", result[1].last_name)
+        self.assertEqual("Smith", result[2].last_name)

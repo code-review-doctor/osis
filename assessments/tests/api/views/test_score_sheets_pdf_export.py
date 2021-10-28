@@ -64,7 +64,6 @@ class ScoreSheetsPDFExportAPIViewTestCase(APITestCase):
                 DonneesAdministrativesFeuilleDeNotesDTO(
                     sigle_formation="DROI1BA",
                     code_unite_enseignement='LDROI1200',
-                    date_deliberation=DateDTO.build_from_date(datetime.date.today()),
                     contact_feuille_de_notes=AdresseFeuilleDeNotesDTO(
                         nom_cohorte='DROI1BA',
                         entite='BUDR',
@@ -141,7 +140,7 @@ class ScoreSheetsPDFExportAPIViewTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     @mock.patch(
-        'assessments.api.views.score_sheets_pdf_export.paper_sheet.print_notes',
+        'assessments.api.views.score_sheets_pdf_export.print_notes',
         return_value=HttpResponse(content_type='application/pdf')
     )
     def test_get_assert_call_print_pdf(self, mock_print_notes):

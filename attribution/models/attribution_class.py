@@ -51,8 +51,13 @@ class AttributionClass(models.Model):
     changed = models.DateTimeField(null=True, auto_now=True)
     attribution_charge = models.ForeignKey('AttributionChargeNew', on_delete=models.CASCADE)
     learning_class_year = models.ForeignKey('learning_unit.LearningClassYear', on_delete=models.CASCADE)
-    allocation_charge = models.DecimalField(max_digits=6, decimal_places=1, blank=True, null=True,
-                                            validators=[validators.MinValueValidator(MIN_ALLOCATION_CHARGE)])
+    allocation_charge = models.DecimalField(
+        max_digits=6,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        validators=[validators.MinValueValidator(MIN_ALLOCATION_CHARGE)]
+    )
     objects = models.Manager()
 
     def __str__(self):

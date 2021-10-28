@@ -102,7 +102,8 @@ class AttributionSerializerTestCase(TestCase):
             'links',
             'has_peps',
             'effective_class_repartition',
-            'is_partim'
+            'is_partim',
+            'percentage_allocation_charge'
         ]
         self.assertCountEqual(list(self.serializer.data.keys()), expected_fields)
 
@@ -124,3 +125,7 @@ class AttributionSerializerTestCase(TestCase):
             code=self.attribution_obj.code
         )
         self.assertEquals(self.serializer.data['links']['schedule'], expected_url)
+
+    def test_should_return_percentage_none_when_total_charge_is_none(self):
+        self.attribution_obj.total_learning_unit_charge = None
+        self.assertIsNone(AttributionSerializer.get_percentage_allocation_charge(self.attribution_obj))
