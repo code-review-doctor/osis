@@ -85,12 +85,6 @@ msgstr ""
 msgid "Extra time (33% generally)"
 msgstr ""
 
-msgid "Following fields are required : {}"
-msgstr ""
-
-msgid "Internship subtype is a mandatory field"
-msgstr ""
-
 msgid "Large print"
 msgstr ""
 
@@ -104,9 +98,6 @@ msgid "Lecturing charge or practical charge must be filled"
 msgstr ""
 
 msgid "No student to encode by excel"
-msgstr ""
-
-msgid "No vacant corresponding activity"
 msgstr ""
 
 msgid "No vacant corresponding activity"
