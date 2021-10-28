@@ -23,30 +23,40 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List, Dict
+
 import attr
 from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
-from django.db.models import Exists, OuterRef
 from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.functional import cached_property
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from django_filters.views import FilterView
 
 from assessments.api.serializers.scores_responsible import ScoresResponsibleListSerializer
 from assessments.forms.scores_responsible import ScoresResponsiblesFilter
-from assessments.models.score_responsible import ScoreResponsible
-from attribution.models.attribution_new import AttributionNew
 from base.models import session_exam_calendar
 from base.models.academic_year import AcademicYear
 from base.models.learning_unit_year import LearningUnitYear
+from base.models.person import Person
 from base.utils.cache import CacheFilterMixin
-from ddd.logic.encodage_des_notes.soumission.commands import AssignerResponsableDeNotesCommand
+from base.views.common import display_success_messages
+from ddd.logic.effective_class_repartition.commands import SearchAttributionsToLearningUnitCommand, \
+    SearchTutorsDistributedToClassCommand
+from ddd.logic.effective_class_repartition.dtos import TutorAttributionToLearningUnitDTO
+from ddd.logic.effective_class_repartition.dtos import TutorClassRepartitionDTO
+from ddd.logic.encodage_des_notes.soumission.commands import AssignerResponsableDeNotesCommand, \
+    GetResponsableDeNotesCommand, SearchResponsableDeNotesCommand
+from ddd.logic.encodage_des_notes.soumission.dtos import ResponsableDeNotesDTO
 from infrastructure.messages_bus import message_bus_instance
+from learning_unit.models.learning_class_year import LearningClassYear
 
 
 @attr.s(frozen=True, slots=True)
 class AttributionDTO:
+    code = attr.ib(type=str)
     matricule_fgs = attr.ib(type=str)
     enseignant = attr.ib(type=str)
     statut = attr.ib(type=str)
@@ -80,54 +90,108 @@ class SelectScoreResponsible(LoginRequiredMixin, PermissionRequiredMixin, Templa
     permission_required = 'assessments.change_scoresresponsible'
 
     @cached_property
-    def code(self) -> str:
+    def code_unite_enseignement(self) -> str:
         return self.kwargs['code']
 
     @cached_property
     def academic_year(self) -> 'AcademicYear':
         return session_exam_calendar.current_sessions_academic_year()
 
-    def get_attributions(self):
-        # FIXME :: use DDD instead of query database directly
-        qs = AttributionNew.objects.filter(
-            attributionchargenew__learning_component_year__learning_unit_year__acronym=self.code,
-            attributionchargenew__learning_component_year__learning_unit_year__academic_year=self.academic_year,
-        ).annotate(
-            est_responsable_de_notes=Exists(
-                ScoreResponsible.objects.filter(
-                    learning_unit_year__acronym=self.code,
-                    learning_unit_year__academic_year=self.academic_year,
-                    tutor=OuterRef('tutor')
-                )
+    @cached_property
+    def responsables_notes(self) -> List['ResponsableDeNotesDTO']:
+        codes_complets_classes = {repartition.complete_class_code for repartition in self.repartitions_classes}
+        codes = list(codes_complets_classes) + [self.code_unite_enseignement]
+        cmd_resp_notes = SearchResponsableDeNotesCommand(
+            unites_enseignement=[GetResponsableDeNotesCommand(code, self.academic_year.year) for code in codes]
+        )
+        return message_bus_instance.invoke(cmd_resp_notes)
+
+    @cached_property
+    def attributions_unites_enseignement(self) -> List['TutorAttributionToLearningUnitDTO']:
+        cmd_resp_notes = SearchAttributionsToLearningUnitCommand(
+            learning_unit_code=self.code_unite_enseignement,
+            learning_unit_year=self.academic_year.year,
+        )
+        return message_bus_instance.invoke(cmd_resp_notes)
+
+    @cached_property
+    def repartitions_classes(self) -> List['TutorClassRepartitionDTO']:
+        codes_classes_de_unite_enseignement = LearningClassYear.objects.filter(
+            learning_component_year__learning_unit_year__acronym=self.code_unite_enseignement,
+            learning_component_year__learning_unit_year__academic_year=self.academic_year,
+        ).values_list('acronym', flat=True)
+        repartitions_classes = []
+        for code_classe in codes_classes_de_unite_enseignement:
+            cmd_resp_notes = SearchTutorsDistributedToClassCommand(
+                class_code=code_classe,
+                learning_unit_code=self.code_unite_enseignement,
+                learning_unit_year=self.academic_year.year,
             )
-        ).order_by(
-            "tutor__person__last_name",
-            "tutor__person__first_name",
-        ).distinct(
-            "tutor__person__last_name",
-            "tutor__person__first_name",
+            repartitions_classes += message_bus_instance.invoke(cmd_resp_notes)
+        return repartitions_classes
+
+    def est_responsable_de_notes_classe(self, repartition: 'TutorClassRepartitionDTO') -> bool:
+        return any(
+            resp for resp in self.responsables_notes
+            if resp.matricule == repartition.personal_id_number
+            and resp.code_unite_enseignement == repartition.complete_class_code
         )
 
+    def est_responsable_de_notes_unite_enseignement(self, attribution: 'TutorAttributionToLearningUnitDTO') -> bool:
+        return any(
+            resp for resp in self.responsables_notes
+            if resp.matricule == attribution.personal_id_number
+            and resp.code_unite_enseignement == attribution.learning_unit_code
+        )
+
+    def get_attributions(self) -> List['AttributionDTO']:
         return [
             AttributionDTO(
-                matricule_fgs=attribution_new.tutor.person.global_id,
-                enseignant=str(attribution_new.tutor),
-                statut=attribution_new.get_function_display(),
-                responsable_de_notes=attribution_new.est_responsable_de_notes
+                code=self.code_unite_enseignement,
+                matricule_fgs=attrib.personal_id_number,
+                enseignant=Person.get_str(attrib.first_name, attrib.last_name),
+                statut=attrib.function_text,
+                responsable_de_notes=bool(self.est_responsable_de_notes_unite_enseignement(attrib)),
             )
-            for attribution_new in qs
+            for attrib in self.attributions_unites_enseignement
         ]
 
-    def post(self, *args, **kwargs):
+    @cached_property
+    def get_repartitions_classes_par_code(self) -> Dict[str, List['AttributionDTO']]:
+        repartition_classes_par_code = dict()
+        for repartition in self.repartitions_classes:
+            attribution_dto = AttributionDTO(
+                code=repartition.complete_class_code,
+                matricule_fgs=repartition.personal_id_number,
+                enseignant=Person.get_str(repartition.first_name, repartition.last_name),
+                statut=repartition.function_text,
+                responsable_de_notes=self.est_responsable_de_notes_classe(repartition)
+            )
+            repartition_classes_par_code.setdefault(repartition.complete_class_code, []).append(attribution_dto)
+
+        return repartition_classes_par_code
+
+    def post(self, request, *args, **kwargs):
         matricule_fgs = self.request.POST.get('matricule_fgs')
 
         cmd = AssignerResponsableDeNotesCommand(
-            code_unite_enseignement=self.code,
+            code_unite_enseignement=self.code_unite_enseignement,
             annee_unite_enseignement=self.academic_year.year,
             matricule_fgs_enseignant=matricule_fgs
         )
 
         message_bus_instance.invoke(cmd)
+        display_success_messages(request, self.get_success_msg(self.code_unite_enseignement))
+
+        for code_complet_classe in self.get_repartitions_classes_par_code:
+            matricule_fgs_classe = self.request.POST.get('matricule_fgs_' + code_complet_classe)
+            cmd = AssignerResponsableDeNotesCommand(
+                code_unite_enseignement=code_complet_classe,
+                annee_unite_enseignement=self.academic_year.year,
+                matricule_fgs_enseignant=matricule_fgs_classe
+            )
+            message_bus_instance.invoke(cmd)
+            display_success_messages(request, self.get_success_msg(code_complet_classe))
 
         return redirect(reverse('scores_responsibles_search'))
 
@@ -135,7 +199,13 @@ class SelectScoreResponsible(LoginRequiredMixin, PermissionRequiredMixin, Templa
         context = super().get_context_data(**kwargs)
 
         context['attributions'] = self.get_attributions()
-        context['code'] = self.code
+        context['repartitions_classes'] = self.get_repartitions_classes_par_code
+        context['code'] = self.code_unite_enseignement
         context['annee_academique'] = str(self.academic_year)
 
         return context
+
+    def get_success_msg(self, code: str) -> str:
+        return _("Score responsible successfully designated on %(code)s.") % {
+            "code": code,
+        }
