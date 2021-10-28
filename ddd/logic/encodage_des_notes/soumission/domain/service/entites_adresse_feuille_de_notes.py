@@ -65,6 +65,15 @@ class EntitesPossiblesAdresseFeuilleDeNotesDTO:
 
         return filter_duplicate(choix, lambda option: option[1])
 
+    def get_par_type(self, type_entite: str) -> Optional['EntiteUCL']:
+        if type_entite == ScoreSheetAddressEntityType.ENTITY_ADMINISTRATION.value:
+            return self.administration
+        elif type_entite == ScoreSheetAddressEntityType.ENTITY_MANAGEMENT.value:
+            return self.gestion
+        elif type_entite == ScoreSheetAddressEntityType.ENTITY_ADMINISTRATION_PARENT.value:
+            return self.administration_faculte
+        return self.gestion_faculte
+
 
 class EntiteAdresseFeuilleDeNotes(interface.DomainService):
     @classmethod

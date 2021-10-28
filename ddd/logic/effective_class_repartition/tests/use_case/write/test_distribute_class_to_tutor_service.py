@@ -52,7 +52,7 @@ from unittest import mock
 class DistributeClassToTutorService(TestCase):
     def setUp(self):
         self.tutor_repository = TutorRepository()
-        self.tutor_repository.entities.clear()
+        self.tutor_repository.reset()
         self.effective_class_repository = EffectiveClassRepository()
         self.effective_class_repository.reset()
 

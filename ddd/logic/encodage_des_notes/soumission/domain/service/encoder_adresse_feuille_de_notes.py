@@ -24,7 +24,6 @@
 #
 ##############################################################################
 
-from assessments.models.enums.score_sheet_address_choices import ScoreSheetAddressEntityType
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodage_notes import \
     IPeriodeEncodageNotesTranslator
 from ddd.logic.encodage_des_notes.soumission.builder.adresse_feuille_de_notes_builder import \
@@ -33,7 +32,8 @@ from ddd.logic.encodage_des_notes.soumission.builder.adresse_feuille_de_notes_id
     AdresseFeuilleDeNotesIdentityBuilder
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderAdresseFeuilleDeNotesSpecifique, \
     EncoderAdresseEntiteCommeAdresseFeuilleDeNotes, SupprimerAdresseFeuilleDeNotesPremiereAnneeDeBachelier
-from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_notes import IdentiteAdresseFeuilleDeNotes
+from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_notes import \
+    IdentiteAdresseFeuilleDeNotes, AdresseFeuilleDeNotes
 from ddd.logic.encodage_des_notes.soumission.domain.service \
     .adresse_feuille_de_note_premiere_annee_de_bachelier_est_specifique import \
     EntiteAdresseFeuilleDeNotesPremiereAnneeDeBachelierEstDifferenteDeCelleDuBachelier, \
@@ -86,7 +86,15 @@ class EncoderAdresseFeuilleDeNotesDomainService(interface.DomainService):
         annee_academique = cls._get_annee_academique(periode_soumission_note_translator, academic_year_repo)
 
         EntiteAdresseFeuilleDeNotesPremiereAnneeDeBachelierEstDifferenteDeCelleDuBachelier(
-        ).verifier(cmd, annee_academique, repo)
+        ).verifier(
+            cmd,
+            annee_academique,
+            repo,
+            entite_repository,
+            entites_cohorte_translator,
+            periode_soumission_note_translator,
+            academic_year_repo
+        )
         EncoderAdresseFeuilleDeNotesValidatorLIst(type_entite=cmd.type_entite).validate()
 
         entites_possibles = EntiteAdresseFeuilleDeNotes.search(
@@ -96,15 +104,7 @@ class EncoderAdresseFeuilleDeNotesDomainService(interface.DomainService):
             periode_soumission_note_translator,
             academic_year_repo
         )
-
-        if cmd.type_entite == ScoreSheetAddressEntityType.ENTITY_ADMINISTRATION.value:
-            entite = entites_possibles.administration
-        elif cmd.type_entite == ScoreSheetAddressEntityType.ENTITY_MANAGEMENT.value:
-            entite = entites_possibles.gestion
-        elif cmd.type_entite == ScoreSheetAddressEntityType.ENTITY_ADMINISTRATION_PARENT.value:
-            entite = entites_possibles.administration_faculte
-        else:
-            entite = entites_possibles.gestion_faculte
+        entite = entites_possibles.get_par_type(cmd.type_entite)
 
         dto = AdresseFeuilleDeNotesDTO(
             nom_cohorte=cmd.nom_cohorte,
@@ -166,7 +166,32 @@ class EncoderAdresseFeuilleDeNotesDomainService(interface.DomainService):
     ) -> 'IdentiteAdresseFeuilleDeNotes':
         nouvelle_adresse = AdresseFeuilleDeNotesBuilder().build_from_repository_dto(dto)
         repo.save(nouvelle_adresse)
+
+        cls._supprimer_adresse_11ba_si_equivalente_a_celle_du_1ba(
+            nouvelle_adresse,
+            repo
+        )
+
         return nouvelle_adresse.entity_id
+
+    @classmethod
+    def _supprimer_adresse_11ba_si_equivalente_a_celle_du_1ba(
+            cls,
+            adresse: 'AdresseFeuilleDeNotes',
+            repo: IAdresseFeuilleDeNotesRepository
+    ):
+        if not ('1BA' in adresse.nom_cohorte and '11BA' not in adresse.nom_cohorte):
+            return
+
+        nom_cohorte_11BA = adresse.nom_cohorte.replace('1BA', '11BA')
+        identite_adresse_11ba = AdresseFeuilleDeNotesIdentityBuilder.build_from_nom_cohorte_and_annee_academique(
+            nom_cohorte_11BA,
+            adresse.annee_academique
+        )
+        adresse_11ba = repo.get(identite_adresse_11ba)
+
+        if adresse_11ba and adresse.est_identique_a(adresse_11ba):
+            repo.delete(identite_adresse_11ba)
 
     @classmethod
     def _get_annee_academique(

@@ -36,7 +36,7 @@ class OffersFilter(forms.Form):
     acronym = fields.CharField(
         max_length=40,
         required=False,
-        label=_('Acronym/Short title'),
+        label=_('Training'),
     )
 
     def __init__(self, *args, **kwargs):
