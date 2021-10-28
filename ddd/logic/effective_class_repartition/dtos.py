@@ -45,6 +45,7 @@ class DistributedEffectiveClassesDTO(DTO):
     class_code = attr.ib(type=str)
     learning_unit_code = attr.ib(type=str)
     learning_unit_year = attr.ib(type=int)
+    code_complet_classe = attr.ib(type=str)
     distributed_volume = attr.ib(type=Decimal)
     attribution_uuid = attr.ib(type=str)
 
