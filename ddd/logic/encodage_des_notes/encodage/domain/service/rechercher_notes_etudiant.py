@@ -124,7 +124,7 @@ class RechercheNotesEtudiant(interface.DomainService):
                         desinscription.code_unite_enseignement == note_etudiant.code_unite_enseignement
                     ),
                     note_decimale_est_autorisee=note_etudiant.note_decimale_autorisee,
-                    peps=signaletique_par_noma[note_etudiant.noma].peps
+                    peps=getattr(signaletique_etudiant_dto, 'peps', None),
                 )
             )
         return sorted(
