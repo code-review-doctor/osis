@@ -105,6 +105,7 @@
                                         <th id="program" class="col-md-1">{% trans 'Program' context 'encoding' %}</th>
                                         <th id="learning_unit" class="col-md-3">{% trans 'Learning unit' %}</th>
                                         <th id="registration_number" class="col-md-1">{% trans 'Reg. No.' %}</th>
+                                        <th id="peps_data" class="col-md-2">{% trans 'Type of specific profile' %}</th>
                                         <th id="name" class="col-md-4">{% trans 'Name' %}</th>
                                         <th id="score" class="col-md-1" style="width: 70px;">
                                             {% trans 'Score' %}
@@ -140,6 +141,7 @@
                                                 {{ note_etudiant.code_unite_enseignement |add:" - " |add:note_etudiant.intitule_complet_unite_enseignement| truncatechars:30}}
                                             </td>
                                             <td headers="registration_number">{{ note_etudiant.noma }}</td>
+                                            {% include 'assessments/common/peps_column.html' %}
                                             <td headers="name">{{ note_etudiant.nom }}, {{ note_etudiant.prenom }}</td>
                                             <td id="enrollment_note_{{ forloop.counter0 }}" headers="score">
                                                 {% if not note_etudiant.date_echeance_atteinte and not note_etudiant.desinscrit_tardivement %}
