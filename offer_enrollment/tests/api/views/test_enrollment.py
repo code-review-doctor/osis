@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+
 from django.conf import settings
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
@@ -33,7 +34,6 @@ from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
 from base.tests.factories.student import StudentFactory
 from education_group.tests.factories.first_year_bachelor import FirstYearBachelorFactory
 from offer_enrollment.api.views.enrollment import MyOfferEnrollmentsListView, OfferEnrollmentsListView
-from osis_common.ddd.interface import BusinessException
 
 
 class MyOfferEnrollmentsListViewTestCase(APITestCase):
@@ -125,14 +125,14 @@ class OfferEnrollmentsListViewTestCase(APITestCase):
             education_group_year__academic_year=self.offer_enrollment.education_group_year.academic_year,
             student=other_student
         )
-        with self.assertRaises(BusinessException) as e:
-            self.client.get(self.url)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         expected_message = _(
             "A problem was detected with your registration : 2 registration id's are linked to your user.</br> Please "
             "contact <a href=\"{registration_department_url}\" "
             "target=\"_blank\">the Registration department</a>. Thank you."
         ).format(registration_department_url=settings.REGISTRATION_ADMINISTRATION_URL)
-        self.assertEqual(e.exception.message, expected_message)
+        self.assertEqual(response.json()['non_field_errors'][0]['detail'], expected_message)
 
     def test_get_results_assert_acronym_11ba_is_correct(self):
         cohort = FirstYearBachelorFactory(
