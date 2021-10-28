@@ -55,3 +55,10 @@ class ScoresResponsibleListSerializer(serializers.Serializer):
             "score_responsible_select",
             kwargs={'code': obj.acronym}
         )
+
+
+class ScoreResponsiblePersonListSerializer(serializers.Serializer):
+    learning_unit_acronym = serializers.CharField(source='learning_unit_full_acronym')
+    year = serializers.IntegerField()
+    full_name = serializers.CharField()
+    global_id = serializers.CharField()
