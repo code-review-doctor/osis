@@ -34,8 +34,6 @@ from attribution.models.attribution_new import AttributionNew
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from attribution.tests.factories.attribution_new import AttributionNewFactory
 from attribution.tests.views.charge_repartition.common import TestChargeRepartitionMixin
-from base.tests.factories.learning_component_year import PracticalLearningComponentYearFactory, \
-    LecturingLearningComponentYearFactory
 
 
 class TestRemoveChargeRepartition(TestChargeRepartitionMixin, TestCase):
@@ -70,13 +68,11 @@ class TestRemoveChargeRepartition(TestChargeRepartitionMixin, TestCase):
         )
         charge_lecturing2 = AttributionChargeNewFactory(
             attribution__tutor=attribution.tutor,
-            learning_component_year__learning_unit_year__learning_container_year=
-            self.learning_unit_year.learning_container_year
+            learning_component_year__learning_unit_year=self.learning_unit_year
         )
         charge_practical2 = AttributionChargeNewFactory(
             attribution__tutor=attribution.tutor,
-            learning_component_year__learning_unit_year__learning_container_year=
-            self.learning_unit_year.learning_container_year
+            learning_component_year__learning_unit_year=self.learning_unit_year
         )
         self.client.delete(self.url)
 
