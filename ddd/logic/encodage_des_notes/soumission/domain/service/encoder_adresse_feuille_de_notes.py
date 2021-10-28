@@ -24,7 +24,6 @@
 #
 ##############################################################################
 
-from assessments.models.enums.score_sheet_address_choices import ScoreSheetAddressEntityType
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodage_notes import \
     IPeriodeEncodageNotesTranslator
 from ddd.logic.encodage_des_notes.soumission.builder.adresse_feuille_de_notes_builder import \
@@ -33,8 +32,8 @@ from ddd.logic.encodage_des_notes.soumission.builder.adresse_feuille_de_notes_id
     AdresseFeuilleDeNotesIdentityBuilder
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderAdresseFeuilleDeNotesSpecifique, \
     EncoderAdresseEntiteCommeAdresseFeuilleDeNotes, SupprimerAdresseFeuilleDeNotesPremiereAnneeDeBachelier
-from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_notes import IdentiteAdresseFeuilleDeNotes, \
-    AdresseFeuilleDeNotes
+from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_notes import \
+    IdentiteAdresseFeuilleDeNotes, AdresseFeuilleDeNotes
 from ddd.logic.encodage_des_notes.soumission.domain.service \
     .adresse_feuille_de_note_premiere_annee_de_bachelier_est_specifique import \
     EntiteAdresseFeuilleDeNotesPremiereAnneeDeBachelierEstDifferenteDeCelleDuBachelier, \
