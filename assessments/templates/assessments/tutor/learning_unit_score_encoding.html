@@ -2,27 +2,27 @@
 {% load i18n academic_year_display %}
 
 {% comment "License" %}
-    * OSIS stands for Open Student Information System. It's an application
-    * designed to manage the core business of higher education institutions,
-    * such as universities, faculties, institutes and professional schools.
-    * The core business involves the administration of students, teachers,
-    * courses, programs and so on.
-    *
-    * Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
-    *
-    * This program is free software: you can redistribute it and/or modify
-    * it under the terms of the GNU General Public License as published by
-    * the Free Software Foundation, either version 3 of the License, or
-    * (at your option) any later version.
-    *
-    * This program is distributed in the hope that it will be useful,
-    * but WITHOUT ANY WARRANTY; without even the implied warranty of
-    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    * GNU General Public License for more details.
-    *
-    * A copy of this license - GNU General Public License - is available
-    * at the root of the source code of this program.  If not,
-    * see http://www.gnu.org/licenses/.
+ * OSIS stands for Open Student Information System. It's an application
+ * designed to manage the core business of higher education institutions,
+ * such as universities, faculties, institutes and professional schools.
+ * The core business involves the administration of students, teachers,
+ * courses, programs and so on.
+ *
+ * Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * A copy of this license - GNU General Public License - is available
+ * at the root of the source code of this program.  If not,
+ * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
 
@@ -34,8 +34,7 @@
         <a href="{% url 'assessments' %}" id="lnk_evaluations">{% trans 'Evaluations' %}</a>
     </li>
     <li>
-        <a href="{% url 'score_encoding_progress_overview' %}"
-           id="lnk_scores_encoding">{% trans 'Scores encoding' %}</a>
+        <a href="{% url 'score_encoding_progress_overview' %}" id="lnk_scores_encoding">{% trans 'Scores encoding' %}</a>
     </li>
     <li class="active">{% trans 'Online encoding' %}</li>
 {% endblock %}
@@ -176,17 +175,16 @@
                                 <span class="glyphicon glyphicon-warning-sign"
                                       style="font-size: 150%; margin-right: 5px" aria-hidden="true"></span>
                                 {% if can_submit_scores %}
-                                    {% blocktrans with scores=feuille_de_notes.quantite_notes_en_attente_de_soumission %}Warning: {{ scores }} scores are ready to be submitted.{% endblocktrans %}
-                                    <button id="submit_btn" class="btn btn-warning"
-                                        type="submit"
-                                        onclick="$('#submission_scores_modal_form').submit();"
-                                        data-container="body"
-                                        data-toggle="tooltip" data-placement="left"
-                                        title="{% trans 'Submit these scores to faculty. These scores can not be changed after submission. The unsubmitted scores remain editable.' %}">
-                                        <em class="fas fa-paper-plane"></em> {% trans 'Submit' %}
-                                    </button>
+                                    {% blocktrans with scores=feuille_de_notes.quantite_notes_en_attente_de_soumission %}Warning: {{ scores }} score(s) ready to be submitted.{% endblocktrans %}
+                                    <a  id="lnk_submit"
+                                    class="btn btn-warning trigger_modal" data-url="{{ learning_unit_submit_url }}"
+                                        data-toggle="tooltip" data-placement="bottom"
+                                        title="{% trans 'Submit these scores to faculty. These scores can not be changed after submission. The unsubmitted scores remain editable.' %}"
+                                        role="button">
+                                        <em class="fas fa-paper-plane"></em> {% trans 'Submission' %}
+                                    </a>
                                 {% else %}
-                                    {% blocktrans with scores=feuille_de_notes.quantite_notes_en_attente_de_soumission responsable_nom=feuille_de_notes.responsable_note.nom responsable_prenom=feuille_de_notes.responsable_note.prenom %}Warning: {{ scores }} scores are ready to be submitted. Only score responsible ({{ responsable_nom }} {{ responsable_prenom }}) will be allowed to submit these scores to faculty.{% endblocktrans %}
+                                    {% blocktrans with scores=feuille_de_notes.quantite_notes_en_attente_de_soumission responsable_nom=feuille_de_notes.responsable_note.nom responsable_prenom=feuille_de_notes.responsable_note.prenom %}Warning: {{ scores }} score(s) ready to be submitted. Only score responsible ({{ responsable_nom }}, {{ responsable_prenom }}) will be allowed to submit the scores to faculty.{% endblocktrans %}
                                 {% endif %}
                              </p>
                         </div>
