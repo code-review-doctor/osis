@@ -95,6 +95,7 @@ class LearningUnitSerializerTestCase(TestCase):
             'subtype',
             'subtype_text',
             'has_proposal',
+            'has_classes'
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
@@ -142,6 +143,7 @@ class LearningUnitDetailedSerializerTestCase(TestCase):
             'subtype',
             'subtype_text',
             'has_proposal',
+            'has_classes',
             'quadrimester',
             'quadrimester_text',
             'periodicity',
@@ -208,6 +210,7 @@ class ExternalLearningUnitDetailedSerializerTestCase(TestCase):
             'subtype',
             'subtype_text',
             'has_proposal',
+            'has_classes',
             'quadrimester',
             'quadrimester_text',
             'periodicity',
