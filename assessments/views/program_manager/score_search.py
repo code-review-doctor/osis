@@ -54,6 +54,8 @@ class ScoreSearchFormView(PermissionRequiredMixin, FormView):
     # FormView
     template_name = "assessments/program_manager/score_search_form.html"
 
+    _too_many_results = False
+
     @cached_property
     def person(self):
         return self.request.user.person
@@ -146,12 +148,13 @@ class ScoreSearchFormView(PermissionRequiredMixin, FormView):
             'search_form': self.get_search_form(),
             'notes_etudiant_filtered': self.notes_etudiant_filtered,
             'score_encoding_progress_overview_url': self.get_score_encoding_progress_overview_url(),
+            'too_many_results_message': self.get_too_many_results_message(),
         }
 
     def get_too_many_results_message(self):
         return _(
             'More than {0} results found. Only the {0} first results are displayed.'
-        ).format(MAXIMUM_RESULTS_DISPLAYED)
+        ).format(MAXIMUM_RESULTS_DISPLAYED) if self._too_many_results else None
 
     @cached_property
     def notes_etudiant_filtered(self):
@@ -167,7 +170,7 @@ class ScoreSearchFormView(PermissionRequiredMixin, FormView):
             )
             notes = message_bus_instance.invoke(cmd)
             if len(notes) > MAXIMUM_RESULTS_DISPLAYED:
-                display_warning_messages(self.request, self.get_too_many_results_message())
+                self._too_many_results = True
                 return notes[:MAXIMUM_RESULTS_DISPLAYED]
             return notes
         return []
