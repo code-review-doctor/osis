@@ -95,7 +95,7 @@ class LearningUnitSerializerTestCase(TestCase):
             'subtype',
             'subtype_text',
             'has_proposal',
-            'has_classes'
+            'has_classes',
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 

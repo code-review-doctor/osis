@@ -169,6 +169,7 @@ class EffectiveClassRepository(IEffectiveClassRepository):
         )
         qs = _annotate_queryset(qs)
         qs = _values_queryset(qs)
+        qs = qs.order_by('acronym')
 
         result = list()
         for values in qs:
