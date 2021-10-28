@@ -181,8 +181,7 @@ class TutorRepositoryTestCase(TestCase):
         )
 
         self.assertTrue(AttributionClass.objects.filter(pk=distrubuted_class_db.pk).exists())
-        tutor.distributed_effective_classes = []
-        self.tutor_repository.save(tutor)
+        tutor.distributed_effective_classes.delete()
         self.assertFalse(AttributionClass.objects.filter(pk=distrubuted_class_db.pk).exists())
         self.assertFalse(ScoreResponsible.objects.filter(pk=score_responsible_db.pk).exists())
 

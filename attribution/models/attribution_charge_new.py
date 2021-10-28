@@ -65,8 +65,7 @@ class AttributionChargeNew(models.Model):
 def _attribution_new_delete(sender, instance, **kwargs):
     if AttributionChargeNew.objects.filter(
             attribution__tutor=instance.attribution.tutor,
-            learning_component_year__learning_unit_year__learning_container_year=
-            instance.learning_component_year.learning_unit_year.learning_container_year
+            learning_component_year__learning_unit_year=instance.learning_component_year.learning_unit_year
     ).count() == 0:
         ScoreResponsible.objects.filter(
             learning_unit_year=instance.learning_component_year.learning_unit_year,

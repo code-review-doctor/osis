@@ -71,9 +71,9 @@ class AttributionClass(models.Model):
 def _attribution_class_delete(sender, instance, **kwargs):
     if AttributionClass.objects.filter(
             attribution_charge__attribution__tutor=instance.attribution_charge.attribution.tutor,
-            learning_class_year__learning_component_year__learning_unit_year__learning_container_year=
-            instance.attribution_charge.learning_component_year.learning_unit_year.learning_container_year
+            learning_class_year__learning_component_year__learning_unit_year=
+            instance.attribution_charge.learning_component_year.learning_unit_year
     ).count() == 0:
         ScoreResponsible.objects.filter(
-            learning_unit_year=instance.learning_class_year.learning_component_year.learning_unit_year,
+            learning_class_year=instance.learning_class_year,
             tutor=instance.attribution_charge.attribution.tutor).delete()
