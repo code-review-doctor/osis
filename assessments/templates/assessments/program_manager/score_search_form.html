@@ -101,13 +101,13 @@
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
-                                        <th id="status" class="col-md-1">{% trans 'Status' %}</th>
-                                        <th id="program" class="col-md-1">{% trans 'Program' context 'encoding' %}</th>
-                                        <th id="learning_unit" class="col-md-3">{% trans 'Learning unit' %}</th>
-                                        <th id="registration_number" class="col-md-1">{% trans 'Reg. No.' %}</th>
-                                        <th id="peps_data" class="col-md-2">{% trans 'Type of specific profile' %}</th>
-                                        <th id="name" class="col-md-4">{% trans 'Name' %}</th>
-                                        <th id="score" class="col-md-1" style="width: 70px;">
+                                        <th id="status" style="width: 5%">{% trans 'Status' %}</th>
+                                        <th id="program" style="width: 10%">{% trans 'Program' context 'encoding' %}</th>
+                                        <th id="learning_unit" style="width: 20%">{% trans 'Learning unit' %}</th>
+                                        <th id="registration_number" style="width: 10%">{% trans 'Reg. No.' %}</th>
+                                        <th id="peps_data" style="width: 15%">{% trans 'Type of specific profile' %}</th>
+                                        <th id="name" style="width: 20%">{% trans 'Name' %}</th>
+                                        <th id="score" style="width: 10%" style="width: 70px;">
                                             {% trans 'Score' %}
                                             <span
                                                 class="glyphicon glyphicon-question-sign"
@@ -138,7 +138,7 @@
                                             </td>
                                             <td headers="program">{{ note_etudiant.nom_cohorte }}</td>
                                             <td headers="learning_unit" data-container="body" data-toggle="tooltip" title="{{ note_etudiant.intitule_complet_unite_enseignement }}">
-                                                {{ note_etudiant.code_unite_enseignement |add:" - " |add:note_etudiant.intitule_complet_unite_enseignement| truncatechars:30}}
+                                                {{ note_etudiant.code_unite_enseignement |add:" - " |add:note_etudiant.intitule_complet_unite_enseignement| truncatechars:45}}
                                             </td>
                                             <td headers="registration_number">{{ note_etudiant.noma }}</td>
                                             {% include 'assessments/common/peps_column.html' %}
