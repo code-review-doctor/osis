@@ -98,7 +98,7 @@ class LearningUnitDetailed(LanguageContextSerializerMixin, generics.RetrieveAPIV
         ).prefetch_related(
             'learning_container_year__requirement_entity__entityversion_set',
             'learningcomponentyear_set',
-        ).annotate_full_title().annotate_full_title().annotate_has_classes()
+        ).annotate_full_title().annotate_has_classes()
         luy = get_object_or_404(
             LearningUnitYearQuerySet.annotate_entities_allocation_and_requirement_acronym(queryset),
             acronym__iexact=acronym,
