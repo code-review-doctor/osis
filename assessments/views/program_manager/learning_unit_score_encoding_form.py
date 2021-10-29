@@ -24,6 +24,8 @@
 #
 ##############################################################################
 from gettext import ngettext
+
+import attr
 from django.utils.translation import gettext_lazy as _
 
 from django.contrib import messages
@@ -46,7 +48,16 @@ class LearningUnitScoreEncodingProgramManagerFormView(LearningUnitScoreEncodingB
             matricule_fgs_gestionnaire=self.person.global_id,
             code_unite_enseignement=self.kwargs['learning_unit_code'].upper()
         )
-        return message_bus_instance.invoke(cmd)
+        feuille_de_notes = message_bus_instance.invoke(cmd)
+        if self.echeance_enseignant_filter:
+            feuille_de_notes = attr.evolve(
+                feuille_de_notes,
+                notes_etudiants=[
+                    n for n in feuille_de_notes.notes_etudiants
+                    if n.echeance_enseignant.to_date() == self.echeance_enseignant_filter
+                ]
+            )
+        return feuille_de_notes
 
     def form_valid(self, formset):
         cmd = EncoderNotesCommand(
