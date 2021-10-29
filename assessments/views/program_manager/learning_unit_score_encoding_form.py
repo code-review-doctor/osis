@@ -55,6 +55,7 @@ class LearningUnitScoreEncodingProgramManagerFormView(LearningUnitScoreEncodingB
                 notes_etudiants=[
                     n for n in feuille_de_notes.notes_etudiants
                     if n.echeance_enseignant.to_date() == self.echeance_enseignant_filter
+                    and not n.desinscrit_tardivement
                 ]
             )
         return feuille_de_notes
