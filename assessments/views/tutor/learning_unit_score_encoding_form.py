@@ -23,10 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import contextlib
-import datetime
 from gettext import ngettext
-from typing import Optional
 
 import attr
 from django.utils.translation import gettext_lazy as _
@@ -44,13 +41,6 @@ from infrastructure.messages_bus import message_bus_instance
 class LearningUnitScoreEncodingTutorFormView(LearningUnitScoreEncodingBaseFormView):
     # TemplateView
     template_name = "assessments/tutor/learning_unit_score_encoding_form.html"
-
-    @cached_property
-    def echeance_enseignant_filter(self) -> Optional[datetime.date]:
-        with contextlib.suppress(TypeError, ValueError):
-            echeance_enseignant_queryparams = self.request.GET.get('echeance_enseignant')
-            return datetime.datetime.strptime(echeance_enseignant_queryparams, "%d/%m/%Y").date()
-        return None
 
     @cached_property
     def feuille_de_notes(self):
