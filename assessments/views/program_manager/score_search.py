@@ -37,10 +37,14 @@ from django.utils.translation import gettext_lazy as _, ngettext
 from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmissionCalendar
 from assessments.forms.score_encoding import ScoreSearchForm, ScoreSearchEncodingForm, ScoreEncodingFormSet
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
+from base.views.common import display_warning_messages
 from ddd.logic.encodage_des_notes.encodage.commands import RechercherNotesCommand, EncoderNotesCommand, \
     EncoderNoteCommand
 from infrastructure.messages_bus import message_bus_instance
 from osis_role.contrib.views import PermissionRequiredMixin
+
+
+MAXIMUM_RESULTS_DISPLAYED = 1000
 
 
 class ScoreSearchFormView(PermissionRequiredMixin, FormView):
@@ -49,6 +53,8 @@ class ScoreSearchFormView(PermissionRequiredMixin, FormView):
 
     # FormView
     template_name = "assessments/program_manager/score_search_form.html"
+
+    _too_many_results = False
 
     @cached_property
     def person(self):
@@ -141,8 +147,14 @@ class ScoreSearchFormView(PermissionRequiredMixin, FormView):
             **super().get_context_data(**kwargs),
             'search_form': self.get_search_form(),
             'notes_etudiant_filtered': self.notes_etudiant_filtered,
-            'score_encoding_progress_overview_url': self.get_score_encoding_progress_overview_url()
+            'score_encoding_progress_overview_url': self.get_score_encoding_progress_overview_url(),
+            'too_many_results_message': self.get_too_many_results_message(),
         }
+
+    def get_too_many_results_message(self):
+        return _(
+            'More than {0} results found. Only the {0} first results are displayed.'
+        ).format(MAXIMUM_RESULTS_DISPLAYED) if self._too_many_results else None
 
     @cached_property
     def notes_etudiant_filtered(self):
@@ -156,7 +168,11 @@ class ScoreSearchFormView(PermissionRequiredMixin, FormView):
                 nom_cohorte=search_form.cleaned_data['nom_cohorte'],
                 matricule_fgs_gestionnaire=self.person.global_id
             )
-            return message_bus_instance.invoke(cmd)
+            notes = message_bus_instance.invoke(cmd)
+            if len(notes) > MAXIMUM_RESULTS_DISPLAYED:
+                self._too_many_results = True
+                return notes[:MAXIMUM_RESULTS_DISPLAYED]
+            return notes
         return []
 
     def get_score_encoding_progress_overview_url(self):
