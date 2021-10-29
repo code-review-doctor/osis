@@ -58,6 +58,7 @@ paths:
           name: stage_dimona
           schema:
             type: boolean
+        # FIX ME: use explode: true instead of split
         - in: query
           name: learning_unit_codes
           schema:
