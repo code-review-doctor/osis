@@ -60,12 +60,9 @@ paths:
             type: boolean
         - in: query
           name: learning_unit_codes
+          # FIXME: use explode True and avoid splitting a string to get codes
           schema:
-            type: array
-            items:
-              type: string
-          style: form
-          explode: true
+            type: string
         - $ref: '#/components/parameters/Accept-Language'
         - $ref: '#/components/parameters/X-User-FirstName'
         - $ref: '#/components/parameters/X-User-LastName'
