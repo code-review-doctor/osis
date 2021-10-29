@@ -277,6 +277,9 @@ msgstr ""
 msgid "Institution"
 msgstr ""
 
+msgid "January"
+msgstr ""
+
 msgid "Justification (A,T)"
 msgstr ""
 
@@ -337,6 +340,9 @@ msgid "No result!"
 msgstr ""
 
 msgid "No score injected"
+msgstr ""
+
+msgid "No student to encode by excel"
 msgstr ""
 
 msgid "No students to encode by excel"
@@ -587,6 +593,9 @@ msgid "There is %(error_counter)s error in form"
 msgid_plural "There are %(error_counter)s errors in form"
 msgstr[0] ""
 msgstr[1] ""
+
+msgid "There is no enrollment for this course"
+msgstr ""
 
 msgid "This process helps tutor while encoding notes for the exams sessions."
 msgstr ""
