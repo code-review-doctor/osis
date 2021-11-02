@@ -56,7 +56,7 @@ from ddd.logic.effective_class_repartition.commands import (
     SearchAttributionsToLearningUnitCommand,
     SearchClassesEnseignantCommand,
     SearchTutorsDistributedToClassCommand,
-    UnassignTutorClassCommand,
+    UnassignTutorClassCommand, SearchClassesParNomEnseignantCommand,
 )
 from ddd.logic.effective_class_repartition.use_case.read.get_attribution_service import get_attribution
 from ddd.logic.effective_class_repartition.use_case.read.get_tutor_repartition_classes_service import \
@@ -67,6 +67,8 @@ from ddd.logic.effective_class_repartition.use_case.read.search_attributions_to_
     search_attributions_to_learning_unit
 from ddd.logic.effective_class_repartition.use_case.read.search_classes_enseignant_service import \
     search_classes_enseignant
+from ddd.logic.effective_class_repartition.use_case.read.search_classes_par_nom_enseignant_service import \
+    search_classes_par_nom_prenom
 from ddd.logic.effective_class_repartition.use_case.read.search_effective_classes_distributed_service import \
     search_tutors_distributed_to_class
 from ddd.logic.effective_class_repartition.use_case.write.distribute_class_to_tutor_service import \
@@ -88,8 +90,8 @@ from ddd.logic.encodage_des_notes.encodage.use_case.read.get_feuille_de_notes_se
 from ddd.logic.encodage_des_notes.encodage.use_case.read.get_periode_encodage_service import get_periode_encodage
 from ddd.logic.encodage_des_notes.encodage.use_case.read.get_progression_generale_encodage_service import \
     get_progression_generale_gestionnaire
-from ddd.logic.encodage_des_notes.encodage.use_case.read.rechercher_notes_service import rechercher_notes
 from ddd.logic.encodage_des_notes.encodage.use_case.read.rechercher_enseignants import rechercher_enseignants
+from ddd.logic.encodage_des_notes.encodage.use_case.read.rechercher_notes_service import rechercher_notes
 from ddd.logic.encodage_des_notes.encodage.use_case.write.encoder_notes_service import encoder_notes
 from ddd.logic.encodage_des_notes.shared_kernel.commands import GetEncoderNotesRapportCommand
 from ddd.logic.encodage_des_notes.shared_kernel.use_case.read.get_encoder_notes_rapport_service import \
@@ -198,7 +200,6 @@ from infrastructure.encodage_de_notes.shared_kernel.service.periode_encodage_not
 from infrastructure.encodage_de_notes.shared_kernel.service.signaletique_etudiant import \
     SignaletiqueEtudiantTranslator
 from infrastructure.encodage_de_notes.shared_kernel.service.unite_enseignement import UniteEnseignementTranslator
-from infrastructure.encodage_de_notes.soumission.domain.service.deliberation import DeliberationTranslator
 from infrastructure.encodage_de_notes.soumission.domain.service.entites_cohorte import EntitesCohorteTranslator
 from infrastructure.encodage_de_notes.soumission.domain.service.historiser_notes import HistoriserNotesService
 from infrastructure.encodage_de_notes.soumission.domain.service.notifier_soumission_notes import NotifierSoumissionNotes
@@ -405,7 +406,6 @@ class MessageBusCommands(AbstractMessageBusCommands):
             cmd,
             PeriodeEncodageNotesTranslator(),
             InscriptionExamenTranslator(),
-            DeliberationTranslator(),
             AdresseFeuilleDeNotesRepository(),
         ),
         EncoderNotesCommand: lambda cmd: encoder_notes(
@@ -445,6 +445,7 @@ class MessageBusCommands(AbstractMessageBusCommands):
             UniteEnseignementTranslator(),
             CohortesDuGestionnaireTranslator(),
             InscriptionExamenTranslator(),
+            AttributionEnseignantTranslator(),
         ),
         GetPeriodeEncodageCommand: lambda cmd: get_periode_encodage(
             cmd,
@@ -495,6 +496,11 @@ class MessageBusCommands(AbstractMessageBusCommands):
             cmd,
             AttributionEnseignantTranslator(),
             PeriodeEncodageNotesTranslator(),
+        ),
+        SearchClassesParNomEnseignantCommand: lambda cmd: search_classes_par_nom_prenom(
+            cmd,
+            TutorAttributionToLearningUnitTranslator(),
+            TutorRepository(),
         ),
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 

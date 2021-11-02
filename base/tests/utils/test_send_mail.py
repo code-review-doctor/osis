@@ -54,10 +54,6 @@ class TestSendMessage(TestCase):
         cls.persons = [cls.person_1, cls.person_2]
 
         cls.person_3 = PersonWithPermissionsFactory("can_receive_emails_about_automatic_postponement")
-        cls.person_without_language = test_person.create_person(
-            "language", last_name="without", email="personwithoutlang@test.com", language=None
-        )
-
         cls.academic_year = test_academic_year.create_academic_year()
         test_academic_year.create_academic_year(year=cls.academic_year.year - 1)
 

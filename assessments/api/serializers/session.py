@@ -23,42 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Set
-
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_deliberation import IDeliberationTranslator
-from ddd.logic.encodage_des_notes.soumission.dtos import DeliberationDTO, DateDTO
+from rest_framework import serializers
 
 
-class DeliberationTranslatorInMemory(IDeliberationTranslator):
-
-    deliberations = {
-        DeliberationDTO(
-            annee=2020,
-            session=2,
-            nom_cohorte='DROI1BA',
-            date=DateDTO(
-                jour=15,
-                mois=6,
-                annee=2020,
-            ),
-        ),
-    }
-
-    @classmethod
-    def search(
-            cls,
-            annee: int,
-            session: int,
-            noms_cohortes: Set[str],
-    ) -> Set['DeliberationDTO']:
-        return set(
-            filter(
-                lambda dto: _filter(dto, annee, session, noms_cohortes),
-                cls.deliberations,
-            )
-        )
-
-
-def _filter(dto, annee: int, session: int, noms_cohortes: Set[str]):
-    return dto.nom_cohorte in noms_cohortes and dto.annee == annee and dto.session == session
-
+class SessionSerializer(serializers.Serializer):
+    start_date = serializers.DateField()
+    end_date = serializers.DateField()
+    year = serializers.IntegerField()
+    month_session_name = serializers.CharField()

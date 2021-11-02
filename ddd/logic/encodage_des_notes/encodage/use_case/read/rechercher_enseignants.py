@@ -39,7 +39,7 @@ def rechercher_enseignants(
         periode_encodage_notes_translator: 'IPeriodeEncodageNotesTranslator',
 ) -> List['EnseignantDTO']:
     periode_encodage = periode_encodage_notes_translator.get()
-    return attribution_enseignant_translator.search_attributions_enseignant_par_nom_prenom_annee(
+    return attribution_enseignant_translator.search_enseignants_par_nom_prenom_annee(
         annee=periode_encodage.annee_concernee,
         nom_prenom=cmd.nom_prenom,
     )

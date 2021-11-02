@@ -11,7 +11,7 @@ servers:
  - url: https://osis.uclouvain.be/api/v1/reference/
    description: Production server
 info:
-  version: '1.13'
+  version: '1.14'
   title: Reference Service
   description: |-
     A set of API endpoints that allow you to get reference data.
@@ -179,7 +179,7 @@ paths:
         - in: query
           name: search
           schema:
-            description: A search term which will look up at country name
+            description: A search term which will look up at language name (french or english)
             type: string
         - $ref: '#/components/parameters/Accept-Language'
         - $ref: '#/components/parameters/X-User-FirstName'
@@ -224,8 +224,6 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
       tags:
         - academic_years
 components:
@@ -370,6 +368,7 @@ components:
         nationality:
           type: string
           description: The nationality of the country
+          nullable: true
     PaginatedStudyDomain:
       allOf:
         - $ref: '#/components/schemas/Paging'
@@ -434,7 +433,10 @@ components:
           description: The language iso_code
         name:
           type: string
-          description: The language name
+          description: The language name in french
+        name_en:
+          type: string
+          description: The language name in english
     AcceptedLanguageEnum:
       type: string
       enum:

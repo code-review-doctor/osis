@@ -73,7 +73,8 @@ class ResponsableDeNotesRepository(IResponsableDeNotesRepository):
         if not filter:
             return []
 
-        rows = qs.filter(**filter)
+        matricules_fgs = _fetch_responsable_de_notes().filter(**filter).values_list('global_id', flat=True)
+        rows = qs.filter(global_id__in=matricules_fgs)
         rows_grouped_by_global_id = itertools.groupby(rows, key=lambda row: row.global_id)
 
         return [

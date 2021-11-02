@@ -33,6 +33,7 @@ from django.utils.translation import gettext_lazy
 from base.models.person import Person
 from base.utils import send_mail
 from base.utils.send_mail import get_enrollment_headers
+from base.utils.string import unaccent
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_inscription_examen import IInscriptionExamenTranslator
@@ -162,7 +163,7 @@ class NotifierSoumissionNotes(INotifierSoumissionNotes):
                 cls._format_score(str(note.note)),
             )
             result.append(ligne)
-        return sorted(result, key=lambda l: (l[0], l[3], l[4]))
+        return sorted(result, key=lambda l: (l[0], unaccent(l[3]), unaccent(l[4])))
 
     @classmethod
     def _format_score(cls, score: str) -> str:

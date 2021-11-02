@@ -1,4 +1,3 @@
-##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -15,7 +14,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,21 +22,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import abc
-from typing import Set
+import re
 
-from ddd.logic.encodage_des_notes.soumission.dtos import DeliberationDTO
-from osis_common.ddd import interface
+from unidecode import unidecode
 
 
-class IDeliberationTranslator(interface.DomainService):
+SPECIAL_CHARACTERS_PATTERN = r"[-'\s]"
+SPECIAL_CHARACTERS_REGEX = re.compile(SPECIAL_CHARACTERS_PATTERN)
 
-    @classmethod
-    @abc.abstractmethod
-    def search(
-            cls,
-            annee: int,
-            session: int,
-            noms_cohortes: Set[str],
-    ) -> Set['DeliberationDTO']:
-        raise NotImplementedError
+
+def unaccent(s: str) -> str:
+    string_without_special_characters = re.sub(SPECIAL_CHARACTERS_REGEX, "", s)
+    lower_cased_character = str.lower(string_without_special_characters)
+    return unidecode(lower_cased_character)
