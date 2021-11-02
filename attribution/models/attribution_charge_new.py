@@ -30,6 +30,7 @@ from django.db.models.signals import post_delete
 from django.dispatch import receiver
 
 from assessments.models.score_responsible import ScoreResponsible
+from attribution.models.attribution_class import AttributionClass
 
 MIN_ALLOCATION_CHARGE = 0
 
@@ -70,3 +71,8 @@ def _attribution_new_delete(sender, instance, **kwargs):
         ScoreResponsible.objects.filter(
             learning_unit_year=instance.learning_component_year.learning_unit_year,
             tutor=instance.attribution.tutor).delete()
+        AttributionClass.objects.filter(
+            attribution_charge__attribution__tutor=instance.attribution.tutor,
+            learning_class_year__learning_component_year__learning_unit_year=
+            instance.learning_component_year.learning_unit_year
+        ).delete()

@@ -29,8 +29,9 @@ from django.db.models.signals import post_delete
 from django.dispatch import receiver
 
 from assessments.models.score_responsible import ScoreResponsible
-from attribution.models.attribution_charge_new import MIN_ALLOCATION_CHARGE
 from osis_common.models.osis_model_admin import OsisModelAdmin
+
+MIN_ALLOCATION_CHARGE = 0
 
 
 class AttributionClassAdmin(OsisModelAdmin):
