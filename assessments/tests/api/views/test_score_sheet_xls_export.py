@@ -33,7 +33,8 @@ from rest_framework.test import APITestCase
 from assessments.api.views.score_sheet_xls_export import ScoreSheetXLSExportAPIView
 from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.tutor import TutorFactory
-from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO, FeuilleDeNotesDTO, EnseignantDTO, DetailContactDTO, \
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO, FeuilleDeNotesDTO, EnseignantDTO, \
+    DetailContactDTO, \
     NoteEtudiantDTO
 from ddd.logic.encodage_des_notes.soumission.commands import SearchAdressesFeuilleDeNotesCommand, \
     GetFeuilleDeNotesCommand
@@ -68,7 +69,8 @@ class ScoreSheetXLSExportAPIViewTestCase(APITestCase):
                     code_unite_enseignement='LDROI1200',
                     contact_feuille_de_notes=AdresseFeuilleDeNotesDTO(
                         nom_cohorte='DROI1BA',
-                        entite='BUDR',
+                        annee_academique=2021,
+                        type_entite=None,
                         destinataire='',
                         rue_numero='',
                         code_postal='',

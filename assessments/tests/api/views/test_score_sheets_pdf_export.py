@@ -32,6 +32,7 @@ from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
 
 from assessments.api.views.score_sheets_pdf_export import ScoreSheetsPDFExportAPIView
+from assessments.models.enums.score_sheet_address_choices import ScoreSheetAddressEntityType
 from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.tutor import TutorFactory
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO, FeuilleDeNotesDTO, EnseignantDTO, DetailContactDTO, \
@@ -66,7 +67,8 @@ class ScoreSheetsPDFExportAPIViewTestCase(APITestCase):
                     code_unite_enseignement='LDROI1200',
                     contact_feuille_de_notes=AdresseFeuilleDeNotesDTO(
                         nom_cohorte='DROI1BA',
-                        entite='BUDR',
+                        annee_academique=2020,
+                        type_entite=ScoreSheetAddressEntityType.ENTITY_ADMINISTRATION.name,
                         destinataire='',
                         rue_numero='',
                         code_postal='',

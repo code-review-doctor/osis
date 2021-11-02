@@ -26,10 +26,19 @@ import attr
 import mock
 from django.test import SimpleTestCase
 
+from ddd.logic.encodage_des_notes.soumission.builder.adresse_feuille_de_notes_identity_builder import \
+    AdresseFeuilleDeNotesIdentityBuilder
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderAdresseFeuilleDeNotesSpecifique
+from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import \
+    AdresseSpecifiquePremiereAnneeDeBachelierIdentiqueAuBachlierException
+from ddd.logic.encodage_des_notes.tests.factory.adresse_feuille_de_notes import \
+    AdresseFeuilleDeNotesBaseeSurEntiteFactory
+from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.periode_encodage_notes import \
+    PeriodeEncodageNotesTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.repository.in_memory.adresse_feuille_de_notes import \
     AdresseFeuilleDeNotesInMemoryRepository
 from infrastructure.messages_bus import message_bus_instance
+from infrastructure.shared_kernel.academic_year.repository.in_memory.academic_year import AcademicYearInMemoryRepository
 
 
 class TestEncoderAddressFeuilleDeNotesSpecifique(SimpleTestCase):
@@ -49,12 +58,17 @@ class TestEncoderAddressFeuilleDeNotesSpecifique(SimpleTestCase):
         self.repo = AdresseFeuilleDeNotesInMemoryRepository()
         self.repo.entities.clear()
 
+        self.periode_encodage_notes_translator = PeriodeEncodageNotesTranslatorInMemory()
+        self.academic_year_repository = AcademicYearInMemoryRepository()
+
         self.__mock_service_bus()
 
     def __mock_service_bus(self):
         message_bus_patcher = mock.patch.multiple(
             'infrastructure.messages_bus',
             AdresseFeuilleDeNotesRepository=lambda: self.repo,
+            PeriodeEncodageNotesTranslator=lambda: self.periode_encodage_notes_translator,
+            AcademicYearRepository=lambda: self.academic_year_repository
         )
         message_bus_patcher.start()
         self.addCleanup(message_bus_patcher.stop)
@@ -74,10 +88,39 @@ class TestEncoderAddressFeuilleDeNotesSpecifique(SimpleTestCase):
         self.assertEqual(adresse_sauvegardee.telephone, self.cmd.telephone)
         self.assertEqual(adresse_sauvegardee.fax, self.cmd.fax)
         self.assertEqual(adresse_sauvegardee.email, self.cmd.email)
-        self.assertIsNone(adresse_sauvegardee.entite)
+        self.assertEqual(adresse_sauvegardee.type_entite, None)
 
-    def test_should_aussi_encoder_pour_la_premiere_annee_de_bachelier_when_encode_adresse_de_bachelier(self):
-        result = message_bus_instance.invoke(self.cmd)
+    def test_should_raise_exception_if_encoded_address_of_first_year_bachelor_is_the_same_as_bachelor(self):
+        adresse_bachelier = AdresseFeuilleDeNotesBaseeSurEntiteFactory()
+        self.repo.save(adresse_bachelier)
 
-        identite_11ba = attr.evolve(result, nom_cohorte=self.cmd.nom_cohorte.replace("1BA", "11BA"))
-        self.assertTrue(self.repo.get(identite_11ba))
+        cmd = attr.evolve(
+            self.cmd,
+            nom_cohorte=adresse_bachelier.nom_cohorte.replace('1BA', '11BA'),
+            email=adresse_bachelier.email,
+            destinataire=adresse_bachelier.destinataire,
+            rue_numero=adresse_bachelier.rue_numero,
+            code_postal=adresse_bachelier.code_postal,
+            ville=adresse_bachelier.ville,
+            pays=adresse_bachelier.pays,
+            telephone=adresse_bachelier.telephone,
+            fax=adresse_bachelier.fax
+        )
+
+        with self.assertRaises(AdresseSpecifiquePremiereAnneeDeBachelierIdentiqueAuBachlierException):
+            message_bus_instance.invoke(cmd)
+
+    def test_should_supprimer_adresse_specifique_11BA_si_equivalente_a_1ba_when_modifier_adresse_1ba(self):
+        self.repo.save(
+            AdresseFeuilleDeNotesBaseeSurEntiteFactory(entity_id__nom_cohorte=self.cmd.nom_cohorte)
+        )
+        cmd = attr.evolve(self.cmd, nom_cohorte=self.cmd.nom_cohorte.replace('1BA', '11BA'))
+        message_bus_instance.invoke(cmd)
+        message_bus_instance.invoke(self.cmd)
+
+        identite_adresse_11ba = AdresseFeuilleDeNotesIdentityBuilder().build_from_nom_cohorte_and_annee_academique(
+            cmd.nom_cohorte,
+            self.periode_encodage_notes_translator.get().annee_concernee
+        )
+
+        self.assertIsNone(self.repo.get(identite_adresse_11ba))

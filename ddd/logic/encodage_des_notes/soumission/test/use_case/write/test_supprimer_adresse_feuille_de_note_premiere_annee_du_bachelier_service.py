@@ -25,24 +25,28 @@
 import mock
 from django.test import SimpleTestCase
 
-from ddd.logic.encodage_des_notes.soumission.commands import EcraserAdresseFeuilleDeNotesPremiereAnneeDeBachelier
+from ddd.logic.encodage_des_notes.soumission.commands import SupprimerAdresseFeuilleDeNotesPremiereAnneeDeBachelier
 from ddd.logic.encodage_des_notes.tests.factory.adresse_feuille_de_notes import \
-    AdresseFeuilleDeNotesSpecifiqueFactory, \
     AdresseFeuilleDeNotesBaseeSurEntiteFactory
+from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.periode_encodage_notes import \
+    PeriodeEncodageNotesTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.repository.in_memory.adresse_feuille_de_notes import \
     AdresseFeuilleDeNotesInMemoryRepository
 from infrastructure.messages_bus import message_bus_instance
-from testing.assertions import assert_attrs_instances_are_equal
+from infrastructure.shared_kernel.academic_year.repository.in_memory.academic_year import AcademicYearInMemoryRepository
 
 
-class TestEcraserAdresseFeuilleDeNotePremiereAnneeDuBachlierParAdresseDuBachelier(SimpleTestCase):
+class TestSupprimerAdresseFeuilleDeNotePremiereAnneeDuBachlier(SimpleTestCase):
     def setUp(self) -> None:
-        self.cmd = EcraserAdresseFeuilleDeNotesPremiereAnneeDeBachelier(
+        self.cmd = SupprimerAdresseFeuilleDeNotesPremiereAnneeDeBachelier(
             nom_cohorte="DROI11BA",
         )
 
         self.repo = AdresseFeuilleDeNotesInMemoryRepository()
         self.repo.entities.clear()
+
+        self.periode_encodage_notes_translator = PeriodeEncodageNotesTranslatorInMemory()
+        self.academic_year_repository = AcademicYearInMemoryRepository()
 
         self.__mock_service_bus()
 
@@ -50,25 +54,21 @@ class TestEcraserAdresseFeuilleDeNotePremiereAnneeDuBachlierParAdresseDuBachelie
         message_bus_patcher = mock.patch.multiple(
             'infrastructure.messages_bus',
             AdresseFeuilleDeNotesRepository=lambda: self.repo,
+            PeriodeEncodageNotesTranslator=lambda: self.periode_encodage_notes_translator,
+            AcademicYearRepository=lambda: self.academic_year_repository
         )
         message_bus_patcher.start()
         self.addCleanup(message_bus_patcher.stop)
         self.message_bus = message_bus_instance
 
-    def test_should_avoir_meme_adresse_entre_bachelier_et_premiere_annee_de_bachelier(self):
-        adresse_bachelier = AdresseFeuilleDeNotesSpecifiqueFactory()
+    def test_should_delete_addresse(self):
         adresse_premiere_annee_de_bachelier = AdresseFeuilleDeNotesBaseeSurEntiteFactory(
             entity_id__nom_cohorte="DROI11BA"
         )
-        self.repo.save(adresse_bachelier)
         self.repo.save(adresse_premiere_annee_de_bachelier)
 
         result = message_bus_instance.invoke(self.cmd)
 
         adresse_sauvegardee = self.repo.get(result)
 
-        assert_attrs_instances_are_equal(
-            adresse_bachelier,
-            adresse_sauvegardee,
-            exclude=["entity_id"]
-        )
+        self.assertIsNone(adresse_sauvegardee)

@@ -24,23 +24,23 @@
 ##############################################################################
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodage_notes import \
     IPeriodeEncodageNotesTranslator
-from ddd.logic.encodage_des_notes.soumission.commands import GetAdresseFeuilleDeNotesServiceCommand
-from ddd.logic.encodage_des_notes.soumission.domain.service.get_adresse_feuille_de_notes_dto import \
-    GetAdresseFeuilleDeNotesDTODomainService
-from ddd.logic.encodage_des_notes.soumission.dtos import AdresseFeuilleDeNotesDTO
+from ddd.logic.encodage_des_notes.soumission.commands import SupprimerAdresseFeuilleDeNotesPremiereAnneeDeBachelier
+from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_notes import IdentiteAdresseFeuilleDeNotes
+from ddd.logic.encodage_des_notes.soumission.domain.service.encoder_adresse_feuille_de_notes import \
+    EncoderAdresseFeuilleDeNotesDomainService
 from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_notes import \
     IAdresseFeuilleDeNotesRepository
 from ddd.logic.shared_kernel.academic_year.repository.i_academic_year import IAcademicYearRepository
 
 
-def get_adresse_feuille_de_notes(
-        cmd: GetAdresseFeuilleDeNotesServiceCommand,
+def supprimer_adresse_feuille_de_note_premiere_annee_de_bachelier(
+        cmd: SupprimerAdresseFeuilleDeNotesPremiereAnneeDeBachelier,
         repo: IAdresseFeuilleDeNotesRepository,
         periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
         academic_year_repo: 'IAcademicYearRepository'
-) -> 'AdresseFeuilleDeNotesDTO':
-    return GetAdresseFeuilleDeNotesDTODomainService.get(
-        cmd.nom_cohorte,
+) -> 'IdentiteAdresseFeuilleDeNotes':
+    return EncoderAdresseFeuilleDeNotesDomainService().supprimer_adresse_premiere_annee_de_bachelier(
+        cmd,
         repo,
         periode_soumission_note_translator,
         academic_year_repo

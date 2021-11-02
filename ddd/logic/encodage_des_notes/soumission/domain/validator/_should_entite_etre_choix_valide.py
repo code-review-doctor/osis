@@ -1,3 +1,4 @@
+##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -14,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -22,17 +23,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.encodage_des_notes.soumission.commands import EncoderAdresseFeuilleDeNotesSpecifique, \
-    EcraserAdresseFeuilleDeNotesPremiereAnneeDeBachelier
-from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_notes import IdentiteAdresseFeuilleDeNotes
-from ddd.logic.encodage_des_notes.soumission.domain.service.encoder_adresse_feuille_de_notes import \
-    EncoderAdresseFeuilleDeNotesDomainService
-from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_notes import \
-    IAdresseFeuilleDeNotesRepository
+
+import attr
+
+from assessments.models.enums.score_sheet_address_choices import ScoreSheetAddressEntityType
+from base.ddd.utils.business_validator import BusinessValidator
+from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import EntiteNonValidePourAdresseException
 
 
-def ecraser_adresse_feuille_de_note_premiere_annee_de_bachelier_par_adresse_du_bachelier(
-        cmd: EcraserAdresseFeuilleDeNotesPremiereAnneeDeBachelier,
-        repo: IAdresseFeuilleDeNotesRepository,
-) -> 'IdentiteAdresseFeuilleDeNotes':
-    return EncoderAdresseFeuilleDeNotesDomainService().ecraser_adresse_premiere_annee_de_bachelier(cmd, repo)
+@attr.s(frozen=True, slots=True)
+class ShouldEntiteEtreChoixValide(BusinessValidator):
+    type_entite = attr.ib(type=str)
+
+    def validate(self, *args, **kwargs):
+        if not self.type_entite:
+            return
+
+        try:
+            ScoreSheetAddressEntityType[self.type_entite]
+        except KeyError:
+            raise EntiteNonValidePourAdresseException()
