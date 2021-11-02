@@ -1,3 +1,4 @@
+##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -14,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -22,26 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodage_notes import \
-    IPeriodeEncodageNotesTranslator
-from ddd.logic.encodage_des_notes.soumission.commands import GetAdresseFeuilleDeNotesServiceCommand
-from ddd.logic.encodage_des_notes.soumission.domain.service.get_adresse_feuille_de_notes_dto import \
-    GetAdresseFeuilleDeNotesDTODomainService
-from ddd.logic.encodage_des_notes.soumission.dtos import AdresseFeuilleDeNotesDTO
-from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_notes import \
-    IAdresseFeuilleDeNotesRepository
+from typing import List, Optional
+
+from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
+from base.models.academic_year import AcademicYear as AcademicYearDatabase
+from ddd.logic.shared_kernel.academic_year.builder.academic_year_builder import AcademicYearBuilder
+from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYear, AcademicYearIdentity
+from ddd.logic.shared_kernel.academic_year.dtos import AcademicYearDataDTO
 from ddd.logic.shared_kernel.academic_year.repository.i_academic_year import IAcademicYearRepository
+from osis_common.ddd.interface import ApplicationService
 
 
-def get_adresse_feuille_de_notes(
-        cmd: GetAdresseFeuilleDeNotesServiceCommand,
-        repo: IAdresseFeuilleDeNotesRepository,
-        periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
-        academic_year_repo: 'IAcademicYearRepository'
-) -> 'AdresseFeuilleDeNotesDTO':
-    return GetAdresseFeuilleDeNotesDTODomainService.get(
-        cmd.nom_cohorte,
-        repo,
-        periode_soumission_note_translator,
-        academic_year_repo
-    )
+class AcademicYearInMemoryRepository(InMemoryGenericRepository, IAcademicYearRepository):
+    entities = list()  # type: List[AcademicYear]

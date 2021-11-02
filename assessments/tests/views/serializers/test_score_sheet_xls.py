@@ -96,7 +96,8 @@ class ScoreSheetXLSSerializerTest(SimpleTestCase):
             code_unite_enseignement='LDROI1200',
             contact_feuille_de_notes=AdresseFeuilleDeNotesDTO(
                 nom_cohorte='DROI2M',
-                entite="",
+                annee_academique=2021,
+                type_entite="",
                 destinataire='Durant Thomas',
                 rue_numero='Chemin de lasne',
                 code_postal=1200,
@@ -317,7 +318,8 @@ class TutorScoreSheetXLSSerilizeTest(SimpleTestCase):
             code_unite_enseignement='LDROI1200',
             contact_feuille_de_notes=AdresseFeuilleDeNotesDTO(
                 nom_cohorte='DROI2M',
-                entite="",
+                annee_academique=2021,
+                type_entite="",
                 destinataire='Durant Thomas',
                 rue_numero='Chemin de lasne',
                 code_postal=1200,

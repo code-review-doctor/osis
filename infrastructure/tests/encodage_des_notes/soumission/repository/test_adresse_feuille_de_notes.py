@@ -34,7 +34,8 @@ from ddd.logic.encodage_des_notes.soumission.builder.adresse_feuille_de_notes_id
 from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_notes import AdresseFeuilleDeNotes
 from ddd.logic.encodage_des_notes.tests.factory.adresse_feuille_de_notes import \
     AdresseFeuilleDeNotesSpecifiqueFactory, \
-    PremiereAnneeBachelierAdresseFeuilleDeNotesSpecifiqueFactory, AdresseFeuilleDeNotesBaseeSurEntiteFactory
+    PremiereAnneeBachelierAdresseFeuilleDeNotesSpecifiqueFactory, AdresseFeuilleDeNotesBaseeSurEntiteFactory, \
+    PremiereAnneeBachelierAdresseFeuilleDeNotesBaseeSurEntiteFactory
 from infrastructure.encodage_de_notes.soumission.repository.adresse_feuille_de_notes import \
     AdresseFeuilleDeNotesRepository
 from reference.tests.factories.country import CountryFactory
@@ -62,8 +63,9 @@ class TestAdresseFeuilleDeNotesRepository(TestCase):
 
         self.repository.save(adresse)
 
-        entity_11ba = AdresseFeuilleDeNotesIdentityBuilder().build_from_nom_cohorte(
-            adresse.nom_cohorte.replace('1BA', "11BA")
+        entity_11ba = AdresseFeuilleDeNotesIdentityBuilder().build_from_nom_cohorte_and_annee_academique(
+            adresse.nom_cohorte.replace('1BA', "11BA"),
+            adresse.annee_academique
         )
 
         self.assertTrue(self.repository.get(entity_11ba))
@@ -158,18 +160,49 @@ class TestAdresseFeuilleDeNotesRepository(TestCase):
         )
         assert_attrs_instances_are_equal(result, adresse)
 
-    def _create_necessary_data(self, adresse: 'AdresseFeuilleDeNotes', with_cohort_year: bool = False):
+    def test_should_return_cohort_specific_administration_entity_if_present(self):
+        adresse = PremiereAnneeBachelierAdresseFeuilleDeNotesBaseeSurEntiteFactory()
+        self._create_necessary_data(adresse)
+
+        self.repository.save(adresse)
+
+        result = self.repository.get(adresse.entity_id)
+
+        assert_attrs_instances_are_equal(result, adresse)
+
+    def _create_necessary_data(
+            self,
+            adresse: 'AdresseFeuilleDeNotes',
+            with_cohort_year: bool = False,
+    ):
         if "11BA" in adresse.nom_cohorte:
-            CohortYearFactory(
+            cohort = CohortYearFactory(
                 education_group_year__acronym=adresse.nom_cohorte.replace('11BA', '1BA'),
-                education_group_year__academic_year__current=True,
+                education_group_year__academic_year__year=adresse.annee_academique,
                 first_year_bachelor=True
             )
+            administration_entity = cohort.administration_entity
         else:
-            egy = EducationGroupYearFactory(acronym=adresse.nom_cohorte, academic_year__current=True)
+            egy = EducationGroupYearFactory(
+                acronym=adresse.nom_cohorte,
+                academic_year__year=adresse.annee_academique
+            )
             if with_cohort_year:
                 CohortYearFactory(education_group_year=egy, first_year_bachelor=True)
+            administration_entity = egy.administration_entity
 
         CountryFactory(name=adresse.pays)
-        if adresse.sigle_entite:
-            EntityVersionFactory(acronym=adresse.sigle_entite)
+        if adresse.type_entite:
+            administration_entity.location = adresse.rue_numero
+            administration_entity.postal_code = adresse.code_postal
+            administration_entity.city = adresse.ville
+            administration_entity.country = CountryFactory(name=adresse.pays)
+            administration_entity.phone = adresse.telephone
+            administration_entity.fax = adresse.fax
+            administration_entity.save()
+
+            EntityVersionFactory(
+                entity=administration_entity,
+                acronym=adresse.destinataire.split(' - ')[0],
+                title=adresse.destinataire.split(' - ')[1],
+            )

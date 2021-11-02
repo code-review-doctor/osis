@@ -94,7 +94,7 @@ class SearchAdressesFeuilleDeNotesCommand(interface.CommandRequest):
 class EncoderAdresseEntiteCommeAdresseFeuilleDeNotes(interface.CommandRequest):
     nom_cohorte = attr.ib(type=str)
     email = attr.ib(type=str)
-    entite = attr.ib(type=str)
+    type_entite = attr.ib(type=str)
 
 
 @attr.s(frozen=True, slots=True)
@@ -111,7 +111,7 @@ class EncoderAdresseFeuilleDeNotesSpecifique(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
-class EcraserAdresseFeuilleDeNotesPremiereAnneeDeBachelier(interface.CommandRequest):
+class SupprimerAdresseFeuilleDeNotesPremiereAnneeDeBachelier(interface.CommandRequest):
     nom_cohorte = attr.ib(type=str)
 
 

@@ -22,25 +22,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
 
-from base.models import academic_year
 from base.models.education_group_year import EducationGroupYear
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_entites_cohorte import IEntitesCohorteTranslator
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_entites_cohorte import IEntitesCohorteTranslator, \
+    EntitesCohorteDTO
 from ddd.logic.shared_kernel.entite.builder.identite_entite_builder import IdentiteEntiteBuilder
-from ddd.logic.shared_kernel.entite.domain.model.entiteucl import IdentiteUCLEntite
 from education_group.models.cohort_year import CohortYear
 
 
 class EntitesCohorteTranslator(IEntitesCohorteTranslator):
 
     @classmethod
-    def search_entite_administration_et_gestion(cls, nom_cohorte: str) -> List['IdentiteUCLEntite']:
+    def search_entite_administration_et_gestion(cls, nom_cohorte: str, annee: int) -> EntitesCohorteDTO:
         builder = IdentiteEntiteBuilder()
         if "11BA" in nom_cohorte:
             cohort = CohortYear.objects.get_first_year_bachelor(
                 education_group_year__acronym=nom_cohorte.replace("11BA", '1BA'),
-                education_group_year__academic_year=academic_year.current_academic_year()
+                education_group_year__academic_year__year=annee
             )
             management_entity_acronym = cohort.education_group_year.management_entity.most_recent_acronym
             administration_entity_acronym = cohort.education_group_year.administration_entity.most_recent_acronym \
@@ -49,7 +47,7 @@ class EntitesCohorteTranslator(IEntitesCohorteTranslator):
 
         else:
             egy = EducationGroupYear.objects.filter(
-                academic_year=academic_year.current_academic_year(),
+                academic_year__year=annee,
                 acronym=nom_cohorte
             ).select_related(
                 "management_entity",
@@ -58,9 +56,13 @@ class EntitesCohorteTranslator(IEntitesCohorteTranslator):
             management_entity_acronym = egy.management_entity.most_recent_acronym
             administration_entity_acronym = egy.administration_entity.most_recent_acronym
 
-        entities = set()
+        management_entity = None
+        administration_entity = None
         if management_entity_acronym:
-            entities.add(builder.build_from_sigle(management_entity_acronym))
+            management_entity = builder.build_from_sigle(management_entity_acronym)
         if administration_entity_acronym:
-            entities.add(builder.build_from_sigle(administration_entity_acronym))
-        return list(entities)
+            administration_entity = builder.build_from_sigle(administration_entity_acronym)
+        return EntitesCohorteDTO(
+            administration=administration_entity,
+            gestion=management_entity
+        )

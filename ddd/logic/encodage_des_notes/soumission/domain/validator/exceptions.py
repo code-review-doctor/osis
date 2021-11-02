@@ -79,7 +79,13 @@ class PasGestionnaireParcoursCohorteException(BusinessException):
         super().__init__(message, **kwargs)
 
 
-class AdressePremiereAnneeDeBachelierIdentiqueAuBachlierException(BusinessException):
+class AdresseSpecifiquePremiereAnneeDeBachelierIdentiqueAuBachlierException(BusinessException):
+    def __init__(self, **kwargs):
+        message = _("The address cannot be the same between bachelor and first year bachelor")
+        super().__init__(message, **kwargs)
+
+
+class EntiteAdressePremiereAnneeDeBachelierIdentiqueAuBachlierException(BusinessException):
     def __init__(self, **kwargs):
         message = _("The entity cannot be the same between bachelor and first year bachelor")
         super().__init__(message, **kwargs)

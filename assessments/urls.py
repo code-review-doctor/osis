@@ -80,12 +80,12 @@ urlpatterns = [
         path('pdf_export', ScoreSheetsPDFExportView.as_view(), name='score_sheets_pdf_export'),
     ])),
 
-    url(r'^offers/', include([
-        url(r'^new/$', OffersSearch.as_view(), name='offers_search_new'),
+    path('offers/', include([
+        path('', OffersSearch.as_view(), name='offers_search'),
         path('<acronym:acronym>/', include([
-            url(r'^score_encoding/$', ScoreSheetAddressView.as_view(), name='score_sheet_address'),
-            url(
-                r'^first_year_bachelor/score_encoding/$',
+            path('score_encoding', ScoreSheetAddressView.as_view(), name='score_sheet_address'),
+            path(
+                'first_year_bachelor/score_encoding',
                 FirstYearBachelorScoreSheetAddressView.as_view(),
                 name='first_year_bachelor_score_sheet_address'
             ),
