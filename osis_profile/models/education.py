@@ -120,7 +120,7 @@ class BelgianHighSchoolDiploma(HighSchoolDiploma):
         _("Did you change of orientation during your studies?"), default=False
     )
     # TODO change by a FK when we got the related service to look for institutes
-    institute = models.CharField(_("Institute"), default="", max_length=25)
+    institute = models.CharField(_("Institute"), default="", blank=True, max_length=25)
     other_institute = models.CharField(
         _("Another institute"),
         max_length=500,
