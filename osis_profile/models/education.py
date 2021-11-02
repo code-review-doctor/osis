@@ -24,7 +24,7 @@
 #
 # ##############################################################################
 from django.db import models
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy as _
 
 from base.models.academic_year import AcademicYear
 from base.models.person import Person
