@@ -24,11 +24,11 @@
 #
 ##############################################################################
 from datetime import date
-from typing import Set, Optional, List
+from typing import Set, Optional
 
 import attr
 
-from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO, EtudiantPepsDTO, DateEcheanceDTO
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO, EtudiantPepsDTO
 from osis_common.ddd import interface
 
 
@@ -53,7 +53,6 @@ class AdresseFeuilleDeNotesDTO(interface.DTO):
 class DonneesAdministrativesFeuilleDeNotesDTO(interface.DTO):
     sigle_formation = attr.ib(type=str)
     code_unite_enseignement = attr.ib(type=str)
-    date_deliberation = attr.ib(type=DateDTO)
     contact_feuille_de_notes = attr.ib(type=AdresseFeuilleDeNotesDTO)
 
 

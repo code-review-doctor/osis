@@ -90,8 +90,8 @@ from ddd.logic.encodage_des_notes.encodage.use_case.read.get_feuille_de_notes_se
 from ddd.logic.encodage_des_notes.encodage.use_case.read.get_periode_encodage_service import get_periode_encodage
 from ddd.logic.encodage_des_notes.encodage.use_case.read.get_progression_generale_encodage_service import \
     get_progression_generale_gestionnaire
-from ddd.logic.encodage_des_notes.encodage.use_case.read.rechercher_notes_service import rechercher_notes
 from ddd.logic.encodage_des_notes.encodage.use_case.read.rechercher_enseignants import rechercher_enseignants
+from ddd.logic.encodage_des_notes.encodage.use_case.read.rechercher_notes_service import rechercher_notes
 from ddd.logic.encodage_des_notes.encodage.use_case.write.encoder_notes_service import encoder_notes
 from ddd.logic.encodage_des_notes.shared_kernel.commands import GetEncoderNotesRapportCommand
 from ddd.logic.encodage_des_notes.shared_kernel.use_case.read.get_encoder_notes_rapport_service import \
@@ -200,7 +200,6 @@ from infrastructure.encodage_de_notes.shared_kernel.service.periode_encodage_not
 from infrastructure.encodage_de_notes.shared_kernel.service.signaletique_etudiant import \
     SignaletiqueEtudiantTranslator
 from infrastructure.encodage_de_notes.shared_kernel.service.unite_enseignement import UniteEnseignementTranslator
-from infrastructure.encodage_de_notes.soumission.domain.service.deliberation import DeliberationTranslator
 from infrastructure.encodage_de_notes.soumission.domain.service.entites_cohorte import EntitesCohorteTranslator
 from infrastructure.encodage_de_notes.soumission.domain.service.historiser_notes import HistoriserNotesService
 from infrastructure.encodage_de_notes.soumission.domain.service.notifier_soumission_notes import NotifierSoumissionNotes
@@ -407,7 +406,6 @@ class MessageBusCommands(AbstractMessageBusCommands):
             cmd,
             PeriodeEncodageNotesTranslator(),
             InscriptionExamenTranslator(),
-            DeliberationTranslator(),
             AdresseFeuilleDeNotesRepository(),
         ),
         EncoderNotesCommand: lambda cmd: encoder_notes(
