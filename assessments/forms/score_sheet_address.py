@@ -77,6 +77,13 @@ class ScoreSheetAddressForm(forms.Form):
         choices.append((None, gettext_lazy('Customized')))
 
         self.fields['entity'].choices = tuple(choices)
+        self._get_initial_entity_field()
+
+    def _get_initial_entity_field(self):
+        self.initial['entity'] = next(
+            (choice[0] for choice in self.fields['entity'].choices if choice[1] == self.initial['recipient']),
+            None
+        )
 
     def clean(self):
         cleaned_data = super().clean()
