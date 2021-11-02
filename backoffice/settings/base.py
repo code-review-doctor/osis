@@ -96,6 +96,9 @@ INSTALLED_APPS = (
     'osis_document',
     'osis_history',
     'osis_signature',
+    'osis_export',
+    'osis_notification',
+    'osis_async'
 )
 
 
@@ -540,3 +543,7 @@ INTERNSHIP_SCORE_ENCODING_URL = os.environ.get("INTERNSHIP_SCORE_ENCODING_URL", 
 CONTINUING_EDUCATION_STUDENT_PORTAL_URL = os.environ.get("CONTINUING_EDUCATION_STUDENT_PORTAL_URL", "")
 
 SCHEDULE_APP_URL = os.environ.get("SCHEDULE_APP_URL", "")
+
+OSIS_EXPORT_ASYNCHRONOUS_MANAGER_CLS = os.environ.get(
+    "OSIS_EXPORT_ASYNCHRONOUS_MANAGER_CLS", "backoffice.settings.osis_export.async_manager.AsyncTaskManager"
+)
