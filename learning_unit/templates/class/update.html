@@ -111,14 +111,31 @@
                                         <div class="col-md-3">
                                             {% bootstrap_field form.learning_unit_state %}
                                         </div>
-                                        <div class="col-md-3">
-                                            {% bootstrap_field form.learning_unit_language %}
+                                       <div class="col-md-3">
+                                            {% bootstrap_field form.learning_unit_individual_loan %}
                                         </div>
                                     {% endblock content_row2 %}
                                 </div>
                                 <div class="row">
-                                    <div class="col-md-12">
+                                    <div class="col-md-3">
+                                        {% bootstrap_field form.learning_unit_language %}
+                                    </div>
+                                    <div class="col-md-3">
+                                        {% bootstrap_field form.learning_unit_english_friendly %}
+                                    </div>
+                                    <div class="col-md-3">
+                                        {% bootstrap_field form.learning_unit_french_friendly %}
+                                    </div>
+                                    <div class="col-md-3">
+                                        {% bootstrap_field form.learning_unit_exchange_students %}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3">
                                         {% bootstrap_field form.learning_unit_professional_integration %}
+                                    </div>
+                                    <div class="col-md-3">
+                                        {% bootstrap_field form.learning_unit_stage_dimona %}
                                     </div>
                                 </div>
                                 <label>

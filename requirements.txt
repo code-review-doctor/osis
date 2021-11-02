@@ -45,7 +45,15 @@ numpy==1.17.4
 setuptools==49.6.0
 tblib==1.7.0
 
+# Modules transverses
+git+https://github.com/uclouvain/osis-async.git@dev#egg=osis_async
+git+https://github.com/uclouvain/osis-document.git@dev#egg=osis_document
+git+https://github.com/uclouvain/osis-history.git@dev#egg=osis_history
+git+https://github.com/uclouvain/osis-notification.git@dev#egg=osis_notification
+git+https://github.com/uclouvain/osis-signature.git@dev#egg=osis_signature
+git+https://github.com/uclouvain/osis-mail-template.git@dev#egg=osis_mail_template
+
+
 -r ./osis_common/requirements.txt
 -r ./internship/requirements.txt
 -r ./osis_role/requirements.txt
--r ./osis_mail_template/requirements.txt
