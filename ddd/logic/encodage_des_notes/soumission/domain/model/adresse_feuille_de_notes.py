@@ -59,8 +59,7 @@ class AdresseFeuilleDeNotes(interface.RootEntity):
 
     def est_identique_a(self, autre_adresse: 'AdresseFeuilleDeNotes') -> bool:
         if self.type_entite:
-            return self.type_entite == autre_adresse.type_entite and \
-                   self.destinataire == autre_adresse.destinataire
+            return autre_adresse.type_entite and self.destinataire == autre_adresse.destinataire
 
         return self.type_entite == autre_adresse.type_entite and \
             self.destinataire == autre_adresse.destinataire and \

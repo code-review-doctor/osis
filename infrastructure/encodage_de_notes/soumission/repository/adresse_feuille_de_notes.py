@@ -146,10 +146,13 @@ class AdresseFeuilleDeNotesRepository(IAdresseFeuilleDeNotesRepository):
                 educationgroupyear__acronym=entity_id.nom_cohorte
             ).first()
 
-        ScoreSheetAddress.objects.get(
-            education_group=education_group,
-            cohort_name=cohort_name
-        ).delete()
+        try:
+            ScoreSheetAddress.objects.get(
+                education_group=education_group,
+                cohort_name=cohort_name
+            ).delete()
+        except ScoreSheetAddress.DoesNotExist:
+            pass
 
     @classmethod
     def save(cls, entity: 'AdresseFeuilleDeNotes') -> None:

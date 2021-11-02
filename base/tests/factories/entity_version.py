@@ -51,6 +51,10 @@ class EntityVersionFactory(factory.DjangoModelFactory):
     start_date = datetime.date(2015, 1, 1).isoformat()
     end_date = None
 
+    class Params:
+        sector = factory.Trait(entity_type=entity_type.SECTOR)
+        faculty = factory.Trait(entity_type=entity_type.FACULTY)
+
 
 class MainEntityVersionFactory(EntityVersionFactory):
     entity = factory.SubFactory(EntityFactory, organization__type=organization_type.MAIN)
