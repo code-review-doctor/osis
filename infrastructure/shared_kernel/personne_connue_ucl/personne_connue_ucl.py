@@ -25,6 +25,7 @@
 ##############################################################################
 from typing import Set, List
 
+from base.models.person import Person, search_employee
 from ddd.logic.shared_kernel.personne_connue_ucl.domain.service.personne_connue_ucl import IPersonneConnueUclTranslator
 from ddd.logic.shared_kernel.personne_connue_ucl.dtos import PersonneConnueUclDTO
 
@@ -32,12 +33,33 @@ from ddd.logic.shared_kernel.personne_connue_ucl.dtos import PersonneConnueUclDT
 class PersonneConnueUclTranslator(IPersonneConnueUclTranslator):
     @classmethod
     def get(cls, matricule: str) -> 'PersonneConnueUclDTO':
-        raise NotImplementedError
+        person = Person.objects.get(global_id=matricule)
+        return PersonneConnueUclDTO(
+            matricule=matricule,
+            nom=person.last_name,
+            prenom=person.first_name,
+            email=person.email,
+            adresse_professionnelle=None,
+        )
 
     @classmethod
     def search(cls, terme_de_recherche: str) -> List['PersonneConnueUclDTO']:
-        raise NotImplementedError
+        persons = search_employee(terme_de_recherche)
+        return [PersonneConnueUclDTO(
+            matricule=person.global_id,
+            nom=person.last_name,
+            prenom=person.first_name,
+            email=person.email,
+            adresse_professionnelle=None,
+        ) for person in persons]
 
     @classmethod
     def search_by_matricules(cls, matricules_fgs: Set[str]) -> List['PersonneConnueUclDTO']:
-        raise NotImplementedError
+        persons = Person.objects.filter(global_id__in=matricules_fgs)
+        return [PersonneConnueUclDTO(
+            matricule=person.global_id,
+            nom=person.last_name,
+            prenom=person.first_name,
+            email=person.email,
+            adresse_professionnelle=None,
+        ) for person in persons]
