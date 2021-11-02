@@ -42,7 +42,7 @@ from base.models.academic_year import AcademicYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.utils.cache import CacheFilterMixin
-from base.views.common import display_success_messages
+from base.views.common import display_success_messages, display_error_messages
 from ddd.logic.effective_class_repartition.commands import SearchAttributionsToLearningUnitCommand, \
     SearchTutorsDistributedToClassCommand
 from ddd.logic.effective_class_repartition.dtos import TutorAttributionToLearningUnitDTO
@@ -173,25 +173,26 @@ class SelectScoreResponsible(LoginRequiredMixin, PermissionRequiredMixin, Templa
 
     def post(self, request, *args, **kwargs):
         matricule_fgs = self.request.POST.get('matricule_fgs')
+        if matricule_fgs:
+            cmd = AssignerResponsableDeNotesCommand(
+                code_unite_enseignement=self.code_unite_enseignement,
+                annee_unite_enseignement=self.academic_year.year,
+                matricule_fgs_enseignant=matricule_fgs
+            )
 
-        cmd = AssignerResponsableDeNotesCommand(
-            code_unite_enseignement=self.code_unite_enseignement,
-            annee_unite_enseignement=self.academic_year.year,
-            matricule_fgs_enseignant=matricule_fgs
-        )
-
-        message_bus_instance.invoke(cmd)
-        display_success_messages(request, self.get_success_msg(self.code_unite_enseignement))
+            message_bus_instance.invoke(cmd)
+            display_success_messages(request, self.get_success_msg(self.code_unite_enseignement))
 
         for code_complet_classe in self.get_repartitions_classes_par_code:
             matricule_fgs_classe = self.request.POST.get('matricule_fgs_' + code_complet_classe)
-            cmd = AssignerResponsableDeNotesCommand(
-                code_unite_enseignement=code_complet_classe,
-                annee_unite_enseignement=self.academic_year.year,
-                matricule_fgs_enseignant=matricule_fgs_classe
-            )
-            message_bus_instance.invoke(cmd)
-            display_success_messages(request, self.get_success_msg(code_complet_classe))
+            if matricule_fgs_classe:
+                cmd = AssignerResponsableDeNotesCommand(
+                    code_unite_enseignement=code_complet_classe,
+                    annee_unite_enseignement=self.academic_year.year,
+                    matricule_fgs_enseignant=matricule_fgs_classe
+                )
+                message_bus_instance.invoke(cmd)
+                display_success_messages(request, self.get_success_msg(code_complet_classe))
 
         return redirect(reverse('scores_responsibles_search'))
 
