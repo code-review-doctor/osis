@@ -72,17 +72,17 @@ msgstr ""
 msgid "Details other educational facilities"
 msgstr ""
 
+msgid "Following fields are required : {}"
+msgstr ""
+
+msgid "Internship subtype is a mandatory field"
+msgstr ""
+
 msgid "Distributed volume should be filled in and be greater than 0"
 msgstr ""
 
 #, python-format
 msgid "Extra time (33% generally)"
-msgstr ""
-
-msgid "Following fields are required : {}"
-msgstr ""
-
-msgid "Internship subtype is a mandatory field"
 msgstr ""
 
 msgid "Large print"
@@ -95,6 +95,9 @@ msgid "Learning unit {} is used in following programs : {}"
 msgstr ""
 
 msgid "Lecturing charge or practical charge must be filled"
+msgstr ""
+
+msgid "No student to encode by excel"
 msgstr ""
 
 msgid "No vacant corresponding activity"
@@ -202,6 +205,12 @@ msgid ""
 msgstr ""
 
 msgid "The teaching place is required."
+msgstr ""
+
+msgid "There is no enrollment for this course"
+msgstr ""
+
+msgid "There is no enrollment to the exam"
 msgstr ""
 
 msgid ""

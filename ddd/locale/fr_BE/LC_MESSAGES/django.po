@@ -107,6 +107,9 @@ msgstr "L'UE est utilisée dans les formations suivantes : {}"
 msgid "Lecturing charge or practical charge must be filled"
 msgstr "Le vol.1 postulé ou le vol.2 postulé doit être rempli"
 
+msgid "No student to encode by excel"
+msgstr "Aucun étudiant à encoder par Excel "
+
 msgid "No vacant corresponding activity"
 msgstr "Pas d'activité vacante correspondante"
 
@@ -235,6 +238,12 @@ msgstr ""
 
 msgid "The teaching place is required."
 msgstr "Le lieu d'enseignement est obligatoire"
+
+msgid "There is no enrollment for this course"
+msgstr "Aucune inscription pour ce cours"
+
+msgid "There is no enrollment to the exam"
+msgstr "Aucune inscription à l'examen de ce cours"
 
 msgid ""
 "This course is team-managed. The application to this activity is based on a "
