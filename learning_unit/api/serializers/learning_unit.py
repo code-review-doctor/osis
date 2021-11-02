@@ -90,7 +90,7 @@ class LearningUnitSerializer(LearningUnitTitleSerializer):
             'subtype',
             'subtype_text',
             'has_proposal',
-            'has_classes',
+            'has_classes'
         )
 
     def get_has_proposal(self, learning_unit_year):

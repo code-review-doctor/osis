@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-25 11:40+0200\n"
+"POT-Creation-Date: 2021-10-28 10:36+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -186,9 +186,6 @@ msgstr ""
 msgid "Define a specific address for the first year of bachelor"
 msgstr ""
 
-msgid "Definitive submission (Submit to faculty)"
-msgstr ""
-
 msgid "Deliberation date"
 msgstr ""
 
@@ -316,6 +313,10 @@ msgid "Managers"
 msgstr ""
 
 msgid "Missing score"
+msgstr ""
+
+#, python-brace-format
+msgid "More than {0} results found. Only the {0} first results are displayed."
 msgstr ""
 
 msgid ""
@@ -539,7 +540,15 @@ msgstr ""
 msgid "Submission"
 msgstr ""
 
+msgid "Submit"
+msgstr ""
+
 msgid "Submit data"
+msgstr ""
+
+msgid ""
+"Submit these scores to faculty. These scores can not be changed after "
+"submission. The unsubmitted scores remain editable."
 msgstr ""
 
 msgid "Teacher deadline"
@@ -638,7 +647,15 @@ msgstr ""
 msgid "Via paper"
 msgstr ""
 
-msgid "Warning : some registered scores have not been submitted yet!"
+#, python-format
+msgid "Warning: %(scores)s score(s) ready to be submitted."
+msgstr ""
+
+#, python-format
+msgid ""
+"Warning: %(scores)s score(s) ready to be submitted. Only score responsible "
+"(%(responsable_nom)s, %(responsable_prenom)s) will be allowed to submit the "
+"scores to faculty."
 msgstr ""
 
 msgid "Yes"

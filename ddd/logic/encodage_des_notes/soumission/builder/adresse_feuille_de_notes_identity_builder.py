@@ -39,8 +39,15 @@ class AdresseFeuilleDeNotesIdentityBuilder(EntityIdentityBuilder):
             cls,
             dto_object: 'AdresseFeuilleDeNotesDTO'
     ) -> 'IdentiteAdresseFeuilleDeNotes':
-        return IdentiteAdresseFeuilleDeNotes(nom_cohorte=dto_object.nom_cohorte)
+        return IdentiteAdresseFeuilleDeNotes(
+            nom_cohorte=dto_object.nom_cohorte,
+            annee_academique=dto_object.annee_academique
+        )
 
     @classmethod
-    def build_from_nom_cohorte(cls, nom_cohorte: str) -> 'IdentiteAdresseFeuilleDeNotes':
-        return IdentiteAdresseFeuilleDeNotes(nom_cohorte=nom_cohorte)
+    def build_from_nom_cohorte_and_annee_academique(
+            cls,
+            nom_cohorte: str,
+            annee_academique: int
+    ) -> 'IdentiteAdresseFeuilleDeNotes':
+        return IdentiteAdresseFeuilleDeNotes(nom_cohorte=nom_cohorte, annee_academique=annee_academique)
