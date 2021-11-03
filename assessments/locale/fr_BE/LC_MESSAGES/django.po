@@ -508,6 +508,10 @@ msgstr "Valeurs acceptées"
 msgid "Score legend: A=Absent, T=Cheating, {score} (0=Score of presence)"
 msgstr "Valeur acceptée: A=Absent, T=Tricherie, {score} (0=Note de présence)"
 
+#, python-format
+msgid "Score responsible successfully designated on %(code)s."
+msgstr "Responsable de notes désigné avec succès sur %(code)s."
+
 msgid "Score sheet"
 msgstr "Feuille de notes"
 
@@ -681,7 +685,11 @@ msgid "Tutor deadlines"
 msgstr "Dates d'échéance de l'enseignant"
 
 msgid "Tutors of the course"
-msgstr "Tuteurs du cours"
+msgstr "Enseignant.e.s du cours"
+
+#, python-format
+msgid "Tutors' classes of the course %(code)s (%(annee_academique)s)"
+msgstr "Enseignant.e.s des classes du cours %(code)s (%(annee_academique)s)"
 
 msgid "Type"
 msgstr "Type"

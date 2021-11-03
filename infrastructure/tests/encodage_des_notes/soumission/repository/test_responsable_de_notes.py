@@ -98,8 +98,7 @@ class ResponsableDeNotesRepositoryTest(TestCase):
 
         self.responsable_de_notes_repository.save(responsable)
 
-        with self.assertRaises(IndexError):
-            self.responsable_de_notes_repository.get(responsable.entity_id)
+        self.assertIsNone(self.responsable_de_notes_repository.get(responsable.entity_id))
 
     def test_should_get_responsable_de_notes_par_cours(self):
         responsable = ResponsableDeNotesPourUneUniteEnseignement()

@@ -462,6 +462,10 @@ msgstr ""
 msgid "Score legend: A=Absent, T=Cheating, {score} (0=Score of presence)"
 msgstr ""
 
+#, python-format
+msgid "Score responsible successfully designated on %(code)s."
+msgstr ""
+
 msgid "Score sheet"
 msgstr ""
 
@@ -618,6 +622,10 @@ msgid "Tutor deadlines"
 msgstr ""
 
 msgid "Tutors of the course"
+msgstr ""
+
+#, python-format
+msgid "Tutors' classes of the course %(code)s (%(annee_academique)s)"
 msgstr ""
 
 msgid "Type"
