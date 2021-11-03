@@ -184,17 +184,18 @@
                                       style="font-size: 150%; margin-right: 5px" aria-hidden="true"></span>
                                 {% if can_submit_scores %}
                                     {% blocktrans with scores=feuille_de_notes.quantite_notes_en_attente_de_soumission %}Warning: {{ scores }} score(s) ready to be submitted.{% endblocktrans %}
-                                    <a  id="lnk_submit"
-                                    class="btn btn-warning trigger_modal" data-url="{{ learning_unit_submit_url }}"
-                                        data-toggle="tooltip" data-placement="bottom"
-                                        title="{% trans 'Submit these scores to faculty. These scores can not be changed after submission. The unsubmitted scores remain editable.' %}"
-                                        role="button">
+                                    <a id="lnk_submit"
+                                       class="btn btn-warning trigger_modal" data-url="{{ learning_unit_submit_url }}"
+                                       data-toggle="tooltip" data-placement="bottom"
+                                       title="{% trans 'Submit these scores to faculty. These scores can not be changed after submission. The unsubmitted scores remain editable.' %}"
+                                       role="button">
                                         <em class="fas fa-paper-plane"></em> {% trans 'Submit' %}
                                     </a>
                                 {% else %}
                                     {% blocktrans with scores=feuille_de_notes.quantite_notes_en_attente_de_soumission responsable_nom=feuille_de_notes.responsable_note.nom responsable_prenom=feuille_de_notes.responsable_note.prenom %}
                                         Warning: {{ scores }} score(s) ready to be submitted. Only score responsible (
-                                        {{ responsable_nom }}, {{ responsable_prenom }}) will be allowed to submit the
+                                        <strong>{{ responsable_nom }}, {{ responsable_prenom }})</strong> will be
+                                        allowed to submit the
                                         scores to faculty.{% endblocktrans %}
                                 {% endif %}
                             </p>
