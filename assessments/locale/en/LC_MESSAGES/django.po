@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-03 11:50+0100\n"
+"POT-Creation-Date: 2021-11-03 12:09+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,6 +22,16 @@ msgid ""
 "                                        Address of reference for "
 "%(nom_cohorte_bachelier)s - %(intitule)s\n"
 "                                    "
+msgstr ""
+
+#, python-format
+msgid ""
+"\n"
+"                                        Warning: %(scores)s score(s) ready "
+"to be submitted. Only score responsible (\n"
+"                                        %(responsable_nom)s, "
+"%(responsable_prenom)s) will be allowed to submit the\n"
+"                                        scores to faculty."
 msgstr ""
 
 #, python-format
@@ -186,12 +196,6 @@ msgstr ""
 msgid "Define a specific address for the first year of bachelor"
 msgstr ""
 
-msgid "Definitive submission (Submit to faculty)"
-msgstr ""
-
-msgid "Deliberation date"
-msgstr ""
-
 msgid "Details other educational facilities"
 msgstr ""
 
@@ -226,9 +230,6 @@ msgid "Enrolled lately"
 msgstr ""
 
 msgid "Entity"
-msgstr ""
-
-msgid "Entity of reference"
 msgstr ""
 
 msgid "Evaluations"
@@ -542,9 +543,6 @@ msgstr ""
 msgid "Students deliberated are not shown"
 msgstr ""
 
-msgid "Submission"
-msgstr ""
-
 msgid "Submit"
 msgstr ""
 
@@ -658,13 +656,6 @@ msgstr ""
 
 #, python-format
 msgid "Warning: %(scores)s score(s) ready to be submitted."
-msgstr ""
-
-#, python-format
-msgid ""
-"Warning: %(scores)s score(s) ready to be submitted. Only score responsible "
-"(%(responsable_nom)s, %(responsable_prenom)s) will be allowed to submit the "
-"scores to faculty."
 msgstr ""
 
 msgid "Yes"

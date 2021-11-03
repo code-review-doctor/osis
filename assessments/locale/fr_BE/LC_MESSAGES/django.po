@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-03 11:50+0100\n"
+"POT-Creation-Date: 2021-11-03 12:09+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -25,6 +25,18 @@ msgid ""
 msgstr ""
 "\n"
 "Adresse de réference pour %(nom_cohorte_bachelier)s - %(intitule)s"
+
+msgid ""
+"\n"
+"                                        Warning: %(scores)s score(s) ready "
+"to be submitted. Only score responsible (\n"
+"                                        %(responsable_nom)s, "
+"%(responsable_prenom)s) will be allowed to submit the\n"
+"                                        scores to faculty."
+msgstr ""
+"Attention:  %(scores)s note(s) prête(s) à être soumise(s). Seul le "
+"responsable de note (%(responsable_nom)s, %(responsable_prenom)s) pourra "
+"soumettre les notes à la faculté."
 
 #, python-format
 msgid ""
@@ -215,12 +227,6 @@ msgstr "Les notes décimales sont autorisées pour ce cours"
 msgid "Define a specific address for the first year of bachelor"
 msgstr "Définir une adresse spécifique à la première année de bachelier"
 
-msgid "Definitive submission (Submit to faculty)"
-msgstr "Soumission définitive (Soumettre à la faculté)"
-
-msgid "Deliberation date"
-msgstr "Date de délibération"
-
 msgid "Details other educational facilities"
 msgstr "Détails autre aménagement"
 
@@ -256,9 +262,6 @@ msgstr "Inscrit tardivement"
 
 msgid "Entity"
 msgstr "Entité"
-
-msgid "Entity of reference"
-msgstr "Entité de référence"
 
 msgid "Evaluations"
 msgstr "Evaluations"
@@ -593,11 +596,6 @@ msgstr "Parcours de l'étudiant"
 msgid "Students deliberated are not shown"
 msgstr "Les étudiants délibérés ne sont pas montrés"
 
-#, fuzzy
-#| msgid "Session"
-msgid "Submission"
-msgstr "Session"
-
 msgid "Submit"
 msgstr "Soumettre"
 
@@ -725,16 +723,6 @@ msgstr "Via papier"
 msgid "Warning: %(scores)s score(s) ready to be submitted."
 msgstr "Attention: %(scores)s note(s) prête(s) à être soumise(s)."
 
-#, python-format
-msgid ""
-"Warning: %(scores)s score(s) ready to be submitted. Only score responsible "
-"(%(responsable_nom)s, %(responsable_prenom)s) will be allowed to submit the "
-"scores to faculty."
-msgstr ""
-"Attention:  %(scores)s note(s) prête(s) à être soumise(s). Seul le "
-"responsable de note (%(responsable_nom)s, %(responsable_prenom)s) pourra "
-"soumettre les notes à la faculté."
-
 msgid "Yes"
 msgstr "Oui"
 
@@ -773,3 +761,17 @@ msgstr "étudiants"
 
 msgid "the"
 msgstr "le"
+
+#~ msgid "Definitive submission (Submit to faculty)"
+#~ msgstr "Soumission définitive (Soumettre à la faculté)"
+
+#~ msgid "Deliberation date"
+#~ msgstr "Date de délibération"
+
+#~ msgid "Entity of reference"
+#~ msgstr "Entité de référence"
+
+#, fuzzy
+#~| msgid "Session"
+#~ msgid "Submission"
+#~ msgstr "Session"
