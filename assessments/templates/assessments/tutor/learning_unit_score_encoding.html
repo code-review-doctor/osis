@@ -57,7 +57,14 @@
                 <div class="col-md-3">
                     <div class="form-group">
                         <label class="w-100">{% trans 'Scores responsible' %}</label>
-                        <span> {{ feuille_de_notes.responsable_note.nom|upper }}, {{ feuille_de_notes.responsable_note.prenom }}</span>
+                        <span>
+                            {% if feuille_de_notes.responsable_note %}
+                                {{ feuille_de_notes.responsable_note.nom|upper }},
+                                {{ feuille_de_notes.responsable_note.prenom }}
+                            {% else %}
+                                {% trans 'None' %}
+                            {% endif %}
+                        </span>
                         {% if feuille_de_notes.autres_enseignants %}
                             <a role="button" data-toggle="collapse" data-target="#other_tutors"
                                aria-expanded="false"

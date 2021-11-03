@@ -47,7 +47,8 @@
     <div class="panel panel-default">
         <div class="panel-heading">
             <h3 class="panel-title" style="font-size: 150%; color: #3399CC;">
-                {{ feuille_de_notes.annee_academique|display_as_academic_year }} - {{ feuille_de_notes.code_unite_enseignement }}
+                {{ feuille_de_notes.annee_academique|display_as_academic_year }}
+                - {{ feuille_de_notes.code_unite_enseignement }}
             </h3>
         </div>
         <div class="panel-body">
@@ -55,9 +56,14 @@
                 <div class="col-md-3">
                     <div class="form-group">
                         <label class="w-100">{% trans 'Scores responsible' %}</label>
-                        {% if feuille_de_notes.responsable_note %}
-                            <span> {{ feuille_de_notes.responsable_note.nom|upper }}, {{ feuille_de_notes.responsable_note.prenom }}</span>
-                        {% endif %}
+                        <span>
+                            {% if feuille_de_notes.responsable_note %}
+                                {{ feuille_de_notes.responsable_note.nom|upper }},
+                                {{ feuille_de_notes.responsable_note.prenom }}
+                            {% else %}
+                                {% trans 'None' %}
+                            {% endif %}
+                        </span>
                         {% if feuille_de_notes.autres_enseignants %}
                             <a role="button" data-toggle="collapse" data-target="#other_tutors"
                                aria-expanded="false"
