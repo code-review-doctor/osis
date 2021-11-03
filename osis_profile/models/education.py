@@ -155,6 +155,8 @@ class ForeignHighSchoolDiploma(HighSchoolDiploma):
         verbose_name=_("Linguistic regime"),
         on_delete=models.CASCADE,
         related_name="+",
+        blank=True,
+        null=True,
     )
     other_linguistic_regime = models.CharField(
         _("If other linguistic regime, please clarify"),
