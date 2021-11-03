@@ -267,8 +267,6 @@ msgstr "Entité"
 msgid "Evaluations"
 msgstr "Evaluations"
 
-#, fuzzy, python-format
-#| msgid "Extra time (33% generally)"
 msgid "Extra time (33% generally)"
 msgstr "Tiers-Temps"
 
@@ -762,17 +760,3 @@ msgstr "étudiants"
 
 msgid "the"
 msgstr "le"
-
-#~ msgid "Definitive submission (Submit to faculty)"
-#~ msgstr "Soumission définitive (Soumettre à la faculté)"
-
-#~ msgid "Deliberation date"
-#~ msgstr "Date de délibération"
-
-#~ msgid "Entity of reference"
-#~ msgstr "Entité de référence"
-
-#, fuzzy
-#~| msgid "Session"
-#~ msgid "Submission"
-#~ msgstr "Session"
