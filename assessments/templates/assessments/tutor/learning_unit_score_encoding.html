@@ -192,11 +192,7 @@
                                         <em class="fas fa-paper-plane"></em> {% trans 'Submit' %}
                                     </a>
                                 {% else %}
-                                    {% blocktrans with scores=feuille_de_notes.quantite_notes_en_attente_de_soumission responsable_nom=feuille_de_notes.responsable_note.nom responsable_prenom=feuille_de_notes.responsable_note.prenom %}
-                                        Warning: {{ scores }} score(s) ready to be submitted. Only score responsible (
-                                        <strong>{{ responsable_nom }}, {{ responsable_prenom }})</strong> will be
-                                        allowed to submit the
-                                        scores to faculty.{% endblocktrans %}
+                                    {% blocktrans with scores=feuille_de_notes.quantite_notes_en_attente_de_soumission responsable_nom=feuille_de_notes.responsable_note.nom responsable_prenom=feuille_de_notes.responsable_note.prenom %}Warning: {{ scores }} score(s) ready to be submitted. Only score responsible <strong>({{ responsable_nom }}, {{ responsable_prenom }})</strong> will be allowed to submit the scores to faculty.{% endblocktrans %}
                                 {% endif %}
                             </p>
                         </div>
