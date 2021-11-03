@@ -35,7 +35,7 @@ HEADER = [
     _('Session'),
     _('Learning unit'),
     pgettext_lazy('encoding', 'Program'),
-    _('Registration number'),
+    pgettext_lazy('assessments', 'Registration number'),
     _('Lastname'),
     _('Firstname'),
     _('Email'),

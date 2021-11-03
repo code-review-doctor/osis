@@ -24,25 +24,23 @@
 #
 ##############################################################################
 import datetime
-import functools
-import operator
+from typing import Tuple, List, Optional
 
 from dal import autocomplete
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.postgres.aggregates import ArrayAgg, StringAgg
-from django.db.models import F, CharField, Value, When, Case, OuterRef, Subquery, Q
+from django.db.models import CharField, Value, When, Case
 from django.db.models.functions import Concat
 from django.urls import reverse
 from django.utils.functional import cached_property
 
 from assessments.forms.score_encoding import ScoreEncodingProgressFilterForm
 from assessments.views.common.score_encoding_progress_overview import ScoreEncodingProgressOverviewBaseView
-from attribution.models.attribution_new import AttributionNew
 from base.models import synchronization
-from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
+from base.models.enums.learning_component_year_type import PRACTICAL_EXERCISES
 from base.models.learning_unit_year import LearningUnitYear
 from ddd.logic.encodage_des_notes.encodage.commands import GetProgressionGeneraleGestionnaireCommand, \
     GetPeriodeEncodageCommand, SearchEnseignantsCommand
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import ProgressionGeneraleEncodageNotesDTO, PeriodeEncodageNotesDTO
 from infrastructure.messages_bus import message_bus_instance
 from learning_unit.models.learning_class_year import LearningClassYear
 
@@ -64,19 +62,19 @@ class ScoreEncodingProgressOverviewProgramManagerView(ScoreEncodingProgressOverv
         }
 
     @cached_property
-    def get_search_form(self):
+    def get_search_form(self) -> 'ScoreEncodingProgressFilterForm':
         return ScoreEncodingProgressFilterForm(
             matricule_fgs_gestionnaire=self.person.global_id,
             data=self.request.GET or None
         )
 
     @cached_property
-    def periode_encodage(self):
+    def periode_encodage(self) -> 'PeriodeEncodageNotesDTO':
         cmd = GetPeriodeEncodageCommand()
         return message_bus_instance.invoke(cmd)
 
     @cached_property
-    def progression_generale(self):
+    def progression_generale(self) -> Optional['ProgressionGeneraleEncodageNotesDTO']:
         search_form = self.get_search_form
         if search_form.is_bound:
             cmd_kwargs = {'matricule_fgs_gestionnaire': self.person.global_id}
@@ -91,24 +89,26 @@ class ScoreEncodingProgressOverviewProgramManagerView(ScoreEncodingProgressOverv
             return message_bus_instance.invoke(cmd)
         return None
 
-    def get_last_synchronization(self):
+    @staticmethod
+    def get_last_synchronization() -> datetime.date:
         return synchronization.find_last_synchronization_date()
 
-    def get_learning_unit_count(self):
+    def get_learning_unit_count(self) -> Optional[int]:
         return len(self.progression_generale.progression_generale) if self.progression_generale else None
 
-    def get_cohorte_count(self):
+    def get_cohorte_count(self) -> int:
         search_form = self.get_search_form
         if search_form.is_valid() and search_form.cleaned_data['cohorte_name']:
             return 1
         return len(search_form.fields['cohorte_name'].choices) - 1
 
-    def get_score_search_url(self):
+    @staticmethod
+    def get_score_search_url() -> str:
         return reverse('score_search')
 
 
 class CodeUniteEnseignementAutocomplete(LoginRequiredMixin, autocomplete.Select2ListView):
-    def get_list(self):
+    def get_list(self) -> List[str]:
         recherche = self.q
         minimum_chars_to_search = 2
         if recherche and len(recherche) > minimum_chars_to_search:
@@ -158,7 +158,8 @@ class CodeUniteEnseignementAutocomplete(LoginRequiredMixin, autocomplete.Select2
         else:
             return [recherche]
 
-    def __separer_filtre_ue_et_classe(self, recherche):
+    @staticmethod
+    def __separer_filtre_ue_et_classe(recherche: str) -> Tuple[str, bool]:
         filtre_sur_ue = recherche
         has_filtre_sur_classe = False
         if '-' in filtre_sur_ue:
@@ -173,7 +174,7 @@ class CodeUniteEnseignementAutocomplete(LoginRequiredMixin, autocomplete.Select2
 
 
 class EnseignantAutocomplete(LoginRequiredMixin, autocomplete.Select2ListView):
-    def get_list(self):
+    def get_list(self) -> List[str]:
         recherche = self.q
         minimum_chars_to_search = 2
         if recherche and len(recherche) > minimum_chars_to_search:

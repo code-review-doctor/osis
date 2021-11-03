@@ -85,24 +85,26 @@
                             {% if too_many_results_message %}
                                 <div class="alert alert-warning" style="margin:5px">{{ too_many_results_message }}</div>
                             {% endif %}
-                            <form id="score_submit_form" class="form-inline" method="POST" action="{{ request.path }}?{{ request.GET.urlencode }}">
-                            {% csrf_token %}
-                            <div class="row">
-                                <div class="col-md-12">
-                                   {% include 'assessments/common/legend.html' %}
+                            <form id="score_submit_form" class="form-inline" method="POST"
+                                  action="{{ request.path }}?{{ request.GET.urlencode }}">
+                                {% csrf_token %}
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        {% include 'assessments/common/legend.html' %}
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <button id="lnk_submit_up" class="btn btn-primary" type="submit">
-                                        <em class="fas fa-save"></em> {% trans 'Save' %}
-                                    </button>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <button id="lnk_submit_up" class="btn btn-primary" type="submit"
+                                                data-toggle="tooltip" title="{% trans 'Encode scores' %}">
+                                            <em class="fas fa-save"></em> {% trans 'Save' %}
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <table class="table table-hover">
-                                <thead>
+                                <table class="table table-hover">
+                                    <thead>
                                     <tr>
                                         <th id="status" class="col-md-1">{% trans 'Status' %}</th>
                                         <th id="program" class="col-md-1">{% trans 'Program' context 'encoding' %}</th>
@@ -127,20 +129,27 @@
                                             </span>
                                         </th>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                     {% for note_etudiant in notes_etudiant_filtered %}
-                                         <tr class="result" style="{% include 'assessments/common/row-background-color.html' %}">
-                                             <td style="text-align:center;" id="enrollment_status_{{ forloop.counter }}" headers="status">
+                                    </thead>
+                                    <tbody>
+                                    {% for note_etudiant in notes_etudiant_filtered %}
+                                        <tr class="result"
+                                            style="{% include 'assessments/common/row-background-color.html' %}">
+                                            <td style="text-align:center;" id="enrollment_status_{{ forloop.counter }}"
+                                                headers="status">
                                                 {% if note_etudiant.date_echeance_atteinte %}
-                                                    <span class="glyphicon glyphicon-lock" aria-hidden="true" style="color: #8B008B;" title="{% trans 'Deadline reached' %}"></span>
+                                                    <span class="glyphicon glyphicon-lock" aria-hidden="true"
+                                                          style="color: #8B008B;"
+                                                          title="{% trans 'Deadline reached' %}"></span>
                                                 {% endif %}
                                                 {% if note_etudiant.est_soumise %}
-                                                    <span class="glyphicon glyphicon-send" aria-hidden="true" style="color: green;" title="{% trans 'Score submitted' %}"></span>
+                                                    <span class="glyphicon glyphicon-send" aria-hidden="true"
+                                                          style="color: green;" data-toggle="tooltip"
+                                                          title="{% trans 'Score submitted' %}"></span>
                                                 {% endif %}
                                             </td>
                                             <td headers="program">{{ note_etudiant.nom_cohorte }}</td>
-                                            <td headers="learning_unit" data-container="body" data-toggle="tooltip" title="{{ note_etudiant.intitule_complet_unite_enseignement }}">
+                                            <td headers="learning_unit" data-container="body" data-toggle="tooltip"
+                                                title="{{ note_etudiant.intitule_complet_unite_enseignement }}">
                                                 {{ note_etudiant.code_unite_enseignement |add:" - " |add:note_etudiant.intitule_complet_unite_enseignement| truncatechars:30}}
                                             </td>
                                             <td headers="registration_number">{{ note_etudiant.noma }}</td>
@@ -158,21 +167,22 @@
                                                     {{ note_etudiant.note|default:"-" }}
                                                 {% endif %}
                                             </td>
-                                         </tr>
-                                        {% endfor %}
-                                        {{ form.management_form }}
-                                </tbody>
-                            </table>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <button id="lnk_submit_down" class="btn btn-primary" type="submit">
-                                        <em class="fas fa-save"></em> {% trans 'Save' %}
-                                    </button>
+                                        </tr>
+                                    {% endfor %}
+                                    {{ form.management_form }}
+                                    </tbody>
+                                </table>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <button id="lnk_submit_down" class="btn btn-primary" type="submit"
+                                                data-toggle="tooltip" title="{% trans 'Encode scores' %}">
+                                            <em class="fas fa-save"></em> {% trans 'Save' %}
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                         </form>
+                            </form>
                         {% else %}
-                             <div class="alert alert-info" style="margin:5px">{% trans 'No result!' %}</div>
+                            <div class="alert alert-info" style="margin:5px">{% trans 'No result!' %}</div>
                         {% endif %}
                     {% endif %}
                 </div>

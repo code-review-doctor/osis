@@ -114,21 +114,23 @@
                                                                     {{ echeance_formated }}
                                                                 </strong>
                                                             {% else %}
-                                                                 <span class="col-md-5">
+                                                                <span class="col-md-5">
                                                                      <a href="{% url 'learning_unit_score_encoding_form' progression_encodage.code_unite_enseignement %}?echeance_enseignant={{ echeance_formated }}">
                                                                          {{ echeance_formated }}
                                                                      </a>
                                                                  </span>
                                                             {% endif %}
                                                             <div class="col-md-3">
-                                                                <span title="{% trans 'Remaining scores to submit for this deadline' %}"
+                                                                <span data-toggle="tooltip"
+                                                                      title="{% trans 'Remaining scores to submit for this deadline' %}"
                                                                       class="badge badge-default {% if echeance.quantite_notes_manquantes %}background-error{% else %}background-success{% endif %}">
                                                                     {{ echeance.quantite_notes_manquantes }}
                                                                 </span>
                                                             </div>
 
                                                             {% if forloop.first and progression_encodage.dates_echeance|length > 1 %}
-                                                                 <a role="button" data-toggle="collapse" data-target="#tutor_deadlines_collapse_{{ progression_encodage.code_unite_enseignement }}"
+                                                                <a role="button" data-toggle="collapse"
+                                                                   data-target="#tutor_deadlines_collapse_{{ progression_encodage.code_unite_enseignement }}"
                                                                    aria-expanded="false"
                                                                    aria-controls="tutor_deadlines_collapse_{{ progression_encodage.code_unite_enseignement }}"
                                                                    title="{% trans 'Display all deadlines for this learning unit' %}">
@@ -156,6 +158,7 @@
                                             <td headers="tab_online_peps">
                                                 {% if progression_encodage.a_etudiants_peps %}
                                                     <span class="badge warning-color"
+                                                          data-toggle="tooltip"
                                                           title="{% trans 'Some of the students enrolled to this course have a PEPS status (Program for Students with a Specific Profile). You will find detailled information in the Excel file to encode notes' %}">
                                                         PEPS
                                                     </span>
