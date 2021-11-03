@@ -715,7 +715,7 @@ msgid ""
 "allowed to submit the scores to faculty."
 msgstr ""
 "Attention:  %(scores)s note(s) prête(s) à être soumise(s). Seul le "
-"responsable de note <strong>(%(responsable_nom)s, %(responsable_prenom)s)</"
+"responsable de notes <strong>(%(responsable_nom)s, %(responsable_prenom)s)</"
 "strong> pourra soumettre les notes à la faculté."
 
 msgid "Yes"
