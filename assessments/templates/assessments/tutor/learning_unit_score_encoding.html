@@ -210,7 +210,12 @@
                     <th id="program" class="col-md-1">{% trans 'Program' context 'encoding' %}</th>
                     <th id="registration_number"
                         class="col-md-1">{% trans 'Registration number' context 'assessments' %}</th>
-                    <th id="peps_data" class="col-md-2">{% trans 'Type of specific profile' %}</th>
+                    <th id="peps_data" class="col-md-2">
+                        {% trans 'Type' %}
+                        <span class="badge warning-color">
+                            PEPS
+                        </span>
+                    </th>
                     <th id="lastname" class="col-md-2">{% trans 'Lastname' %}</th>
                     <th id="firstname" class="col-md-2">{% trans 'Firstname' %}</th>
                     <th id="score" class="col-md-2">{% trans 'Score' %}</th>
