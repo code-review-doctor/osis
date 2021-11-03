@@ -305,8 +305,8 @@ msgstr "Inclure les entités subordonnées"
 msgid "Inject"
 msgstr "Injecter"
 
-msgid "Inject XLS file"
-msgstr "Injecter le fichier XLS"
+msgid "Inject Excel file"
+msgstr "Injecter le fichier Excel"
 
 msgid "Institution"
 msgstr "Institution"
@@ -424,8 +424,8 @@ msgstr "Téléphone"
 msgid "Please choose at least one criteria!"
 msgstr "Veuillez choisir au moins un critère!"
 
-msgid "Please select an XLS file for injection"
-msgstr "Veuillez sélectionner un fichier XLS pour injection"
+msgid "Please select the Excel file for injection"
+msgstr "Veuillez sélectionner le fichier Excel pour injection"
 
 msgid "Please select an address"
 msgstr "Veuillez sélectionner une adresse"
@@ -545,8 +545,8 @@ msgstr "Recherche des programmes annualisés"
 msgid "Select an encoding type"
 msgstr "Sélectionnez un type d'encodage"
 
-msgid "Select an excel file to inject scores."
-msgstr "Sélectionnez un fichier excel pour injecter des notes."
+msgid "Inject encoded scores into Excel file."
+msgstr "Injecter les notes encodées dans le fichier Excel"
 
 msgid "Select/deselect all"
 msgstr "Sélectionner/Dé-sélectionner tout"

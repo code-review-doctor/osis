@@ -268,7 +268,7 @@ msgstr ""
 msgid "Inject"
 msgstr ""
 
-msgid "Inject XLS file"
+msgid "Inject Excel file"
 msgstr ""
 
 msgid "Institution"
@@ -383,7 +383,7 @@ msgstr ""
 msgid "Please choose at least one criteria!"
 msgstr ""
 
-msgid "Please select an XLS file for injection"
+msgid "Please select the Excel file for injection"
 msgstr ""
 
 msgid "Please select an address"
@@ -499,7 +499,7 @@ msgstr ""
 msgid "Select an encoding type"
 msgstr ""
 
-msgid "Select an excel file to inject scores."
+msgid "Inject encoded scores into Excel file."
 msgstr ""
 
 msgid "Select/deselect all"
