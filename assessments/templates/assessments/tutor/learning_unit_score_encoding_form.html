@@ -59,9 +59,10 @@
                         {% if feuille_de_notes.autres_enseignants %}
                             <a role="button" data-toggle="collapse" data-target="#other_tutors"
                                aria-expanded="false"
-                               aria-controls="other_tutors"
-                               title="{% trans 'Display all tutors for this learning unit' %}">
-                              <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+                               aria-controls="other_tutors">
+                              <span class="glyphicon glyphicon-list" aria-hidden="true"
+                                    data-toggle="tooltip"
+                                    title="{% trans 'Display all tutors for this learning unit' %}"></span>
                             </a>
                             <div class="collapse" id="other_tutors">
                                 <label class="w-100">{% trans 'Other tutors' %}</label>
@@ -110,14 +111,13 @@
                 <div class="row">
                     <div class="col-md-12">
                         <button id="lnk_submit_up" class="btn btn-primary"
-                            type="submit"
-                            data-toggle="tooltip" data-placement="bottom"
-                            title="{% trans 'Temporary save (not submitted to the faculty yet)' %}">
-                                <em class="fas fa-save"></em> {% trans 'Save' %}
+                                type="submit"
+                                data-toggle="tooltip" data-placement="bottom"
+                                title="{% trans 'Temporary save (not submitted to the faculty yet)' %}">
+                            <em class="fas fa-save"></em> {% trans 'Save' %}
                         </button>
-                         <a id="lnk_cancel_up"
-                            class="btn btn-default" href="{{ cancel_url }}"
-                            title="{% trans 'Encode scores' %}">
+                        <a id="lnk_cancel_up"
+                           class="btn btn-default" href="{{ cancel_url }}">
                             <em class="fas fa-times"></em> {% trans 'Cancel' %}
                         </a>
                         {% include 'assessments/common/legend.html' %}
@@ -125,20 +125,21 @@
                 </div>
                 <table class="table table-hover">
                     <thead>
-                        <tr>
-                            <th id="status" class="col-md-1">{% trans 'Status' %}</th>
-                            <th id="program" class="col-md-1">{% trans 'Program' context 'encoding' %}</th>
-                            <th id="registration_number" class="col-md-1">{% trans 'Registration number' %}</th>
-                            <th id="peps_data" class="col-md-2">{% trans 'Type of specific profile' %}</th>
-                            <th id="lastname" class="col-md-2">{% trans 'Lastname' %}</th>
-                            <th id="firstname" class="col-md-2">{% trans 'Firstname' %}</th>
-                            <th id="score" class="col-md-2">
-                                {% trans 'Score' %}
-                                <span
-                                        class="glyphicon glyphicon-question-sign"
-                                        data-toggle="tooltip"
-                                        data-placement="top"
-                                        data-html="true"
+                    <tr>
+                        <th id="status" class="col-md-1">{% trans 'Status' %}</th>
+                        <th id="program" class="col-md-1">{% trans 'Program' context 'encoding' %}</th>
+                        <th id="registration_number"
+                            class="col-md-1">{% trans 'Registration number' context 'assessments' %}</th>
+                        <th id="peps_data" class="col-md-2">{% trans 'Type of specific profile' %}</th>
+                        <th id="lastname" class="col-md-2">{% trans 'Lastname' %}</th>
+                        <th id="firstname" class="col-md-2">{% trans 'Firstname' %}</th>
+                        <th id="score" class="col-md-2">
+                            {% trans 'Score' %}
+                            <span
+                                    class="glyphicon glyphicon-question-sign"
+                                    data-toggle="tooltip"
+                                    data-placement="top"
+                                    data-html="true"
                                         title="{% trans "Score legend" %}:
                                         <ul>
                                             <li> {% trans "number between 0-20 (0=Score of presence)" %}</li>
@@ -148,27 +149,30 @@
                                         "></span>
                             </th>
                             <th id="deadline" class="col-md-1">{% trans 'Teacher deadline' %}</th>
-                        </tr>
+                    </tr>
                     </thead>
                     <tbody>
-                         {% for note_etudiant in feuille_de_notes.notes_etudiants %}
-                            <tr class="result" style="{% include 'assessments/common/row-background-color.html' %}">
-                                <td style="text-align:center;" id="enrollment_status_{{ forloop.counter }}" headers="status">
-                                    {% if note_etudiant.date_echeance_atteinte %}
-                                        <span class="glyphicon glyphicon-lock" aria-hidden="true" style="color: #8B008B;" title="{% trans 'Deadline reached' %}"></span>
-                                    {% endif %}
-                                    {% if note_etudiant.est_soumise %}
-                                        <span class="glyphicon glyphicon-send" aria-hidden="true" style="color: green;" title="{% trans 'Score submitted' %}"></span>
-                                    {% endif %}
-                                </td>
-                                <td headers="program">{{ note_etudiant.nom_cohorte }}</td>
-                                <td headers="registration_number">{{ note_etudiant.noma }}</td>
-                                {% include 'assessments/common/peps_column.html' %}
-                                <td headers="lastname">{{ note_etudiant.nom }}</td>
-                                <td headers="firstname">{{ note_etudiant.prenom }}</td>
-                                <td id="enrollment_note_{{ forloop.counter0 }}" headers="score">
-                                    {% if not note_etudiant.est_soumise and not note_etudiant.date_echeance_atteinte and not note_etudiant.desinscrit_tardivement %}
-                                        {% with score_encoding_form=form|index:forloop.counter0 %}
+                    {% for note_etudiant in feuille_de_notes.notes_etudiants %}
+                        <tr class="result" style="{% include 'assessments/common/row-background-color.html' %}">
+                            <td style="text-align:center;" id="enrollment_status_{{ forloop.counter }}"
+                                headers="status">
+                                {% if note_etudiant.date_echeance_atteinte %}
+                                    <span class="glyphicon glyphicon-lock" aria-hidden="true" style="color: #8B008B;"
+                                          title="{% trans 'Deadline reached' %}"></span>
+                                {% endif %}
+                                {% if note_etudiant.est_soumise %}
+                                    <span class="glyphicon glyphicon-send" aria-hidden="true" style="color: green;"
+                                          data-toggle="tooltip" title="{% trans 'Score submitted' %}"></span>
+                                {% endif %}
+                            </td>
+                            <td headers="program">{{ note_etudiant.nom_cohorte }}</td>
+                            <td headers="registration_number">{{ note_etudiant.noma }}</td>
+                            {% include 'assessments/common/peps_column.html' %}
+                            <td headers="lastname">{{ note_etudiant.nom }}</td>
+                            <td headers="firstname">{{ note_etudiant.prenom }}</td>
+                            <td id="enrollment_note_{{ forloop.counter0 }}" headers="score">
+                                {% if not note_etudiant.est_soumise and not note_etudiant.date_echeance_atteinte and not note_etudiant.desinscrit_tardivement %}
+                                    {% with score_encoding_form=form|index:forloop.counter0 %}
                                             {% bootstrap_field score_encoding_form.note show_label=False %}
                                             {% bootstrap_field score_encoding_form.noma %}
                                         {% endwith %}
@@ -190,14 +194,13 @@
                     <div class="col-md-12">
                         {% csrf_token %}
                         <button id="lnk_submit_down" class="btn btn-primary"
-                            type="submit"
-                            data-toggle="tooltip" data-placement="bottom"
-                            title="{% trans 'Temporary save (not submitted to the faculty yet)' %}">
-                                <em class="fas fa-save"></em> {% trans 'Save' %}
+                                type="submit"
+                                data-toggle="tooltip" data-placement="bottom"
+                                title="{% trans 'Temporary save (not submitted to the faculty yet)' %}">
+                            <em class="fas fa-save"></em> {% trans 'Save' %}
                         </button>
-                         <a id="lnk_cancel_down"
-                            class="btn btn-default" href="{{ cancel_url }}"
-                            title="{% trans 'Encode scores' %}">
+                        <a id="lnk_cancel_down"
+                           class="btn btn-default" href="{{ cancel_url }}">
                             <em class="fas fa-times"></em> {% trans 'Cancel' %}
                         </a>
                     </div>

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-28 10:36+0200\n"
+"POT-Creation-Date: 2021-11-03 11:50+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -186,6 +186,9 @@ msgstr ""
 msgid "Define a specific address for the first year of bachelor"
 msgstr ""
 
+msgid "Definitive submission (Submit to faculty)"
+msgstr ""
+
 msgid "Deliberation date"
 msgstr ""
 
@@ -348,9 +351,6 @@ msgstr ""
 msgid "None"
 msgstr ""
 
-msgid "Not passed"
-msgstr ""
-
 msgid "Number of enrollments"
 msgstr ""
 
@@ -420,6 +420,7 @@ msgstr ""
 msgid "Reg. No."
 msgstr ""
 
+msgctxt "assessments"
 msgid "Registration number"
 msgstr ""
 
