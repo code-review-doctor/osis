@@ -31,7 +31,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 
-from assessments.forms.score_sheet_address_new import ScoreSheetAddressForm, FirstYearBachelorScoreSheetAddressForm
+from assessments.forms.score_sheet_address import ScoreSheetAddressForm, FirstYearBachelorScoreSheetAddressForm
 from base.auth.roles import program_manager
 from base.forms.exceptions import InvalidFormException
 from base.models import academic_year
@@ -69,7 +69,7 @@ class ScoreSheetAddressView(PermissionRequiredMixin, FormView):
     def get_initial(self):
         initial = super().get_initial()
         initial.update({
-            "entity": self.score_sheet_address.entite,
+            "entity": self.score_sheet_address.type_entite,
             "recipient": self.score_sheet_address.destinataire,
             "location": self.score_sheet_address.rue_numero,
             "postal_code": self.score_sheet_address.code_postal,
@@ -154,6 +154,7 @@ class FirstYearBachelorScoreSheetAddressView(ScoreSheetAddressView):
 
     def get_form_kwargs(self):
         form_kwargs = super().get_form_kwargs()
+        form_kwargs['nom_cohorte'] = self.nom_cohorte_premiere_annee
         form_kwargs['adresse_bachelier'] = self.bachelor_score_sheet_address_dto
         form_kwargs['nom_cohorte_premiere_annee'] = self.nom_cohorte_premiere_annee
         return form_kwargs

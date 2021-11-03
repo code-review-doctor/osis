@@ -49,6 +49,7 @@ class DonneesAdministratives(interface.DomainService):
             adresse_feuille_de_notes_repository: 'IAdresseFeuilleDeNotesRepository',
     ) -> List['DonneesAdministrativesFeuilleDeNotesDTO']:
         periode_soumission_ouverte = periode_soumission_note_translator.get()
+        annee_academique = periode_soumission_ouverte.annee_concernee
 
         cohortes_par_unite_enseignement = _get_cohortes_par_unite_enseignement(
             codes_unites_enseignement,
@@ -59,7 +60,8 @@ class DonneesAdministratives(interface.DomainService):
 
         adresse_par_cohorte = _get_adresse_par_cohorte(
             adresse_feuille_de_notes_repository,
-            noms_cohortes
+            noms_cohortes,
+            annee_academique
         )
 
         result = []
@@ -70,7 +72,7 @@ class DonneesAdministratives(interface.DomainService):
                     code_unite_enseignement=code,
                     contact_feuille_de_notes=adresse_par_cohorte.get(
                         nom_cohorte,
-                        AdresseFeuilleDeNotesDTO(nom_cohorte=nom_cohorte)
+                        AdresseFeuilleDeNotesDTO(nom_cohorte=nom_cohorte, annee_academique=annee_academique)
                     ),
                 )
                 result.append(dto)
@@ -90,10 +92,14 @@ def _get_responsable_de_notes(code, periode_soumission_ouverte, responsables_de_
 
 def _get_adresse_par_cohorte(
         adresse_feuille_de_notes_repository: 'IAdresseFeuilleDeNotesRepository',
-        noms_cohortes: Set['str']
+        noms_cohortes: Set['str'],
+        annee_academique: int
 ):
     identity_builder = AdresseFeuilleDeNotesIdentityBuilder()
-    identites_adresse = [identity_builder.build_from_nom_cohorte(nom_cohorte) for nom_cohorte in noms_cohortes]
+    identites_adresse = [
+        identity_builder.build_from_nom_cohorte_and_annee_academique(nom_cohorte, annee_academique)
+        for nom_cohorte in noms_cohortes
+    ]
     adresses_feuilles_de_notes = adresse_feuille_de_notes_repository.search_dtos(identites_adresse)
     return {adresse.nom_cohorte: adresse for adresse in adresses_feuilles_de_notes}
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-28 15:20+0200\n"
+"POT-Creation-Date: 2021-10-28 10:36+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -184,9 +184,6 @@ msgid "Decimals authorized for this learning unit"
 msgstr ""
 
 msgid "Define a specific address for the first year of bachelor"
-msgstr ""
-
-msgid "Definitive submission (Submit to faculty)"
 msgstr ""
 
 msgid "Deliberation date"
@@ -465,6 +462,10 @@ msgstr ""
 msgid "Score legend: A=Absent, T=Cheating, {score} (0=Score of presence)"
 msgstr ""
 
+#, python-format
+msgid "Score responsible successfully designated on %(code)s."
+msgstr ""
+
 msgid "Score sheet"
 msgstr ""
 
@@ -543,7 +544,15 @@ msgstr ""
 msgid "Submission"
 msgstr ""
 
+msgid "Submit"
+msgstr ""
+
 msgid "Submit data"
+msgstr ""
+
+msgid ""
+"Submit these scores to faculty. These scores can not be changed after "
+"submission. The unsubmitted scores remain editable."
 msgstr ""
 
 msgid "Teacher deadline"
@@ -615,6 +624,10 @@ msgstr ""
 msgid "Tutors of the course"
 msgstr ""
 
+#, python-format
+msgid "Tutors' classes of the course %(code)s (%(annee_academique)s)"
+msgstr ""
+
 msgid "Type"
 msgstr ""
 
@@ -642,7 +655,15 @@ msgstr ""
 msgid "Via paper"
 msgstr ""
 
-msgid "Warning : some registered scores have not been submitted yet!"
+#, python-format
+msgid "Warning: %(scores)s score(s) ready to be submitted."
+msgstr ""
+
+#, python-format
+msgid ""
+"Warning: %(scores)s score(s) ready to be submitted. Only score responsible "
+"(%(responsable_nom)s, %(responsable_prenom)s) will be allowed to submit the "
+"scores to faculty."
 msgstr ""
 
 msgid "Yes"

@@ -25,10 +25,10 @@
 
 import factory
 
+from assessments.models.enums.score_sheet_address_choices import ScoreSheetAddressEntityType
 from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_notes import \
     IdentiteAdresseFeuilleDeNotes, \
     AdresseFeuilleDeNotes
-from ddd.logic.shared_kernel.entite.tests.factory.entiteucl import _IdentiteEntiteFactory
 
 
 class _IdentiteAdresseFeuilleDeNotesFactory(factory.Factory):
@@ -37,6 +37,7 @@ class _IdentiteAdresseFeuilleDeNotesFactory(factory.Factory):
         abstract = False
 
     nom_cohorte = "DROI1BA"
+    annee_academique = 2020
 
 
 class AdresseFeuilleDeNotesVideFactory(factory.Factory):
@@ -45,7 +46,7 @@ class AdresseFeuilleDeNotesVideFactory(factory.Factory):
         abstract = False
 
     entity_id = factory.SubFactory(_IdentiteAdresseFeuilleDeNotesFactory)
-    entite = None
+    type_entite = None
     destinataire = ""
     rue_numero = ""
     code_postal = ""
@@ -58,7 +59,7 @@ class AdresseFeuilleDeNotesVideFactory(factory.Factory):
 
 class AdresseFeuilleDeNotesSpecifiqueFactory(AdresseFeuilleDeNotesVideFactory):
     entity_id = factory.SubFactory(_IdentiteAdresseFeuilleDeNotesFactory)
-    entite = None
+    type_entite = None
     destinataire = "Faculté de Droit"
     rue_numero = "Rue de la Fac, 19"
     code_postal = "1321"
@@ -76,8 +77,8 @@ class PremiereAnneeBachelierAdresseFeuilleDeNotesSpecifiqueFactory(AdresseFeuill
 
 class AdresseFeuilleDeNotesBaseeSurEntiteFactory(AdresseFeuilleDeNotesVideFactory):
     entity_id = factory.SubFactory(_IdentiteAdresseFeuilleDeNotesFactory)
-    entite = factory.SubFactory(_IdentiteEntiteFactory, sigle="EPL")
-    destinataire = "Faculté de EPL"
+    type_entite = ScoreSheetAddressEntityType.ENTITY_ADMINISTRATION
+    destinataire = "EPL - Faculté de EPL"
     rue_numero = "Rue de EPL, 19"
     code_postal = "1321"
     ville = "Louvain-La-Neuve"
@@ -85,3 +86,7 @@ class AdresseFeuilleDeNotesBaseeSurEntiteFactory(AdresseFeuilleDeNotesVideFactor
     telephone = "0106605122"
     fax = "0106601123"
     email = "email-epl@email.be"
+
+
+class PremiereAnneeBachelierAdresseFeuilleDeNotesBaseeSurEntiteFactory(AdresseFeuilleDeNotesBaseeSurEntiteFactory):
+    entity_id = factory.SubFactory(_IdentiteAdresseFeuilleDeNotesFactory, nom_cohorte="ECGE11BA")

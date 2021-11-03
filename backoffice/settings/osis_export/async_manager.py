@@ -23,28 +23,28 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
-from typing import Optional
-
-from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmissionCalendar
-from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodage_notes import \
-    IPeriodeEncodageNotesTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO, PeriodeEncodageNotesDTO
+from osis_async.models import AsyncTask
+from osis_async.models.enums import TaskStates
+from osis_async.utils import update_task
+from osis_export.contrib.async_manager import AsyncManager
 
 
-class PeriodeEncodageNotesTranslator(IPeriodeEncodageNotesTranslator):
+class AsyncTaskManager(AsyncManager):
+    @staticmethod
+    def get_pending_job_uuids():
+        """"Must return the pending export job uuids"""
+        pending_tasks = AsyncTask.objects.filter(
+            state=TaskStates.PENDING.name
+        ).values_list("uuid", flat=True)
+        return pending_tasks
 
-    @classmethod
-    def get(cls) -> Optional['PeriodeEncodageNotesDTO']:
-        calendar = ScoresExamSubmissionCalendar()
-        events = calendar.get_opened_academic_events(date=datetime.date.today())
-        if events:
-            event = events[0]
-            date_debut = event.start_date
-            date_fin = event.end_date
-            return PeriodeEncodageNotesDTO(
-                annee_concernee=event.authorized_target_year,
-                session_concernee=event.session,
-                debut_periode_soumission=DateDTO(jour=date_debut.day, mois=date_debut.month, annee=date_debut.year),
-                fin_periode_soumission=DateDTO(jour=date_fin.day, mois=date_fin.month, annee=date_fin.year),
-            )
+    @staticmethod
+    def update(
+        uuid,
+        progression=None,
+        description=None,
+        state=None,
+        started_at=None,
+        completed_at=None,
+    ):
+        update_task(uuid, progression, description, state, started_at, completed_at)

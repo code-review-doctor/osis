@@ -26,6 +26,7 @@ from django.test import TestCase
 
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_entites_cohorte import EntitesCohorteDTO
 from ddd.logic.shared_kernel.entite.builder.identite_entite_builder import IdentiteEntiteBuilder
 from infrastructure.encodage_de_notes.soumission.domain.service.entites_cohorte import EntitesCohorteTranslator
 
@@ -43,23 +44,29 @@ class TestEntitesCohorte(TestCase):
             administration_entity=cls.drt.entity
         )
 
+        cls.annee = cls.sinf1ba.academic_year.year
+
     def setUp(self) -> None:
         self.translator = EntitesCohorteTranslator()
 
     def test_should_return_dtos_if_matching_nom_cohorte(self):
-        result = self.translator.search_entite_administration_et_gestion("SINF1BA")
+        result = self.translator.search_entite_administration_et_gestion("SINF1BA", self.annee)
 
-        expected = [
-            IdentiteEntiteBuilder().build_from_sigle("INFO"),
-            IdentiteEntiteBuilder().build_from_sigle("DRT"),
-        ]
-        self.assertCountEqual(result, expected)
+        expected = EntitesCohorteDTO(
+            administration=IdentiteEntiteBuilder().build_from_sigle("DRT"),
+            gestion=IdentiteEntiteBuilder().build_from_sigle("INFO")
+        )
+        self.assertEqual(result, expected)
 
     def test_should_return_empty_list_if_no_matching_nom_cohorte(self):
         EducationGroupYearFactory(
             acronym="ECGE1BA",
             academic_year__current=True,
         )
-        result = self.translator.search_entite_administration_et_gestion("ECGE1BA")
+        result = self.translator.search_entite_administration_et_gestion("ECGE1BA", self.annee)
 
-        self.assertListEqual(result, [])
+        expected = EntitesCohorteDTO(
+            administration=None,
+            gestion=None
+        )
+        self.assertEqual(result, expected)

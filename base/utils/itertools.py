@@ -22,26 +22,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodage_notes import \
-    IPeriodeEncodageNotesTranslator
-from ddd.logic.encodage_des_notes.soumission.commands import GetAdresseFeuilleDeNotesServiceCommand
-from ddd.logic.encodage_des_notes.soumission.domain.service.get_adresse_feuille_de_notes_dto import \
-    GetAdresseFeuilleDeNotesDTODomainService
-from ddd.logic.encodage_des_notes.soumission.dtos import AdresseFeuilleDeNotesDTO
-from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_notes import \
-    IAdresseFeuilleDeNotesRepository
-from ddd.logic.shared_kernel.academic_year.repository.i_academic_year import IAcademicYearRepository
+from typing import TypeVar, List, Callable
+
+T = TypeVar('T')
+ReturnType = TypeVar('ReturnType')
 
 
-def get_adresse_feuille_de_notes(
-        cmd: GetAdresseFeuilleDeNotesServiceCommand,
-        repo: IAdresseFeuilleDeNotesRepository,
-        periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
-        academic_year_repo: 'IAcademicYearRepository'
-) -> 'AdresseFeuilleDeNotesDTO':
-    return GetAdresseFeuilleDeNotesDTODomainService.get(
-        cmd.nom_cohorte,
-        repo,
-        periode_soumission_note_translator,
-        academic_year_repo
-    )
+def filter_duplicate(iterable: List[T], key_function: Callable[[T], ReturnType]) -> List[T]:
+    keys_seen = set()
+
+    result = []
+    for element in iterable:
+        key = key_function(element)
+
+        if key not in keys_seen:
+            result.append(element)
+            keys_seen.add(key)
+
+    return result
