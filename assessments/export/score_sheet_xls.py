@@ -147,14 +147,13 @@ def _build_rows(worksheet, feuille_de_notes_serialized):
     current_row_number = 12
 
     for row in feuille_de_notes_serialized['rows']:
-        full_name = "{}, {}".format(row["nom"] if row["nom"] else "", row["prenom"] if row["prenom"] else "")
         worksheet.append([
             feuille_de_notes_serialized['annee_academique'],
             feuille_de_notes_serialized['numero_session'],
             feuille_de_notes_serialized['code_unite_enseignement'],
             row['nom_cohorte'],
             row['noma'],
-            full_name,
+            row['nom_complet'],
             row['email'],
             row['note'],
             row['date_remise_de_notes'],
@@ -200,7 +199,7 @@ def __set_late_unsubscribe_row_color(worksheet, row_number):
 
 
 def __set_border_on_first_peps_cell(worksheet, row_number):
-    first_peps_cell = worksheet["K{}".format(row_number)]
+    first_peps_cell = worksheet["J{}".format(row_number)]
     if first_peps_cell.has_style:
         c = first_peps_cell.style
         c.border = Border(
