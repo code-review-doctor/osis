@@ -1,3 +1,4 @@
+
 # ##############################################################################
 #
 #  OSIS stands for Open Student Information System. It's an application
@@ -23,21 +24,14 @@
 #  see http://www.gnu.org/licenses/.
 #
 # ##############################################################################
-try:
-    from .education import BelgianHighSchoolDiploma, ForeignHighSchoolDiploma, Schedule
-    from .curriculum import CurriculumYear, Experience
-except RuntimeError as e:  # pragma: no cover
-    # There's a weird bug when running tests, the test runner seeing a models
-    # package tries to import it directly, failing to do so
-    import sys
+from django.utils.translation import gettext_lazy as _
 
-    if "test" not in sys.argv:
-        raise e
+from base.models.utils.utils import ChoiceEnum
 
-__all__ = [
-    "BelgianHighSchoolDiploma",
-    "ForeignHighSchoolDiploma",
-    "Schedule",
-    "CurriculumYear",
-    "Experience",
-]
+
+class CourseTypes(ChoiceEnum):
+    BELGIAN_UNIVERSITY = _("Belgian university")
+    FOREIGN_UNIVERSITY = _("Foreign university")
+    BELGIAN_NON_UNIVERSITY_HIGHER_EDUCATION = _("Belgian non-university higher education")
+    FOREIGN_NON_UNIVERSITY_HIGHER_EDUCATION = _("Foreign non-university higher education")
+    OTHER = _("Other")
