@@ -220,8 +220,7 @@
                         <td headers="program">{{ note_etudiant.nom_cohorte }}</td>
                         <td headers="registration_number">{{ note_etudiant.noma }}</td>
                         {% include 'assessments/common/peps_column.html' %}
-                        <td headers="lastname">{{ note_etudiant.nom }}</td>
-                        <td headers="firstname">{{ note_etudiant.prenom }}</td>
+                        <td headers="name">{{ note_etudiant.nom }}, {{ note_etudiant.prenom }}</td>
                         <td id="enrollment_note_{{ forloop.counter }}" headers="score">
                             {% include 'assessments/common/note_read.html' %}
                         </td>
