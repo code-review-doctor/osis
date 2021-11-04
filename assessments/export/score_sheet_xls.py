@@ -126,8 +126,8 @@ def _define_worksheet_column_size(worksheet):
     worksheet.column_dimensions['A'].width = 18
     worksheet.column_dimensions['C'].width = 18
     worksheet.column_dimensions['E'].width = 18
-    worksheet.column_dimensions['F'].width = 25
-    worksheet.column_dimensions['G'].width = 65
+    worksheet.column_dimensions['F'].width = 35
+    worksheet.column_dimensions['G'].width = 45
     worksheet.column_dimensions['H'].width = 20
     worksheet.column_dimensions['I'].width = 15
     worksheet.column_dimensions['J'].width = 15
@@ -200,7 +200,7 @@ def __set_late_unsubscribe_row_color(worksheet, row_number):
 
 
 def __set_border_on_first_peps_cell(worksheet, row_number):
-    first_peps_cell = worksheet["K{}".format(row_number)]
+    first_peps_cell = worksheet["J{}".format(row_number)]
     if first_peps_cell.has_style:
         c = first_peps_cell.style
         c.border = Border(
