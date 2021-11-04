@@ -45,10 +45,16 @@ class LearningUnitTitleSerializer(serializers.ModelSerializer):
 
     def get_title(self, learning_unit_year):
         language = self.context['language']
-        return getattr(
+        title = getattr(
             learning_unit_year,
             'full_title' + ('_' + language if language not in settings.LANGUAGE_CODE_FR else '')
         )
+        if language not in settings.LANGUAGE_CODE_FR and title is None:
+            return getattr(
+                learning_unit_year,
+                'full_title'
+            )
+        return title
 
 
 class LearningUnitSerializer(LearningUnitTitleSerializer):
