@@ -135,7 +135,10 @@ class _NoteEtudiantRowSerializer(serializers.Serializer):
         return ""
 
     def get_nom_complet(self, note_etudiant: NoteEtudiantDTO):
-        return "{}, {}".format(note_etudiant.nom if note_etudiant.nom else "", note_etudiant.prenom if note_etudiant.prenom else "")
+        return "{}, {}".format(
+            note_etudiant.nom if note_etudiant.nom else "",
+            note_etudiant.prenom if note_etudiant.prenom else ""
+        )
 
 
 class ScoreSheetXLSSerializer(serializers.Serializer):
