@@ -53,11 +53,19 @@ class ScoreEncodingForm(forms.Form):
             return note.replace(",", ".")
         return note
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.fields['note'].widget.attrs['style'] = self.fields['note'].widget.attrs['style'] + '; width:70px; '
+
 
 class ScoreSearchEncodingForm(forms.Form):
     note = UpperCaseCharField(max_length=100, required=False)
     noma = forms.CharField(widget=HiddenInput())
     code_unite_enseignement = forms.CharField(widget=HiddenInput())
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.fields['note'].widget.attrs['style'] = 'width:70px; '
 
 
 class ScoreSearchForm(forms.Form):
