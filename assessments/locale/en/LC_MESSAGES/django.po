@@ -225,7 +225,6 @@ msgstr ""
 msgid "Evaluations"
 msgstr ""
 
-#, python-format
 msgid "Extra time (33% generally)"
 msgstr ""
 
