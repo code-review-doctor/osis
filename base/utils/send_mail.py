@@ -232,8 +232,7 @@ def get_enrollment_headers(lang_code):
             translation.pgettext('Submission email table header', 'Program'),
             translation.pgettext('Submission email table header', 'Session number'),
             translation.pgettext('Submission email table header', 'Registration number'),
-            _('Last name'),
-            _('First name'),
+            _('Name'),
             _('Score'),
             _('Justification')
         ]
