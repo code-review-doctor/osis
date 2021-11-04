@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-28 10:36+0200\n"
+"POT-Creation-Date: 2021-11-04 10:48+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -215,9 +215,6 @@ msgstr "Les notes décimales sont autorisées pour ce cours"
 msgid "Define a specific address for the first year of bachelor"
 msgstr "Définir une adresse spécifique à la première année de bachelier"
 
-msgid "Deliberation date"
-msgstr "Date de délibération"
-
 msgid "Details other educational facilities"
 msgstr "Détails autre aménagement"
 
@@ -254,14 +251,10 @@ msgstr "Inscrit tardivement"
 msgid "Entity"
 msgstr "Entité"
 
-msgid "Entity of reference"
-msgstr "Entité de référence"
-
 msgid "Evaluations"
 msgstr "Evaluations"
 
-#, fuzzy, python-format
-#| msgid "Extra time (33% generally)"
+#, python-format
 msgid "Extra time (33% generally)"
 msgstr "Tiers-Temps"
 
@@ -355,7 +348,9 @@ msgstr "Note manquante"
 
 #, python-brace-format
 msgid "More than {0} results found. Only the {0} first results are displayed."
-msgstr "Plus de {0} résultats trouvés. Seuls les {0} premiers résultats sont affichés."
+msgstr ""
+"Plus de {0} résultats trouvés. Seuls les {0} premiers résultats sont "
+"affichés."
 
 msgid ""
 "NOTE : the 'Email' field is optional. You can fill in this field if you want "
@@ -387,9 +382,6 @@ msgstr "Aucun étudiant à encoder par excel"
 
 msgid "None"
 msgstr "Aucun"
-
-msgid "Not passed"
-msgstr "Non communiquée"
 
 msgid "Number of enrollments"
 msgstr "Nombre d'inscriptions"
@@ -589,11 +581,6 @@ msgstr "Parcours de l'étudiant"
 
 msgid "Students deliberated are not shown"
 msgstr "Les étudiants délibérés ne sont pas montrés"
-
-#, fuzzy
-#| msgid "Session"
-msgid "Submission"
-msgstr "Session"
 
 msgid "Submit"
 msgstr "Soumettre"
