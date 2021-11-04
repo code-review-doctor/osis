@@ -45,7 +45,7 @@ import base.views.learning_units.search.simple
 import base.views.learning_units.update
 from assessments.views.address.search import OffersSearch
 from attribution.views import attribution
-from base.views import geocoding
+from base.views import geocoding, explo
 from base.views import learning_achievement, search, user_list
 from base.views import learning_unit, common, institution, organization, academic_calendar, \
     my_osis, student
@@ -53,6 +53,7 @@ from base.views import teaching_material
 from base.views.autocomplete import OrganizationAutocomplete, CountryAutocomplete, CampusAutocomplete, \
     EntityAutocomplete, AllocationEntityAutocomplete, AdditionnalEntity1Autocomplete, AdditionnalEntity2Autocomplete, \
     EntityRequirementAutocomplete, EmployeeAutocomplete, AcademicCalendarTypeAutocomplete
+from base.views.explo import Explo, CodeAutocomplete
 from base.views.learning_units.detail import DetailLearningUnitYearView, DetailLearningUnitYearViewBySlug
 from base.views.learning_units.external import create as create_external
 from base.views.learning_units.pedagogy.publish import publish_and_access_publication
@@ -66,6 +67,12 @@ from learning_unit import urls as learning_unit_urls
 
 urlpatterns = [
     url(r'^$', common.home, name='home'),
+    path('explo/', Explo.as_view(), name='explo'),
+    url(
+        r'^code-autocomplete/$',
+        CodeAutocomplete.as_view(),
+        name='code-autocomplete',
+    ),
     path('autocomplete/', include([
         path(
             'academic-calendar-types/',
