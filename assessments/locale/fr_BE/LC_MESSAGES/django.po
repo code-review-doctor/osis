@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-19 15:08+0200\n"
+"POT-Creation-Date: 2021-10-28 10:36+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -215,9 +215,6 @@ msgstr "Les notes décimales sont autorisées pour ce cours"
 msgid "Define a specific address for the first year of bachelor"
 msgstr "Définir une adresse spécifique à la première année de bachelier"
 
-msgid "Definitive submission (Submit to faculty)"
-msgstr "Soumission définitive (Soumettre à la faculté)"
-
 msgid "Deliberation date"
 msgstr "Date de délibération"
 
@@ -263,6 +260,8 @@ msgstr "Entité de référence"
 msgid "Evaluations"
 msgstr "Evaluations"
 
+#, fuzzy, python-format
+#| msgid "Extra time (33% generally)"
 msgid "Extra time (33% generally)"
 msgstr "Tiers-Temps"
 
@@ -312,6 +311,9 @@ msgstr "Injecter le fichier XLS"
 msgid "Institution"
 msgstr "Institution"
 
+msgid "January"
+msgstr "Janvier"
+
 msgid "Justification (A,T)"
 msgstr "Justification (A,T)"
 
@@ -351,6 +353,10 @@ msgstr "Gestionnaires"
 msgid "Missing score"
 msgstr "Note manquante"
 
+#, python-brace-format
+msgid "More than {0} results found. Only the {0} first results are displayed."
+msgstr "Plus de {0} résultats trouvés. Seuls les {0} premiers résultats sont affichés."
+
 msgid ""
 "NOTE : the 'Email' field is optional. You can fill in this field if you want "
 "it to appear on the score sheet."
@@ -372,6 +378,9 @@ msgstr "Aucun résultat!"
 
 msgid "No score injected"
 msgstr "Aucune note injectée"
+
+msgid "No student to encode by excel"
+msgstr "Aucun étudiant à encoder par excel"
 
 msgid "No students to encode by excel"
 msgstr "Aucun étudiant à encoder par excel"
@@ -467,8 +476,8 @@ msgid ""
 "tutor that aren't submitted yet ('draft' state)"
 msgstr ""
 "Représente la quantité de notes soumises à l'administration. Le nombre "
-"entouré de parenthèses est le nombre de notes encodées par l'enseignant.e qui "
-"n'ont pas encore été soumises (état 'brouillon')"
+"entouré de parenthèses est le nombre de notes encodées par l'enseignant.e "
+"qui n'ont pas encore été soumises (état 'brouillon')"
 
 msgid "Req. Entity"
 msgstr "Ent. charge"
@@ -498,6 +507,10 @@ msgstr "Valeurs acceptées"
 #, python-brace-format
 msgid "Score legend: A=Absent, T=Cheating, {score} (0=Score of presence)"
 msgstr "Valeur acceptée: A=Absent, T=Tricherie, {score} (0=Note de présence)"
+
+#, python-format
+msgid "Score responsible successfully designated on %(code)s."
+msgstr "Responsable de notes désigné avec succès sur %(code)s."
 
 msgid "Score sheet"
 msgstr "Feuille de notes"
@@ -577,11 +590,23 @@ msgstr "Parcours de l'étudiant"
 msgid "Students deliberated are not shown"
 msgstr "Les étudiants délibérés ne sont pas montrés"
 
+#, fuzzy
+#| msgid "Session"
 msgid "Submission"
-msgstr "Soumission"
+msgstr "Session"
+
+msgid "Submit"
+msgstr "Soumettre"
 
 msgid "Submit data"
 msgstr "Date de remise"
+
+msgid ""
+"Submit these scores to faculty. These scores can not be changed after "
+"submission. The unsubmitted scores remain editable."
+msgstr ""
+"Soumettre ces notes à la faculté. Ces notes ne pourront plus être modifiées "
+"après la soumission. Les notes non soumises restent modifiables."
 
 msgid "Teacher deadline"
 msgstr "Date d'échéance de l'enseignant"
@@ -639,11 +664,13 @@ msgid_plural "There are %(error_counter)s errors in form"
 msgstr[0] "Il y a %(error_counter)s erreur dans le formulaire"
 msgstr[1] "Il y a %(error_counter)s erreurs dans le formulaire"
 
+msgid "There is no enrollment for this course"
+msgstr "Il n'y a pas d'inscription pour ce cours"
+
 msgid "This process helps tutor while encoding notes for the exams sessions."
 msgstr ""
-"Cette procédure aide l'enseignant.e durant l'encodage de notes pour les sessions "
-"d'examens."
-
+"Cette procédure aide l'enseignant.e durant l'encodage de notes pour les "
+"sessions d'examens."
 
 msgid "Title"
 msgstr "Intitulé"
@@ -658,7 +685,11 @@ msgid "Tutor deadlines"
 msgstr "Dates d'échéance de l'enseignant"
 
 msgid "Tutors of the course"
-msgstr "Tuteurs du cours"
+msgstr "Enseignant.e.s du cours"
+
+#, python-format
+msgid "Tutors' classes of the course %(code)s (%(annee_academique)s)"
+msgstr "Enseignant.e.s des classes du cours %(code)s (%(annee_academique)s)"
 
 msgid "Type"
 msgstr "Type"
@@ -687,9 +718,19 @@ msgstr "Via excel"
 msgid "Via paper"
 msgstr "Via papier"
 
-msgid "Warning : some registered scores have not been submitted yet!"
+#, python-format
+msgid "Warning: %(scores)s score(s) ready to be submitted."
+msgstr "Attention: %(scores)s note(s) prête(s) à être soumise(s)."
+
+#, python-format
+msgid ""
+"Warning: %(scores)s score(s) ready to be submitted. Only score responsible "
+"(%(responsable_nom)s, %(responsable_prenom)s) will be allowed to submit the "
+"scores to faculty."
 msgstr ""
-"Attention : certaines notes enregistrées n'ont pas encore été soumises!"
+"Attention:  %(scores)s note(s) prête(s) à être soumise(s). Seul le "
+"responsable de note (%(responsable_nom)s, %(responsable_prenom)s) pourra "
+"soumettre les notes à la faculté."
 
 msgid "Yes"
 msgstr "Oui"

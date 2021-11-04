@@ -161,5 +161,5 @@ def _add_row_to_worksheet(
     worksheet['B' + str(row_number)].value = numero_session
     worksheet['C' + str(row_number)].value = code_cours
     worksheet['E' + str(row_number)].value = noma
-    worksheet['H' + str(row_number)].value = note
-    worksheet['G' + str(row_number)].value = email
+    worksheet['I' + str(row_number)].value = note
+    worksheet['H' + str(row_number)].value = email

@@ -22,20 +22,38 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodage_notes import \
+    IPeriodeEncodageNotesTranslator
 from ddd.logic.encodage_des_notes.soumission.builder.adresse_feuille_de_notes_identity_builder import \
     AdresseFeuilleDeNotesIdentityBuilder
+from ddd.logic.encodage_des_notes.soumission.domain.service.annee_academique_addresse_feuille_de_notes import \
+    AnneeAcademiqueAddresseFeuilleDeNotesDomaineService
 from ddd.logic.encodage_des_notes.soumission.dtos import AdresseFeuilleDeNotesDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_notes import \
     IAdresseFeuilleDeNotesRepository
+from ddd.logic.shared_kernel.academic_year.repository.i_academic_year import IAcademicYearRepository
 from osis_common.ddd import interface
 
 
 class GetAdresseFeuilleDeNotesDTODomainService(interface.DomainService):
 
     @classmethod
-    def get(cls, nom_cohorte: str, repo: 'IAdresseFeuilleDeNotesRepository') -> AdresseFeuilleDeNotesDTO:
-        identite = AdresseFeuilleDeNotesIdentityBuilder().build_from_nom_cohorte(nom_cohorte)
+    def get(
+            cls,
+            nom_cohorte: str,
+            repo: 'IAdresseFeuilleDeNotesRepository',
+            periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
+            academic_year_repo: 'IAcademicYearRepository'
+    ) -> AdresseFeuilleDeNotesDTO:
+        annee_academique = AnneeAcademiqueAddresseFeuilleDeNotesDomaineService().get(
+            periode_soumission_note_translator,
+            academic_year_repo
+        )
+        identite = AdresseFeuilleDeNotesIdentityBuilder().build_from_nom_cohorte_and_annee_academique(
+            nom_cohorte,
+            annee_academique
+        )
         try:
             return repo.search_dtos([identite])[0]
         except IndexError:
-            return AdresseFeuilleDeNotesDTO(nom_cohorte=nom_cohorte)
+            return AdresseFeuilleDeNotesDTO(nom_cohorte=nom_cohorte, annee_academique=annee_academique)

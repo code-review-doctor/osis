@@ -23,21 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import abc
-from typing import Set
+from typing import List, Optional
 
-from ddd.logic.encodage_des_notes.soumission.dtos import DeliberationDTO
-from osis_common.ddd import interface
+from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
+from base.models.academic_year import AcademicYear as AcademicYearDatabase
+from ddd.logic.shared_kernel.academic_year.builder.academic_year_builder import AcademicYearBuilder
+from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYear, AcademicYearIdentity
+from ddd.logic.shared_kernel.academic_year.dtos import AcademicYearDataDTO
+from ddd.logic.shared_kernel.academic_year.repository.i_academic_year import IAcademicYearRepository
+from osis_common.ddd.interface import ApplicationService
 
 
-class IDeliberationTranslator(interface.DomainService):
-
-    @classmethod
-    @abc.abstractmethod
-    def search(
-            cls,
-            annee: int,
-            session: int,
-            noms_cohortes: Set[str],
-    ) -> Set['DeliberationDTO']:
-        raise NotImplementedError
+class AcademicYearInMemoryRepository(InMemoryGenericRepository, IAcademicYearRepository):
+    entities = list()  # type: List[AcademicYear]

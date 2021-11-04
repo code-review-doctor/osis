@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-25 13:44+0200\n"
+"POT-Creation-Date: 2021-10-28 10:34+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -107,6 +107,9 @@ msgstr "L'UE est utilisée dans les formations suivantes : {}"
 msgid "Lecturing charge or practical charge must be filled"
 msgstr "Le vol.1 postulé ou le vol.2 postulé doit être rempli"
 
+msgid "No student to encode by excel"
+msgstr "Aucun étudiant à encoder par Excel "
+
 msgid "No vacant corresponding activity"
 msgstr "Pas d'activité vacante correspondante"
 
@@ -114,7 +117,7 @@ msgid "Other educational facilities"
 msgstr "Autre aménagement"
 
 msgid "Registration ID does not match email"
-msgstr "Le noma ne correspond pas à l'adresse de messagerie"
+msgstr "Le noma ne corresond pas à l'adresse de messagerie"
 
 msgid "Score already submitted"
 msgstr "Note déjà soumise"
@@ -180,6 +183,11 @@ msgstr ""
 "Les volumes de %(effective_class_complete_acronym)s sont incohérents (le "
 "volume %(quadrimester)s doit avoir une valeur)"
 
+msgid "The address cannot be the same between bachelor and first year bachelor"
+msgstr ""
+"L'adresse ne peut pas être la même entre le bachelier et la première année "
+"de bachelier"
+
 #, python-format
 msgid ""
 "The class %(class_complete_code)s is assigned to %(tutor_full_name)s in "
@@ -230,6 +238,12 @@ msgstr ""
 
 msgid "The teaching place is required."
 msgstr "Le lieu d'enseignement est obligatoire"
+
+msgid "There is no enrollment for this course"
+msgstr "Aucune inscription pour ce cours"
+
+msgid "There is no enrollment to the exam"
+msgstr "Aucune inscription à l'examen de ce cours"
 
 msgid ""
 "This course is team-managed. The application to this activity is based on a "

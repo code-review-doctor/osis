@@ -22,18 +22,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodage_notes import \
+    IPeriodeEncodageNotesTranslator
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderAdresseEntiteCommeAdresseFeuilleDeNotes
 from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_notes import IdentiteAdresseFeuilleDeNotes
-from ddd.logic.encodage_des_notes.soumission.domain.service\
-    .adresse_feuille_de_note_premiere_annee_de_bachelier_est_specifique import \
-    EntiteAdresseFeuilleDeNotesPremiereAnneeDeBachelierEstDifferenteDeCelleDuBachelier
 from ddd.logic.encodage_des_notes.soumission.domain.service.encoder_adresse_feuille_de_notes import \
     EncoderAdresseFeuilleDeNotesDomainService
-from ddd.logic.encodage_des_notes.soumission.domain.service.entites_adresse_feuille_de_notes import \
-    EntiteAdresseFeuilleDeNotes
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_entites_cohorte import IEntitesCohorteTranslator
 from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_notes import \
     IAdresseFeuilleDeNotesRepository
+from ddd.logic.shared_kernel.academic_year.repository.i_academic_year import IAcademicYearRepository
 from ddd.logic.shared_kernel.entite.repository.entiteucl import IEntiteUCLRepository
 
 
@@ -41,18 +39,15 @@ def encoder_adresse_entite_comme_adresse_feuille_de_notes(
         cmd: EncoderAdresseEntiteCommeAdresseFeuilleDeNotes,
         repo: IAdresseFeuilleDeNotesRepository,
         entite_repository: 'IEntiteUCLRepository',
-        entites_cohorte_translator: 'IEntitesCohorteTranslator'
+        entites_cohorte_translator: 'IEntitesCohorteTranslator',
+        periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
+        academic_year_repo: 'IAcademicYearRepository'
 ) -> 'IdentiteAdresseFeuilleDeNotes':
-    EntiteAdresseFeuilleDeNotesPremiereAnneeDeBachelierEstDifferenteDeCelleDuBachelier().verifier(cmd, repo)
-    EntiteAdresseFeuilleDeNotes().verifier_est_valide(
-        cmd.nom_cohorte,
-        cmd.entite,
-        entite_repository,
-        entites_cohorte_translator
-    )
-
     return EncoderAdresseFeuilleDeNotesDomainService().encoder_adresse_entite_comme_adresse(
         cmd,
         repo,
-        entite_repository
+        entite_repository,
+        entites_cohorte_translator,
+        periode_soumission_note_translator,
+        academic_year_repo
     )

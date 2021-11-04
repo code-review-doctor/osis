@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import datetime
+from typing import Optional
 
 from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmissionCalendar
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodage_notes import \
@@ -34,7 +35,7 @@ from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO, PeriodeEnco
 class PeriodeEncodageNotesTranslator(IPeriodeEncodageNotesTranslator):
 
     @classmethod
-    def get(cls) -> 'PeriodeEncodageNotesDTO':
+    def get(cls) -> Optional['PeriodeEncodageNotesDTO']:
         calendar = ScoresExamSubmissionCalendar()
         events = calendar.get_opened_academic_events(date=datetime.date.today())
         if events:

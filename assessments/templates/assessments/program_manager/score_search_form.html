@@ -82,6 +82,9 @@
 
                     {% if search_form.is_valid %}
                         {% if notes_etudiant_filtered %}
+                            {% if too_many_results_message %}
+                                <div class="alert alert-warning" style="margin:5px">{{ too_many_results_message }}</div>
+                            {% endif %}
                             <form id="score_submit_form" class="form-inline" method="POST" action="{{ request.path }}?{{ request.GET.urlencode }}">
                             {% csrf_token %}
                             <div class="row">
@@ -141,8 +144,8 @@
                                                 {{ note_etudiant.code_unite_enseignement |add:" - " |add:note_etudiant.intitule_complet_unite_enseignement| truncatechars:45}}
                                             </td>
                                             <td headers="registration_number">{{ note_etudiant.noma }}</td>
-                                            {% include 'assessments/common/peps_column.html' %}
-                                            <td headers="name">{{ note_etudiant.nom }}, {{ note_etudiant.prenom }}</td>
+                                            <td headers="lastname">{{ note_etudiant.nom }}</td>
+                                            <td headers="firstname">{{ note_etudiant.prenom }}</td>
                                             <td id="enrollment_note_{{ forloop.counter0 }}" headers="score">
                                                 {% if not note_etudiant.date_echeance_atteinte and not note_etudiant.desinscrit_tardivement %}
                                                     {% with score_encoding_form=form|index:forloop.counter0 %}
@@ -197,6 +200,7 @@
             }
 
             const is_valid_justification = function (justification) {
+                justification = justification.toUpperCase();
                 const justificationAvailables = ['M', 'S', 'T'];
                 return justificationAvailables.indexOf(justification) > -1;
             }
