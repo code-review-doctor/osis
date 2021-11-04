@@ -24,13 +24,14 @@
 #
 ##############################################################################
 import string
+import uuid
 from decimal import Decimal
 
 import factory.fuzzy
-import uuid
 
 from ddd.logic.effective_class_repartition.domain.model._class_volume_repartition import ClassVolumeRepartition
-from ddd.logic.effective_class_repartition.domain.model._learning_unit_attribution import LearningUnitAttributionIdentity
+from ddd.logic.effective_class_repartition.domain.model._learning_unit_attribution import \
+    LearningUnitAttributionIdentity
 from ddd.logic.effective_class_repartition.domain.model.tutor import TutorIdentity, Tutor
 from ddd.logic.learning_unit.tests.factory.effective_class import LDROI1001XEffectiveClassIdentityFactory
 
@@ -75,7 +76,7 @@ class TutorWithDistributedEffectiveClassesFactory(_TutorFactory):
 
 
 class TutorWithoutDistributedEffectiveClassesFactory(_TutorFactory):
-    distributed_effective_classes = []
+    distributed_effective_classes = factory.List([])
 
 
 class Tutor9999IdentityFactory(_TutorIdentityFactory):
