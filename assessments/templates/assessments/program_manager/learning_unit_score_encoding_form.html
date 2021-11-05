@@ -245,5 +245,15 @@
             SCORE_INPUTS.change(validate_form);
         });
         $(document).on('keypress', function(e) { disable_enter(e); });
+
+        // Focus on next input when keypress 'enter'
+        const focusables = $(":focusable");
+        focusables.keypress(function(e) {
+            if (keycode_is_enter(e)) {
+                const current = focusables.index(this),
+                    next = focusables.eq(current+1).length ? focusables.eq(current+1) : focusables.eq(0);
+                next.focus();
+            }
+        });
     </script>
 {% endblock %}
