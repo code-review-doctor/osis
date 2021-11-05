@@ -58,8 +58,7 @@ from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit import LEARNING_UNIT_ACRONYM_REGEX_MODEL
 from base.models.prerequisite_item import PrerequisiteItem
 from education_group import publisher
-from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin, SerializableModelManager, \
-    SerializableQuerySet
+from osis_common.models.osis_model_admin import OsisModelAdmin
 
 CREDITS_FOR_DECIMAL_SCORES = 15
 
@@ -120,7 +119,7 @@ def academic_year_validator(value):
         )
 
 
-class LearningUnitYearAdmin(VersionAdmin, SerializableModelAdmin):
+class LearningUnitYearAdmin(VersionAdmin, OsisModelAdmin):
     list_display = (
         'external_id',
         'acronym',
@@ -143,7 +142,7 @@ class LearningUnitYearAdmin(VersionAdmin, SerializableModelAdmin):
     ]
 
 
-class LearningUnitYearQuerySet(SerializableQuerySet):
+class LearningUnitYearQuerySet(models.QuerySet):
     def annotate_volume_total(self):
         return self.annotate_volume_total_class_method(self)
 
@@ -298,7 +297,7 @@ class LearningUnitYearQuerySet(SerializableQuerySet):
         )
 
 
-class BaseLearningUnitYearManager(SerializableModelManager):
+class BaseLearningUnitYearManager(models.Manager):
     def get_queryset(self):
         return LearningUnitYearQuerySet(self.model, using=self._db)
 
@@ -310,7 +309,7 @@ class LearningUnitYearWithContainerManager(models.Manager):
             .filter(learning_container_year__isnull=False)
 
 
-class LearningUnitYear(SerializableModel):
+class LearningUnitYear(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     academic_year = models.ForeignKey(AcademicYear, verbose_name=_('Academic year'),
                                       validators=[academic_year_validator], on_delete=models.PROTECT)
