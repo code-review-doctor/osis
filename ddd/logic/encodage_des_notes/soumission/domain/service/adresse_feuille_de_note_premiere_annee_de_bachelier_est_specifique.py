@@ -55,7 +55,6 @@ class EntiteAdresseFeuilleDeNotesPremiereAnneeDeBachelierEstDifferenteDeCelleDuB
             entite_repository: 'IEntiteUCLRepository',
             entites_cohorte_translator: 'IEntitesCohorteTranslator',
             periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
-            academic_year_repo: 'IAcademicYearRepository'
     ) -> None:
         if "11BA" not in cmd.nom_cohorte:
             return
@@ -76,7 +75,6 @@ class EntiteAdresseFeuilleDeNotesPremiereAnneeDeBachelierEstDifferenteDeCelleDuB
             entite_repository,
             entites_cohorte_translator,
             periode_soumission_note_translator,
-            academic_year_repo
         )
 
         entite_1BA = cls._get_entite_cohorte(
@@ -85,7 +83,6 @@ class EntiteAdresseFeuilleDeNotesPremiereAnneeDeBachelierEstDifferenteDeCelleDuB
             entite_repository,
             entites_cohorte_translator,
             periode_soumission_note_translator,
-            academic_year_repo
         )
 
         if entite_1BA == entite_11BA:
@@ -99,14 +96,12 @@ class EntiteAdresseFeuilleDeNotesPremiereAnneeDeBachelierEstDifferenteDeCelleDuB
             entite_repository: 'IEntiteUCLRepository',
             entites_cohorte_translator: 'IEntitesCohorteTranslator',
             periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
-            academic_year_repo: 'IAcademicYearRepository'
     ) -> Optional['EntiteUCL']:
         entites_possibles = EntiteAdresseFeuilleDeNotes.search(
             nom_cohorte,
             entite_repository,
             entites_cohorte_translator,
             periode_soumission_note_translator,
-            academic_year_repo
         )
         return entites_possibles.get_par_type(type_entite)
 
