@@ -146,6 +146,7 @@ class RechercheNoteEtudiantDTO(interface.DTO):
     inscrit_tardivement = attr.ib(type=bool)  # inscription examen
     desinscrit_tardivement = attr.ib(type=bool)  # inscription examen
     note_decimale_est_autorisee = attr.ib(type=bool)
+    peps = attr.ib(type=Optional[EtudiantPepsDTO])  # signaletique
 
     @property
     def date_echeance_atteinte(self) -> bool:
