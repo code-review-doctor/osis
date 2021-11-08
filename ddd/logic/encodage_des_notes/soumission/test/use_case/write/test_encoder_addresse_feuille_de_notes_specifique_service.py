@@ -59,7 +59,6 @@ class TestEncoderAddressFeuilleDeNotesSpecifique(SimpleTestCase):
         self.repo.entities.clear()
 
         self.periode_encodage_notes_translator = PeriodeEncodageNotesTranslatorInMemory()
-        self.academic_year_repository = AcademicYearInMemoryRepository()
 
         self.__mock_service_bus()
 
@@ -68,7 +67,6 @@ class TestEncoderAddressFeuilleDeNotesSpecifique(SimpleTestCase):
             'infrastructure.messages_bus',
             AdresseFeuilleDeNotesRepository=lambda: self.repo,
             PeriodeEncodageNotesTranslator=lambda: self.periode_encodage_notes_translator,
-            AcademicYearRepository=lambda: self.academic_year_repository
         )
         message_bus_patcher.start()
         self.addCleanup(message_bus_patcher.stop)

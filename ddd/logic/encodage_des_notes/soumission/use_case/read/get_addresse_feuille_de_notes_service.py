@@ -39,7 +39,6 @@ def get_adresse_feuille_de_notes(
         cmd: GetAdresseFeuilleDeNotesServiceCommand,
         repo: IAdresseFeuilleDeNotesRepository,
         periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
-        academic_year_repo: 'IAcademicYearRepository',
         entite_repository: 'IEntiteUCLRepository',
         entites_cohorte_translator: 'IEntitesCohorteTranslator',
 ) -> 'AdresseFeuilleDeNotesDTO':
@@ -47,7 +46,6 @@ def get_adresse_feuille_de_notes(
         cmd.nom_cohorte,
         repo,
         periode_soumission_note_translator,
-        academic_year_repo,
         entite_repository,
         entites_cohorte_translator,
     )

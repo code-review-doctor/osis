@@ -31,7 +31,6 @@ from ddd.logic.shared_kernel.academic_year.repository.i_academic_year import IAc
 from osis_common.ddd import interface
 
 
-# FIXME :: à ssupprimer ? Il n'est pas possible d'appeler ce service en dehors de la periode encodage de notes => le AcademicYearRepo est inutile
 class AnneeAcademiqueAddresseFeuilleDeNotesDomaineService(interface.DomainService):
     @classmethod
     def get(

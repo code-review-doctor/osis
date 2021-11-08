@@ -43,7 +43,6 @@ def search_donnees_administratives_feuille_de_notes(
         periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
         inscr_exam_translator: 'IInscriptionExamenTranslator',
         adresse_feuille_de_notes_repository: 'IAdresseFeuilleDeNotesRepository',
-        academic_year_repo: 'IAcademicYearRepository',
         entite_repository: 'IEntiteUCLRepository',
         entites_cohorte_translator: 'IEntitesCohorteTranslator',
 ) -> List['DonneesAdministrativesFeuilleDeNotesDTO']:
@@ -52,7 +51,6 @@ def search_donnees_administratives_feuille_de_notes(
         periode_soumission_note_translator=periode_soumission_note_translator,
         inscr_exam_translator=inscr_exam_translator,
         adresse_feuille_de_notes_repository=adresse_feuille_de_notes_repository,
-        academic_year_repo=academic_year_repo,
         entite_repository=entite_repository,
         entites_cohorte_translator=entites_cohorte_translator,
     )

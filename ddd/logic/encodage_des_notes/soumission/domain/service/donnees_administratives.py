@@ -52,7 +52,6 @@ class DonneesAdministratives(interface.DomainService):
             periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
             inscr_exam_translator: 'IInscriptionExamenTranslator',
             adresse_feuille_de_notes_repository: 'IAdresseFeuilleDeNotesRepository',
-            academic_year_repo: 'IAcademicYearRepository',
             entite_repository: 'IEntiteUCLRepository',
             entites_cohorte_translator: 'IEntitesCohorteTranslator',
     ) -> List['DonneesAdministrativesFeuilleDeNotesDTO']:
@@ -70,7 +69,6 @@ class DonneesAdministratives(interface.DomainService):
             adresse_feuille_de_notes_repository=adresse_feuille_de_notes_repository,
             noms_cohortes=noms_cohortes,
             periode_soumission_note_translator=periode_soumission_note_translator,
-            academic_year_repo=academic_year_repo,
             entite_repository=entite_repository,
             entites_cohorte_translator=entites_cohorte_translator,
         )
@@ -105,7 +103,6 @@ def _get_adresse_par_cohorte(
         adresse_feuille_de_notes_repository: 'IAdresseFeuilleDeNotesRepository',
         noms_cohortes: Set['str'],
         periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
-        academic_year_repo: 'IAcademicYearRepository',
         entite_repository: 'IEntiteUCLRepository',
         entites_cohorte_translator: 'IEntitesCohorteTranslator',
 ):
@@ -115,7 +112,6 @@ def _get_adresse_par_cohorte(
             nom_cohorte=nom_cohorte,
             repo=adresse_feuille_de_notes_repository,
             periode_soumission_note_translator=periode_soumission_note_translator,
-            academic_year_repo=academic_year_repo,
             entite_repository=entite_repository,
             entites_cohorte_translator=entites_cohorte_translator,
         )

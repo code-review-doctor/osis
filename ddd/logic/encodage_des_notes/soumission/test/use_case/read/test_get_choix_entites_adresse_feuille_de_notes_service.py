@@ -54,7 +54,6 @@ class TestGetChoixEntitesAdresseFeuilleDeNotes(SimpleTestCase):
         self.entites_cohorte_translator.datas.clear()
 
         self.periode_encodage_notes_translator = PeriodeEncodageNotesTranslatorInMemory()
-        self.academic_year_repository = AcademicYearInMemoryRepository()
 
         self.__mock_service_bus()
 
@@ -64,7 +63,6 @@ class TestGetChoixEntitesAdresseFeuilleDeNotes(SimpleTestCase):
             EntiteUCLRepository=lambda: self.entite_repository,
             EntitesCohorteTranslator=lambda: self.entites_cohorte_translator,
             PeriodeEncodageNotesTranslator=lambda: self.periode_encodage_notes_translator,
-            AcademicYearRepository=lambda: self.academic_year_repository
         )
         message_bus_patcher.start()
         self.addCleanup(message_bus_patcher.stop)

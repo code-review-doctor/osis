@@ -27,15 +27,12 @@ from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodag
     IPeriodeEncodageNotesTranslator
 from ddd.logic.encodage_des_notes.soumission.builder.adresse_feuille_de_notes_identity_builder import \
     AdresseFeuilleDeNotesIdentityBuilder
-from ddd.logic.encodage_des_notes.soumission.domain.service.annee_academique_addresse_feuille_de_notes import \
-    AnneeAcademiqueAddresseFeuilleDeNotesDomaineService
 from ddd.logic.encodage_des_notes.soumission.domain.service.entites_adresse_feuille_de_notes import \
     EntiteAdresseFeuilleDeNotes
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_entites_cohorte import IEntitesCohorteTranslator
 from ddd.logic.encodage_des_notes.soumission.dtos import AdresseFeuilleDeNotesDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_notes import \
     IAdresseFeuilleDeNotesRepository
-from ddd.logic.shared_kernel.academic_year.repository.i_academic_year import IAcademicYearRepository
 from ddd.logic.shared_kernel.entite.repository.entiteucl import IEntiteUCLRepository
 from osis_common.ddd import interface
 
@@ -48,14 +45,10 @@ class GetAdresseFeuilleDeNotesDTODomainService(interface.DomainService):
             nom_cohorte: str,
             repo: 'IAdresseFeuilleDeNotesRepository',
             periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
-            academic_year_repo: 'IAcademicYearRepository',
             entite_repository: 'IEntiteUCLRepository',
             entites_cohorte_translator: 'IEntitesCohorteTranslator',
     ) -> AdresseFeuilleDeNotesDTO:
-        annee_academique = AnneeAcademiqueAddresseFeuilleDeNotesDomaineService().get(
-            periode_soumission_note_translator,
-            academic_year_repo
-        )
+        annee_academique = periode_soumission_note_translator.get().annee_concernee
         identite = AdresseFeuilleDeNotesIdentityBuilder().build_from_nom_cohorte_and_annee_academique(
             nom_cohorte,
             annee_academique
@@ -67,7 +60,6 @@ class GetAdresseFeuilleDeNotesDTODomainService(interface.DomainService):
                 nom_cohorte,
                 annee_academique,
                 periode_soumission_note_translator,
-                academic_year_repo,
                 entite_repository,
                 entites_cohorte_translator,
             )
@@ -78,7 +70,6 @@ class GetAdresseFeuilleDeNotesDTODomainService(interface.DomainService):
             nom_cohorte: str,
             annee_academique: int,
             periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
-            academic_year_repo: 'IAcademicYearRepository',
             entite_repository: 'IEntiteUCLRepository',
             entites_cohorte_translator: 'IEntitesCohorteTranslator',
     ):
@@ -88,7 +79,6 @@ class GetAdresseFeuilleDeNotesDTODomainService(interface.DomainService):
             entite_repository,
             entites_cohorte_translator,
             periode_soumission_note_translator,
-            academic_year_repo
         )
         entite = entites_possibles.get_par_type(type_entite_par_defaut)
         return AdresseFeuilleDeNotesDTO(

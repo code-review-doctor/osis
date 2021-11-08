@@ -407,6 +407,8 @@ class MessageBusCommands(AbstractMessageBusCommands):
             PeriodeEncodageNotesTranslator(),
             InscriptionExamenTranslator(),
             AdresseFeuilleDeNotesRepository(),
+            EntiteUCLRepository(),
+            EntitesCohorteTranslator(),
         ),
         EncoderNotesCommand: lambda cmd: encoder_notes(
             cmd,
@@ -458,33 +460,30 @@ class MessageBusCommands(AbstractMessageBusCommands):
                 EntiteUCLRepository(),
                 EntitesCohorteTranslator(),
                 PeriodeEncodageNotesTranslator(),
-                AcademicYearRepository()
         ),
         EncoderAdresseFeuilleDeNotesSpecifique: lambda cmd: encoder_adresse_feuille_de_notes_specifique(
             cmd,
             AdresseFeuilleDeNotesRepository(),
             PeriodeEncodageNotesTranslator(),
-            AcademicYearRepository()
         ),
         SupprimerAdresseFeuilleDeNotesPremiereAnneeDeBachelier: lambda cmd: \
             supprimer_adresse_feuille_de_note_premiere_annee_de_bachelier(
                 cmd,
                 AdresseFeuilleDeNotesRepository(),
                 PeriodeEncodageNotesTranslator(),
-                AcademicYearRepository()
         ),
         GetAdresseFeuilleDeNotesServiceCommand: lambda cmd: get_adresse_feuille_de_notes(
             cmd,
             AdresseFeuilleDeNotesRepository(),
             PeriodeEncodageNotesTranslator(),
-            AcademicYearRepository()
+            EntiteUCLRepository(),
+            EntitesCohorteTranslator(),
         ),
         GetChoixEntitesAdresseFeuilleDeNotesCommand: lambda cmd: get_choix_entites_adresse_feuille_de_notes(
             cmd,
             EntiteUCLRepository(),
             EntitesCohorteTranslator(),
             PeriodeEncodageNotesTranslator(),
-            AcademicYearRepository()
         ),
         GetResponsableDeNotesCommand: lambda cmd: get_responsable_de_notes(
             cmd,

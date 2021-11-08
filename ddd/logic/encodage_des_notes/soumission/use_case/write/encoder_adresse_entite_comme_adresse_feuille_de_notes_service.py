@@ -41,7 +41,6 @@ def encoder_adresse_entite_comme_adresse_feuille_de_notes(
         entite_repository: 'IEntiteUCLRepository',
         entites_cohorte_translator: 'IEntitesCohorteTranslator',
         periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
-        academic_year_repo: 'IAcademicYearRepository'
 ) -> 'IdentiteAdresseFeuilleDeNotes':
     return EncoderAdresseFeuilleDeNotesDomainService().encoder_adresse_entite_comme_adresse(
         cmd,
@@ -49,5 +48,4 @@ def encoder_adresse_entite_comme_adresse_feuille_de_notes(
         entite_repository,
         entites_cohorte_translator,
         periode_soumission_note_translator,
-        academic_year_repo
     )

@@ -43,7 +43,6 @@ from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.entite
 from infrastructure.encodage_de_notes.soumission.repository.in_memory.adresse_feuille_de_notes import \
     AdresseFeuilleDeNotesInMemoryRepository
 from infrastructure.messages_bus import message_bus_instance
-from infrastructure.shared_kernel.academic_year.repository.in_memory.academic_year import AcademicYearInMemoryRepository
 from infrastructure.shared_kernel.entite.repository.in_memory.entiteucl import EntiteUCLInMemoryRepository
 
 
@@ -68,8 +67,6 @@ class SearchDonneesAdministrativesTest(SimpleTestCase):
         self.periode_encodage_translator = PeriodeEncodageNotesTranslatorInMemory()
         self.inscr_examen_translator = InscriptionExamenTranslatorInMemory()
 
-        self.academic_year_repository = AcademicYearInMemoryRepository()
-
         self.entite_repository = EntiteUCLInMemoryRepository()
 
         self.entites_cohorte_translator = EntitesCohorteTranslatorInMemory()
@@ -82,7 +79,6 @@ class SearchDonneesAdministrativesTest(SimpleTestCase):
             PeriodeEncodageNotesTranslator=lambda: self.periode_encodage_translator,
             AdresseFeuilleDeNotesRepository=lambda: self.adresse_feuille_de_notes_repository,
             InscriptionExamenTranslator=lambda: self.inscr_examen_translator,
-            AcademicYearRepository=lambda: self.academic_year_repository,
             EntiteUCLRepository=lambda: self.entite_repository,
             EntitesCohorteTranslator=lambda: self.entites_cohorte_translator,
         )
