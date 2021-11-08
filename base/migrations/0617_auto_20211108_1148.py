@@ -20,29 +20,4 @@ class Migration(migrations.Migration):
             model_name='learningunit',
             name='uuid',
         ),
-        migrations.AlterField(
-            model_name='examenrollment',
-            name='score_draft',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=4, null=True, validators=[django.core.validators.MinValueValidator(0, message='Les scores doivent être compris entre 0 et 20'), django.core.validators.MaxValueValidator(20, message='Les scores doivent être compris entre 0 et 20')]),
-        ),
-        migrations.AlterField(
-            model_name='examenrollment',
-            name='score_final',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=4, null=True, validators=[django.core.validators.MinValueValidator(0, message='Les scores doivent être compris entre 0 et 20'), django.core.validators.MaxValueValidator(20, message='Les scores doivent être compris entre 0 et 20')]),
-        ),
-        migrations.AlterField(
-            model_name='examenrollment',
-            name='score_reencoded',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=4, null=True, validators=[django.core.validators.MinValueValidator(0, message='Les scores doivent être compris entre 0 et 20'), django.core.validators.MaxValueValidator(20, message='Les scores doivent être compris entre 0 et 20')]),
-        ),
-        migrations.AlterField(
-            model_name='person',
-            name='id_card',
-            field=osis_document.contrib.fields.FileField(base_field=models.UUIDField(), default=list, null=True, size=1),
-        ),
-        migrations.AlterField(
-            model_name='person',
-            name='passport',
-            field=osis_document.contrib.fields.FileField(base_field=models.UUIDField(), default=list, null=True, size=1),
-        ),
     ]
