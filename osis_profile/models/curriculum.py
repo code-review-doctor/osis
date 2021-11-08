@@ -46,18 +46,26 @@ class CurriculumYear(models.Model):
         ordering = ["-academic_graduation_year__year"]
 
 
+class ExperienceManager(models.Manager):
+    def get_queryset(self):
+        """An experience is 'valuated' after an admission has been accepted."""
+        return super().get_queryset().annotate(
+            is_valuated=models.ExpressionWrapper(
+                models.Q(valuated_from__isnull=False),
+                output_field=models.BooleanField(),
+            )
+        )
+
+
 class Experience(models.Model):
     curriculum_year = models.ForeignKey(CurriculumYear, on_delete=models.CASCADE, related_name="experiences")
-    validated_from = models.ForeignKey(
+    valuated_from = models.ForeignKey(
         DoctorateAdmission,
-        verbose_name=_("Experience validated from this accepted admission."),
+        verbose_name=_("Experience valuated from this accepted admission."),
         on_delete=models.PROTECT,
         null=True,
         blank=True,
     )
     course_type = models.CharField(_("Course types"), max_length=50, choices=CourseTypes.choices())
 
-    @property
-    def is_valuated(self):
-        """An experience is 'valuated' after an admission has been accepted."""
-        return bool(self.validated_from_id)
+    objects = ExperienceManager()
