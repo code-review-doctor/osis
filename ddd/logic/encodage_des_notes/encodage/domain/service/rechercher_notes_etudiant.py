@@ -123,7 +123,8 @@ class RechercheNotesEtudiant(interface.DomainService):
                         desinscription for desinscription in desinscriptions_examens_dto if
                         desinscription.code_unite_enseignement == note_etudiant.code_unite_enseignement
                     ),
-                    note_decimale_est_autorisee=note_etudiant.note_decimale_autorisee
+                    note_decimale_est_autorisee=note_etudiant.note_decimale_autorisee,
+                    peps=getattr(signaletique_etudiant_dto, 'peps', None),
                 )
             )
         return sorted(

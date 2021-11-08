@@ -650,8 +650,8 @@ msgid_plural "There are %(error_counter)s errors in form"
 msgstr[0] "Il y a %(error_counter)s erreur dans le formulaire"
 msgstr[1] "Il y a %(error_counter)s erreurs dans le formulaire"
 
-msgid "There is no enrollment for this course"
-msgstr "Il n'y a pas d'inscription pour ce cours"
+msgid "There is no enrollment to the exam for this learning unit"
+msgstr "Aucune inscription à l'examen pour cette unité d'enseignement"
 
 msgid "This process helps tutor while encoding notes for the exams sessions."
 msgstr ""

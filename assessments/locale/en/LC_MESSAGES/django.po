@@ -225,7 +225,6 @@ msgstr ""
 msgid "Evaluations"
 msgstr ""
 
-#, python-format
 msgid "Extra time (33% generally)"
 msgstr ""
 
@@ -591,7 +590,7 @@ msgid_plural "There are %(error_counter)s errors in form"
 msgstr[0] ""
 msgstr[1] ""
 
-msgid "There is no enrollment for this course"
+msgid "There is no enrollment to the exam for this learning unit"
 msgstr ""
 
 msgid "This process helps tutor while encoding notes for the exams sessions."
