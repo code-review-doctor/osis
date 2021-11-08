@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -37,19 +37,19 @@ from base.models.enums import vacant_declaration_type
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ALLOCATION_ENTITY, \
     ADDITIONAL_REQUIREMENT_ENTITY_1, ADDITIONAL_REQUIREMENT_ENTITY_2
 from base.models.enums.learning_container_year_types import LearningContainerYearType, IN_CHARGE_TYPES
-from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
+from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
 FIELDS_FOR_COMPARISON = ['team', 'is_vacant', 'type_declaration_vacant']
 
 
-class LearningContainerYearAdmin(VersionAdmin, SerializableModelAdmin):
+class LearningContainerYearAdmin(VersionAdmin, OsisModelAdmin):
     list_display = ('learning_container', 'academic_year', 'container_type', 'acronym', 'common_title')
     search_fields = ['acronym']
     list_filter = ('academic_year', 'is_vacant',)
 
 
-class LearningContainerYear(SerializableModel):
+class LearningContainerYear(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     academic_year = models.ForeignKey('AcademicYear', on_delete=models.PROTECT)
     learning_container = models.ForeignKey('LearningContainer', on_delete=models.CASCADE)
