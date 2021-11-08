@@ -30,9 +30,12 @@ from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodag
     IPeriodeEncodageNotesTranslator
 from ddd.logic.encodage_des_notes.soumission.commands import SearchAdressesFeuilleDeNotesCommand
 from ddd.logic.encodage_des_notes.soumission.domain.service.donnees_administratives import DonneesAdministratives
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_entites_cohorte import IEntitesCohorteTranslator
 from ddd.logic.encodage_des_notes.soumission.dtos import DonneesAdministrativesFeuilleDeNotesDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_notes import \
     IAdresseFeuilleDeNotesRepository
+from ddd.logic.shared_kernel.academic_year.repository.i_academic_year import IAcademicYearRepository
+from ddd.logic.shared_kernel.entite.repository.entiteucl import IEntiteUCLRepository
 
 
 def search_donnees_administratives_feuille_de_notes(
@@ -40,10 +43,16 @@ def search_donnees_administratives_feuille_de_notes(
         periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
         inscr_exam_translator: 'IInscriptionExamenTranslator',
         adresse_feuille_de_notes_repository: 'IAdresseFeuilleDeNotesRepository',
+        academic_year_repo: 'IAcademicYearRepository',
+        entite_repository: 'IEntiteUCLRepository',
+        entites_cohorte_translator: 'IEntitesCohorteTranslator',
 ) -> List['DonneesAdministrativesFeuilleDeNotesDTO']:
     return DonneesAdministratives().search(
         codes_unites_enseignement=cmd.codes_unite_enseignement,
         periode_soumission_note_translator=periode_soumission_note_translator,
         inscr_exam_translator=inscr_exam_translator,
         adresse_feuille_de_notes_repository=adresse_feuille_de_notes_repository,
+        academic_year_repo=academic_year_repo,
+        entite_repository=entite_repository,
+        entites_cohorte_translator=entites_cohorte_translator,
     )
