@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -35,8 +35,7 @@ from base.models import academic_year
 from base.models.academic_year import AcademicYear, starting_academic_year
 from base.models.enums.learning_container_year_types import EXTERNAL
 from base.models.enums.learning_unit_year_subtypes import PARTIM, FULL
-from osis_common.models.serializable_model import SerializableModel, \
-    SerializableModelAdmin
+from osis_common.models.osis_model_admin import OsisModelAdmin
 
 LEARNING_UNIT_ACRONYM_REGEX_MODEL = "^[BEGLMTWX][A-Z]{2,4}[1-9]\d{3}"
 LEARNING_UNIT_ACRONYM_REGEX_BASE = "^[BELMWX][A-Z]{2,4}[1-9]\d{3}"
@@ -54,7 +53,7 @@ REGEX_BY_SUBTYPE = {
 }
 
 
-class LearningUnitAdmin(VersionAdmin, SerializableModelAdmin):
+class LearningUnitAdmin(VersionAdmin, OsisModelAdmin):
     list_display = ('learning_container', 'acronym', 'title', 'start_year', 'end_year', 'changed')
     search_fields = ['learningunityear__acronym', 'learningunityear__specific_title', 'learning_container__external_id']
     list_filter = ('start_year',)
@@ -85,7 +84,7 @@ class LearningUnitAdmin(VersionAdmin, SerializableModelAdmin):
     apply_learning_unit_year_postponement.short_description = _("Apply postponement on learning unit year")
 
 
-class LearningUnit(SerializableModel):
+class LearningUnit(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     learning_container = models.ForeignKey('LearningContainer', blank=True, null=True, on_delete=models.CASCADE)
     changed = models.DateTimeField(null=True, auto_now=True)
