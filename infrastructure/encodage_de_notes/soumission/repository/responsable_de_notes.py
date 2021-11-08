@@ -162,20 +162,21 @@ class ResponsableDeNotesRepository(IResponsableDeNotesRepository):
             entity_id: 'IdentiteResponsableDeNotes',
             unite_enseignement: 'UniteEnseignementIdentite'
     ):
-        is_class = unite_enseignement.est_classe()
+        code_ue = unite_enseignement.code_unite_enseignement
+        is_class = "-" in code_ue or '_' in code_ue
         tutor = Tutor.objects.get(person__global_id=entity_id.matricule_fgs_enseignant)
         if is_class:
             luy = LearningUnitYear.objects.get(
-                acronym=unite_enseignement.get_code_unite_enseignement_sans_code_classe(),
+                acronym=code_ue[:-2],
                 academic_year__year=unite_enseignement.annee_academique
             )
             class_year = LearningClassYear.objects.get(
-                acronym=unite_enseignement.get_code_classe(),
+                acronym=code_ue[-1],
                 learning_component_year__learning_unit_year=luy
             )
         else:
             luy = LearningUnitYear.objects.get(
-                acronym=unite_enseignement.code_unite_enseignement,
+                acronym=code_ue,
                 academic_year__year=unite_enseignement.annee_academique
             )
             class_year = None
@@ -190,12 +191,10 @@ class ResponsableDeNotesRepository(IResponsableDeNotesRepository):
         raise NotImplementedError
 
     @classmethod
-    def get(cls, entity_id: 'IdentiteResponsableDeNotes') -> 'ResponsableDeNotes':
-        try:
-            responsable_de_note = cls.search([entity_id])[0]
-            return responsable_de_note
-        except IndexError:
-            return None
+    def get(cls, entity_id: 'IdentiteResponsableDeNotes') -> Optional['ResponsableDeNotes']:
+        search = cls.search([entity_id])
+        if search:
+            return search[0]
 
     @classmethod
     def get_for_unite_enseignement(
@@ -204,7 +203,8 @@ class ResponsableDeNotesRepository(IResponsableDeNotesRepository):
             annee_academique: int
     ) -> Optional['ResponsableDeNotes']:
         try:
-            return cls.search(codes_unites_enseignement=[code_unite_enseignement], annee_academique=annee_academique)[0]
+            liste = cls.search(codes_unites_enseignement=[code_unite_enseignement], annee_academique=annee_academique)
+            return liste[0]
         except IndexError:
             return None
 

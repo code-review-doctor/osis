@@ -55,6 +55,7 @@ class _NoteEtudiantRowSerializer(serializers.Serializer):
     autre_amenagement = serializers.SerializerMethodField()
     details_autre_amenagement = serializers.SerializerMethodField()
     accompagnateur = serializers.SerializerMethodField()
+    nom_complet = serializers.SerializerMethodField()
 
     def get_type_peps(self, note_etudiant: NoteEtudiantDTO):
         try:
@@ -132,6 +133,12 @@ class _NoteEtudiantRowSerializer(serializers.Serializer):
         if note_etudiant.date_remise_de_notes and not note_etudiant.desinscrit_tardivement:
             return note_etudiant.date_remise_de_notes.to_date().strftime("%d/%m/%Y")
         return ""
+
+    def get_nom_complet(self, note_etudiant: NoteEtudiantDTO):
+        return "{}, {}".format(
+            note_etudiant.nom if note_etudiant.nom else "",
+            note_etudiant.prenom if note_etudiant.prenom else ""
+        )
 
 
 class ScoreSheetXLSSerializer(serializers.Serializer):

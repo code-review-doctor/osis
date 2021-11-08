@@ -98,7 +98,7 @@ class ResponsableDeNotesRepositoryTest(TestCase):
 
         self.responsable_de_notes_repository.save(responsable)
 
-        self.assertEqual(self.responsable_de_notes_repository.get(responsable.entity_id), None)
+        self.assertIsNone(self.responsable_de_notes_repository.get(responsable.entity_id))
 
     def test_should_get_responsable_de_notes_par_cours(self):
         responsable = ResponsableDeNotesPourUneUniteEnseignement()

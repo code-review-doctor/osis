@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-28 10:36+0200\n"
+"POT-Creation-Date: 2021-11-04 14:39+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -186,9 +186,6 @@ msgstr ""
 msgid "Define a specific address for the first year of bachelor"
 msgstr ""
 
-msgid "Deliberation date"
-msgstr ""
-
 msgid "Details other educational facilities"
 msgstr ""
 
@@ -225,13 +222,9 @@ msgstr ""
 msgid "Entity"
 msgstr ""
 
-msgid "Entity of reference"
-msgstr ""
-
 msgid "Evaluations"
 msgstr ""
 
-#, python-format
 msgid "Extra time (33% generally)"
 msgstr ""
 
@@ -348,9 +341,6 @@ msgstr ""
 msgid "None"
 msgstr ""
 
-msgid "Not passed"
-msgstr ""
-
 msgid "Number of enrollments"
 msgstr ""
 
@@ -462,6 +452,10 @@ msgstr ""
 msgid "Score legend: A=Absent, T=Cheating, {score} (0=Score of presence)"
 msgstr ""
 
+#, python-format
+msgid "Score responsible successfully designated on %(code)s."
+msgstr ""
+
 msgid "Score sheet"
 msgstr ""
 
@@ -537,9 +531,6 @@ msgstr ""
 msgid "Students deliberated are not shown"
 msgstr ""
 
-msgid "Submission"
-msgstr ""
-
 msgid "Submit"
 msgstr ""
 
@@ -599,7 +590,7 @@ msgid_plural "There are %(error_counter)s errors in form"
 msgstr[0] ""
 msgstr[1] ""
 
-msgid "There is no enrollment for this course"
+msgid "There is no enrollment to the exam for this learning unit"
 msgstr ""
 
 msgid "This process helps tutor while encoding notes for the exams sessions."
@@ -618,6 +609,10 @@ msgid "Tutor deadlines"
 msgstr ""
 
 msgid "Tutors of the course"
+msgstr ""
+
+#, python-format
+msgid "Tutors' classes of the course %(code)s (%(annee_academique)s)"
 msgstr ""
 
 msgid "Type"

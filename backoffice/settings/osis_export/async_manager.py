@@ -23,26 +23,28 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from functools import partial
-
-from rest_framework import serializers
-
-from reference.models.language import Language
-
-
-RelatedLanguageField = partial(
-    serializers.SlugRelatedField,
-    slug_field='code',
-    queryset=Language.objects.all(),
-    allow_null=True,
-)
+from osis_async.models import AsyncTask
+from osis_async.models.enums import TaskStates
+from osis_async.utils import update_task
+from osis_export.contrib.async_manager import AsyncManager
 
 
-class LanguageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Language
-        fields = (
-            'code',
-            'name',
-            'name_en'
-        )
+class AsyncTaskManager(AsyncManager):
+    @staticmethod
+    def get_pending_job_uuids():
+        """"Must return the pending export job uuids"""
+        pending_tasks = AsyncTask.objects.filter(
+            state=TaskStates.PENDING.name
+        ).values_list("uuid", flat=True)
+        return pending_tasks
+
+    @staticmethod
+    def update(
+        uuid,
+        progression=None,
+        description=None,
+        state=None,
+        started_at=None,
+        completed_at=None,
+    ):
+        update_task(uuid, progression, description, state, started_at, completed_at)
