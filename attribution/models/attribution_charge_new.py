@@ -68,11 +68,12 @@ def _attribution_new_delete(sender, instance, **kwargs):
             attribution__tutor=instance.attribution.tutor,
             learning_component_year__learning_unit_year=instance.learning_component_year.learning_unit_year
     ).count() == 0:
+        learning_unit_year = instance.learning_component_year.learning_unit_year
         ScoreResponsible.objects.filter(
-            learning_unit_year=instance.learning_component_year.learning_unit_year,
-            tutor=instance.attribution.tutor).delete()
+            learning_unit_year=learning_unit_year,
+            tutor=instance.attribution.tutor
+        ).delete()
         AttributionClass.objects.filter(
             attribution_charge__attribution__tutor=instance.attribution.tutor,
-            learning_class_year__learning_component_year__learning_unit_year=
-            instance.learning_component_year.learning_unit_year
+            learning_class_year__learning_component_year__learning_unit_year=learning_unit_year
         ).delete()
