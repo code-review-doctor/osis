@@ -132,15 +132,17 @@
                                                                 <a role="button" data-toggle="collapse"
                                                                    data-target="#tutor_deadlines_collapse_{{ progression_encodage.code_unite_enseignement }}"
                                                                    aria-expanded="false"
-                                                                   aria-controls="tutor_deadlines_collapse_{{ progression_encodage.code_unite_enseignement }}"
-                                                                   title="{% trans 'Display all deadlines for this learning unit' %}">
-                                                                    <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
-                                                                 </a>
+                                                                   aria-controls="tutor_deadlines_collapse_{{ progression_encodage.code_unite_enseignement }}">
+                                                                    <span class="glyphicon glyphicon-list"
+                                                                          aria-hidden="true"
+                                                                          data-toggle="tooltip"
+                                                                          title="{% trans 'Display all deadlines for this learning unit' %}"></span>
+                                                                </a>
                                                             {% endif %}
                                                         </div>
-                                                        {% if forloop.last and forloop.counter > 2 %}
-                                                            </div>
-                                                        {% endif %}
+                                                    {% if forloop.last and forloop.counter > 2 %}
+                                                        </div>
+                                                    {% endif %}
                                                     {% endwith %}
                                                 {% endfor %}
                                             </td>

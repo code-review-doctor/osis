@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-03 15:45+0100\n"
+"POT-Creation-Date: 2021-11-09 09:05+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -490,6 +490,9 @@ msgstr "S=Absence Injustifiée"
 msgid "Save"
 msgstr "Enregistrer"
 
+msgid "Save scores"
+msgstr "Enregistrer les notes"
+
 msgid "Score"
 msgstr "Note"
 
@@ -709,6 +712,7 @@ msgstr "Via papier"
 msgid "Warning: %(scores)s score(s) ready to be submitted."
 msgstr "Attention: %(scores)s note(s) prête(s) à être soumise(s)."
 
+#, python-format
 msgid ""
 "Warning: %(scores)s score(s) ready to be submitted. Only score responsible "
 "<strong>(%(responsable_nom)s, %(responsable_prenom)s)</strong> will be "

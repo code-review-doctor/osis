@@ -230,9 +230,10 @@
                                                             <a role="button" data-toggle="collapse"
                                                                data-target="#tutor_deadlines_collapse_{{ progression_encodage.code_unite_enseignement }}"
                                                                aria-expanded="false"
-                                                               aria-controls="tutor_deadlines_collapse_{{ progression_encodage.code_unite_enseignement }}"
-                                                               title="{% trans 'Display all deadlines for this learning unit' %}">
+                                                               aria-controls="tutor_deadlines_collapse_{{ progression_encodage.code_unite_enseignement }}">
                                                                 <span class="glyphicon glyphicon-list"
+                                                                      data-toggle="tooltip"
+                                                                      title="{% trans 'Display all deadlines for this learning unit' %}"
                                                                       aria-hidden="true"></span>
                                                             </a>
                                                         {% endif %}
