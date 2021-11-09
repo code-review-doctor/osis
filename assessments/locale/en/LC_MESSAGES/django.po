@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-09 10:15+0100\n"
+"POT-Creation-Date: 2021-11-09 11:03+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,24 +22,6 @@ msgid ""
 "                                        Address of reference for "
 "%(nom_cohorte_bachelier)s - %(intitule)s\n"
 "                                    "
-msgstr ""
-
-#, python-format
-msgid ""
-"\n"
-"                                        Warning: %(scores)s score(s) ready "
-"to be submitted."
-msgstr ""
-
-#, python-format
-msgid ""
-"\n"
-"                                        Warning: %(scores)s score(s) ready "
-"to be submitted. Only score responsible\n"
-"                                        <strong>(%(responsable_nom)s, "
-"%(responsable_prenom)s)</strong> will be\n"
-"                                        allowed to submit the scores to "
-"faculty."
 msgstr ""
 
 #, python-format
@@ -666,6 +648,17 @@ msgid "Via excel"
 msgstr ""
 
 msgid "Via paper"
+msgstr ""
+
+#, python-format
+msgid "Warning: %(scores)s score(s) ready to be submitted."
+msgstr ""
+
+#, python-format
+msgid ""
+"Warning: %(scores)s score(s) ready to be submitted. Only score responsible "
+"<strong>(%(responsable_nom)s, %(responsable_prenom)s)</strong> will be "
+"allowed to submit the scores to faculty."
 msgstr ""
 
 msgid "Yes"
