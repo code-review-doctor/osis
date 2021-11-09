@@ -135,19 +135,17 @@
                 <table class="table table-hover">
                     <thead>
                     <tr>
-                        <th id="status" class="col-md-1">{% trans 'Status' %}</th>
-                        <th id="program" class="col-md-1">{% trans 'Program' context 'encoding' %}</th>
-                        <th id="registration_number"
-                            class="col-md-1">{% trans 'Registration number' context 'assessments' %}</th>
-                        <th id="peps_data" class="col-md-2">
+                        <th id="status" style="width: 5%">{% trans 'Status' %}</th>
+                        <th id="program" style="width: 13%">{% trans 'Program' context 'encoding' %}</th>
+                        <th id="registration_number" style="width: 13%">{% trans 'Registration number' %}</th>
+                        <th id="peps_data" style="width: 17%">
                             {% trans 'Type' %}
                             <span class="badge warning-color">
                             PEPS
                         </span>
                         </th>
-                        <th id="lastname" class="col-md-2">{% trans 'Lastname' %}</th>
-                        <th id="firstname" class="col-md-2">{% trans 'Firstname' %}</th>
-                        <th id="score" class="col-md-2">
+                        <th id="name" style="width: 22%">{% trans 'Name' %}</th>
+                        <th id="score" style="width: 15%">
                             {% trans 'Score' %}
                             <span
                                     class="glyphicon glyphicon-question-sign"
@@ -162,9 +160,9 @@
                                             <li>T : {% trans "Cheating" %}</li>
                                         </ul>">
                                 </span>
-                        </th>
-                        <th id="deadline" class="col-md-1">{% trans 'Teacher deadline' %}</th>
-                    </tr>
+                            </th>
+                            <th id="deadline" style="width: 15%">{% trans 'Teacher deadline' %}</th>
+                        </tr>
                     </thead>
                     <tbody>
                     {% for note_etudiant in feuille_de_notes.notes_etudiants %}
@@ -183,8 +181,7 @@
                             <td headers="program">{{ note_etudiant.nom_cohorte }}</td>
                             <td headers="registration_number">{{ note_etudiant.noma }}</td>
                             {% include 'assessments/common/peps_column.html' %}
-                            <td headers="lastname">{{ note_etudiant.nom }}</td>
-                            <td headers="firstname">{{ note_etudiant.prenom }}</td>
+                            <td headers="name">{{ note_etudiant.nom }}, {{ note_etudiant.prenom }}</td>
                             <td id="enrollment_note_{{ forloop.counter0 }}" headers="score">
                                 {% if not note_etudiant.date_echeance_atteinte and not note_etudiant.desinscrit_tardivement %}
                                     {% with score_encoding_form=form|index:forloop.counter0 %}
@@ -266,6 +263,16 @@
         });
         $(document).on('keypress', function (e) {
             disable_enter(e);
+        });
+
+        // Focus on next input when keypress 'enter'
+        const focusables = $(":focusable");
+        focusables.keypress(function(e) {
+            if (keycode_is_enter(e)) {
+                const current = focusables.index(this),
+                    next = focusables.eq(current+1).length ? focusables.eq(current+1) : focusables.eq(0);
+                next.focus();
+            }
         });
     </script>
 {% endblock %}

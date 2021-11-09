@@ -58,7 +58,7 @@ class ScoreSheetXLSExportAPIView(APIView):
                 return XLSResponse(xls_file=virtual_workbook, filename=self.get_filename())
             raise ValidationError(detail=_("No student to encode by excel"))
         else:
-            raise ValidationError(detail=_("There is no enrollment for this course"))
+            raise ValidationError(detail=_("There is no enrollment to the exam for this learning unit"))
 
     @cached_property
     def donnees_administratives(self):

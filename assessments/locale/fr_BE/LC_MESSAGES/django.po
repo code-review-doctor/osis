@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-09 09:05+0100\n"
+"POT-Creation-Date: 2021-11-09 11:03+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -297,8 +297,11 @@ msgstr "Inclure les entités subordonnées"
 msgid "Inject"
 msgstr "Injecter"
 
-msgid "Inject XLS file"
-msgstr "Injecter le fichier XLS"
+msgid "Inject Excel file"
+msgstr "Injecter le fichier Excel"
+
+msgid "Inject encoded scores into Excel file."
+msgstr "Injecter les notes encodées dans le fichier Excel"
 
 msgid "Institution"
 msgstr "Institution"
@@ -415,11 +418,11 @@ msgstr "Téléphone"
 msgid "Please choose at least one criteria!"
 msgstr "Veuillez choisir au moins un critère!"
 
-msgid "Please select an XLS file for injection"
-msgstr "Veuillez sélectionner un fichier XLS pour injection"
-
 msgid "Please select an address"
 msgstr "Veuillez sélectionner une adresse"
+
+msgid "Please select the Excel file for injection"
+msgstr "Veuillez sélectionner le fichier Excel pour injection"
 
 msgid "Postal code"
 msgstr "Code postal"
@@ -450,6 +453,9 @@ msgid "Refresh list"
 msgstr "rafraîchir la liste"
 
 msgid "Reg. No."
+msgstr "Noma"
+
+msgid "Registration number"
 msgstr "Noma"
 
 msgctxt "assessments"
@@ -541,7 +547,7 @@ msgid "Select an encoding type"
 msgstr "Sélectionnez un type d'encodage"
 
 msgid "Select an excel file to inject scores."
-msgstr "Sélectionnez un fichier excel pour injecter des notes."
+msgstr "Veuillez sélectionner le fichier Excel pour injection"
 
 msgid "Select/deselect all"
 msgstr "Sélectionner/Dé-sélectionner tout"
@@ -654,8 +660,8 @@ msgid_plural "There are %(error_counter)s errors in form"
 msgstr[0] "Il y a %(error_counter)s erreur dans le formulaire"
 msgstr[1] "Il y a %(error_counter)s erreurs dans le formulaire"
 
-msgid "There is no enrollment for this course"
-msgstr "Il n'y a pas d'inscription pour ce cours"
+msgid "There is no enrollment to the exam for this learning unit"
+msgstr "Aucune inscription à l'examen pour cette unité d'enseignement"
 
 msgid "This process helps tutor while encoding notes for the exams sessions."
 msgstr ""
@@ -708,7 +714,6 @@ msgstr "Via excel"
 msgid "Via paper"
 msgstr "Via papier"
 
-#, python-format
 msgid "Warning: %(scores)s score(s) ready to be submitted."
 msgstr "Attention: %(scores)s note(s) prête(s) à être soumise(s)."
 
