@@ -25,6 +25,7 @@
 ##############################################################################
 import uuid
 
+from assessments.tests.factories.score_responsible import ScoreResponsibleFactory
 from attribution.models.attribution_new import AttributionNew
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from attribution.tests.factories.attribution_new import AttributionNewFactory
@@ -89,6 +90,10 @@ class TestChargeRepartitionMixin:
         )
 
         self.attribution = AttributionNew.objects.get(id=attribution_id)
+        self.score_responsible = ScoreResponsibleFactory(
+            tutor=self.attribution.tutor,
+            learning_unit_year=self.learning_unit_year
+        )
         self.client.force_login(self.person.user)
 
     def clean_partim_charges(self):

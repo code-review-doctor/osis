@@ -31,10 +31,10 @@ from openpyxl.worksheet import Worksheet
 from rest_framework import serializers
 
 HEADER = [_('Academic year'), _('Session'), _('Learning unit'), pgettext_lazy('encoding', 'Program'),
-          pgettext_lazy('assessments', 'Registration number'), _('Lastname'), _('Firstname'), _('Email'),
-          _('Numbered scores'), _('Justification (A,T)'), _('End date Prof'), _('Type of specific profile'),
-          _('Extra time (33% generally)'), _('Large print'), _('Specific room of examination'),
-          _('Other educational facilities'), _('Details other educational facilities'), _('Educational tutor'),
+          pgettext_lazy('assessments', 'Registration number'), _('Name'), _('Email'), _('Numbered scores'),
+          _('Justification (A,T)'), _('End date Prof'), _('Type of specific profile'), _('Extra time (33% generally)'),
+          _('Large print'), _('Specific room of examination'), _('Other educational facilities'),
+          _('Details other educational facilities'), _('Educational tutor'),
           ]
 
 

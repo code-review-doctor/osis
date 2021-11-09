@@ -78,7 +78,7 @@ if 'osis_signature' in settings.INSTALLED_APPS:
     urlpatterns += (url(r'^osis_signature/', include('osis_signature.urls')),)
 if 'osis_document' in settings.INSTALLED_APPS:
     urlpatterns += (
-        url(r'^osis-document/', include('osis_document.urls')),
+        url(r'^api/osis-document/', include('osis_document.urls')),
     )
 if 'osis_notification' in settings.INSTALLED_APPS:
     urlpatterns += (
