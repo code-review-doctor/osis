@@ -25,9 +25,9 @@
 ##############################################################################
 from ajax_select import urls as ajax_select_urls
 from django.conf import settings
-from django.conf.urls import url, include
-from django.conf.urls.static import static
+from django.conf.urls import include, url
 from django.urls import path
+from django.conf.urls.static import static
 
 import base.views.autocomplete
 import base.views.learning_units.common
@@ -43,7 +43,6 @@ import base.views.learning_units.search.proposal
 import base.views.learning_units.search.service_course
 import base.views.learning_units.search.simple
 import base.views.learning_units.update
-from assessments.views.address.search import OffersSearch
 from attribution.views import attribution
 from base.views import geocoding
 from base.views import learning_achievement, search, user_list
@@ -283,10 +282,6 @@ urlpatterns = [
     ])),
 
     url(r'^noscript/$', common.noscript, name='noscript'),
-
-    url(r'^offers/', include([
-        url(r'^new/$', OffersSearch.as_view(), name='offers_search_new'),
-    ])),
 
     url(r'^educationgroups/', include(education_group_urls.urlpatterns)),
 

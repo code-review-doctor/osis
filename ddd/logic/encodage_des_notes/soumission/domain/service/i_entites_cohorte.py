@@ -23,15 +23,23 @@
 #
 ##############################################################################
 import abc
-from typing import Set, List
+from typing import Set, List, Optional
+
+import attr
 
 from ddd.logic.shared_kernel.entite.domain.model.entiteucl import IdentiteUCLEntite
 from osis_common.ddd import interface
+
+
+@attr.s(frozen=True, slots=True)
+class EntitesCohorteDTO:
+    administration = attr.ib(type=Optional[IdentiteUCLEntite])
+    gestion = attr.ib(type=Optional[IdentiteUCLEntite])
 
 
 class IEntitesCohorteTranslator(interface.DomainService):
 
     @classmethod
     @abc.abstractmethod
-    def search_entite_administration_et_gestion(cls, nom_cohorte: str) -> List['IdentiteUCLEntite']:
+    def search_entite_administration_et_gestion(cls, nom_cohorte: str, annee: int) -> EntitesCohorteDTO:
         raise NotImplementedError()

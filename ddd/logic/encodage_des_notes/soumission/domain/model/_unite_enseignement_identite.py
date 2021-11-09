@@ -54,3 +54,12 @@ class UniteEnseignementIdentite(interface.EntityIdentity):
     """Identifie un cours, stage, mémoire partim, classe..."""
     code_unite_enseignement = attr.ib(type=str)
     annee_academique = attr.ib(type=int)
+
+    def est_classe(self):
+        return "-" in self.code_unite_enseignement or "_" in self.code_unite_enseignement
+
+    def get_code_classe(self):
+        return self.code_unite_enseignement[-1] if self.est_classe() else ""
+
+    def get_code_unite_enseignement_sans_code_classe(self):
+        return self.code_unite_enseignement[:-2] if self.est_classe() else self.code_unite_enseignement

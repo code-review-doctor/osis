@@ -35,10 +35,12 @@ OPTIONAL_APPS = (
     'cms',
     'webservices',
     'behave_django',
+    'osis_profile',
     'osis_role',
     'offer_enrollment',
     'learning_unit_enrollment',
     'backoffice',
+    'admission',
 )
 OPTIONAL_MIDDLEWARES = ()
 OPTIONAL_INTERNAL_IPS = ()

@@ -240,6 +240,6 @@ class TestNotifierEncodageNotes(SimpleTestCase):
         )
 
         tables_rows = mock_send_mail.call_args[0][0]['tables'][0]['data']
-        expected_nom_order = ["Arogan", "Déjean", "De Pierre"]
+        expected_nom_order = ["Arogan, Adrien", "Déjean, Morge", "De Pierre, Adrién"]
         actual_order = [row[3] for row in tables_rows]
         self.assertListEqual(expected_nom_order, actual_order)

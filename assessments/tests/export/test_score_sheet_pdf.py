@@ -157,7 +157,6 @@ def get_right_data():
             },
             'programs': [{
                 'deadline': '',
-                'deliberation_date': 'Non communiquée',
                 'acronym': 'CHIM1BA',
                 'address': {
                     'city': 'Louvain-la-Neuve',
