@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-03 15:45+0100\n"
+"POT-Creation-Date: 2021-11-09 10:15+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,6 +22,24 @@ msgid ""
 "                                        Address of reference for "
 "%(nom_cohorte_bachelier)s - %(intitule)s\n"
 "                                    "
+msgstr ""
+
+#, python-format
+msgid ""
+"\n"
+"                                        Warning: %(scores)s score(s) ready "
+"to be submitted."
+msgstr ""
+
+#, python-format
+msgid ""
+"\n"
+"                                        Warning: %(scores)s score(s) ready "
+"to be submitted. Only score responsible\n"
+"                                        <strong>(%(responsable_nom)s, "
+"%(responsable_prenom)s)</strong> will be\n"
+"                                        allowed to submit the scores to "
+"faculty."
 msgstr ""
 
 #, python-format
@@ -262,7 +280,10 @@ msgstr ""
 msgid "Inject"
 msgstr ""
 
-msgid "Inject XLS file"
+msgid "Inject Excel file"
+msgstr ""
+
+msgid "Inject encoded scores into Excel file."
 msgstr ""
 
 msgid "Institution"
@@ -374,10 +395,10 @@ msgstr ""
 msgid "Please choose at least one criteria!"
 msgstr ""
 
-msgid "Please select an XLS file for injection"
+msgid "Please select an address"
 msgstr ""
 
-msgid "Please select an address"
+msgid "Please select the Excel file for injection"
 msgstr ""
 
 msgid "Postal code"
@@ -409,6 +430,9 @@ msgid "Refresh list"
 msgstr ""
 
 msgid "Reg. No."
+msgstr ""
+
+msgid "Registration number"
 msgstr ""
 
 msgctxt "assessments"
@@ -592,7 +616,7 @@ msgid_plural "There are %(error_counter)s errors in form"
 msgstr[0] ""
 msgstr[1] ""
 
-msgid "There is no enrollment for this course"
+msgid "There is no enrollment to the exam for this learning unit"
 msgstr ""
 
 msgid "This process helps tutor while encoding notes for the exams sessions."
@@ -642,17 +666,6 @@ msgid "Via excel"
 msgstr ""
 
 msgid "Via paper"
-msgstr ""
-
-#, python-format
-msgid "Warning: %(scores)s score(s) ready to be submitted."
-msgstr ""
-
-#, python-format
-msgid ""
-"Warning: %(scores)s score(s) ready to be submitted. Only score responsible "
-"<strong>(%(responsable_nom)s, %(responsable_prenom)s)</strong> will be "
-"allowed to submit the scores to faculty."
 msgstr ""
 
 msgid "Yes"

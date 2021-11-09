@@ -27,6 +27,8 @@ from decimal import Decimal
 
 from django.test import TestCase
 
+from assessments.models.score_responsible import ScoreResponsible
+from assessments.tests.factories.score_responsible import ScoreResponsibleFactory
 from attribution.models.attribution_class import AttributionClass
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from attribution.tests.factories.attribution_class import AttributionClassFactory
@@ -155,6 +157,34 @@ class TutorRepositoryTestCase(TestCase):
         tutor.distributed_effective_classes = []
         self.tutor_repository.save(tutor)
         self.assertFalse(AttributionClass.objects.filter(pk=distrubuted_class_db.pk).exists())
+
+    def test_should_correctly_last_unassign_class_and_score_responsible_from_tutor(self):
+        person = PersonFactory(global_id="123456")
+        ue = LearningUnitYearFactory()
+        learning_class_year = LearningClassYearFactory(learning_component_year__learning_unit_year=ue)
+        attribution_charge = AttributionChargeNewFactory(
+            learning_component_year=learning_class_year.learning_component_year,
+            attribution__tutor__person=person,
+        )
+        score_responsible_db = ScoreResponsibleFactory(
+            tutor=attribution_charge.attribution.tutor,
+            learning_class_year=learning_class_year,
+            learning_unit_year=ue
+        )
+        distrubuted_class_db = AttributionClassFactory(
+            learning_class_year=learning_class_year,
+            attribution_charge=attribution_charge,
+            allocation_charge=Decimal(5.0),
+        )
+        tutor = self.tutor_repository.get(
+            entity_id=TutorIdentityBuilder.build_from_personal_id_number(personal_id_number=person.global_id)
+        )
+
+        self.assertTrue(AttributionClass.objects.filter(pk=distrubuted_class_db.pk).exists())
+        tutor.distributed_effective_classes = []
+        self.tutor_repository.save(tutor)
+        self.assertFalse(AttributionClass.objects.filter(pk=distrubuted_class_db.pk).exists())
+        self.assertFalse(ScoreResponsible.objects.filter(pk=score_responsible_db.pk).exists())
 
 
 class TutorRepositorySearchDtoTestCase(TestCase):

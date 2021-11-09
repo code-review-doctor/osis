@@ -42,7 +42,7 @@ from osis_common.decorators.download import set_download_cookie
 
 PAGE_SIZE = A4
 MARGIN_SIZE = 15 * mm
-COLS_WIDTH = [30*mm, 40*mm, 40*mm, 35*mm, 30*mm]
+COLS_WIDTH = [30*mm, 80*mm, 35*mm, 30*mm]
 STUDENTS_PER_PAGE = 20
 DATE_FORMAT = "%d/%m/%Y"
 
@@ -187,7 +187,9 @@ def _data_to_pdf_content(json_data):
         for program in learn_unit_year['programs']:
             nb_students = len(program['enrollments'])
             for enrollments_by_pdf_page in chunks(program['enrollments'], STUDENTS_PER_PAGE):
-                content.extend(_build_page_content(enrollments_by_pdf_page, learn_unit_year, nb_students, program, styles))
+                content.extend(
+                    _build_page_content(enrollments_by_pdf_page, learn_unit_year, nb_students, program, styles)
+                )
     return content
 
 
@@ -211,14 +213,15 @@ def _build_page_content(enrollments_by_pdf_page, learn_unit_year, nb_students, p
 def _build_exam_enrollments_table(enrollments_by_pdf_page, styles):
     students_table = _students_table_header()
     for enrollment in enrollments_by_pdf_page:
-        student_last_name = enrollment["last_name"] if enrollment["last_name"] else ""
-        student_first_name = enrollment["first_name"] if enrollment["first_name"] else ""
+        student_name = "{}, {}".format(
+            enrollment["last_name"] if enrollment["last_name"] else "",
+            enrollment["first_name"] if enrollment["first_name"] else ""
+        )
 
         # 1. Append the examEnrollment to the table 'students_table'
         students_table.append([
             enrollment["registration_id"],
-            Paragraph(student_last_name, styles['Normal']),
-            Paragraph(student_first_name, styles['Normal']),
+            Paragraph(student_name, styles['Normal']),
             enrollment["score"],
             enrollment["deadline"]
         ])
@@ -240,8 +243,7 @@ def _build_exam_enrollments_table(enrollments_by_pdf_page, styles):
 
 def _students_table_header():
     data = [['''%s''' % _('Reg. No.'),
-             '''%s''' % _('Lastname'),
-             '''%s''' % _('Firstname'),
+             '''%s''' % _('Name'),
              '''%s''' % _('Score'),
              '''%s''' % _('Submit data')
              ]]
