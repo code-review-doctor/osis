@@ -11,7 +11,7 @@ servers:
   - url: https://osis.uclouvain.be/api/v1/offer_enrollment/
     description: 'Production server'
 info:
-  version: '1.1'
+  version: '1.2'
   title: 'Offer Enrollment Service'
   description: |-
     A set of API endpoints that allow you to get information about offer enrollment
@@ -21,48 +21,6 @@ paths:
       description: 'Return all enrollments of the connected user'
       operationId: my_enrollments_list
       parameters:
-        - in: query
-          name: enrollment_state
-          schema:
-            description: Filter result by specified offer enrollment states
-            type: array
-            items:
-              type: string
-          style: form
-          explode: true
-        - $ref: '#/components/parameters/Accept-Language'
-        - $ref: '#/components/parameters/X-User-FirstName'
-        - $ref: '#/components/parameters/X-User-LastName'
-        - $ref: '#/components/parameters/X-User-Email'
-        - $ref: '#/components/parameters/X-User-GlobalID'
-        - $ref: '#/components/parameters/PaginationLimit'
-        - $ref: '#/components/parameters/PaginationOffset'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EnrollmentList'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-      tags:
-        - enrollment
-  /enrollments/{registration_id}:
-    get:
-      description: 'Return all enrollments of a student specified by its registration id'
-      operationId: enrollments_list
-      parameters:
-        - in: path
-          name: registration_id
-          required: true
-          schema:
-            description: ''
-            type: string
         - in: query
           name: enrollment_state
           schema:
@@ -100,17 +58,17 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
         - enrollment
-  /my_enrollments/{year}:
+  /enrollments/{global_id}:
     get:
-      description: 'Return all enrollments of the connected user for a specific year'
-      operationId: my_enrollments_year_list
+      description: 'Return all enrollments of a student specified by its global_id. If there are many students, service has to discriminate by valid offer enrollment'
+      operationId: enrollments_list
       parameters:
         - in: path
-          name: year
+          name: global_id
           required: true
           schema:
-            description: ''
-            type: integer
+            description: '0123456789'
+            type: string
         - in: query
           name: enrollment_state
           schema:
@@ -120,6 +78,12 @@ paths:
               type: string
           style: form
           explode: true
+        - in: query
+          name: year
+          schema:
+            description: Filter result by year
+            type: integer
+            example: 2020
         - $ref: '#/components/parameters/Accept-Language'
         - $ref: '#/components/parameters/X-User-FirstName'
         - $ref: '#/components/parameters/X-User-LastName'
@@ -251,6 +215,9 @@ components:
           type: string
           example: "Bachelier en Sciences de l'ingénieur"
           nullable: true
+        student_registration_id:
+          type: string
+          example: "12345678"
     AcceptedLanguageEnum:
       type: string
       enum:
