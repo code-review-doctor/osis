@@ -450,6 +450,9 @@ msgstr ""
 msgid "Save"
 msgstr ""
 
+msgid "Save scores"
+msgstr ""
+
 msgid "Score"
 msgstr ""
 

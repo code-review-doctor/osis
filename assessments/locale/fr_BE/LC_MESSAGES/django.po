@@ -496,6 +496,9 @@ msgstr "S=Absence Injustifiée"
 msgid "Save"
 msgstr "Enregistrer"
 
+msgid "Save scores"
+msgstr "Enregistrer les notes"
+
 msgid "Score"
 msgstr "Note"
 
@@ -714,6 +717,7 @@ msgstr "Via papier"
 msgid "Warning: %(scores)s score(s) ready to be submitted."
 msgstr "Attention: %(scores)s note(s) prête(s) à être soumise(s)."
 
+#, python-format
 msgid ""
 "Warning: %(scores)s score(s) ready to be submitted. Only score responsible "
 "<strong>(%(responsable_nom)s, %(responsable_prenom)s)</strong> will be "
