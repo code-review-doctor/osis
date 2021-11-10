@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import contextlib
+from typing import Dict
 
 from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
@@ -40,7 +41,7 @@ class ScoreSheetXLSImportProgramManagerView(ScoreSheetXLSImportBaseView):
     def get_xls_import_serializer_cls(self):
         return ProgramManagerScoreSheetXLSImportSerializer
 
-    def call_command(self, matricule, score_sheet_serialized):
+    def call_command(self, matricule: str, score_sheet_serialized: Dict):
         cmd = self._get_command(self.person.global_id, score_sheet_serialized)
 
         with contextlib.suppress(MultipleBusinessExceptions):
@@ -64,8 +65,8 @@ class ScoreSheetXLSImportProgramManagerView(ScoreSheetXLSImportBaseView):
             messages.error(self.request, _("No score injected"))
 
     @staticmethod
-    def _get_command(matricule_gestionnaire, score_sheet_serialized):
-        cmd = EncoderNotesCommand(
+    def _get_command(matricule_gestionnaire: str, score_sheet_serialized: Dict) -> 'EncoderNotesCommand':
+        return EncoderNotesCommand(
             matricule_fgs_gestionnaire=matricule_gestionnaire,
             notes_encodees=[
                 EncoderNoteCommand(
@@ -76,4 +77,3 @@ class ScoreSheetXLSImportProgramManagerView(ScoreSheetXLSImportBaseView):
                 ) for note_etudiant in score_sheet_serialized['notes_etudiants'] if note_etudiant['note']
             ]
         )
-        return cmd
