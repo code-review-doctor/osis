@@ -225,7 +225,6 @@ msgstr ""
 msgid "Evaluations"
 msgstr ""
 
-#, python-format
 msgid "Extra time (33% generally)"
 msgstr ""
 
@@ -498,9 +497,6 @@ msgid "Search of annual programs"
 msgstr ""
 
 msgid "Select an encoding type"
-msgstr ""
-
-msgid "Select an excel file to inject scores."
 msgstr ""
 
 msgid "Select/deselect all"

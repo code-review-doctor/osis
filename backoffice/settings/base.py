@@ -547,3 +547,5 @@ SCHEDULE_APP_URL = os.environ.get("SCHEDULE_APP_URL", "")
 OSIS_EXPORT_ASYNCHRONOUS_MANAGER_CLS = os.environ.get(
     "OSIS_EXPORT_ASYNCHRONOUS_MANAGER_CLS", "backoffice.settings.osis_export.async_manager.AsyncTaskManager"
 )
+
+OSIS_DOCUMENT_API_SHARED_SECRET = os.environ.get("OSIS_DOCUMENT_API_SHARED_SECRET", "")

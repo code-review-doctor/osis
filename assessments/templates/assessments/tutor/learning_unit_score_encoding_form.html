@@ -170,7 +170,7 @@
                                 headers="status">
                                 {% if note_etudiant.date_echeance_atteinte %}
                                     <span class="glyphicon glyphicon-lock" aria-hidden="true" style="color: #8B008B;"
-                                          title="{% trans 'Deadline reached' %}"></span>
+                                          data-toggle="tooltip" title="{% trans 'Deadline reached' %}"></span>
                                 {% endif %}
                                 {% if note_etudiant.est_soumise %}
                                     <span class="glyphicon glyphicon-send" aria-hidden="true" style="color: green;"
