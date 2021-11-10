@@ -37,11 +37,9 @@ def supprimer_adresse_feuille_de_note_premiere_annee_de_bachelier(
         cmd: SupprimerAdresseFeuilleDeNotesPremiereAnneeDeBachelier,
         repo: IAdresseFeuilleDeNotesRepository,
         periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
-        academic_year_repo: 'IAcademicYearRepository'
 ) -> 'IdentiteAdresseFeuilleDeNotes':
     return EncoderAdresseFeuilleDeNotesDomainService().supprimer_adresse_premiere_annee_de_bachelier(
         cmd,
         repo,
         periode_soumission_note_translator,
-        academic_year_repo
     )

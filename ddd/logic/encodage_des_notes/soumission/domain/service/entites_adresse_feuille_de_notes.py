@@ -30,10 +30,7 @@ from assessments.models.enums.score_sheet_address_choices import ScoreSheetAddre
 from base.utils.itertools import filter_duplicate
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodage_notes import \
     IPeriodeEncodageNotesTranslator
-from ddd.logic.encodage_des_notes.soumission.domain.service.annee_academique_addresse_feuille_de_notes import \
-    AnneeAcademiqueAddresseFeuilleDeNotesDomaineService
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_entites_cohorte import IEntitesCohorteTranslator
-from ddd.logic.shared_kernel.academic_year.repository.i_academic_year import IAcademicYearRepository
 from ddd.logic.shared_kernel.entite.domain.model.entiteucl import EntiteUCL
 from ddd.logic.shared_kernel.entite.dtos import EntiteDTO
 from ddd.logic.shared_kernel.entite.repository.entiteucl import IEntiteUCLRepository
@@ -83,12 +80,8 @@ class EntiteAdresseFeuilleDeNotes(interface.DomainService):
             entite_repository: 'IEntiteUCLRepository',
             entites_cohorte_translator: 'IEntitesCohorteTranslator',
             periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
-            academic_year_repo: 'IAcademicYearRepository'
     ) -> EntitesPossiblesAdresseFeuilleDeNotesDTO:
-        annee_academique = AnneeAcademiqueAddresseFeuilleDeNotesDomaineService().get(
-            periode_soumission_note_translator,
-            academic_year_repo
-        )
+        annee_academique = periode_soumission_note_translator.get().annee_concernee
         identites_administration_et_gestion = entites_cohorte_translator.search_entite_administration_et_gestion(
             nom_cohorte,
             annee_academique
