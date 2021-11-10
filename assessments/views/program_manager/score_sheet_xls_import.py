@@ -41,17 +41,7 @@ class ScoreSheetXLSImportProgramManagerView(ScoreSheetXLSImportBaseView):
         return ProgramManagerScoreSheetXLSImportSerializer
 
     def call_command(self, matricule, score_sheet_serialized):
-        cmd = EncoderNotesCommand(
-            matricule_fgs_gestionnaire=self.person.global_id,
-            notes_encodees=[
-                EncoderNoteCommand(
-                    noma=note_etudiant['noma'],
-                    email=note_etudiant['email'],
-                    code_unite_enseignement=note_etudiant['code_unite_enseignement'],
-                    note=note_etudiant['note'],
-                ) for note_etudiant in score_sheet_serialized['notes_etudiants']
-            ]
-        )
+        cmd = self._get_command(self.person.global_id, score_sheet_serialized)
 
         with contextlib.suppress(MultipleBusinessExceptions):
             message_bus_instance.invoke(cmd)
@@ -72,3 +62,18 @@ class ScoreSheetXLSImportProgramManagerView(ScoreSheetXLSImportBaseView):
             messages.success(self.request, "{} {}".format(str(nombre_notes_enregistrees), _("Score(s) saved")))
         else:
             messages.error(self.request, _("No score injected"))
+
+    @staticmethod
+    def _get_command(matricule_gestionnaire, score_sheet_serialized):
+        cmd = EncoderNotesCommand(
+            matricule_fgs_gestionnaire=matricule_gestionnaire,
+            notes_encodees=[
+                EncoderNoteCommand(
+                    noma=note_etudiant['noma'],
+                    email=note_etudiant['email'],
+                    code_unite_enseignement=note_etudiant['code_unite_enseignement'],
+                    note=note_etudiant['note'],
+                ) for note_etudiant in score_sheet_serialized['notes_etudiants'] if note_etudiant['note']
+            ]
+        )
+        return cmd
