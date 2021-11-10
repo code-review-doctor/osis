@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Dict
+
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.urls import reverse
@@ -73,5 +75,5 @@ class ScoreSheetXLSImportBaseView(AjaxPermissionRequiredMixin, AjaxTemplateMixin
     def get_xls_import_serializer_cls(self):
         return ScoreSheetXLSImportSerializer
 
-    def call_command(self, matricule, score_sheet_serialized):
+    def call_command(self, matricule: str, score_sheet_serialized: Dict):
         pass
