@@ -2,27 +2,27 @@
 {% load i18n academic_year_display %}
 
 {% comment "License" %}
- * OSIS stands for Open Student Information System. It's an application
- * designed to manage the core business of higher education institutions,
- * such as universities, faculties, institutes and professional schools.
- * The core business involves the administration of students, teachers,
- * courses, programs and so on.
- *
- * Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * A copy of this license - GNU General Public License - is available
- * at the root of the source code of this program.  If not,
- * see http://www.gnu.org/licenses/.
+    * OSIS stands for Open Student Information System. It's an application
+    * designed to manage the core business of higher education institutions,
+    * such as universities, faculties, institutes and professional schools.
+    * The core business involves the administration of students, teachers,
+    * courses, programs and so on.
+    *
+    * Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+    *
+    * This program is free software: you can redistribute it and/or modify
+    * it under the terms of the GNU General Public License as published by
+    * the Free Software Foundation, either version 3 of the License, or
+    * (at your option) any later version.
+    *
+    * This program is distributed in the hope that it will be useful,
+    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    * GNU General Public License for more details.
+    *
+    * A copy of this license - GNU General Public License - is available
+    * at the root of the source code of this program.  If not,
+    * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
 
@@ -34,7 +34,8 @@
         <a href="{% url 'assessments' %}" id="lnk_evaluations">{% trans 'Evaluations' %}</a>
     </li>
     <li>
-        <a href="{% url 'score_encoding_progress_overview' %}" id="lnk_scores_encoding">{% trans 'Scores encoding' %}</a>
+        <a href="{% url 'score_encoding_progress_overview' %}"
+           id="lnk_scores_encoding">{% trans 'Scores encoding' %}</a>
     </li>
     <li class="active">{% trans 'Online encoding' %}</li>
 {% endblock %}
@@ -57,13 +58,21 @@
                 <div class="col-md-3">
                     <div class="form-group">
                         <label class="w-100">{% trans 'Scores responsible' %}</label>
-                        <span> {{ feuille_de_notes.responsable_note.nom|upper }}, {{ feuille_de_notes.responsable_note.prenom }}</span>
+                        <span>
+                            {% if feuille_de_notes.responsable_note %}
+                                {{ feuille_de_notes.responsable_note.nom|upper }},
+                                {{ feuille_de_notes.responsable_note.prenom }}
+                            {% else %}
+                                {% trans 'None' %}
+                            {% endif %}
+                        </span>
                         {% if feuille_de_notes.autres_enseignants %}
                             <a role="button" data-toggle="collapse" data-target="#other_tutors"
                                aria-expanded="false"
-                               aria-controls="other_tutors"
-                               title="{% trans 'Display all tutors for this learning unit' %}">
-                                <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+                               aria-controls="other_tutors">
+                              <span class="glyphicon glyphicon-list" aria-hidden="true"
+                                    data-toggle="tooltip"
+                                    title="{% trans 'Display all tutors for this learning unit' %}"></span>
                             </a>
                             <div class="collapse" id="other_tutors">
                                 <label class="w-100">{% trans 'Other tutors' %}</label>
@@ -118,12 +127,12 @@
                     <a id="lnk_encoding" class="btn btn-default"
                             {% if can_encode_scores %}
                        href="{{ learning_unit_encoding_url }}"
-                       data-toggle="tooltip"
                        data-placement="bottom"
                             {% else %}
                        title="{% trans 'All the scores were submitted. It is not possible to encode scores anymore.' %}"
                        disabled
                             {% endif %}
+                       data-toggle="tooltip"
                        title="{% trans 'Encode scores' %}"
                        role="button">
                         <em class="fa fa-hashtag"></em> {% trans 'Encode' %}
@@ -148,7 +157,6 @@
                             {% if can_upload_scores_xls %}
                                 trigger_modal"
                            data-url="{{ learning_unit_upload_xls_url }}"
-                           data-toggle="tooltip"
                            data-placement="bottom"
                            {% else %}
                                "
@@ -157,6 +165,7 @@
                                "
                                disabled
                            {% endif %}
+                        data-toggle="tooltip"
                         title="{% trans 'Inject encoded scores into Excel file.' %}"
                         role="button">
                         <em class="fas fa-upload"></em> {% trans 'Inject Excel file' %}
@@ -176,17 +185,17 @@
                                       style="font-size: 150%; margin-right: 5px" aria-hidden="true"></span>
                                 {% if can_submit_scores %}
                                     {% blocktrans with scores=feuille_de_notes.quantite_notes_en_attente_de_soumission %}Warning: {{ scores }} score(s) ready to be submitted.{% endblocktrans %}
-                                    <a  id="lnk_submit"
-                                    class="btn btn-warning trigger_modal" data-url="{{ learning_unit_submit_url }}"
-                                        data-toggle="tooltip" data-placement="bottom"
-                                        title="{% trans 'Submit these scores to faculty. These scores can not be changed after submission. The unsubmitted scores remain editable.' %}"
-                                        role="button">
+                                    <a id="lnk_submit"
+                                       class="btn btn-warning trigger_modal" data-url="{{ learning_unit_submit_url }}"
+                                       data-toggle="tooltip" data-placement="bottom"
+                                       title="{% trans 'Submit these scores to faculty. These scores can not be changed after submission. The unsubmitted scores remain editable.' %}"
+                                       role="button">
                                         <em class="fas fa-paper-plane"></em> {% trans 'Submit' %}
                                     </a>
                                 {% else %}
-                                    {% blocktrans with scores=feuille_de_notes.quantite_notes_en_attente_de_soumission responsable_nom=feuille_de_notes.responsable_note.nom responsable_prenom=feuille_de_notes.responsable_note.prenom %}Warning: {{ scores }} score(s) ready to be submitted. Only score responsible ({{ responsable_nom }}, {{ responsable_prenom }}) will be allowed to submit the scores to faculty.{% endblocktrans %}
+                                    {% blocktrans with scores=feuille_de_notes.quantite_notes_en_attente_de_soumission responsable_nom=feuille_de_notes.responsable_note.nom responsable_prenom=feuille_de_notes.responsable_note.prenom %}Warning: {{ scores }} score(s) ready to be submitted. Only score responsible <strong>({{ responsable_nom }}, {{ responsable_prenom }})</strong> will be allowed to submit the scores to faculty.{% endblocktrans %}
                                 {% endif %}
-                             </p>
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -194,15 +203,20 @@
 
             <table class="table table-hover">
                 <thead>
-                    <tr>
-                        <th id="status" style="width: 5%">{% trans 'Status' %}</th>
-                        <th id="program" style="width: 13%">{% trans 'Program' context 'encoding' %}</th>
-                        <th id="registration_number" style="width: 13%">{% trans 'Registration number' %}</th>
-                        <th id="peps_data" style="width: 17%">{% trans 'Type of specific profile' %}</th>
-                        <th id="name" style="width: 22%">{% trans 'Name' %}</th>
-                        <th id="score" style="width: 15%">{% trans 'Score' %}</th>
-                        <th id="deadline" style="width: 15%">{% trans 'Teacher deadline' %}</th>
-                    </tr>
+                <tr>
+                    <th id="status" style="width: 5%">{% trans 'Status' %}</th>
+                    <th id="program" style="width: 13%">{% trans 'Program' context 'encoding' %}</th>
+                    <th id="registration_number" style="width: 13%">{% trans 'Registration number' %}</th>
+                    <th id="peps_data" style="width: 17%">
+                        {% trans 'Type' %}
+                        <span class="badge warning-color">
+                            PEPS
+                        </span>
+                    </th>
+                    <th id="name" style="width: 22%">{% trans 'Name' %}</th>
+                    <th id="score" style="width: 15%">{% trans 'Score' %}</th>
+                    <th id="deadline" style="width: 15%">{% trans 'Teacher deadline' %}</th>
+                </tr>
                 </thead>
                 <tbody>
                 {% for note_etudiant in feuille_de_notes.notes_etudiants %}
@@ -214,7 +228,7 @@
                             {% endif %}
                             {% if note_etudiant.est_soumise %}
                                 <span class="glyphicon glyphicon-send" aria-hidden="true" style="color: green;"
-                                      title="{% trans 'Score submitted' %}"></span>
+                                      data-toggle="tooltip" title="{% trans 'Score submitted' %}"></span>
                             {% endif %}
                         </td>
                         <td headers="program">{{ note_etudiant.nom_cohorte }}</td>
