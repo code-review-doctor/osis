@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-04 14:39+0100\n"
+"POT-Creation-Date: 2021-11-09 11:03+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -261,7 +261,10 @@ msgstr ""
 msgid "Inject"
 msgstr ""
 
-msgid "Inject XLS file"
+msgid "Inject Excel file"
+msgstr ""
+
+msgid "Inject encoded scores into Excel file."
 msgstr ""
 
 msgid "Institution"
@@ -373,10 +376,10 @@ msgstr ""
 msgid "Please choose at least one criteria!"
 msgstr ""
 
-msgid "Please select an XLS file for injection"
+msgid "Please select an address"
 msgstr ""
 
-msgid "Please select an address"
+msgid "Please select the Excel file for injection"
 msgstr ""
 
 msgid "Postal code"
@@ -413,6 +416,10 @@ msgstr ""
 msgid "Registration number"
 msgstr ""
 
+msgctxt "assessments"
+msgid "Registration number"
+msgstr ""
+
 msgid "Remaining scores to submit for this deadline"
 msgstr ""
 
@@ -440,6 +447,9 @@ msgid "S=Unjustified Absence"
 msgstr ""
 
 msgid "Save"
+msgstr ""
+
+msgid "Save scores"
 msgstr ""
 
 msgid "Score"
@@ -487,9 +497,6 @@ msgid "Search of annual programs"
 msgstr ""
 
 msgid "Select an encoding type"
-msgstr ""
-
-msgid "Select an excel file to inject scores."
 msgstr ""
 
 msgid "Select/deselect all"
@@ -649,8 +656,8 @@ msgstr ""
 #, python-format
 msgid ""
 "Warning: %(scores)s score(s) ready to be submitted. Only score responsible "
-"(%(responsable_nom)s, %(responsable_prenom)s) will be allowed to submit the "
-"scores to faculty."
+"<strong>(%(responsable_nom)s, %(responsable_prenom)s)</strong> will be "
+"allowed to submit the scores to faculty."
 msgstr ""
 
 msgid "Yes"

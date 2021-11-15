@@ -24,22 +24,40 @@
 #
 ##############################################################################
 import logging
+from typing import Optional
 
 from django.conf import settings
-from django.db.models import Case, When, Q, F, Value, CharField
+from django.db.models import Case, When, Q, F, Value, CharField, Max
 from django.db.models.functions import Replace, Concat, Lower, Substr
+from django.http import Http404
 from django.utils.functional import cached_property
+from django.utils.translation import ugettext_lazy as _
 from django_filters import rest_framework as filters
 from rest_framework import generics
+from rest_framework.generics import get_object_or_404
 
 from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
 from base.models.enums import offer_enrollment_state
 from base.models.offer_enrollment import OfferEnrollment
 from base.models.person import Person
+from base.models.student import Student
 from education_group.models.enums.cohort_name import CohortName
 from offer_enrollment.api.serializers.enrollment import EnrollmentSerializer
+from osis_common.ddd.interface import BusinessException
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
+
+
+class DoubleNOMAException(BusinessException):
+    status_code = "OFFER_ENROLLMENT-1"
+
+    def __init__(self, *args, **kwargs):
+        message = _(
+            "A problem was detected with your registration : 2 registration id's are linked to your user.</br> Please "
+            "contact <a href=\"{registration_department_url}\" "
+            "target=\"_blank\">the Registration department</a>. Thank you."
+        ).format(registration_department_url=settings.REGISTRATION_ADMINISTRATION_URL)
+        super().__init__(message, **kwargs)
 
 
 class OfferEnrollmentFilter(filters.FilterSet):
@@ -47,6 +65,7 @@ class OfferEnrollmentFilter(filters.FilterSet):
         field_name='enrollment_state',
         choices=offer_enrollment_state.STATES
     )
+    year = filters.NumberFilter(field_name="education_group_year__academic_year__year")
 
 
 class OfferEnrollmentsListView(LanguageContextSerializerMixin, generics.ListAPIView):
@@ -58,11 +77,43 @@ class OfferEnrollmentsListView(LanguageContextSerializerMixin, generics.ListAPIV
     ordering = ['-education_group_year__academic_year__year']
     filterset_class = OfferEnrollmentFilter
 
+    @cached_property
+    def person(self) -> Person:
+        return get_object_or_404(
+            Person,
+            global_id=self.kwargs['global_id']
+        )
+
+    def get_student(self, qs) -> Optional[Student]:
+        students = self.person.student_set.all()
+        has_to_discriminate = len(students) > 1
+        if has_to_discriminate:
+            return self.discriminate_student(qs)
+        elif students:
+            return students.first()
+        raise Http404
+
+    @staticmethod
+    def discriminate_student(qs) -> Student:
+        qs = qs.filter(
+            enrollment_state__in=list(offer_enrollment_state.VALID_ENROLLMENT_STATES)
+        ).annotate(
+            max_year=Max('education_group_year__academic_year__year')
+        ).filter(
+            education_group_year__academic_year__year=F('max_year')
+        )
+        if len(qs) > 1:
+            raise DoubleNOMAException
+        return qs.first().student
+
     def get_queryset(self):
         qs = self.get_common_queryset().filter(
-            student__registration_id=self.kwargs['registration_id']
+            student__person__global_id=self.kwargs['global_id']
         )
-        return self.annotate_queryset(qs)
+        student = self.get_student(qs)
+        if student:
+            qs = qs.filter(student=student)
+            return self.annotate_queryset(qs)
 
     @staticmethod
     def get_common_queryset():
@@ -110,6 +161,7 @@ class OfferEnrollmentsListView(LanguageContextSerializerMixin, generics.ListAPIV
                 default=F('education_group_year__title_english'),
                 output_field=CharField()
             ),
+            student_registration_id=F('student__registration_id'),
         )
 
 
@@ -123,21 +175,11 @@ class MyOfferEnrollmentsListView(OfferEnrollmentsListView):
         qs = self.get_common_queryset().filter(
             student__person=self.person
         )
-        return self.annotate_queryset(qs)
+        student = self.get_student(qs)
+        if student:
+            qs = qs.filter(student=student)
+            return self.annotate_queryset(qs)
 
     @cached_property
     def person(self) -> Person:
         return self.request.user.person
-
-
-class MyOfferYearEnrollmentsListView(MyOfferEnrollmentsListView):
-    """
-       Return all offer enrollments of connected user for a specific year
-    """
-    name = 'my_enrollments_year'
-
-    def get_queryset(self):
-        qs = super().get_queryset()
-        return qs.filter(
-            education_group_year__academic_year__year=self.kwargs['year']
-        )
