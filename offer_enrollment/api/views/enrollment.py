@@ -95,6 +95,12 @@ class OfferEnrollmentsListView(LanguageContextSerializerMixin, generics.ListAPIV
 
     @staticmethod
     def discriminate_student(qs) -> Student:
+        """
+        Discriminate between several student objects that belong to the same person.
+        Offer enrollments with valid state enrollment are checked.
+        If the most recent enrollment year has only one student, this student is returned.
+        If there are more than one student for the most recent offer enrollment year, an exception is raised.
+        """
         qs = qs.filter(
             enrollment_state__in=list(offer_enrollment_state.VALID_ENROLLMENT_STATES)
         ).annotate(
@@ -102,7 +108,8 @@ class OfferEnrollmentsListView(LanguageContextSerializerMixin, generics.ListAPIV
         ).filter(
             education_group_year__academic_year__year=F('max_year')
         )
-        if len(qs) > 1:
+        nomas = qs.values('student__registration_id').distinct()
+        if len(nomas) > 1:
             raise DoubleNOMAException
         return qs.first().student
 
