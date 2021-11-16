@@ -41,7 +41,7 @@ OPTIONAL_APPS = (
     'learning_unit_enrollment',
     'backoffice',
     'admission',
-    'organisations'
+    'organisation'
 )
 OPTIONAL_MIDDLEWARES = ()
 OPTIONAL_INTERNAL_IPS = ()
