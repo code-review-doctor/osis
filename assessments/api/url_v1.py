@@ -25,6 +25,7 @@
 from django.urls import path, include
 
 from assessments.api.views.assessments import CurrentSessionExamView, NextSessionExamView, PreviousSessionExamView
+from assessments.api.views.progress_overview import ProgressOverviewTutorView
 from assessments.api.views.score_responsibles import ScoreResponsibleList
 from assessments.api.views.score_sheet_xls_export import ScoreSheetXLSExportAPIView
 from assessments.api.views.score_sheets_pdf_export import ScoreSheetsPDFExportAPIView
@@ -44,4 +45,5 @@ urlpatterns = [
 
     ])),
     path('score_responsibles/', ScoreResponsibleList.as_view(), name=ScoreResponsibleList.name),
+    path('progress_overview/', ProgressOverviewTutorView.as_view(), name=ProgressOverviewTutorView.name),
 ]
