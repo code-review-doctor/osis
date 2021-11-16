@@ -32,7 +32,7 @@ from base.models.enums.entity_type import EntityType
 from organisation.api.serializers.entities import EntitySerializer
 
 
-class EntityFilter(filters.FilterSet):
+class EntitiesFilter(filters.FilterSet):
     entity_type = filters.MultipleChoiceFilter(
         field_name='entity_type',
         choices=EntityType.choices()
@@ -60,7 +60,7 @@ class EntitiesListView(generics.ListAPIView):
     """
     name = 'entities'
     serializer_class = EntitySerializer
-    filterset_class = EntityFilter
+    filterset_class = EntitiesFilter
     ordering = ('acronym',)
 
     def get_queryset(self):
