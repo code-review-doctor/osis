@@ -8,22 +8,24 @@ def create_payment_notice_academic_calendars(apps, shema_editor):
     AcademicYear = apps.get_model('base', 'academicyear')
     AcademicCalendar = apps.get_model('base', 'academiccalendar')
 
-    academic_year_2021_22 = AcademicYear.objects.get(year=2021)
-    ac1 = AcademicCalendar(
-        data_year=academic_year_2021_22,
-        title="Affichage de l'avertissement de l'avis d'échéance de paiement 1 sur osis-portal",
-        start_date=datetime.datetime(2021, 11, 1),
-        reference="PAYMENT_NOTICE_1_WARNING"
-    )
-    ac1.save()
-    ac2 = AcademicCalendar(
-        data_year=academic_year_2021_22,
-        title="Affichage de l'avertissement de l'avis d'échéance de paiement 2 sur osis-portal",
-        start_date=datetime.datetime(2021, 11, 1),
-        end_date=datetime.datetime(2021, 11, 1),
-        reference="PAYMENT_NOTICE_2_WARNING"
-    )
-    ac2.save()
+    academic_year_2021_22_qs = AcademicYear.objects.filter(year=2021)
+    if academic_year_2021_22_qs:
+        academic_year_2021_22 = academic_year_2021_22_qs[0]
+        ac1 = AcademicCalendar(
+            data_year=academic_year_2021_22,
+            title="Affichage de l'avertissement de l'avis d'échéance de paiement 1 sur osis-portal",
+            start_date=datetime.datetime(2021, 11, 1),
+            reference="PAYMENT_NOTICE_1_WARNING"
+        )
+        ac1.save()
+        ac2 = AcademicCalendar(
+            data_year=academic_year_2021_22,
+            title="Affichage de l'avertissement de l'avis d'échéance de paiement 2 sur osis-portal",
+            start_date=datetime.datetime(2021, 11, 1),
+            end_date=datetime.datetime(2021, 11, 1),
+            reference="PAYMENT_NOTICE_2_WARNING"
+        )
+        ac2.save()
 
 
 class Migration(migrations.Migration):
