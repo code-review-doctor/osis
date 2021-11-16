@@ -41,7 +41,7 @@ class EnrollmentSerializerTestCase(TestCase):
             year=cls.offer_enrollment.education_group_year.academic_year.year,
             title_fr=cls.offer_enrollment.education_group_year.title,
             title_en=cls.offer_enrollment.education_group_year.title_english,
-            education_group_year=cls.offer_enrollment.education_group_year
+            student_registration_id=cls.offer_enrollment.student.registration_id,
         )
 
         cls.serializer = EnrollmentSerializer(cls.offer_enrollment_ns, context={'language': settings.LANGUAGE_CODE_FR})
@@ -51,6 +51,7 @@ class EnrollmentSerializerTestCase(TestCase):
             'acronym',
             'year',
             'title',
+            'student_registration_id'
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 

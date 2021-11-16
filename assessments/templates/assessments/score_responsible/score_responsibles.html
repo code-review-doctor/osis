@@ -119,7 +119,7 @@
                         "orderable": false,
                         "render" : function (data, type, row, meta) {
                             const href = row['select_url'];
-                            if (row['attributions'].length > 1){
+                            if (row['attributions'].length > 0){
                                 return "<a href='"+ href + "'> <span class='disabled glyphicon glyphicon-edit'></span></a>";
                             }else{
                                 return "<span class='glyphicon glyphicon-edit'></span>";

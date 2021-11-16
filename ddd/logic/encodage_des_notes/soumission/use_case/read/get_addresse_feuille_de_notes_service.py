@@ -27,21 +27,25 @@ from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodag
 from ddd.logic.encodage_des_notes.soumission.commands import GetAdresseFeuilleDeNotesServiceCommand
 from ddd.logic.encodage_des_notes.soumission.domain.service.get_adresse_feuille_de_notes_dto import \
     GetAdresseFeuilleDeNotesDTODomainService
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_entites_cohorte import IEntitesCohorteTranslator
 from ddd.logic.encodage_des_notes.soumission.dtos import AdresseFeuilleDeNotesDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_notes import \
     IAdresseFeuilleDeNotesRepository
 from ddd.logic.shared_kernel.academic_year.repository.i_academic_year import IAcademicYearRepository
+from ddd.logic.shared_kernel.entite.repository.entiteucl import IEntiteUCLRepository
 
 
 def get_adresse_feuille_de_notes(
         cmd: GetAdresseFeuilleDeNotesServiceCommand,
         repo: IAdresseFeuilleDeNotesRepository,
         periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
-        academic_year_repo: 'IAcademicYearRepository'
+        entite_repository: 'IEntiteUCLRepository',
+        entites_cohorte_translator: 'IEntitesCohorteTranslator',
 ) -> 'AdresseFeuilleDeNotesDTO':
     return GetAdresseFeuilleDeNotesDTODomainService.get(
         cmd.nom_cohorte,
         repo,
         periode_soumission_note_translator,
-        academic_year_repo
+        entite_repository,
+        entites_cohorte_translator,
     )

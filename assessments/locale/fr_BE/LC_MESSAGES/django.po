@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-08 15:04+0100\n"
+"POT-Creation-Date: 2021-11-09 11:03+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -458,6 +458,10 @@ msgstr "Noma"
 msgid "Registration number"
 msgstr "Noma"
 
+msgctxt "assessments"
+msgid "Registration number"
+msgstr "Noma"
+
 msgid "Remaining scores to submit for this deadline"
 msgstr "Nombre de notes encore à soumettre pour cette date"
 
@@ -491,6 +495,9 @@ msgstr "S=Absence Injustifiée"
 
 msgid "Save"
 msgstr "Enregistrer"
+
+msgid "Save scores"
+msgstr "Enregistrer les notes"
 
 msgid "Score"
 msgstr "Note"
@@ -538,6 +545,9 @@ msgstr "Recherche des programmes annualisés"
 
 msgid "Select an encoding type"
 msgstr "Sélectionnez un type d'encodage"
+
+msgid "Select an excel file to inject scores."
+msgstr "Veuillez sélectionner le fichier Excel pour injection"
 
 msgid "Select/deselect all"
 msgstr "Sélectionner/Dé-sélectionner tout"
@@ -704,19 +714,18 @@ msgstr "Via excel"
 msgid "Via paper"
 msgstr "Via papier"
 
-#, python-format
 msgid "Warning: %(scores)s score(s) ready to be submitted."
 msgstr "Attention: %(scores)s note(s) prête(s) à être soumise(s)."
 
 #, python-format
 msgid ""
 "Warning: %(scores)s score(s) ready to be submitted. Only score responsible "
-"(%(responsable_nom)s, %(responsable_prenom)s) will be allowed to submit the "
-"scores to faculty."
+"<strong>(%(responsable_nom)s, %(responsable_prenom)s)</strong> will be "
+"allowed to submit the scores to faculty."
 msgstr ""
 "Attention:  %(scores)s note(s) prête(s) à être soumise(s). Seul le "
-"responsable de note (%(responsable_nom)s, %(responsable_prenom)s) pourra "
-"soumettre les notes à la faculté."
+"responsable de notes <strong>(%(responsable_nom)s, %(responsable_prenom)s)</"
+"strong> pourra soumettre les notes à la faculté."
 
 msgid "Yes"
 msgstr "Oui"
