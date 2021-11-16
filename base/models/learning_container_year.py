@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import uuid
 from collections import OrderedDict
 
 from django.db import models
@@ -50,6 +51,10 @@ class LearningContainerYearAdmin(VersionAdmin, OsisModelAdmin):
 
 
 class LearningContainerYear(models.Model):
+    uuid = models.UUIDField(
+        default=uuid.uuid4, editable=False, unique=True, db_index=True
+    )
+
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     academic_year = models.ForeignKey('AcademicYear', on_delete=models.PROTECT)
     learning_container = models.ForeignKey('LearningContainer', on_delete=models.CASCADE)

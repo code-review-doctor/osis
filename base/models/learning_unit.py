@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import uuid
+
 from gettext import ngettext
 
 from django.core.exceptions import ObjectDoesNotExist
@@ -85,6 +87,9 @@ class LearningUnitAdmin(VersionAdmin, OsisModelAdmin):
 
 
 class LearningUnit(models.Model):
+    uuid = models.UUIDField(
+        default=uuid.uuid4, editable=False, unique=True, db_index=True
+    )
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     learning_container = models.ForeignKey('LearningContainer', blank=True, null=True, on_delete=models.CASCADE)
     changed = models.DateTimeField(null=True, auto_now=True)
