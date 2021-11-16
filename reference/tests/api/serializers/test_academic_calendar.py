@@ -23,28 +23,24 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.test import TestCase, RequestFactory
-from django.urls import reverse
+from django.test import TestCase
 
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from reference.api.serializers.academic_calendar import AcademicCalendarSerializer
-from reference.api.views.academic_calendar import AcademicCalendarList
 
 
 class AcademicCalendarListSerializerTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_calendar = AcademicCalendarFactory()
-        url = reverse('reference_api_v1:' + AcademicCalendarList.name)
-        cls.serializer = AcademicCalendarSerializer(cls.country, context={'request': RequestFactory().get(url)})
+        cls.serializer = AcademicCalendarSerializer(cls.academic_calendar)
 
     def test_contains_expected_fields(self):
         expected_fields = [
-            'url',
-            'uuid',
-            'iso_code',
-            'name',
-            'name_en',
-            'nationality'
+            'reference',
+            'title',
+            'data_year',
+            'start_date',
+            'end_date',
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
