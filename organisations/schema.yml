@@ -1,0 +1,219 @@
+openapi: 3.0.0
+servers:
+  - url: https://{environment}.osis.uclouvain.be/api/v1/organisations/
+    variables:
+      environment:
+        default: dev
+        enum:
+          - dev # Development server
+          - qa # Staging server
+          - test # Test server
+  - url: https://osis.uclouvain.be/api/v1/organisations/
+    description: 'Production server'
+info:
+  version: '1.0'
+  title: 'Organisations Service'
+  description: |-
+    A set of API endpoints that allow you to get information about organizations
+paths:
+  /{organisation_code}/entites/:
+    get:
+      description: 'Return all enrollments of the connected user'
+      operationId: get_ucl_entities_by_year
+      parameters:
+        - in: path
+          name: organisation_code
+          required: true
+          schema:
+            description: Filter entities by the name of their organization
+            type: string
+            example: "UCL"
+        - in: query
+          name: entity_type
+          schema:
+            description: Filter result by the type of the entity
+            type: array
+            items:
+              $ref: '#/components/schemas/EntiteTypeEnum'
+          style: form
+          explode: true
+        - in: query
+          name: year
+          schema:
+            description: Filter result by academic year
+            type: integer
+            example: 2020
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
+        - $ref: '#/components/parameters/PaginationLimit'
+        - $ref: '#/components/parameters/PaginationOffset'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntitesList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      tags:
+        - entites
+components:
+  securitySchemes:
+    Token:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Enter your token in the format **Token &lt;token>**
+  parameters:
+    PaginationLimit:
+      in: query
+      name: limit
+      description: Limit of paginated results
+      schema:
+        type: integer
+        example: 25
+    PaginationOffset:
+      in: query
+      name: offset
+      description: Offset of paginated results
+      schema:
+        type: integer
+        example: 25
+    X-User-FirstName:
+      in: header
+      name: X-User-FirstName
+      schema:
+        type: string
+      required: false
+    X-User-LastName:
+      in: header
+      name: X-User-LastName
+      schema:
+        type: string
+      required: false
+    X-User-Email:
+      in: header
+      name: X-User-Email
+      schema:
+        type: string
+      required: false
+    X-User-GlobalID:
+      in: header
+      name: X-User-GlobalID
+      schema:
+        type: string
+      required: false
+    Accept-Language:
+      in: header
+      name: Accept-Language
+      description: >
+        The header advertises which languages the client is able to understand, and which locale variant is preferred. (By languages, we mean natural languages, such as English, and not programming languages.)
+      schema:
+        $ref: '#/components/schemas/AcceptedLanguageEnum'
+      required: false
+  responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: The specified resource was not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  schemas:
+    Paging:
+      type: object
+      properties:
+        count:
+          type: integer
+        next:
+          type: string
+          format: uri
+          nullable: true
+        previous:
+          type: string
+          format: uri
+          nullable: true
+    EntitesList:
+      allOf:
+        - $ref: '#/components/schemas/Paging'
+        - type: object
+          properties:
+            results:
+              type: array
+              items:
+                $ref: '#/components/schemas/Entite'
+    Entite:
+      type: object
+      properties:
+        organization_name:
+          type: string
+          example: "UCLouvain"
+        organization_acronym:
+          type: string
+          example: "UCL"
+        title:
+          type: string
+          example: "Ecole d'agrégation en sciences sociales, économiques et juridiques"
+        acronym:
+          type: string
+          example: "AGES"
+        entity_type:
+          $ref: '#/components/schemas/EntiteTypeEnum'
+        entity_type_text:
+          type: string
+          example: 'Ecole'
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+          nullable: true
+        logo:
+          type: string
+          format: uri
+    EntiteTypeEnum:
+      type: string
+      enum:
+        - 'SECTOR'
+        - 'FACULTY'
+        - 'SCHOOL'
+        - 'INSTITUTE'
+        - 'POLE'
+        - 'DOCTORAL_COMMISSION'
+        - 'PLATFORM'
+        - 'LOGISTICS_ENTITY'
+    AcceptedLanguageEnum:
+      type: string
+      enum:
+        - 'en'
+        - 'fr-be'
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+        - code
+        - message
+security:
+  - Token: [ ]
