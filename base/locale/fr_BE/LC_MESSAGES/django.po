@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-11 17:19+0200\n"
+"POT-Creation-Date: 2021-11-16 13:20+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -331,9 +331,6 @@ msgstr "Toutes"
 msgctxt "male plural"
 msgid "All"
 msgstr "Tous"
-
-msgid "All the scores are encoded."
-msgstr "Toutes les notes ont été soumises."
 
 msgid "Alloc. Ent."
 msgstr "Ent. attrib."
@@ -1085,9 +1082,6 @@ msgstr "Liste au choix de Finalités (120)"
 msgid "Finality 180 list choice"
 msgstr "Liste au choix de Finalités (180)"
 
-msgid "First name"
-msgstr "Prénom"
-
 msgid "Firstname"
 msgstr "Prénom"
 
@@ -1331,9 +1325,6 @@ msgstr "Cours isolés"
 msgid "It is necessary to indicate the internship subtype."
 msgstr "Il est nécessaire d'indiquer le sous-type de stage."
 
-msgid "It remains notes to encode."
-msgstr "Il reste encore des notes à encoder."
-
 msgid "January"
 msgstr "Janvier"
 
@@ -1367,9 +1358,6 @@ msgstr "Cours de langue"
 
 msgid "Last modifications"
 msgstr "Dernières modifications"
-
-msgid "Last name"
-msgstr "Nom"
 
 msgid "Last update description fiche (force majeure) by"
 msgstr "Dernière modification fiche descriptive (force majeure) par"
@@ -1975,6 +1963,12 @@ msgid "Pay attention! This learning unit is used in more than one formation"
 msgstr ""
 "Attention cette unité d'enseignement fait partie de plusieurs formations :"
 
+msgid "Payment notice 1 warning"
+msgstr "Avertissement avis d'échéance de paiement 1"
+
+msgid "Payment notice 2 warning"
+msgstr "Avertissement avis d'échéance de paiement 2"
+
 msgid "Pending"
 msgstr "En attente"
 
@@ -2371,9 +2365,6 @@ msgstr "Rechercher une entité"
 msgid "Search for an organization"
 msgstr "Recherche d'organisations"
 
-msgid "Search of annual programs"
-msgstr "Recherche des programmes annualisés"
-
 msgid "Search type"
 msgstr "Type de recherche"
 
@@ -2636,7 +2627,9 @@ msgstr ""
 msgid ""
 "The effective class %(acronym)s has %(count)d enrollments for the year "
 "%(year)s"
-msgstr "La classe %(acronym)s fait l'objet de %(count)d inscription(s) pour l'année %(year)s"
+msgstr ""
+"La classe %(acronym)s fait l'objet de %(count)d inscription(s) pour l'année "
+"%(year)s"
 
 #, python-format
 msgid ""
@@ -3543,3 +3536,18 @@ msgstr "oui"
 
 msgid "yes,no"
 msgstr "oui,non"
+
+#~ msgid "All the scores are encoded."
+#~ msgstr "Toutes les notes ont été soumises."
+
+#~ msgid "First name"
+#~ msgstr "Prénom"
+
+#~ msgid "It remains notes to encode."
+#~ msgstr "Il reste encore des notes à encoder."
+
+#~ msgid "Last name"
+#~ msgstr "Nom"
+
+#~ msgid "Search of annual programs"
+#~ msgstr "Recherche des programmes annualisés"
