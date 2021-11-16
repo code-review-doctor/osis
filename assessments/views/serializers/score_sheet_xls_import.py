@@ -131,7 +131,6 @@ class ScoreSheetXLSImportSerializer(serializers.Serializer):
             return raw_cell_value
 
     def get_notes_etudiants(self, worksheet: Worksheet) -> List[_XLSNoteEtudiantRowImportSerializer]:
-        print('get_notes_etudiants')
         notes_etudiants = []
         for row in self.__get_student_rows(worksheet):
             row_serialized = _XLSNoteEtudiantRowImportSerializer(instance=row, context={'row_number': row[0].row}).data
