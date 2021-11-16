@@ -317,6 +317,9 @@ msgctxt "male plural"
 msgid "All"
 msgstr ""
 
+msgid "All the scores are encoded."
+msgstr ""
+
 msgid "Alloc. Ent."
 msgstr ""
 
@@ -1285,6 +1288,9 @@ msgstr ""
 msgid "It is necessary to indicate the internship subtype."
 msgstr ""
 
+msgid "It remains notes to encode."
+msgstr ""
+
 msgid "January"
 msgstr ""
 
@@ -1315,6 +1321,9 @@ msgid "Language classes"
 msgstr ""
 
 msgid "Last modifications"
+msgstr ""
+
+msgid "Last name"
 msgstr ""
 
 msgid "Last update description fiche (force majeure) by"
@@ -2292,6 +2301,9 @@ msgid "Search for an entity"
 msgstr ""
 
 msgid "Search for an organization"
+msgstr ""
+
+msgid "Search of annual programs"
 msgstr ""
 
 msgid "Search type"
