@@ -39,7 +39,7 @@ class EntitiesListViewTestCase(APITestCase):
         cls.entity_version = EntityVersionFactory(
             entity__organization__acronym='UCL'
         )
-        cls.url = reverse('organisations_api_v1:' + EntitiesListView.name, kwargs={
+        cls.url = reverse('organisation_api_v1:' + EntitiesListView.name, kwargs={
             'organisation_code': cls.entity_version.entity.organization.acronym
         })
         cls.user = UserFactory()
