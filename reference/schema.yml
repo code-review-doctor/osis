@@ -252,7 +252,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AcademicCalendar'
+                type: array
+                items:
+                  $ref: '#/components/schemas/AcademicCalendar'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -468,9 +470,9 @@ components:
           type: string
           description: The title of the academic calendar
         data_year:
-          type: string
+          type: integer
           description: The academic year which the calendar relates to
-          example: "2021-22"
+          example: 2021
         start_date:
           type: string
           format: date

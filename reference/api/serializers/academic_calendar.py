@@ -29,7 +29,7 @@ from base.models.academic_calendar import AcademicCalendar
 
 
 class AcademicCalendarSerializer(serializers.ModelSerializer):
-    data_year = serializers.CharField()
+    data_year = serializers.IntegerField(source='data_year.year')
 
     class Meta:
         model = AcademicCalendar

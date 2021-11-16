@@ -23,10 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django_filters import rest_framework as filters
 from rest_framework import generics
 
 from base.models.academic_calendar import AcademicCalendar
 from reference.api.serializers.academic_calendar import AcademicCalendarSerializer
+
+
+class AcademicCalendarFilter(filters.FilterSet):
+    data_year = filters.NumberFilter(field_name='data_year__year')
+    reference = filters.CharFilter()
 
 
 class AcademicCalendarList(generics.ListAPIView):
@@ -35,20 +41,8 @@ class AcademicCalendarList(generics.ListAPIView):
     """
     name = 'academic-calendar-list'
 
-    def get_queryset(self):
-        """
-        Optionally restricts the returned academic_calendars,
-        by filtering against a `data_year` and/or `reference` query parameter in the URL.
-        """
-        queryset = AcademicCalendar.objects.all()
-        data_year = self.request.query_params.get('data_year')
-        if data_year is not None:
-            queryset = queryset.filter(data_year__year=data_year)
-        reference = self.request.query_params.get('reference')
-        if reference is not None:
-            queryset = queryset.filter(reference=reference)
-        return queryset
-
+    queryset = AcademicCalendar.objects.all()
+    filterset_class = AcademicCalendarFilter
     serializer_class = AcademicCalendarSerializer
     ordering_fields = (
         'data_year',
