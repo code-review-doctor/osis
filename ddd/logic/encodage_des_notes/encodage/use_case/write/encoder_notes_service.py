@@ -94,20 +94,13 @@ def encoder_notes(
         historiser_note_service,
         inscription_examen_translator,
         rapport,
-        rapport_repository
-    )
-
-    # THEN
-    notification_encodage.notifier(
-        notes,
+        rapport_repository,
+        notification_encodage,
         cohortes_non_completes,
-        gestionnaire_parcours,
-        note_etudiant_repo,
         attribution_enseignant_translator,
         signaletique_personne_repo,
         signaletique_etudiant_repo,
         adresse_feuille_de_notes_repo,
-        inscription_examen_translator,
     )
 
     return notes
