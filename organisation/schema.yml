@@ -1,6 +1,6 @@
 openapi: 3.0.0
 servers:
-  - url: https://{environment}.osis.uclouvain.be/api/v1/organisations/
+  - url: https://{environment}.osis.uclouvain.be/api/v1/organisation/
     variables:
       environment:
         default: dev
@@ -8,7 +8,7 @@ servers:
           - dev # Development server
           - qa # Staging server
           - test # Test server
-  - url: https://osis.uclouvain.be/api/v1/organisations/
+  - url: https://osis.uclouvain.be/api/v1/organisation/
     description: 'Production server'
 info:
   version: '1.0'
@@ -18,8 +18,8 @@ info:
 paths:
   /{organisation_code}/entites/:
     get:
-      description: 'Return all enrollments of the connected user'
-      operationId: get_ucl_entities_by_year
+      description: 'Return all the entities of the specified organisation'
+      operationId: get_entities
       parameters:
         - in: path
           name: organisation_code
@@ -162,6 +162,9 @@ components:
     Entite:
       type: object
       properties:
+        uuid:
+          type: string
+          format: uuid
         organization_name:
           type: string
           example: "UCLouvain"

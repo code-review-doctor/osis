@@ -23,19 +23,30 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from rest_framework import serializers
+
+from django.test import TestCase
+
+from base.tests.factories.entity_version import EntityVersionFactory
+from organisation.api.serializers.entities import EntitySerializer
 
 
-class EntitesSerializer(serializers.Serializer):
-    organization_name = serializers.CharField(source='entity.organization.name')
-    organization_acronym = serializers.CharField(source='entity.organization.acronym')
-    title = serializers.CharField()
-    acronym = serializers.CharField()
-    entity_type = serializers.CharField()
-    entity_type_text = serializers.SerializerMethodField()
-    start_date = serializers.DateField()
-    end_date = serializers.DateField()
-    logo = serializers.ImageField()
+class EntitySerializerTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.entity_version = EntityVersionFactory()
+        cls.serializer = EntitySerializer(cls.entity_version)
 
-    def get_entity_type_text(self, obj):
-        return obj.get_entity_type_display()
+    def test_contains_expected_fields(self):
+        expected_fields = [
+            'uuid',
+            'organization_name',
+            'organization_acronym',
+            'title',
+            'acronym',
+            'entity_type',
+            'entity_type_text',
+            'start_date',
+            'end_date',
+            'logo',
+        ]
+        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)

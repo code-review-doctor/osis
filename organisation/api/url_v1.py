@@ -23,29 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.urls import path, include
 
-from django.test import TestCase
+from organisation.api.views.entities import EntitiesListView
 
-from base.tests.factories.entity_version import EntityVersionFactory
-from organisations.api.serializers.entites import EntitesSerializer
-
-
-class EntitesSerializerTestCase(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.entity_version = EntityVersionFactory()
-        cls.serializer = EntitesSerializer(cls.entity_version)
-
-    def test_contains_expected_fields(self):
-        expected_fields = [
-            'organization_name',
-            'organization_acronym',
-            'title',
-            'acronym',
-            'entity_type',
-            'entity_type_text',
-            'start_date',
-            'end_date',
-            'logo',
-        ]
-        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
+app_name = "organisation"
+urlpatterns = [
+    path('<str:organisation_code>/entites/', include([
+        path('', EntitiesListView.as_view(), name=EntitiesListView.name),
+    ]))
+]

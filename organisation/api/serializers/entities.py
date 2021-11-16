@@ -23,13 +23,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.urls import path, include
+from rest_framework import serializers
 
-from organisations.api.views.entites import EntitesListView
 
-app_name = "organisations"
-urlpatterns = [
-    path('<str:organisation_code>/entites/', include([
-        path('', EntitesListView.as_view(), name=EntitesListView.name),
-    ]))
-]
+class EntitySerializer(serializers.Serializer):
+    uuid = serializers.UUIDField()
+    organization_name = serializers.CharField(source='entity.organization.name')
+    organization_acronym = serializers.CharField(source='entity.organization.acronym')
+    title = serializers.CharField()
+    acronym = serializers.CharField()
+    entity_type = serializers.CharField()
+    entity_type_text = serializers.SerializerMethodField()
+    start_date = serializers.DateField()
+    end_date = serializers.DateField()
+    logo = serializers.ImageField()
+
+    def get_entity_type_text(self, obj):
+        return obj.get_entity_type_display()

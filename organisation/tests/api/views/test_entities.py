@@ -30,16 +30,16 @@ from rest_framework.test import APITestCase
 
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.user import UserFactory
-from organisations.api.views.entites import EntitesListView
+from organisation.api.views.entities import EntitiesListView
 
 
-class EntitesListViewTestCase(APITestCase):
+class EntitiesListViewTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
         cls.entity_version = EntityVersionFactory(
             entity__organization__acronym='UCL'
         )
-        cls.url = reverse('organisations_api_v1:' + EntitesListView.name, kwargs={
+        cls.url = reverse('organisations_api_v1:' + EntitiesListView.name, kwargs={
             'organisation_code': cls.entity_version.entity.organization.acronym
         })
         cls.user = UserFactory()
@@ -69,6 +69,7 @@ class EntitesListViewTestCase(APITestCase):
 
         self.assertCountEqual(
             list(results[0].keys()), [
+                'uuid',
                 'organization_name',
                 'organization_acronym',
                 'title',

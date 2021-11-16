@@ -29,10 +29,10 @@ from rest_framework import generics
 
 from base.models.entity_version import EntityVersion
 from base.models.enums.entity_type import EntityType
-from organisations.api.serializers.entites import EntitesSerializer
+from organisation.api.serializers.entities import EntitySerializer
 
 
-class EntitesFilter(filters.FilterSet):
+class EntityFilter(filters.FilterSet):
     entity_type = filters.MultipleChoiceFilter(
         field_name='entity_type',
         choices=EntityType.choices()
@@ -54,13 +54,13 @@ class EntitesFilter(filters.FilterSet):
         return queryset.filter(q_statement)
 
 
-class EntitesListView(generics.ListAPIView):
+class EntitiesListView(generics.ListAPIView):
     """
        Return all entities
     """
-    name = 'entites_ucl'
-    serializer_class = EntitesSerializer
-    filterset_class = EntitesFilter
+    name = 'entities'
+    serializer_class = EntitySerializer
+    filterset_class = EntityFilter
     ordering = ('acronym',)
 
     def get_queryset(self):
