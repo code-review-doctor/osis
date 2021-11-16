@@ -88,7 +88,7 @@ class ScoreSheetsPDFExportAPIView(APIView):
                     }
                 )
             else:
-                validation_errors.append(_('There is no enrollment for this course'))
+                validation_errors.append(_('There is no enrollment to the exam for this learning unit'))
         if validation_errors:
             raise ValidationError(detail=", ".join([str(error) for error in validation_errors]))
         return documents
