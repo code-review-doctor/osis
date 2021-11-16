@@ -1085,6 +1085,9 @@ msgstr "Liste au choix de Finalités (120)"
 msgid "Finality 180 list choice"
 msgstr "Liste au choix de Finalités (180)"
 
+msgid "First name"
+msgstr "Prénom"
+
 msgid "Firstname"
 msgstr "Prénom"
 
