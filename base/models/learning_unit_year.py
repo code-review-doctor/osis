@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import uuid
+
 from decimal import Decimal
 from typing import List
 
@@ -310,6 +312,10 @@ class LearningUnitYearWithContainerManager(models.Manager):
 
 
 class LearningUnitYear(models.Model):
+    uuid = models.UUIDField(
+        default=uuid.uuid4, editable=False, unique=True, db_index=True
+    )
+
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     academic_year = models.ForeignKey(AcademicYear, verbose_name=_('Academic year'),
                                       validators=[academic_year_validator], on_delete=models.PROTECT)
