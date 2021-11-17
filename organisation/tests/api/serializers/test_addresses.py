@@ -23,15 +23,27 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.urls import path, include
 
-from organisation.api.views.addresses import AddressesListView
-from organisation.api.views.entities import EntitiesListView
+from django.test import TestCase
 
-app_name = "organisation"
-urlpatterns = [
-    path('<str:organisation_code>/entites/', include([
-        path('', EntitiesListView.as_view(), name=EntitiesListView.name),
-        path('<str:uuid>/addresses', AddressesListView.as_view(), name=AddressesListView.name)
-    ]))
-]
+from base.tests.factories.entity_version_address import EntityVersionAddressFactory
+from organisation.api.serializers.addresses import AddressSerializer
+
+
+class AddressSerializerTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.address = EntityVersionAddressFactory()
+        cls.serializer = AddressSerializer(cls.address)
+
+    def test_contains_expected_fields(self):
+        expected_fields = [
+            'city',
+            'street',
+            'street_number',
+            'postal_code',
+            'state',
+            'country_iso_code',
+            'is_main',
+        ]
+        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)

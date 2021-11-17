@@ -63,6 +63,45 @@ paths:
           $ref: '#/components/responses/Unauthorized'
       tags:
         - entites
+  /{organisation_code}/entites/{uuid}/addresses:
+    get:
+      description: 'Return all the addresses of the entity specified by its uuid'
+      operationId: get_entity_addresses
+      parameters:
+        - in: path
+          name: organisation_code
+          required: true
+          schema:
+            description: Filter entities by the name of their organization
+            type: string
+            example: "UCL"
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            description: The uuid of the EntityVersion
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
+        - $ref: '#/components/parameters/PaginationLimit'
+        - $ref: '#/components/parameters/PaginationOffset'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddressesList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      tags:
+        - entites
 components:
   securitySchemes:
     Token:
@@ -192,6 +231,37 @@ components:
         logo:
           type: string
           format: uri
+    AddressesList:
+      allOf:
+        - $ref: '#/components/schemas/Paging'
+        - type: object
+          properties:
+            results:
+              type: array
+              items:
+                $ref: '#/components/schemas/Address'
+    Address:
+      type: object
+      properties:
+        city:
+          type: string
+          example: "Louvain-la-Neuve"
+        street:
+          type: string
+          example: "Rue du compas"
+        street_number:
+          type: string
+          example: "1"
+        postal_code:
+          type: string
+          example: "1348"
+        state:
+          type: string
+        country_iso_code:
+          type: string
+          example: "BE"
+        is_main:
+          type: boolean
     EntiteTypeEnum:
       type: string
       enum:
