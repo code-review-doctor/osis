@@ -23,30 +23,29 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from datetime import date
 
-from rest_framework import serializers
+from rest_framework import status
+from rest_framework.reverse import reverse
+from rest_framework.test import APITestCase
 
-
-class LearningUnitProgressSerializer(serializers.Serializer):
-    code = serializers.CharField(source='code_unite_enseignement')
-    full_title = serializers.CharField(source='intitule_complet_unite_enseignement')
-    due_dates = serializers.SerializerMethodField()
-    score_responsible = serializers.SerializerMethodField(source='responsable_note')
-    has_peps = serializers.BooleanField(source='a_etudiants_peps')
-
-    def get_due_dates(self, obj):
-        return [date(d.annee, d.mois, d.jour) for d in obj.dates_echeance]
-
-    def get_score_responsible(self, obj):
-        return "{} {}".format(
-            obj.responsable_note.nom, obj.responsable_note.prenom
-        ) if obj.responsable_note.nom else None  # EnseignantDTO is not nullable
+from assessments.api.views.progress_overview import ProgressOverviewTutorView
+from base.tests.factories.tutor import TutorFactory
 
 
-class ProgressOverviewSerializer(serializers.Serializer):
-    academic_year = serializers.IntegerField(source='annee_academique')
-    session_number = serializers.IntegerField(source='numero_session')
-    by_learning_unit = serializers.ListSerializer(
-        source='progression_generale', child=LearningUnitProgressSerializer()
-    )
+class ProgressOverviewAPIViewTestCase(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.tutor = TutorFactory()
+        cls.url = reverse('assessments_api_v1:' + ProgressOverviewTutorView.name)
+
+    def setUp(self):
+        self.client.force_authenticate(user=self.tutor.person.user)
+
+    def test_get_not_authorized(self):
+        self.client.force_authenticate(user=None)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_response(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)

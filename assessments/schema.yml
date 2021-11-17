@@ -193,7 +193,7 @@ paths:
             $ref: '#/components/responses/Unauthorized'
         tags:
           - score_encoding
-  /progress_overview/:
+  /overview/:
       get:
         description: Return score encoding progress overview for a tutor
         operationId: get_progress_overview
@@ -338,8 +338,8 @@ components:
         by_learning_unit:
           type: array
           items:
-            $ref: '#/components/schemas/LearningUnitProgressOverview'
-    LearningUnitProgressOverview:
+            $ref: '#/components/schemas/LearningUnitProgress'
+    LearningUnitProgress:
       type: object
       properties:
         code:

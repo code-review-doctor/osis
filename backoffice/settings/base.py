@@ -96,9 +96,9 @@ INSTALLED_APPS = (
     'osis_document',
     'osis_history',
     'osis_signature',
-    'osis_export',
+    # 'osis_export',
     'osis_notification',
-    'osis_async'
+    'osis_async',
 )
 
 

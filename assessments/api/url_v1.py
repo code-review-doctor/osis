@@ -45,5 +45,5 @@ urlpatterns = [
 
     ])),
     path('score_responsibles/', ScoreResponsibleList.as_view(), name=ScoreResponsibleList.name),
-    path('progress_overview/', ProgressOverviewTutorView.as_view(), name=ProgressOverviewTutorView.name),
+    path('overview/', ProgressOverviewTutorView.as_view(), name=ProgressOverviewTutorView.name),
 ]
