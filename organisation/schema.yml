@@ -56,7 +56,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/EntitesList'
+                $ref: '#/components/schemas/PaginatedEntites'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -95,7 +95,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AddressesList'
+                $ref: '#/components/schemas/PaginatedAddresses'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -189,7 +189,7 @@ components:
           type: string
           format: uri
           nullable: true
-    EntitesList:
+    PaginatedEntites:
       allOf:
         - $ref: '#/components/schemas/Paging'
         - type: object
@@ -231,7 +231,7 @@ components:
         logo:
           type: string
           format: uri
-    AddressesList:
+    PaginatedAddresses:
       allOf:
         - $ref: '#/components/schemas/Paging'
         - type: object
