@@ -23,7 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from types import SimpleNamespace
 
+import mock
 from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
@@ -46,6 +48,21 @@ class ProgressOverviewAPIViewTestCase(APITestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_response(self):
+    @mock.patch('ddd.logic.encodage_des_notes.shared_kernel.domain.service.periode_encodage_ouverte.'
+                'PeriodeEncodageOuverte.verifier')
+    @mock.patch('ddd.logic.encodage_des_notes.soumission.domain.service.progression_generale_encodage.'
+                'ProgressionGeneraleEncodage.get')
+    def test_response(self, mock_get_progression, mock_periode_ouverte):
+        mock_get_progression.return_value = SimpleNamespace(
+            annee_academique=2020,
+            numero_session=1,
+            progression_generale=[SimpleNamespace(
+                code_unite_enseignement='CODE',
+                intitule_complet_unite_enseignement='Intitulé',
+                dates_echeance=[],
+                responsable_note=SimpleNamespace(nom='John', prenom='Doe'),
+                a_etudiants_peps=False
+            )]
+        )
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
