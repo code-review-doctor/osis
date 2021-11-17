@@ -41,8 +41,12 @@ class TutorApplicationAdmin(admin.ModelAdmin):
                                     'tutor', 'volume_lecturing', 'volume_pratical_exercice',
                                     'remark', 'course_summary')}),)
     raw_id_fields = ('learning_container_year', 'tutor')
-    search_fields = ['tutor__person__first_name', 'tutor__person__last_name', 'learning_container_year__acronym',
-                     'tutor__person__global_id',]
+    search_fields = [
+        'tutor__person__first_name',
+        'tutor__person__last_name',
+        'learning_container_year__acronym',
+        'tutor__person__global_id',
+    ]
 
 
 class TutorApplication(models.Model):

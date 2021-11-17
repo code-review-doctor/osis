@@ -87,7 +87,8 @@ class LearningUnitTranslator(ILearningUnitService):
         )
         subqs = AttributionChargeNew.objects.filter(attribution__id=OuterRef('id'))
         qs = AttributionNew.objects.filter(filter_clause).exclude(
-            attributionchargenew__learning_component_year__learning_unit_year__subtype=learning_unit_year_subtypes.PARTIM
+            attributionchargenew__learning_component_year__learning_unit_year__subtype=
+            learning_unit_year_subtypes.PARTIM
         ).annotate(
             code=F('learning_container_year__acronym'),
             year=F('learning_container_year__academic_year__year'),
