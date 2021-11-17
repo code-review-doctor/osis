@@ -27,13 +27,10 @@ import uuid as uuid
 from django.contrib import admin
 from django.db import models
 
-from attribution.models.enums.function import Functions
-
 
 class TutorApplicationAdmin(admin.ModelAdmin):
     list_display = (
         'tutor',
-        'function',
         'learning_container_year',
         'volume_lecturing',
         'volume_pratical_exercice',
@@ -41,11 +38,15 @@ class TutorApplicationAdmin(admin.ModelAdmin):
     )
     list_filter = ('learning_container_year__academic_year', )
     fieldsets = ((None, {'fields': ('last_changed', 'learning_container_year',
-                                    'tutor', 'function', 'volume_lecturing', 'volume_pratical_exercice',
+                                    'tutor', 'volume_lecturing', 'volume_pratical_exercice',
                                     'remark', 'course_summary')}),)
     raw_id_fields = ('learning_container_year', 'tutor')
-    search_fields = ['tutor__person__first_name', 'tutor__person__last_name', 'learning_container_year__acronym',
-                     'tutor__person__global_id', 'function']
+    search_fields = [
+        'tutor__person__first_name',
+        'tutor__person__last_name',
+        'learning_container_year__acronym',
+        'tutor__person__global_id',
+    ]
 
 
 class TutorApplication(models.Model):
@@ -54,12 +55,11 @@ class TutorApplication(models.Model):
     changed = models.DateTimeField(null=True, auto_now=True)
     learning_container_year = models.ForeignKey('base.LearningContainerYear', on_delete=models.PROTECT)
     tutor = models.ForeignKey('base.Tutor', on_delete=models.CASCADE)
-    function = models.CharField(max_length=35, blank=True, null=True, choices=Functions.choices(), db_index=True)
-    volume_lecturing = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
-    volume_pratical_exercice = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
+    volume_lecturing = models.DecimalField(max_digits=6, decimal_places=1, blank=True, null=True)
+    volume_pratical_exercice = models.DecimalField(max_digits=6, decimal_places=1, blank=True, null=True)
     remark = models.TextField(blank=True, null=True)
     course_summary = models.TextField(blank=True, null=True)
     last_changed = models.DateTimeField(null=True)
 
     def __str__(self):
-        return u"%s - %s" % (self.tutor, self.function)
+        return str(self.tutor)

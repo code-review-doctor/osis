@@ -36,6 +36,7 @@ from osis_common.ddd.interface import DTO
 class AttributionFromRepositoryDTO(DTO):
     course_id_code = attr.ib(type=str)
     course_id_year = attr.ib(type=int)
+    course_is_in_suppression_proposal = attr.ib(type=bool)
     course_title = attr.ib(type=int)
     applicant_id_global_id = attr.ib(type=str)
     function = attr.ib(type=str)
@@ -166,10 +167,19 @@ class LearningUnitTutorAttributionFromServiceDTO(DTO):
 
 
 @attr.s(frozen=True, slots=True)
+class LearningUnitModificationProposalFromServiceDTO(DTO):
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
+    old_code = attr.ib(type=str)
+    old_title = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
 class ApplicantAttributionChargeSummaryDTO(DTO):
     code = attr.ib(type=str)
     year = attr.ib(type=int)
     title = attr.ib(type=str)
+    course_is_in_suppression_proposal = attr.ib(type=bool)
     start_year = attr.ib(type=int)
     end_year = attr.ib(type=int)
     function = attr.ib(type=Functions)

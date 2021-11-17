@@ -31,7 +31,7 @@ msgid ""
 "Application on this vacant course is not reserved for interns/open for extern"
 msgstr ""
 "La candidature sur cette activité vacante est réservé pour les internes/"
-"ouvert pour les externes"
+"ouverte pour les externes"
 
 msgid "Can't create a learning unit lower than 2019-20"
 msgstr "On ne peut pas créer une UE avec une année inférieure à 2019-20"
@@ -307,7 +307,7 @@ msgstr ""
 "n'y a pas de classe prévue."
 
 msgid "You have already applied on vacant course"
-msgstr "Vous avez déjà candidaté pour cette activité"
+msgstr "Vous avez déjà candidaté.e pour cette unité d'enseignement"
 
 #, python-brace-format
 msgid ""

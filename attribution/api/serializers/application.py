@@ -89,6 +89,7 @@ class MyChargeSummarySerializer(serializers.Serializer):
     code = serializers.CharField(read_only=True)
     year = serializers.IntegerField(read_only=True)
     title = serializers.CharField(read_only=True)
+    course_is_in_suppression_proposal = serializers.BooleanField(read_only=True)
     start_year = serializers.IntegerField(read_only=True)
     end_year = serializers.IntegerField(read_only=True)
     function = serializers.CharField(read_only=True, source="function.name")
