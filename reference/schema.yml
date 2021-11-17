@@ -246,15 +246,15 @@ paths:
         - $ref: '#/components/parameters/X-User-LastName'
         - $ref: '#/components/parameters/X-User-Email'
         - $ref: '#/components/parameters/X-User-GlobalID'
+        - $ref: '#/components/parameters/PaginationLimit'
+        - $ref: '#/components/parameters/PaginationOffset'
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/AcademicCalendar'
+                $ref: '#/components/schemas/PaginatedAcademicCalendars'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -443,6 +443,15 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/AcademicYear'
+    PaginatedAcademicCalendars:
+      allOf:
+        - $ref: '#/components/schemas/Paging'
+        - type: object
+          properties:
+            results:
+              type: array
+              items:
+                $ref: '#/components/schemas/AcademicCalendar'
     AcademicYear:
       type: object
       properties:
