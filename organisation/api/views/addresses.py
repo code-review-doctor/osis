@@ -23,15 +23,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.urls import path, include
+from rest_framework import generics
 
-from organisation.api.views.addresses import AddressesListView
-from organisation.api.views.entities import EntitiesListView
+from base.models.entity_version_address import EntityVersionAddress
+from organisation.api.serializers.addresses import AddressSerializer
 
-app_name = "organisation"
-urlpatterns = [
-    path('<str:organisation_code>/entites/', include([
-        path('', EntitiesListView.as_view(), name=EntitiesListView.name),
-        path('<str:uuid>/addresses', AddressesListView.as_view(), name=AddressesListView.name)
-    ]))
-]
+
+class AddressesListView(generics.ListAPIView):
+    """
+       Return all the addresses of an entity
+    """
+    name = 'entity_addresses'
+    serializer_class = AddressSerializer
+
+    def get_queryset(self):
+        return EntityVersionAddress.objects.filter(
+            entity_version__uuid=self.kwargs['uuid']
+        )

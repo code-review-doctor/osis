@@ -23,15 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.urls import path, include
+from rest_framework import serializers
 
-from organisation.api.views.addresses import AddressesListView
-from organisation.api.views.entities import EntitiesListView
 
-app_name = "organisation"
-urlpatterns = [
-    path('<str:organisation_code>/entites/', include([
-        path('', EntitiesListView.as_view(), name=EntitiesListView.name),
-        path('<str:uuid>/addresses', AddressesListView.as_view(), name=AddressesListView.name)
-    ]))
-]
+class AddressSerializer(serializers.Serializer):
+    city = serializers.CharField()
+    street = serializers.CharField()
+    street_number = serializers.CharField()
+    postal_code = serializers.CharField()
+    state = serializers.CharField()
+    country_iso_code = serializers.CharField(source='country.iso_code')
+    is_main = serializers.BooleanField()
