@@ -183,9 +183,9 @@
                         <div class="panel-body">
                             <label title="{% trans "The title is made up of the common part and / or any supplement" %}">{% trans "Title" %}</label><br>
                             <label class="text-muted">{% trans 'Common part' %}</label><br>
-                            <span class="text-muted">{{ learning_unit.titles.common_fr|default_if_none:'-'}}</span><br>
+                            <span class="text-muted">{{ learning_unit.titles.common_fr|default_if_none:'-'|default:'-'}}</span><br>
                             <label>{% trans 'Class specific complement' %}</label><br>
-                            {{ effective_class.titles.fr|default_if_none:'-' }}
+                            {{ effective_class.titles.fr|default_if_none:'-'|default:'-' }}
                         </div>
                     </div>
                     <br/>
@@ -209,7 +209,7 @@
                             </label>
                             <br>
                             <span id="id_quadrimester">
-                                {{ effective_class.derogation_quadrimester.value |default:'-'}}
+                                {{ learning_unit.derogation_quadrimester.value |default:'-'}}
                             </span>
                         </div>
                         <div class="col-md-6">
@@ -218,7 +218,7 @@
                             </label>
                             <br>
                             <span id="id_session_derogation">
-                                {{ effective_class.session_derogation.value |default:'-'}}
+                                {{ effective_class.session_derogation.value |default:'-' }}
                             </span>
                         </div>
                     </div>

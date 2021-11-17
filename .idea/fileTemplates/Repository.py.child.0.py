@@ -1,6 +1,8 @@
 #set( $aggregate = ${StringUtils.removeAndHump($NAME)} )
 from typing import Optional, List
 
+from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
+
 
 class ${aggregate}InMemoryRepository(InMemoryGenericRepository, I${aggregate}Repository):
     entities = list()  # type: List[${aggregate}]

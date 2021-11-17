@@ -24,8 +24,12 @@
 #
 ##############################################################################
 from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
+from ddd.logic.learning_unit.commands import GetEffectiveClassCommand
+from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
+from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
 
 
+# FIXME :: à tester unitairement + renvoyer EffectiveClassFromRepositoryDTO au lieu de l'objet du domaine
 def get_effective_class(
         cmd: 'GetEffectiveClassCommand',
         effective_class_repository: 'IEffectiveClassRepository'

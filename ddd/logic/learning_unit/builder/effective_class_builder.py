@@ -66,11 +66,7 @@ class EffectiveClassBuilder(interface.RootEntityBuilder):
 
     @classmethod
     def build_from_repository_dto(cls, dto_object: 'EffectiveClassFromRepositoryDTO') -> 'EffectiveClass':
-        class_identity = EffectiveClassIdentityBuilder.build_from_code_and_learning_unit_identity_data(
-            class_code=dto_object.class_code,
-            learning_unit_code=dto_object.learning_unit_code,
-            learning_unit_year=dto_object.learning_unit_year
-        )
+        class_identity = EffectiveClassIdentityBuilder.build_from_repository_dto(dto_object)
         dto_quadrimester = dto_object.derogation_quadrimester
         dto_session = dto_object.session_derogation
         return _get_effective_class_type_with_dto(dto_object)(

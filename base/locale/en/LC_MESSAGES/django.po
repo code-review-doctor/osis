@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-31 11:42+0200\n"
+"POT-Creation-Date: 2021-10-11 17:19+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -150,9 +150,6 @@ msgid "Absence justified"
 msgstr ""
 
 msgid "Absence unjustified"
-msgstr ""
-
-msgid "Absent"
 msgstr ""
 
 msgid "Ac yr."
@@ -621,6 +618,9 @@ msgstr ""
 msgid "Consolidate the proposal"
 msgstr ""
 
+msgid "Contact"
+msgstr ""
+
 msgid "Continuing Education"
 msgstr ""
 
@@ -699,6 +699,7 @@ msgstr ""
 msgid "Delete"
 msgstr ""
 
+msgctxt "learning_unit_achievement_delete"
 msgid "Delete achievement"
 msgstr ""
 
@@ -804,11 +805,6 @@ msgstr ""
 msgid "Down"
 msgstr ""
 
-msgid ""
-"Due to a pending change in OSIS, student counters for 1BA, 11BA and learning units containing classes could be "
-"distorted(abnormally high). For accurate statistics, please consult the EPC statistics."
-msgstr ""
-
 msgid "Duration"
 msgstr ""
 
@@ -906,7 +902,13 @@ msgstr ""
 msgid "Enrolled"
 msgstr ""
 
+msgid "Enrolled to"
+msgstr ""
+
 msgid "Enrolled to learning unit"
+msgstr ""
+
+msgid "Enrolled to training"
 msgstr ""
 
 msgid "Enrollment campus"
@@ -1629,6 +1631,9 @@ msgstr ""
 msgid "Minor list choice"
 msgstr ""
 
+msgid "Missing score"
+msgstr ""
+
 msgid "Missing search address"
 msgstr ""
 
@@ -1732,6 +1737,9 @@ msgid "No proposals was selected."
 msgstr ""
 
 msgid "No result!"
+msgstr ""
+
+msgid "No weighting(same weight)"
 msgstr ""
 
 msgid "No. Session"
@@ -2196,6 +2204,9 @@ msgctxt "Submission email table header"
 msgid "Registration number"
 msgstr ""
 
+msgid "Relative credits"
+msgstr ""
+
 msgid "Remarks, comments and constraints"
 msgstr ""
 
@@ -2398,6 +2409,9 @@ msgstr ""
 msgid "Student's dissertations management"
 msgstr ""
 
+msgid "Student.s enrolled in block 1"
+msgstr ""
+
 msgid "Students"
 msgstr ""
 
@@ -2527,6 +2541,12 @@ msgid ""
 "The derogation session field must be completed ONLY if you want to encode an "
 "exception in relation to the sessions calculated according to the "
 "quadrimesters."
+msgstr ""
+
+#, python-format
+msgid ""
+"The effective class %(acronym)s has %(count)d enrollments for the year "
+"%(year)s"
 msgstr ""
 
 #, python-format
@@ -2802,9 +2822,6 @@ msgstr ""
 msgid "Total"
 msgstr ""
 
-msgid "Total enrollments to training"
-msgstr ""
-
 msgid "Training"
 msgstr ""
 
@@ -2991,6 +3008,9 @@ msgid "Week"
 msgstr ""
 
 msgid "Weighting"
+msgstr ""
+
+msgid "Weighting type"
 msgstr ""
 
 msgctxt "section title"
@@ -3248,9 +3268,6 @@ msgid "role (english)"
 msgstr ""
 
 msgid "role (french)"
-msgstr ""
-
-msgid "score(s) saved"
 msgstr ""
 
 msgid "search"

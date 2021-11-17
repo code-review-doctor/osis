@@ -36,7 +36,6 @@ from openpyxl.utils import get_column_letter
 
 from attribution.business import attribution_charge_new
 from attribution.business.attribution_class import create_attributions_dictionary
-from attribution.models.attribution import search as search_attributions
 from attribution.models.enums.function import Functions
 from base.business.xls import get_name_or_username, _get_all_columns_reference
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
@@ -45,6 +44,8 @@ from base.models.group_element_year import GroupElementYear
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS, LearningUnitYear
 from base.models.person import Person
+from ddd.logic.encodage_des_notes.soumission.commands import GetResponsableDeNotesCommand
+from infrastructure.messages_bus import message_bus_instance
 from learning_unit.models.learning_class_year import LearningClassYear
 from osis_common.document import xls_build
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, version_label
@@ -84,7 +85,7 @@ PROPOSAL_LINE_STYLES = {
 WRAP_TEXT_ALIGNMENT = Alignment(wrapText=True, vertical="top")
 WITH_ATTRIBUTIONS = 'with_attributions'
 WITH_GRP = 'with_grp'
-NB_COLUMNS_WHICH_COULD_BE_WHITENED = 29
+NB_COLUMNS_WHICH_COULD_BE_WHITENED = 31
 
 
 def learning_unit_titles_part1() -> List[str]:
@@ -361,6 +362,9 @@ def get_data_part2(learning_unit_yr: LearningUnitYear, effective_class: Learning
     lu_data_part2.append(yesno(learning_unit_yr.exchange_students).strip())
     lu_data_part2.append(yesno(learning_unit_yr.individual_loan).strip())
     lu_data_part2.append(yesno(learning_unit_yr.stage_dimona).strip())
+    lu_data_part2.append(learning_unit_yr.other_remark or "", )
+    lu_data_part2.append(learning_unit_yr.other_remark_english or "", )
+    #  If you add columns you have to update NB_COLUMNS_WHICH_COULD_BE_WHITENED
     return lu_data_part2
 
 
@@ -426,6 +430,8 @@ def learning_unit_titles_part2() -> List[str]:
         str(_('Exchange students')),
         str(_('Individual loan')),
         str(_('Stage-Dimona')),
+        str(_('Other remark (intended for publication)')),
+        str(_('Other remark in english (intended for publication)')),
     ]
 
 
@@ -688,11 +694,12 @@ def _get_teachers(learning_unit_yr: LearningUnitYear) -> List[Person]:
 
 
 def _get_score_responsibles(learning_unit_yr: LearningUnitYear) -> List[Person]:
-    attributions = search_attributions(score_responsible=True, learning_unit_year=learning_unit_yr)
-    score_responsibles = set()
-    for attribution in attributions:
-        score_responsibles.add(attribution.tutor.person)
-    return score_responsibles
+    resp_note = message_bus_instance.invoke(
+        GetResponsableDeNotesCommand(learning_unit_yr.acronym, learning_unit_yr.academic_year.year)
+    )
+    if resp_note:
+        return Person.objects.filter(global_id=resp_note.matricule)
+    return []
 
 
 def _get_effective_class_teachers(effective_class: LearningClassYear) -> List[Person]:
@@ -754,7 +761,4 @@ def _get_attribution_volume(volume, is_attribution_class):
 
 
 def _get_class_score_responsibles(effective_class: LearningClassYear) -> List[Person]:
-    score_responsibles = set()
-    for a in effective_class.attributionclass_set.all():
-        score_responsibles.update([a.attribution_charge.attribution.tutor.person for _ in a.scoreresponsible_set.all()])
-    return list(score_responsibles)
+    return [responsible.tutor.person for responsible in effective_class.scoreresponsible_set.all()]

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -43,6 +43,7 @@ class CountryListSerializerTestCase(TestCase):
             'uuid',
             'iso_code',
             'name',
+            'name_en',
             'nationality'
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)

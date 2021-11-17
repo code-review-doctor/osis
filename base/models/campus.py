@@ -23,26 +23,31 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import uuid as uuid
+
+from django.contrib.admin import ModelAdmin
 from django.db import models
+from django.db.models import Model
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from base.models.enums import organization_type
 from base.models.enums.organization_type import MAIN
 from base.models.organization import Organization
-from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
-
 
 LOUVAIN_LA_NEUVE_CAMPUS_NAME = "Louvain-la-Neuve"
 
 
-class CampusAdmin(SerializableModelAdmin):
+class CampusAdmin(ModelAdmin):
     list_display = ('name', 'organization', 'is_administration', 'changed')
     list_filter = ('organization', 'is_administration')
     search_fields = ['name', 'organization__name']
 
 
-class Campus(SerializableModel):
+class Campus(Model):
+
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, db_index=True)
+
     name = models.CharField(max_length=100)
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)

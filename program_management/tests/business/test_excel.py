@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -43,6 +43,7 @@ class TestGeneratePrerequisitesWorkbook(SimpleTestCase):
         self.year = 2019
         self.tree_droi2m = ProgramTreeDROI2MFactory(root_node__year=self.year)
         self.common_core = self.tree_droi2m.get_node_by_code_and_year("LDROI220T", self.year)
+        self.base = self.tree_droi2m.get_node_by_code_and_year("LDROP100T", self.year)
 
     def test_header_lines_offer(self):
         expected_first_line = HeaderLine(egy_acronym=self.tree_droi2m.root_node.title,
@@ -88,10 +89,15 @@ class TestGeneratePrerequisitesWorkbook(SimpleTestCase):
         content = _build_excel_lines(tree)
         learning_unit_year_line = content[2]
         prerequisite_item_line = content[3]
-
+        link_with_node_has_prerequisite = tree.get_link(self.base, node_has_prerequisite)
         expected_learning_unit_year_line = LearningUnitYearLine(
             luy_acronym=node_has_prerequisite.code,
-            luy_title=node_has_prerequisite.full_title_en
+            luy_title=node_has_prerequisite.full_title_en,
+            empty_col1='',
+            empty_col2='',
+            credits=link_with_node_has_prerequisite.relative_credits_repr,
+            blocks=str(link_with_node_has_prerequisite.block) if link_with_node_has_prerequisite.block else '',
+            mandatory_status=_("Yes") if link_with_node_has_prerequisite.is_mandatory else _("No")
         )
         expected_prerequisite_item_line = PrerequisiteItemLine(
             text='{} :'.format(_('has as prerequisite')),
@@ -122,6 +128,18 @@ class TestGeneratePrerequisitesWorkbook(SimpleTestCase):
         )
 
         content = _build_excel_lines(tree)
+        learning_unit_year_line = content[2]
+        link_with_node_has_prerequisite = tree.get_link(self.base, node_has_prerequisite)
+        expected_learning_unit_year_line = LearningUnitYearLine(
+            luy_acronym=node_has_prerequisite.code,
+            luy_title=node_has_prerequisite.full_title_en,
+            empty_col1='',
+            empty_col2='',
+            credits=link_with_node_has_prerequisite.relative_credits_repr,
+            blocks=str(link_with_node_has_prerequisite.block) if link_with_node_has_prerequisite.block else '',
+            mandatory_status=_("Yes") if link_with_node_has_prerequisite.is_mandatory else _("No")
+        )
+        self.assertEqual(expected_learning_unit_year_line, learning_unit_year_line)
 
         prerequisite_item_line_1 = content[3]
         expected_prerequisite_item_line1 = PrerequisiteItemLine(

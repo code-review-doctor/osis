@@ -87,4 +87,16 @@ SESSION_CHECK_RULES = {
         'correct_values': CORRECT_VALUES_23,
         'available_values_str': AVAILABLE_VALUES_STR_23
     },
+    learning_unit_year_session.SESSION_123: {
+        'correct_values': [
+            None,
+            learning_unit_year_session.SESSION_1XX,
+            learning_unit_year_session.SESSION_X2X,
+            learning_unit_year_session.SESSION_XX3,
+            learning_unit_year_session.SESSION_X23,
+            learning_unit_year_session.SESSION_P23,
+            learning_unit_year_session.SESSION_123
+        ],
+        'available_values_str': "1, 2, 3, 23, P23 {} 123".format(_('or'))
+    }
 }

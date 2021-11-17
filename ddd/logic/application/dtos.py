@@ -190,3 +190,8 @@ class ApplicantAttributionChargeSummaryDTO(DTO):
     total_lecturing_volume_course = attr.ib(type=Decimal)
     total_practical_volume_course = attr.ib(type=Decimal)
     tutors = attr.ib(type=List[TutorAttributionDTO], default=[])
+
+
+@attr.s(frozen=True, slots=True)
+class LearningUnitAnnualVolumeFromServiceDTO(DTO):
+    volume = attr.ib(type=Decimal)

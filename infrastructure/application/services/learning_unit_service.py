@@ -25,22 +25,24 @@
 ##############################################################################
 import functools
 import operator
+from decimal import Decimal
 from typing import List
 
 from django.contrib.postgres.fields.jsonb import KeyTextTransform
 from django.db import models
-from django.db.models import Q, F, Subquery, OuterRef, Case, When, Value
+from django.db.models import Q, F, Subquery, OuterRef, Case, When, fields, Sum, Value
 from django.db.models.functions import Concat
 
 from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.attribution_new import AttributionNew
 from base.models.enums import learning_component_year_type, learning_unit_year_subtypes
 from base.models.enums.proposal_type import ProposalType
+from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from ddd.logic.application.domain.service.i_learning_unit_service import ILearningUnitService
 from ddd.logic.application.dtos import LearningUnitVolumeFromServiceDTO, LearningUnitTutorAttributionFromServiceDTO, \
-    LearningUnitModificationProposalFromServiceDTO
+    LearningUnitAnnualVolumeFromServiceDTO, LearningUnitModificationProposalFromServiceDTO
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 
 
@@ -91,27 +93,16 @@ class LearningUnitTranslator(ILearningUnitService):
             year=F('learning_container_year__academic_year__year'),
             first_name=F('tutor__person__first_name'),
             last_name=F('tutor__person__last_name'),
-            lecturing_volume_raw=Subquery(
+            lecturing_volume=Subquery(
                 subqs.filter(
                     learning_component_year__type=learning_component_year_type.LECTURING
                 ).values('allocation_charge')[:1],
                 output_field=models.DecimalField()
             ),
-            practical_volume_raw=Subquery(
+            practical_volume=Subquery(
                 subqs.filter(
                     learning_component_year__type=learning_component_year_type.PRACTICAL_EXERCISES
                 ).values('allocation_charge')[:1],
-                output_field=models.DecimalField()
-            )
-        ).annotate(
-            lecturing_volume=Case(
-                When(lecturing_volume_raw__isnull=True, then=Value(0)),
-                default=F('lecturing_volume_raw'),
-                output_field=models.DecimalField()
-            ),
-            practical_volume=Case(
-                When(practical_volume_raw__isnull=True, then=Value(0)),
-                default=F('practical_volume_raw'),
                 output_field=models.DecimalField()
             )
         ).values(
@@ -124,6 +115,22 @@ class LearningUnitTranslator(ILearningUnitService):
             'practical_volume',
         )
         return [LearningUnitTutorAttributionFromServiceDTO(**row_as_dict) for row_as_dict in qs]
+
+    def search_learning_unit_annual_volume_dto(
+            self,
+            entity_id: LearningUnitIdentity
+    ) -> LearningUnitAnnualVolumeFromServiceDTO:
+        qs = LearningComponentYear.objects.filter(
+            learning_unit_year__acronym=entity_id.code,
+            learning_unit_year__academic_year__year=entity_id.academic_year.year
+        ).annotate(
+            hourly_volume_total_annual_casted=Case(
+                When(hourly_volume_total_annual__isnull=True, then=Decimal(0.0)),
+                default=F('hourly_volume_total_annual'),
+                output_field=fields.DecimalField()
+            )
+        ).aggregate(Sum('hourly_volume_total_annual_casted'))['hourly_volume_total_annual_casted__sum']
+        return LearningUnitAnnualVolumeFromServiceDTO(volume=qs)
 
     # TODO: Refactor use learning unit application service instead
     def search_learning_unit_modification_proposal_dto(

@@ -55,7 +55,7 @@ class TestGetEffectiveClassWarningsService(TestCase):
                 volume_second_quadrimester=self.learning_unit.lecturing_part.volumes.volume_second_quadrimester,
             ),
             derogation_quadrimester=self.learning_unit.derogation_quadrimester,
-            session_derogation=self.learning_unit.derogation_session.value
+            session_derogation=self.learning_unit.derogation_session
         )
         self.cmd = GetEffectiveClassWarningsCommand(
             class_code=self.effective_class.class_code,

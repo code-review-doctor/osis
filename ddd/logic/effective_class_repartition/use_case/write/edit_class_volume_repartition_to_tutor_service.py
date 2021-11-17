@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from ddd.logic.application.domain.service.i_learning_unit_service import ILearningUnitService
 from ddd.logic.effective_class_repartition.builder.tutor_builder import TutorBuilder
 from ddd.logic.effective_class_repartition.builder.tutor_identity_builder import TutorIdentityBuilder
 from ddd.logic.effective_class_repartition.commands import EditClassVolumeRepartitionToTutorCommand
@@ -38,6 +39,7 @@ def edit_class_volume_repartition_to_tutor(
         cmd: EditClassVolumeRepartitionToTutorCommand,
         repository: 'ITutorRepository',
         effective_class_repository: 'IEffectiveClassRepository',
+        learning_unit_service: ILearningUnitService,
 ) -> 'TutorIdentity':
     # GIVEN
     tutor_identity = TutorIdentityBuilder.build_from_personal_id_number(cmd.tutor_personal_id_number)
@@ -48,6 +50,7 @@ def edit_class_volume_repartition_to_tutor(
     DistributedVolumeWithClassVolume().verify(
         distributed_volume=cmd.distributed_volume,
         effective_class=effective_class,
+        learning_unit_service=learning_unit_service
     )
     tutor.edit_distributed_volume(
         class_code=effective_class.class_code,

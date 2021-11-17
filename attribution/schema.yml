@@ -11,7 +11,7 @@ servers:
  - url: https://osis.uclouvain.be/api/v1/attribution/
    description: 'Production server'
 info:
-  version: '1.16'
+  version: '1.18'
   title: 'Attribution Service'
   description: |-
     A set of API endpoints that allow you to get information about attribution
@@ -310,9 +310,9 @@ paths:
             description: ''
             type: string
         - in: query
-          name: with_classes
+          name: with_effective_class_repartition
           schema:
-            description: 'Query parameter to add classes to attributions results'
+            description: 'Query parameter to add classes repartition to attributions results'
             type: boolean
       responses:
         '200':
@@ -354,7 +354,7 @@ paths:
             description: ''
             type: string
         - in: query
-          name: with_classes
+          name: with_effective_class_repartition
           schema:
             description: 'Query parameter to add classes to attributions results'
             type: boolean
@@ -469,10 +469,10 @@ components:
           example: "Candidature aux cours vacants"
         lecturing_volume:
           type: string
-          example: '10.0'
+          example: '10.00'
         practical_volume:
           type: string
-          example: '15.0'
+          example: '15.00'
         remark:
           type: string
         course_summary:
@@ -488,10 +488,10 @@ components:
       properties:
         lecturing_volume:
           type: string
-          example: '10.0'
+          example: '10.00'
         practical_volume:
           type: string
-          example: '15.0'
+          example: '15.00'
         remark:
           type: string
         course_summary:
@@ -523,8 +523,6 @@ components:
         title:
           type: string
           example: "Introduction au droit"
-        course_is_in_suppression_proposal:
-          type: boolean
         start_year:
           type: integer
           example: 2018
@@ -535,6 +533,8 @@ components:
           example: 2018
           description: 'End year of attribution'
           nullable: true
+        course_is_in_suppression_proposal:
+          type: boolean
         function:
           $ref: '#/components/schemas/AttributionFunctionEnum'
         function_text:
@@ -545,19 +545,24 @@ components:
           example: '10.0'
         practical_volume:
           type: string
-          example: '10.0'
+          example: '10.00'
+          nullable: true
         lecturing_volume_available:
           type: string
-          example: '15.0'
+          example: '15.00'
+          nullable: true
         practical_volume_available:
           type: string
-          example: '10.5'
+          example: '10.50'
+          nullable: true
         total_lecturing_volume_course:
           type: string
-          example: '30.0'
+          example: '30.00'
+          nullable: true
         total_practical_volume_course:
           type: string
-          example: '30.0'
+          example: '30.00'
+          nullable: true
         tutors:
           type: array
           items:
@@ -590,15 +595,19 @@ components:
         lecturing_volume_total:
           type: string
           example: '20.0'
+          nullable: true
         practical_volume_total:
           type: string
           example: '50.0'
+          nullable: true
         lecturing_volume_available:
           type: string
           example: '10.0'
+          nullable: true
         practical_volume_available:
           type: string
           example: '40.0'
+          nullable: true
         title:
           type: string
           example: "Introduction au droit"
@@ -641,9 +650,11 @@ components:
         lecturing_volume:
           type: string
           example: '10.0'
+          nullable: true
         practical_volume:
           type: string
           example: '15.0'
+          nullable: true
         function:
           $ref: '#/components/schemas/AttributionFunctionEnum'
         function_text:
@@ -753,7 +764,11 @@ components:
         total_learning_unit_charge:
           type: string
           description: 'Total charge for learning unit year'
-          example: '55.5'
+          example: '55.50'
+          nullable: true
+        percentage_allocation_charge:
+          type: string
+          example: '50.5'
           nullable: true
         start_year:
           type: integer
@@ -767,14 +782,39 @@ components:
           example: 'Coordinateur'
         lecturing_charge:
           type: string
-          example: '15.0'
+          example: '15.00'
           nullable: true
         practical_charge:
           type: string
-          example: '10.5'
+          example: '10.50'
           nullable: true
         links:
           $ref: '#/components/schemas/AttributionLinks'
+        has_peps:
+          type: boolean
+        is_partim:
+          type: boolean
+        effective_class_repartition:
+          type: array
+          items:
+            $ref: '#/components/schemas/EffectiveClassRepartition'
+    EffectiveClassRepartition:
+      type: object
+      properties:
+        code:
+          type: string
+          example: 'LDROI1001A'
+        title_fr:
+          type: string
+          example: 'Introduction au droit - Partie I'
+        title_en:
+          type: string
+          example: 'Introduction to Law - Part I'
+          nullable: true
+        links:
+          $ref: '#/components/schemas/AttributionLinks'
+        has_peps:
+          type: boolean
     TutorAttribution:
       type: object
       properties:
@@ -791,11 +831,11 @@ components:
           example: 'Coordinateur'
         lecturing_volume:
           type: string
-          example: '15.0'
+          example: '15.00'
           nullable: true
         practical_volume:
           type: string
-          example: '10.5'
+          example: '10.50'
           nullable: true
     AttributionFunctionEnum:
       type: string
@@ -817,6 +857,12 @@ components:
         catalog:
           type: string
           nullable: true
+        schedule:
+          type: string
+          nullable: true
+    AttributionClassLinks:
+      type: object
+      properties:
         schedule:
           type: string
           nullable: true

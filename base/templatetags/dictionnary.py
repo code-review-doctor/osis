@@ -43,3 +43,8 @@ def remove_first(dictionary: dict):
     key, value = get_first_item(dictionary)
     del dictionary[key]
     return dictionary
+
+
+@register.filter
+def get_item_or_zero(dictionary, key):
+    return dictionary.get(key, 0) if dictionary else 0

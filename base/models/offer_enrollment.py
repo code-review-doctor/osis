@@ -30,7 +30,7 @@ from osis_common.models.serializable_model import SerializableModel, Serializabl
 
 
 class OfferEnrollmentAdmin(SerializableModelAdmin):
-    list_display = ('education_group_year', 'student', 'date_enrollment', 'enrollment_state', 'changed')
+    list_display = ('education_group_year', 'cohort_year', 'student', 'date_enrollment', 'enrollment_state', 'changed')
     list_filter = ('education_group_year__academic_year', 'enrollment_state')
     search_fields = ['education_group_year__acronym', 'student__person__first_name',
                      'student__person__last_name', 'student__registration_id', 'enrollment_state']
@@ -43,6 +43,7 @@ class OfferEnrollment(SerializableModel):
     student = models.ForeignKey('Student', on_delete=models.PROTECT)
     enrollment_state = models.CharField(max_length=15, choices=offer_enrollment_state.STATES, blank=True, null=True)
     education_group_year = models.ForeignKey('EducationGroupYear', on_delete=models.PROTECT)
+    cohort_year = models.ForeignKey('education_group.CohortYear', on_delete=models.PROTECT, blank=True, null=True)
 
     def __str__(self):
         return u"%s - %s" % (self.student, self.education_group_year)
@@ -57,5 +58,6 @@ class OfferEnrollment(SerializableModel):
 def count_enrollments(acronym: str, year: int) -> int:
     return OfferEnrollment.objects.filter(
         education_group_year__acronym=acronym,
-        education_group_year__academic_year__year=year
+        education_group_year__academic_year__year=year,
+        cohort_year__isnull=True,
     ).count()
