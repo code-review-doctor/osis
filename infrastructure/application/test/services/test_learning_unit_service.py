@@ -147,7 +147,7 @@ class LearningUnitTranslatorSearchTutorAttribution(TestCase):
                 first_name=self.tutor.person.first_name,
                 last_name=self.tutor.person.last_name,
                 function=Functions.CO_HOLDER.name,
-                lecturing_volume=Decimal(0),
+                lecturing_volume=None,
                 practical_volume=Decimal(10),
             )
         )
