@@ -152,7 +152,12 @@ class ScoreSheetXLSImportSerializer(serializers.Serializer):
             if row[0].value == HEADER[0]:
                 headers_line_found = True
                 for header_count, header in enumerate(HEADER):
-                    if row[header_count].value != header:
+                    try:
+                        if row[header_count].value != header:
+                            raise ScoreSheetXLSImportSerializerError(
+                                _("File error : The file is not consistent. No scores injected."),
+                            )
+                    except Exception as e:
                         raise ScoreSheetXLSImportSerializerError(
                             _("File error : The file is not consistent. No scores injected."),
                         )
