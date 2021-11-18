@@ -490,6 +490,7 @@ components:
           type: string
           format: date
           example: '2020-07-15'
+          nullable: true
     Language:
       type: object
       properties:
