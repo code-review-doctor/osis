@@ -763,12 +763,3 @@ msgstr "étudiants"
 
 msgid "the"
 msgstr "le"
-
-#~ msgid "Justification (A,T)"
-#~ msgstr "Justification (A,T)"
-
-#~ msgid "Numbered scores"
-#~ msgstr "Notes chiffrées"
-
-#~ msgid "Select an excel file to inject scores."
-#~ msgstr "Veuillez sélectionner le fichier Excel pour injection"
