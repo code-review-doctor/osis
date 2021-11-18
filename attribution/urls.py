@@ -34,7 +34,7 @@ from attribution.views.learning_unit.update import UpdateAttributionView
 
 urlpatterns = [
     url(r'^manage_my_courses/', include([
-        url(r'^$', manage_my_courses.list_my_attributions_summary_editable,
+        url(r'^$', manage_my_courses.MyAttributionsSummaryEditable.as_view(),
             name='list_my_attributions_summary_editable'),
         url(r'^(?P<learning_unit_year_id>[0-9]+)/', include([
             url(r'^educational_information/$', manage_my_courses.view_educational_information,
