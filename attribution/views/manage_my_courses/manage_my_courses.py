@@ -24,109 +24,24 @@
 #
 ##############################################################################
 import itertools
-from datetime import datetime
 from typing import Iterable
 
-from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, render
-from django.utils.translation import gettext as _
+from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_http_methods
 
-from base.models.academic_year import AcademicYear
 from base.models.learning_unit_year import LearningUnitYear
-from base.auth.roles.tutor import Tutor
 from base.views import teaching_material
 from base.views.learning_unit import get_specifications_context, get_achievements_group_by_language, \
     get_languages_settings
 from base.views.learning_units.pedagogy.read import read_learning_unit_pedagogy
 from base.views.learning_units.pedagogy.update import edit_learning_unit_pedagogy, \
     post_method_edit_force_majeure_pedagogy
-from education_group.templatetags.academic_year_display import display_as_academic_year
 from learning_unit.calendar.learning_unit_force_majeur_summary_edition import \
     LearningUnitForceMajeurSummaryEditionCalendar
 from learning_unit.calendar.learning_unit_summary_edition_calendar import LearningUnitSummaryEditionCalendar
 from learning_unit.views.utils import learning_unit_year_getter
 from osis_role.contrib.views import permission_required
-
-
-@login_required
-def list_my_attributions_summary_editable(request):
-    tutor = get_object_or_404(Tutor, person__user=request.user)
-
-    summary_edition_calendar = LearningUnitSummaryEditionCalendar()
-    summary_edition_academic_events_opened = summary_edition_calendar.get_opened_academic_events()
-    force_majeur_summary_edition_calendar = LearningUnitForceMajeurSummaryEditionCalendar()
-    force_majeure_academic_events_opened = force_majeur_summary_edition_calendar.get_opened_academic_events()
-
-    if summary_edition_academic_events_opened or force_majeure_academic_events_opened:
-        event_based = min(
-            summary_edition_academic_events_opened + force_majeure_academic_events_opened,
-            key=lambda event: event.authorized_target_year
-        )
-        year_displayed = event_based.authorized_target_year
-    else:
-        year_displayed = datetime.today().year
-
-    main_summary_edition_academic_event = next(
-        (event for event in summary_edition_academic_events_opened if event.authorized_target_year == year_displayed),
-        None
-    )
-    if not main_summary_edition_academic_event:
-        main_summary_edition_academic_event = summary_edition_calendar.get_academic_event(year_displayed)
-        if not main_summary_edition_academic_event.is_open_now():
-            messages.add_message(
-                request,
-                messages.INFO,
-                _('For the academic year %(data_year)s, the summary edition period ended on %(end_date)s.') % {
-                    "data_year": display_as_academic_year(main_summary_edition_academic_event.authorized_target_year),
-                    "end_date": main_summary_edition_academic_event.end_date.strftime('%d/%m/%Y'),
-                }
-            )
-        next_summary_edition_academic_event = summary_edition_calendar.get_academic_event(year_displayed+1)
-        if next_summary_edition_academic_event and not next_summary_edition_academic_event.is_open_now():
-            messages.add_message(
-                request,
-                messages.INFO,
-                _('For the academic year %(data_year)s, the summary edition period will open on %(start_date)s.') % {
-                    "data_year": display_as_academic_year(next_summary_edition_academic_event.authorized_target_year),
-                    "start_date": next_summary_edition_academic_event.start_date.strftime('%d/%m/%Y'),
-                }
-            )
-
-    force_majeure_academic_event = next(
-        (event for event in force_majeure_academic_events_opened if event.authorized_target_year == year_displayed),
-        None
-    )
-    if force_majeure_academic_event:
-        messages.add_message(
-            request,
-            messages.WARNING,
-            _('Force majeure case : Some fields of the description fiche can be edited from %(start_date)s '
-              'to %(end_date)s.') % {
-                "start_date": force_majeure_academic_event.start_date.strftime('%d/%m/%Y'),
-                "end_date": force_majeure_academic_event.end_date.strftime('%d/%m/%Y'),
-            }
-        )
-    else:
-        force_majeure_academic_event = force_majeur_summary_edition_calendar.get_academic_event(
-            target_year=main_summary_edition_academic_event.authorized_target_year
-        )
-
-    academic_year = AcademicYear.objects.get(year=year_displayed)
-    learning_unit_years_qs = LearningUnitYear.objects_with_container.filter(
-        academic_year=academic_year,
-        learningcomponentyear__attributionchargenew__attribution__tutor=tutor
-    ).select_related(
-        'academic_year', 'learning_container_year__requirement_entity'
-    ).distinct().order_by('academic_year__year', 'acronym')
-
-    context = {
-        'learning_unit_years': learning_unit_years_qs,
-        'summary_edition_academic_event': main_summary_edition_academic_event,
-        'force_majeure_academic_event': force_majeure_academic_event,
-    }
-    return render(request, 'manage_my_courses/list_my_courses_summary_editable.html', context)
 
 
 @login_required

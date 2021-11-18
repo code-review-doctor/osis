@@ -25,16 +25,18 @@
 ##############################################################################
 from django.conf.urls import url, include
 
-from attribution.views import manage_my_courses, attribution
+from attribution.views import attribution
 from attribution.views.charge_repartition.create import SelectAttributionView, AddChargeRepartition
 from attribution.views.charge_repartition.update import EditChargeRepartition
 from attribution.views.learning_unit.create import CreateAttribution
 from attribution.views.learning_unit.delete import DeleteAttribution
 from attribution.views.learning_unit.update import UpdateAttributionView
+from attribution.views.manage_my_courses import manage_my_courses
+from attribution.views.manage_my_courses.my_attributions_summary_editable import MyAttributionsSummaryEditable
 
 urlpatterns = [
     url(r'^manage_my_courses/', include([
-        url(r'^$', manage_my_courses.list_my_attributions_summary_editable,
+        url(r'^$', MyAttributionsSummaryEditable.as_view(),
             name='list_my_attributions_summary_editable'),
         url(r'^(?P<learning_unit_year_id>[0-9]+)/', include([
             url(r'^educational_information/$', manage_my_courses.view_educational_information,
