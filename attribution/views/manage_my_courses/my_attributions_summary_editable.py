@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from datetime import datetime
+from typing import List
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -33,6 +34,7 @@ from django.utils.translation import gettext as _
 from django.views.generic import TemplateView
 
 from base.auth.roles.tutor import Tutor
+from base.business.academic_calendar import AcademicEvent
 from base.models.learning_unit_year import LearningUnitYear
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from learning_unit.calendar.learning_unit_force_majeur_summary_edition import \
@@ -44,11 +46,11 @@ class MyAttributionsSummaryEditable(LoginRequiredMixin, TemplateView):
     template_name = 'manage_my_courses/list_my_courses_summary_editable.html'
 
     @cached_property
-    def tutor(self):
+    def tutor(self) -> Tutor:
         return get_object_or_404(Tutor, person__user=self.request.user)
 
     @cached_property
-    def learning_unit_years(self):
+    def learning_unit_years(self) -> List[LearningUnitYear]:
         return LearningUnitYear.objects_with_container.filter(
             academic_year__year=self.year,
             learningcomponentyear__attributionchargenew__attribution__tutor=self.tutor
@@ -61,23 +63,23 @@ class MyAttributionsSummaryEditable(LoginRequiredMixin, TemplateView):
         )
 
     @cached_property
-    def summary_edition_calendar(self):
+    def summary_edition_calendar(self) -> LearningUnitSummaryEditionCalendar:
         return LearningUnitSummaryEditionCalendar()
 
     @cached_property
-    def force_majeur_summary_edition_calendar(self):
+    def force_majeur_summary_edition_calendar(self) -> LearningUnitForceMajeurSummaryEditionCalendar:
         return LearningUnitForceMajeurSummaryEditionCalendar()
 
     @cached_property
-    def summary_edition_academic_events_opened(self):
+    def summary_edition_academic_events_opened(self) -> List[AcademicEvent]:
         return self.summary_edition_calendar.get_opened_academic_events()
 
     @cached_property
-    def force_majeure_academic_events_opened(self):
+    def force_majeure_academic_events_opened(self) -> List[AcademicEvent]:
         return self.force_majeur_summary_edition_calendar.get_opened_academic_events()
 
     @cached_property
-    def year(self):
+    def year(self) -> int:
         if self.summary_edition_academic_events_opened or self.force_majeure_academic_events_opened:
             event_based = min(
                 self.summary_edition_academic_events_opened + self.force_majeure_academic_events_opened,
@@ -87,7 +89,7 @@ class MyAttributionsSummaryEditable(LoginRequiredMixin, TemplateView):
         return datetime.today().year
 
     @cached_property
-    def main_summary_edition_academic_event(self):
+    def main_summary_edition_academic_event(self) -> AcademicEvent:
         main_summary_edition_academic_event = next(
             (event for event in self.summary_edition_academic_events_opened if
              event.authorized_target_year == self.year),
@@ -122,7 +124,7 @@ class MyAttributionsSummaryEditable(LoginRequiredMixin, TemplateView):
         return main_summary_edition_academic_event
 
     @cached_property
-    def force_majeure_academic_event(self):
+    def force_majeure_academic_event(self) -> AcademicEvent:
         force_majeure_academic_event = next(
             (event for event in self.force_majeure_academic_events_opened if event.authorized_target_year == self.year),
             None
