@@ -32,6 +32,7 @@ from attribution.views.learning_unit.create import CreateAttribution
 from attribution.views.learning_unit.delete import DeleteAttribution
 from attribution.views.learning_unit.update import UpdateAttributionView
 from attribution.views.manage_my_courses import manage_my_courses
+from attribution.views.manage_my_courses.educational_information import EducationalInformation
 from attribution.views.manage_my_courses.my_attributions_summary_editable import MyAttributionsSummaryEditable
 
 urlpatterns = [
@@ -39,7 +40,7 @@ urlpatterns = [
         url(r'^$', MyAttributionsSummaryEditable.as_view(),
             name='list_my_attributions_summary_editable'),
         url(r'^(?P<learning_unit_year_id>[0-9]+)/', include([
-            url(r'^educational_information/$', manage_my_courses.view_educational_information,
+            url(r'^educational_information/$', EducationalInformation.as_view(),
                 name='view_educational_information'),
             url(r'^edit_educational_information/$',
                 manage_my_courses.edit_educational_information,

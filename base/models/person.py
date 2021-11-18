@@ -33,13 +33,13 @@ from django.db.models import Value
 from django.db.models.functions import Concat, Lower
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _, pgettext_lazy
+from osis_document.contrib import FileField
 
 from base.models.enums import person_source_type
 from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP, SIC_GROUP, \
     UE_FACULTY_MANAGER_GROUP, ADMINISTRATIVE_MANAGER_GROUP, PROGRAM_MANAGER_GROUP, UE_CENTRAL_MANAGER_GROUP
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin, SerializableModelManager
 from osis_common.utils.models import get_object_or_none
-from osis_document.contrib import FileField
 
 FILE_MAX_SIZE = None  # TODO : ??
 
@@ -248,7 +248,7 @@ def find_by_user(user: User):
         return None
 
 
-def get_user_interface_language(user):
+def get_user_interface_language(user: User) -> str:
     user_language = settings.LANGUAGE_CODE
     person = find_by_user(user)
 
