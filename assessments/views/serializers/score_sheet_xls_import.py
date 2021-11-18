@@ -75,7 +75,7 @@ class ScoreSheetXLSImportSerializer(serializers.Serializer):
     notes_etudiants = serializers.SerializerMethodField()
 
     def get_numero_session(self, worksheet: Worksheet) -> int:
-        self._check_headers_consitency(worksheet)
+        self._check_headers_consistency(worksheet)
 
         col_session = HEADER.index(_('Session'))
         session_found = set()
@@ -145,7 +145,8 @@ class ScoreSheetXLSImportSerializer(serializers.Serializer):
         json_str = json.dumps(representation)
         return json.loads(json_str)
 
-    def _check_headers_consitency(self, worksheet):
+    @staticmethod
+    def _check_headers_consistency(worksheet):
         headers_line_found = False
         for count, row in enumerate(worksheet.rows):
             if row[0].value == HEADER[0]:

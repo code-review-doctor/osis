@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-09 11:03+0100\n"
+"POT-Creation-Date: 2021-11-18 07:14+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -254,6 +254,8 @@ msgstr "Entité"
 msgid "Evaluations"
 msgstr "Evaluations"
 
+#, fuzzy, python-format
+#| msgid "Extra time (33% generally)"
 msgid "Extra time (33% generally)"
 msgstr "Tiers-Temps"
 
@@ -270,6 +272,10 @@ msgid "File error : No value in the column Session. No scores injected."
 msgstr ""
 "Erreur dans le fichier : Aucune valeur dans la colonne Session. Aucune note "
 "injectée."
+
+msgid "File error : The file is not consistent. No scores injected."
+msgstr ""
+"Fichier non conforme. Aucune note injectée."
 
 msgid "Firstname"
 msgstr "Prénom"
@@ -308,9 +314,6 @@ msgstr "Institution"
 
 msgid "January"
 msgstr "Janvier"
-
-msgid "Justification (A,T)"
-msgstr "Justification (A,T)"
 
 #, python-format
 msgid "Justification legend: %(justification_label_authorized)s"
@@ -387,9 +390,6 @@ msgstr "Aucun"
 
 msgid "Number of enrollments"
 msgstr "Nombre d'inscriptions"
-
-msgid "Numbered scores"
-msgstr "Notes chiffrées"
 
 msgid "Online"
 msgstr "En ligne"
@@ -545,9 +545,6 @@ msgstr "Recherche des programmes annualisés"
 
 msgid "Select an encoding type"
 msgstr "Sélectionnez un type d'encodage"
-
-msgid "Select an excel file to inject scores."
-msgstr "Veuillez sélectionner le fichier Excel pour injection"
 
 msgid "Select/deselect all"
 msgstr "Sélectionner/Dé-sélectionner tout"
@@ -714,6 +711,7 @@ msgstr "Via excel"
 msgid "Via paper"
 msgstr "Via papier"
 
+#, python-format
 msgid "Warning: %(scores)s score(s) ready to be submitted."
 msgstr "Attention: %(scores)s note(s) prête(s) à être soumise(s)."
 
@@ -765,3 +763,12 @@ msgstr "étudiants"
 
 msgid "the"
 msgstr "le"
+
+#~ msgid "Justification (A,T)"
+#~ msgstr "Justification (A,T)"
+
+#~ msgid "Numbered scores"
+#~ msgstr "Notes chiffrées"
+
+#~ msgid "Select an excel file to inject scores."
+#~ msgstr "Veuillez sélectionner le fichier Excel pour injection"
