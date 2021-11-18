@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-09 11:03+0100\n"
+"POT-Creation-Date: 2021-11-18 08:06+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -225,6 +225,7 @@ msgstr ""
 msgid "Evaluations"
 msgstr ""
 
+#, python-format
 msgid "Extra time (33% generally)"
 msgstr ""
 
@@ -236,6 +237,9 @@ msgid ""
 msgstr ""
 
 msgid "File error : No value in the column Session. No scores injected."
+msgstr ""
+
+msgid "File error : The file is not consistent. No scores injected."
 msgstr ""
 
 msgid "Firstname"
@@ -271,9 +275,6 @@ msgid "Institution"
 msgstr ""
 
 msgid "January"
-msgstr ""
-
-msgid "Justification (A,T)"
 msgstr ""
 
 #, python-format
@@ -345,9 +346,6 @@ msgid "None"
 msgstr ""
 
 msgid "Number of enrollments"
-msgstr ""
-
-msgid "Numbered scores"
 msgstr ""
 
 msgid "Online"
