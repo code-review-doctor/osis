@@ -47,6 +47,6 @@ class LearningUnitProgressSerializer(serializers.Serializer):
 class ProgressOverviewSerializer(serializers.Serializer):
     academic_year = serializers.IntegerField(source='annee_academique')
     session_number = serializers.IntegerField(source='numero_session')
-    by_learning_unit = serializers.ListSerializer(
+    learning_units_progress = serializers.ListSerializer(
         source='progression_generale', child=LearningUnitProgressSerializer()
     )
