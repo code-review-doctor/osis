@@ -196,7 +196,7 @@ paths:
   /overview/:
       get:
         description: Return score encoding progress overview for a tutor
-        operationId: get_progress_overview
+        operationId: get_overview
         parameters:
           - $ref: '#/components/parameters/Accept-Language'
           - $ref: '#/components/parameters/X-User-FirstName'
@@ -335,7 +335,7 @@ components:
         session_number:
           type: integer
           example: 1
-        by_learning_unit:
+        learning_units_progress:
           type: array
           items:
             $ref: '#/components/schemas/LearningUnitProgress'
