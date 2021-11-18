@@ -34,7 +34,7 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
-from attribution.views.manage_my_courses import _fetch_achievements_by_language
+from attribution.views.manage_my_courses.manage_my_courses import _fetch_achievements_by_language
 from base.business.academic_calendar import AcademicEvent
 from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.tests.factories.academic_calendar import AcademicCalendarFactory, OpenAcademicCalendarFactory
