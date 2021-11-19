@@ -26,6 +26,7 @@
 from django.conf import settings
 
 from base.models import academic_year
+from base.models.learning_unit_year import LearningUnitYear
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.models.teaching_material import TeachingMaterial, find_by_learning_unit_year
 from cms.enums import entity_name
@@ -50,7 +51,7 @@ def delete_teaching_material(teach_material):
     return result
 
 
-def postpone_teaching_materials(luy, commit=True):
+def postpone_teaching_materials(luy: LearningUnitYear, commit: bool = True):
     """
         from base.models import teaching_material
         This function override all teaching materials from start_luy until latest version of this luy
@@ -93,7 +94,7 @@ def update_bibliography_changed_field_in_cms(learning_unit_year):
             )
 
 
-def is_pedagogy_data_must_be_postponed(learning_unit_year):
+def is_pedagogy_data_must_be_postponed(learning_unit_year: LearningUnitYear) -> bool:
     return learning_unit_year.academic_year.year >= academic_year.starting_academic_year().year \
            and not ProposalLearningUnit.objects.filter(
         learning_unit_year__learning_unit=learning_unit_year.learning_unit

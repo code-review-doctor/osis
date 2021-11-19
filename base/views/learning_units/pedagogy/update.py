@@ -31,6 +31,7 @@ from django.views.decorators.http import require_http_methods
 
 from base.business.learning_units.pedagogy import is_pedagogy_data_must_be_postponed
 from base.models import learning_unit_year
+from base.models.learning_unit_year import LearningUnitYear
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.views import learning_unit
 from base.views.common import display_success_messages
@@ -48,7 +49,7 @@ def toggle_summary_locked(request, learning_unit_year_id):
     return redirect(reverse("learning_unit_pedagogy", kwargs={'learning_unit_year_id': learning_unit_year_id}))
 
 
-def build_success_message(last_luy_reported, luy):
+def build_success_message(last_luy_reported: LearningUnitYear, luy: LearningUnitYear) -> str:
     default_message = _("The learning unit has been updated (without report).")
     proposal = ProposalLearningUnit.objects.filter(learning_unit_year__learning_unit=luy.learning_unit).first()
 

@@ -44,14 +44,14 @@ class CommonTeachingMaterial(LoginRequiredMixin, PermissionRequiredMixin):
     raise_exception = True
 
     @cached_property
-    def learning_unit_year(self):
+    def learning_unit_year(self) -> LearningUnitYear:
         return get_object_or_404(LearningUnitYear, pk=self.kwargs['learning_unit_year_id'])
 
-    def get_permission_object(self):
+    def get_permission_object(self) -> LearningUnitYear:
         return self.learning_unit_year
 
     @cached_property
-    def teaching_material(self):
+    def teaching_material(self) -> TeachingMaterial:
         return get_object_or_404(
             TeachingMaterial,
             pk=self.kwargs['teaching_material_id'],
