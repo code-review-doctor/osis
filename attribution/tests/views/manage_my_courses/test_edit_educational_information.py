@@ -174,7 +174,7 @@ class TestTutorEditForceMajeurEducationalInformation(TestCase):
         )
 
     @mock.patch('base.forms.learning_unit_pedagogy.LearningUnitPedagogyEditForm.save')
-    def test_assert_post_http_call_edit_learning_unit_pedagogy_method(self, mock_save):
+    def test_assert_post_save_form_without_postpone(self, mock_save):
         url = self.url + '?language={}&label={}'.format(
             self.ttl.language, self.text_label.label
         )
