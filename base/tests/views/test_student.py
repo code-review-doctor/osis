@@ -101,7 +101,7 @@ class TestStudentPicture(TestCase):
 
     @mock.patch('requests.get', side_effect=RequestException)
     def test_student_picture_unknown(self, mock_request_get):
-        from base.views.student import student_picture
+        from base.views.student.detail import student_picture
         from django.contrib.staticfiles.storage import staticfiles_storage
 
         request = RequestFactory().get(reverse(student_picture, args=[self.student_m.id]))
@@ -120,7 +120,7 @@ class TestStudentPicture(TestCase):
 
     @mock.patch('requests.get')
     def test_student_picture(self, mock_request_get):
-        from base.views.student import student_picture
+        from base.views.student.detail import student_picture
 
         mock_response = Mock()
         mock_response.json.return_value = {'photo_url': 'awesome/photo.png'}
@@ -140,7 +140,7 @@ class TestStudentPicture(TestCase):
         request = RequestFactory().get(reverse('student_picture', args=[non_existent_student_id]))
         request.user = self.program_manager.person.user
 
-        from base.views.student import student_picture
+        from base.views.student.detail import student_picture
         from django.http import Http404
 
         self.assertRaises(Http404, student_picture, request, non_existent_student_id)
