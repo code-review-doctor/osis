@@ -27,6 +27,7 @@ from unittest import mock
 import attr
 from django.test import SimpleTestCase
 
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from ddd.logic.encodage_des_notes.encodage.commands import RechercherNotesCommand
 from ddd.logic.encodage_des_notes.encodage.domain.model._note import NOTE_MANQUANTE
 from ddd.logic.encodage_des_notes.encodage.test.factory.note_etudiant import NoteManquanteEtudiantFactory, \
@@ -102,7 +103,7 @@ class TestRechercherNotes(SimpleTestCase):
     def test_should_raise_exception_when_nom_cohorte_n_est_pas_une_cohorte_du_gestionnaire(self):
         cmd = attr.evolve(self.cmd, nom_cohorte="ECGE1BA")
 
-        with self.assertRaises(PasGestionnaireParcoursCohorteException):
+        with self.assertRaises(MultipleBusinessExceptions):
             message_bus_instance.invoke(cmd)
 
     def test_should_return_notes_correspondantes_when_justification_est_precise(self):

@@ -188,7 +188,7 @@ class EncoderNoteTest(SimpleTestCase):
         )
         self.cohortes_gestionnaire_trans.search = lambda *args, **kwargs: {cohorte_gestionnaire}
 
-        with self.assertRaises(PasGestionnaireParcoursCohorteException):
+        with self.assertRaises(MultipleBusinessExceptions):
             self.message_bus.invoke(self.cmd)
 
     def test_should_empecher_si_date_de_remise_est_hier(self):
