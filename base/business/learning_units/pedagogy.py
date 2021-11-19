@@ -43,14 +43,6 @@ def save_teaching_material(teach_material):
     return teach_material
 
 
-def delete_teaching_material(teach_material):
-    luy = teach_material.learning_unit_year
-    result = teach_material.delete()
-    if is_pedagogy_data_must_be_postponed(luy):
-        postpone_teaching_materials(luy)
-    return result
-
-
 def postpone_teaching_materials(luy: LearningUnitYear, commit: bool = True):
     """
         from base.models import teaching_material
