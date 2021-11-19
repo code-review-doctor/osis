@@ -60,6 +60,7 @@ from base.views.learning_units.pedagogy.update import learning_unit_pedagogy_edi
     learning_unit_pedagogy_force_majeure_edit
 from base.views.learning_units.proposal import create, update
 from base.views.learning_units.update import update_learning_unit, learning_unit_edition_end_date
+from base.views.student import StudentSearch
 from education_group import urls as education_group_urls
 from learning_unit import urls as learning_unit_urls
 
@@ -299,9 +300,9 @@ urlpatterns = [
 
     url(r'^studies/$', common.studies, name='studies'),
     url(r'^students/', include([
-        url(r'^$', student.students, name='students'),
+        path('', StudentSearch.as_view(), name='students'),
         url(r'^(?P<student_id>[0-9]+)/', include([
-            url(r'^$', student.student_read, name='student_read'),
+            url(r'^$', student.StudentRead.as_view(), name='student_read'),
             url(r'^picture$', student.student_picture, name='student_picture'),
         ]))
     ])),

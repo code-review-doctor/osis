@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,89 +23,104 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
 import requests
 from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.staticfiles.storage import staticfiles_storage
-from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.http import HttpResponse
+from django.http import JsonResponse
 from django.shortcuts import redirect, render, get_object_or_404
+from django.views.generic import DetailView
+from django_filters.views import FilterView
 from requests.exceptions import RequestException
 
 from backoffice.settings.base import ESB_STUDENT_API, ESB_AUTHORIZATION
-from base.forms.student import StudentSearchForm
+from base.api.serializers.student import StudentListSerializer
+from base.forms.student import StudentFilter
 from base.models.exam_enrollment import ExamEnrollment
 from base.models.learning_unit_enrollment import LearningUnitEnrollment
 from base.models.offer_enrollment import OfferEnrollment
 from base.models.student import Student
+from base.utils.cache import CacheFilterMixin
+from base.utils.search import SearchMixin
 
 
-@login_required
-@permission_required('base.can_access_student', raise_exception=True)
-def students(request):
-    form = StudentSearchForm(request.GET or None)
-    students_qs = Student.objects.none()
-    if form.is_valid():
-        students_qs = form.get_objects()
+class StudentSearch(PermissionRequiredMixin, SearchMixin, CacheFilterMixin, FilterView):
+    model = Student
+    paginate_by = 25
+    template_name = "student/students.html"
+    raise_exception = True
 
-    paginator = Paginator(students_qs, 25)
-    page = request.GET.get('page')
-    try:
-        students = paginator.page(page)
-    except PageNotAnInteger:
-        students = paginator.page(1)
-    except EmptyPage:
-        students = paginator.page(paginator.num_pages)
+    filterset_class = StudentFilter
+    permission_required = 'base.can_access_student'
 
-    return render(request, "student/students.html", {
-        'students': students,
-        'form': form
-    })
+    def get_filterset_kwargs(self, filterset_class):
+        return {
+            **super().get_filterset_kwargs(filterset_class),
+        }
+
+    def render_to_response(self, context, **response_kwargs):
+        if self.request.is_ajax():
+            serializer = StudentListSerializer(context['object_list'], many=True)
+            return JsonResponse({'object_list': serializer.data})
+        return super().render_to_response(context, **response_kwargs)
 
 
-@login_required
-@permission_required('base.can_access_student', raise_exception=True)
-def student_read(request, student_id):
-    student = get_object_or_404(Student.objects.select_related("person"), id=student_id)
+class StudentRead(PermissionRequiredMixin, DetailView):
+    permission_required = 'base.can_access_learningunit'
+    raise_exception = True
 
-    offer_enrollments = OfferEnrollment.objects.filter(
-        student=student_id
-    ).select_related(
-        "education_group_year",
-        "education_group_year__academic_year"
-    ).order_by(
-        '-education_group_year__academic_year__year',
-        'education_group_year__acronym'
-    )
+    template_name = "student/student.html"
 
-    learning_unit_enrollments = LearningUnitEnrollment.objects.filter(
-        offer_enrollment__student=student_id
-    ).select_related(
-        "learning_unit_year",
-        "learning_unit_year__academic_year"
-    ).order_by(
-        '-learning_unit_year__academic_year__year',
-        'learning_unit_year__acronym'
-    )
+    pk_url_kwarg = "student_id"
+    context_object_name = "student"
 
-    exam_enrollments = ExamEnrollment.objects.filter(
-        learning_unit_enrollment__offer_enrollment__student=student_id
-    ).select_related(
-        "session_exam",
-        "learning_unit_enrollment__learning_unit_year",
-        "learning_unit_enrollment__learning_unit_year__academic_year"
-    ).order_by(
-        '-learning_unit_enrollment__learning_unit_year__academic_year__year',
-        'session_exam__number_session',
-        'learning_unit_enrollment__learning_unit_year__acronym'
-    )
+    model = Student
 
-    return render(request, "student/student.html", {
-        "student": student,
-        "offer_enrollments": offer_enrollments,
-        "learning_unit_enrollments": learning_unit_enrollments,
-        "exam_enrollments": exam_enrollments
-    })
+    def get(self, request, *args, **kwargs):
+        student_id = kwargs['student_id']
+        student = get_object_or_404(Student, pk=student_id)
+        context = {'student': student}
+        offer_enrollments = OfferEnrollment.objects.filter(
+            student=student_id
+        ).select_related(
+            "education_group_year",
+            "education_group_year__academic_year"
+        ).order_by(
+            '-education_group_year__academic_year__year',
+            'education_group_year__acronym'
+        )
+
+        learning_unit_enrollments = LearningUnitEnrollment.objects.filter(
+            offer_enrollment__student=student_id
+        ).select_related(
+            "learning_unit_year",
+            "learning_unit_year__academic_year"
+        ).order_by(
+            '-learning_unit_year__academic_year__year',
+            'learning_unit_year__acronym'
+        )
+
+        exam_enrollments = ExamEnrollment.objects.filter(
+            learning_unit_enrollment__offer_enrollment__student=student_id
+        ).select_related(
+            "session_exam",
+            "learning_unit_enrollment__learning_unit_year",
+            "learning_unit_enrollment__learning_unit_year__academic_year"
+        ).order_by(
+            '-learning_unit_enrollment__learning_unit_year__academic_year__year',
+            'session_exam__number_session',
+            'learning_unit_enrollment__learning_unit_year__acronym'
+        )
+        context.update(
+            {
+                "student": student,
+                "offer_enrollments": offer_enrollments,
+                "learning_unit_enrollments": learning_unit_enrollments,
+                "exam_enrollments": exam_enrollments
+            }
+        )
+        return render(request, self.template_name, context)
 
 
 @login_required

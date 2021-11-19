@@ -52,19 +52,19 @@ class StudentsViewTest(TestCase):
         response = self.client.get(self.url)
 
         self.assertTemplateUsed(response, 'student/students.html')
-        self.assertFalse(response.context['students'].object_list)
+        self.assertFalse(response.context['student_list'])
 
     def test_search_by_registration_id(self):
         response = self.client.get(self.url, data={'registration_id': self.students_db[0].registration_id})
 
         self.assertTemplateUsed(response, 'student/students.html')
-        self.assertEqual(response.context['students'].object_list, [self.students_db[0]])
+        self.assertEqual(list(response.context['student_list']), [self.students_db[0]])
 
     def test_search_by_name(self):
         response = self.client.get(self.url, data={'name': self.students_db[1].person.last_name[:2]})
 
         self.assertTemplateUsed(response, 'student/students.html')
-        self.assertIn(self.students_db[1], response.context['students'].object_list)
+        self.assertIn(self.students_db[1], response.context['student_list'])
 
 
 class TestStudentRead(TestCase):
