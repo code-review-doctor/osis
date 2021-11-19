@@ -206,7 +206,8 @@
                 <tr>
                     <th id="status" style="width: 5%">{% trans 'Status' %}</th>
                     <th id="program" style="width: 13%">{% trans 'Program' context 'encoding' %}</th>
-                    <th id="registration_number" style="width: 13%">{% trans 'Registration number' %}</th>
+                    <th id="registration_number"
+                        style="width: 13%">{% trans 'Registration number' context 'assessments' %}</th>
                     <th id="peps_data" style="width: 17%">
                         {% trans 'Type' %}
                         <span class="badge warning-color">
@@ -224,7 +225,7 @@
                         <td style="text-align:center;" id="enrollment_status_{{ forloop.counter }}" headers="status">
                             {% if note_etudiant.date_echeance_atteinte %}
                                 <span class="glyphicon glyphicon-lock" aria-hidden="true" style="color: #8B008B;"
-                                      title="{% trans 'Deadline reached' %}"></span>
+                                      data-toggle="tooltip" title="{% trans 'Deadline reached' %}"></span>
                             {% endif %}
                             {% if note_etudiant.est_soumise %}
                                 <span class="glyphicon glyphicon-send" aria-hidden="true" style="color: green;"
