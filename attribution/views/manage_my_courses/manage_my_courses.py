@@ -28,25 +28,8 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 
 from base.views import teaching_material
-from base.views.learning_units.pedagogy.update import edit_learning_unit_pedagogy, \
-    post_method_edit_force_majeure_pedagogy
 from learning_unit.views.utils import learning_unit_year_getter
 from osis_role.contrib.views import permission_required
-
-
-@login_required
-@permission_required('base.can_edit_learningunit_pedagogy', fn=learning_unit_year_getter, raise_exception=True)
-def edit_educational_information(request, learning_unit_year_id):
-    return edit_learning_unit_pedagogy(request, learning_unit_year_id)
-
-
-@login_required
-@permission_required('base.can_edit_learningunit_pedagogy_force_majeur', fn=learning_unit_year_getter,
-                     raise_exception=True)
-def edit_educational_information_force_majeure(request, learning_unit_year_id):
-    if request.method == 'POST':
-        return post_method_edit_force_majeure_pedagogy(request)
-    return edit_learning_unit_pedagogy(request, learning_unit_year_id)
 
 
 @login_required
