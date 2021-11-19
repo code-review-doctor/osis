@@ -44,7 +44,6 @@ from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.models.enums.learning_unit_year_subtypes import FULL
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
-from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import FacultyManagerForUEFactory
@@ -52,7 +51,6 @@ from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFact
 from base.tests.factories.teaching_material import TeachingMaterialFactory
 from base.tests.factories.user import UserFactory
 from base.tests.factories.utils.get_messages import get_messages_from_response
-from base.views.learning_units.pedagogy.update import learning_unit_pedagogy_edit
 from base.views.learning_units.search.common import SearchTypes
 from cms.enums import entity_name
 from cms.enums.entity_name import LEARNING_UNIT_YEAR
@@ -359,7 +357,7 @@ class LearningUnitPedagogyEditTestCase(TestCase):
             learning_container_year__acronym="LBIR1100",
             learning_container_year__requirement_entity=cls.requirement_entity_version.entity
         )
-        cls.url = reverse(learning_unit_pedagogy_edit, kwargs={'learning_unit_year_id': cls.learning_unit_year.pk})
+        cls.url = reverse('learning_unit_pedagogy_edit', kwargs={'learning_unit_year_id': cls.learning_unit_year.pk})
         cls.faculty_person = FacultyManagerForUEFactory('can_access_learningunit', 'can_edit_learningunit_pedagogy')
 
     def setUp(self):
