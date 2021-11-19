@@ -23,60 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import itertools
-from typing import Iterable
 
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_http_methods
 
-from base.models.learning_unit_year import LearningUnitYear
 from base.views import teaching_material
-from base.views.learning_unit import get_specifications_context, get_achievements_group_by_language, \
-    get_languages_settings
-from base.views.learning_units.pedagogy.read import read_learning_unit_pedagogy
 from base.views.learning_units.pedagogy.update import edit_learning_unit_pedagogy, \
     post_method_edit_force_majeure_pedagogy
-from learning_unit.calendar.learning_unit_force_majeur_summary_edition import \
-    LearningUnitForceMajeurSummaryEditionCalendar
-from learning_unit.calendar.learning_unit_summary_edition_calendar import LearningUnitSummaryEditionCalendar
 from learning_unit.views.utils import learning_unit_year_getter
 from osis_role.contrib.views import permission_required
-
-
-@login_required
-@permission_required('base.can_access_learningunit_pedagogy', fn=learning_unit_year_getter, raise_exception=True)
-def view_educational_information(request, learning_unit_year_id):
-    context = {
-        'create_teaching_material_urlname': 'tutor_teaching_material_create',
-        'update_teaching_material_urlname': 'tutor_teaching_material_edit',
-        'delete_teaching_material_urlname': 'tutor_teaching_material_delete',
-        'update_mobility_modality_urlname': 'tutor_mobility_modality_update'
-    }
-    template = 'manage_my_courses/educational_information.html'
-    query_set = LearningUnitYear.objects.all().select_related(
-        'learning_unit', 'learning_container_year', 'academic_year'
-    )
-    learning_unit_year = get_object_or_404(query_set, pk=learning_unit_year_id)
-
-    context.update(get_specifications_context(learning_unit_year, request))
-    context['submission_dates'] = LearningUnitSummaryEditionCalendar().get_academic_event(
-        learning_unit_year.academic_year.year
-    )
-    context['force_majeure_submission_dates'] = LearningUnitForceMajeurSummaryEditionCalendar().get_academic_event(
-        learning_unit_year.academic_year.year
-    )
-    context["achievements"] = _fetch_achievements_by_language(learning_unit_year)
-    context.update(get_languages_settings())
-    context['div_class'] = 'collapse'
-    return read_learning_unit_pedagogy(request, learning_unit_year_id, context, template)
-
-
-def _fetch_achievements_by_language(learning_unit_year: LearningUnitYear) -> Iterable:
-    fr_achievement_code = "achievements_FR"
-    en_achievement_code = "achievements_EN"
-    achievements = get_achievements_group_by_language(learning_unit_year)
-    return itertools.zip_longest(achievements.get(fr_achievement_code, []), achievements.get(en_achievement_code, []))
 
 
 @login_required
