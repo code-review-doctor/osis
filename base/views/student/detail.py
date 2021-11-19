@@ -28,41 +28,15 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.http import HttpResponse
-from django.http import JsonResponse
-from django.shortcuts import redirect, render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import DetailView
-from django_filters.views import FilterView
 from requests.exceptions import RequestException
 
 from backoffice.settings.base import ESB_STUDENT_API, ESB_AUTHORIZATION
-from base.api.serializers.student import StudentListSerializer
-from base.forms.student import StudentFilter
 from base.models.exam_enrollment import ExamEnrollment
 from base.models.learning_unit_enrollment import LearningUnitEnrollment
 from base.models.offer_enrollment import OfferEnrollment
 from base.models.student import Student
-from base.utils.search import SearchMixin
-
-
-class StudentSearch(PermissionRequiredMixin, SearchMixin, FilterView):
-    model = Student
-    paginate_by = 25
-    template_name = "student/students.html"
-    raise_exception = True
-
-    filterset_class = StudentFilter
-    permission_required = 'base.can_access_student'
-
-    def get_filterset_kwargs(self, filterset_class):
-        return {
-            **super().get_filterset_kwargs(filterset_class),
-        }
-
-    def render_to_response(self, context, **response_kwargs):
-        if self.request.is_ajax():
-            serializer = StudentListSerializer(context['object_list'], many=True)
-            return JsonResponse({'object_list': serializer.data})
-        return super().render_to_response(context, **response_kwargs)
 
 
 class StudentRead(PermissionRequiredMixin, DetailView):

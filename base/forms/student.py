@@ -25,7 +25,9 @@
 ##############################################################################
 import django_filters
 from django.db.models import Q
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from rest_framework import serializers
 
 from base.models.student import Student
 
@@ -59,3 +61,22 @@ class StudentFilter(django_filters.FilterSet):
             queryset = super().filter_queryset(queryset)
             return queryset.select_related('person')
         return Student.objects.none()
+
+
+class StudentListSerializer(serializers.Serializer):
+    registration_id = serializers.CharField()
+    name = serializers.SerializerMethodField()
+    gender = serializers.SerializerMethodField()
+    select_url = serializers.SerializerMethodField()
+
+    def get_name(self, obj):
+        return str(obj.person)
+
+    def get_gender(self, obj):
+        return obj.person.gender
+
+    def get_select_url(self, obj):
+        return reverse(
+            "student_read",
+            kwargs={'student_id': obj.id}
+        )
