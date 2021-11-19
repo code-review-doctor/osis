@@ -15,10 +15,14 @@ Using database ID in path increase the risk of "Insecure Direct Object Reference
 ## Decision
 
 We will use natural key in path as preferred alternative.
-If we cannot determine a natural key, we will use UUID in Path
+If we cannot determine a natural key, we will use UUID in Path.
+We cannot see UUID as protection so we will ensure that path is correctly protected by access check.
 
 ## Consequences
 
-+) In case of natural key, it's a human-readable format.
++) UUID is unique across resources.
 
--) In case of UUID, it's difficult to read for a human.
++) UUIS is difficult to guess.
+
+-) The readability of a natural key might be a drawback. If a url is human-readable it might be easier for a human to attempt 
+to modify it.

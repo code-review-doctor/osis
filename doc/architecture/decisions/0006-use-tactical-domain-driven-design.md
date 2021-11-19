@@ -10,7 +10,7 @@ Accepted
 
 Having a tightly coupled code (Template, View, Model) is very hard to maintain and make change mainly when there are many business rules.
 Developers have fear of modification because it's very difficult to predict the result of a change.
-Moreover, each developer have it's own codestyle/approach which can lead to inconsistent way to 
+Moreover, each developer has it's own codestyle/approach which can lead to inconsistent way to 
 treat same problems.
 
 
@@ -26,7 +26,7 @@ If we use Domain-Driven-Design approach for a business case, we will use a set o
 - Factories
 - DTO
 
-Each components have 1! purpose, we will use them accordingly.
+Each components have one and only one purpose, we will use them accordingly.
 
 
 ## Consequences
