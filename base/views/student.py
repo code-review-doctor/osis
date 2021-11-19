@@ -41,11 +41,10 @@ from base.models.exam_enrollment import ExamEnrollment
 from base.models.learning_unit_enrollment import LearningUnitEnrollment
 from base.models.offer_enrollment import OfferEnrollment
 from base.models.student import Student
-from base.utils.cache import CacheFilterMixin
 from base.utils.search import SearchMixin
 
 
-class StudentSearch(PermissionRequiredMixin, SearchMixin, CacheFilterMixin, FilterView):
+class StudentSearch(PermissionRequiredMixin, SearchMixin, FilterView):
     model = Student
     paginate_by = 25
     template_name = "student/students.html"
