@@ -52,6 +52,7 @@ from base.views import teaching_material
 from base.views.autocomplete import OrganizationAutocomplete, CountryAutocomplete, CampusAutocomplete, \
     EntityAutocomplete, AllocationEntityAutocomplete, AdditionnalEntity1Autocomplete, AdditionnalEntity2Autocomplete, \
     EntityRequirementAutocomplete, EmployeeAutocomplete, AcademicCalendarTypeAutocomplete
+from base.views.entity.list import EntitySearch
 from base.views.learning_units.detail import DetailLearningUnitYearView, DetailLearningUnitYearViewBySlug
 from base.views.learning_units.external import create as create_external
 from base.views.learning_units.pedagogy.publish import publish_and_access_publication
@@ -62,6 +63,7 @@ from base.views.learning_units.proposal import create, update
 from base.views.learning_units.update import update_learning_unit, learning_unit_edition_end_date
 from education_group import urls as education_group_urls
 from learning_unit import urls as learning_unit_urls
+from base.views.entity.detail import EntityRead, EntityDiagramRead, EntityVersionsRead, EntityReadByAcronym
 
 urlpatterns = [
     url(r'^$', common.home, name='home'),
@@ -116,15 +118,15 @@ urlpatterns = [
     url(r'^catalog/$', common.catalog, name='catalog'),
 
     url(r'^entities/', include([
-        url(r'^$', institution.entities_search, name='entities'),
+        url(r'^$', EntitySearch.as_view(), name='entities'),
         url(r'^(?P<entity_version_id>[0-9]+)/', include([
-            url(r'^$', institution.entity_read, name='entity_read'),
+            url(r'^$', EntityRead.as_view(), name='entity_read'),
             url(r'^address/$', institution.get_entity_address, name='entity_address'),
-            url(r'^diagram/$', institution.entity_diagram, name='entity_diagram'),
-            url(r'^versions/$', institution.entities_version, name='entities_version'),
+            url(r'^diagram/$', EntityDiagramRead.as_view(), name='entity_diagram'),
+            url(r'^versions/$', EntityVersionsRead.as_view(), name='entities_version'),
         ])),
         url(r'^(?P<entity_acronym>[A-Z]+)/', include([
-            url(r'^$', institution.entity_read_by_acronym, name='entity_read'),
+            url(r'^$', EntityReadByAcronym.as_view(), name='entity_read'),
             url(r'^address/$', institution.get_entity_address_by_acronym, name='entity_address'),
         ])),
     ])),
