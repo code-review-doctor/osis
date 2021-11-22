@@ -54,13 +54,11 @@
         </div>
         <br/>
         <div class="row">
-            {% if view_academicactors %}
-                <div class="col-md-1"><i class="fa fa-users" style="font-size: 400%; color: #6699FF;"></i></div>
-                <div class="col-md-5">
-                    <h4 class="media-heading"><a href="{% url 'academic_actors' %}" id="lnk_academic_actors">{% trans 'Academic actors'%}</a></h4>
-                    <p>{% trans 'Academic actors management' %}</p>
-                </div>
-            {% endif %}
+            <div class="col-md-1"><i class="fa fa-users" style="font-size: 400%; color: #6699FF;"></i></div>
+            <div class="col-md-5">
+                <h4 class="media-heading"><a href="{% url 'academic_actors' %}" id="lnk_academic_actors">{% trans 'Academic actors'%}</a></h4>
+                <p>{% trans 'Academic actors management' %}</p>
+            </div>
             {%  if perms.base.can_access_academicyear and perms.base.can_access_academic_calendar %}
                 <div class="col-md-1"><i class="fa fa-calendar" style="font-size: 400%; color: #6699FF;"></i></div>
                 <div class="col-md-5">
