@@ -97,10 +97,16 @@ class TestGetChargeRepartitionWarningMessage(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.full_luy = LearningUnitYearFullFactory()
-        cls.partim_luy_1 = LearningUnitYearPartimFactory(academic_year=cls.full_luy.academic_year,
-                                                         learning_container_year=cls.full_luy.learning_container_year)
-        cls.partim_luy_2 = LearningUnitYearPartimFactory(academic_year=cls.full_luy.academic_year,
-                                                         learning_container_year=cls.full_luy.learning_container_year)
+        cls.partim_luy_1 = LearningUnitYearPartimFactory(
+            academic_year=cls.full_luy.academic_year,
+            learning_container_year=cls.full_luy.learning_container_year,
+            acronym=cls.full_luy.learning_container_year.acronym + 'A'
+        )
+        cls.partim_luy_2 = LearningUnitYearPartimFactory(
+            academic_year=cls.full_luy.academic_year,
+            learning_container_year=cls.full_luy.learning_container_year,
+            acronym=cls.full_luy.learning_container_year.acronym + 'B'
+        )
         cls.attribution_full = AttributionNewFactory(
             learning_container_year=cls.full_luy.learning_container_year
         )
@@ -174,8 +180,7 @@ class TestGetChargeRepartitionWarningMessage(TestCase):
     def test_should_not_give_warning_messages_when_volume_partim_inferior_or_equal_to_volume_parent(self):
         msgs = get_charge_repartition_warning_messages(self.full_luy.learning_container_year)
 
-        self.assertEqual(msgs,
-                         [])
+        self.assertEqual(msgs, [])
 
     def test_should_not_fail_when_no_charges(self):
         self.charge_lecturing_1.allocation_charge = None
@@ -189,8 +194,7 @@ class TestGetChargeRepartitionWarningMessage(TestCase):
 
         msgs = get_charge_repartition_warning_messages(self.full_luy.learning_container_year)
 
-        self.assertEqual(msgs,
-                         [])
+        self.assertEqual(msgs, [])
 
     def test_should_give_warning_messages_when_volume_partim_superior_to_volume_parent(self):
         self.charge_lecturing_1.allocation_charge = 50
