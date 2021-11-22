@@ -42,6 +42,7 @@ from osis_role.contrib.views import PermissionRequiredMixin
 class CommonTeachingMaterial(LoginRequiredMixin, PermissionRequiredMixin):
     permission_required = 'base.can_edit_learningunit_pedagogy'
     raise_exception = True
+    http_method_names = ['get', 'post']
 
     @cached_property
     def learning_unit_year(self) -> LearningUnitYear:
@@ -61,7 +62,7 @@ class CommonTeachingMaterial(LoginRequiredMixin, PermissionRequiredMixin):
 
 class CreateTeachingMaterial(CommonTeachingMaterial, FormView):
     form_class = TeachingMaterialModelForm
-    template_name = "learning_unit/teaching_material/modal_edit.html"
+    template_name = "learning_unit/blocks/modal/modal_teaching_material_edit.html"
 
     def form_valid(self, form):
         form.save(learning_unit_year=self.learning_unit_year)
@@ -75,7 +76,7 @@ class CreateTeachingMaterial(CommonTeachingMaterial, FormView):
 
 class UpdateTeachingMaterial(CommonTeachingMaterial, FormView):
     form_class = TeachingMaterialModelForm
-    template_name = "learning_unit/teaching_material/modal_edit.html"
+    template_name = "learning_unit/blocks/modal/modal_teaching_material_edit.html"
 
     def form_valid(self, form):
         form.save(learning_unit_year=self.learning_unit_year)
@@ -94,7 +95,7 @@ class UpdateTeachingMaterial(CommonTeachingMaterial, FormView):
 
 
 class DeleteTeachingMaterial(CommonTeachingMaterial, TemplateView):
-    template_name = "learning_unit/teaching_material/modal_delete.html"
+    template_name = "learning_unit/blocks/modal/modal_teaching_material_delete.html"
 
     def post(self, request, *args, **kwargs):
         last_luy_reported = self.learning_unit_year.find_gt_learning_units_year().last()

@@ -35,8 +35,8 @@ from attribution.views.manage_my_courses.edit_my_educational_information import 
     EditMyEducationalInformationForceMajeure, EditMyEducationalInformation
 from attribution.views.manage_my_courses.my_attributions_summary_editable import MyAttributionsSummaryEditable
 from attribution.views.manage_my_courses.my_educational_information import EducationalInformation
-from attribution.views.manage_my_courses.teaching_material import CreateTeachingMaterial, UpdateTeachingMaterial, \
-    DeleteTeachingMaterial
+from attribution.views.manage_my_courses.my_teaching_material import UpdateMyTeachingMaterial, CreateMyTeachingMaterial, \
+    DeleteMyTeachingMaterial
 
 urlpatterns = [
     url(r'^manage_my_courses/', include([
@@ -52,10 +52,10 @@ urlpatterns = [
                 EditMyEducationalInformationForceMajeure.as_view(),
                 name='tutor_edit_educational_information_force_majeure'),
             url(r'^teaching_materials/', include([
-                url(r'^create', CreateTeachingMaterial.as_view(), name="tutor_teaching_material_create"),
-                url(r'^(?P<teaching_material_id>[0-9]+)/edit/', UpdateTeachingMaterial.as_view(),
+                url(r'^create', CreateMyTeachingMaterial.as_view(), name="tutor_teaching_material_create"),
+                url(r'^(?P<teaching_material_id>[0-9]+)/edit/', UpdateMyTeachingMaterial.as_view(),
                     name="tutor_teaching_material_edit"),
-                url(r'^(?P<teaching_material_id>[0-9]+)/delete/', DeleteTeachingMaterial.as_view(),
+                url(r'^(?P<teaching_material_id>[0-9]+)/delete/', DeleteMyTeachingMaterial.as_view(),
                     name="tutor_teaching_material_delete")
             ])),
         ]))

@@ -44,8 +44,6 @@ import base.views.learning_units.search.service_course
 import base.views.learning_units.search.simple
 import base.views.learning_units.update
 from attribution.views import attribution
-from attribution.views.manage_my_courses.teaching_material import UpdateTeachingMaterial, DeleteTeachingMaterial, \
-    CreateTeachingMaterial
 from base.views import geocoding
 from base.views import learning_achievement, search, user_list
 from base.views import learning_unit, common, institution, organization, academic_calendar, \
@@ -64,6 +62,8 @@ from education_group import urls as education_group_urls
 from learning_unit import urls as learning_unit_urls
 from learning_unit.views.learning_unit.edit_educational_information import EditEducationalInformation, \
     EditEducationalInformationForceMajeure
+from learning_unit.views.learning_unit.teaching_material import CreateTeachingMaterial, UpdateTeachingMaterial, \
+    DeleteTeachingMaterial
 
 urlpatterns = [
     url(r'^$', common.home, name='home'),
