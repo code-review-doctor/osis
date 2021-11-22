@@ -48,7 +48,7 @@ from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
 from reference.models.language import find_language_in_settings
 
 
-class TestTutorEditEducationalInformation(TestCase):
+class TestEditMyEducationalInformation(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.tutor = TutorFactory()
@@ -111,7 +111,7 @@ class TestTutorEditEducationalInformation(TestCase):
         )
 
 
-class TestTutorEditForceMajeurEducationalInformation(TestCase):
+class TestEditMyEducationalInformationForceMajeure(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.tutor = TutorFactory()

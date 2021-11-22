@@ -31,10 +31,10 @@ from attribution.views.charge_repartition.update import EditChargeRepartition
 from attribution.views.learning_unit.create import CreateAttribution
 from attribution.views.learning_unit.delete import DeleteAttribution
 from attribution.views.learning_unit.update import UpdateAttributionView
-from attribution.views.manage_my_courses.edit_educational_information import EditEducationalInformation, \
-    EditEducationalInformationForceMajeure
-from attribution.views.manage_my_courses.educational_information import EducationalInformation
+from attribution.views.manage_my_courses.edit_my_educational_information import \
+    EditMyEducationalInformationForceMajeure, EditMyEducationalInformation
 from attribution.views.manage_my_courses.my_attributions_summary_editable import MyAttributionsSummaryEditable
+from attribution.views.manage_my_courses.my_educational_information import EducationalInformation
 from attribution.views.manage_my_courses.teaching_material import CreateTeachingMaterial, UpdateTeachingMaterial, \
     DeleteTeachingMaterial
 
@@ -46,10 +46,10 @@ urlpatterns = [
             url(r'^educational_information/$', EducationalInformation.as_view(),
                 name='view_educational_information'),
             url(r'^edit_educational_information/$',
-                EditEducationalInformation.as_view(),
+                EditMyEducationalInformation.as_view(),
                 name='tutor_edit_educational_information'),
             url(r'^edit_educational_information_force_majeure/$',
-                EditEducationalInformationForceMajeure.as_view(),
+                EditMyEducationalInformationForceMajeure.as_view(),
                 name='tutor_edit_educational_information_force_majeure'),
             url(r'^teaching_materials/', include([
                 url(r'^create', CreateTeachingMaterial.as_view(), name="tutor_teaching_material_create"),
