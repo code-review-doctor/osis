@@ -35,8 +35,8 @@ from attribution.views.manage_my_courses.edit_my_educational_information import 
     EditMyEducationalInformationForceMajeure, EditMyEducationalInformation
 from attribution.views.manage_my_courses.my_attributions_summary_editable import MyAttributionsSummaryEditable
 from attribution.views.manage_my_courses.my_educational_information import EducationalInformation
-from attribution.views.manage_my_courses.my_teaching_material import UpdateMyTeachingMaterial, CreateMyTeachingMaterial, \
-    DeleteMyTeachingMaterial
+from attribution.views.manage_my_courses.my_teaching_material import UpdateMyTeachingMaterial, \
+    CreateMyTeachingMaterial, DeleteMyTeachingMaterial
 
 urlpatterns = [
     url(r'^manage_my_courses/', include([
