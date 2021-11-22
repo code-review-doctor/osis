@@ -26,8 +26,8 @@
 from ajax_select import urls as ajax_select_urls
 from django.conf import settings
 from django.conf.urls import include, url
-from django.urls import path
 from django.conf.urls.static import static
+from django.urls import path
 
 import base.views.autocomplete
 import base.views.learning_units.common
@@ -56,12 +56,13 @@ from base.views.learning_units.detail import DetailLearningUnitYearView, DetailL
 from base.views.learning_units.external import create as create_external
 from base.views.learning_units.pedagogy.publish import publish_and_access_publication
 from base.views.learning_units.pedagogy.read import learning_unit_pedagogy
-from base.views.learning_units.pedagogy.update import learning_unit_pedagogy_edit, toggle_summary_locked, \
-    learning_unit_pedagogy_force_majeure_edit
+from base.views.learning_units.pedagogy.update import toggle_summary_locked
 from base.views.learning_units.proposal import create, update
 from base.views.learning_units.update import update_learning_unit, learning_unit_edition_end_date
 from education_group import urls as education_group_urls
 from learning_unit import urls as learning_unit_urls
+from learning_unit.views.learning_unit.edit_educational_information import EditEducationalInformation, \
+    EditEducationalInformationForceMajeure
 
 urlpatterns = [
     url(r'^$', common.home, name='home'),
@@ -188,10 +189,10 @@ urlpatterns = [
             url(r'^attributions/$', attribution.learning_unit_attributions, name="learning_unit_attributions"),
             url(r'^pedagogy/', include([
                 url(r'^$', learning_unit_pedagogy, name="learning_unit_pedagogy"),
-                url(r'^edit/$', learning_unit_pedagogy_edit, name="learning_unit_pedagogy_edit"),
+                url(r'^edit/$', EditEducationalInformation.as_view(), name="learning_unit_pedagogy_edit"),
                 url(
                     r'^edit_force_majeure/$',
-                    learning_unit_pedagogy_force_majeure_edit,
+                    EditEducationalInformationForceMajeure.as_view(),
                     name="learning_unit_pedagogy_force_majeure_edit"
                 ),
                 url(r'^toggle_summary_locked/$', toggle_summary_locked,

@@ -24,30 +24,13 @@
 #
 ##############################################################################
 
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_http_methods
-
-from base.views import teaching_material
-from learning_unit.views.utils import learning_unit_year_getter
-from osis_role.contrib.views import permission_required
+from learning_unit.views.learning_unit.edit_educational_information import EditEducationalInformation, \
+    EditEducationalInformationForceMajeure
 
 
-@login_required
-@require_http_methods(['POST', 'GET'])
-@permission_required('base.can_edit_learningunit_pedagogy', fn=learning_unit_year_getter, raise_exception=True)
-def create_teaching_material(request, learning_unit_year_id):
-    return teaching_material.create_view(request, learning_unit_year_id)
+class EditMyEducationalInformation(EditEducationalInformation):
+    pass
 
 
-@login_required
-@require_http_methods(['POST', 'GET'])
-@permission_required('base.can_edit_learningunit_pedagogy', fn=learning_unit_year_getter, raise_exception=True)
-def update_teaching_material(request, learning_unit_year_id, teaching_material_id):
-    return teaching_material.update_view(request, learning_unit_year_id, teaching_material_id)
-
-
-@login_required
-@require_http_methods(['POST', 'GET'])
-@permission_required('base.can_edit_learningunit_pedagogy', fn=learning_unit_year_getter, raise_exception=True)
-def delete_teaching_material(request, learning_unit_year_id, teaching_material_id):
-    return teaching_material.delete_view(request, learning_unit_year_id, teaching_material_id)
+class EditMyEducationalInformationForceMajeure(EditEducationalInformationForceMajeure):
+    pass
