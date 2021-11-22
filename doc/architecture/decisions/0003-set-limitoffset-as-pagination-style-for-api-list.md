@@ -24,4 +24,4 @@ We will limit to return maximum 100 items in list (cf. https://github.com/uclouv
 
 +) Provide maximum in order to prevent large data returned (Network/Database overload)
 
--) If client need to fetch all data, client need to make multiple call with next attribute
+-) If client needs to fetch all data, client must make multiple call with next attribute
