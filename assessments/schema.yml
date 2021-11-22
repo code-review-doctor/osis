@@ -1,0 +1,305 @@
+openapi: 3.0.0
+servers:
+ - url: https://{environment}.osis.uclouvain.be/api/v1/assessments/
+   variables:
+     environment:
+       default: dev
+       enum:
+         - dev # Development server
+         - qa # Staging server
+         - test # Test server
+ - url: https://osis.uclouvain.be/api/v1/assessments/
+   description: 'Production server'
+info:
+  version: '1.00'
+  title: 'Assessments Service'
+  description: |-
+    A set of API endpoints that allow you to get score sheet
+paths:
+  /{code}/xls_export:
+    get:
+      description: Return XLS file of score sheet
+      operationId: score_sheet_xls_export
+      parameters:
+        - in: path
+          name: code
+          required: true
+          schema:
+            description: 'Learning unit code'
+            type: string
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      tags:
+        - score_encoding
+  /pdf_export:
+    get:
+      description: Return PDF file of score sheet
+      operationId: score_sheets_pdf_export
+      parameters:
+        - in: query
+          name: codes
+          schema:
+            description: Get score sheet of learning unit code
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      tags:
+        - score_encoding
+  /sessions/current/:
+      get:
+        description: Return current session
+        operationId: get_current_session
+        parameters:
+          - $ref: '#/components/parameters/Accept-Language'
+          - $ref: '#/components/parameters/X-User-FirstName'
+          - $ref: '#/components/parameters/X-User-LastName'
+          - $ref: '#/components/parameters/X-User-Email'
+          - $ref: '#/components/parameters/X-User-GlobalID'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/SessionExam'
+          '400':
+            $ref: '#/components/responses/BadRequest'
+          '401':
+            $ref: '#/components/responses/Unauthorized'
+          '404':
+            $ref: '#/components/responses/NotFound'
+        tags:
+          - score_encoding
+  /sessions/next/:
+      get:
+        description: Return next session exam
+        operationId: get_next_session
+        parameters:
+          - $ref: '#/components/parameters/Accept-Language'
+          - $ref: '#/components/parameters/X-User-FirstName'
+          - $ref: '#/components/parameters/X-User-LastName'
+          - $ref: '#/components/parameters/X-User-Email'
+          - $ref: '#/components/parameters/X-User-GlobalID'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/SessionExam'
+          '400':
+            $ref: '#/components/responses/BadRequest'
+          '401':
+            $ref: '#/components/responses/Unauthorized'
+          '404':
+            $ref: '#/components/responses/NotFound'
+        tags:
+          - score_encoding
+  /sessions/previous/:
+      get:
+        description: Return previous session exam
+        operationId: get_previous_session
+        parameters:
+          - $ref: '#/components/parameters/Accept-Language'
+          - $ref: '#/components/parameters/X-User-FirstName'
+          - $ref: '#/components/parameters/X-User-LastName'
+          - $ref: '#/components/parameters/X-User-Email'
+          - $ref: '#/components/parameters/X-User-GlobalID'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/SessionExam'
+          '400':
+            $ref: '#/components/responses/BadRequest'
+          '401':
+            $ref: '#/components/responses/Unauthorized'
+          '404':
+            $ref: '#/components/responses/NotFound'
+        tags:
+          - score_encoding
+  /score_responsibles/:
+      get:
+        description: Return a list of score responsibles for several learning units.
+        operationId: get_score_responsible_list
+        parameters:
+          - in: query
+            name: learning_unit_codes
+            schema:
+              description: Get score responsibles of learning unit codes
+              type: array
+              items:
+                type: string
+            style: form
+            explode: true
+          - in: query
+            name: year
+            schema:
+              description: 'Query parameter to filter by year'
+              type: integer
+          - $ref: '#/components/parameters/Accept-Language'
+          - $ref: '#/components/parameters/X-User-FirstName'
+          - $ref: '#/components/parameters/X-User-LastName'
+          - $ref: '#/components/parameters/X-User-Email'
+          - $ref: '#/components/parameters/X-User-GlobalID'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ScoreResponsiblePerson'
+          '400':
+            $ref: '#/components/responses/BadRequest'
+          '401':
+            $ref: '#/components/responses/Unauthorized'
+        tags:
+          - score_encoding
+components:
+  securitySchemes:
+    Token:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Enter your token in the format **Token &lt;token>**
+  parameters:
+    X-User-FirstName:
+      in: header
+      name: X-User-FirstName
+      schema:
+        type: string
+      required: false
+    X-User-LastName:
+      in: header
+      name: X-User-LastName
+      schema:
+        type: string
+      required: false
+    X-User-Email:
+      in: header
+      name: X-User-Email
+      schema:
+        type: string
+      required: false
+    X-User-GlobalID:
+      in: header
+      name: X-User-GlobalID
+      schema:
+        type: string
+      required: false
+    Accept-Language:
+      in: header
+      name: Accept-Language
+      description: >
+        The header advertises which languages the client is able to understand, and which locale variant is preferred. (By languages, we mean natural languages, such as English, and not programming languages.)
+      schema:
+        $ref: '#/components/schemas/AcceptedLanguageEnum'
+      required: false
+  responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: The specified resource was not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  schemas:
+    AcceptedLanguageEnum:
+      type: string
+      enum:
+        - 'en'
+        - 'fr-be'
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+        - code
+        - message
+    SessionExam:
+      type: object
+      properties:
+        start_date:
+          type: date
+          nullable: true
+        end_date:
+          type: date
+          nullable: true
+        year:
+          type: integer
+          example: "2021"
+          nullable: true
+        month_session_name:
+          type: string
+          example: "January"
+          nullable: true
+    ScoreResponsiblePerson:
+      type: object
+      properties:
+        learning_unit_acronym:
+          type: string
+          example: "LPSP1210"
+        year:
+          type: integer
+          example: 2020
+          description: 'Year of learning unit'
+        full_name:
+          type: string
+          example: "Martin Tom"
+        global_id:
+          type: string
+          example: "00015847"
+security:
+  - Token: []

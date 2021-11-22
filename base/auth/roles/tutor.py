@@ -30,9 +30,6 @@ from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
 
-from attribution.models import attribution
-from base.models import person
-from learning_unit.auth import predicates as learning_unit_predicates
 from attribution.auth import predicates as attribution_predicates
 from osis_common.models import serializable_model
 from osis_role.contrib.admin import RoleModelAdmin
@@ -60,6 +57,7 @@ class Tutor(RoleModel, serializable_model.SerializableModel):
 
     @classmethod
     def rule_set(cls):
+        from learning_unit.auth import predicates as learning_unit_predicates
         return rules.RuleSet({
             'assessments.can_access_scoreencoding': rules.always_allow,
             'base.can_access_academicyear': rules.always_allow,
@@ -80,14 +78,6 @@ class Tutor(RoleModel, serializable_model.SerializableModel):
         })
 
 
-def find_by_user(user):
-    try:
-        pers = person.find_by_user(user)
-        return Tutor.objects.get(person=pers)
-    except Tutor.DoesNotExist:
-        return None
-
-
 def find_by_person(a_person):
     try:
         return Tutor.objects.get(person=a_person)
@@ -100,30 +90,6 @@ def find_by_id(tutor_id):
         return Tutor.objects.get(id=tutor_id)
     except Tutor.DoesNotExist:
         return None
-
-
-# To refactor because it is not in the right place.
-def find_by_learning_unit(learning_unit_year):
-    """
-    :param learning_unit_year:
-    :return: All tutors of the learningUnit passed in parameter.
-    """
-    if isinstance(learning_unit_year, list):
-        queryset = attribution.search(list_learning_unit_year=learning_unit_year)
-    else:
-        queryset = attribution.search(learning_unit_year=learning_unit_year)
-    tutor_ids = queryset.values_list('tutor').distinct('tutor')
-    return Tutor.objects.filter(pk__in=tutor_ids)\
-                        .select_related('person')\
-                        .order_by('person__last_name', 'person__first_name')
-
-
-def is_tutor(user):
-    """
-    :param user:
-    :return: True if the user is a tutor. False if the user is not a tutor.
-    """
-    return Tutor.objects.filter(person__user=user).count() > 0
 
 
 def search(**criterias):

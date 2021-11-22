@@ -67,6 +67,7 @@ class TestRenewMultipleAttributionsService(TestCase):
                 academic_year=AcademicYearIdentityBuilder.build_from_year(year=2018)
             ),
             course_title="Introduction au droit",
+            course_is_in_suppression_proposal=False,
             function=Functions.HOLDER,
             end_year=AcademicYearIdentityBuilder.build_from_year(year=2018),
             start_year=AcademicYearIdentityBuilder.build_from_year(year=2017),

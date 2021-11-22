@@ -23,6 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from datetime import date
+from typing import Optional
+
 from django.db import models
 from django.utils import timezone
 
@@ -42,10 +45,8 @@ class Synchronization(models.Model):
         return "{}".format(self.date)
 
 
-def find_last_synchronization_date():
+def find_last_synchronization_date() -> Optional[date]:
     sync = Synchronization.objects.filter(date__isnull=False)
     if sync:
         return sync.order_by('-date').first().date
-    else:
-        return None
-
+    return None

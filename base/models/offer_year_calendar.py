@@ -42,9 +42,10 @@ class OfferYearCalendarAdmin(VersionAdmin, OsisModelAdmin):
 
 class OfferYearCalendar(AbstractCalendar):
     education_group_year = models.ForeignKey('EducationGroupYear', on_delete=models.CASCADE)
+    cohort_year = models.ForeignKey("education_group.CohortYear", null=True, blank=True, on_delete=models.CASCADE)
 
     class Meta:
-        unique_together = ('academic_calendar', 'education_group_year')
+        unique_together = ('academic_calendar', 'education_group_year', 'cohort_year')
 
     def clean(self):
         super().clean()

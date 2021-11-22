@@ -28,7 +28,7 @@ from typing import List
 from base.ddd.utils import business_validator
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception
-from program_management.ddd.domain.program_tree_version import version_label
+from program_management.ddd.domain import program_tree_version
 
 
 class MatchVersionValidator(business_validator.BusinessValidator):
@@ -59,7 +59,7 @@ class MatchVersionValidator(business_validator.BusinessValidator):
 
         version_mismatched = [
             parent_version.entity_id for parent_version in parent_versions
-            if version_label(parent_version.entity_id, only_label=True) != child_version_label
+            if program_tree_version.version_label(parent_version.entity_id, only_label=True) != child_version_label
         ]
         if version_mismatched:
             raise exception.ProgramTreeVersionMismatch(

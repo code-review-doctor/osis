@@ -23,14 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Optional, List
+from typing import Optional, List, Any
 
+from base.ddd.utils.singleton import SingletonMeta
 from osis_common.ddd import interface
 from osis_common.ddd.interface import ApplicationService, RootEntity, EntityIdentity
 
 
-class InMemoryGenericRepository(interface.AbstractRepository):
+class InMemoryGenericRepository(interface.AbstractRepository, metaclass=SingletonMeta):
     entities = list()  # type: List[RootEntity]
+
+    def __new__(cls) -> Any:
+        cls.reset()
+        return super().__new__(cls)
 
     @classmethod
     def get(cls, entity_id: 'EntityIdentity') -> 'RootEntity':
@@ -41,7 +46,8 @@ class InMemoryGenericRepository(interface.AbstractRepository):
 
     @classmethod
     def search(cls, entity_ids: Optional[List['EntityIdentity']] = None, **kwargs) -> List['RootEntity']:
-        raise NotImplementedError
+        entity_ids = entity_ids or set()
+        return [entity for entity in cls.entities if entity.entity_id in entity_ids]
 
     @classmethod
     def delete(cls, entity_id: 'EntityIdentity', **kwargs: ApplicationService) -> None:
@@ -49,10 +55,15 @@ class InMemoryGenericRepository(interface.AbstractRepository):
 
     @classmethod
     def save(cls, entity: 'RootEntity') -> None:
-        if entity in cls.entities:
-            cls.entities.remove(entity)
+        to_remove = cls.get(entity.entity_id)
+        if to_remove:
+            cls.entities.remove(to_remove)
         cls.entities.append(entity)
 
     @classmethod
     def get_all_identities(cls) -> List['EntityIdentity']:
         return [entity.entity_id for entity in cls.entities]
+
+    @classmethod
+    def reset(cls):
+        cls.entities = []

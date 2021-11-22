@@ -31,7 +31,7 @@ from django.template.defaultfilters import yesno
 from django.test import TestCase
 from django.utils.translation import gettext_lazy as _
 
-from assessments.tests.factories.score_responsible import ClassAttributionScoreResponsibleFactory
+from assessments.tests.factories.score_responsible import ScoreResponsibleOfClassFactory
 from attribution.business import attribution_charge_new
 from attribution.models.enums.function import COORDINATOR
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
@@ -453,6 +453,7 @@ class TestLearningUnitXls(TestCase):
             str(_('yes')) if luy.french_friendly else str(_('no')),
             str(_('yes')) if luy.exchange_students else str(_('no')),
             str(_('yes')) if luy.individual_loan else str(_('no')),
+            str(_('yes')) if luy.learning_container_year.team else str(_('no')),
             str(_('yes')) if luy.stage_dimona else str(_('no')),
             luy.other_remark,
             luy.other_remark_english,
@@ -612,6 +613,7 @@ class TestLearningUnitXls(TestCase):
             str(_('yes')) if luy.exchange_students else str(_('no')),
             str(_('yes')) if luy.individual_loan else str(_('no')),
             str(_('yes')) if luy.stage_dimona else str(_('no')),
+            str(_('yes')) if luy.learning_container_year.team else str(_('no')),
             luy.other_remark,
             luy.other_remark_english,
             "{} ({}) - {} - {}".format(
@@ -663,24 +665,24 @@ class TestLearningUnitXls(TestCase):
             entity_requirement=Subquery(self.entity_requirement),
             entity_allocation=Subquery(self.entity_allocation),
         )
-        result = prepare_xls_content_with_attributions(qs, 33)
+        result = prepare_xls_content_with_attributions(qs, 34)
         self.assertEqual(len(result.get('data')), 2)
         self.assertCountEqual(result.get('cells_with_top_border'), ['A2', 'B2', 'C2', 'D2', 'E2', 'F2', 'G2', 'H2',
                                                                     'I2', 'J2', 'K2', 'L2', 'M2', 'N2', 'O2', 'P2',
                                                                     'Q2', 'R2', 'S2', 'T2', 'U2', 'V2', 'W2', 'X2',
                                                                     'Y2', 'Z2', 'AA2', 'AB2', 'AC2', 'AD2', 'AE2',
-                                                                    'AF2', 'AG2'
+                                                                    'AF2', 'AG2', 'AH2'
                                                                     ]
                               )
         self.assertCountEqual(result.get('cells_with_white_font'),
                               [
                                   'A3', 'B3', 'C3', 'D3', 'E3', 'F3', 'G3', 'H3', 'I3', 'J3', 'K3', 'L3', 'M3', 'N3',
                                   'O3', 'P3', 'Q3', 'R3', 'S3', 'T3', 'U3', 'V3', 'W3', 'X3', 'Y3', 'Z3', 'AA3', 'AB3',
-                                  'AC3', 'AD3', 'AE3'
+                                  'AC3', 'AD3', 'AE3', 'AF3'
                               ]
                               )
         first_attribution = result.get('data')[0]
-        attribution_first_column = 31
+        attribution_first_column = 32
         self.assertEqual(first_attribution[attribution_first_column], 'Dupuis Tom')
         self.assertEqual(first_attribution[attribution_first_column+1], 'dupuis@gmail.com')
         self.assertEqual(first_attribution[attribution_first_column+2], _("Coordinator"))
@@ -769,9 +771,9 @@ class TestLearningUnitXlsClassesDetail(TestCase):
             OuterRef('academic_year__start_date')
         ).values('acronym')[:1]
 
-        cls.score_responsible = ClassAttributionScoreResponsibleFactory(
+        cls.score_responsible = ScoreResponsibleOfClassFactory(
             learning_unit_year=cls.luy,
-            attribution_class=cls.attribution_1_on_class_a
+            learning_class_year=cls.class_a
         )
 
     def test_get_data_part1_with_effective_class_for_lecturing(self):
@@ -806,8 +808,8 @@ class TestLearningUnitXlsClassesDetail(TestCase):
             dict(PERIODICITY_TYPES)[luy.periodicity],
             str(_('yes')) if luy.status else str(_('no')),
             effective_class.hourly_volume_partial_q1 + effective_class.hourly_volume_partial_q2,
-            effective_class.hourly_volume_partial_q1,
-            effective_class.hourly_volume_partial_q2,
+            effective_class.hourly_volume_partial_q1 or '',
+            effective_class.hourly_volume_partial_q2 or '',
             '',
             '',
             '',
@@ -821,10 +823,10 @@ class TestLearningUnitXlsClassesDetail(TestCase):
             yesno(luy.exchange_students).strip(),
             yesno(luy.individual_loan).strip(),
             yesno(luy.stage_dimona).strip(),
+            yesno(luy.learning_container_year.team).strip(),
             luy.other_remark,
             luy.other_remark_english,
         ]
-
         self.assertEqual(
             get_data_part2(learning_unit_yr=luy, effective_class=effective_class, with_attributions=False),
             expected_common
@@ -874,7 +876,7 @@ class TestLearningUnitXlsClassesDetail(TestCase):
 
         expected = _build_cells_ref(
             ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
-             'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE'], [3, 4, 5, 7])
+             'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF'], [3, 4, 5, 7])
 
         self.assertSetEqual(
             cells_with_white_font,
@@ -882,8 +884,8 @@ class TestLearningUnitXlsClassesDetail(TestCase):
         )
 
     def _assert_class_attribution_volumes(self, class_attribution_line_data, attribution_class):
-        self.assertEqual(class_attribution_line_data[36], '')
-        self.assertEqual(class_attribution_line_data[37], attribution_class.allocation_charge)
+        self.assertEqual(class_attribution_line_data[37], '')
+        self.assertEqual(class_attribution_line_data[38], attribution_class.allocation_charge)
 
     def test_get_class_score_responsibles(self):
         score_responsibles = _get_class_score_responsibles(self.class_a)
@@ -949,6 +951,7 @@ def _expected_titles_common_part2_b() -> List[str]:
         str(_('Exchange students')),
         str(_('Individual loan')),
         str(_('Stage-Dimona')),
+        str(_('Team management')),
         str(_('Other remark (intended for publication)')),
         str(_('Other remark in english (intended for publication)')),
     ]

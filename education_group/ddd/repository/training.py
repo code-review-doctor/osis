@@ -29,7 +29,7 @@ import warnings
 from typing import Optional, List
 
 from django.db import IntegrityError
-from django.db.models import Subquery, OuterRef, Prefetch, QuerySet, Q, Max, Exists
+from django.db.models import Subquery, OuterRef, Prefetch, QuerySet, Q, Max
 
 from base.models import entity_version
 from base.models.academic_year import AcademicYear as AcademicYearModelDb
@@ -133,6 +133,22 @@ class TrainingRepository(interface.AbstractRepository):
         qs = _get_queryset_to_fetch_data_for_training(entity_ids)
         dtos = [_convert_education_group_year_to_dto(education_group_year_db) for education_group_year_db in qs]
         return [TrainingBuilder.build_from_repository_dto(dto) for dto in dtos]
+
+    @classmethod
+    def search_dtos(
+            cls,
+            sigle: str = None,
+            annee: int = None,
+            type: str = None,
+    ) -> List['TrainingDto']:
+        qs = _get_training_base_queryset()
+        if sigle:
+            qs = qs.filter(acronym__icontains=sigle)
+        if annee:
+            qs = qs.filter(academic_year__year=annee)
+        if type:
+            qs = qs.filter(education_group_type__name=type)
+        return [_convert_education_group_year_to_dto(education_group_year_db) for education_group_year_db in qs]
 
     @classmethod
     def search_trainings_last_occurence(cls, from_year: int) -> List['Training']:
