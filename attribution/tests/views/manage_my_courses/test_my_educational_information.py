@@ -29,7 +29,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
-from attribution.views.manage_my_courses.educational_information import _fetch_achievements_by_language
+from attribution.views.manage_my_courses.my_educational_information import _fetch_achievements_by_language
 from base.business.academic_calendar import AcademicEvent
 from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
@@ -41,7 +41,7 @@ from base.tests.factories.user import UserFactory
 from reference.tests.factories.language import FrenchLanguageFactory, EnglishLanguageFactory
 
 
-class TestTutorViewEducationalInformation(TestCase):
+class TestMyEducationalInformation(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.current_academic_year = AcademicYearFactory(current=True)

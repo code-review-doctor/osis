@@ -49,6 +49,7 @@ class EditEducationalInformation(LoginRequiredMixin, PermissionRequiredMixin, Fo
     raise_exception = True
     template_name = "learning_unit/pedagogy_edit.html"
     form_class = LearningUnitPedagogyEditForm
+    http_method_names = ['get', 'post']
 
     @cached_property
     def learning_unit_year(self) -> LearningUnitYear:
