@@ -22,6 +22,8 @@ We will group all declarations inside 'ddd/logic' folder
 
 We will group all implementations inside 'infrastructure/' folder
 
+We will use Dependency Injection mechanism in order to prevent implementation's leak into DDD logic. 
+
 ## Consequences
 
 +) It's easier to change the implementation of a service without impacting client which use this service 

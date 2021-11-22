@@ -33,6 +33,6 @@ Each components have one and only one purpose, we will use them accordingly.
 
 +) Consistent way of treating a part of business problem.
 
-+) Business logic is encapsulate in one place.
++) Business logic is encapsulated in one place.
 
 -) Use Domain Driven Design approach with business (Strategic part) can lead to organisational issues.
