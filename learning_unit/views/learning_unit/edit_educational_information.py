@@ -37,7 +37,7 @@ from base.forms.learning_unit_pedagogy import LearningUnitPedagogyEditForm
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import get_user_interface_language, Person
 from base.views.common import display_success_messages
-from base.views.learning_units.common import get_text_label_translated, get_common_context_learning_unit_year
+from base.views.learning_units.common import get_text_label_translated, get_common_context_for_learning_unit_year
 from base.views.learning_units.pedagogy.update import build_success_message
 from cms.models.text_label import TextLabel
 from osis_role.contrib.views import PermissionRequiredMixin
@@ -54,7 +54,15 @@ class EditEducationalInformation(LoginRequiredMixin, PermissionRequiredMixin, Fo
     @cached_property
     def learning_unit_year(self) -> LearningUnitYear:
         return get_object_or_404(
-            LearningUnitYear.objects.all().select_related('learning_container_year', 'academic_year'),
+            LearningUnitYear.objects.all().select_related(
+                'learning_unit',
+                'learning_container_year'
+            ).prefetch_related(
+                Prefetch(
+                    'learning_unit__learningunityear_set',
+                    queryset=LearningUnitYear.objects.select_related('academic_year')
+                )
+            ),
             pk=self.kwargs['learning_unit_year_id']
         )
 
@@ -72,7 +80,7 @@ class EditEducationalInformation(LoginRequiredMixin, PermissionRequiredMixin, Fo
     def get_context_data(self, **kwargs):
         return {
             **super().get_context_data(**kwargs),
-            **get_common_context_learning_unit_year(self.person, self.kwargs['learning_unit_year_id']),
+            **get_common_context_for_learning_unit_year(self.person, self.learning_unit_year),
             'text_label_translated': get_text_label_translated(self.text_label, self.user_language),
             'language_translated': find_language_in_settings(self.language),
             'cms_label_pedagogy_fr_only': CMS_LABEL_PEDAGOGY_FR_ONLY,
