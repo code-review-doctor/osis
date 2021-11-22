@@ -52,7 +52,7 @@ class OutsidePeriod(LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestM
         return not self._is_inside_scores_encodings_period()
 
     @staticmethod
-    def _is_inside_scores_encodings_period():
+    def _is_inside_scores_encodings_period() -> bool:
         return bool(message_bus_instance.invoke(GetPeriodeEncodageCommand()))
 
     def get_context_data(self, **kwargs):

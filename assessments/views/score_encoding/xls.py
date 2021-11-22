@@ -33,12 +33,13 @@ from assessments.views.tutor.score_sheet_xls_export import ScoreSheetXLSExportTu
 from assessments.views.tutor.score_sheet_xls_import import ScoreSheetXLSImportTutorView
 from base.auth.roles.program_manager import ProgramManager
 from base.auth.roles.tutor import Tutor
+from base.models.person import Person
 from osis_role.contrib.helper import EntityRoleHelper
 
 
 class ScoreSheetXLSExportView(LoginRequiredMixin, View):
     @cached_property
-    def person(self):
+    def person(self) -> Person:
         return self.request.user.person
 
     def dispatch(self, request, *args, **kwargs):

@@ -31,12 +31,13 @@ from assessments.views.program_manager.score_sheet_pdf_export import ScoreSheets
 from assessments.views.tutor.score_sheet_pdf_export import ScoreSheetsPDFExportTutorView
 from base.auth.roles.program_manager import ProgramManager
 from base.auth.roles.tutor import Tutor
+from base.models.person import Person
 from osis_role.contrib.helper import EntityRoleHelper
 
 
 class ScoreSheetsPDFExportView(LoginRequiredMixin, View):
     @cached_property
-    def person(self):
+    def person(self) -> Person:
         return self.request.user.person
 
     def dispatch(self, request, *args, **kwargs):

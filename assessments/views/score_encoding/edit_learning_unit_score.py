@@ -32,12 +32,13 @@ from assessments.views.program_manager.learning_unit_score_encoding_form import 
 from assessments.views.tutor.learning_unit_score_encoding_form import LearningUnitScoreEncodingTutorFormView
 from base.auth.roles.program_manager import ProgramManager
 from base.auth.roles.tutor import Tutor
+from base.models.person import Person
 from osis_role.contrib.helper import EntityRoleHelper
 
 
 class LearningUnitScoreEncodingFormView(LoginRequiredMixin, View):
     @cached_property
-    def person(self):
+    def person(self) -> Person:
         return self.request.user.person
 
     def dispatch(self, request, *args, **kwargs):

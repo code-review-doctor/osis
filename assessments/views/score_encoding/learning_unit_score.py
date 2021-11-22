@@ -31,12 +31,13 @@ from assessments.views.program_manager.learning_unit_score_encoding import Learn
 from assessments.views.tutor.learning_unit_score_encoding import LearningUnitScoreEncodingTutorView
 from base.auth.roles.program_manager import ProgramManager
 from base.auth.roles.tutor import Tutor
+from base.models.person import Person
 from osis_role.contrib.helper import EntityRoleHelper
 
 
 class LearningUnitScoreEncodingView(LoginRequiredMixin, View):
     @cached_property
-    def person(self):
+    def person(self) -> Person:
         return self.request.user.person
 
     def dispatch(self, request, *args, **kwargs):
