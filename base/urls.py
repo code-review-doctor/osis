@@ -48,7 +48,6 @@ from base.views import geocoding
 from base.views import learning_achievement, search, user_list
 from base.views import learning_unit, common, institution, organization, academic_calendar, \
     my_osis, student
-from base.views import teaching_material
 from base.views.autocomplete import OrganizationAutocomplete, CountryAutocomplete, CampusAutocomplete, \
     EntityAutocomplete, AllocationEntityAutocomplete, AdditionnalEntity1Autocomplete, AdditionnalEntity2Autocomplete, \
     EntityRequirementAutocomplete, EmployeeAutocomplete, AcademicCalendarTypeAutocomplete
@@ -63,6 +62,8 @@ from education_group import urls as education_group_urls
 from learning_unit import urls as learning_unit_urls
 from learning_unit.views.learning_unit.edit_educational_information import EditEducationalInformation, \
     EditEducationalInformationForceMajeure
+from learning_unit.views.learning_unit.teaching_material import CreateTeachingMaterial, UpdateTeachingMaterial, \
+    DeleteTeachingMaterial
 
 urlpatterns = [
     url(r'^$', common.home, name='home'),
@@ -235,10 +236,10 @@ urlpatterns = [
 
             ])),
             url(r'^teaching_materials/', include([
-                url(r'^create', teaching_material.create, name="teaching_material_create"),
-                url(r'^(?P<teaching_material_id>[0-9]+)/edit/', teaching_material.update,
+                url(r'^create', CreateTeachingMaterial.as_view(), name="teaching_material_create"),
+                url(r'^(?P<teaching_material_id>[0-9]+)/edit/', UpdateTeachingMaterial.as_view(),
                     name="teaching_material_edit"),
-                url(r'^(?P<teaching_material_id>[0-9]+)/delete/', teaching_material.delete,
+                url(r'^(?P<teaching_material_id>[0-9]+)/delete/', DeleteTeachingMaterial.as_view(),
                     name="teaching_material_delete")
             ])),
             url(r'^comparison/$', learning_unit.learning_unit_comparison, name="learning_unit_comparison"),
