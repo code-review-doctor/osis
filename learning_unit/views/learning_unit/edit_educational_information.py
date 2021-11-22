@@ -47,7 +47,7 @@ from reference.models.language import find_language_in_settings
 class EditEducationalInformation(LoginRequiredMixin, PermissionRequiredMixin, FormView):
     permission_required = 'base.can_edit_learningunit_pedagogy'
     raise_exception = True
-    template_name = "learning_unit/pedagogy_edit.html"
+    template_name = "learning_unit/educational_information_edit.html"
     form_class = LearningUnitPedagogyEditForm
     http_method_names = ['get', 'post']
 
