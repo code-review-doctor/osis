@@ -24,15 +24,13 @@
 #
 ##############################################################################
 
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import FormView
-
-from osis_role.contrib.views import PermissionRequiredMixin
+from learning_unit.views.learning_unit.edit_educational_information import EditEducationalInformation, \
+    EditEducationalInformationForceMajeure
 
 
-class EditMyEducationalInformation(LoginRequiredMixin, PermissionRequiredMixin, FormView):
+class EditMyEducationalInformation(EditEducationalInformation):
     pass
 
 
-class EditMyEducationalInformationForceMajeure(EditMyEducationalInformation):
+class EditMyEducationalInformationForceMajeure(EditEducationalInformationForceMajeure):
     pass
