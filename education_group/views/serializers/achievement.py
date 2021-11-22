@@ -42,7 +42,11 @@ def get_achievements(group: Group, path: str):
     qs = EducationGroupAchievement.objects.filter(
         education_group_year__educationgroupversion__root_group__partial_acronym=group.code,
         education_group_year__educationgroupversion__root_group__academic_year__year=group.year
-    ).prefetch_related('educationgroupdetailedachievement_set')
+    ).select_related(
+        'education_group_year__education_group_type'
+    ).prefetch_related(
+        'educationgroupdetailedachievement_set'
+    )
 
     achievements = []
     for achievement in qs:
