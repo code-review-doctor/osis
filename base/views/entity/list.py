@@ -57,4 +57,3 @@ class EntitySearch(LoginRequiredMixin, SearchMixin, FilterView):
         queryset = super().get_queryset()
 
         return queryset.select_related('entity__organization').order_by('acronym')
-
