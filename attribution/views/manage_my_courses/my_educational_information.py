@@ -36,12 +36,11 @@ from reversion.models import Version
 
 from attribution.models.attribution_new import AttributionNew
 from base.business.learning_unit import get_achievements_group_by_language, CMS_LABEL_PEDAGOGY_FR_ONLY
-from base.models.academic_year import starting_academic_year
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import get_user_interface_language, Person
 from base.models.teaching_material import TeachingMaterial
 from base.views.learning_unit import get_specifications_context, get_languages_settings
-from base.views.learning_units.common import get_common_context_to_publish
+from base.views.learning_units.common import get_common_context_for_learning_unit_year
 from base.views.learning_units.pedagogy.read import _get_cms_pedagogy_labels_translated, \
     _get_cms_force_majeure_labels_translated, _get_modification_history
 from cms.models.translated_text import TranslatedText
@@ -143,7 +142,7 @@ class EducationalInformation(LoginRequiredMixin, PermissionRequiredMixin, Templa
             **super().get_context_data(**kwargs),
             **get_languages_settings(),
             **get_specifications_context(self.learning_unit_year, self.request),
-            **get_common_context_to_publish(self.person, self.learning_unit_year),
+            **get_common_context_for_learning_unit_year(self.person, self.learning_unit_year),
             **self.get_context_actions_url(),
             'submission_dates': LearningUnitSummaryEditionCalendar().get_academic_event(
                 self.learning_unit_year.academic_year.year
@@ -153,12 +152,6 @@ class EducationalInformation(LoginRequiredMixin, PermissionRequiredMixin, Templa
             ),
             'achievements': _fetch_achievements_by_language(self.learning_unit_year),
             'div_class': 'collapse',
-            'learning_unit_year': self.learning_unit_year,
-            'current_academic_year': starting_academic_year(),
-            'is_person_linked_to_entity': self.person.is_linked_to_entity_in_charge_of_learning_unit_year(
-                self.learning_unit_year
-            ),
-            'learning_unit_year_choices': (reversed(self.learning_unit_year.learning_unit.learningunityear_set.all()),),
             'cms_labels_translated': self.pedagogy_translated_labels,
             'cms_force_majeure_labels_translated': _get_cms_force_majeure_labels_translated(
                 self.kwargs['learning_unit_year_id'],
@@ -172,7 +165,6 @@ class EducationalInformation(LoginRequiredMixin, PermissionRequiredMixin, Templa
             'attributions': self.attributions,
             "version": self.pedagogy_history,
             "force_majeure_version": self.force_majeure_history,
-            'tab_active': 'learning_unit_pedagogy'  # Corresponds to url_name
         }
 
 
