@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-30 14:16+0200\n"
+"POT-Creation-Date: 2021-11-22 09:36+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -296,6 +296,12 @@ msgstr ""
 "La date de cette unité d'enseignement n'est pas modifiable en raison de son "
 "type qui n'est pas parmi les types suivants: %(types)s"
 
+msgid "The learning unit has been updated"
+msgstr "L'unité d'enseignement a été modifiée"
+
+msgid "The learning unit has been updated (without report)."
+msgstr "L'unité d'enseignement a été modifiée (sans report)."
+
 msgid "The learning unit has proposal for this or a previous year"
 msgstr ""
 "L'unité d'enseignement est en proposition pour cette année ou une année "
@@ -307,6 +313,14 @@ msgstr ""
 
 msgid "The learning unit is a partim"
 msgstr "L'unité d'enseignement est un partim"
+
+#, python-format
+msgid ""
+"The learning unit is in proposal, the report from %(proposal_year)s will be "
+"done at consolidation"
+msgstr ""
+"L'UE étant en proposition, le report à partir de %(proposal_year)s sera "
+"effectué lors de la consolidation"
 
 msgid "The learning unit is not a partim"
 msgstr "L'unité d'enseignement n'est pas un partim"
@@ -510,6 +524,10 @@ msgstr "Vous n'avez pas les droits nécessaires pour supprimer une classe."
 msgid "You do not have sufficient access rights to update a class."
 msgstr "Vous n'avez pas les droits nécessaires pour modifier une classe."
 
+#, python-format
+msgid "and postponed until %(year)s"
+msgstr "et reportée jusque %(year)s"
+
 msgid "external acronym rules"
 msgstr ""
 "Code composé de:\n"
@@ -523,3 +541,11 @@ msgstr "volume horaire partiel q1"
 
 msgid "hourly volume partial q2"
 msgstr "volume horaire partiel q2"
+
+#, python-format
+msgid ""
+"the report has not been done from %(proposal_year)s because the LU is in "
+"proposal"
+msgstr ""
+"le report n'a pas été effectué à partir de %(proposal_year)s parce que l'UE "
+"est en proposition"
