@@ -172,7 +172,6 @@ class EducationalInformation(LoginRequiredMixin, PermissionRequiredMixin, Templa
             'attributions': self.attributions,
             "version": self.pedagogy_history,
             "force_majeure_version": self.force_majeure_history,
-            'tab_active': 'learning_unit_pedagogy'  # Corresponds to url_name
         }
 
 
