@@ -43,7 +43,7 @@ import base.views.learning_units.search.proposal
 import base.views.learning_units.search.service_course
 import base.views.learning_units.search.simple
 import base.views.learning_units.update
-from attribution.views import attribution
+from attribution.views.attribution import LearningUnitAttributions
 from base.views import geocoding
 from base.views import learning_achievement, search, user_list
 from base.views import learning_unit, common, institution, organization, academic_calendar, \
@@ -186,7 +186,7 @@ urlpatterns = [
             url(r'^$', DetailLearningUnitYearView.as_view(), name='learning_unit'),
             url(r'^formations/$', learning_unit.learning_unit_formations, name="learning_unit_formations"),
             url(r'^components/$', learning_unit.learning_unit_components, name="learning_unit_components"),
-            url(r'^attributions/$', attribution.learning_unit_attributions, name="learning_unit_attributions"),
+            url(r'^attributions/$', LearningUnitAttributions.as_view(), name="learning_unit_attributions"),
             url(r'^pedagogy/', include([
                 url(r'^$', learning_unit_pedagogy, name="learning_unit_pedagogy"),
                 url(r'^edit/$', EditEducationalInformation.as_view(), name="learning_unit_pedagogy_edit"),
