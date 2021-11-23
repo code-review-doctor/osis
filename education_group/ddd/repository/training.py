@@ -153,11 +153,10 @@ class TrainingRepository(interface.AbstractRepository):
             qs = qs.filter(education_group_type__name=type)
         if sigle_entite_gestion and not inclure_entites_gestion_subordonnees:
             qs = qs.annotate(
-                management_entity_acronym=CTESubquery(
-                    EntityVersion.objects.with_acronym_path(
+                management_entity_acronym=Subquery(
+                    EntityVersion.objects.filter(
                         entity_id=OuterRef('management_entity'),
-                    ).values('path_as_string')[:1],
-                    output_field=TextField(),
+                    ).values('management_entity_acronym')[:1],
                 ),
             ).filter(management_entity_acronym=sigle_entite_gestion)
         elif sigle_entite_gestion and inclure_entites_gestion_subordonnees:
