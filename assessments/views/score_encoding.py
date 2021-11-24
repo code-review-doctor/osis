@@ -78,33 +78,37 @@ def assessments(request):
 @permission_required('assessments.can_access_scoreencoding', raise_exception=True)
 @user_passes_test(_is_not_inside_scores_encodings_period, login_url=reverse_lazy('assessments'))
 def outside_period(request):
-    date_format = str(_('date_format'))
-    latest_session_exam = mdl.session_exam_calendar.get_latest_session_exam()
-    closest_new_session_exam = mdl.session_exam_calendar.get_closest_new_session_exam()
+    messages_str = get_latest_closest_session_information_message()
 
-    if latest_session_exam:
-        month_session = latest_session_exam.month_session_name()
-        str_date = latest_session_exam.end_date.strftime(date_format)
+    for message in messages_str:
         messages.add_message(
             request,
             messages.WARNING,
-            _("The period of scores' encoding for %(month_session)s session is closed since %(str_date)s")
-            % {'month_session': month_session, 'str_date': str_date}
-        )
-
-    if closest_new_session_exam:
-        month_session = closest_new_session_exam.month_session_name()
-        str_date = closest_new_session_exam.start_date.strftime(date_format)
-        messages.add_message(
-            request,
-            messages.WARNING,
-            _("The period of scores' encoding for %(month_session)s session will be open %(str_date)s")
-            % {'month_session': month_session, 'str_date': str_date}
+            message
         )
 
     if not messages.get_messages(request):
         messages.add_message(request, messages.WARNING, _("The period of scores' encoding is not opened"))
     return render(request, "assessments/outside_scores_encodings_period.html", {})
+
+
+def get_latest_closest_session_information_message():
+    messages_str = []
+    date_format = str(_('date_format'))
+    latest_session_exam = mdl.session_exam_calendar.get_latest_session_exam()
+    closest_new_session_exam = mdl.session_exam_calendar.get_closest_new_session_exam()
+    if latest_session_exam:
+        month_session = latest_session_exam.month_session_name()
+        str_date = latest_session_exam.end_date.strftime(date_format)
+        messages_str.append(
+            _("The period of scores' encoding for %(month_session)s session is closed since %(str_date)s")
+            % {'month_session': month_session, 'str_date': str_date})
+    if closest_new_session_exam:
+        month_session = closest_new_session_exam.month_session_name()
+        str_date = closest_new_session_exam.start_date.strftime(date_format)
+        messages_str.append(_("The period of scores' encoding for %(month_session)s session will be open %(str_date)s")
+                            % {'month_session': month_session, 'str_date': str_date})
+    return messages_str
 
 
 class LearningUnitScoreEncodingView(LoginRequiredMixin, View):
