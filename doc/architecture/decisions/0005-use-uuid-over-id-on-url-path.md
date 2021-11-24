@@ -24,5 +24,5 @@ We cannot see UUID as protection so we will ensure that path is correctly protec
 
 +) UUID is difficult to guess.
 
--) The readability of a natural key might be a drawback. If a url is human-readable it might be easier for a human to attempt 
-to modify it.
+-+) The readability of a natural key might be viewed as drawback OR opportunity. 
+If a url is human-readable it might be easier for a human to attempt to modify it.
