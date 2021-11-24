@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,14 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf import settings
+from rest_framework import serializers
 
 
-def view_academicactors(user):
-    return user.has_perm('base.view_programmanager') \
-           or ("assessments" in settings.INSTALLED_APPS and user.has_perm('assessments.view_scoresresponsible')) \
-           or ("dissertation" in settings.INSTALLED_APPS and user.has_perm('dissertation.change_offerproposition'))
-
-
-def view_scores_responsible(user):
-    return "assessments" in settings.INSTALLED_APPS and user.has_perm('assessments.view_scoresresponsible')
+class AddressSerializer(serializers.Serializer):
+    city = serializers.CharField()
+    street = serializers.CharField()
+    street_number = serializers.CharField()
+    postal_code = serializers.CharField()
+    state = serializers.CharField()
+    country_iso_code = serializers.CharField(source='country.iso_code')
+    is_main = serializers.BooleanField()

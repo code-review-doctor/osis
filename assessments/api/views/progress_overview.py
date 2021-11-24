@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,14 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf import settings
+from rest_framework import generics
+
+from assessments.api.serializers.progress_overview import ProgressOverviewSerializer
+from ddd.logic.encodage_des_notes.soumission.commands import GetProgressionGeneraleCommand
+from infrastructure.messages_bus import message_bus_instance
 
 
-def view_academicactors(user):
-    return user.has_perm('base.view_programmanager') \
-           or ("assessments" in settings.INSTALLED_APPS and user.has_perm('assessments.view_scoresresponsible')) \
-           or ("dissertation" in settings.INSTALLED_APPS and user.has_perm('dissertation.change_offerproposition'))
+class ProgressOverviewTutorView(generics.RetrieveAPIView):
+    name = 'progress_overview_tutor'
+    serializer_class = ProgressOverviewSerializer
 
-
-def view_scores_responsible(user):
-    return "assessments" in settings.INSTALLED_APPS and user.has_perm('assessments.view_scoresresponsible')
+    def get_object(self):
+        cmd = GetProgressionGeneraleCommand(matricule_fgs_enseignant=self.request.user.person.global_id)
+        return message_bus_instance.invoke(cmd)

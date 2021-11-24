@@ -11,7 +11,7 @@ servers:
  - url: https://osis.uclouvain.be/api/v1/assessments/
    description: 'Production server'
 info:
-  version: '1.00'
+  version: '1.1.0'
   title: 'Assessments Service'
   description: |-
     A set of API endpoints that allow you to get score sheet
@@ -193,6 +193,29 @@ paths:
             $ref: '#/components/responses/Unauthorized'
         tags:
           - score_encoding
+  /overview/:
+      get:
+        description: Return score encoding progress overview for a tutor
+        operationId: get_overview
+        parameters:
+          - $ref: '#/components/parameters/Accept-Language'
+          - $ref: '#/components/parameters/X-User-FirstName'
+          - $ref: '#/components/parameters/X-User-LastName'
+          - $ref: '#/components/parameters/X-User-Email'
+          - $ref: '#/components/parameters/X-User-GlobalID'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ProgressOverview'
+          '400':
+            $ref: '#/components/responses/BadRequest'
+          '401':
+            $ref: '#/components/responses/Unauthorized'
+        tags:
+          - score_encoding
 components:
   securitySchemes:
     Token:
@@ -272,10 +295,12 @@ components:
       type: object
       properties:
         start_date:
-          type: date
+          type: string
+          format: date
           nullable: true
         end_date:
-          type: date
+          type: string
+          format: date
           nullable: true
         year:
           type: integer
@@ -301,5 +326,39 @@ components:
         global_id:
           type: string
           example: "00015847"
+    ProgressOverview:
+      type: object
+      properties:
+        academic_year:
+          type: integer
+          example: 2020
+        session_number:
+          type: integer
+          example: 1
+        learning_units_progress:
+          type: array
+          items:
+            $ref: '#/components/schemas/LearningUnitProgress'
+    LearningUnitProgress:
+      type: object
+      properties:
+        code:
+          type: string
+          example: "LPSP1210"
+        full_title:
+          type: string
+          example: "Methodology of research"
+        due_dates:
+          type: array
+          items:
+            type: string
+            format: date
+            example: "2020-01-31"
+        score_responsible:
+          type: string
+          example: "Doe John"
+          nullable: true
+        has_peps:
+          type: boolean
 security:
   - Token: []

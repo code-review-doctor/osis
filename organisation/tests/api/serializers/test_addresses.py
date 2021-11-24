@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,14 +23,27 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf import settings
+
+from django.test import TestCase
+
+from base.tests.factories.entity_version_address import EntityVersionAddressFactory
+from organisation.api.serializers.addresses import AddressSerializer
 
 
-def view_academicactors(user):
-    return user.has_perm('base.view_programmanager') \
-           or ("assessments" in settings.INSTALLED_APPS and user.has_perm('assessments.view_scoresresponsible')) \
-           or ("dissertation" in settings.INSTALLED_APPS and user.has_perm('dissertation.change_offerproposition'))
+class AddressSerializerTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.address = EntityVersionAddressFactory()
+        cls.serializer = AddressSerializer(cls.address)
 
-
-def view_scores_responsible(user):
-    return "assessments" in settings.INSTALLED_APPS and user.has_perm('assessments.view_scoresresponsible')
+    def test_contains_expected_fields(self):
+        expected_fields = [
+            'city',
+            'street',
+            'street_number',
+            'postal_code',
+            'state',
+            'country_iso_code',
+            'is_main',
+        ]
+        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
