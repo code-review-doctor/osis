@@ -148,9 +148,19 @@
                                             </td>
                                             <td headers="tab_online_progress">
                                                 <div class="progress">
-                                                    <div class="progress-bar {% if progression_encodage.encodage_est_complet %} progress-bar-success {% else %} progress-bar-warning {% endif %}" role="progressbar" style="width: {% widthratio progression_encodage.quantite_notes_soumises progression_encodage.quantite_totale_notes 100 %}%;">
+                                                    <div
+                                                            class="progress-bar {% if progression_encodage.encodage_est_complet %} progress-bar-success {% else %} progress-bar-warning {% endif %}"
+                                                            role="progressbar"
+                                                            style="width: {% widthratio progression_encodage.quantite_notes_soumises progression_encodage.quantite_totale_notes 100 %}%;"
+                                                            data-toggle="tooltip"
+                                                            data-container="body"
+                                                            title="{% trans "Represents the quantity of scores submitted to the administration. The number surrounded by parenthesis is the number of scores encoded by the tutor that aren't submitted yet ('draft' state)" %}"
+                                                    >
                                                        <span>
                                                             <b>
+                                                                {% if progression_encodage.quantite_notes_brouillon %}
+                                                                    ({{ progression_encodage.quantite_notes_brouillon }})
+                                                                {% endif %}
                                                                 {{ progression_encodage.quantite_notes_soumises}} / {{ progression_encodage.quantite_totale_notes }}
                                                             </b>
                                                         </span>
@@ -226,9 +236,19 @@
                                             </td>
                                             <td headers="tab_paper_progress">
                                                 <div class="progress">
-                                                    <div class="progress-bar {% if progression_encodage.encodage_est_complet %} progress-bar-success {% else %} progress-bar-warning {% endif %}" role="progressbar" style="width: {% widthratio progression_encodage.quantite_notes_soumises progression_encodage.quantite_totale_notes 100 %}%;">
+                                                    <div
+                                                            class="progress-bar {% if progression_encodage.encodage_est_complet %} progress-bar-success {% else %} progress-bar-warning {% endif %}"
+                                                            role="progressbar"
+                                                            style="width: {% widthratio progression_encodage.quantite_notes_soumises progression_encodage.quantite_totale_notes 100 %}%;"
+                                                            data-toggle="tooltip"
+                                                            data-container="body"
+                                                            title="{% trans "Represents the quantity of scores submitted to the administration. The number surrounded by parenthesis is the number of scores encoded by the tutor that aren't submitted yet ('draft' state)" %}"
+                                                    >
                                                        <span>
                                                             <b>
+                                                                {% if progression_encodage.quantite_notes_brouillon %}
+                                                                    ({{ progression_encodage.quantite_notes_brouillon }})
+                                                                {% endif %}
                                                                 {{ progression_encodage.quantite_notes_soumises}} / {{ progression_encodage.quantite_totale_notes }}
                                                             </b>
                                                         </span>
@@ -279,9 +299,19 @@
                                             </td>
                                             <td headers="tab_excel_progress">
                                                 <div class="progress">
-                                                    <div class="progress-bar {% if progression_encodage.encodage_est_complet %} progress-bar-success {% else %} progress-bar-warning {% endif %}" role="progressbar" style="width: {% widthratio progression_encodage.quantite_notes_soumises progression_encodage.quantite_totale_notes 100 %}%;">
+                                                    <div
+                                                            class="progress-bar {% if progression_encodage.encodage_est_complet %} progress-bar-success {% else %} progress-bar-warning {% endif %}"
+                                                            role="progressbar"
+                                                            style="width: {% widthratio progression_encodage.quantite_notes_soumises progression_encodage.quantite_totale_notes 100 %}%;"
+                                                            data-toggle="tooltip"
+                                                            data-container="body"
+                                                            title="{% trans "Represents the quantity of scores submitted to the administration. The number surrounded by parenthesis is the number of scores encoded by the tutor that aren't submitted yet ('draft' state)" %}"
+                                                    >
                                                        <span>
                                                             <b>
+                                                                {% if progression_encodage.quantite_notes_brouillon %}
+                                                                    ({{ progression_encodage.quantite_notes_brouillon }})
+                                                                {% endif %}
                                                                 {{ progression_encodage.quantite_notes_soumises}} / {{ progression_encodage.quantite_totale_notes }}
                                                             </b>
                                                         </span>
