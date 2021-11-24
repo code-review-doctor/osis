@@ -67,6 +67,12 @@ class ScoreSearchEncodingForm(forms.Form):
         super().__init__(**kwargs)
         self.fields['note'].widget.attrs['style'] = 'width:70px; '
 
+    def clean_note(self):
+        note = self.cleaned_data['note']
+        if note:
+            return note.replace(",", ".")
+        return note
+
 
 class ScoreSearchForm(forms.Form):
     noma = forms.CharField(required=False, label=_("Reg. No."))
