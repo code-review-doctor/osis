@@ -157,10 +157,10 @@
                                                             title="{% trans "Represents the quantity of scores submitted to the administration. The number surrounded by parenthesis is the number of scores encoded by the tutor that aren't submitted yet ('draft' state)" %}"
                                                     >
                                                        <span>
+                                                           {% if progression_encodage.quantite_notes_brouillon %}
+                                                               ({{ progression_encodage.quantite_notes_brouillon }})
+                                                           {% endif %}
                                                             <b>
-                                                                {% if progression_encodage.quantite_notes_brouillon %}
-                                                                    ({{ progression_encodage.quantite_notes_brouillon }})
-                                                                {% endif %}
                                                                 {{ progression_encodage.quantite_notes_soumises}} / {{ progression_encodage.quantite_totale_notes }}
                                                             </b>
                                                         </span>
@@ -245,10 +245,10 @@
                                                             title="{% trans "Represents the quantity of scores submitted to the administration. The number surrounded by parenthesis is the number of scores encoded by the tutor that aren't submitted yet ('draft' state)" %}"
                                                     >
                                                        <span>
+                                                           {% if progression_encodage.quantite_notes_brouillon %}
+                                                               ({{ progression_encodage.quantite_notes_brouillon }})
+                                                           {% endif %}
                                                             <b>
-                                                                {% if progression_encodage.quantite_notes_brouillon %}
-                                                                    ({{ progression_encodage.quantite_notes_brouillon }})
-                                                                {% endif %}
                                                                 {{ progression_encodage.quantite_notes_soumises}} / {{ progression_encodage.quantite_totale_notes }}
                                                             </b>
                                                         </span>
@@ -308,10 +308,10 @@
                                                             title="{% trans "Represents the quantity of scores submitted to the administration. The number surrounded by parenthesis is the number of scores encoded by the tutor that aren't submitted yet ('draft' state)" %}"
                                                     >
                                                        <span>
+                                                           {% if progression_encodage.quantite_notes_brouillon %}
+                                                               ({{ progression_encodage.quantite_notes_brouillon }})
+                                                           {% endif %}
                                                             <b>
-                                                                {% if progression_encodage.quantite_notes_brouillon %}
-                                                                    ({{ progression_encodage.quantite_notes_brouillon }})
-                                                                {% endif %}
                                                                 {{ progression_encodage.quantite_notes_soumises}} / {{ progression_encodage.quantite_totale_notes }}
                                                             </b>
                                                         </span>
