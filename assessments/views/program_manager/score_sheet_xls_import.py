@@ -50,13 +50,16 @@ class ScoreSheetXLSImportProgramManagerView(ScoreSheetXLSImportBaseView):
         get_rapport_cmd = GetEncoderNotesRapportCommand(from_transaction_id=cmd.transaction_id)
         rapport = message_bus_instance.invoke(get_rapport_cmd)
 
+        already = []
         for note_non_enregistrees in rapport.get_notes_non_enregistrees():
-            row_number = next(
-                note_etudiant['row_number'] for note_etudiant in score_sheet_serialized['notes_etudiants']
-                if note_etudiant['noma'] == note_non_enregistrees.noma
-            )
-            error_message = "{} : {} {}".format(note_non_enregistrees.cause, _('Row'), str(row_number))
-            messages.error(self.request, error_message)
+            if note_non_enregistrees.cause not in already:
+                already.append(note_non_enregistrees.cause)
+                row_number = next(
+                    note_etudiant['row_number'] for note_etudiant in score_sheet_serialized['notes_etudiants']
+                    if note_etudiant['noma'] == note_non_enregistrees.noma
+                )
+                error_message = "{}".format(note_non_enregistrees.cause)
+                messages.error(self.request, error_message)
 
         nombre_notes_enregistrees = len(rapport.get_notes_enregistrees())
         if nombre_notes_enregistrees:

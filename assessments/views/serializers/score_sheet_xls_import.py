@@ -29,13 +29,7 @@ from typing import List
 from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from openpyxl.worksheet import Worksheet
 from rest_framework import serializers
-
-HEADER = [_('Academic year'), _('Session'), _('Learning unit'), pgettext_lazy('encoding', 'Program'),
-          pgettext_lazy('assessments', 'Registration number'), _('Name'), _('Email'), _('Numbered scores'),
-          _('Justification (A,T)'), _('End date Prof'), _('Type of specific profile'), _('Extra time (33% generally)'),
-          _('Large print'), _('Specific room of examination'), _('Other educational facilities'),
-          _('Details other educational facilities'), _('Educational tutor'),
-          ]
+from assessments.export.score_sheet_xls import HEADER
 
 
 class ScoreSheetXLSImportSerializerError(ValueError):
@@ -57,7 +51,7 @@ class _XLSNoteEtudiantRowImportSerializer(serializers.Serializer):
 
     @staticmethod
     def get_note(obj: tuple) -> str:
-        col_note = HEADER.index(_('Numbered scores'))
+        col_note = HEADER.index(_('Score'))
         raw_value = str(obj[col_note].value) if obj[col_note].value is not None else ''
         return raw_value.replace(",", ".")
 
@@ -81,6 +75,8 @@ class ScoreSheetXLSImportSerializer(serializers.Serializer):
     notes_etudiants = serializers.SerializerMethodField()
 
     def get_numero_session(self, worksheet: Worksheet) -> int:
+        self._check_headers_consistency(worksheet)
+
         col_session = HEADER.index(_('Session'))
         session_found = set()
         for count, row in enumerate(self.__get_student_rows(worksheet)):
@@ -148,6 +144,28 @@ class ScoreSheetXLSImportSerializer(serializers.Serializer):
         representation = super().to_representation(instance)
         json_str = json.dumps(representation)
         return json.loads(json_str)
+
+    @staticmethod
+    def _check_headers_consistency(worksheet):
+        headers_line_found = False
+        for count, row in enumerate(worksheet.rows):
+            if row[0].value == HEADER[0]:
+                headers_line_found = True
+                for header_count, header in enumerate(HEADER):
+                    try:
+                        if row[header_count].value != header:
+                            raise ScoreSheetXLSImportSerializerError(
+                                _("File error : The file is not consistent. No scores injected."),
+                            )
+                    except Exception as e:
+                        raise ScoreSheetXLSImportSerializerError(
+                            _("File error : The file is not consistent. No scores injected."),
+                        )
+                break
+        if not headers_line_found:
+            raise ScoreSheetXLSImportSerializerError(
+                _("File error : The file is not consistent. No scores injected."),
+            )
 
 
 class ProgramManagerScoreSheetXLSImportSerializer(ScoreSheetXLSImportSerializer):

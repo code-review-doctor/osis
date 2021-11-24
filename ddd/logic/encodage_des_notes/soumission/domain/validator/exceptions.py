@@ -75,7 +75,7 @@ class PasGestionnaireParcoursException(BusinessException):
 
 class PasGestionnaireParcoursCohorteException(BusinessException):
     def __init__(self, cohortes_non_geres: Set[str], **kwargs):
-        message = _("You're not a program manager of {}").format(','.join(cohortes_non_geres))
+        message = _("You're not a program manager of {}").format(cohortes_non_geres)
         super().__init__(message, **kwargs)
 
 
