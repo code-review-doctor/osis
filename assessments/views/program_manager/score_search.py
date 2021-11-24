@@ -29,6 +29,7 @@ from django.contrib import messages
 from django.forms import formset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
+from django.template.defaultfilters import floatformat
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.views.generic import FormView
@@ -82,11 +83,7 @@ class ScoreSearchFormView(PermissionRequiredMixin, FormView):
         formset_initial = []
         for note_etudiant in self.notes_etudiant_filtered:
             if not note_etudiant.date_echeance_atteinte and not note_etudiant.desinscrit_tardivement:
-                formset_initial.append({
-                    'note': note_etudiant.note,
-                    'noma': note_etudiant.noma,
-                    'code_unite_enseignement': note_etudiant.code_unite_enseignement
-                })
+                formset_initial.append(self._get_initial_note_etudiant(note_etudiant))
             else:
                 formset_initial.append({})
         return formset_initial
@@ -177,3 +174,15 @@ class ScoreSearchFormView(PermissionRequiredMixin, FormView):
 
     def get_score_encoding_progress_overview_url(self):
         return reverse('score_encoding_progress_overview')
+
+    def _get_initial_note_etudiant(self, note_etudiant):
+        try:
+            note_format = "2" if note_etudiant.note_decimale_est_autorisee else "0"
+            note_formated = floatformat(float(note_etudiant.note), note_format)
+        except ValueError:
+            note_formated = note_etudiant.note
+        return {
+            'note': note_formated,
+            'noma': note_etudiant.noma,
+            'code_unite_enseignement': note_etudiant.code_unite_enseignement
+        }
