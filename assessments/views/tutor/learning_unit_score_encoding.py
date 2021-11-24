@@ -27,6 +27,7 @@ from django.urls import reverse
 from django.utils.functional import cached_property
 
 from assessments.views.common.learning_unit_score_encoding import LearningUnitScoreEncodingBaseView
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import FeuilleDeNotesDTO
 from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand, GetResponsableDeNotesCommand
 from infrastructure.messages_bus import message_bus_instance
 
@@ -46,7 +47,7 @@ class LearningUnitScoreEncodingTutorView(LearningUnitScoreEncodingBaseView):
         }
 
     @cached_property
-    def feuille_de_notes(self):
+    def feuille_de_notes(self) -> 'FeuilleDeNotesDTO':
         cmd = GetFeuilleDeNotesCommand(
             matricule_fgs_enseignant=self.person.global_id,
             code_unite_enseignement=self.kwargs['learning_unit_code'].upper()
