@@ -242,8 +242,6 @@ msgstr "Entité"
 msgid "Evaluations"
 msgstr "Evaluations"
 
-#, fuzzy, python-format
-#| msgid "Extra time (33% generally)"
 msgid "Extra time (33% generally)"
 msgstr "Tiers-Temps"
 
@@ -747,20 +745,3 @@ msgstr "étudiants"
 
 msgid "the"
 msgstr "le"
-
-#~ msgid ""
-#~ "\n"
-#~ "                                For first year bachelor, the address of "
-#~ "reference is by default the one from the bachelor.\n"
-#~ "                                It is possible to define a specific "
-#~ "address for the first year of the bachelor by checking the box.\n"
-#~ "                            "
-#~ msgstr ""
-#~ "\n"
-#~ "Pour la première année de bachelier, l'adresse de référence par défaut "
-#~ "est celle du bachelier. Il est néanmoins possible de définir une adresse "
-#~ "spécifique à la première année de bachelier en cochant la case "
-#~ "correspondante."
-
-#~ msgid "Registration number"
-#~ msgstr "Noma"
