@@ -63,10 +63,16 @@ class LearningUnitScoreEncodingTutorView(LearningUnitScoreEncodingBaseView):
         return self.feuille_de_notes.quantite_notes_en_attente_de_soumission > 0 and self.is_score_responsible()
 
     def can_encode_scores(self) -> bool:
-        return any(not n.date_echeance_atteinte and not n.est_soumise for n in self.feuille_de_notes.notes_etudiants)
+        return self._can_encode_at_least_one_score()
 
     def can_upload_scores_xls(self) -> bool:
-        return any(not n.date_echeance_atteinte and not n.est_soumise for n in self.feuille_de_notes.notes_etudiants)
+        return self._can_encode_at_least_one_score()
+
+    def _can_encode_at_least_one_score(self):
+        return any(
+            not n.date_echeance_enseignant_atteinte and not n.est_soumise
+            for n in self.feuille_de_notes.notes_etudiants
+        )
 
     def is_score_responsible(self) -> bool:
         cmd = GetResponsableDeNotesCommand(
