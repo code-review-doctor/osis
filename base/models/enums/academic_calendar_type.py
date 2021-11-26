@@ -45,3 +45,5 @@ class AcademicCalendarTypes(ChoiceEnum):
     EDUCATION_GROUP_LIMITED_DAILY_MANAGEMENT = _("Education group limited daily management")
     LEARNING_UNIT_EXTENDED_PROPOSAL_MANAGEMENT = _("Extended proposal management")
     LEARNING_UNIT_LIMITED_PROPOSAL_MANAGEMENT = _("Limited proposal management")
+    PAYMENT_NOTICE_1_WARNING = _("Payment notice 1 warning")
+    PAYMENT_NOTICE_2_WARNING = _("Payment notice 2 warning")

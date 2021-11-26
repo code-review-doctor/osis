@@ -25,9 +25,13 @@
 ##############################################################################
 from django.core import validators
 from django.db import models
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
 
-from attribution.models.attribution_charge_new import MIN_ALLOCATION_CHARGE
+from assessments.models.score_responsible import ScoreResponsible
 from osis_common.models.osis_model_admin import OsisModelAdmin
+
+MIN_ALLOCATION_CHARGE = 0
 
 
 class AttributionClassAdmin(OsisModelAdmin):
@@ -48,8 +52,13 @@ class AttributionClass(models.Model):
     changed = models.DateTimeField(null=True, auto_now=True)
     attribution_charge = models.ForeignKey('AttributionChargeNew', on_delete=models.CASCADE)
     learning_class_year = models.ForeignKey('learning_unit.LearningClassYear', on_delete=models.CASCADE)
-    allocation_charge = models.DecimalField(max_digits=6, decimal_places=1, blank=True, null=True,
-                                            validators=[validators.MinValueValidator(MIN_ALLOCATION_CHARGE)])
+    allocation_charge = models.DecimalField(
+        max_digits=6,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        validators=[validators.MinValueValidator(MIN_ALLOCATION_CHARGE)]
+    )
     objects = models.Manager()
 
     def __str__(self):
@@ -57,3 +66,14 @@ class AttributionClass(models.Model):
             self.attribution_charge,
             self.learning_class_year
         )
+
+
+@receiver(post_delete, sender=AttributionClass)
+def _attribution_class_delete(sender, instance, **kwargs):
+    if AttributionClass.objects.filter(
+            attribution_charge__attribution__tutor=instance.attribution_charge.attribution.tutor,
+            learning_class_year=instance.learning_class_year
+    ).count() == 0:
+        ScoreResponsible.objects.filter(
+            learning_class_year=instance.learning_class_year,
+            tutor=instance.attribution_charge.attribution.tutor).delete()

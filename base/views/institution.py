@@ -154,6 +154,29 @@ def get_entity_address(request, entity_version_id):
 
 
 @login_required
+def get_entity_address_by_acronym(request, entity_acronym):
+    version = entity_version_mdl.EntityVersion.objects.filter(
+        acronym=entity_acronym
+    ).order_by("start_date").last()
+    entity = version.entity
+    response = {
+        'entity_version_exists_now': version.exists_now(),
+        'recipient': '{} - {}'.format(version.acronym, version.title),
+        'address': {}
+    }
+    if entity and entity.has_address():
+        response['address'] = {
+            'location': entity.location,
+            'postal_code': entity.postal_code,
+            'city': entity.city,
+            'country': entity.country.name,
+            'phone': entity.phone,
+            'fax': entity.fax,
+        }
+    return JsonResponse(response)
+
+
+@login_required
 def entity_read_by_acronym(request, entity_acronym):
     results = entity.search(acronym=entity_acronym)
     if results:

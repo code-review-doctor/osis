@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 08:30+0200\n"
+"POT-Creation-Date: 2021-11-16 13:20+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -162,9 +162,6 @@ msgstr "Absence justifiée"
 
 msgid "Absence unjustified"
 msgstr "Absence injustifiée"
-
-msgid "Absent"
-msgstr "Absent"
 
 msgid "Ac yr."
 msgstr "Anac."
@@ -642,6 +639,9 @@ msgstr "Consolider"
 msgid "Consolidate the proposal"
 msgstr "Consolider la proposition"
 
+msgid "Contact"
+msgstr "Contact"
+
 msgid "Continuing Education"
 msgstr "Formations Continues"
 
@@ -827,16 +827,6 @@ msgstr "Documentation"
 msgid "Down"
 msgstr "Descendre"
 
-msgid ""
-"Due to a pending change in OSIS, student counters for 1BA, 11BA and learning "
-"units containing classes could be distorted(abnormally high). For accurate "
-"statistics, please consult the EPC statistics."
-msgstr ""
-"Suite à un changement en cours d'implémentation dans OSIS, les compteurs "
-"relatifs aux étudiants de 1BA, 11BA et aux cours qui contiennent des classes "
-"pourraient être faussés (anormalement élevés). Pour une statistique précise, "
-"veuillez consulter les statistiques d'EPC."
-
 msgid "Duration"
 msgstr "Durée"
 
@@ -934,8 +924,14 @@ msgstr "English-friendly"
 msgid "Enrolled"
 msgstr "Inscrit"
 
+msgid "Enrolled to"
+msgstr "Inscrits à"
+
 msgid "Enrolled to learning unit"
 msgstr "Inscrits à l'UE"
+
+msgid "Enrolled to training"
+msgstr "Inscrits à la formation"
 
 msgid "Enrollment campus"
 msgstr "Lieu d'inscription"
@@ -1687,6 +1683,9 @@ msgstr "Nombre minimum de relations autorisées"
 msgid "Minor list choice"
 msgstr "Liste au choix Mineures"
 
+msgid "Missing score"
+msgstr "Note manquante"
+
 msgid "Missing search address"
 msgstr "Adresse de recherche manquante"
 
@@ -1791,6 +1790,9 @@ msgstr "Aucune proposition n'a été sélectionnée."
 
 msgid "No result!"
 msgstr "Aucun résultat !"
+
+msgid "No weighting(same weight)"
+msgstr "Pas de pondération (même poids)"
 
 msgid "No. Session"
 msgstr "No. session"
@@ -1972,6 +1974,12 @@ msgstr "Attention"
 msgid "Pay attention! This learning unit is used in more than one formation"
 msgstr ""
 "Attention cette unité d'enseignement fait partie de plusieurs formations :"
+
+msgid "Payment notice 1 warning"
+msgstr "Avertissement avis d'échéance de paiement 1"
+
+msgid "Payment notice 2 warning"
+msgstr "Avertissement avis d'échéance de paiement 2"
 
 msgid "Pending"
 msgstr "En attente"
@@ -2355,7 +2363,7 @@ msgid "Scores exam submission"
 msgstr "Encodage de notes"
 
 msgid "Scores must be between 0 and 20"
-msgstr "Les scores doivent être compris entre 0 et 20"
+msgstr "Les notes doivent être comprises entre 0 et 20"
 
 msgid "Scores responsibles"
 msgstr "Responsables de notes"
@@ -2477,6 +2485,9 @@ msgstr "Recherche étudiants"
 
 msgid "Student's dissertations management"
 msgstr "Gestion des mémoires des étudiants"
+
+msgid "Student.s enrolled in block 1"
+msgstr "Etudiant.e.s inscrit.e.s au bloc 1"
 
 msgid "Students"
 msgstr "Étudiants"
@@ -2626,6 +2637,14 @@ msgstr ""
 "Le champ session dérogation doit être complété UNIQUEMENT si l'on veut "
 "encoder une exception par rapport aux sessions calculées en fonction des "
 "quadrimestres."
+
+#, python-format
+msgid ""
+"The effective class %(acronym)s has %(count)d enrollments for the year "
+"%(year)s"
+msgstr ""
+"La classe %(acronym)s fait l'objet de %(count)d inscription(s) pour l'année "
+"%(year)s"
 
 #, python-format
 msgid ""
@@ -2950,9 +2969,6 @@ msgstr "Aujourd'hui"
 msgid "Total"
 msgstr "Total"
 
-msgid "Total enrollments to training"
-msgstr "Total d'inscrits à la formation"
-
 msgid "Training"
 msgstr "Formation"
 
@@ -3147,6 +3163,9 @@ msgstr "Semaine"
 
 msgid "Weighting"
 msgstr "Pondération par crédit"
+
+msgid "Weighting type"
+msgstr "Type de pondération"
 
 msgctxt "section title"
 msgid "Welcome"
@@ -3426,9 +3445,6 @@ msgstr "rôle (anglais)"
 
 msgid "role (french)"
 msgstr "rôle (français)"
-
-msgid "score(s) saved"
-msgstr "note(s) enregistrée(s)"
 
 msgid "search"
 msgstr "recherche"

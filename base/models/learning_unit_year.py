@@ -23,13 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import uuid
+
 from decimal import Decimal
 from typing import List
 
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
 from django.db import models
-from django.db.models import Q, When, CharField, Value, Case, Subquery, OuterRef, F, fields
+from django.db.models import Q, When, CharField, Value, Case, Subquery, OuterRef, F, fields, Exists
 from django.db.models.functions import Concat
 from django.db.models.signals import post_delete
 from django.dispatch.dispatcher import receiver
@@ -58,10 +60,9 @@ from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit import LEARNING_UNIT_ACRONYM_REGEX_MODEL
 from base.models.prerequisite_item import PrerequisiteItem
 from education_group import publisher
-from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
-from learning_unit.models.learning_class_year import LearningClassYear
-from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin, SerializableModelManager, \
-    SerializableQuerySet
+from osis_common.models.osis_model_admin import OsisModelAdmin
+
+CREDITS_FOR_DECIMAL_SCORES = 15
 
 AUTHORIZED_REGEX_CHARS = "$*+.^"
 REGEX_ACRONYM_CHARSET = "[A-Z0-9" + AUTHORIZED_REGEX_CHARS + "]+"
@@ -120,7 +121,7 @@ def academic_year_validator(value):
         )
 
 
-class LearningUnitYearAdmin(VersionAdmin, SerializableModelAdmin):
+class LearningUnitYearAdmin(VersionAdmin, OsisModelAdmin):
     list_display = (
         'external_id',
         'acronym',
@@ -131,7 +132,7 @@ class LearningUnitYearAdmin(VersionAdmin, SerializableModelAdmin):
         'status',
         'changed',
     )
-    list_filter = ('academic_year', 'decimal_scores', 'summary_locked')
+    list_filter = ('academic_year', 'summary_locked')
     search_fields = [
         'acronym',
         'learning_container_year__requirement_entity__entityversion__acronym',
@@ -143,7 +144,7 @@ class LearningUnitYearAdmin(VersionAdmin, SerializableModelAdmin):
     ]
 
 
-class LearningUnitYearQuerySet(SerializableQuerySet):
+class LearningUnitYearQuerySet(models.QuerySet):
     def annotate_volume_total(self):
         return self.annotate_volume_total_class_method(self)
 
@@ -152,6 +153,9 @@ class LearningUnitYearQuerySet(SerializableQuerySet):
 
     def annotate_full_title(self):
         return self.annotate_full_title_class_method(self)
+
+    def annotate_has_classes(self):
+        return self.annotate_has_classes_class_method(self)
 
     @classmethod
     def annotate_full_title_class_method(cls, queryset):
@@ -285,8 +289,17 @@ class LearningUnitYearQuerySet(SerializableQuerySet):
             ),
         )
 
+    @classmethod
+    def annotate_has_classes_class_method(cls, queryset):
+        from learning_unit.models.learning_class_year import LearningClassYear
+        return queryset.annotate(
+            has_classes=Exists(
+                LearningClassYear.objects.filter(learning_component_year__learning_unit_year=OuterRef('id'))
+            )
+        )
 
-class BaseLearningUnitYearManager(SerializableModelManager):
+
+class BaseLearningUnitYearManager(models.Manager):
     def get_queryset(self):
         return LearningUnitYearQuerySet(self.model, using=self._db)
 
@@ -298,7 +311,11 @@ class LearningUnitYearWithContainerManager(models.Manager):
             .filter(learning_container_year__isnull=False)
 
 
-class LearningUnitYear(SerializableModel):
+class LearningUnitYear(models.Model):
+    uuid = models.UUIDField(
+        default=uuid.uuid4, editable=False, unique=True, db_index=True
+    )
+
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     academic_year = models.ForeignKey(AcademicYear, verbose_name=_('Academic year'),
                                       validators=[academic_year_validator], on_delete=models.PROTECT)
@@ -318,7 +335,6 @@ class LearningUnitYear(SerializableModel):
     credits = models.DecimalField(null=True, max_digits=5, decimal_places=2,
                                   validators=[MinValueValidator(MINIMUM_CREDITS), MaxValueValidator(MAXIMUM_CREDITS)],
                                   verbose_name=_('Credits'))
-    decimal_scores = models.BooleanField(default=False)
     internship_subtype = models.CharField(max_length=250, blank=True, null=True,
                                           verbose_name=_('Internship subtype'),
                                           choices=internship_subtypes.INTERNSHIP_SUBTYPES)
@@ -381,6 +397,7 @@ class LearningUnitYear(SerializableModel):
         return u"%s - %s" % (self.academic_year, self.acronym)
 
     def save(self, *args, **kwargs):
+        from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
         super().save(*args, **kwargs)
         publisher.learning_unit_year_created.send(
             None,
@@ -388,6 +405,7 @@ class LearningUnitYear(SerializableModel):
         )
 
     def delete(self, *args, **kwargs):
+        from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
         publisher.learning_unit_year_deleted.send(
             None,
             learning_unit_identity=LearningUnitYearIdentity(code=self.acronym, year=self.academic_year.year)
@@ -672,6 +690,7 @@ class LearningUnitYear(SerializableModel):
         return reverse('learning_unit', args=[self.pk])
 
     def has_class_this_year_or_in_future(self):
+        from learning_unit.models.learning_class_year import LearningClassYear
         return LearningClassYear.objects.filter(
             learning_component_year__learning_unit_year__learning_unit=self.learning_unit,
             learning_component_year__learning_unit_year__academic_year__year__gte=self.academic_year.year
@@ -687,6 +706,12 @@ class LearningUnitYear(SerializableModel):
         _warnings.extend(_check_number_of_classes(all_components))
         _warnings.extend(_check_volume_consistency_with_ue(all_components))
         return _warnings
+
+    @property
+    def decimal_scores(self):
+        if self.credits >= CREDITS_FOR_DECIMAL_SCORES:
+            return True
+        return False
 
 
 def _check_volume_consistency_with_ue(all_components: List[LearningComponentYear]):
@@ -735,7 +760,8 @@ def _check_classes_session(ue_session, all_components: List[LearningComponentYea
     for learning_component_year in all_components:
         for effective_class in learning_component_year.classes:
             session = effective_class.session
-            if ue_session and session and session not in SESSION_CHECK_RULES[ue_session]['correct_values']:
+            if ue_session and session and ue_session != learning_unit_year_session.SESSION_123 and \
+                    session not in SESSION_CHECK_RULES[ue_session]['correct_values']:
                 _warnings.append(message % {
                     'code_class': effective_class.effective_class_complete_acronym,
                     'should_be_values': SESSION_CHECK_RULES[ue_session]['available_values_str']
@@ -959,7 +985,7 @@ def _learningunityear_delete(sender, instance, **kwargs):
     TranslatedText.objects.filter(entity=LEARNING_UNIT_YEAR, reference=instance.id).delete()
 
 
-def _check_quadrimester_volume(effective_class: LearningClassYear, quadri: str) -> List[str]:
+def _check_quadrimester_volume(effective_class: 'LearningClassYear', quadri: str) -> List[str]:
     q1_q2_warnings = _get_q1_q2_warnings(effective_class, quadri)
     q1and2_q1or2_warnings = _get_q1and2_q1or2_warnings(effective_class, quadri)
     return q1_q2_warnings + q1and2_q1or2_warnings

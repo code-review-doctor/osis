@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import uuid
 from datetime import datetime
 from typing import Optional
 
@@ -33,10 +34,11 @@ from django.utils.safestring import mark_safe
 from base.models.entity_version import EntityVersion
 from base.models.entity_version_address import EntityVersionAddress
 from base.models.enums import organization_type
-from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
+
+from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
-class OrganizationAdmin(SerializableModelAdmin):
+class OrganizationAdmin(OsisModelAdmin):
     list_display = ('name', 'acronym', 'type', 'changed', 'logo_tag')
     search_fields = ['acronym', 'name']
     list_filter = ['type']
@@ -58,7 +60,8 @@ class OrganizationManager(models.Manager):
         )
 
 
-class Organization(SerializableModel):
+class Organization(models.Model):
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, db_index=True)
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     name = models.CharField(max_length=255)

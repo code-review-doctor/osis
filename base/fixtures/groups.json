@@ -302,6 +302,11 @@
                     "view_learningclassyear",
                     "learning_unit",
                     "learningclassyear"
+                ],
+                [
+                    "can_access_catalog",
+                    "base",
+                    "offer"
                 ]
             ]
         }
