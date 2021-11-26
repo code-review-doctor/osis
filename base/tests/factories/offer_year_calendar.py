@@ -29,6 +29,7 @@ import string
 import factory.fuzzy
 
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
+from base.tests.factories.cohort_year import CohortYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 
 
@@ -61,3 +62,12 @@ class OfferYearCalendarFactory(factory.django.DjangoModelFactory):
     start_date = factory.LazyAttribute(generate_start_date)
     end_date = factory.LazyAttribute(generate_end_date)
     education_group_year = factory.SubFactory(EducationGroupYearFactory)
+    cohort_year = None
+
+
+class OfferYearCalendar11BAFactory(OfferYearCalendarFactory):
+    cohort_year = factory.SubFactory(
+        CohortYearFactory,
+        education_group_year=factory.SelfAttribute("..education_group_year"),
+        first_year_bachelor=True
+    )

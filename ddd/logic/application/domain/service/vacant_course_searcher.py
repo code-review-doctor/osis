@@ -52,6 +52,7 @@ class VacantCourseSearcher(interface.DomainService):
             code=code,
             academic_year_id=application_calendar.authorized_target_year,
             allocation_entity_code=allocation_entity_code,
+            with_allocation_entity_children=True,
             vacant_declaration_types=vacant_declaration_types
         )
         if not vacant_courses_dto:

@@ -1,0 +1,63 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-11-04 10:49+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#, python-format
+msgid "(Noma: %(noma)s, Score: %(score)s)"
+msgstr "(Noma: %(noma)s, Note: %(score)s)"
+
+msgid "Absence justified"
+msgstr "Absence justifiée"
+
+msgid "Absence unjustified"
+msgstr "Absence injustifiée"
+
+msgid "Absent"
+msgstr "Absent"
+
+msgid "Cheating"
+msgstr "Tricherie"
+
+msgctxt "applications"
+msgid "Code"
+msgstr "Code"
+
+msgid "Name"
+msgstr "Nom"
+
+msgctxt "Submission email table header"
+msgid "Program"
+msgstr "Sigle"
+
+msgctxt "Submission email table header"
+msgid "Registration number"
+msgstr "Noma"
+
+msgid "Score"
+msgstr "Note"
+
+msgctxt "Submission email table header"
+msgid "Session number"
+msgstr "Session"
+
+#, python-format
+msgid "The following scores %(scores_with_noma)s has been encoded"
+msgstr "Les notes suivantes %(scores_with_noma)s ont été encodées"
+
+#, python-format
+msgid "The following scores %(scores_with_noma)s has been submitted"
+msgstr "Les notes suivantes %(scores_with_noma)s ont été soumises"

@@ -57,6 +57,16 @@ class LearningComponentYearFactory(factory.django.DjangoModelFactory):
             self.planned_classes = 0
             self.repartition_volume_requirement_entity = self.vol_global
 
+    class Params:
+        lecturing = factory.Trait(
+            type=learning_component_year_type.LECTURING,
+            acronym="PM"
+        )
+        practical = factory.Trait(
+            type=learning_component_year_type.PRACTICAL_EXERCISES,
+            acronym="TP"
+        )
+
 
 class LecturingLearningComponentYearFactory(LearningComponentYearFactory):
     type = learning_component_year_type.LECTURING

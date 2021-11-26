@@ -32,7 +32,6 @@ from ddd.logic.effective_class_repartition.dtos import TutorAttributionToLearnin
 from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 
 
-# TODO :: unit test
 # FIXME :: should be moved in another context "attribution_to_learning_unit"
 def search_attributions_to_learning_unit(
         cmd: SearchAttributionsToLearningUnitCommand,

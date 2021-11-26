@@ -45,10 +45,16 @@ class LearningUnitTitleSerializer(serializers.ModelSerializer):
 
     def get_title(self, learning_unit_year):
         language = self.context['language']
-        return getattr(
+        title = getattr(
             learning_unit_year,
             'full_title' + ('_' + language if language not in settings.LANGUAGE_CODE_FR else '')
         )
+        if language not in settings.LANGUAGE_CODE_FR and title is None:
+            return getattr(
+                learning_unit_year,
+                'full_title'
+            )
+        return title
 
 
 class LearningUnitSerializer(LearningUnitTitleSerializer):
@@ -72,6 +78,7 @@ class LearningUnitSerializer(LearningUnitTitleSerializer):
     type_text = serializers.CharField(source='get_container_type_display', read_only=True)
     subtype_text = serializers.CharField(source='get_subtype_display', read_only=True)
     has_proposal = serializers.SerializerMethodField()
+    has_classes = serializers.BooleanField(default=False)
 
     class Meta(LearningUnitTitleSerializer.Meta):
         model = LearningUnitYear
@@ -89,6 +96,7 @@ class LearningUnitSerializer(LearningUnitTitleSerializer):
             'subtype',
             'subtype_text',
             'has_proposal',
+            'has_classes'
         )
 
     def get_has_proposal(self, learning_unit_year):

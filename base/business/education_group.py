@@ -39,6 +39,7 @@ from base.models.enums.education_group_types import TrainingType
 from base.models.mandate import Mandate
 from base.models.offer_year_calendar import OfferYearCalendar
 from education_group.models.group_year import GroupYear
+from openpyxl.styles import Font
 from osis_common.document import xls_build
 from program_management.models.education_group_version import EducationGroupVersion
 
@@ -72,7 +73,7 @@ MARKS_PRESENTATION_COL = _('Marks presentation')
 DISSERTATION_PRESENTATION_COL = _('Dissertation presentation')
 DELIBERATION_COL = _('Deliberation')
 SCORES_DIFFUSION_COL = _('Scores diffusion')
-WEIGHTING_COL = _('Weighting')
+WEIGHTING_COL = _('Weighting type')
 DEFAULT_LEARNING_UNIT_ENROLLMENT_COL = _('Default learning unit enrollment')
 CHAIR_OF_THE_EXAM_BOARD_COL = _('Chair of the exam board')
 EXAM_BOARD_SECRETARY_COL = _('Exam board secretary')
@@ -104,6 +105,7 @@ EDUCATION_GROUP_TITLES_ADMINISTRATIVE = [
     EXAM_BOARD_SIGNATORY_COL,
     SIGNATORY_QUALIFICATION_COL,
 ]
+BOLD_FONT = Font(bold=True)
 
 
 def prepare_xls_content(found_education_groups: List[GroupYear]) -> List:
@@ -171,7 +173,8 @@ def create_xls_administrative_data(user, education_group_years_qs, filters, orde
         xls_build.USER: get_name_or_username(user),
         xls_build.FILENAME: XLS_FILENAME_ADMINISTRATIVE,
         xls_build.HEADER_TITLES: header_titles,
-        xls_build.WS_TITLE: WORKSHEET_TITLE_ADMINISTRATIVE
+        xls_build.WS_TITLE: WORKSHEET_TITLE_ADMINISTRATIVE,
+        xls_build.FONT_ROWS: {BOLD_FONT: [0]}
     }
     return xls_build.generate_xls(xls_build.prepare_xls_parameters_list(working_sheets_data, parameters), filters)
 
@@ -231,7 +234,7 @@ def _extract_main_data(a_version: EducationGroupVersion, language) -> Dict:
             _get_title(a_version, language)
         ),
         ACADEMIC_YEAR_COL: an_education_group_year.academic_year.name,
-        WEIGHTING_COL: convert_boolean(an_education_group_year.weighting),
+        WEIGHTING_COL: _('Weighting') if an_education_group_year.weighting else _('No weighting(same weight)'),
         DEFAULT_LEARNING_UNIT_ENROLLMENT_COL: convert_boolean(an_education_group_year.default_learning_unit_enrollment)
     }
 
