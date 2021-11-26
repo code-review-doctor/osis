@@ -24,38 +24,38 @@ class PermissionRequiredMixin(PermissionRequiredMixinRules):
         super().handle_no_permission()
 
 
-class APIPermissionRequiredMixin():
+class APIPermissionRequiredMixin:
 
     permission_mapping = {}
+
+    def check_method_permissions(self, user, method):
+        """
+        Check that a user has the right to use a method.
+        Raises an appropriate exception if this is not the case.
+        """
+        request_permissions = self.permission_mapping.get(method)
+
+        if request_permissions is None:
+            # No permission is specified for this request then we skip the checking
+            return
+
+        if isinstance(request_permissions, str):
+            request_permissions = (request_permissions, )
+
+        # Eventually get the object to check for permission against
+        obj = self.get_permission_object()
+
+        # Check the permissions
+        for permission in request_permissions:
+            if not user.has_perm(permission, obj):
+                raise PermissionDenied(get_permission_error(user, permission))
 
     def check_permissions(self, request):
         """
         Check if the request should be permitted.
         Raises an appropriate exception if the request is not permitted.
         """
-        if not self.request.user:
-            # No user, don't check permission
-            return
-
-        request_permissions = self.permission_mapping.get(request.method)
-
-        if request_permissions is None:
-            # No permission is specified for this request so we skip the checking
-            return
-
-        if isinstance(request_permissions, str):
-            request_permissions = (request_permissions, )
-
-        # Eventually get the object to check form permission against
-        obj = self.get_permission_object()
-
-        # Check the permissions
-        for permission in request_permissions:
-            if not request.user.has_perm(permission, obj):
-                self.permission_denied(
-                    request,
-                    message=get_permission_error(request.user, permission),
-                )
+        return self.check_method_permissions(request.user, request.method)
 
     def get_permission_object(self):
         """
