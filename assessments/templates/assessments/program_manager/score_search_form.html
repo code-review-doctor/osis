@@ -141,7 +141,7 @@
                                     <tbody>
                                     {% for note_etudiant in notes_etudiant_filtered %}
                                         <tr class="result"
-                                            style="{% include 'assessments/common/row-background-color.html' %}">
+                                            style="{% include 'assessments/common/row-background-color.html' with date_echeance_atteinte=note_etudiant.date_echeance_atteinte %}">
                                             <td style="text-align:center;" id="enrollment_status_{{ forloop.counter }}"
                                                 headers="status">
                                                 {% if note_etudiant.date_echeance_atteinte %}
@@ -165,7 +165,7 @@
                                             {% include 'assessments/common/peps_column.html' %}
                                             <td headers="name">{{ note_etudiant.nom }}, {{ note_etudiant.prenom }}</td>
                                             <td id="enrollment_note_{{ forloop.counter0 }}" headers="score">
-                                                {% if not note_etudiant.date_echeance_atteinte and not note_etudiant.desinscrit_tardivement %}
+                                                {% if not note_etudiant.date_echeance_gestionnaire_atteinte and not note_etudiant.desinscrit_tardivement %}
                                                     {% with score_encoding_form=form|index:forloop.counter0 %}
                                                         {% bootstrap_field score_encoding_form.note show_label=False %}
                                                         {% bootstrap_field score_encoding_form.noma %}
