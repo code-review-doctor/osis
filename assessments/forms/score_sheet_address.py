@@ -138,7 +138,9 @@ class ScoreSheetAddressForm(forms.Form):
 
 class FirstYearBachelorScoreSheetAddressForm(ScoreSheetAddressForm):
     specific_address = forms.BooleanField(
-        label=gettext_lazy("Define a specific address for the first year of bachelor"),
+        label=gettext_lazy(
+            "Define a specific address for the first year of bachelor (if different from the addresse of the bachelor)"
+        ),
         required=False
     )
 
