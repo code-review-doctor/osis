@@ -29,13 +29,10 @@ from rest_framework.test import APITestCase
 
 from base.models.enums import offer_enrollment_state, learning_container_year_types, learning_unit_year_subtypes
 from base.models.enums.learning_component_year_type import LECTURING
-from base.models.learning_unit_enrollment import LearningUnitEnrollment
-from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
+from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
-from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearPartimFactory, LearningUnitYearFactory, \
-    LearningUnitYearFullFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearPartimFactory, LearningUnitYearFactory
 from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
 from base.tests.factories.user import UserFactory
 from education_group.tests.factories.first_year_bachelor import FirstYearBachelorFactory
