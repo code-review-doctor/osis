@@ -29,7 +29,6 @@ import operator
 import attr
 from django.template.defaultfilters import floatformat
 from django.utils.translation import gettext_lazy as _
-
 from rest_framework import serializers
 
 from base.models.enums.peps_type import PepsTypes, HtmSubtypes, SportSubtypes
@@ -130,8 +129,8 @@ class _NoteEtudiantRowSerializer(serializers.Serializer):
             return note_etudiant.note
 
     def get_date_remise_de_notes(self, note_etudiant: NoteEtudiantDTO) -> str:
-        if note_etudiant.date_remise_de_notes and not note_etudiant.desinscrit_tardivement:
-            return note_etudiant.date_remise_de_notes.to_date().strftime("%d/%m/%Y")
+        if note_etudiant.echeance_enseignant and not note_etudiant.desinscrit_tardivement:
+            return note_etudiant.echeance_enseignant.to_date().strftime("%d/%m/%Y")
         return ""
 
     def get_nom_complet(self, note_etudiant: NoteEtudiantDTO):
