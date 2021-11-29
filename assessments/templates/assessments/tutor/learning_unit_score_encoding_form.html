@@ -137,14 +137,14 @@
                     <tr>
                         <th id="status" style="width: 5%">{% trans 'Status' %}</th>
                         <th id="program" style="width: 13%">{% trans 'Program' context 'encoding' %}</th>
-                        <th id="registration_number"
-                            style="width: 13%">{% trans 'Registration number' context 'assessments' %}</th>
                         <th id="peps_data" style="width: 17%">
                             {% trans 'Type' %}
                             <span class="badge warning-color">
                                 PEPS
                             </span>
                         </th>
+                        <th id="registration_number"
+                            style="width: 13%">{% trans 'Registration number' context 'assessments' %}</th>
                         <th id="name" style="width: 22%">{% trans 'Name' %}</th>
                         <th id="score" style="width: 15%">
                             {% trans 'Score' %}
@@ -179,8 +179,8 @@
                                 {% endif %}
                             </td>
                             <td headers="program">{{ note_etudiant.nom_cohorte }}</td>
-                            <td headers="registration_number">{{ note_etudiant.noma }}</td>
                             {% include 'assessments/common/peps_column.html' %}
+                            <td headers="registration_number">{{ note_etudiant.noma }}</td>
                             <td headers="lastname">{{ note_etudiant.nom }}, {{ note_etudiant.prenom }}</td>
                             <td id="enrollment_note_{{ forloop.counter0 }}" headers="score">
                                 {% if not note_etudiant.est_soumise and not note_etudiant.date_echeance_enseignant_atteinte and not note_etudiant.desinscrit_tardivement %}
