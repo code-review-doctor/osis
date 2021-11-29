@@ -57,17 +57,21 @@ class _XLSNoteEtudiantRowImportSerializer(serializers.Serializer):
         col_note = HEADER.index(_('Score'))
         raw_value = str(obj[col_note].value) if obj[col_note].value is not None else ''
         note_value = raw_value.replace(",", ".")
-        number_of_decimal = decimal.Decimal(note_value).as_tuple().exponent * -1
-        if number_of_decimal > MAXIMAL_NUMBER_OF_DECIMALS:
-            raise ScoreSheetXLSImportSerializerError(
-                _('Invalid score line %(row_number)s : %(decimal_value)s. Ensure that there are no more '
-                  'than %(max_decimal)s decimal place.') %
-                {
-                    'decimal_value': note_value,
-                    'max_decimal': MAXIMAL_NUMBER_OF_DECIMALS,
-                    'row_number': str(self.get_row_number(obj))
-                }
-            )
+        try:
+            number_of_decimal = decimal.Decimal(note_value).as_tuple().exponent * -1
+            if number_of_decimal > MAXIMAL_NUMBER_OF_DECIMALS:
+                raise ScoreSheetXLSImportSerializerError(
+                    _('Invalid score line %(row_number)s : %(decimal_value)s. Ensure that there are no more '
+                      'than %(max_decimal)s decimal place.') %
+                    {
+                        'decimal_value': note_value,
+                        'max_decimal': MAXIMAL_NUMBER_OF_DECIMALS,
+                        'row_number': str(self.get_row_number(obj))
+                    }
+                )
+        except decimal.DecimalException:
+            # Note is a letter
+            pass
 
         return note_value
 
