@@ -80,13 +80,20 @@ class ScoreSearchForm(forms.Form):
         required=False,
         label=_("State")
     )
-    nom_cohorte = forms.ChoiceField(required=False, label=pgettext_lazy('encoding', 'Program'))
+    noms_cohortes = forms.MultipleChoiceField(
+        required=False,
+        label=pgettext_lazy('encoding', 'Program'),
+        widget=autocomplete.Select2Multiple(
+            url='formations-autocomplete',
+            attrs={'data-html': True, 'data-placeholder': _('Acronym/Short title')},
+        )
+    )
 
     def __init__(self, matricule_fgs_gestionnaire: str = '', **kwargs):
         super().__init__(**kwargs)
-        self.fields['nom_cohorte'].choices = self.get_nom_cohorte_choices(matricule_fgs_gestionnaire)
+        self.fields['noms_cohortes'].choices = self.get_noms_cohortes_choices(matricule_fgs_gestionnaire)
 
-    def get_nom_cohorte_choices(self, matricule_fgs_gestionnaire: str):
+    def get_noms_cohortes_choices(self, matricule_fgs_gestionnaire: str):
         cmd = GetCohortesGestionnaireCommand(matricule_fgs_gestionnaire=matricule_fgs_gestionnaire)
         results = message_bus_instance.invoke(cmd)
         choices = (
@@ -101,7 +108,7 @@ class ScoreSearchForm(forms.Form):
             cleaned_data['nom'],
             cleaned_data['prenom'],
             cleaned_data['etat'],
-            cleaned_data['nom_cohorte'],
+            cleaned_data['noms_cohortes'],
         ]):
             self.add_error(None, _("Please choose at least one criteria!"))
         return cleaned_data

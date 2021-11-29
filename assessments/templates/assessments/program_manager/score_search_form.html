@@ -55,6 +55,7 @@
 
             <div class="tab-content">
                 <div id="tab_score_search" class="tab-pane fade in active">
+                    {{ search_form.media }}
                     <form id="score_search_form" method="GET" action="{{ request.path }}" style="margin-top: 20px;">
                         <div class="row">
                             <div class="col-md-2">
@@ -70,7 +71,7 @@
                                 {% bootstrap_field search_form.etat %}
                             </div>
                             <div class="col-md-2">
-                                {% bootstrap_field search_form.nom_cohorte %}
+                                {% bootstrap_field search_form.noms_cohortes %}
                             </div>
                             <div class="col-md-1">
                                 <button id="bt_submit_score_search" class="btn btn-primary" type="submit" role="button"

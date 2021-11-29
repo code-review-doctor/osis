@@ -57,7 +57,7 @@ def rechercher_notes(
         cohortes_gestionnaire_translator
     )
     return RechercheNotesEtudiant().search(
-        nom_cohorte=cmd.nom_cohorte,
+        noms_cohortes=cmd.noms_cohortes,
         noma=cmd.noma,
         nom=cmd.nom,
         prenom=cmd.prenom,

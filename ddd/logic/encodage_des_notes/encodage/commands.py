@@ -66,17 +66,17 @@ class RechercherNotesCommand(interface.CommandRequest):
     nom = attr.ib(type=str)
     prenom = attr.ib(type=str)
     etat = attr.ib(type=str)  # absence justifiee, injustifiee, tricherie, note manquante  TODO :: renommer ?
-    nom_cohorte = attr.ib(type=str)
     matricule_fgs_gestionnaire = attr.ib(type=str)
+    noms_cohortes = attr.ib(type=List[str], factory=list)
 
 
 @attr.s(frozen=True, slots=True)
 class GetProgressionGeneraleGestionnaireCommand(interface.CommandRequest):
     matricule_fgs_gestionnaire = attr.ib(type=str)
-    noms_cohortes = attr.ib(type=List[str], default='')
     code_unite_enseignement = attr.ib(type=str, default='')
     enseignant = attr.ib(type=str, default='')
     seulement_notes_manquantes = attr.ib(type=bool, default=False)
+    noms_cohortes = attr.ib(type=List[str], factory=list)
 
 
 @attr.s(frozen=True, slots=True)
