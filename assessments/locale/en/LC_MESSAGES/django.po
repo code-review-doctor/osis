@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-18 08:06+0100\n"
+"POT-Creation-Date: 2021-11-29 09:16+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -37,15 +37,6 @@ msgid ""
 "                                "
 msgstr ""
 
-msgid ""
-"\n"
-"                                For first year bachelor, the address of "
-"reference is by default the one from the bachelor.\n"
-"                                It is possible to define a specific address "
-"for the first year of the bachelor by checking the box.\n"
-"                            "
-msgstr ""
-
 #, python-format
 msgid ""
 "\n"
@@ -72,6 +63,9 @@ msgid ""
 "LCOPS1113-A</i> </p> <p> For a practical effective class (PP), use '_' <br/> "
 "<i>Example : LCOPS1113-A</i> </p> <p> For a partim, put the letter against "
 "the the acronym <br/> <i>Example : LCOPS1113A</i> </p>"
+msgstr ""
+
+msgid "Absence"
 msgstr ""
 
 msgid "Absence justified"
@@ -183,7 +177,9 @@ msgstr ""
 msgid "Decimals authorized for this learning unit"
 msgstr ""
 
-msgid "Define a specific address for the first year of bachelor"
+msgid ""
+"Define a specific address for the first year of bachelor (if different from "
+"the addresse of the bachelor)"
 msgstr ""
 
 msgid "Details other educational facilities"
@@ -411,9 +407,6 @@ msgstr ""
 msgid "Reg. No."
 msgstr ""
 
-msgid "Registration number"
-msgstr ""
-
 msgctxt "assessments"
 msgid "Registration number"
 msgstr ""
@@ -429,6 +422,9 @@ msgid ""
 "number surrounded by parenthesis is the number of scores encoded by the "
 "tutor that aren't submitted yet ('draft' state)"
 msgstr ""
+"Represents the quantity of scores submitted to the administration. The "
+"number surrounded by parenthesis is the scores encoded by the score "
+"responsible that aren't submitted to the faculty yet"
 
 msgid "Req. Entity"
 msgstr ""
@@ -454,6 +450,12 @@ msgid "Score"
 msgstr ""
 
 msgid "Score legend"
+msgstr ""
+
+msgid "Score legend for program manager"
+msgstr ""
+
+msgid "Score legend for tutor"
 msgstr ""
 
 #, python-brace-format

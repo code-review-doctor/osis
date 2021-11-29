@@ -156,7 +156,7 @@ def _build_rows(worksheet, feuille_de_notes_serialized):
             row['nom_complet'],
             row['email'],
             row['note'],
-            row['date_remise_de_notes'],
+            row['echeance_enseignant'],
             row['type_peps'],
             row['tiers_temps'],
             row['copie_adaptee'],
