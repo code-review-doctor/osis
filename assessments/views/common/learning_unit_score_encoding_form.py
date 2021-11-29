@@ -94,7 +94,7 @@ class LearningUnitScoreEncodingBaseFormView(PermissionRequiredMixin, FormView):
 
     def _get_initial_note_etudiant(self, note_etudiant):
         try:
-            note_format = "2" if self.feuille_de_notes.note_decimale_est_autorisee else "0"
+            note_format = "1" if self.feuille_de_notes.note_decimale_est_autorisee else "0"
             note_formated = floatformat(float(note_etudiant.note), note_format)
         except ValueError:
             note_formated = note_etudiant.note
