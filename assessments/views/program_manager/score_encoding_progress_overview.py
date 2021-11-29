@@ -30,6 +30,7 @@ from dal import autocomplete
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import CharField, Value, When, Case
 from django.db.models.functions import Concat
+from django.http import JsonResponse
 from django.urls import reverse
 from django.utils.functional import cached_property
 
@@ -38,8 +39,9 @@ from assessments.views.common.score_encoding_progress_overview import ScoreEncod
 from base.models import synchronization
 from base.models.enums.learning_component_year_type import PRACTICAL_EXERCISES
 from base.models.learning_unit_year import LearningUnitYear
+from base.models.person import Person
 from ddd.logic.encodage_des_notes.encodage.commands import GetProgressionGeneraleGestionnaireCommand, \
-    GetPeriodeEncodageCommand, SearchEnseignantsCommand
+    GetPeriodeEncodageCommand, SearchEnseignantsCommand, GetCohortesGestionnaireCommand
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import ProgressionGeneraleEncodageNotesDTO, PeriodeEncodageNotesDTO
 from infrastructure.messages_bus import message_bus_instance
 from learning_unit.models.learning_class_year import LearningClassYear
@@ -80,7 +82,7 @@ class ScoreEncodingProgressOverviewProgramManagerView(ScoreEncodingProgressOverv
             cmd_kwargs = {'matricule_fgs_gestionnaire': self.person.global_id}
             if search_form.is_valid():
                 cmd_kwargs.update({
-                    'nom_cohorte': search_form.cleaned_data['cohorte_name'],
+                    'noms_cohortes': search_form.cleaned_data['cohorte_name'],
                     'code_unite_enseignement': search_form.cleaned_data['learning_unit_code'],
                     'enseignant': search_form.cleaned_data['tutor'],
                     'seulement_notes_manquantes': search_form.cleaned_data['incomplete_encodings_only'],
@@ -181,3 +183,20 @@ class EnseignantAutocomplete(LoginRequiredMixin, autocomplete.Select2ListView):
             enseignants = message_bus_instance.invoke(SearchEnseignantsCommand(recherche))
             return [recherche] + ['{} {}'.format(enseignant.nom, enseignant.prenom) for enseignant in enseignants]
         return [recherche]
+
+
+class FormationAutocomplete(LoginRequiredMixin, autocomplete.Select2ListView):
+    def get(self, request, *args, **kwargs):
+        matricule_fgs_gestionnaire = Person.objects.filter(
+            user=self.request.user
+        ).values_list('global_id', flat=True)[0]
+        cmd = GetCohortesGestionnaireCommand(matricule_fgs_gestionnaire=matricule_fgs_gestionnaire)
+        results = message_bus_instance.invoke(cmd)
+        choices = (
+            (cohorte.nom_cohorte, cohorte.nom_cohorte,) for cohorte in results
+        )
+        if self.q:
+            choices = filter(lambda cohorte_tuple: self.q.upper() in cohorte_tuple[1], choices)
+
+        results = [{'id': id, 'text': value} for id, value in sorted(choices, key=lambda x: x[1])]
+        return JsonResponse({'results': results})
