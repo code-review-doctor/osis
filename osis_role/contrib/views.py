@@ -3,6 +3,7 @@ from django.contrib.auth.views import redirect_to_login
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
+import rest_framework.exceptions as drf_exceptions
 from rules.contrib.views import PermissionRequiredMixin as PermissionRequiredMixinRules, \
     objectgetter as objectgetterrules, \
     permission_required as permission_requiredrules
@@ -35,6 +36,9 @@ class APIPermissionRequiredMixin:
         """
         request_permissions = self.permission_mapping.get(method)
 
+        if not user.is_authenticated:
+            raise drf_exceptions.NotAuthenticated()
+
         if request_permissions is None:
             # No permission is specified for this request then we skip the checking
             return
@@ -48,7 +52,7 @@ class APIPermissionRequiredMixin:
         # Check the permissions
         for permission in request_permissions:
             if not user.has_perm(permission, obj):
-                raise PermissionDenied(get_permission_error(user, permission))
+                raise drf_exceptions.PermissionDenied(get_permission_error(user, permission))
 
     def check_permissions(self, request):
         """

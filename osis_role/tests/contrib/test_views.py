@@ -128,3 +128,10 @@ class TestApiPermissionRequiredMixin(TestCase):
 
         # Check result -> authorized access as no permission is required for this request
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_no_authenticated_user(self):
+        # Simulate a get request with an anonymous user
+        request = self.factory.post('/osis_role/tests_views/')
+        response = self.api_view.as_view()(request)
+        # Check result -> unauthorized access as the user isn't authenticated
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
