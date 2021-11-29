@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import decimal
 import json
 from typing import List
 
@@ -56,18 +57,17 @@ class _XLSNoteEtudiantRowImportSerializer(serializers.Serializer):
         col_note = HEADER.index(_('Score'))
         raw_value = str(obj[col_note].value) if obj[col_note].value is not None else ''
         note_value = raw_value.replace(",", ".")
-        decimal_position = note_value.find('.')
-        if decimal_position >= 0:
-            if len(note_value[decimal_position + 1:]) > MAXIMAL_NUMBER_OF_DECIMALS:
-                raise ScoreSheetXLSImportSerializerError(
-                    _('Invalid score line %(row_number)s : %(decimal_value)s. Ensure that there are no more '
-                      'than %(max_decimal)s decimal place.') %
-                    {
-                        'decimal_value': note_value,
-                        'max_decimal': MAXIMAL_NUMBER_OF_DECIMALS,
-                        'row_number': str(self.get_row_number(obj))
-                    }
-                )
+        number_of_decimal = decimal.Decimal(note_value).as_tuple().exponent * -1
+        if number_of_decimal > MAXIMAL_NUMBER_OF_DECIMALS:
+            raise ScoreSheetXLSImportSerializerError(
+                _('Invalid score line %(row_number)s : %(decimal_value)s. Ensure that there are no more '
+                  'than %(max_decimal)s decimal place.') %
+                {
+                    'decimal_value': note_value,
+                    'max_decimal': MAXIMAL_NUMBER_OF_DECIMALS,
+                    'row_number': str(self.get_row_number(obj))
+                }
+            )
 
         return note_value
 

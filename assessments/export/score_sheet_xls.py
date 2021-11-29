@@ -212,7 +212,8 @@ def __set_border_on_first_peps_cell(worksheet, row_number):
 
 
 def _format_note(note: str) -> str:
-    # Have to be deleted when examEnrollment score's field will be transform from decimal_places=2 to decimal_places=1
+    # TODO : Have to be deleted when examEnrollment score's field will be transform from decimal_places=2 to
+    #  decimal_places=1
     decimal_position = note.find('.')
     if decimal_position >= 0 and len(note[decimal_position + 1:]) > MAXIMAL_NUMBER_OF_DECIMALS:
         return note[:-1]
