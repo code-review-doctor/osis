@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-26 10:43+0100\n"
+"POT-Creation-Date: 2021-11-29 09:16+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -84,6 +84,9 @@ msgstr ""
 "utilisez l’underscore. <br/> <i>Exemple : LCOPS1113_A</i> </p> <p> Pour un "
 "partim, accolez directement la lettre au code.  <br/> <i>Exemple : "
 "LCOPS1113A</i> </p>"
+
+msgid "Absence"
+msgstr "Absence"
 
 msgid "Absence justified"
 msgstr "Absence justifiée"
@@ -201,7 +204,9 @@ msgstr "Les notes décimales sont autorisées pour ce cours"
 msgid ""
 "Define a specific address for the first year of bachelor (if different from "
 "the addresse of the bachelor)"
-msgstr "Définir une adresse spécifique à la première année de bachelier (si différente de l'adresse du bachelier)"
+msgstr ""
+"Définir une adresse spécifique à la première année de bachelier (si "
+"différente de l'adresse du bachelier)"
 
 msgid "Details other educational facilities"
 msgstr "Détails autre aménagement"
@@ -486,6 +491,12 @@ msgstr "Note"
 
 msgid "Score legend"
 msgstr "Valeurs acceptées"
+
+msgid "Score legend for program manager"
+msgstr "Valeurs acceptées pour le ou la gestionnaire"
+
+msgid "Score legend for tutor"
+msgstr "Valeurs acceptées pour l'enseignant·e"
 
 #, python-brace-format
 msgid "Score legend: A=Absent, T=Cheating, {score} (0=Score of presence)"
