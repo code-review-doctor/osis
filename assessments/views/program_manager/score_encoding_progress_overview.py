@@ -199,4 +199,4 @@ class FormationAutocomplete(LoginRequiredMixin, autocomplete.Select2ListView):
             choices = filter(lambda cohorte_tuple: self.q.upper() in cohorte_tuple[1], choices)
 
         results = [{'id': id, 'text': value} for id, value in sorted(choices, key=lambda x: x[1])]
-        return JsonResponse({'results': results}, content_type='application/json')
+        return JsonResponse({'results': results})

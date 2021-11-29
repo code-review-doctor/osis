@@ -150,13 +150,7 @@ class RechercheNotesEtudiant(interface.DomainService):
             note_etudiant_repo: 'INoteEtudiantRepository',
             signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
     ):
-        cohortes = gestionnaire_parcours.cohortes_gerees
-        if noms_cohortes:
-            cohortes = []
-            for nom_cohorte in noms_cohortes:
-                gestionnaire_parcours.verifier_gere_cohorte(nom_cohorte)
-                cohortes.append(nom_cohorte)
-
+        gestionnaire_parcours.verifier_gere_cohortes(set(noms_cohortes))
         note_manquante = etat == NOTE_MANQUANTE
         justification = None
         if etat and etat != NOTE_MANQUANTE:
@@ -173,7 +167,7 @@ class RechercheNotesEtudiant(interface.DomainService):
                 return []
 
         return note_etudiant_repo.search(
-            noms_cohortes=cohortes,
+            noms_cohortes=noms_cohortes,
             nomas=nomas_searched,
             annee_academique=periode_encodage.annee_concernee,
             numero_session=periode_encodage.session_concernee,

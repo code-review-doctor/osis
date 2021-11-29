@@ -61,15 +61,9 @@ class ProgressionGeneraleEncodage(interface.DomainService):
             enseignant: Optional[str],
             seulement_notes_manquantes: bool = False
     ) -> 'ProgressionGeneraleEncodageNotesDTO':
-        cohortes = gestionnaire.cohortes_gerees
-        if noms_cohortes:
-            cohortes = []
-            for nom_cohorte in noms_cohortes:
-                gestionnaire.verifier_gere_cohorte(nom_cohorte)
-                cohortes.append(nom_cohorte)
-
+        gestionnaire.verifier_gere_cohortes(set(noms_cohortes))
         notes_identites = note_etudiant_repo.search_notes_identites(
-            noms_cohortes=cohortes,
+            noms_cohortes=noms_cohortes,
             annee_academique=periode_encodage.annee_concernee,
             numero_session=periode_encodage.session_concernee,
             code_unite_enseignement=code_unite_enseignement,
