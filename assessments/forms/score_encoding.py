@@ -108,7 +108,14 @@ class ScoreSearchForm(forms.Form):
 
 
 class ScoreEncodingProgressFilterForm(forms.Form):
-    cohorte_name = forms.ChoiceField(required=False, label=pgettext_lazy('encoding', 'Program'))
+    cohorte_name = forms.MultipleChoiceField(
+        required=False,
+        label=pgettext_lazy('encoding', 'Program'),
+        widget=autocomplete.Select2Multiple(
+            url='formations-autocomplete',
+            attrs={'data-html': True, 'data-placeholder': _('Acronym/Short title')},
+        )
+    )
     tutor = forms.ChoiceField(
         required=False,
         label=_('Tutor'),

@@ -73,7 +73,7 @@ class RechercherNotesCommand(interface.CommandRequest):
 @attr.s(frozen=True, slots=True)
 class GetProgressionGeneraleGestionnaireCommand(interface.CommandRequest):
     matricule_fgs_gestionnaire = attr.ib(type=str)
-    nom_cohorte = attr.ib(type=str, default='')
+    noms_cohortes = attr.ib(type=List[str], default='')
     code_unite_enseignement = attr.ib(type=str, default='')
     enseignant = attr.ib(type=str, default='')
     seulement_notes_manquantes = attr.ib(type=bool, default=False)
