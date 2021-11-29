@@ -34,10 +34,11 @@ class APIPermissionRequiredMixin:
         Check that a user has the right to use a method.
         Raises an appropriate exception if this is not the case.
         """
-        request_permissions = self.permission_mapping.get(method)
-
         if not user.is_authenticated:
+            # No user, don't check permission
             raise drf_exceptions.NotAuthenticated()
+
+        request_permissions = self.permission_mapping.get(method)
 
         if request_permissions is None:
             # No permission is specified for this request then we skip the checking
