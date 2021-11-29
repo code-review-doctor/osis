@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-18 08:06+0100\n"
+"POT-Creation-Date: 2021-11-29 08:53+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -274,6 +274,12 @@ msgstr ""
 msgid "Institution"
 msgstr ""
 
+#, python-format
+msgid ""
+"Invalid score line %(row_number)s : %(decimal_value)s. Ensure that there are "
+"no more than %(max_decimal)s decimal place."
+msgstr ""
+
 msgid "January"
 msgstr ""
 
@@ -409,9 +415,6 @@ msgid "Refresh list"
 msgstr ""
 
 msgid "Reg. No."
-msgstr ""
-
-msgid "Registration number"
 msgstr ""
 
 msgctxt "assessments"

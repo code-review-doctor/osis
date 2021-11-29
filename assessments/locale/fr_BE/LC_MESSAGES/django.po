@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-18 08:06+0100\n"
+"POT-Creation-Date: 2021-11-29 08:53+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -309,6 +309,14 @@ msgstr "Injecter les notes encodées dans le fichier Excel"
 msgid "Institution"
 msgstr "Institution"
 
+#, python-format
+msgid ""
+"Invalid score line %(row_number)s : %(decimal_value)s. Ensure that there are "
+"no more than %(max_decimal)s decimal place."
+msgstr ""
+"Note invalide ligne %(row_number)s : %(decimal_value)s. Assurez-vous qu'il "
+"n'y a pas plus de %(max_decimal)s chiffre après la virgule."
+
 msgid "January"
 msgstr "Janvier"
 
@@ -450,9 +458,6 @@ msgid "Refresh list"
 msgstr "rafraîchir la liste"
 
 msgid "Reg. No."
-msgstr "Noma"
-
-msgid "Registration number"
 msgstr "Noma"
 
 msgctxt "assessments"

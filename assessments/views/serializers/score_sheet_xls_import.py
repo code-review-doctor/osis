@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import decimal
 import json
 from typing import List
 
@@ -30,6 +31,9 @@ from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from openpyxl.worksheet import Worksheet
 from rest_framework import serializers
 from assessments.export.score_sheet_xls import HEADER
+from ddd.logic.encodage_des_notes.encodage.domain.validator.exceptions import NoteIncorrecteException
+
+MAXIMAL_NUMBER_OF_DECIMALS = 1
 
 
 class ScoreSheetXLSImportSerializerError(ValueError):
@@ -49,11 +53,27 @@ class _XLSNoteEtudiantRowImportSerializer(serializers.Serializer):
         col_unite_enseignement = HEADER.index(_('Learning unit'))
         return str(obj[col_unite_enseignement].value)
 
-    @staticmethod
-    def get_note(obj: tuple) -> str:
+    def get_note(self, obj: tuple) -> str:
         col_note = HEADER.index(_('Score'))
         raw_value = str(obj[col_note].value) if obj[col_note].value is not None else ''
-        return raw_value.replace(",", ".")
+        note_value = raw_value.replace(",", ".")
+        try:
+            number_of_decimal = decimal.Decimal(note_value).as_tuple().exponent * -1
+            if number_of_decimal > MAXIMAL_NUMBER_OF_DECIMALS:
+                raise ScoreSheetXLSImportSerializerError(
+                    _('Invalid score line %(row_number)s : %(decimal_value)s. Ensure that there are no more '
+                      'than %(max_decimal)s decimal place.') %
+                    {
+                        'decimal_value': note_value,
+                        'max_decimal': MAXIMAL_NUMBER_OF_DECIMALS,
+                        'row_number': str(self.get_row_number(obj))
+                    }
+                )
+        except decimal.DecimalException:
+            # Note is a letter
+            pass
+
+        return note_value
 
     @staticmethod
     def get_email(obj: tuple) -> str:

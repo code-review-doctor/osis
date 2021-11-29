@@ -234,11 +234,11 @@
                     false {% endif %};
                 score = score.replace(',', '.');
 
-                const regex = (is_decimal) ? /^\d+(\.\d{0,2})?$/ : /^\d+$/;
+                const regex = (is_decimal) ? /^\d+(\.\d{0,1})?$/ : /^\d+$/;
                 if (!regex.test(score)) {
                     return false;
                 }
-                score = parseFloat(score).toFixed(2)
+                score = parseFloat(score).toFixed(1)
                 return !(score > 20 || score < 0);
             }
 
