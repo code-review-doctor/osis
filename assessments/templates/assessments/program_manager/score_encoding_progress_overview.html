@@ -79,7 +79,7 @@
                     {{ search_form.media }}
                     <form method="GET" action="{{ request.path }}" id="form_search_scores_by_offer">
                         <div class="col-md-3">
-                            {% bootstrap_field search_form.cohorte_name %}
+                            {% bootstrap_field search_form.cohorte_name form_group_class="prevent-select-multiple-overlap"  %}
                         </div>
                         <div class="col-md-3">
                             {% bootstrap_field search_form.tutor %}
