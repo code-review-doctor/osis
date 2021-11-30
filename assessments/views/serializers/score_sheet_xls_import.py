@@ -58,6 +58,7 @@ class _XLSNoteEtudiantRowImportSerializer(serializers.Serializer):
         raw_value = str(obj[col_note].value) if obj[col_note].value is not None else ''
         note_value = raw_value.replace(",", ".")
         try:
+            # FIXME :: à déplacer dans le DDD ; cela est une règle métier, ce n'est pas le role du Serializer
             number_of_decimal = decimal.Decimal(note_value).as_tuple().exponent * -1
             if number_of_decimal > MAXIMAL_NUMBER_OF_DECIMALS:
                 raise ScoreSheetXLSImportSerializerError(
