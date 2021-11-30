@@ -25,7 +25,7 @@
 ##############################################################################
 from django.test import TestCase
 from django.utils.translation import gettext_lazy as _
-
+from unittest import mock
 
 from assessments.forms.score_encoding import ScoreSearchForm
 
@@ -33,6 +33,13 @@ from assessments.forms.score_encoding import ScoreSearchForm
 class ScoreSearchFormTest(TestCase):
     def setUp(self) -> None:
         self.matricule_fgs_gestionnaire = '123456789'
+        self.annee_concernee_context_mock = mock.patch(
+            "ddd.logic.encodage_des_notes.encodage.use_case.read.get_cohortes_gestionnaire._get_annee_periode_encodage",
+            new_callable=mock.PropertyMock,
+            return_value=2021
+        )
+        self.annee_concernee_context_mock.start()
+        self.addCleanup(self.annee_concernee_context_mock.stop)
 
     def test_assert_at_least_one_criteria_must_be_filled_in(self):
         form = ScoreSearchForm(matricule_fgs_gestionnaire=self.matricule_fgs_gestionnaire, data={})
