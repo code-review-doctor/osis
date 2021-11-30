@@ -45,6 +45,10 @@
     <div class="page-header">
         <h2>{% trans 'Scores responsibles' %}{% if filter.academic_year %} - {{ filter.academic_year }}{% endif %}</h2>
     </div>
+    <div class="alert alert-info" style="display:inline-block;">
+        <i class="fa fa-info-circle"></i>
+        {% trans 'For classes, you must modify scores responsible via full LU. Example: For LCOPS1113-B, you must search and modify via LCOPS1113.' %}
+    </div>
     {% if can_view_scores_responsible %}
         <div class="panel panel-default">
             <div class="panel-heading">
