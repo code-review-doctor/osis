@@ -60,9 +60,9 @@ def get_feuille_de_notes_gestionnaire(
     PeriodeEncodageOuverte().verifier(periode_encodage_note_translator)
     periode_encodage = periode_encodage_note_translator.get()
     GestionnaireParcoursBuilder().get(
-        cmd.matricule_fgs_gestionnaire,
-        periode_encodage.annee_concernee,
-        cohortes_gestionnaire_translator,
+        matricule_gestionnaire=cmd.matricule_fgs_gestionnaire,
+        annee_concernee=periode_encodage.annee_concernee,
+        cohortes_gestionnaire_translator=cohortes_gestionnaire_translator,
     )
 
     notes = note_repo.search_by_code_unite_enseignement_annee_session(
