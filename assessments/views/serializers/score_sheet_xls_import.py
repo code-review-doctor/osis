@@ -26,10 +26,10 @@
 import json
 from typing import List
 
-from django.utils import translation
 from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from openpyxl.worksheet import Worksheet
 from rest_framework import serializers
+
 from assessments.export.score_sheet_xls import HEADER
 from base.utils.string import is_a_translation_of
 
