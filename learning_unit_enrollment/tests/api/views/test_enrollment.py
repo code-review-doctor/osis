@@ -175,7 +175,8 @@ class LearningUnitEnrollmentsListViewTestCase(APITestCase):
         current_academic_year = create_current_academic_year()
         learning_container_year = LearningContainerYearFactory(
             academic_year=current_academic_year,
-            container_type=learning_container_year_types.COURSE
+            container_type=learning_container_year_types.COURSE,
+            acronym="LBRT2101",
         )
         learning_unit_year_full = LearningUnitYearFactory(
             learning_container_year=learning_container_year,
