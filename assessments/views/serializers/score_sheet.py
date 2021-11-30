@@ -68,8 +68,8 @@ class _EnrollmentSerializer(serializers.Serializer):
         return note_etudiant.note
 
     def get_deadline(self, note_etudiant: NoteEtudiantDTO) -> str:
-        if note_etudiant.date_remise_de_notes and not note_etudiant.desinscrit_tardivement:
-            return note_etudiant.date_remise_de_notes.to_date().strftime("%d/%m/%Y")
+        if note_etudiant.echeance_enseignant and not note_etudiant.desinscrit_tardivement:
+            return note_etudiant.echeance_enseignant.to_date().strftime("%d/%m/%Y")
         return ""
 
 
