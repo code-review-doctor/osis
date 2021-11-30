@@ -81,10 +81,10 @@
                         <div class="col-md-3">
                             {% bootstrap_field search_form.cohorte_name %}
                         </div>
-                        <div class="col-md-3" id="id_select2">
+                        <div class="col-md-3">
                             {% bootstrap_field search_form.tutor %}
                         </div>
-                        <div class="col-md-3" id="id_select2">
+                        <div class="col-md-3">
                             {% bootstrap_label search_form.learning_unit_code.label label_class="control-label" %}
                             <span
                                     class="glyphicon glyphicon-question-sign"
@@ -459,7 +459,7 @@
 
 {% block script %}
     <script>
-        $('#id_select2').bind('DOMSubtreeModified', function () {
+        $('#form_search_scores_by_offer').bind('DOMSubtreeModified', function () {
             $('.select2-selection__rendered').removeAttr("title");
             $('.select2-selection__clear').attr('data-toggle', 'tooltip');
         });
