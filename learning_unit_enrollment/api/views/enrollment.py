@@ -106,8 +106,8 @@ class LearningUnitEnrollmentsListView(generics.ListAPIView):
             )
         ).filter(
             (
-                    Q(learning_unit_acronym=self.kwargs['acronym']) |
-                    Q(learning_unit_year__learning_container_year__acronym=self.kwargs['acronym'])
+                Q(learning_unit_acronym=self.kwargs['acronym']) |
+                Q(learning_unit_year__learning_container_year__acronym=self.kwargs['acronym'])
             )
         ).annotate(
             student_last_name=F('offer_enrollment__student__person__last_name'),
