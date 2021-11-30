@@ -25,13 +25,24 @@
 ##############################################################################
 from typing import Set
 
-from ddd.logic.encodage_des_notes.encodage.commands import GetCohortesGestionnaireCommand
+from ddd.logic.encodage_des_notes.encodage.commands import GetCohortesGestionnaireCommand, GetPeriodeEncodageCommand
 from ddd.logic.encodage_des_notes.encodage.domain.service.i_cohortes_du_gestionnaire import ICohortesDuGestionnaire
 from ddd.logic.encodage_des_notes.encodage.dtos import CohorteGestionnaireDTO
+from ddd.logic.encodage_des_notes.encodage.use_case.read.get_periode_encodage_service import get_periode_encodage
+from infrastructure.encodage_de_notes.shared_kernel.service.periode_encodage_notes import \
+    PeriodeEncodageNotesTranslator
 
 
 def get_cohortes_gestionnaire(
         cmd: GetCohortesGestionnaireCommand,
         cohortes_gestionnaire_translator: ICohortesDuGestionnaire,
 ) -> Set[CohorteGestionnaireDTO]:
-    return cohortes_gestionnaire_translator.search(cmd.matricule_fgs_gestionnaire)
+    return cohortes_gestionnaire_translator.search(
+        matricule_gestionnaire=cmd.matricule_fgs_gestionnaire,
+        year=_get_annee_periode_encodage()
+    )
+
+
+def _get_annee_periode_encodage() -> int:
+    period_encodage = get_periode_encodage(GetPeriodeEncodageCommand(), PeriodeEncodageNotesTranslator())
+    return period_encodage.annee_concernee
