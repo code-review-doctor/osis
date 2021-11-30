@@ -50,7 +50,7 @@ class CohorteDuGestionnaireTest(TestCase):
     def test_should_renvoyer_aucun_resultat(self):
         result = self.translator.search(
             matricule_gestionnaire=self.matricule_gestionnaire,
-            year=self.academic_year.year
+            annee_concernee=self.academic_year.year
         )
         self.assertSetEqual(result, set())
 
@@ -62,7 +62,7 @@ class CohorteDuGestionnaireTest(TestCase):
         ProgramManagerFactory(person=pm.person, education_group=self.education_group_droi2m)
         result = self.translator.search(
             matricule_gestionnaire=self.matricule_gestionnaire,
-            year=self.academic_year.year
+            annee_concernee=self.academic_year.year
         )
         expected_result = {
             CohorteGestionnaireDTO(nom_cohorte='DROI1BA', matricule_gestionnaire=self.matricule_gestionnaire),
@@ -78,7 +78,7 @@ class CohorteDuGestionnaireTest(TestCase):
         )
         result = self.translator.search(
             matricule_gestionnaire=self.matricule_gestionnaire,
-            year=self.academic_year.year
+            annee_concernee=self.academic_year.year
         )
         expected_result = {
             CohorteGestionnaireDTO(nom_cohorte='DROI11BA', matricule_gestionnaire=self.matricule_gestionnaire),
@@ -97,7 +97,7 @@ class CohorteDuGestionnaireTest(TestCase):
         )
         result = self.translator.search(
             matricule_gestionnaire=self.matricule_gestionnaire,
-            year=self.academic_year.year,
+            annee_concernee=self.academic_year.year,
         )
         expected_result = {
             CohorteGestionnaireDTO(nom_cohorte='DROI11BA', matricule_gestionnaire=self.matricule_gestionnaire),
