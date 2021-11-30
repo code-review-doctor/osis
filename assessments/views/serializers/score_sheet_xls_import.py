@@ -29,7 +29,9 @@ from typing import List
 from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from openpyxl.worksheet import Worksheet
 from rest_framework import serializers
+
 from assessments.export.score_sheet_xls import HEADER
+from base.utils.string import is_a_translation_of
 
 
 class ScoreSheetXLSImportSerializerError(ValueError):
@@ -149,11 +151,11 @@ class ScoreSheetXLSImportSerializer(serializers.Serializer):
     def _check_headers_consistency(worksheet):
         headers_line_found = False
         for count, row in enumerate(worksheet.rows):
-            if row[0].value == HEADER[0]:
+            if is_a_translation_of(row[0].value, HEADER[0]):
                 headers_line_found = True
                 for header_count, header in enumerate(HEADER):
                     try:
-                        if row[header_count].value != header:
+                        if not is_a_translation_of(row[header_count].value, header):
                             raise ScoreSheetXLSImportSerializerError(
                                 _("File error : The file is not consistent. No scores injected."),
                             )
