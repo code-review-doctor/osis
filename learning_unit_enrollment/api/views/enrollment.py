@@ -85,15 +85,11 @@ class LearningUnitEnrollmentsListView(generics.ListAPIView):
         return self.kwargs['year']
 
     def get_queryset(self):
-        filter = {}
-
         if self._acronym_corresponds_to_ue():
             full_acronym = self.kwargs['acronym']
-            filter["learning_unit_acronym__contains"] = full_acronym
         else:
             # Which means Classe or Partim
             full_acronym = self.kwargs['acronym'][:-1]
-            filter["learning_unit_acronym"] = self.kwargs['acronym']
 
         return LearningUnitEnrollment.objects.filter(
             learning_unit_year__academic_year__year=self.year,
@@ -109,7 +105,10 @@ class LearningUnitEnrollmentsListView(generics.ListAPIView):
                 default=F('learning_unit_year__acronym')
             )
         ).filter(
-            **filter
+            (
+                    Q(learning_unit_acronym=self.kwargs['acronym']) |
+                    Q(learning_unit_year__learning_container_year__acronym=self.kwargs['acronym'])
+            )
         ).annotate(
             student_last_name=F('offer_enrollment__student__person__last_name'),
             student_first_name=F('offer_enrollment__student__person__first_name'),
