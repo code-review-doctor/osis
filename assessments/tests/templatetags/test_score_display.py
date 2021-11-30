@@ -68,4 +68,4 @@ class ScoreDisplayTagTests(TestCase):
             'score': Decimal(15.5),
             'is_decimal_scores': True
         }))
-        self.assertEqual(out, "15.50")
+        self.assertEqual(out, "15.5")
