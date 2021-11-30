@@ -70,11 +70,12 @@ def encoder_notes(
 ) -> List['IdentiteNoteEtudiant']:
     # Given
     PeriodeEncodageOuverte().verifier(periode_encodage_note_translator)
+    periode_ouverte = periode_encodage_note_translator.get()
     gestionnaire_parcours = GestionnaireParcoursBuilder().get(
         matricule_gestionnaire=cmd.matricule_fgs_gestionnaire,
+        annee_concernee=periode_ouverte.annee_concernee,
         cohortes_gestionnaire_translator=cohortes_gestionnaire_translator,
     )
-    periode_ouverte = periode_encodage_note_translator.get()
 
     cohortes_non_completes = CohorteAvecEncodageIncomplet().search(
         [cmd_note.code_unite_enseignement for cmd_note in cmd.notes_encodees],

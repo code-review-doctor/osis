@@ -39,16 +39,16 @@ class CohortesDuGestionnaireTranslator(ICohortesDuGestionnaire):
     def search(
             cls,
             matricule_gestionnaire: str,
+            annee_concernee: int
     ) -> Set['CohorteGestionnaireDTO']:
         qs = ProgramManager.objects.filter(
             person__global_id=matricule_gestionnaire
         ).annotate(
             nom_formation=Subquery(
                 EducationGroupYear.objects.filter(
-                    education_group_id=OuterRef('education_group_id')
-                ).order_by(
-                    '-academic_year__year'
-                ).values('acronym')[:1]
+                    education_group_id=OuterRef('education_group_id'),
+                    academic_year__year=annee_concernee
+                ).order_by('-academic_year__year').values('acronym')[:1]
             ),
             matricule_gestionnaire=F('person__global_id'),
             is_11ba=F('cohort'),
@@ -60,12 +60,13 @@ class CohortesDuGestionnaireTranslator(ICohortesDuGestionnaire):
         result = set()
         for values_dict in qs:
             nom_cohorte = values_dict['nom_formation']
-            if values_dict['is_11ba']:
-                nom_cohorte = nom_cohorte.replace('1BA', '11BA')
-            result.add(
-                CohorteGestionnaireDTO(
-                    matricule_gestionnaire=values_dict['matricule_gestionnaire'],
-                    nom_cohorte=nom_cohorte,
+            if nom_cohorte:
+                if values_dict['is_11ba']:
+                    nom_cohorte = nom_cohorte.replace('1BA', '11BA')
+                result.add(
+                    CohorteGestionnaireDTO(
+                        matricule_gestionnaire=values_dict['matricule_gestionnaire'],
+                        nom_cohorte=nom_cohorte,
+                    )
                 )
-            )
         return result
