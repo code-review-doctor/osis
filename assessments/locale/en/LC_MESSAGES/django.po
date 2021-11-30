@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-29 09:16+0100\n"
+"POT-Creation-Date: 2021-11-30 10:15+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -241,6 +241,11 @@ msgstr ""
 msgid "Firstname"
 msgstr ""
 
+msgid ""
+"For classes, you must modify scores responsible via full LU. Example: For "
+"LCOPS1113-B, you must search and modify via LCOPS1113."
+msgstr ""
+
 msgid "Get Excel file"
 msgstr ""
 
@@ -270,6 +275,12 @@ msgstr ""
 msgid "Institution"
 msgstr ""
 
+#, python-format
+msgid ""
+"Invalid score line %(row_number)s : %(decimal_value)s. Ensure that there are "
+"no more than %(max_decimal)s decimal place."
+msgstr ""
+
 msgid "January"
 msgstr ""
 
@@ -277,7 +288,7 @@ msgstr ""
 msgid "Justification legend: %(justification_label_authorized)s"
 msgstr ""
 
-msgid "LU code"
+msgid "LU"
 msgstr ""
 
 msgid "Large print"
@@ -482,9 +493,6 @@ msgid "Scores encoding"
 msgstr ""
 
 msgid "Scores responsible"
-msgstr ""
-
-msgid "Scores responsible tutor"
 msgstr ""
 
 msgid "Scores responsibles"

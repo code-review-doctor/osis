@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import decimal
 import json
 from typing import List
 
@@ -32,6 +33,8 @@ from rest_framework import serializers
 
 from assessments.export.score_sheet_xls import HEADER_MANDATORY_PART
 from base.utils.string import is_a_translation_of
+
+MAXIMAL_NUMBER_OF_DECIMALS = 1
 
 
 class ScoreSheetXLSImportSerializerError(ValueError):
@@ -51,11 +54,28 @@ class _XLSNoteEtudiantRowImportSerializer(serializers.Serializer):
         col_unite_enseignement = HEADER_MANDATORY_PART.index(_('Learning unit'))
         return str(obj[col_unite_enseignement].value)
 
-    @staticmethod
-    def get_note(obj: tuple) -> str:
+    def get_note(self, obj: tuple) -> str:
         col_note = HEADER_MANDATORY_PART.index(_('Score'))
         raw_value = str(obj[col_note].value) if obj[col_note].value is not None else ''
-        return raw_value.replace(",", ".")
+        note_value = raw_value.replace(",", ".")
+        try:
+            # FIXME :: à déplacer dans le DDD ; cela est une règle métier, ce n'est pas le role du Serializer
+            number_of_decimal = decimal.Decimal(note_value).as_tuple().exponent * -1
+            if number_of_decimal > MAXIMAL_NUMBER_OF_DECIMALS:
+                raise ScoreSheetXLSImportSerializerError(
+                    _('Invalid score line %(row_number)s : %(decimal_value)s. Ensure that there are no more '
+                      'than %(max_decimal)s decimal place.') %
+                    {
+                        'decimal_value': note_value,
+                        'max_decimal': MAXIMAL_NUMBER_OF_DECIMALS,
+                        'row_number': str(self.get_row_number(obj))
+                    }
+                )
+        except decimal.DecimalException:
+            # Note is a letter
+            pass
+
+        return note_value
 
     @staticmethod
     def get_email(obj: tuple) -> str:

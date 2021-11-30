@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-29 09:16+0100\n"
+"POT-Creation-Date: 2021-11-30 10:15+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -247,6 +247,7 @@ msgstr "Entité"
 msgid "Evaluations"
 msgstr "Evaluations"
 
+# python-format
 msgid "Extra time (33% generally)"
 msgstr "Tiers-Temps"
 
@@ -269,6 +270,11 @@ msgstr "Fichier non conforme. Aucune note injectée."
 
 msgid "Firstname"
 msgstr "Prénom"
+
+msgid ""
+"For classes, you must modify scores responsible via full LU. Example: For "
+"LCOPS1113-B, you must search and modify via LCOPS1113."
+msgstr "Pour les classes, il faut modifier les responsables via l'UE complète. Exemple: pour LCOPS1113-B, il faut chercher et modifier via LCOPS1113."
 
 msgid "Get Excel file"
 msgstr "Récupérer le fichier Excel"
@@ -302,6 +308,14 @@ msgstr "Injecter les notes encodées dans le fichier Excel"
 msgid "Institution"
 msgstr "Institution"
 
+#, python-format
+msgid ""
+"Invalid score line %(row_number)s : %(decimal_value)s. Ensure that there are "
+"no more than %(max_decimal)s decimal place."
+msgstr ""
+"Note invalide ligne %(row_number)s : %(decimal_value)s. Assurez-vous qu'il "
+"n'y a pas plus de %(max_decimal)s chiffre après la virgule."
+
 msgid "January"
 msgstr "Janvier"
 
@@ -310,8 +324,8 @@ msgid "Justification legend: %(justification_label_authorized)s"
 msgstr ""
 "Légende pour le champ 'Justification': %(justification_label_authorized)s"
 
-msgid "LU code"
-msgstr "Code de l'UE"
+msgid "LU"
+msgstr "Code"
 
 msgid "Large print"
 msgstr "Copie adaptée"
@@ -523,9 +537,6 @@ msgstr "Encodage de notes"
 
 msgid "Scores responsible"
 msgstr "Responsable de notes"
-
-msgid "Scores responsible tutor"
-msgstr "Enseignant·e responsable des notes"
 
 msgid "Scores responsibles"
 msgstr "Responsables de notes"

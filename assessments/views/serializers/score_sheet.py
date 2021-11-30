@@ -54,7 +54,7 @@ class _EnrollmentSerializer(serializers.Serializer):
 
     def get_score(self, note_etudiant) -> str:
         with contextlib.suppress(ValueError, TypeError):
-            note_format = "2" if self.context['note_decimale_est_autorisee'] else "0"
+            note_format = "1" if self.context['note_decimale_est_autorisee'] else "0"
             return floatformat(float(note_etudiant.note), note_format)
 
         if note_etudiant.note == 'T':
