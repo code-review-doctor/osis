@@ -39,7 +39,7 @@ def get_cohortes_gestionnaire(
 ) -> Set[CohorteGestionnaireDTO]:
     return cohortes_gestionnaire_translator.search(
         matricule_gestionnaire=cmd.matricule_fgs_gestionnaire,
-        year=_get_annee_periode_encodage()
+        annee_concernee=_get_annee_periode_encodage()
     )
 
 

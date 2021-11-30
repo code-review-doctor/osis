@@ -39,7 +39,7 @@ class CohortesDuGestionnaireTranslator(ICohortesDuGestionnaire):
     def search(
             cls,
             matricule_gestionnaire: str,
-            year: int
+            annee_concernee: int
     ) -> Set['CohorteGestionnaireDTO']:
         qs = ProgramManager.objects.filter(
             person__global_id=matricule_gestionnaire
@@ -47,10 +47,8 @@ class CohortesDuGestionnaireTranslator(ICohortesDuGestionnaire):
             nom_formation=Subquery(
                 EducationGroupYear.objects.filter(
                     education_group_id=OuterRef('education_group_id'),
-                    academic_year__year=year
-                ).order_by(
-                    '-academic_year__year'
-                ).values('acronym')[:1]
+                    academic_year__year=annee_concernee
+                ).order_by('-academic_year__year').values('acronym')[:1]
             ),
             matricule_gestionnaire=F('person__global_id'),
             is_11ba=F('cohort'),
