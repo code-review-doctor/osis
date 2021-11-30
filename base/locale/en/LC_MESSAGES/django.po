@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-16 13:20+0100\n"
+"POT-Creation-Date: 2021-11-30 13:09+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -317,9 +317,6 @@ msgctxt "male plural"
 msgid "All"
 msgstr ""
 
-msgid "All the scores are encoded."
-msgstr ""
-
 msgid "Alloc. Ent."
 msgstr ""
 
@@ -480,6 +477,12 @@ msgid "Cancel the proposal"
 msgstr ""
 
 msgid "Cancel the proposal?"
+msgstr ""
+
+msgid "Catalog viewer"
+msgstr ""
+
+msgid "Catalog viewers"
 msgstr ""
 
 msgid "Catalogue"
@@ -1057,9 +1060,6 @@ msgstr ""
 msgid "Finality 180 list choice"
 msgstr ""
 
-msgid "First name"
-msgstr ""
-
 msgid "Firstname"
 msgstr ""
 
@@ -1291,9 +1291,6 @@ msgstr ""
 msgid "It is necessary to indicate the internship subtype."
 msgstr ""
 
-msgid "It remains notes to encode."
-msgstr ""
-
 msgid "January"
 msgstr ""
 
@@ -1324,9 +1321,6 @@ msgid "Language classes"
 msgstr ""
 
 msgid "Last modifications"
-msgstr ""
-
-msgid "Last name"
 msgstr ""
 
 msgid "Last update description fiche (force majeure) by"
@@ -2304,9 +2298,6 @@ msgid "Search for an entity"
 msgstr ""
 
 msgid "Search for an organization"
-msgstr ""
-
-msgid "Search of annual programs"
 msgstr ""
 
 msgid "Search type"

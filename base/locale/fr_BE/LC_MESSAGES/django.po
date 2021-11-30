@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-16 13:20+0100\n"
+"POT-Creation-Date: 2021-11-30 13:09+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -332,9 +332,6 @@ msgctxt "male plural"
 msgid "All"
 msgstr "Tous"
 
-msgid "All the scores are encoded."
-msgstr "Toutes les notes ont été soumises."
-
 msgid "Alloc. Ent."
 msgstr "Ent. attrib."
 
@@ -500,6 +497,12 @@ msgstr "Annuler la proposition"
 
 msgid "Cancel the proposal?"
 msgstr "Annuler la proposition ?"
+
+msgid "Catalog viewer"
+msgstr "Lecteur catalogue"
+
+msgid "Catalog viewers"
+msgstr "Lecteurs atalogue"
 
 msgid "Catalogue"
 msgstr "Catalogue"
@@ -1085,9 +1088,6 @@ msgstr "Liste au choix de Finalités (120)"
 msgid "Finality 180 list choice"
 msgstr "Liste au choix de Finalités (180)"
 
-msgid "First name"
-msgstr "Prénom"
-
 msgid "Firstname"
 msgstr "Prénom"
 
@@ -1331,9 +1331,6 @@ msgstr "Cours isolés"
 msgid "It is necessary to indicate the internship subtype."
 msgstr "Il est nécessaire d'indiquer le sous-type de stage."
 
-msgid "It remains notes to encode."
-msgstr "Il reste encore des notes à encoder."
-
 msgid "January"
 msgstr "Janvier"
 
@@ -1367,9 +1364,6 @@ msgstr "Cours de langue"
 
 msgid "Last modifications"
 msgstr "Dernières modifications"
-
-msgid "Last name"
-msgstr "Nom"
 
 msgid "Last update description fiche (force majeure) by"
 msgstr "Dernière modification fiche descriptive (force majeure) par"
@@ -2376,9 +2370,6 @@ msgstr "Rechercher une entité"
 
 msgid "Search for an organization"
 msgstr "Recherche d'organisations"
-
-msgid "Search of annual programs"
-msgstr "Recherche des programmes annualisés"
 
 msgid "Search type"
 msgstr "Type de recherche"

@@ -31,21 +31,21 @@ from osis_role.contrib.admin import RoleModelAdmin
 from osis_role.contrib.models import RoleModel
 
 
-class AdministrativeManagerAdmin(RoleModelAdmin):
+class CatalogViewerAdmin(RoleModelAdmin):
     list_display = ('person', 'changed')
     list_filter = ('person__gender', 'person__language')
     search_fields = ['person__first_name', 'person__last_name', 'person__global_id']
 
 
-class AdministrativeManager(RoleModel):
+class CatalogViewer(RoleModel):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     person = models.OneToOneField('Person', on_delete=models.CASCADE)
 
     class Meta:
-        verbose_name = _("Administrative manager")
-        verbose_name_plural = _("Administrative managers")
-        group_name = "administrative_managers"
+        verbose_name = _("Catalog viewer")
+        verbose_name_plural = _("Catalog viewers")
+        group_name = "catalog_viewers"
 
     def __str__(self):
         return u"%s" % self.person
