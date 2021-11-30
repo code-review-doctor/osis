@@ -25,7 +25,7 @@
 ##############################################################################
 from django.contrib import admin
 
-from base.auth.roles import entity_manager, program_manager, tutor
+from base.auth.roles import entity_manager, program_manager, tutor, administrative_manager
 from base.models import *
 from base.models import validation_rule, education_group_achievement, education_group_detailed_achievement
 
@@ -73,6 +73,9 @@ admin.site.register(entity.Entity,
 
 admin.site.register(entity_calendar.EntityCalendar,
                     entity_calendar.EntityCalendarAdmin)
+
+admin.site.register(administrative_manager.AdministrativeManager,
+                    administrative_manager.AdministrativeManagerAdmin)
 
 admin.site.register(entity_manager.EntityManager,
                     entity_manager.EntityManagerAdmin)
