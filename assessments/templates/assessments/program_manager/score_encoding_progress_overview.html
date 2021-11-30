@@ -459,7 +459,7 @@
 
 {% block script %}
     <script>
-        $('#id_select2').next().bind('DOMSubtreeModified', function () {
+        $('#id_select2').bind('DOMSubtreeModified', function () {
             $('.select2-selection__rendered').removeAttr("title");
             $('.select2-selection__clear').attr('data-toggle', 'tooltip');
         });
