@@ -30,7 +30,7 @@ from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from openpyxl.worksheet import Worksheet
 from rest_framework import serializers
 
-from assessments.export.score_sheet_xls import HEADER
+from assessments.export.score_sheet_xls import HEADER_MANDATORY_PART
 from base.utils.string import is_a_translation_of
 
 
@@ -48,23 +48,23 @@ class _XLSNoteEtudiantRowImportSerializer(serializers.Serializer):
 
     @staticmethod
     def get_code_unite_enseignement(obj: tuple) -> str:
-        col_unite_enseignement = HEADER.index(_('Learning unit'))
+        col_unite_enseignement = HEADER_MANDATORY_PART.index(_('Learning unit'))
         return str(obj[col_unite_enseignement].value)
 
     @staticmethod
     def get_note(obj: tuple) -> str:
-        col_note = HEADER.index(_('Score'))
+        col_note = HEADER_MANDATORY_PART.index(_('Score'))
         raw_value = str(obj[col_note].value) if obj[col_note].value is not None else ''
         return raw_value.replace(",", ".")
 
     @staticmethod
     def get_email(obj: tuple) -> str:
-        col_email = HEADER.index(_('Email'))
+        col_email = HEADER_MANDATORY_PART.index(_('Email'))
         return str(obj[col_email].value)
 
     @staticmethod
     def get_noma(obj: tuple) -> str:
-        col_noma = HEADER.index(pgettext_lazy('assessments', 'Registration number'))
+        col_noma = HEADER_MANDATORY_PART.index(pgettext_lazy('assessments', 'Registration number'))
         return str(obj[col_noma].value)
 
     def get_row_number(self, obj: tuple) -> int:
@@ -79,7 +79,7 @@ class ScoreSheetXLSImportSerializer(serializers.Serializer):
     def get_numero_session(self, worksheet: Worksheet) -> int:
         self._check_headers_consistency(worksheet)
 
-        col_session = HEADER.index(_('Session'))
+        col_session = HEADER_MANDATORY_PART.index(_('Session'))
         session_found = set()
         for count, row in enumerate(self.__get_student_rows(worksheet)):
             raw_session_value = row[col_session].value
@@ -97,7 +97,7 @@ class ScoreSheetXLSImportSerializer(serializers.Serializer):
         return session_found.pop()
 
     def get_annee_academique(self, worksheet: Worksheet) -> int:
-        col_academic_year = HEADER.index(_('Academic year'))
+        col_academic_year = HEADER_MANDATORY_PART.index(_('Academic year'))
         academic_year_found = set()
 
         for count, row in enumerate(self.__get_student_rows(worksheet)):
@@ -118,7 +118,7 @@ class ScoreSheetXLSImportSerializer(serializers.Serializer):
 
     @staticmethod
     def __is_student_score_row(row) -> bool:
-        col_registration_id = HEADER.index(pgettext_lazy('assessments', 'Registration number'))
+        col_registration_id = HEADER_MANDATORY_PART.index(pgettext_lazy('assessments', 'Registration number'))
         raw_registration_id = row[col_registration_id].value
         return raw_registration_id and str(raw_registration_id).isdigit()
 
@@ -151,9 +151,9 @@ class ScoreSheetXLSImportSerializer(serializers.Serializer):
     def _check_headers_consistency(worksheet):
         headers_line_found = False
         for count, row in enumerate(worksheet.rows):
-            if is_a_translation_of(row[0].value, HEADER[0]):
+            if is_a_translation_of(row[0].value, HEADER_MANDATORY_PART[0]):
                 headers_line_found = True
-                for header_count, header in enumerate(HEADER):
+                for header_count, header in enumerate(HEADER_MANDATORY_PART):
                     try:
                         if not is_a_translation_of(row[header_count].value, header):
                             raise ScoreSheetXLSImportSerializerError(
