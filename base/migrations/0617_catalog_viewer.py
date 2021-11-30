@@ -10,26 +10,25 @@ def migrate_administrative_managers(apps, schema_editor):
 
     print("Starting migration of administrative managers to Osis-Roles (CatalogViewer)")
 
-    new_group, old_group = _get_groups(apps)
-    administrative_persons = Person.objects.filter(user__groups=old_group)
+    group = _get_and_rename_group(apps)
+    administrative_persons = Person.objects.filter(user__groups=group)
 
     print("{} persons to migrate".format(len(administrative_persons)))
 
     to_create = []
 
     for person in administrative_persons:
-        person.user.groups.remove(old_group)
-        person.user.groups.add(new_group)
         to_create.append(CatalogViewer(person=person))
 
     CatalogViewer.objects.bulk_create(to_create, batch_size=1000)
 
 
-def _get_groups(apps):
+def _get_and_rename_group(apps):
     Group = apps.get_model("auth", "Group")
-    old_group = Group.objects.get(name='administrative_managers')
-    new_group, _ = Group.objects.get_or_create(name='catalog_viewers')
-    return new_group, old_group
+    group = Group.objects.get(name='administrative_managers')
+    group.name = 'catalog_viewers'
+    group.save()
+    return group
 
 
 class Migration(migrations.Migration):
@@ -51,5 +50,5 @@ class Migration(migrations.Migration):
                 'verbose_name_plural': 'Catalog viewers',
             },
         ),
-        # migrations.RunPython(migrate_administrative_managers)
+        migrations.RunPython(migrate_administrative_managers)
     ]
