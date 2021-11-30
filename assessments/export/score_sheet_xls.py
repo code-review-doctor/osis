@@ -34,7 +34,7 @@ from openpyxl.writer.excel import save_virtual_workbook
 
 MAXIMAL_NUMBER_OF_DECIMALS = 1
 
-HEADER = [
+HEADER_MANDATORY_PART = [
     _('Academic year'),
     _('Session'),
     _('Learning unit'),
@@ -44,6 +44,9 @@ HEADER = [
     _('Email'),
     _('Score'),
     _('End date Prof'),
+]
+
+HEADER_OPTIONAL_PART = [
     _('Type of specific profile'),
     _('Extra time (33% generally)'),
     _('Large print'),
@@ -52,6 +55,8 @@ HEADER = [
     _('Details other educational facilities'),
     _('Educational tutor'),
 ]
+
+HEADER = HEADER_MANDATORY_PART + HEADER_OPTIONAL_PART
 
 
 def build_xls(feuille_de_notes_serialized):
