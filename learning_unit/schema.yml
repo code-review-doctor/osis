@@ -562,6 +562,7 @@ components:
           type: boolean
         has_proposal:
           type: boolean
+          nullable: true
         has_classes:
           type: boolean
         title:
