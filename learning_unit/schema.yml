@@ -556,8 +556,7 @@ components:
         acronym:
           type: string
         credits:
-          type: number
-          multipleOf: 0.01
+          type: string
         status:
           type: boolean
         has_proposal:
