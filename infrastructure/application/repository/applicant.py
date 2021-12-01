@@ -28,13 +28,15 @@ import operator
 from typing import Optional, List
 
 from django.db import models
-from django.db.models import F, QuerySet, Q, Subquery, OuterRef, Case, When
+from django.db.models import F, QuerySet, Q, Subquery, OuterRef, Case, When, Value, Exists
 
 from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.attribution_new import AttributionNew
 from base.auth.roles.tutor import Tutor
 from base.models.enums import learning_component_year_type, learning_unit_year_subtypes
+from base.models.enums.proposal_type import ProposalType
 from base.models.learning_unit_year import LearningUnitYear
+from base.models.proposal_learning_unit import ProposalLearningUnit
 from ddd.logic.application.domain.builder.applicant_builder import ApplicantBuilder
 from ddd.logic.application.domain.model.applicant import ApplicantIdentity, Applicant
 from ddd.logic.application.dtos import ApplicantFromRepositoryDTO, AttributionFromRepositoryDTO
@@ -95,6 +97,8 @@ def _prefetch_attributions(applicant_qs) -> List[AttributionFromRepositoryDTO]:
     attributions_as_dict = AttributionNew.objects.filter(
         tutor__person__global_id__in=applicant_qs.values_list('global_id', flat=True),
         decision_making=''
+    ).exclude(
+        attributionchargenew__learning_component_year__learning_unit_year__subtype=learning_unit_year_subtypes.PARTIM
     ).annotate(
         course_id_code=F('learning_container_year__acronym'),
         course_id_year=F('learning_container_year__academic_year__year'),
@@ -104,6 +108,12 @@ def _prefetch_attributions(applicant_qs) -> List[AttributionFromRepositoryDTO]:
                 subtype=learning_unit_year_subtypes.FULL
             ).annotate_full_title().values('full_title')[:1],
             output_field=models.CharField()
+        ),
+        course_is_in_suppression_proposal=Exists(
+            ProposalLearningUnit.objects.filter(
+                learning_unit_year__learning_container_year_id=OuterRef('learning_container_year_id'),
+                type=ProposalType.SUPPRESSION.name
+            )
         ),
         applicant_id_global_id=F('tutor__person__global_id'),
         lecturing_volume=Subquery(
@@ -126,6 +136,7 @@ def _prefetch_attributions(applicant_qs) -> List[AttributionFromRepositoryDTO]:
     ).values(
         'course_id_code',
         'course_id_year',
+        'course_is_in_suppression_proposal',
         'course_title',
         'function',
         'end_year',

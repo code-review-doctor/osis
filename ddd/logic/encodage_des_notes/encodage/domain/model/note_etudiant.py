@@ -73,6 +73,10 @@ class NoteEtudiant(interface.RootEntity):
         return self.note.is_manquant
 
     @property
+    def is_encodee(self) -> bool:
+        return not self.is_manquant
+
+    @property
     def is_chiffree(self) -> bool:
         return type(self.note.value) in (float, int)
 

@@ -31,10 +31,14 @@ from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
 class EntityVersionAddressAdmin(VersionAdmin, OsisModelAdmin):
-    list_display = ('id', 'entity_version_id', 'is_main', 'country', 'state', 'city', 'postal_code',)
-    search_fields = ['city', 'street', 'postal_code', 'country__name', 'state', 'entity_version__id']
+    list_display = ('id', 'entity_version_acronym', 'is_main', 'country', 'state', 'city', 'postal_code',)
+    search_fields = ['city', 'street', 'postal_code', 'country__name', 'state', 'entity_version__acronym']
     raw_id_fields = ('country', 'entity_version')
     list_filter = ['is_main', 'country']
+
+    @staticmethod
+    def entity_version_acronym(obj: 'EntityVersionAddress') -> str:
+        return obj.entity_version.acronym
 
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('country')

@@ -104,42 +104,62 @@
                                             </td>
                                             <td headers="tab_online_tutor_deadline">
                                                 {% for echeance in progression_encodage.dates_echeance %}
-                                                    {% if forloop.counter == 2 %}
-                                                        <div id="tutor_deadlines_collapse_{{ progression_encodage.code_unite_enseignement }}" class="collapse in">
-                                                    {% endif %}
-                                                    <div class="row row-score-encoding">
-                                                        {% if echeance.est_atteinte %}
-                                                            <strong class="col-md-5 {% if echeance.quantite_notes_manquantes %} error {% else %} success {% endif %}">
-                                                                {{ echeance.to_date|date:"d/m/Y" }}
-                                                            </strong>
-                                                        {% else %}
-                                                             <span class="col-md-5">{{ echeance.to_date|date:"d/m/Y" }}</span>
+                                                    {% with echeance_formated=echeance.to_date|date:"d/m/Y" %}
+                                                        {% if forloop.counter == 2 %}
+                                                            <div id="tutor_deadlines_collapse_{{ progression_encodage.code_unite_enseignement }}" class="collapse in">
                                                         {% endif %}
-                                                        <div class="col-md-3">
-                                                            <span title="{% trans 'Remaining scores to submit for this deadline' %}"
-                                                                  class="badge badge-default {% if echeance.quantite_notes_manquantes %}background-error{% else %}background-success{% endif %}">
-                                                                {{ echeance.quantite_notes_manquantes }}
-                                                            </span>
-                                                        </div>
+                                                        <div class="row row-score-encoding">
+                                                            {% if echeance.est_atteinte %}
+                                                                <strong class="col-md-5 {% if echeance.quantite_notes_manquantes %} error {% else %} success {% endif %}">
+                                                                    {{ echeance_formated }}
+                                                                </strong>
+                                                            {% else %}
+                                                                <span class="col-md-5">
+                                                                     <a href="{% url 'learning_unit_score_encoding_form' progression_encodage.code_unite_enseignement %}?echeance_enseignant={{ echeance_formated }}">
+                                                                         {{ echeance_formated }}
+                                                                     </a>
+                                                                 </span>
+                                                            {% endif %}
+                                                            <div class="col-md-3">
+                                                                <span data-toggle="tooltip"
+                                                                      title="{% trans 'Remaining scores to submit for this deadline' %}"
+                                                                      class="badge badge-default {% if echeance.quantite_notes_manquantes %}background-error{% else %}background-success{% endif %}">
+                                                                    {{ echeance.quantite_notes_manquantes }}
+                                                                </span>
+                                                            </div>
 
-                                                        {% if forloop.first and progression_encodage.dates_echeance|length > 1 %}
-                                                             <a role="button" data-toggle="collapse" data-target="#tutor_deadlines_collapse_{{ progression_encodage.code_unite_enseignement }}"
-                                                               aria-expanded="false"
-                                                               aria-controls="tutor_deadlines_collapse_{{ progression_encodage.code_unite_enseignement }}"
-                                                               title="{% trans 'Display all deadlines for this learning unit' %}">
-                                                                <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
-                                                             </a>
-                                                        {% endif %}
-                                                    </div>
+                                                            {% if forloop.first and progression_encodage.dates_echeance|length > 1 %}
+                                                                <a role="button" data-toggle="collapse"
+                                                                   data-target="#tutor_deadlines_collapse_{{ progression_encodage.code_unite_enseignement }}"
+                                                                   aria-expanded="false"
+                                                                   aria-controls="tutor_deadlines_collapse_{{ progression_encodage.code_unite_enseignement }}">
+                                                                    <span class="glyphicon glyphicon-list"
+                                                                          aria-hidden="true"
+                                                                          data-toggle="tooltip"
+                                                                          title="{% trans 'Display all deadlines for this learning unit' %}"></span>
+                                                                </a>
+                                                            {% endif %}
+                                                        </div>
                                                     {% if forloop.last and forloop.counter > 2 %}
                                                         </div>
                                                     {% endif %}
+                                                    {% endwith %}
                                                 {% endfor %}
                                             </td>
                                             <td headers="tab_online_progress">
                                                 <div class="progress">
-                                                    <div class="progress-bar {% if progression_encodage.encodage_est_complet %} progress-bar-success {% else %} progress-bar-warning {% endif %}" role="progressbar" style="width: {% widthratio progression_encodage.quantite_notes_soumises progression_encodage.quantite_totale_notes 100 %}%;">
+                                                    <div
+                                                            class="progress-bar {% if progression_encodage.encodage_est_complet %} progress-bar-success {% else %} progress-bar-warning {% endif %}"
+                                                            role="progressbar"
+                                                            style="width: {% widthratio progression_encodage.quantite_notes_soumises progression_encodage.quantite_totale_notes 100 %}%;"
+                                                            data-toggle="tooltip"
+                                                            data-container="body"
+                                                            title="{% trans "Represents the quantity of scores submitted to the administration. The number surrounded by parenthesis is the number of scores encoded by the tutor that aren't submitted yet ('draft' state)" %}"
+                                                    >
                                                        <span>
+                                                           {% if progression_encodage.quantite_notes_brouillon %}
+                                                               ({{ progression_encodage.quantite_notes_brouillon }})
+                                                           {% endif %}
                                                             <b>
                                                                 {{ progression_encodage.quantite_notes_soumises}} / {{ progression_encodage.quantite_totale_notes }}
                                                             </b>
@@ -150,6 +170,7 @@
                                             <td headers="tab_online_peps">
                                                 {% if progression_encodage.a_etudiants_peps %}
                                                     <span class="badge warning-color"
+                                                          data-toggle="tooltip"
                                                           title="{% trans 'Some of the students enrolled to this course have a PEPS status (Program for Students with a Specific Profile). You will find detailled information in the Excel file to encode notes' %}">
                                                         PEPS
                                                     </span>
@@ -215,8 +236,18 @@
                                             </td>
                                             <td headers="tab_paper_progress">
                                                 <div class="progress">
-                                                    <div class="progress-bar {% if progression_encodage.encodage_est_complet %} progress-bar-success {% else %} progress-bar-warning {% endif %}" role="progressbar" style="width: {% widthratio progression_encodage.quantite_notes_soumises progression_encodage.quantite_totale_notes 100 %}%;">
+                                                    <div
+                                                            class="progress-bar {% if progression_encodage.encodage_est_complet %} progress-bar-success {% else %} progress-bar-warning {% endif %}"
+                                                            role="progressbar"
+                                                            style="width: {% widthratio progression_encodage.quantite_notes_soumises progression_encodage.quantite_totale_notes 100 %}%;"
+                                                            data-toggle="tooltip"
+                                                            data-container="body"
+                                                            title="{% trans "Represents the quantity of scores submitted to the administration. The number surrounded by parenthesis is the number of scores encoded by the tutor that aren't submitted yet ('draft' state)" %}"
+                                                    >
                                                        <span>
+                                                           {% if progression_encodage.quantite_notes_brouillon %}
+                                                               ({{ progression_encodage.quantite_notes_brouillon }})
+                                                           {% endif %}
                                                             <b>
                                                                 {{ progression_encodage.quantite_notes_soumises}} / {{ progression_encodage.quantite_totale_notes }}
                                                             </b>
@@ -268,8 +299,18 @@
                                             </td>
                                             <td headers="tab_excel_progress">
                                                 <div class="progress">
-                                                    <div class="progress-bar {% if progression_encodage.encodage_est_complet %} progress-bar-success {% else %} progress-bar-warning {% endif %}" role="progressbar" style="width: {% widthratio progression_encodage.quantite_notes_soumises progression_encodage.quantite_totale_notes 100 %}%;">
+                                                    <div
+                                                            class="progress-bar {% if progression_encodage.encodage_est_complet %} progress-bar-success {% else %} progress-bar-warning {% endif %}"
+                                                            role="progressbar"
+                                                            style="width: {% widthratio progression_encodage.quantite_notes_soumises progression_encodage.quantite_totale_notes 100 %}%;"
+                                                            data-toggle="tooltip"
+                                                            data-container="body"
+                                                            title="{% trans "Represents the quantity of scores submitted to the administration. The number surrounded by parenthesis is the number of scores encoded by the tutor that aren't submitted yet ('draft' state)" %}"
+                                                    >
                                                        <span>
+                                                           {% if progression_encodage.quantite_notes_brouillon %}
+                                                               ({{ progression_encodage.quantite_notes_brouillon }})
+                                                           {% endif %}
                                                             <b>
                                                                 {{ progression_encodage.quantite_notes_soumises}} / {{ progression_encodage.quantite_totale_notes }}
                                                             </b>

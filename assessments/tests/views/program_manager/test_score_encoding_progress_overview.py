@@ -30,11 +30,15 @@ from django.test import TestCase
 from django.urls import reverse
 
 from assessments.forms.score_encoding import ScoreEncodingProgressFilterForm
+from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
+from base.tests.factories.user import UserFactory
 from ddd.logic.encodage_des_notes.encodage.commands import GetCohortesGestionnaireCommand, GetPeriodeEncodageCommand
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import PeriodeEncodageNotesDTO, DateDTO
+from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
 
 
 class ScoreEncodingProgressOverviewProgramManagerViewTest(TestCase):
@@ -79,8 +83,8 @@ class ScoreEncodingProgressOverviewProgramManagerViewTest(TestCase):
 
         response = self.client.get(self.url)
 
-        expected_redirect_url = reverse('outside_scores_encodings_period')
-        self.assertRedirects(response, expected_redirect_url)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse('outside_scores_encodings_period'))
 
     def test_assert_template_used(self):
         response = self.client.get(self.url)
@@ -98,3 +102,131 @@ class ScoreEncodingProgressOverviewProgramManagerViewTest(TestCase):
 
         expected_score_search_url = reverse('score_search')
         self.assertEqual(response.context['score_search_url'], expected_score_search_url)
+
+
+class RechercheCodeUeEtClasseAutocompleteTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.year = 2020
+        cls.user = UserFactory()
+        cls.url = reverse('learning-unit-code-autocomplete')
+
+    def setUp(self) -> None:
+        self.patch_message_bus = mock.patch(
+            "assessments.views.program_manager.score_encoding_progress_overview.message_bus_instance.invoke",
+            side_effect=self.__mock_message_bus_invoke
+        )
+        self.message_bus_mocked = self.patch_message_bus.start()
+        self.addCleanup(self.patch_message_bus.stop)
+
+    def __mock_message_bus_invoke(self, cmd):
+        if isinstance(cmd, GetPeriodeEncodageCommand):
+            aujourdhui = datetime.date.today()
+            return PeriodeEncodageNotesDTO(
+                annee_concernee=self.year,
+                session_concernee=1,
+                debut_periode_soumission=aujourdhui,
+                fin_periode_soumission=aujourdhui,
+            )
+
+    def test_should_be_authenticated(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url, {'q': 'existepas'})
+        results = response.json()['results']
+        self.assertEqual(len(results), 0)
+
+    def test_should_rien_trouver_en_dessous_3_chars(self):
+        LearningClassYearFactory(
+            learning_component_year__learning_unit_year__academic_year__year=self.year,
+            learning_component_year__learning_unit_year__acronym='LDROI1234',
+            learning_component_year__type=LECTURING,
+            acronym='F',
+        )
+        self.client.force_login(self.user)
+        response = self.client.get(self.url, {'q': 'LD'})
+        results = response.json()['results']
+        self.assertEqual(len(results), 1)
+
+    def test_should_inclure_recherche_premiere_position(self):
+        LearningClassYearFactory(
+            learning_component_year__learning_unit_year__academic_year__year=self.year,
+            learning_component_year__learning_unit_year__acronym='LDROI1234',
+            learning_component_year__type=LECTURING,
+            acronym='F',
+        )
+        self.client.force_login(self.user)
+        response = self.client.get(self.url, {'q': 'ldr'})
+        results = response.json()['results']
+        self.assertEqual(len(results), 3)
+        self.assertEqual(results[0]['text'], 'ldr', "l'élément tapé dans la recherche doit être le 1er de la liste")
+
+    def test_should_ignorer_recherche_si_fait_partie_du_resultat(self):
+        LearningClassYearFactory(
+            learning_component_year__learning_unit_year__academic_year__year=self.year,
+            learning_component_year__learning_unit_year__acronym='LDROI1234',
+            learning_component_year__type=LECTURING,
+            acronym='F',
+        )
+        self.client.force_login(self.user)
+        response = self.client.get(self.url, {'q': 'ldroi1234-f'})
+        results = response.json()['results']
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['text'], 'LDROI1234-F')
+
+    def test_should_trouver_une_classe_magistrale(self):
+        LearningClassYearFactory(
+            learning_component_year__learning_unit_year__academic_year__year=self.year,
+            learning_component_year__learning_unit_year__acronym='LDROI1234',
+            learning_component_year__type=LECTURING,
+            acronym='F',
+        )
+        self.client.force_login(self.user)
+        response = self.client.get(self.url, {'q': 'LDROI1234-F'})
+        results = response.json()['results']
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['text'], 'LDROI1234-F')
+
+    def test_should_trouver_une_unite_enseignement(self):
+        LearningUnitYearFactory(
+            academic_year__year=self.year,
+            acronym='LDROI1234',
+        )
+        self.client.force_login(self.user)
+        response = self.client.get(self.url, {'q': 'LDROI1234'})
+        results = response.json()['results']
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['text'], 'LDROI1234')
+
+    def test_should_trouver_une_classe_pratique(self):
+        LearningClassYearFactory(
+            learning_component_year__learning_unit_year__academic_year__year=self.year,
+            learning_component_year__learning_unit_year__acronym='LDROI1234',
+            learning_component_year__type=PRACTICAL_EXERCISES,
+            acronym='F',
+        )
+        self.client.force_login(self.user)
+        response = self.client.get(self.url, {'q': 'LDROI1234_F'})
+        results = response.json()['results']
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['text'], 'LDROI1234_F')
+
+    def test_should_trouver_recherche_encodee_dans_resultat(self):
+        LearningClassYearFactory(
+            learning_component_year__learning_unit_year__academic_year__year=self.year,
+            learning_component_year__learning_unit_year__acronym='LDROI1234',
+            learning_component_year__type=PRACTICAL_EXERCISES,
+            acronym='F',
+        )
+        self.client.force_login(self.user)
+        response = self.client.get(self.url, {'q': 'LDROI1'})
+        results = response.json()['results']
+        self.assertEqual(len(results), 3)
+        self.assertEqual(results[0]['text'], 'LDROI1')  # partestam de recherche
+        self.assertEqual(results[1]['text'], 'LDROI1234')  # unité enseignement
+        self.assertEqual(results[2]['text'], 'LDROI1234_F')  # classe
+
+    def test_should_ignorer_recherche_dans_resultat_si_aucune_ue_ou_classe_trouvee(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url, {'q': 'LEXISTEPAS'})
+        results = response.json()['results']
+        self.assertEqual(len(results), 0)

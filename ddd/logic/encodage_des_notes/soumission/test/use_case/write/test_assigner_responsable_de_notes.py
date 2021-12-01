@@ -106,3 +106,16 @@ class TestAssignerResponsableDeNotes(SimpleTestCase):
                 self.cmd.annee_unite_enseignement
             )
         )
+
+    def test_should_assigner_responsable_de_notes_si_aucun_responsable_existant(self):
+        self.repo.delete(self.responsable.entity_id)
+
+        entity_id = self.message_bus.invoke(self.cmd)
+
+        responsable_retrieved = self.repo.get(entity_id)
+        self.assertTrue(
+            responsable_retrieved.is_responsable_unite_enseignement(
+                self.cmd.code_unite_enseignement,
+                self.cmd.annee_unite_enseignement
+            )
+        )

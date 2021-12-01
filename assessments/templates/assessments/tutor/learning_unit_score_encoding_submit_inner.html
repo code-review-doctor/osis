@@ -24,8 +24,13 @@
 {% endcomment %}
 
 <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="bt_close_submission_score_modal"><span aria-hidden="true">&times;</span></button>
-    <h4 class="modal-title" id="submissionScoresLabel">{% trans 'Submission' %}</h4>
+    {% if draft_scores_not_submitted > 0 %}
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="bt_close_submission_score_modal"
+        title="{% trans 'Submit these scores to faculty. These scores can not be changed after submission. The unsubmitted scores remain editable.' %}">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title" id="submissionScoresLabel">{% trans 'Submit' %}</h4>
+    {% endif %}
 </div>
 
 <div id="form-modal-body" class="modal-body">
@@ -45,8 +50,8 @@
                 type="submit"
                 onclick="$('#submission_scores_modal_form').submit();"
                 data-container="body"
-                data-toggle="tooltip" data-placement="left" title="{% trans 'Definitive submission (Submit to faculty)' %}">
-            {% trans 'Submission' %}
+                data-toggle="tooltip" data-placement="left" title="{% trans 'Submit these scores to faculty. These scores can not be changed after submission. The unsubmitted scores remain editable.' %}">
+            <em class="fas fa-paper-plane"></em> {% trans 'Submit' %}
         </button>
     {% endif %}
     <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Cancel' %}</button>

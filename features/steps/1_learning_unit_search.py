@@ -23,7 +23,6 @@
 # ############################################################################
 from behave import *
 
-from attribution.tests.factories.attribution import AttributionFactory
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.models.academic_year import AcademicYear
@@ -43,12 +42,6 @@ def step_impl(context, person, luys, year):
         # Use all possible factories. I have no idea which is the good one.
         attribution = AttributionNewFactory(
             learning_container_year=luy.learning_container_year,
-            tutor__person__last_name=person,
-            start_year=ac_year.year,
-        )
-
-        AttributionFactory(
-            learning_unit_year=luy,
             tutor__person__last_name=person,
             start_year=ac_year.year,
         )

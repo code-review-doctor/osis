@@ -43,8 +43,15 @@ class PersonAddress(models.Model):
     postal_code = models.CharField(max_length=20, blank=True, null=True)
     city = models.CharField(max_length=255, blank=True, null=True)
     country = models.ForeignKey('reference.Country', blank=True, null=True, on_delete=models.PROTECT)
-    label = models.CharField(max_length=20, choices=PersonAddressType.choices(),
-                             default=PersonAddressType.PROFESSIONAL.value)
+    label = models.CharField(
+        max_length=20,
+        choices=PersonAddressType.choices(),
+        default=PersonAddressType.PROFESSIONAL.value
+    )
+    street = models.CharField(max_length=255, blank=True)
+    street_number = models.CharField(max_length=20, blank=True)
+    postal_box = models.CharField(max_length=20, blank=True)
+    place = models.CharField(max_length=255, blank=True)
 
 
 def find_by_person(a_person):

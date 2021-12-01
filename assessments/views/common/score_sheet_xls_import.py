@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Dict
+
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.urls import reverse
@@ -59,7 +61,7 @@ class ScoreSheetXLSImportBaseView(AjaxPermissionRequiredMixin, AjaxTemplateMixin
     def form_valid(self, form):
         xls_workbook = form.cleaned_data['file']
         try:
-            score_sheet_serialized = ScoreSheetXLSImportSerializer(xls_workbook.active).data
+            score_sheet_serialized = self.get_xls_import_serializer_cls()(xls_workbook.active).data
             self.call_command(self.person.global_id, score_sheet_serialized)
         except ScoreSheetXLSImportSerializerError as e:
             messages.add_message(self.request, messages.ERROR, e.message)
@@ -70,5 +72,8 @@ class ScoreSheetXLSImportBaseView(AjaxPermissionRequiredMixin, AjaxTemplateMixin
             'learning_unit_code': self.kwargs['learning_unit_code']
         })
 
-    def call_command(self, matricule, score_sheet_serialized):
+    def get_xls_import_serializer_cls(self):
+        return ScoreSheetXLSImportSerializer
+
+    def call_command(self, matricule: str, score_sheet_serialized: Dict):
         pass

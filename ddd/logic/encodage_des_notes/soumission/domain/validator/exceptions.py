@@ -75,11 +75,17 @@ class PasGestionnaireParcoursException(BusinessException):
 
 class PasGestionnaireParcoursCohorteException(BusinessException):
     def __init__(self, cohortes_non_geres: Set[str], **kwargs):
-        message = _("You're not a program manager of {}").format(','.join(cohortes_non_geres))
+        message = _("You're not a program manager of {}").format(cohortes_non_geres)
         super().__init__(message, **kwargs)
 
 
-class AdressePremiereAnneeDeBachelierIdentiqueAuBachlierException(BusinessException):
+class AdresseSpecifiquePremiereAnneeDeBachelierIdentiqueAuBachlierException(BusinessException):
+    def __init__(self, **kwargs):
+        message = _("The address cannot be the same between bachelor and first year bachelor")
+        super().__init__(message, **kwargs)
+
+
+class EntiteAdressePremiereAnneeDeBachelierIdentiqueAuBachlierException(BusinessException):
     def __init__(self, **kwargs):
         message = _("The entity cannot be the same between bachelor and first year bachelor")
         super().__init__(message, **kwargs)

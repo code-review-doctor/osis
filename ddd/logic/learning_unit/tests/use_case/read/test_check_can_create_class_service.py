@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from unittest.mock import patch
 
 from django.test import SimpleTestCase
 
@@ -140,9 +141,12 @@ class TestCheckCanCreateEffectiveClass(SimpleTestCase):
         raised_exceptions = [type(e) for e in context.exception.exceptions]
         self.assertIn(LearningUnitHasEnrollmentException, raised_exceptions)
 
-    def test_check_cannot_create_effective_class_for_lu_with_proposal(self):
-        self.learning_unit_repository.has_proposal_this_year_or_in_past = lambda *args, **kwargs: True
-
+    @patch(
+        'infrastructure.learning_unit.repository.in_memory.learning_unit.LearningUnitRepository.'
+        'has_proposal_this_year_or_in_past',
+        return_value=True
+    )
+    def test_check_cannot_create_effective_class_for_lu_with_proposal(self, mock_proposal):
         LDROI1001_course = LDROI1001CourseLearningUnitFactory()
         self.learning_unit_repository.save(LDROI1001_course)
 

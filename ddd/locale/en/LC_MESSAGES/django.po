@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-14 16:20+0200\n"
+"POT-Creation-Date: 2021-10-28 10:34+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -69,13 +69,23 @@ msgstr ""
 msgid "Decimal scores not authorized"
 msgstr ""
 
-msgid "Distributed volume should be filled in and be greater than 0"
+msgid "Details other educational facilities"
 msgstr ""
 
 msgid "Following fields are required : {}"
 msgstr ""
 
 msgid "Internship subtype is a mandatory field"
+msgstr ""
+
+msgid "Distributed volume should be filled in and be greater than 0"
+msgstr ""
+
+#, python-format
+msgid "Extra time (33% generally)"
+msgstr ""
+
+msgid "Large print"
 msgstr ""
 
 msgid "Learning unit {} already exists next year"
@@ -87,7 +97,13 @@ msgstr ""
 msgid "Lecturing charge or practical charge must be filled"
 msgstr ""
 
+msgid "No student to encode by excel"
+msgstr ""
+
 msgid "No vacant corresponding activity"
+msgstr ""
+
+msgid "Other educational facilities"
 msgstr ""
 
 msgid "Registration ID does not match email"
@@ -97,6 +113,12 @@ msgid "Score already submitted"
 msgstr ""
 
 msgid "Selected entity {} is not an authorized responsible entity"
+msgstr ""
+
+msgid "Specific room of examination"
+msgstr ""
+
+msgid "Student not registered for exam"
 msgstr ""
 
 msgid "Subdivision should be one character A-Z or 0-9"
@@ -136,6 +158,9 @@ msgstr ""
 msgid ""
 "The %(effective_class_complete_acronym)s volumes are inconsistent(the "
 "%(quadrimester)s volume has to be completed)"
+msgstr ""
+
+msgid "The address cannot be the same between bachelor and first year bachelor"
 msgstr ""
 
 #, python-format
@@ -182,12 +207,21 @@ msgstr ""
 msgid "The teaching place is required."
 msgstr ""
 
+msgid "There is no enrollment for this course"
+msgstr ""
+
+msgid "There is no enrollment to the exam"
+msgstr ""
+
 msgid ""
 "This course is team-managed. The application to this activity is based on a "
 "paper transmission."
 msgstr ""
 
 msgid "Tutor already assigned to the class"
+msgstr ""
+
+msgid "UCL Person not found."
 msgstr ""
 
 #, python-format

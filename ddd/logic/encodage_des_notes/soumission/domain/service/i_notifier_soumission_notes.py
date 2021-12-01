@@ -27,6 +27,7 @@ from typing import List
 
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_inscription_examen import IInscriptionExamenTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_etudiant import \
     ISignaletiqueEtudiantTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_personne import \
@@ -47,5 +48,6 @@ class INotifierSoumissionNotes(interface.DomainService):
             translator: 'IAttributionEnseignantTranslator',
             signaletique_repo: 'ISignaletiquePersonneTranslator',
             signaletique_etudiant_repo: 'ISignaletiqueEtudiantTranslator',
+            inscr_exam_translator: 'IInscriptionExamenTranslator',
     ) -> None:
         raise NotImplementedError

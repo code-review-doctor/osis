@@ -23,15 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import uuid as uuid
+
+from django.contrib.admin import ModelAdmin
 from django.db import models
+from django.db.models import Model
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
 from base.models.enums import peps_type
-from osis_common.models.serializable_model import SerializableModelAdmin, SerializableModel
 
 
-class StudentSpecificProfileAdmin(VersionAdmin, SerializableModelAdmin):
+class StudentSpecificProfileAdmin(VersionAdmin, ModelAdmin):
     list_display = ('student', 'guide', 'changed',)
     list_filter = ('type', 'subtype_disability', 'subtype_sport')
     search_fields = [
@@ -40,7 +43,10 @@ class StudentSpecificProfileAdmin(VersionAdmin, SerializableModelAdmin):
     ]
 
 
-class StudentSpecificProfile(SerializableModel):
+class StudentSpecificProfile(Model):
+
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, db_index=True)
+
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     student = models.OneToOneField('Student', on_delete=models.PROTECT)

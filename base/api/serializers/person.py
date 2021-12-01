@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -77,7 +77,8 @@ class PersonRolesSerializer(serializers.ModelSerializer):
         }
         return roles
 
-    def roles_for_reddot(self, obj):
+    @staticmethod
+    def roles_for_reddot(obj):
         all_entities = EntityRoleHelper.get_all_entities(obj, {CentralManager.group_name, FacultyManager.group_name})
         all_faculties = set(
             row.acronym for row in EntityVersion.objects.current(datetime.now()).filter(
@@ -92,7 +93,8 @@ class PersonRolesSerializer(serializers.ModelSerializer):
             all_faculties.add(Scope.IUFC.name)
         return all_faculties
 
-    def roles_for_program_managers(self, obj):
+    @staticmethod
+    def roles_for_program_managers(obj):
         return [
             {'acronym': educ_group_year.acronym, 'year': educ_group_year.academic_year.year}
             for educ_group_year in education_group_year.find_by_user(obj.user).select_related('academic_year')

@@ -74,13 +74,47 @@ class ClassDistributionWithAttribution(interface.DomainService):
 
         effective_classes = _get_effective_classes_from_tutors([tutor], effective_class_repository)
         attribution_uuids = {
-            distributed_class.attribution.uuid
-            for distributed_class in tutor.distributed_effective_classes
-            if distributed_class.effective_class.learning_unit_identity.year == annee
-            # FIXME :: ajouter 'annee' dans l'aggregat Tutor ????
+            distributed_class.attribution.uuid for distributed_class in tutor.distributed_effective_classes
         }
         attributions = tutor_attribution_translator.search_learning_unit_attributions(attribution_uuids)
-        return _get_tutor_class_repartition_dtos(tutor, attributions, effective_classes)
+        tutor_class_repartition_dtos = _get_tutor_class_repartition_dtos(tutor, attributions, effective_classes)
+        return [dto for dto in tutor_class_repartition_dtos if dto.annee == annee]
+
+    @classmethod
+    def search_par_nom_prenom_enseignant(
+            cls,
+            annee: int,
+            nom_prenom: str,
+            tutor_attribution_translator: 'ITutorAttributionToLearningUnitTranslator',
+            tutor_repository: 'ITutorRepository',
+    ) -> List['TutorClassRepartitionDTO']:
+        attributions = tutor_attribution_translator.search_par_nom_prenom_enseignant(annee, nom_prenom)
+        identites_enseignants = [
+            TutorIdentityBuilder.build_from_personal_id_number(attrib.personal_id_number)
+            for attrib in attributions
+        ]
+        tutor_dtos = tutor_repository.search_dto(entity_ids=identites_enseignants)
+
+        attributions_par_uuid = {attrib.attribution_uuid: attrib for attrib in attributions}
+        result = []
+        for tutor in tutor_dtos:
+            for classe_distribuee in tutor.distributed_classes:
+                if classe_distribuee.learning_unit_year != annee:
+                    continue  # FIXME :: l'identité DOIT contenir l'année - code à supprimer...
+                attrib = attributions_par_uuid[classe_distribuee.attribution_uuid]
+                result.append(
+                    TutorClassRepartitionDTO(
+                        attribution_uuid=classe_distribuee.attribution_uuid,
+                        last_name=attrib.last_name,
+                        first_name=attrib.first_name,
+                        function=attrib.function,
+                        distributed_volume_to_class=classe_distribuee.distributed_volume,
+                        personal_id_number=tutor.personal_id_number,
+                        complete_class_code=classe_distribuee.code_complet_classe,
+                        annee=classe_distribuee.learning_unit_year,
+                    )
+                )
+        return sorted(result, key=lambda dto: (dto.last_name, dto.first_name))
 
 
 def _get_effective_classes_from_tutors(

@@ -23,12 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import functools
+import operator
 from typing import List
 
-from django.db.models import F, QuerySet, OuterRef, Subquery
+from django.db import models
+from django.db.models import F, QuerySet, OuterRef, Subquery, Case, When, Q
 
 from attribution.models.attribution_charge_new import AttributionChargeNew as AttributionChargeNewDb
-from attribution.models.attribution_new import AttributionNew as AttributionNewDb
+from attribution.models.attribution_new import AttributionNew as AttributionNewDb, AttributionNew
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from ddd.logic.effective_class_repartition.domain.model.tutor import TutorIdentity
 from ddd.logic.effective_class_repartition.domain.service.i_tutor_attribution import \
@@ -82,6 +85,30 @@ class TutorAttributionToLearningUnitTranslator(ITutorAttributionToLearningUnitTr
         qs = _value_qs(qs)
         return [TutorAttributionToLearningUnitDTO(**tutor_attribution_db) for tutor_attribution_db in qs]
 
+    @classmethod
+    def search_par_nom_prenom_enseignant(
+            cls,
+            annee: int,
+            nom_prenom: str,
+    ) -> List['TutorAttributionToLearningUnitDTO']:
+        filters = [
+            Q(tutor__person__first_name__icontains=mot)
+            | Q(tutor__person__last_name__icontains=mot)
+            for mot in nom_prenom.split(' ')
+        ]
+        qs = _get_common_qs()
+        qs = qs.filter(
+            learning_container_year__academic_year__year=annee,
+        ).filter(
+            functools.reduce(
+                operator.and_,
+                filters
+            )
+        )
+        qs = _annotate_qs(qs)
+        qs = _value_qs(qs).order_by('last_name', 'first_name')
+        return [TutorAttributionToLearningUnitDTO(**tutor_attribution_db) for tutor_attribution_db in qs]
+
 
 def _get_common_qs() -> QuerySet:
     return AttributionNewDb.objects.all()
@@ -97,7 +124,15 @@ def _annotate_qs(qs: QuerySet) -> QuerySet:
         learning_component_year__type=PRACTICAL_EXERCISES
     )
     return qs.annotate(
-        learning_unit_code=F('learning_container_year__acronym'),
+        learning_unit_code=Case(
+            When(attributionchargenew__isnull=True, then=F('learning_container_year__acronym')),
+            default=Subquery(
+                AttributionChargeNewDb.objects.filter(
+                    attribution_id=OuterRef('pk')
+                ).values('learning_component_year__learning_unit_year__acronym')[:1]
+            ),
+            output_field=models.CharField()
+        ),
         learning_unit_year=F('learning_container_year__academic_year__year'),
         attribution_uuid=F('uuid'),
         first_name=F('tutor__person__first_name'),

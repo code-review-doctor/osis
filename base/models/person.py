@@ -49,6 +49,7 @@ class PersonAdmin(SerializableModelAdmin):
                     'changed', 'source', 'employee')
     search_fields = ['first_name', 'middle_name', 'last_name', 'user__username', 'email', 'global_id']
     list_filter = ('gender', 'language')
+    exclude = ('id_card', 'passport', 'id_photo',)
 
 
 class EmployeeManager(SerializableModelManager):
@@ -87,11 +88,11 @@ class Person(SerializableModel):
     email = models.EmailField(max_length=255, default='')
     phone = models.CharField(max_length=30, blank=True, default='')
     phone_mobile = models.CharField(max_length=30, blank=True, default='')
-    language = models.CharField(max_length=30, null=True, choices=settings.LANGUAGES, default=settings.LANGUAGE_CODE)
+    language = models.CharField(max_length=30, choices=settings.LANGUAGES, default=settings.LANGUAGE_CODE)
     birth_date = models.DateField(blank=True, null=True)
 
     sex = models.CharField(max_length=1, blank=True, default='', choices=SEX_CHOICES)
-    first_name_in_use = models.CharField(max_length=50, default='')
+    first_name_in_use = models.CharField(max_length=50, default='', blank=True)
     birth_year = models.IntegerField(blank=True, null=True, validators=[YEAR_REGEX])
     birth_country = models.ForeignKey(
         'reference.Country',
@@ -100,7 +101,7 @@ class Person(SerializableModel):
         on_delete=models.PROTECT,
         related_name='birth_persons'
     )
-    birth_place = models.CharField(max_length=255, default='')
+    birth_place = models.CharField(max_length=255, default='', blank=True)
     country_of_citizenship = models.ForeignKey(
         'reference.Country', verbose_name=_('Country of citizenship'), on_delete=models.PROTECT, blank=True, null=True
     )
@@ -124,10 +125,10 @@ class Person(SerializableModel):
         null=True,
         blank=True,
     )
-    national_number = models.CharField(max_length=255, default='')
-    id_card_number = models.CharField(max_length=255, default='')
-    passport_number = models.CharField(max_length=255, default='')
-    passport_expiration_date = models.DateField(null=True)
+    national_number = models.CharField(max_length=255, default='', blank=True)
+    id_card_number = models.CharField(max_length=255, default='', blank=True)
+    passport_number = models.CharField(max_length=255, default='', blank=True)
+    passport_expiration_date = models.DateField(null=True, blank=True)
     id_photo = FileField(
         mimetypes=['image/jpeg', 'image/png'],
         max_size=FILE_MAX_SIZE,
@@ -136,8 +137,11 @@ class Person(SerializableModel):
         null=True
     )
 
-    source = models.CharField(max_length=25, blank=True, null=True, choices=person_source_type.CHOICES,
-                              default=person_source_type.BASE)
+    source = models.CharField(
+        max_length=25, blank=True, null=True,
+        choices=person_source_type.CHOICES,
+        default=person_source_type.BASE
+    )
     employee = models.BooleanField(default=False)
     managed_entities = models.ManyToManyField("Entity", through="EntityManager")
 

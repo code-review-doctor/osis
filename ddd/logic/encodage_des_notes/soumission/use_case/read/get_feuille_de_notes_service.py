@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Optional
+
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_inscription_examen import IInscriptionExamenTranslator
@@ -52,7 +54,7 @@ def get_feuille_de_notes(
         signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
         attribution_translator: 'IAttributionEnseignantTranslator',
         unite_enseignement_translator: 'IUniteEnseignementTranslator',
-) -> 'FeuilleDeNotesDTO':
+) -> Optional['FeuilleDeNotesDTO']:
     # GIVEN
     PeriodeEncodageOuverte().verifier(periode_encodage_note_translator)
     periode_encodage = periode_encodage_note_translator.get()
@@ -63,29 +65,32 @@ def get_feuille_de_notes(
     )
 
     # WHEN
-    donnees_notes = [
-        DonneesNotes(
-            code_unite_enseignement=note.code_unite_enseignement,
-            annee=note.annee,
-            noma=note.noma,
-            email=note.email,
-            note=str(note.note),
-            date_limite_de_remise=note.date_limite_de_remise,
-            est_soumise=note.est_soumise,
-            note_decimale_autorisee=note.note_decimale_est_autorisee(),
-            echeance_enseignant=note.date_limite_de_remise
+    if notes:
+        donnees_notes = [
+            DonneesNotes(
+                code_unite_enseignement=note.code_unite_enseignement,
+                annee=note.annee,
+                noma=note.noma,
+                email=note.email,
+                note=str(note.note),
+                date_limite_de_remise=note.date_limite_de_remise,
+                est_soumise=note.est_soumise,
+                note_decimale_autorisee=note.note_decimale_est_autorisee(),
+                echeance_enseignant=note.date_limite_de_remise
+            )
+            for note in notes
+        ]
+        feuille_de_notes_dto = FeuilleDeNotesParUniteEnseignement().get(
+            donnees_notes,
+            responsable_notes_repo,
+            signaletique_personne_translator,
+            periode_encodage,
+            inscription_examen_translator,
+            signaletique_etudiant_translator,
+            attribution_translator,
+            unite_enseignement_translator,
         )
-        for note in notes
-    ]
-    feuille_de_notes_dto = FeuilleDeNotesParUniteEnseignement().get(
-        donnees_notes,
-        responsable_notes_repo,
-        signaletique_personne_translator,
-        periode_encodage,
-        inscription_examen_translator,
-        signaletique_etudiant_translator,
-        attribution_translator,
-        unite_enseignement_translator,
-    )
 
-    return feuille_de_notes_dto
+        return feuille_de_notes_dto
+    else:
+        return None

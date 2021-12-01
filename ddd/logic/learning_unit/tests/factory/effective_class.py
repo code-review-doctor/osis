@@ -101,3 +101,10 @@ class LecturingEffectiveClassFactory(_LecturingEffectiveClassFactory):
 class LDROI1001XEffectiveClassIdentityFactory(_EffectiveClassIdentityFactory):
     class_code = 'X'
     learning_unit_identity = factory.SubFactory(LDROI1001LearningUnitIdentityFactory)
+
+
+class LecturingEffectiveClassWithoutRepartitionFactory(_LecturingEffectiveClassFactory):
+    volumes = _ClassVolumesFactory(
+        volume_first_quadrimester=0,
+        volume_second_quadrimester=0
+    )

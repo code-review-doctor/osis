@@ -202,7 +202,6 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
             numero_session: int = None,
             nomas: List[str] = None,
             code_unite_enseignement: str = None,
-            enseignant: str = None,
             note_manquante: bool = False,
             **kwargs
     ) -> Set['IdentiteNoteEtudiant']:
@@ -217,7 +216,8 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
             autres_cohortes = {nom for nom in noms_cohortes if '11BA' not in nom}
 
             autres_cohortes_q = Q(
-                learning_unit_enrollment__offer_enrollment__education_group_year__acronym__in=autres_cohortes
+                learning_unit_enrollment__offer_enrollment__education_group_year__acronym__in=autres_cohortes,
+                learning_unit_enrollment__offer_enrollment__cohort_year__isnull=True
             ) if autres_cohortes else Q()
 
             equivalents_1ba = {cohorte.replace("11BA", "1BA") for cohorte in cohortes_11ba}
@@ -270,23 +270,6 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
             'annee_academique',
             'numero_session',
         )
-
-        # TODO: Remove filtering to enseignement and use translator to get all code_unite_enseignement + annee_academic
-        # managed by tutor name searched
-        if enseignant:
-            mots = enseignant.split(" ")
-            filters = [
-                Q(learning_unit_enrollment__learning_unit_year__learningcomponentyear__attributionchargenew__attribution__tutor__person__first_name__icontains=mot)
-                | Q(learning_unit_enrollment__learning_unit_year__learningcomponentyear__attributionchargenew__attribution__tutor__person__last_name__icontains=mot)
-                for mot in mots
-            ]
-
-            qs = qs.filter(
-                functools.reduce(
-                    operator.and_,
-                    filters
-                )
-            )
 
         return {IdentiteNoteEtudiant(**row) for row in qs}
 

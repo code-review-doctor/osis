@@ -46,9 +46,13 @@ class GestionnaireParcoursBuilder(interface.RootEntityBuilder):
     def get(
             cls,
             matricule_gestionnaire: str,
+            annee_concernee: int,
             cohortes_gestionnaire_translator: 'ICohortesDuGestionnaire',
     ) -> 'GestionnaireParcours':
-        cohortes_gestionnaire = cohortes_gestionnaire_translator.search(matricule_gestionnaire)
+        cohortes_gestionnaire = cohortes_gestionnaire_translator.search(
+            matricule_gestionnaire=matricule_gestionnaire,
+            annee_concernee=annee_concernee
+        )
         if not cohortes_gestionnaire:
             raise PasGestionnaireParcoursException()
         return GestionnaireParcours(

@@ -23,39 +23,51 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import attr
 
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_periode_encodage_notes import \
+    IPeriodeEncodageNotesTranslator
 from ddd.logic.encodage_des_notes.soumission.builder.adresse_feuille_de_notes_builder import \
     AdresseFeuilleDeNotesBuilder
 from ddd.logic.encodage_des_notes.soumission.builder.adresse_feuille_de_notes_identity_builder import \
     AdresseFeuilleDeNotesIdentityBuilder
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderAdresseFeuilleDeNotesSpecifique, \
-    EncoderAdresseEntiteCommeAdresseFeuilleDeNotes, EcraserAdresseFeuilleDeNotesPremiereAnneeDeBachelier
-from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_notes import IdentiteAdresseFeuilleDeNotes
+    EncoderAdresseEntiteCommeAdresseFeuilleDeNotes, SupprimerAdresseFeuilleDeNotesPremiereAnneeDeBachelier
+from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_notes import \
+    IdentiteAdresseFeuilleDeNotes, AdresseFeuilleDeNotes
+from ddd.logic.encodage_des_notes.soumission.domain.service \
+    .adresse_feuille_de_note_premiere_annee_de_bachelier_est_specifique import \
+    EntiteAdresseFeuilleDeNotesPremiereAnneeDeBachelierEstDifferenteDeCelleDuBachelier, \
+    AdresseFeuilleDeNotesSpecifiquePremiereAnneeDeBachelierEstDifferenteDeCelleDuBachelier
+from ddd.logic.encodage_des_notes.soumission.domain.service.entites_adresse_feuille_de_notes import \
+    EntiteAdresseFeuilleDeNotes
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_entites_cohorte import IEntitesCohorteTranslator
+from ddd.logic.encodage_des_notes.soumission.domain.validator.validators_by_business_action import \
+    EncoderAdresseFeuilleDeNotesValidatorLIst
 from ddd.logic.encodage_des_notes.soumission.dtos import AdresseFeuilleDeNotesDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_notes import \
     IAdresseFeuilleDeNotesRepository
-from ddd.logic.shared_kernel.entite.builder.identite_entite_builder import IdentiteEntiteBuilder
 from ddd.logic.shared_kernel.entite.repository.entiteucl import IEntiteUCLRepository
 from osis_common.ddd import interface
 
 
 class EncoderAdresseFeuilleDeNotesDomainService(interface.DomainService):
     @classmethod
-    def ecraser_adresse_premiere_annee_de_bachelier(
+    def supprimer_adresse_premiere_annee_de_bachelier(
             cls,
-            cmd: EcraserAdresseFeuilleDeNotesPremiereAnneeDeBachelier,
+            cmd: SupprimerAdresseFeuilleDeNotesPremiereAnneeDeBachelier,
             repo: IAdresseFeuilleDeNotesRepository,
+            periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
     ) -> 'IdentiteAdresseFeuilleDeNotes':
-        nom_cohorte_bachelier = cmd.nom_cohorte.replace("11BA", "1BA")
-        identite_adresse_bachelier = AdresseFeuilleDeNotesIdentityBuilder().build_from_nom_cohorte(
-            nom_cohorte_bachelier
+        annee_academique = periode_soumission_note_translator.get().annee_concernee
+
+        identite_adresse = AdresseFeuilleDeNotesIdentityBuilder().build_from_nom_cohorte_and_annee_academique(
+            cmd.nom_cohorte,
+            annee_academique
         )
-        dto_adresse_bachelier = repo.search_dtos([identite_adresse_bachelier])[0]
 
-        dto_adresse_premiere_annee_de_bachelier = attr.evolve(dto_adresse_bachelier, nom_cohorte=cmd.nom_cohorte)
+        repo.delete(identite_adresse)
 
-        return cls._encoder_adresse(dto_adresse_premiere_annee_de_bachelier, repo)
+        return identite_adresse
 
     @classmethod
     def encoder_adresse_entite_comme_adresse(
@@ -63,13 +75,34 @@ class EncoderAdresseFeuilleDeNotesDomainService(interface.DomainService):
             cmd: EncoderAdresseEntiteCommeAdresseFeuilleDeNotes,
             repo: IAdresseFeuilleDeNotesRepository,
             entite_repository: 'IEntiteUCLRepository',
+            entites_cohorte_translator: 'IEntitesCohorteTranslator',
+            periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
     ) -> 'IdentiteAdresseFeuilleDeNotes':
-        identite_entite = IdentiteEntiteBuilder().build_from_sigle(cmd.entite)
-        entite = entite_repository.get(identite_entite)
+        annee_academique = periode_soumission_note_translator.get().annee_concernee
+
+        EntiteAdresseFeuilleDeNotesPremiereAnneeDeBachelierEstDifferenteDeCelleDuBachelier(
+        ).verifier(
+            cmd,
+            annee_academique,
+            repo,
+            entite_repository,
+            entites_cohorte_translator,
+            periode_soumission_note_translator,
+        )
+        EncoderAdresseFeuilleDeNotesValidatorLIst(type_entite=cmd.type_entite).validate()
+
+        entites_possibles = EntiteAdresseFeuilleDeNotes.search(
+            cmd.nom_cohorte,
+            entite_repository,
+            entites_cohorte_translator,
+            periode_soumission_note_translator,
+        )
+        entite = entites_possibles.get_par_type(cmd.type_entite)
 
         dto = AdresseFeuilleDeNotesDTO(
             nom_cohorte=cmd.nom_cohorte,
-            entite=cmd.entite,
+            annee_academique=annee_academique,
+            type_entite=cmd.type_entite,
             destinataire="{} - {}".format(entite.sigle, entite.intitule),
             rue_numero=entite.adresse.rue_numero,
             code_postal=entite.adresse.code_postal,
@@ -87,10 +120,24 @@ class EncoderAdresseFeuilleDeNotesDomainService(interface.DomainService):
             cls,
             cmd: EncoderAdresseFeuilleDeNotesSpecifique,
             repo: IAdresseFeuilleDeNotesRepository,
+            periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
     ) -> 'IdentiteAdresseFeuilleDeNotes':
+        annee_academique = periode_soumission_note_translator.get().annee_concernee
+
+        AdresseFeuilleDeNotesSpecifiquePremiereAnneeDeBachelierEstDifferenteDeCelleDuBachelier().verifier(
+            cmd=cmd,
+            annee_academique=annee_academique,
+            repo=repo
+        )
+
+        EncoderAdresseFeuilleDeNotesValidatorLIst(
+            type_entite=""
+        ).validate()
+
         dto = AdresseFeuilleDeNotesDTO(
             nom_cohorte=cmd.nom_cohorte,
-            entite="",
+            annee_academique=annee_academique,
+            type_entite="",
             destinataire=cmd.destinataire,
             rue_numero=cmd.rue_numero,
             code_postal=cmd.code_postal,
@@ -109,83 +156,31 @@ class EncoderAdresseFeuilleDeNotesDomainService(interface.DomainService):
             dto: AdresseFeuilleDeNotesDTO,
             repo: IAdresseFeuilleDeNotesRepository
     ) -> 'IdentiteAdresseFeuilleDeNotes':
-        concerne_un_bachelier = "1BA" in dto.nom_cohorte
-        if concerne_un_bachelier:
-            return cls._encoder_adresse_pour_bachelier(dto, repo)
-        return cls._encoder_adresse_pour_autre_cohortes(dto, repo)
-
-    @classmethod
-    def _encoder_adresse_pour_bachelier(
-            cls,
-            dto: AdresseFeuilleDeNotesDTO,
-            repo: IAdresseFeuilleDeNotesRepository,
-    ) -> 'IdentiteAdresseFeuilleDeNotes':
-        is_adresse_premiere_annee_de_bachelier_identique =\
-            cls._is_adresse_bachelier_identique_a_la_premiere_annee_de_bachelier(dto, repo)
-
         nouvelle_adresse = AdresseFeuilleDeNotesBuilder().build_from_repository_dto(dto)
         repo.save(nouvelle_adresse)
 
-        if is_adresse_premiere_annee_de_bachelier_identique:
-            dto_premiere_annee_de_bachelier = attr.evolve(
-                dto,
-                nom_cohorte=cls.__get_nom_cohorte_premiere_annee_de_bachelier_a_partir_de_nom_cohorte_bachelier(
-                    dto.nom_cohorte
-                )
-            )
-            nouvelle_adresse_premiere_annee_de_bachelier = AdresseFeuilleDeNotesBuilder().build_from_repository_dto(
-                dto_premiere_annee_de_bachelier
-            )
-            repo.save(nouvelle_adresse_premiere_annee_de_bachelier)
+        cls._supprimer_adresse_11ba_si_equivalente_a_celle_du_1ba(
+            nouvelle_adresse,
+            repo
+        )
 
         return nouvelle_adresse.entity_id
 
     @classmethod
-    def _is_adresse_bachelier_identique_a_la_premiere_annee_de_bachelier(
+    def _supprimer_adresse_11ba_si_equivalente_a_celle_du_1ba(
             cls,
-            dto: AdresseFeuilleDeNotesDTO,
-            repo: IAdresseFeuilleDeNotesRepository,
-    ) -> bool:
-        identite_adresse_builder = AdresseFeuilleDeNotesIdentityBuilder()
+            adresse: 'AdresseFeuilleDeNotes',
+            repo: IAdresseFeuilleDeNotesRepository
+    ):
+        if not ('1BA' in adresse.nom_cohorte and '11BA' not in adresse.nom_cohorte):
+            return
 
-        identite_adresse_bachelier = identite_adresse_builder.build_from_nom_cohorte(dto.nom_cohorte)
-        identite_adresse_premiere_annee_de_bachelier = identite_adresse_builder.build_from_nom_cohorte(
-            cls.__get_nom_cohorte_premiere_annee_de_bachelier_a_partir_de_nom_cohorte_bachelier(dto.nom_cohorte)
+        nom_cohorte_11BA = adresse.nom_cohorte.replace('1BA', '11BA')
+        identite_adresse_11ba = AdresseFeuilleDeNotesIdentityBuilder.build_from_nom_cohorte_and_annee_academique(
+            nom_cohorte_11BA,
+            adresse.annee_academique
         )
+        adresse_11ba = repo.get(identite_adresse_11ba)
 
-        adresses = repo.search([identite_adresse_bachelier, identite_adresse_premiere_annee_de_bachelier])
-
-        adresse_bachelier = next(
-            (adresse for adresse in adresses if adresse.entity_id == identite_adresse_bachelier),
-            None
-        )
-        adresse_premiere_annee_de_bachelier = next(
-            (adresse for adresse in adresses if adresse.entity_id == identite_adresse_premiere_annee_de_bachelier),
-            None
-        )
-
-        if adresse_bachelier is None and adresse_premiere_annee_de_bachelier is None:
-            return True
-        elif adresse_premiere_annee_de_bachelier is None:
-            return True
-        elif adresse_bachelier is not None:
-            return adresse_bachelier.est_identique_a(adresse_premiere_annee_de_bachelier)
-        return False
-
-    @classmethod
-    def __get_nom_cohorte_premiere_annee_de_bachelier_a_partir_de_nom_cohorte_bachelier(
-            cls,
-            nom_cohorte_bachelier: str
-    ) -> str:
-        return nom_cohorte_bachelier.replace('1BA', '11BA')
-
-    @classmethod
-    def _encoder_adresse_pour_autre_cohortes(
-            cls,
-            dto: AdresseFeuilleDeNotesDTO,
-            repo: IAdresseFeuilleDeNotesRepository,
-    ) -> 'IdentiteAdresseFeuilleDeNotes':
-        nouvelle_adresse = AdresseFeuilleDeNotesBuilder().build_from_repository_dto(dto)
-        repo.save(nouvelle_adresse)
-
-        return nouvelle_adresse.entity_id
+        if adresse_11ba and adresse.est_identique_a(adresse_11ba):
+            repo.delete(identite_adresse_11ba)

@@ -33,6 +33,8 @@ from ddd.logic.encodage_des_notes.soumission.domain.validator._should_date_remis
     ShouldDateDeRemiseNotePasEtreAtteinte
 from ddd.logic.encodage_des_notes.soumission.domain.validator._should_email_correspondre_noma import \
     ShouldEmailCorrespondreNoma
+from ddd.logic.encodage_des_notes.soumission.domain.validator._should_entite_etre_choix_valide import \
+    ShouldEntiteEtreChoixValide
 from ddd.logic.encodage_des_notes.soumission.domain.validator._should_note_etre_choix_valide import \
     ShouldNoteEtreChoixValide
 from ddd.logic.encodage_des_notes.soumission.domain.validator._should_note_pas_etre_soumise import \
@@ -58,4 +60,17 @@ class EncoderNoteEtudiantValidatorList(TwoStepsMultipleBusinessExceptionListVali
             ShouldNotePasEtreSoumise(self.note_etudiant),
             ShouldNoteEtreChoixValide(self.note_encodee),
             ShouldVerifierNoteDecimaleAutorisee(self.note_encodee, self.note_etudiant),
+        ]
+
+
+@attr.s(frozen=True, slots=True)
+class EncoderAdresseFeuilleDeNotesValidatorLIst(TwoStepsMultipleBusinessExceptionListValidator):
+    type_entite = attr.ib(type=str)
+
+    def get_data_contract_validators(self) -> List[BusinessValidator]:
+        return []
+
+    def get_invariants_validators(self) -> List[BusinessValidator]:
+        return [
+            ShouldEntiteEtreChoixValide(self.type_entite)
         ]

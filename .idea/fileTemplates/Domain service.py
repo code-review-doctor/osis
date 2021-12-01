@@ -1,5 +1,6 @@
 #set( $Service = ${StringUtils.removeAndHump($NAME)} )
-from typing import Optional, List
+from osis_common.ddd import interface
+
 
 class $Service(interface.DomainService):
     @classmethod

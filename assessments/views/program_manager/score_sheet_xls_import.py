@@ -23,43 +23,57 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import contextlib
+from typing import Dict
+
 from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
 
 from assessments.views.common.score_sheet_xls_import import ScoreSheetXLSImportBaseView
+from assessments.views.serializers.score_sheet_xls_import import ProgramManagerScoreSheetXLSImportSerializer
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from ddd.logic.encodage_des_notes.encodage.commands import EncoderNotesCommand, EncoderNoteCommand
+from ddd.logic.encodage_des_notes.shared_kernel.commands import GetEncoderNotesRapportCommand
 from infrastructure.messages_bus import message_bus_instance
 
 
 class ScoreSheetXLSImportProgramManagerView(ScoreSheetXLSImportBaseView):
-    def call_command(self, matricule, score_sheet_serialized):
-        cmd = EncoderNotesCommand(
-            matricule_fgs_gestionnaire=self.person.global_id,
+    def get_xls_import_serializer_cls(self):
+        return ProgramManagerScoreSheetXLSImportSerializer
+
+    def call_command(self, matricule: str, score_sheet_serialized: Dict):
+        cmd = self._get_command(self.person.global_id, score_sheet_serialized)
+
+        with contextlib.suppress(MultipleBusinessExceptions):
+            message_bus_instance.invoke(cmd)
+
+        get_rapport_cmd = GetEncoderNotesRapportCommand(from_transaction_id=cmd.transaction_id)
+        rapport = message_bus_instance.invoke(get_rapport_cmd)
+
+        for note_non_enregistrees in rapport.get_notes_non_enregistrees():
+            row_number = next(
+                note_etudiant['row_number'] for note_etudiant in score_sheet_serialized['notes_etudiants']
+                if note_etudiant['noma'] == note_non_enregistrees.noma
+            )
+            error_message = "{} : {} {}".format(note_non_enregistrees.cause, _('Row'), str(row_number))
+            messages.error(self.request, error_message)
+
+        nombre_notes_enregistrees = len(rapport.get_notes_enregistrees())
+        if nombre_notes_enregistrees:
+            messages.success(self.request, "{} {}".format(str(nombre_notes_enregistrees), _("Score(s) saved")))
+        else:
+            messages.error(self.request, _("No score injected"))
+
+    @staticmethod
+    def _get_command(matricule_gestionnaire: str, score_sheet_serialized: Dict) -> 'EncoderNotesCommand':
+        return EncoderNotesCommand(
+            matricule_fgs_gestionnaire=matricule_gestionnaire,
             notes_encodees=[
                 EncoderNoteCommand(
                     noma=note_etudiant['noma'],
                     email=note_etudiant['email'],
                     code_unite_enseignement=note_etudiant['code_unite_enseignement'],
                     note=note_etudiant['note'],
-                ) for note_etudiant in score_sheet_serialized['notes_etudiants']
+                ) for note_etudiant in score_sheet_serialized['notes_etudiants'] if note_etudiant['note']
             ]
         )
-
-        injected_notes_counter = 0
-        try:
-            note_identities = message_bus_instance.invoke(cmd)
-            injected_notes_counter = len(note_identities)
-        except MultipleBusinessExceptions as e:
-            for exception in e.exceptions:
-                row_number = next(
-                    note_etudiant['row_number'] for note_etudiant in score_sheet_serialized['notes_etudiants']
-                    if note_etudiant['noma'] == exception.note_id.noma
-                )
-                error_message = "{} : {} {}".format(exception.message, _('Row'), str(row_number))
-                messages.error(self.request, error_message)
-
-        if injected_notes_counter:
-            messages.success(self.request, "{} {}".format(str(injected_notes_counter), _("Score(s) saved")))
-        else:
-            messages.error(self.request, _("No score injected"))

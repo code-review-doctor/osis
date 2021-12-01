@@ -29,6 +29,7 @@ import string
 import factory.fuzzy
 
 from base.models.enums import offer_enrollment_state
+from base.tests.factories.cohort_year import CohortYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.student import StudentFactory
 
@@ -46,3 +47,12 @@ class OfferEnrollmentFactory(factory.django.DjangoModelFactory):
     education_group_year = factory.SubFactory(EducationGroupYearFactory)
     cohort_year = None
     enrollment_state = offer_enrollment_state.SUBSCRIBED
+    cohort_year = None
+
+    class Params:
+        for_11ba = factory.Trait(
+            cohort_year=factory.SubFactory(
+                CohortYearFactory,
+                education_group_year=factory.SelfAttribute('..education_group_year')
+            )
+        )

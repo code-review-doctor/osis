@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2012 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -34,8 +34,6 @@ from django.urls import reverse
 
 from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmissionCalendar
 from assessments.tests.factories.score_responsible import ScoreResponsibleFactory
-from attribution.models.attribution import Attribution
-from attribution.tests.factories.attribution import AttributionFactory, AttributionNewFactory
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.business.entities import create_entities_hierarchy
@@ -131,13 +129,6 @@ class ScoresResponsibleSearchTestCase(TestCase):
         response = self.client.get(self.url)
 
         self.assertRedirects(response, "/login/?next={}".format(self.url))
-
-    def test_case_user_without_perms(self):
-        unauthorized_user = UserFactory()
-        self.client.force_login(unauthorized_user)
-
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
     def test_case_search_without_filter_ensure_ordering(self):
         data = {

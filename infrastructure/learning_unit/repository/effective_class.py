@@ -26,7 +26,8 @@
 import itertools
 from typing import Optional, List, Set
 
-from django.db.models import F, QuerySet
+from django.db.models import F, QuerySet, Q, Value
+from django.db.models.functions import Concat
 
 from base.models.campus import Campus
 from base.models.enums import learning_component_year_type
@@ -35,6 +36,7 @@ from ddd.logic.learning_unit.builder.effective_class_builder import EffectiveCla
 from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass, EffectiveClassIdentity, \
     LecturingEffectiveClass
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 from ddd.logic.learning_unit.dtos import EffectiveClassFromRepositoryDTO
 from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
 from learning_unit.models.learning_class_year import LearningClassYear as LearningClassYearDb
@@ -69,6 +71,38 @@ class EffectiveClassRepository(IEffectiveClassRepository):
             )
         builder = EffectiveClassBuilder()
         return [builder.build_from_repository_dto(dto) for dto in dtos]
+
+    @classmethod
+    def search_dtos_by_learning_unit(
+            cls,
+            learning_unit_id: LearningUnitIdentity = None,
+            **kwargs
+    ) -> List['EffectiveClassFromRepositoryDTO']:
+        qs = _get_common_queryset()
+        if learning_unit_id:
+            qs = qs.filter(
+                learning_component_year__learning_unit_year__acronym=learning_unit_id.code,
+                learning_component_year__learning_unit_year__academic_year__year=learning_unit_id.year,
+            )
+        qs = _annotate_queryset(qs)
+        qs = _values_queryset(qs)
+        return [
+            EffectiveClassFromRepositoryDTO(
+                class_code=effective_class['class_code'],
+                learning_unit_code=effective_class['learning_unit_code'],
+                learning_unit_year=effective_class['learning_unit_year'],
+                title_fr=effective_class['title_fr'],
+                full_title_fr=effective_class['full_title_fr'],
+                title_en=effective_class['title_en'],
+                full_title_en=effective_class['full_title_en'],
+                teaching_place_uuid=effective_class['teaching_place_uuid'],
+                derogation_quadrimester=effective_class['derogation_quadrimester'],
+                session_derogation=effective_class['session_derogation'],
+                volume_q1=effective_class['volume_q1'],
+                volume_q2=effective_class['volume_q2'],
+                class_type=effective_class['class_type'],
+            ) for effective_class in qs
+        ]
 
     @classmethod
     def delete(cls, entity_id: 'EffectiveClassIdentity', **kwargs: ApplicationService) -> None:
@@ -135,6 +169,7 @@ class EffectiveClassRepository(IEffectiveClassRepository):
         )
         qs = _annotate_queryset(qs)
         qs = _values_queryset(qs)
+        qs = qs.order_by('acronym')
 
         result = list()
         for values in qs:
@@ -153,14 +188,18 @@ def _get_learning_component_year_id_from_entity(entity: 'EffectiveClass') -> int
     learning_unit_identity = entity.entity_id.learning_unit_identity
     component_type = learning_component_year_type.LECTURING if isinstance(entity, LecturingEffectiveClass) \
         else learning_component_year_type.PRACTICAL_EXERCISES
-    learning_component_year_id = LearningComponentYearDb.objects.select_related(
-        'learning_unit_year',
+    qs = LearningComponentYearDb.objects.select_related(
         'learning_unit_year__academic_year'
     ).filter(
-        type=component_type,
         learning_unit_year__academic_year__year=learning_unit_identity.year,
         learning_unit_year__acronym=learning_unit_identity.code
-    ).values_list('pk', flat=True).get()
+    )
+    if component_type == learning_component_year_type.PRACTICAL_EXERCISES:
+        qs = qs.filter(type=component_type)
+    else:
+        qs = qs.filter(Q(type=component_type) | Q(type__isnull=True, acronym="NT"))
+
+    learning_component_year_id = qs.values_list('pk', flat=True).get()
     return learning_component_year_id
 
 
@@ -174,7 +213,17 @@ def _annotate_queryset(qs: QuerySet) -> QuerySet:
         session_derogation=F('session'),
         volume_q1=F('hourly_volume_partial_q1'),
         volume_q2=F('hourly_volume_partial_q2'),
-        class_type=F('learning_component_year__type')
+        class_type=F('learning_component_year__type'),
+        full_title_fr=Concat(
+            'learning_component_year__learning_unit_year__learning_container_year__common_title',
+            Value(' - '),
+            'title_fr',
+        ),
+        full_title_en=Concat(
+            'learning_component_year__learning_unit_year__learning_container_year__common_title_english',
+            Value(' - '),
+            'title_en',
+        ),
     )
 
 
@@ -190,7 +239,9 @@ def _values_queryset(qs: QuerySet) -> QuerySet:
         'session_derogation',
         'volume_q1',
         'volume_q2',
-        'class_type'
+        'class_type',
+        'full_title_fr',
+        'full_title_en',
     )
 
 

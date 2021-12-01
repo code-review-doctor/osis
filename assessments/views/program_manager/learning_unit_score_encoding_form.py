@@ -24,10 +24,11 @@
 #
 ##############################################################################
 from gettext import ngettext
-from django.utils.translation import gettext_lazy as _
 
+import attr
 from django.contrib import messages
 from django.utils.functional import cached_property
+from django.utils.translation import gettext_lazy as _
 
 from assessments.views.common.learning_unit_score_encoding_form import LearningUnitScoreEncodingBaseFormView
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
@@ -46,7 +47,17 @@ class LearningUnitScoreEncodingProgramManagerFormView(LearningUnitScoreEncodingB
             matricule_fgs_gestionnaire=self.person.global_id,
             code_unite_enseignement=self.kwargs['learning_unit_code'].upper()
         )
-        return message_bus_instance.invoke(cmd)
+        feuille_de_notes = message_bus_instance.invoke(cmd)
+        if self.echeance_enseignant_filter:
+            feuille_de_notes = attr.evolve(
+                feuille_de_notes,
+                notes_etudiants=[
+                    n for n in feuille_de_notes.notes_etudiants
+                    if n.echeance_enseignant.to_date() == self.echeance_enseignant_filter
+                    and not n.desinscrit_tardivement
+                ]
+            )
+        return feuille_de_notes
 
     def form_valid(self, formset):
         cmd = EncoderNotesCommand(
@@ -95,7 +106,7 @@ class LearningUnitScoreEncodingProgramManagerFormView(LearningUnitScoreEncodingB
     def get_initial(self):
         formset_initial = []
         for note_etudiant in self.feuille_de_notes.notes_etudiants:
-            if not note_etudiant.date_echeance_atteinte and not note_etudiant.desinscrit_tardivement:
+            if not note_etudiant.date_echeance_gestionnaire_atteinte and not note_etudiant.desinscrit_tardivement:
                 initial_note_etudiant = self._get_initial_note_etudiant(note_etudiant)
                 formset_initial.append(initial_note_etudiant)
             else:

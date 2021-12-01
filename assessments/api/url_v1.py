@@ -22,8 +22,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.urls import path
+from django.urls import path, include
 
+from assessments.api.views.assessments import CurrentSessionExamView, NextSessionExamView, PreviousSessionExamView
+from assessments.api.views.progress_overview import ProgressOverviewTutorView
+from assessments.api.views.score_responsibles import ScoreResponsibleList
 from assessments.api.views.score_sheet_xls_export import ScoreSheetXLSExportAPIView
 from assessments.api.views.score_sheets_pdf_export import ScoreSheetsPDFExportAPIView
 
@@ -34,5 +37,13 @@ urlpatterns = [
         '<str:learning_unit_code>/xls_export',
         ScoreSheetXLSExportAPIView.as_view(),
         name=ScoreSheetXLSExportAPIView.name,
-    )
+    ),
+    path('sessions/', include([
+        path('current/', CurrentSessionExamView.as_view(), name=CurrentSessionExamView.name),
+        path('next/', NextSessionExamView.as_view(), name=NextSessionExamView.name),
+        path('previous/', PreviousSessionExamView.as_view(), name=PreviousSessionExamView.name),
+
+    ])),
+    path('score_responsibles/', ScoreResponsibleList.as_view(), name=ScoreResponsibleList.name),
+    path('overview/', ProgressOverviewTutorView.as_view(), name=ProgressOverviewTutorView.name),
 ]

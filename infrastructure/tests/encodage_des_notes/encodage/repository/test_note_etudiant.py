@@ -70,7 +70,7 @@ class TestNoteEtudiant(TestCase):
 
         assert_attrs_instances_are_equal(note_chiffree, self.repo.get(note_chiffree.entity_id))
 
-    def test_should_search_notes_etudiant(self):
+    def test_should_search_notes_etudiant_by_entity_id(self):
         note_chiffree = NoteEtudiantChiffreeFactory()
         self._create_save_necessary_data(note_chiffree)
         self.repo.save(note_chiffree)
@@ -158,6 +158,34 @@ class TestNoteEtudiant(TestCase):
         self.assertEqual(results[0].noma, note_chiffree_2.entity_id.noma)
         self.assertEqual(results[1].noma, note_chiffree_1.entity_id.noma)
 
+    def test_should_search_notes_identites(self):
+        note_chiffree = NoteEtudiantChiffreeFactory(
+            entity_id__code_unite_enseignement='LAGRO1200',
+            entity_id__annee_academique=2021,
+            entity_id__numero_session=2,
+            entity_id__noma="987654321",
+            nom_cohorte='DROI11BA'
+        )
+
+        self._create_save_necessary_data(note_chiffree)
+
+        results = self.repo.search_notes_identites(noms_cohortes=['DROI11BA'])
+        self.assertSetEqual({note_chiffree.entity_id}, results)
+
+    def test_should_not_return_identite_of_11ba_when_searching_for_1ba(self):
+        note_chiffree = NoteEtudiantChiffreeFactory(
+            entity_id__code_unite_enseignement='LAGRO1200',
+            entity_id__annee_academique=2021,
+            entity_id__numero_session=2,
+            entity_id__noma="987654321",
+            nom_cohorte='DROI11BA'
+        )
+
+        self._create_save_necessary_data(note_chiffree)
+
+        results = self.repo.search_notes_identites(noms_cohortes=['DROI1BA'])
+        self.assertSetEqual(set(), results)
+
     def _create_save_necessary_data(self, note_etudiant_to_save, for_class: bool = False):
         luy_acronym = note_etudiant_to_save.code_unite_enseignement
         if for_class:
@@ -177,14 +205,18 @@ class TestNoteEtudiant(TestCase):
             )
         } if for_class else {}
 
+        offer_enrollment_attributes = {
+            'learning_unit_enrollment__offer_enrollment__education_group_year__acronym':
+                note_etudiant_to_save.nom_cohorte.replace('11BA', '1BA'),
+            'learning_unit_enrollment__offer_enrollment__for_11ba': '11BA' in note_etudiant_to_save.nom_cohorte
+        }
+
         enrollment = ExamEnrollmentFactory(
             session_exam__number_session=note_etudiant_to_save.entity_id.numero_session,
-            session_exam__learning_unit_year=luy,
             learning_unit_enrollment__learning_unit_year=luy,
             learning_unit_enrollment__offer_enrollment__student__registration_id=note_etudiant_to_save.noma,
             learning_unit_enrollment__offer_enrollment__student__person__email=note_etudiant_to_save.email,
-            learning_unit_enrollment__offer_enrollment__education_group_year__acronym=note_etudiant_to_save.nom_cohorte,
-
+            **offer_enrollment_attributes,
             **class_attributes
         )
         SessionExamDeadlineFactory(

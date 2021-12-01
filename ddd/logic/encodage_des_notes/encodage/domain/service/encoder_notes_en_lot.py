@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from collections import OrderedDict
-from typing import List, Dict, Set
+from typing import List, Dict, Set, Tuple
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from ddd.logic.encodage_des_notes.encodage.builder.identite_note_etudiant_builder import NoteEtudiantIdentityBuilder
@@ -32,13 +32,25 @@ from ddd.logic.encodage_des_notes.encodage.builder.note_etudiant_builder import 
 from ddd.logic.encodage_des_notes.encodage.commands import EncoderNoteCommand
 from ddd.logic.encodage_des_notes.encodage.domain.model.gestionnaire_parcours import GestionnaireParcours
 from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import IdentiteNoteEtudiant
+from ddd.logic.encodage_des_notes.encodage.domain.service.cohorte_non_complete import CodeUniteEnseignement, NomCohorte
 from ddd.logic.encodage_des_notes.encodage.domain.service.i_historiser_notes import IHistoriserEncodageNotesService
-from ddd.logic.encodage_des_notes.encodage.domain.validator.exceptions import EncoderNotesEnLotLigneBusinessExceptions, \
-    EtudiantNonInscritAExamenException
+from ddd.logic.encodage_des_notes.encodage.domain.service.i_notifier_encodage_notes import INotifierEncodageNotes
+from ddd.logic.encodage_des_notes.encodage.domain.validator.exceptions import \
+    EncoderNotesEnLotLigneBusinessExceptions, EtudiantNonInscritAExamenException
 from ddd.logic.encodage_des_notes.encodage.repository.note_etudiant import INoteEtudiantRepository
+from ddd.logic.encodage_des_notes.shared_kernel.domain.model.encoder_notes_rapport import EncoderNotesRapport
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_attribution_enseignant import \
+    IAttributionEnseignantTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_inscription_examen import IInscriptionExamenTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_etudiant import \
+    ISignaletiqueEtudiantTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_personne import \
+    ISignaletiquePersonneTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import PeriodeEncodageNotesDTO
+from ddd.logic.encodage_des_notes.shared_kernel.repository.i_encoder_notes_rapport import IEncoderNotesRapportRepository
 from ddd.logic.encodage_des_notes.soumission.dtos import DesinscriptionExamenDTO
+from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_notes import \
+    IAdresseFeuilleDeNotesRepository
 from osis_common.ddd import interface
 
 NouvelleNote = str
@@ -55,7 +67,15 @@ class EncoderNotesEnLot(interface.DomainService):
             note_etudiant_repo: 'INoteEtudiantRepository',
             periode_ouverte: 'PeriodeEncodageNotesDTO',
             historiser_note_service: 'IHistoriserEncodageNotesService',
-            inscription_examen_translator: 'IInscriptionExamenTranslator'
+            inscription_examen_translator: 'IInscriptionExamenTranslator',
+            rapport: 'EncoderNotesRapport',
+            rapport_repository: 'IEncoderNotesRapportRepository',
+            notification_encodage: 'INotifierEncodageNotes',
+            cohortes_non_entierement_encodees_avant_encodage: List[Tuple[CodeUniteEnseignement, NomCohorte]],
+            attribution_enseignant_translator: 'IAttributionEnseignantTranslator',
+            signaletique_personne_translator: 'ISignaletiquePersonneTranslator',
+            signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
+            adresse_feuille_de_notes_repo: 'IAdresseFeuilleDeNotesRepository',
     ) -> List['IdentiteNoteEtudiant']:
         note_encodee_cmd_par_identite = _associer_nouvelle_note_a_son_identite(notes_encodees, periode_ouverte)
         anciennes_notes_a_modifier = note_etudiant_repo.search(entity_ids=list(note_encodee_cmd_par_identite.keys()))
@@ -84,12 +104,25 @@ class EncoderNotesEnLot(interface.DomainService):
                     if nouvelle_note.note != ancienne_note_etudiant.note:
                         notes_a_persister.append(nouvelle_note)
                 except MultipleBusinessExceptions as e:
-                    exceptions += [
-                        EncoderNotesEnLotLigneBusinessExceptions(note_id=identite, exception=business_exception)
-                        for business_exception in e.exceptions
-                    ]
+                    for business_exception in e.exceptions:
+                        rapport.add_note_non_enregistree(
+                            noma=ancienne_note_etudiant.noma,
+                            numero_session=ancienne_note_etudiant.numero_session,
+                            code_unite_enseignement=ancienne_note_etudiant.code_unite_enseignement,
+                            annee_academique=ancienne_note_etudiant.annee_academique,
+                            cause=str(business_exception.message)
+                        )
+                        exceptions.append(
+                            EncoderNotesEnLotLigneBusinessExceptions(note_id=identite, exception=business_exception)
+                        )
 
         for note in notes_a_persister:
+            rapport.add_note_enregistree(
+                noma=note.noma,
+                numero_session=note.numero_session,
+                code_unite_enseignement=note.code_unite_enseignement,
+                annee_academique=note.annee_academique,
+            )
             note_etudiant_repo.save(note)
 
         if notes_a_persister:
@@ -98,6 +131,19 @@ class EncoderNotesEnLot(interface.DomainService):
                 notes_a_persister,
             )
 
+            notification_encodage.notifier(
+                [n.entity_id for n in notes_a_persister],
+                cohortes_non_entierement_encodees_avant_encodage,
+                gestionnaire_parcours,
+                note_etudiant_repo,
+                attribution_enseignant_translator,
+                signaletique_personne_translator,
+                signaletique_etudiant_translator,
+                adresse_feuille_de_notes_repo,
+                inscription_examen_translator,
+            )
+
+        rapport_repository.save(rapport)
         if exceptions:
             raise MultipleBusinessExceptions(exceptions=exceptions)
 

@@ -23,13 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import uuid as uuid
+
+from django.contrib.admin import ModelAdmin
 from django.db import models
+from django.db.models import Model
 
 from base.models.enums import learning_unit_enrollment_state
-from osis_common.models.serializable_model import SerializableModelAdmin, SerializableModel
+from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
-class LearningUnitEnrollmentAdmin(SerializableModelAdmin):
+class LearningUnitEnrollmentAdmin(OsisModelAdmin):
     list_display = (
         'student',
         'learning_unit_year',
@@ -47,9 +51,17 @@ class LearningUnitEnrollmentAdmin(SerializableModelAdmin):
         'offer_enrollment__student__person__first_name',
         'offer_enrollment__student__person__last_name',
     ]
+    raw_id_fields = (
+        'offer_enrollment',
+        'learning_unit_year',
+        'learning_class_year',
+    )
 
 
-class LearningUnitEnrollment(SerializableModel):
+class LearningUnitEnrollment(Model):
+
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, db_index=True)
+
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     date_enrollment = models.DateField()
@@ -78,5 +90,15 @@ class LearningUnitEnrollment(SerializableModel):
         return u"%s - %s" % (self.learning_unit_year, self.offer_enrollment.student)
 
 
-def find_by_learning_unit_year(a_learning_unit_year):
-    return LearningUnitEnrollment.objects.filter(learning_unit_year=a_learning_unit_year)
+def count_by_learning_unit_year(a_learning_unit_year):
+    return LearningUnitEnrollment.objects.filter(
+        learning_unit_year=a_learning_unit_year,
+        learning_class_year=None,
+    ).count()
+
+
+def count_by_learning_class_year(class_year):
+    return LearningUnitEnrollment.objects.filter(
+        learning_unit_year=class_year.learning_component_year.learning_unit_year,
+        learning_class_year=class_year,
+    ).count()

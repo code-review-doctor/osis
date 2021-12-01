@@ -37,6 +37,7 @@ from osis_common.models.osis_model_admin import OsisModelAdmin
 class ScoreSheetAddressAdmin(OsisModelAdmin):
     list_display = (
         'offer_acronym',
+        'cohort_name',
         'entity_address_choice',
         'location',
         'postal_code',
@@ -46,7 +47,7 @@ class ScoreSheetAddressAdmin(OsisModelAdmin):
         'email',
     )
     search_fields = ['location', 'education_group__educationgroupyear__acronym']
-    list_filter = ('entity_address_choice', )
+    list_filter = ('entity_address_choice', 'cohort_name',)
 
 
 class ScoreSheetAddress(models.Model):
@@ -70,13 +71,6 @@ class ScoreSheetAddress(models.Model):
         blank=True,
         null=True,
         choices=score_sheet_address_choices.CHOICES
-    )
-    entity = models.ForeignKey(
-        "base.Entity",
-        blank=True,
-        null=True,
-        verbose_name=gettext_lazy('Entity of reference'),
-        on_delete=models.PROTECT
     )
     # Address fields
     recipient = models.CharField(max_length=255, blank=True, null=True)
@@ -106,7 +100,7 @@ class ScoreSheetAddress(models.Model):
         return self.location and self.postal_code and self.city and not self.entity_address_choice
 
     def save(self, *args, **kwargs):
-        if self.customized or self.entity_address_choice or self.entity:
+        if self.customized or self.entity_address_choice:
             super(ScoreSheetAddress, self).save(*args, **kwargs)
         else:
             raise Exception(
@@ -114,14 +108,3 @@ class ScoreSheetAddress(models.Model):
 
     def __str__(self):
         return "{0} - {1}".format(self.education_group, self.entity_address_choice)
-
-
-def search_from_education_group_ids(education_group_ids: List[int]) -> List[ScoreSheetAddress]:
-    return ScoreSheetAddress.objects.filter(education_group_id__in=education_group_ids)
-
-
-def get_from_education_group_id(education_group_id: int) -> Optional[ScoreSheetAddress]:
-    try:
-        return ScoreSheetAddress.objects.get(education_group_id=education_group_id)
-    except ObjectDoesNotExist:
-        return None

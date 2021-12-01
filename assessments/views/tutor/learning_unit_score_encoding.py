@@ -27,6 +27,7 @@ from django.urls import reverse
 from django.utils.functional import cached_property
 
 from assessments.views.common.learning_unit_score_encoding import LearningUnitScoreEncodingBaseView
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import FeuilleDeNotesDTO
 from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand, GetResponsableDeNotesCommand
 from infrastructure.messages_bus import message_bus_instance
 
@@ -40,11 +41,13 @@ class LearningUnitScoreEncodingTutorView(LearningUnitScoreEncodingBaseView):
             **super().get_context_data(),
             'feuille_de_notes': self.feuille_de_notes,
             'learning_unit_submit_url': self.get_learning_unit_submit_url(),
-            'can_submit_scores': self.can_submit_scores()
+            'can_submit_scores': self.can_submit_scores(),
+            'can_encode_scores': self.can_encode_scores(),
+            'can_upload_scores_xls': self.can_upload_scores_xls()
         }
 
     @cached_property
-    def feuille_de_notes(self):
+    def feuille_de_notes(self) -> 'FeuilleDeNotesDTO':
         cmd = GetFeuilleDeNotesCommand(
             matricule_fgs_enseignant=self.person.global_id,
             code_unite_enseignement=self.kwargs['learning_unit_code'].upper()
@@ -58,6 +61,18 @@ class LearningUnitScoreEncodingTutorView(LearningUnitScoreEncodingBaseView):
 
     def can_submit_scores(self) -> bool:
         return self.feuille_de_notes.quantite_notes_en_attente_de_soumission > 0 and self.is_score_responsible()
+
+    def can_encode_scores(self) -> bool:
+        return self._can_encode_at_least_one_score()
+
+    def can_upload_scores_xls(self) -> bool:
+        return self._can_encode_at_least_one_score()
+
+    def _can_encode_at_least_one_score(self):
+        return any(
+            not n.date_echeance_enseignant_atteinte and not n.est_soumise
+            for n in self.feuille_de_notes.notes_etudiants
+        )
 
     def is_score_responsible(self) -> bool:
         cmd = GetResponsableDeNotesCommand(

@@ -27,18 +27,16 @@ import json
 import logging
 
 from django.conf import settings
-from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
+from django.contrib.auth.decorators import login_required, permission_required
 from django.http import JsonResponse, Http404
 from django.shortcuts import get_object_or_404, render
 
 from base import models as mdl
-from base.business import academic_calendar
 from base.business.institution import find_summary_course_submission_dates_for_entity_version
 from base.business.perms import view_academicactors
 from base.forms.entity import EntityVersionFilter
 from base.models import entity_version as entity_version_mdl, entity
 from base.models.academic_year import AcademicYear
-from base.models.entity import Entity
 from base.models.entity_version import EntityVersion
 from base.views.common import paginate_queryset
 from learning_unit.calendar.learning_unit_summary_edition_calendar import LearningUnitSummaryEditionCalendar
@@ -63,7 +61,6 @@ def mandates(request):
 
 
 @login_required
-@user_passes_test(view_academicactors)
 def academic_actors(request):
     return render(request, "academic_actors.html", {})
 

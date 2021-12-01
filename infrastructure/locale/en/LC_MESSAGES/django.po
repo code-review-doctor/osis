@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-16 12:31+0200\n"
+"POT-Creation-Date: 2021-11-04 10:49+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,14 +21,23 @@ msgstr ""
 msgid "(Noma: %(noma)s, Score: %(score)s)"
 msgstr ""
 
+msgid "Absence justified"
+msgstr ""
+
+msgid "Absence unjustified"
+msgstr ""
+
+msgid "Absent"
+msgstr ""
+
+msgid "Cheating"
+msgstr ""
+
 msgctxt "applications"
 msgid "Code"
 msgstr ""
 
-msgid "First name"
-msgstr ""
-
-msgid "Last name"
+msgid "Name"
 msgstr ""
 
 msgctxt "Submission email table header"

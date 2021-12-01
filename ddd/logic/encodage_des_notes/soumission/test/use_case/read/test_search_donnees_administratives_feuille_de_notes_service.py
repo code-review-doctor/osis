@@ -27,19 +27,23 @@ from unittest import mock
 
 from django.test import SimpleTestCase
 
+from assessments.models.enums.score_sheet_address_choices import ScoreSheetAddressEntityType
 from ddd.logic.encodage_des_notes.soumission.commands import SearchAdressesFeuilleDeNotesCommand
-from ddd.logic.encodage_des_notes.soumission.dtos import DateDTO
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_entites_cohorte import EntitesCohorteDTO
+from ddd.logic.encodage_des_notes.soumission.dtos import AdresseFeuilleDeNotesDTO
 from ddd.logic.encodage_des_notes.tests.factory.adresse_feuille_de_notes import \
     AdresseFeuilleDeNotesSpecifiqueFactory
+from ddd.logic.shared_kernel.entite.tests.factory.entiteucl import EPLEntiteFactory
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.inscription_examen import \
     InscriptionExamenTranslatorInMemory
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.periode_encodage_notes import \
     PeriodeEncodageNotesTranslatorInMemory
-from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.deliberation import \
-    DeliberationTranslatorInMemory
+from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.entites_cohorte import \
+    EntitesCohorteTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.repository.in_memory.adresse_feuille_de_notes import \
     AdresseFeuilleDeNotesInMemoryRepository
 from infrastructure.messages_bus import message_bus_instance
+from infrastructure.shared_kernel.entite.repository.in_memory.entiteucl import EntiteUCLInMemoryRepository
 
 
 class SearchDonneesAdministrativesTest(SimpleTestCase):
@@ -62,7 +66,11 @@ class SearchDonneesAdministrativesTest(SimpleTestCase):
 
         self.periode_encodage_translator = PeriodeEncodageNotesTranslatorInMemory()
         self.inscr_examen_translator = InscriptionExamenTranslatorInMemory()
-        self.deliberation_translator = DeliberationTranslatorInMemory()
+
+        self.entite_repository = EntiteUCLInMemoryRepository()
+
+        self.entites_cohorte_translator = EntitesCohorteTranslatorInMemory()
+
         self.__mock_service_bus()
 
     def __mock_service_bus(self):
@@ -71,7 +79,8 @@ class SearchDonneesAdministrativesTest(SimpleTestCase):
             PeriodeEncodageNotesTranslator=lambda: self.periode_encodage_translator,
             AdresseFeuilleDeNotesRepository=lambda: self.adresse_feuille_de_notes_repository,
             InscriptionExamenTranslator=lambda: self.inscr_examen_translator,
-            DeliberationTranslator=lambda: self.deliberation_translator,
+            EntiteUCLRepository=lambda: self.entite_repository,
+            EntitesCohorteTranslator=lambda: self.entites_cohorte_translator,
         )
         message_bus_patcher.start()
         self.addCleanup(message_bus_patcher.stop)
@@ -82,22 +91,6 @@ class SearchDonneesAdministrativesTest(SimpleTestCase):
         cmd = SearchAdressesFeuilleDeNotesCommand(codes_unite_enseignement=['EXISTEPAS'])
         result = self.message_bus.invoke(cmd)
         self.assertEqual(result, list())
-
-    @mock.patch("infrastructure.messages_bus.DeliberationTranslator")
-    def test_should_renvoyer_aucune_date_deliberation(self, mock_delibe_translator):
-        translator = DeliberationTranslatorInMemory()
-        translator.search = lambda *args, **kwargs: set()
-        mock_delibe_translator.return_value = translator
-        result = self.message_bus.invoke(self.cmd)
-        dto = list(result)[0]
-        self.assertEqual(dto.sigle_formation, self.nom_cohorte)
-        self.assertIsNone(dto.date_deliberation)
-
-    def test_should_renvoyer_date_deliberation(self):
-        result = self.message_bus.invoke(self.cmd)
-        dto = list(result)[0]
-        self.assertEqual(dto.sigle_formation, self.nom_cohorte)
-        self.assertEqual(dto.date_deliberation, DateDTO(jour=15, mois=6, annee=2020))
 
     def test_should_renvoyer_contact_feuille_de_notes(self):
         result = self.message_bus.invoke(self.cmd)
@@ -111,3 +104,31 @@ class SearchDonneesAdministrativesTest(SimpleTestCase):
         self.assertEqual(dto.contact_feuille_de_notes.telephone, '0106601122')
         self.assertEqual(dto.contact_feuille_de_notes.fax, '0106601123')
         self.assertEqual(dto.contact_feuille_de_notes.email, 'email-fac-droit@email.be')
+
+    def test_should_renvoyer_contact_adresse_entite_gestion_si_aucune_adresse_encodee(self):
+        self.adresse_feuille_de_notes_repository.reset()  # Aucune adresse
+        epl_entite = EPLEntiteFactory()
+        self.entite_repository.save(epl_entite)
+        self.entites_cohorte_translator.datas.append(
+            EntitesCohorteDTO(
+                administration=epl_entite.entity_id,
+                gestion=epl_entite.entity_id,
+            )
+        )
+
+        result = self.message_bus.invoke(self.cmd)
+        dto = list(result)[0]
+        expected = AdresseFeuilleDeNotesDTO(
+            nom_cohorte=self.nom_cohorte,
+            annee_academique=2020,
+            type_entite=ScoreSheetAddressEntityType.ENTITY_MANAGEMENT.name,
+            destinataire="{} - {}".format(epl_entite.sigle, epl_entite.intitule),
+            rue_numero=epl_entite.adresse.rue_numero,
+            code_postal=epl_entite.adresse.code_postal,
+            ville=epl_entite.adresse.ville,
+            pays=epl_entite.adresse.pays,
+            telephone=epl_entite.adresse.telephone,
+            fax=epl_entite.adresse.fax,
+            email=''
+        )
+        self.assertEqual(expected, dto.contact_feuille_de_notes)

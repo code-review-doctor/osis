@@ -1,4 +1,4 @@
-{% extends "layout.html" %}
+{% extends "assessments/address/common.html" %}
 {% load format bootstrap3 %}
 {% load static i18n%}
 {% comment "License" %}
@@ -27,14 +27,14 @@
 
 {% block breadcrumb %}
     <li><a href="{% url 'studies' %}" id="lnk_studies">{% trans 'Student path' %}</a></li>
-    <li><a href="{% url 'offers_search_new' %}" id="lnk_offers">{% trans 'Addresses' %}</a></li>
-    <li class="active">{{ nom_cohorte }}</li>
+    <li><a href="{% url 'offers_search' %}" id="lnk_offers">{% trans 'Addresses' %}</a></li>
+    <li class="active">{{ nom_cohorte_premiere_annee }}</li>
 {% endblock %}
 
 {% block content %}
 
     <div class="page-header">
-        <h2>{{ nom_cohorte }} - {{ intitule_page }}</h2>
+        <h2>{{ nom_cohorte_premiere_annee }} - {{ intitule_page }}</h2>
     </div>
 
     <div class="panel panel-default">
@@ -59,17 +59,6 @@
                         </p>
                     </div>
 
-                    <div class="alert alert-info text-justify">
-                        <p>
-                            <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
-                            {% blocktrans %}
-                                For first year bachelor, the address of reference is by default the one from the bachelor.
-                                It is possible to define a specific address for the first year of the bachelor by checking the box.
-                            {% endblocktrans %}
-                            <br>
-                        </p>
-                    </div>
-
                     <div class="panel panel-default">
                         <div class="panel-body">
                             <p>
@@ -82,7 +71,7 @@
                             <address>
                                 {{ addresse_bachelier.destinataire }}<br>
                                 {{ addresse_bachelier.rue_numero }}<br>
-                                {{ addresse_bachelier.code_postale }} {{ addresse_bachelier.ville }}<br>
+                                {{ addresse_bachelier.code_postal }} {{ addresse_bachelier.ville }}<br>
                                 {{ addresse_bachelier.pays }}<br>
                                 {% trans "Phone" %}: {{ addresse_bachelier.telephone|default:"-" }}<br>
                                 {% trans "Fax" %}: {{ addresse_bachelier.fax|default:"-" }}<br>
@@ -96,6 +85,7 @@
                             {% csrf_token %}
 
                             {% bootstrap_field form.specific_address %}
+                            {% bootstrap_form_errors form %}
 
                             <div id="div_address_fields" hidden>
                                 {% bootstrap_field form.entity %}
@@ -162,25 +152,11 @@
     </div>
 {% endblock %}
 
-
 {% block script %}
 
+    {{ block.super }}
+
     <script type="text/javascript">
-
-        $('#warning_no_address_found').hide();
-        $('#warning_no_current_entity_version_found').hide();
-
-        window.onload = disableFormInputsIfReuseAddress;
-
-        var form_inputs = [
-            $('#id_recipient'),
-            $('#id_location'),
-            $('#id_postal_code'),
-            $('#id_city'),
-            $('#id_country'),
-            $('#id_phone'),
-            $('#id_fax')
-        ];
 
         $(document).ready(function() {
             if ($('#id_specific_address').get(0).checked) {
@@ -195,90 +171,6 @@
                 $('#div_address_fields').hide()
             }
         });
-
-
-        function disableFormInputsIfReuseAddress() {
-            if ($('#id_entity').val() != "")
-                disableFormInputs();
-        }
-
-        $('#id_entity').change(loadEntityAddress);
-
-        function loadEntityAddress(e) {
-            var entity_version_acronym = $('#id_entity').val();
-            if (entity_version_acronym != "") {
-                $.ajax({
-                    url: "/entities/" + entity_version_acronym + "/address/",
-                    data: null,
-                    dataType: 'json',
-                    success: function (data) {
-                        if (!data.entity_version_exists_now) {
-                            showEntityVersionNotExistsMsg();
-                        }
-                        if (Object.keys(data.address).length != 0) {
-                            disableFormInputs();
-                            setFormFieldsValues(data);
-                        } else {
-                            setFormFieldsValuesToNone();
-                            disableFormInputs();
-                            showNoAddressFoundMsg();
-                        }
-                        $('#id_recipient').val(data.recipient);
-                    },
-                    error: function (xhr, status, error) {
-                        setFormFieldsValuesToNone();
-                        disableFormInputs();
-                        showNoAddressFoundMsg();
-                    }
-                });
-
-
-            } else {
-                setFormFieldsValuesToNone();
-                enableFormInputs();
-            }
-        }
-
-        function showNoAddressFoundMsg() {
-            $('#warning_no_address_found').show().delay(5000).hide(400);
-        }
-
-
-        function showEntityVersionNotExistsMsg() {
-            $('#warning_no_current_entity_version_found').show().delay(10000).hide(400);
-        }
-
-
-        function setFormFieldsValuesToNone() {
-            for (var i = 0; i < form_inputs.length; i++) {
-                form_inputs[i].val(null);
-            }
-        }
-
-
-        function setFormFieldsValues(data) {
-            $('#id_recipient').val(data.recipient);
-            $('#id_location').val(data.address.location);
-            $('#id_postal_code').val(data.address.postal_code);
-            $('#id_city').val(data.address.city);
-            $('#id_country').val(data.address.country);
-            $('#id_phone').val(data.address.phone);
-            $('#id_fax').val(data.address.fax);
-        }
-
-
-        function disableFormInputs() {
-            for (var i = 0; i < form_inputs.length; i++) {
-                form_inputs[i].prop('disabled', true);
-            }
-        }
-
-
-        function enableFormInputs() {
-            for (var i = 0; i < form_inputs.length; i++) {
-                form_inputs[i].prop('disabled', false);
-            }
-        }
 
     </script>
 {% endblock %}

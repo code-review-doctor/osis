@@ -23,22 +23,50 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import contextlib
+from typing import Dict
+
 from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
 
 from assessments.views.common.score_sheet_xls_import import ScoreSheetXLSImportBaseView
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
+from ddd.logic.encodage_des_notes.shared_kernel.commands import GetEncoderNotesRapportCommand
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderNoteCommand, EncoderNotesEtudiantCommand
 from infrastructure.messages_bus import message_bus_instance
 
 
 class ScoreSheetXLSImportTutorView(ScoreSheetXLSImportBaseView):
-    def call_command(self, matricule, score_sheet_serialized):
+    def call_command(self, matricule: str, score_sheet_serialized: Dict):
         if not score_sheet_serialized['notes_etudiants']:
             messages.error(self.request, _("No score injected"))
             return
 
-        cmd = EncoderNotesEtudiantCommand(
+        cmd = self._get_command(matricule, score_sheet_serialized)
+
+        with contextlib.suppress(MultipleBusinessExceptions):
+            message_bus_instance.invoke(cmd)
+
+        get_rapport_cmd = GetEncoderNotesRapportCommand(from_transaction_id=cmd.transaction_id)
+        rapport = message_bus_instance.invoke(get_rapport_cmd)
+
+        for note_non_enregistrees in rapport.get_notes_non_enregistrees():
+            row_number = next(
+                note_etudiant['row_number'] for note_etudiant in score_sheet_serialized['notes_etudiants']
+                if note_etudiant['noma'] == note_non_enregistrees.noma
+            )
+            error_message = "{} : {} {}".format(note_non_enregistrees.cause, _('Row'), str(row_number))
+            messages.error(self.request, error_message)
+
+        nombre_notes_enregistrees = len(rapport.get_notes_enregistrees())
+        if nombre_notes_enregistrees:
+            messages.success(self.request, "{} {}".format(str(nombre_notes_enregistrees), _("Score(s) saved")))
+        else:
+            messages.error(self.request, _("No score injected"))
+
+    @staticmethod
+    def _get_command(matricule: str, score_sheet_serialized: Dict) -> 'EncoderNotesEtudiantCommand':
+        return EncoderNotesEtudiantCommand(
             code_unite_enseignement=score_sheet_serialized['notes_etudiants'][0]['code_unite_enseignement'],
             annee_unite_enseignement=score_sheet_serialized['annee_academique'],
             numero_session=score_sheet_serialized['numero_session'],
@@ -49,24 +77,6 @@ class ScoreSheetXLSImportTutorView(ScoreSheetXLSImportBaseView):
                     email_etudiant=note_etudiant['email'],
                     note=note_etudiant['note'],
                 )
-                for note_etudiant in score_sheet_serialized['notes_etudiants']
+                for note_etudiant in score_sheet_serialized['notes_etudiants'] if note_etudiant['note']
             ]
         )
-
-        injected_notes_counter = 0
-        try:
-            note_identities = message_bus_instance.invoke(cmd)
-            injected_notes_counter = len(note_identities)
-        except MultipleBusinessExceptions as e:
-            for exception in e.exceptions:
-                row_number = next(
-                    note_etudiant['row_number'] for note_etudiant in score_sheet_serialized['notes_etudiants']
-                    if note_etudiant['noma'] == exception.note_id.noma
-                )
-                error_message = "{} : {} {}".format(exception.message, _('Row'), str(row_number))
-                messages.error(self.request, error_message)
-
-        if injected_notes_counter:
-            messages.success(self.request, "{} {}".format(str(injected_notes_counter), _("Score(s) saved")))
-        else:
-            messages.error(self.request, _("No score injected"))

@@ -34,7 +34,7 @@ from osis_common.ddd import interface
 class EncoderNoteCommand(interface.CommandRequest):
     noma_etudiant = attr.ib(type=str, validator=attr.validators.instance_of(str))
     email_etudiant = attr.ib(type=str, validator=attr.validators.instance_of(str))
-    note = attr.ib(type=str, validator=attr.validators.instance_of(str))
+    note = attr.ib(type=str, converter=lambda n: n.upper(), validator=attr.validators.instance_of(str))
 
 
 @attr.s(frozen=True, slots=True)
@@ -94,7 +94,7 @@ class SearchAdressesFeuilleDeNotesCommand(interface.CommandRequest):
 class EncoderAdresseEntiteCommeAdresseFeuilleDeNotes(interface.CommandRequest):
     nom_cohorte = attr.ib(type=str)
     email = attr.ib(type=str)
-    entite = attr.ib(type=str)
+    type_entite = attr.ib(type=str)
 
 
 @attr.s(frozen=True, slots=True)
@@ -111,7 +111,7 @@ class EncoderAdresseFeuilleDeNotesSpecifique(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
-class EcraserAdresseFeuilleDeNotesPremiereAnneeDeBachelier(interface.CommandRequest):
+class SupprimerAdresseFeuilleDeNotesPremiereAnneeDeBachelier(interface.CommandRequest):
     nom_cohorte = attr.ib(type=str)
 
 
@@ -129,3 +129,8 @@ class GetChoixEntitesAdresseFeuilleDeNotesCommand(interface.CommandRequest):
 class GetResponsableDeNotesCommand(interface.CommandRequest):
     code_unite_enseignement = attr.ib(type=str)
     annee_unite_enseignement = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class SearchResponsableDeNotesCommand(interface.CommandRequest):
+    unites_enseignement = attr.ib(type=List[GetResponsableDeNotesCommand])
