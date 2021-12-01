@@ -64,7 +64,7 @@ def save_csv(choices: Iterable[(FieldChoice)]) -> None:
     csv_rows = format_choices_for_csv(choices)
 
     with open('enums.csv', 'w', newline='',  encoding='utf-8') as csvfile:
-        enumcsv = csv.writer(csvfile, delimiter=',')
+        enumcsv = csv.writer(csvfile, delimiter=';')
         enumcsv.writerow(['table', 'champ', 'valeur db', 'traduction anglaise', 'traduction francaise'])
         enumcsv.writerows(csv_rows)
 
