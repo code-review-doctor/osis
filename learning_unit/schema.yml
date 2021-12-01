@@ -541,9 +541,11 @@ components:
         next:
           type: string
           format: uri
+          nullable: true
         previous:
           type: string
           format: uri
+          nullable: true
     LearningUnit:
       type: object
       properties:
