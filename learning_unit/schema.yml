@@ -74,14 +74,7 @@ paths:
           content:
             application/json:
               schema:
-                allOf:
-                  - $ref: '#/components/schemas/Pagination'
-                  - type: object
-                    properties:
-                      results:
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/LearningUnit'
+                $ref: '#/components/schemas/PaginatedLearningUnitList'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -531,6 +524,15 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
   schemas:
+    PaginatedLearningUnitList:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          properties:
+            results:
+              type: array
+              items:
+                $ref: '#/components/schemas/LearningUnit'
     Pagination:
       type: object
       properties:
@@ -980,7 +982,7 @@ components:
         message:
           type: string
       required:
-      - code
-      - message
+        - code
+        - message
 security:
   - Token: []
