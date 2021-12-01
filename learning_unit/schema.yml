@@ -555,7 +555,7 @@ components:
           format: uri
         acronym:
           type: string
-        credit:
+        credits:
           type: number
           multipleOf: 0.01
         status:
