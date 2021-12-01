@@ -25,8 +25,8 @@
 ##############################################################################
 import factory.fuzzy
 
-from base.tests.factories.student import StudentFactory
 from base.models.enums import peps_type
+from base.tests.factories.student import StudentFactory
 
 
 class StudentSpecificProfileFactory(factory.DjangoModelFactory):
@@ -34,7 +34,7 @@ class StudentSpecificProfileFactory(factory.DjangoModelFactory):
         model = 'base.StudentSpecificProfile'
 
     student = factory.SubFactory(StudentFactory)
-    type = peps_type.PepsTypes.ARTIST
+    type = peps_type.PepsTypes.ARTIST.name
     subtype_disability = ''
     subtype_sport = ''
     guide = None

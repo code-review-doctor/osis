@@ -89,7 +89,7 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
     learning_unit_internship_subtype = forms.ChoiceField(disabled=True, label=_('Internship subtype'), required=False)
     learning_unit_credits = forms.CharField(
         disabled=True,
-        label=_('Credits'),
+        label=_('Learning unit credits'),
         required=False,
         widget=DecimalFormatInput(render_value=True)
     )
@@ -177,17 +177,20 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
         self.fields['learning_unit_stage_dimona'].initial = self.learning_unit.stage_dimona
 
     def __init_volumes(self):
+        volumes = None
         if self.learning_unit.has_practical_volume() and not self.learning_unit.has_lecturing_volume():
             volumes = self.learning_unit.practical_part.volumes
             self.fields['class_type'].initial = _('Practical exercises')
         else:
-            volumes = self.learning_unit.lecturing_part.volumes
+            if self.learning_unit.lecturing_part:
+                volumes = self.learning_unit.lecturing_part.volumes
             self.fields['class_type'].initial = _('Lecturing')
 
         # Fields not editable from LearningUnit
-        repartition = volumes.volumes_repartition
-        self.fields['planned_classes'].initial = volumes.planned_classes
-        self.fields['repartition_volume_requirement_entity'].initial = repartition.repartition_volume_responsible_entity
+        if volumes:
+            repartition = volumes.volumes_repartition
+            self.fields['planned_classes'].initial = volumes.planned_classes
+            self.fields['repartition_volume_requirement_entity'].initial = repartition.repartition_volume_responsible_entity
         attribution_entity_code = self.learning_unit.attribution_entity_identity.code
         self.fields['learning_unit_allocation_entity'].choices = [(attribution_entity_code, attribution_entity_code)]
         self.fields['learning_unit_allocation_entity'].initial = attribution_entity_code
@@ -196,9 +199,10 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
         quadri = self.learning_unit.derogation_quadrimester
         self.fields['quadrimester'].initial = quadri.name if quadri else None
         self.__init_session()
-        self.fields['hourly_volume_partial_q1'].initial = volumes.volume_first_quadrimester
-        self.fields['hourly_volume_partial_q2'].initial = volumes.volume_second_quadrimester
-        self.fields['volume_total_annual'].initial = volumes.volume_annual
+        if volumes:
+            self.fields['hourly_volume_partial_q1'].initial = volumes.volume_first_quadrimester
+            self.fields['hourly_volume_partial_q2'].initial = volumes.volume_second_quadrimester
+            self.fields['volume_total_annual'].initial = volumes.volume_annual
 
     def __init_remarks(self, learning_unit):
         self.fields['learning_unit_remarks_faculty'].initial = learning_unit.remarks.faculty

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-12 14:17+0200\n"
+"POT-Creation-Date: 2021-11-30 10:15+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,6 +15,14 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#, python-format
+msgid ""
+"\n"
+"                                        Address of reference for "
+"%(nom_cohorte_bachelier)s - %(intitule)s\n"
+"                                    "
+msgstr ""
 
 #, python-format
 msgid ""
@@ -32,13 +40,38 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"                        You will submit %(draft_scores_not_submitted)s notes "
-"to faculty(ies). Warning : submitted scores <b>can't be modified anymore.</"
-"b>\n"
-"                    "
+"                                If you customize one of the field below, it "
+"only change the address displayed on the\n"
+"                                score encodings sheets for the program "
+"%(acronym)s.\n"
+"                                It will never change the address of any "
+"structure. The list below will help you to\n"
+"                                pre-fill in the form.\n"
+"                            "
 msgstr ""
 
-msgid "Absence justified cannot be remplaced by absence unjustified"
+#, python-format
+msgid ""
+"\n"
+"                You will submit %(draft_scores_not_submitted)s notes to "
+"faculty(ies). Warning : submitted scores <b>can't be modified anymore.</b>\n"
+"            "
+msgstr ""
+
+msgid ""
+"<p> For a lecturing effective class (PM), use '-' <br/> <i>Example : "
+"LCOPS1113-A</i> </p> <p> For a practical effective class (PP), use '_' <br/> "
+"<i>Example : LCOPS1113-A</i> </p> <p> For a partim, put the letter against "
+"the the acronym <br/> <i>Example : LCOPS1113A</i> </p>"
+msgstr ""
+
+msgid "Absence"
+msgstr ""
+
+msgid "Absence justified"
+msgstr ""
+
+msgid "Absence unjustified"
 msgstr ""
 
 msgid "Absent"
@@ -47,18 +80,14 @@ msgstr ""
 msgid "Academic actors"
 msgstr ""
 
-msgid "Academic background"
-msgstr ""
-
 msgid "Academic year"
-msgstr ""
-
-#, python-format
-msgid "Accepted value: %(justification_label_authorized)s "
 msgstr ""
 
 msgctxt "UE acronym"
 msgid "Acronym"
+msgstr ""
+
+msgid "Acronym/Short title"
 msgstr ""
 
 msgid "Add"
@@ -67,6 +96,13 @@ msgstr ""
 msgid "Add manager"
 msgstr ""
 
+msgid "Addresses"
+msgstr ""
+
+msgid "All"
+msgstr ""
+
+msgctxt "male plural"
 msgid "All"
 msgstr ""
 
@@ -78,15 +114,13 @@ msgid ""
 msgstr ""
 
 msgid ""
-"All the scores were submitted. It is not possible to double encode scores "
-"anymore."
-msgstr ""
-
-msgid ""
 "All the scores were submitted. It is not possible to encode scores anymore."
 msgstr ""
 
 msgid "Are you sure you want to remove the following manager ?"
+msgstr ""
+
+msgid "Arrangements"
 msgstr ""
 
 msgid "By learning unit"
@@ -110,9 +144,6 @@ msgstr ""
 msgid "Code"
 msgstr ""
 
-msgid "Compare"
-msgstr ""
-
 msgid "Complete"
 msgstr ""
 
@@ -120,6 +151,9 @@ msgid "Confirm delete for : "
 msgstr ""
 
 msgid "Country"
+msgstr ""
+
+msgid "Creation date"
 msgstr ""
 
 msgid "Customized"
@@ -134,9 +168,6 @@ msgstr ""
 msgid "Deadline reached"
 msgstr ""
 
-msgid "Decimal score not allowed"
-msgstr ""
-
 msgid "Decimal values in scores are NOT accepted."
 msgstr ""
 
@@ -146,7 +177,9 @@ msgstr ""
 msgid "Decimals authorized for this learning unit"
 msgstr ""
 
-msgid "Definitive submission (Submit to faculty)"
+msgid ""
+"Define a specific address for the first year of bachelor (if different from "
+"the addresse of the bachelor)"
 msgstr ""
 
 msgid "Details other educational facilities"
@@ -158,13 +191,7 @@ msgstr ""
 msgid "Display all tutors for this learning unit"
 msgstr ""
 
-msgid "Display scores for this learning unit"
-msgstr ""
-
-msgid "Double encode scores"
-msgstr ""
-
-msgid "Double encoding"
+msgid "Done at"
 msgstr ""
 
 msgid "Download the Excel file"
@@ -182,16 +209,10 @@ msgstr ""
 msgid "Encode scores"
 msgstr ""
 
-msgid "Encoding"
-msgstr ""
-
 msgid "End date Prof"
 msgstr ""
 
 msgid "Enrolled lately"
-msgstr ""
-
-msgid "Enter a valid email address."
 msgstr ""
 
 msgid "Entity"
@@ -214,16 +235,29 @@ msgstr ""
 msgid "File error : No value in the column Session. No scores injected."
 msgstr ""
 
-msgid "Final"
+msgid "File error : The file is not consistent. No scores injected."
 msgstr ""
 
 msgid "Firstname"
 msgstr ""
 
+msgid ""
+"For classes, you must modify scores responsible via full LU. Example: For "
+"LCOPS1113-B, you must search and modify via LCOPS1113."
+msgstr ""
+
 msgid "Get Excel file"
 msgstr ""
 
+msgid "Guide"
+msgstr ""
+
 msgid "If you try to put decimal values, it will be ignored."
+msgstr ""
+
+msgid ""
+"In accordance to regulation's rules 104, 109 and 111. Complete rules "
+"avalaible here"
 msgstr ""
 
 msgid "Include subordinate entities"
@@ -232,35 +266,23 @@ msgstr ""
 msgid "Inject"
 msgstr ""
 
-msgid "Inject XLS file"
+msgid "Inject Excel file"
+msgstr ""
+
+msgid "Inject encoded scores into Excel file."
 msgstr ""
 
 msgid "Institution"
 msgstr ""
 
-msgid "Invalid justification value"
-msgstr ""
-
 msgid "January"
-msgstr ""
-
-msgid "June"
-msgstr ""
-
-msgid "Justification"
-msgstr ""
-
-msgid "Justification (A,T)"
 msgstr ""
 
 #, python-format
 msgid "Justification legend: %(justification_label_authorized)s"
 msgstr ""
 
-msgid "Justified absence"
-msgstr ""
-
-msgid "LU code"
+msgid "LU"
 msgstr ""
 
 msgid "Large print"
@@ -273,9 +295,6 @@ msgid "Lastname"
 msgstr ""
 
 msgid "Learning unit"
-msgstr ""
-
-msgid "Line"
 msgstr ""
 
 msgid "M=Justified Absence"
@@ -294,24 +313,22 @@ msgstr ""
 msgid "Missing score"
 msgstr ""
 
+#, python-brace-format
+msgid "More than {0} results found. Only the {0} first results are displayed."
+msgstr ""
+
 msgid ""
 "NOTE : the 'Email' field is optional. You can fill in this field if you want "
 "it to appear on the score sheet."
 msgstr ""
 
+msgid "Name"
+msgstr ""
+
 msgid "No address found for the selected entity."
 msgstr ""
 
-msgid "No data for this academic year"
-msgstr ""
-
-msgid "No double score encoded ; nothing to compare."
-msgstr ""
-
 msgid "No entity associated to your profile"
-msgstr ""
-
-msgid "No new scores encoded. The double encoding needs new scores."
 msgstr ""
 
 msgid "No result!"
@@ -320,7 +337,7 @@ msgstr ""
 msgid "No score injected"
 msgstr ""
 
-msgid "No scores injected"
+msgid "No student to encode by excel"
 msgstr ""
 
 msgid "No students to encode by excel"
@@ -329,25 +346,13 @@ msgstr ""
 msgid "None"
 msgstr ""
 
-msgid "Not passed"
-msgstr ""
-
 msgid "Number of enrollments"
-msgstr ""
-
-msgid "Numbered scores"
 msgstr ""
 
 msgid "Online"
 msgstr ""
 
-msgid "Online double scores encoding"
-msgstr ""
-
 msgid "Online encoding"
-msgstr ""
-
-msgid "Online scores encoding"
 msgstr ""
 
 msgid "Other educational facilities"
@@ -370,10 +375,10 @@ msgstr ""
 msgid "Please choose at least one criteria!"
 msgstr ""
 
-msgid "Please select an XLS file for injection"
+msgid "Please select an address"
 msgstr ""
 
-msgid "Please select an address"
+msgid "Please select the Excel file for injection"
 msgstr ""
 
 msgid "Postal code"
@@ -404,12 +409,10 @@ msgstr ""
 msgid "Refresh list"
 msgstr ""
 
-msgid "Registration ID"
+msgid "Reg. No."
 msgstr ""
 
-msgid "Registration ID does not match email"
-msgstr ""
-
+msgctxt "assessments"
 msgid "Registration number"
 msgstr ""
 
@@ -424,6 +427,9 @@ msgid ""
 "number surrounded by parenthesis is the number of scores encoded by the "
 "tutor that aren't submitted yet ('draft' state)"
 msgstr ""
+"Represents the quantity of scores submitted to the administration. The "
+"number surrounded by parenthesis is the scores encoded by the score "
+"responsible that aren't submitted to the faculty yet"
 
 msgid "Req. Entity"
 msgstr ""
@@ -442,20 +448,30 @@ msgstr ""
 msgid "Save"
 msgstr ""
 
+msgid "Save scores"
+msgstr ""
+
 msgid "Score"
 msgstr ""
 
-msgid "Score already submitted"
+msgid "Score legend"
 msgstr ""
 
-msgid "Score have more than 2 decimal places"
+msgid "Score legend for program manager"
+msgstr ""
+
+msgid "Score legend for tutor"
+msgstr ""
+
+#, python-brace-format
+msgid "Score legend: A=Absent, T=Cheating, {score} (0=Score of presence)"
 msgstr ""
 
 #, python-format
-msgid "Score legend: %(score_legend)s (0=Score of presence)"
+msgid "Score responsible successfully designated on %(code)s."
 msgstr ""
 
-msgid "Score responsible should be link to one attribution"
+msgid "Score sheet"
 msgstr ""
 
 msgid "Score sheet address was successfully saved."
@@ -470,16 +486,7 @@ msgstr ""
 msgid "Scores encoding"
 msgstr ""
 
-msgid "Scores injection"
-msgstr ""
-
-msgid "Scores must be between 0 and 20"
-msgstr ""
-
 msgid "Scores responsible"
-msgstr ""
-
-msgid "Scores responsible tutor"
 msgstr ""
 
 msgid "Scores responsibles"
@@ -494,9 +501,6 @@ msgstr ""
 msgid "Select an encoding type"
 msgstr ""
 
-msgid "Select an excel file to inject scores."
-msgstr ""
-
 msgid "Select/deselect all"
 msgstr ""
 
@@ -507,6 +511,9 @@ msgid "Session"
 msgstr ""
 
 msgid "Session number"
+msgstr ""
+
+msgid "Signature"
 msgstr ""
 
 msgid ""
@@ -527,19 +534,21 @@ msgstr ""
 msgid "Street and number"
 msgstr ""
 
-msgid "Student not registered for exam"
-msgstr ""
-
 msgid "Student path"
 msgstr ""
 
 msgid "Students deliberated are not shown"
 msgstr ""
 
-msgid "Studies"
+msgid "Submit"
 msgstr ""
 
-msgid "Submission"
+msgid "Submit data"
+msgstr ""
+
+msgid ""
+"Submit these scores to faculty. These scores can not be changed after "
+"submission. The unsubmitted scores remain editable."
 msgstr ""
 
 msgid "Teacher deadline"
@@ -551,12 +560,13 @@ msgstr ""
 #, python-format
 msgid ""
 "The data presented on this document correspond to the state of the system "
-"dated %(printing_date)s and are likely to evolve"
+"dated %(creation_date)s and are likely to evolve"
 msgstr ""
 
 #, python-format
 msgid ""
-"The enrollment to the activity %(xls_learning_unit_acronym)s doesn't exist"
+"The data presented on this document correspond to the state of the system "
+"dated %(printing_date)s and are likely to evolve"
 msgstr ""
 
 msgid "The file must be a valid 'XLSX' excel file"
@@ -580,10 +590,16 @@ msgstr ""
 msgid "The period of scores' encoding is not opened"
 msgstr ""
 
-msgid "The scores responsible must still submit the scores"
+msgid "The selected entity no longer exists today (end date passed)."
 msgstr ""
 
-msgid "The selected entity no longer exists today (end date passed)."
+#, python-format
+msgid "There is %(error_counter)s error in form"
+msgid_plural "There are %(error_counter)s errors in form"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "There is no enrollment to the exam for this learning unit"
 msgstr ""
 
 msgid "This process helps tutor while encoding notes for the exams sessions."
@@ -604,6 +620,10 @@ msgstr ""
 msgid "Tutors of the course"
 msgstr ""
 
+#, python-format
+msgid "Tutors' classes of the course %(code)s (%(annee_academique)s)"
+msgstr ""
+
 msgid "Type"
 msgstr ""
 
@@ -619,7 +639,7 @@ msgstr ""
 msgid "Unauthorized decimal for this learning unit"
 msgstr ""
 
-msgid "Unjustified absence"
+msgid "Université catholique de Louvain"
 msgstr ""
 
 msgid "Unsubscribed lately"
@@ -631,49 +651,39 @@ msgstr ""
 msgid "Via paper"
 msgstr ""
 
-msgid "Warning : some registered scores have not been submitted yet!"
+#, python-format
+msgid "Warning: %(scores)s score(s) ready to be submitted."
 msgstr ""
 
-msgid "Without attribution"
+#, python-format
+msgid ""
+"Warning: %(scores)s score(s) ready to be submitted. Only score responsible "
+"<strong>(%(responsable_nom)s, %(responsable_prenom)s)</strong> will be "
+"allowed to submit the scores to faculty."
 msgstr ""
 
 msgid "Yes"
 msgstr ""
 
-msgid "You can't encode a 'score' and a 'justification' together"
-msgstr ""
-
-msgid ""
-"You don't have access rights for this learning unit or it doesn't exist in "
-"our database"
-msgstr ""
-
-msgid ""
-"You don't have access rights for this offer or it doesn't exist in our "
-"database"
-msgstr ""
-
-msgid ""
-"You encoded scores for more than 1 learning unit in your excel file (column "
-"'Learning unit').Please make one excel file by learning unit."
-msgstr ""
-
 msgid "You have to select a file to upload."
-msgstr ""
-
-msgid "You haven't any score to encode."
-msgstr ""
-
-#, python-format
-msgid ""
-"Your excel file isn't well structured. Please follow the structure of the "
-"excel file provided (button '%(button_value)s')"
 msgstr ""
 
 msgid "date_format"
 msgstr "%d %b %Y"
 
+msgid "https://uclouvain.be/fr/decouvrir/rgee.html"
+msgstr ""
+
 msgid "learning units in"
+msgstr ""
+
+msgid "more_than_one_academic_year_error"
+msgstr ""
+
+msgid "no_valid_academic_year_error"
+msgstr ""
+
+msgid "number between 0-20 (0=Score of presence)"
 msgstr ""
 
 msgid "of"
@@ -682,5 +692,11 @@ msgstr ""
 msgid "program(s)"
 msgstr ""
 
-msgid "score(s) saved"
+msgid "student"
+msgstr ""
+
+msgid "students"
+msgstr ""
+
+msgid "the"
 msgstr ""

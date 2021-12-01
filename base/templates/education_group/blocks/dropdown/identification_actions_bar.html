@@ -1,4 +1,4 @@
-{% load static i18n format education_group osis_role %}
+{% load static i18n format education_group osis_role cache %}
 {% comment "License" %}
     * OSIS stands for Open Student Information System. It's an application
     * designed to manage the core business of higher education institutions,
@@ -31,8 +31,9 @@
             <span class="caret"></span>
         </button>
 
-        <ul class="dropdown-menu dropdown-menu-large row text-right pull-right">
-            {# Other actions have to be fixed, look in the identifiation_actions_bar_to_be_fixed.html #}
+        {# Cache action menu because permission/role change not frequently #}
+        {% cache 600 education_group_identification_action_bar user.username group_year.pk %}
+            <ul class="dropdown-menu dropdown-menu-large row text-right pull-right">
             {% if create_group_url %}
                 <li>
                     {% a_tag_modal_has_perm create_group_url _('New Education Group') 'base.add_group' user group_year %}
@@ -128,5 +129,6 @@
                 </a>
             </li>
         </ul>
+        {% endcache %}
     </div>
 {% endif %}

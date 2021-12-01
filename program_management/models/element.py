@@ -24,8 +24,6 @@
 #
 ##############################################################################
 
-from collections import Counter
-
 from django.contrib import admin
 from django.db import models
 from django.db.models import Q
@@ -35,7 +33,6 @@ from reversion.admin import VersionAdmin
 from base.models.academic_year import AcademicYear
 from base.models.learning_unit_year import LearningUnitYear
 from education_group.models.group_year import GroupYear
-from learning_unit.models.learning_class_year import LearningClassYear
 from osis_common.models.osis_model_admin import OsisModelAdmin
 from program_management.models.enums.node_type import NodeType
 
@@ -46,6 +43,7 @@ class AcademicYearListFilter(admin.SimpleListFilter):
     parameter_name = 'academic_year_id'
 
     def lookups(self, request, model_admin):
+        from learning_unit.models.learning_class_year import LearningClassYear
         academic_year_ids = set(GroupYear.objects.all().values_list('academic_year', flat=True))
         academic_year_ids.update(set(LearningUnitYear.objects.all().values_list('academic_year', flat=True)))
         academic_year_ids.update(set(

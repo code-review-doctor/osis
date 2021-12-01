@@ -33,5 +33,12 @@ class EnrollmentCounter(interface.DomainService):
     def get_training_enrollments_count(self, training_id: 'TrainingIdentity') -> int:
         return offer_enrollment.count_enrollments(training_id.acronym, training_id.year)
 
+    def get_11BA_enrollments_count(self, training_id: 'TrainingIdentity') -> int:
+        return offer_enrollment.OfferEnrollment.objects.filter(
+            education_group_year__acronym=training_id.acronym,
+            education_group_year__academic_year__year=training_id.year,
+            cohort_year__isnull=False,
+        ).count()
+
     def get_mini_training_enrollments_count(self, mini_training_id: 'MiniTrainingIdentity') -> int:
         return offer_enrollment.count_enrollments(mini_training_id.acronym, mini_training_id.year)

@@ -40,6 +40,6 @@ PERIODICITY_TYPES = (
 
 
 class PeriodicityEnum(ChoiceEnum):
-    ANNUAL = _("Annual")
+    ANNUAL = pgettext_lazy("female", "Annual")
     BIENNIAL_EVEN = _("biennial even")
     BIENNIAL_ODD = _("biennial odd")

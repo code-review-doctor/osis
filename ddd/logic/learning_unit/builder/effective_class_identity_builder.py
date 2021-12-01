@@ -31,6 +31,7 @@ from ddd.logic.learning_unit.builder.learning_unit_identity_builder import Learn
 from ddd.logic.learning_unit.commands import CreateEffectiveClassCommand, UpdateEffectiveClassCommand, \
     DeleteEffectiveClassCommand
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity, EffectiveClassCode
+from ddd.logic.learning_unit.dtos import EffectiveClassFromRepositoryDTO
 from osis_common.ddd.interface import EntityIdentityBuilder, DTO
 
 
@@ -55,8 +56,12 @@ class EffectiveClassIdentityBuilder(EntityIdentityBuilder):
         )
 
     @classmethod
-    def build_from_repository_dto(cls, dto_object: 'DTO') -> 'EffectiveClassIdentity':
-        raise NotImplementedError
+    def build_from_repository_dto(cls, dto_object: 'EffectiveClassFromRepositoryDTO') -> 'EffectiveClassIdentity':
+        learning_unit_identity = LearningUnitIdentityBuilder.build_from_code_and_year(
+            code=dto_object.learning_unit_code,
+            year=dto_object.learning_unit_year
+        )
+        return EffectiveClassIdentity(class_code=dto_object.class_code, learning_unit_identity=learning_unit_identity)
 
     @classmethod
     def build_from_code_and_learning_unit_identity_data(

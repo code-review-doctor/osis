@@ -55,6 +55,11 @@ class AttributionSerializerTestCase(TestCase):
             credits=Decimal("15.5"),
             start_year=2015,
             function=Functions.COORDINATOR.name,
+            lecturing_charge="15.0",
+            practical_charge="10.5",
+            has_peps=False,
+            total_learning_unit_charge="55.5",
+            is_partim=False
         )
 
         cls.academic_event = AcademicEvent(
@@ -65,19 +70,9 @@ class AttributionSerializerTestCase(TestCase):
             end_date=datetime.date.today() + datetime.timedelta(days=10),
             type=AcademicCalendarTypes.ACCESS_SCHEDULE_CALENDAR.name
         )
-        # Fake remote data from EPC API Call
-        cls.attributions_charges = [
-            {
-                'allocationId': cls.attribution_obj.allocation_id,
-                'allocationChargePractical': '10.5',
-                'allocationChargeLecturing': '15.0',
-                'learningUnitCharge': '55.5',
-            }
-        ]
 
         cls.serializer = AttributionSerializer(cls.attribution_obj, context={
             'access_schedule_calendar': AccessScheduleCalendar(),
-            'attribution_charges': cls.attributions_charges
         })
 
     def setUp(self) -> None:
@@ -104,9 +99,13 @@ class AttributionSerializerTestCase(TestCase):
             'lecturing_charge',
             'practical_charge',
             'total_learning_unit_charge',
-            'links'
+            'links',
+            'has_peps',
+            'effective_class_repartition',
+            'is_partim',
+            'percentage_allocation_charge'
         ]
-        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
+        self.assertCountEqual(list(self.serializer.data.keys()), expected_fields)
 
     def test_ensure_function_text_correctly_computed(self):
         self.assertEquals(self.serializer.data['function_text'], Functions.COORDINATOR.value)
@@ -127,14 +126,6 @@ class AttributionSerializerTestCase(TestCase):
         )
         self.assertEquals(self.serializer.data['links']['schedule'], expected_url)
 
-    def test_ensure_lecturing_charge_correctly_found(self):
-        expected_lecturing_charge = "15.0"
-        self.assertEquals(self.serializer.data['lecturing_charge'], expected_lecturing_charge)
-
-    def test_ensure_practical_charge_correctly_found(self):
-        expected_practical_charge = "10.5"
-        self.assertEquals(self.serializer.data['practical_charge'], expected_practical_charge)
-
-    def test_ensure_total_learning_unit_charge_correctly_found(self):
-        expected_total_learning_unit_charge = "55.5"
-        self.assertEquals(self.serializer.data['total_learning_unit_charge'], expected_total_learning_unit_charge)
+    def test_should_return_percentage_none_when_total_charge_is_none(self):
+        self.attribution_obj.total_learning_unit_charge = None
+        self.assertIsNone(AttributionSerializer.get_percentage_allocation_charge(self.attribution_obj))

@@ -40,7 +40,7 @@
             {% if perms.base.can_access_offer %}
                 <div class="col-md-1"><i class="fa fa-map-marker-alt" style="font-size: 400%; color: #6699FF;"></i></div>
                 <div class="col-md-5">
-                    <h4 class="media-heading"><a href="{% url 'offers' %}" id="lnk_offers">{% trans 'Addresses' %}</a></h4>
+                    <h4 class="media-heading"><a href="{% url 'offers_search' %}" id="lnk_offers">{% trans 'Addresses' %}</a></h4>
                     <p>{% trans 'Management of addresses on the scoresheets.' %}</p>
                 </div>
             {% endif %}

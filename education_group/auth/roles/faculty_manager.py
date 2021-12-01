@@ -7,7 +7,6 @@ from base.models.enums.education_group_categories import Categories
 from education_group.auth import predicates
 from education_group.auth.roles.utils import EducationGroupTypeScopeRoleMixin
 from education_group.auth.scope import Scope
-from learning_unit.auth import predicates as lu_predicates
 from osis_role.contrib import admin as osis_role_admin
 from osis_role.contrib import models as osis_role_models
 from osis_role.contrib import predicates as osis_role_predicates
@@ -30,6 +29,7 @@ class FacultyManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
 
     @classmethod
     def rule_set(cls):
+        from learning_unit.auth import predicates as lu_predicates
         return rules.RuleSet({
             'base.can_access_catalog': rules.always_allow,  # Perms Backward compibility
             'base.view_educationgroup': rules.always_allow,
