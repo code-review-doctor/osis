@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-26 10:43+0100\n"
+"POT-Creation-Date: 2021-11-30 10:15+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -63,6 +63,9 @@ msgid ""
 "LCOPS1113-A</i> </p> <p> For a practical effective class (PP), use '_' <br/> "
 "<i>Example : LCOPS1113-A</i> </p> <p> For a partim, put the letter against "
 "the the acronym <br/> <i>Example : LCOPS1113A</i> </p>"
+msgstr ""
+
+msgid "Absence"
 msgstr ""
 
 msgid "Absence justified"
@@ -238,6 +241,11 @@ msgstr ""
 msgid "Firstname"
 msgstr ""
 
+msgid ""
+"For classes, you must modify scores responsible via full LU. Example: For "
+"LCOPS1113-B, you must search and modify via LCOPS1113."
+msgstr ""
+
 msgid "Get Excel file"
 msgstr ""
 
@@ -267,6 +275,12 @@ msgstr ""
 msgid "Institution"
 msgstr ""
 
+#, python-format
+msgid ""
+"Invalid score line %(row_number)s : %(decimal_value)s. Ensure that there are "
+"no more than %(max_decimal)s decimal place."
+msgstr ""
+
 msgid "January"
 msgstr ""
 
@@ -274,7 +288,7 @@ msgstr ""
 msgid "Justification legend: %(justification_label_authorized)s"
 msgstr ""
 
-msgid "LU code"
+msgid "LU"
 msgstr ""
 
 msgid "Large print"
@@ -419,6 +433,9 @@ msgid ""
 "number surrounded by parenthesis is the number of scores encoded by the "
 "tutor that aren't submitted yet ('draft' state)"
 msgstr ""
+"Represents the quantity of scores submitted to the administration. The "
+"number surrounded by parenthesis is the scores encoded by the score "
+"responsible that aren't submitted to the faculty yet"
 
 msgid "Req. Entity"
 msgstr ""
@@ -446,6 +463,12 @@ msgstr ""
 msgid "Score legend"
 msgstr ""
 
+msgid "Score legend for program manager"
+msgstr ""
+
+msgid "Score legend for tutor"
+msgstr ""
+
 #, python-brace-format
 msgid "Score legend: A=Absent, T=Cheating, {score} (0=Score of presence)"
 msgstr ""
@@ -470,9 +493,6 @@ msgid "Scores encoding"
 msgstr ""
 
 msgid "Scores responsible"
-msgstr ""
-
-msgid "Scores responsible tutor"
 msgstr ""
 
 msgid "Scores responsibles"

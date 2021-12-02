@@ -162,7 +162,7 @@ class ScoreSearchFormView(PermissionRequiredMixin, FormView):
                 nom=search_form.cleaned_data['nom'],
                 prenom=search_form.cleaned_data['prenom'],
                 etat=search_form.cleaned_data['etat'],
-                nom_cohorte=search_form.cleaned_data['nom_cohorte'],
+                noms_cohortes=search_form.cleaned_data['noms_cohortes'],
                 matricule_fgs_gestionnaire=self.person.global_id
             )
             notes = message_bus_instance.invoke(cmd)
@@ -177,7 +177,7 @@ class ScoreSearchFormView(PermissionRequiredMixin, FormView):
 
     def _get_initial_note_etudiant(self, note_etudiant):
         try:
-            note_format = "2" if note_etudiant.note_decimale_est_autorisee else "0"
+            note_format = "1" if note_etudiant.note_decimale_est_autorisee else "0"
             note_formated = floatformat(float(note_etudiant.note), note_format)
         except ValueError:
             note_formated = note_etudiant.note

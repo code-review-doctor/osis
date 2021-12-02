@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import decimal
+
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from openpyxl import Workbook
@@ -30,7 +32,9 @@ from openpyxl.styles import Font, colors, Color, PatternFill, Border, Side
 from openpyxl.styles.borders import BORDER_MEDIUM
 from openpyxl.writer.excel import save_virtual_workbook
 
-HEADER = [
+MAXIMAL_NUMBER_OF_DECIMALS = 1
+
+HEADER_MANDATORY_PART = [
     _('Academic year'),
     _('Session'),
     _('Learning unit'),
@@ -40,6 +44,9 @@ HEADER = [
     _('Email'),
     _('Score'),
     _('End date Prof'),
+]
+
+HEADER_OPTIONAL_PART = [
     _('Type of specific profile'),
     _('Extra time (33% generally)'),
     _('Large print'),
@@ -48,6 +55,8 @@ HEADER = [
     _('Details other educational facilities'),
     _('Educational tutor'),
 ]
+
+HEADER = HEADER_MANDATORY_PART + HEADER_OPTIONAL_PART
 
 
 def build_xls(feuille_de_notes_serialized):
@@ -147,6 +156,7 @@ def _build_rows(worksheet, feuille_de_notes_serialized):
     current_row_number = 12
 
     for row in feuille_de_notes_serialized['rows']:
+        note = _format_note(row['note'])
         worksheet.append([
             feuille_de_notes_serialized['annee_academique'],
             feuille_de_notes_serialized['numero_session'],
@@ -155,8 +165,8 @@ def _build_rows(worksheet, feuille_de_notes_serialized):
             row['noma'],
             row['nom_complet'],
             row['email'],
-            row['note'],
-            row['date_remise_de_notes'],
+            note,
+            row['echeance_enseignant'],
             row['type_peps'],
             row['tiers_temps'],
             row['copie_adaptee'],
@@ -206,3 +216,16 @@ def __set_border_on_first_peps_cell(worksheet, row_number):
             left=Side(border_style=BORDER_MEDIUM, color=Color('FF000000')),
         )
         first_peps_cell.style = c
+
+
+def _format_note(note: str) -> str:
+    # TODO : Have to be deleted when examEnrollment score's field will be transform from decimal_places=2 to
+    #  decimal_places=1
+    try:
+        number_of_decimal = decimal.Decimal(note).as_tuple().exponent * -1
+        if number_of_decimal > MAXIMAL_NUMBER_OF_DECIMALS:
+            return note[:-1]
+    except decimal.DecimalException:
+        # Note is a letter
+        pass
+    return note
