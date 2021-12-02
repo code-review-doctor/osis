@@ -139,6 +139,7 @@ class ScoreEncodingProgressFilterForm(forms.Form):
         )
     )
     incomplete_encodings_only = forms.BooleanField(required=False, label=_('Missing score'))
+    form_has_changed = forms.CharField(widget=HiddenInput())
 
     def __init__(self, matricule_fgs_gestionnaire: str = '', **kwargs):
         super().__init__(**kwargs)

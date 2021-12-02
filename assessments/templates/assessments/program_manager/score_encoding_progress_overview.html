@@ -78,6 +78,7 @@
                 <div class="row">
                     {{ search_form.media }}
                     <form method="GET" action="{{ request.path }}" id="form_search_scores_by_offer">
+                        <input name="form_has_changed" type="hidden" value="True"/>
                         <div class="col-md-3">
                             {% bootstrap_field search_form.cohorte_name form_group_class="prevent-select-multiple-overlap"  %}
                         </div>
@@ -532,6 +533,9 @@
             order: [],
         });
 
-
+        setTimeout(function () {
+            $('.select2-selection__clear').attr('title', '');
+            $('.select2-selection__choice').attr('title', '');
+        }, 1);
     </script>
 {% endblock %}

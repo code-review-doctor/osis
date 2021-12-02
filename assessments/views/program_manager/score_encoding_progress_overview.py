@@ -101,7 +101,7 @@ class ScoreEncodingProgressOverviewProgramManagerView(ScoreEncodingProgressOverv
     def get_cohorte_count(self) -> int:
         search_form = self.get_search_form
         if search_form.is_valid() and search_form.cleaned_data['cohorte_name']:
-            return 1
+            return len(search_form.cleaned_data['cohorte_name'])
         return len(search_form.fields['cohorte_name'].choices) - 1
 
     @staticmethod
@@ -198,5 +198,5 @@ class FormationAutocomplete(LoginRequiredMixin, autocomplete.Select2ListView):
         if self.q:
             choices = filter(lambda cohorte_tuple: self.q.upper() in cohorte_tuple[1], choices)
 
-        results = [{'id': id, 'text': value} for id, value in sorted(choices, key=lambda x: x[1])]
+        results = [{'id': id, 'text': value, 'title': ' '} for id, value in sorted(choices, key=lambda x: x[1])]
         return JsonResponse({'results': results})
