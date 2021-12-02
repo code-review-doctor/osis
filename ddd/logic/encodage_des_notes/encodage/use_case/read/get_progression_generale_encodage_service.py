@@ -76,7 +76,7 @@ def get_progression_generale_gestionnaire(
         inscription_examen_translator=inscription_examen_translator,
         attribution_translator=attribution_translator,
 
-        nom_cohorte=cmd.nom_cohorte,
+        noms_cohortes=cmd.noms_cohortes,
         code_unite_enseignement=cmd.code_unite_enseignement,
         enseignant=cmd.enseignant,
         seulement_notes_manquantes=cmd.seulement_notes_manquantes

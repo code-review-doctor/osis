@@ -57,5 +57,5 @@ class GestionnaireParcoursBuilder(interface.RootEntityBuilder):
             raise PasGestionnaireParcoursException()
         return GestionnaireParcours(
             entity_id=IdentiteGestionnaire(matricule_gestionnaire),
-            cohortes_gerees=[dto.nom_cohorte for dto in cohortes_gestionnaire],
+            cohortes_gerees={dto.nom_cohorte for dto in cohortes_gestionnaire},
         )

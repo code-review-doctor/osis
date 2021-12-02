@@ -162,7 +162,7 @@ class ScoreSearchFormView(PermissionRequiredMixin, FormView):
                 nom=search_form.cleaned_data['nom'],
                 prenom=search_form.cleaned_data['prenom'],
                 etat=search_form.cleaned_data['etat'],
-                nom_cohorte=search_form.cleaned_data['nom_cohorte'],
+                noms_cohortes=search_form.cleaned_data['noms_cohortes'],
                 matricule_fgs_gestionnaire=self.person.global_id
             )
             notes = message_bus_instance.invoke(cmd)
