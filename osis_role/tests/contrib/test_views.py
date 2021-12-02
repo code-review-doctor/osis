@@ -33,6 +33,7 @@ from rest_framework.response import Response
 from base.tests.factories.user import UserFactory
 from osis_role.contrib.views import APIPermissionRequiredMixin
 
+
 class TestApiPermissionRequiredMixin(TestCase):
 
     @classmethod

@@ -3,6 +3,7 @@ from django.contrib.auth.views import redirect_to_login
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
+from django.utils.translation import gettext as _
 import rest_framework.exceptions as drf_exceptions
 from rules.contrib.views import PermissionRequiredMixin as PermissionRequiredMixinRules, \
     objectgetter as objectgetterrules, \
@@ -32,7 +33,8 @@ class APIPermissionRequiredMixin:
     def check_method_permissions(self, user, method):
         """
         Check that a user has the right to use a method.
-        Raises an appropriate exception if this is not the case.
+        Returns the message related to the first invalid permission, otherwise returns None.
+        Raises an exception if the user is not authenticated.
         """
         if not user.is_authenticated:
             # No user, don't check permission
@@ -53,14 +55,17 @@ class APIPermissionRequiredMixin:
         # Check the permissions
         for permission in request_permissions:
             if not user.has_perm(permission, obj):
-                raise drf_exceptions.PermissionDenied(get_permission_error(user, permission))
+                permission_error = get_permission_error(user, permission)
+                return permission_error if permission_error is not None else _("Method '{}' not allowed".format(method))
 
     def check_permissions(self, request):
         """
         Check if the request should be permitted.
         Raises an appropriate exception if the request is not permitted.
         """
-        return self.check_method_permissions(request.user, request.method)
+        failed_permission_message = self.check_method_permissions(request.user, request.method)
+        if failed_permission_message is not None:
+            raise drf_exceptions.PermissionDenied(failed_permission_message)
 
     def get_permission_object(self):
         """
