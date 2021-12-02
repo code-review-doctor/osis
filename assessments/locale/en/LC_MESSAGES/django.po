@@ -275,6 +275,12 @@ msgstr ""
 msgid "Institution"
 msgstr ""
 
+#, python-format
+msgid ""
+"Invalid score line %(row_number)s : %(decimal_value)s. Ensure that there are "
+"no more than %(max_decimal)s decimal place."
+msgstr ""
+
 msgid "January"
 msgstr ""
 

@@ -58,8 +58,12 @@ def get_progression_generale_gestionnaire(
 ) -> 'ProgressionGeneraleEncodageNotesDTO':
     # GIVEN
     PeriodeEncodageOuverte().verifier(periode_encodage_note_translator)
-    gestionnaire = GestionnaireParcoursBuilder().get(cmd.matricule_fgs_gestionnaire, cohortes_gestionnaire_translator)
     periode_encodage = periode_encodage_note_translator.get()
+    gestionnaire = GestionnaireParcoursBuilder().get(
+        matricule_gestionnaire=cmd.matricule_fgs_gestionnaire,
+        annee_concernee=periode_encodage.annee_concernee,
+        cohortes_gestionnaire_translator=cohortes_gestionnaire_translator,
+    )
 
     return ProgressionGeneraleEncodage().get(
         gestionnaire=gestionnaire,
@@ -72,7 +76,7 @@ def get_progression_generale_gestionnaire(
         inscription_examen_translator=inscription_examen_translator,
         attribution_translator=attribution_translator,
 
-        nom_cohorte=cmd.nom_cohorte,
+        noms_cohortes=cmd.noms_cohortes,
         code_unite_enseignement=cmd.code_unite_enseignement,
         enseignant=cmd.enseignant,
         seulement_notes_manquantes=cmd.seulement_notes_manquantes
