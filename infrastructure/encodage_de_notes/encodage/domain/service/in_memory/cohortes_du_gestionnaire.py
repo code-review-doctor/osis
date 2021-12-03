@@ -42,6 +42,7 @@ class CohortesDuGestionnaireInMemory(ICohortesDuGestionnaire):
     def search(
             cls,
             matricule_gestionnaire: str,
+            annee_concernee: int,
     ) -> Set['CohorteGestionnaireDTO']:
         return set(
             filter(

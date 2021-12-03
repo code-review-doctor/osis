@@ -55,6 +55,7 @@
 
             <div class="tab-content">
                 <div id="tab_score_search" class="tab-pane fade in active">
+                    {{ search_form.media }}
                     <form id="score_search_form" method="GET" action="{{ request.path }}" style="margin-top: 20px;">
                         <div class="row">
                             <div class="col-md-2">
@@ -70,7 +71,7 @@
                                 {% bootstrap_field search_form.etat %}
                             </div>
                             <div class="col-md-2">
-                                {% bootstrap_field search_form.nom_cohorte %}
+                                {% bootstrap_field search_form.noms_cohortes %}
                             </div>
                             <div class="col-md-1">
                                 <button id="bt_submit_score_search" class="btn btn-primary" type="submit" role="button"
@@ -216,12 +217,11 @@
 
             const is_valid_score = function (score, is_decimal) {
                 score = score.replace(',', '.');
-
-                const regex = (is_decimal) ? /^\d+(\.\d{0,2})?$/ : /^\d+$/;
+                const regex = (is_decimal) ? /^\d+(\.\d{0,1})?$/ : /^\d+$/;
                 if (!regex.test(score)) {
                     return false;
                 }
-                score = parseFloat(score).toFixed(2)
+                score = parseFloat(score).toFixed(1)
                 return !(score > 20 || score < 0);
             }
 
@@ -267,5 +267,10 @@
                 next.focus();
             }
         });
+
+        setTimeout(function () {
+            $('.select2-selection__clear').attr('title', '');
+            $('.select2-selection__choice').attr('title', '');
+        }, 1);
     </script>
 {% endblock %}

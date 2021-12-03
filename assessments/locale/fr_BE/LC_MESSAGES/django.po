@@ -308,6 +308,14 @@ msgstr "Injecter les notes encodées dans le fichier Excel"
 msgid "Institution"
 msgstr "Institution"
 
+#, python-format
+msgid ""
+"Invalid score line %(row_number)s : %(decimal_value)s. Ensure that there are "
+"no more than %(max_decimal)s decimal place."
+msgstr ""
+"Note invalide ligne %(row_number)s : %(decimal_value)s. Assurez-vous qu'il "
+"n'y a pas plus de %(max_decimal)s chiffre après la virgule."
+
 msgid "January"
 msgstr "Janvier"
 

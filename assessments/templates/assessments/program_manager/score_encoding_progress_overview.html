@@ -78,8 +78,9 @@
                 <div class="row">
                     {{ search_form.media }}
                     <form method="GET" action="{{ request.path }}" id="form_search_scores_by_offer">
+                        <input name="form_has_changed" type="hidden" value="True"/>
                         <div class="col-md-3">
-                            {% bootstrap_field search_form.cohorte_name %}
+                            {% bootstrap_field search_form.cohorte_name form_group_class="prevent-select-multiple-overlap"  %}
                         </div>
                         <div class="col-md-3">
                             {% bootstrap_field search_form.tutor %}
@@ -115,9 +116,7 @@
                         </div>
                         <div class="col-md-1" style="margin-top: 30px;">
                             <button type="submit" id="bt_submit_scores_by_offer" class="btn btn-primary" role="button"
-                                    style="margin-top: 4px"
-                                    data-toggle="tooltip"
-                                    title="{% trans 'Refresh list' %}">
+                                    style="margin-top: 4px">
                                 <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
                             </button>
                             <button type="button" id="btn_clear_filter"
@@ -461,6 +460,11 @@
 
 {% block script %}
     <script>
+        $('#form_search_scores_by_offer').bind('DOMSubtreeModified', function () {
+            $("[class^='select2-selection']").removeAttr("title");
+        });
+
+
         $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
             var id = $(e.target).attr("href");
             localStorage.setItem('selectedTab', id);
@@ -532,6 +536,9 @@
             order: [],
         });
 
-
+        setTimeout(function () {
+            $('.select2-selection__clear').attr('title', '');
+            $('.select2-selection__choice').attr('title', '');
+        }, 1);
     </script>
 {% endblock %}

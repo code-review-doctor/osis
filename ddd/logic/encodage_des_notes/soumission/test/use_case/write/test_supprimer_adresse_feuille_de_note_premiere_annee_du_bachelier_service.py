@@ -72,3 +72,17 @@ class TestSupprimerAdresseFeuilleDeNotePremiereAnneeDuBachlier(SimpleTestCase):
         adresse_sauvegardee = self.repo.get(result)
 
         self.assertIsNone(adresse_sauvegardee)
+
+    def test_should_considerer_prochaine_periode_si_aucune_periode_de_soumission_ouverte(self):
+        self.periode_encodage_notes_translator.get = lambda *args, **kwargs: None
+
+        adresse_premiere_annee_de_bachelier = AdresseFeuilleDeNotesBaseeSurEntiteFactory(
+            entity_id__nom_cohorte="DROI11BA"
+        )
+        self.repo.save(adresse_premiere_annee_de_bachelier)
+
+        result = message_bus_instance.invoke(self.cmd)
+
+        adresse_sauvegardee = self.repo.get(result)
+
+        self.assertIsNone(adresse_sauvegardee)
