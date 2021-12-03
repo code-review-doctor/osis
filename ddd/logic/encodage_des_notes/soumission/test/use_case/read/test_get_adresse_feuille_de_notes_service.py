@@ -95,6 +95,19 @@ class TestGetAdresseFeuilleDeNotesService(SimpleTestCase):
             adresse,
         )
 
+    def test_should_considerer_la_prochaine_periode_encodage_si_aucune_periode_ouverte(self):
+        self.periode_encodage_notes_translator.get = lambda *args, **kwargs: None
+
+        adresse = AdresseFeuilleDeNotesSpecifiqueFactory()
+        cmd = attr.evolve(self.cmd, nom_cohorte=adresse.nom_cohorte)
+        self.repository.save(adresse)
+
+        result = message_bus_instance.invoke(cmd)
+        self.assert_dto_corresponds_to_adress(
+            result,
+            adresse,
+        )
+
     def test_should_base_value_on_entity_if_adresse_est_basee_sur_entite(self):
         adresse = AdresseFeuilleDeNotesBaseeSurEntiteFactory()
         self.repository.save(adresse)
