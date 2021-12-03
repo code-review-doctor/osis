@@ -48,3 +48,16 @@ class PeriodeEncodageNotesTranslator(IPeriodeEncodageNotesTranslator):
                 debut_periode_soumission=DateDTO(jour=date_debut.day, mois=date_debut.month, annee=date_debut.year),
                 fin_periode_soumission=DateDTO(jour=date_fin.day, mois=date_fin.month, annee=date_fin.year),
             )
+
+    @classmethod
+    def get_prochaine_periode(cls) -> 'PeriodeEncodageNotesDTO':
+        calendar = ScoresExamSubmissionCalendar()
+        event = calendar.get_next_academic_event(date=datetime.date.today())
+        date_debut = event.start_date
+        date_fin = event.end_date
+        return PeriodeEncodageNotesDTO(
+            annee_concernee=event.authorized_target_year,
+            session_concernee=event.session,
+            debut_periode_soumission=DateDTO(jour=date_debut.day, mois=date_debut.month, annee=date_debut.year),
+            fin_periode_soumission=DateDTO(jour=date_fin.day, mois=date_fin.month, annee=date_fin.year),
+        )
