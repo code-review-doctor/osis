@@ -2,11 +2,11 @@
 from django.db import migrations, connection
 from django.db.models import Prefetch
 
-from base.models.entity_version import EntityVersion
 from base.models.entity_version_address import EntityVersionAddress
 
 
 def correct_entity_main_address(apps, schema_editor):
+    EntityVersion = apps.get_model('base', 'entityversion')
     entity_versions = EntityVersion.objects.only_roots().prefetch_related(
         Prefetch(
             'entityversionaddress_set',
@@ -15,11 +15,8 @@ def correct_entity_main_address(apps, schema_editor):
     )
     for entity_version in entity_versions:
         if len(entity_version.entityversionaddress_set.all()) == 1:
-            with connection.cursor() as cursor:
-                sql = "update base_entityversionaddress set is_main=True where id = {}".format(
-                    entity_version.entityversionaddress_set.all()[0].pk
-                )
-                cursor.execute(sql)
+            entity_version.is_main = True
+            entity_version.save()
 
 
 class Migration(migrations.Migration):
