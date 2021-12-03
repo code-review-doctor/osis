@@ -160,16 +160,11 @@ class LearningUnitEnrollmentsListViewTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         results = response.json()['results']
-        self.assertEqual(len(results), 2)
 
-        self.assertEqual(
-            results[0]['learning_unit_acronym'],
-            "{}".format(learning_unit_year_full.acronym)
-        )
-        self.assertEqual(
-            results[1]['learning_unit_acronym'],
-            "{}".format(learning_unit_year_partim1.acronym)
-        )
+        results_acronyms = [item['learning_unit_acronym'] for item in results]
+        expected_acronyms = [learning_unit_year_full.acronym, learning_unit_year_partim1.acronym]
+
+        self.assertCountEqual(results_acronyms, expected_acronyms)
 
     def _create_ue_with_partims(self):
         current_academic_year = create_current_academic_year()
