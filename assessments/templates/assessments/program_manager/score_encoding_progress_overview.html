@@ -460,8 +460,7 @@
 {% block script %}
     <script>
         $('#form_search_scores_by_offer').bind('DOMSubtreeModified', function () {
-            $('.select2-selection__rendered').removeAttr("title");
-            $('.select2-selection__clear').removeAttr("title");
+            $("[class^='select2-selection']").removeAttr("title");
         });
 
 
