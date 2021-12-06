@@ -180,6 +180,7 @@ def _build_rows(worksheet, feuille_de_notes_serialized):
             __set_non_editable_color(worksheet, column_number, current_row_number)
         if row['est_soumise']:
             __set_non_editable_color(worksheet, 8, current_row_number)
+        __set_non_editable_color(worksheet, 9, current_row_number)
 
         if row['inscrit_tardivement']:
             __set_late_subscribe_row_color(worksheet, current_row_number)
@@ -196,13 +197,13 @@ def __set_non_editable_color(worksheet, column_number, row_number):
 
 def __set_late_subscribe_row_color(worksheet, row_number):
     pattern_fill_enrollment_state = PatternFill(patternType='solid', fgColor='dff0d8')
-    for column_number in range(1, len(HEADER) + 1):
+    for column_number in range(1, 10):
         worksheet.cell(row=row_number, column=column_number).fill = pattern_fill_enrollment_state
 
 
 def __set_late_unsubscribe_row_color(worksheet, row_number):
     pattern_fill_enrollment_state = PatternFill(patternType='solid', fgColor='f2dede')
-    for column_number in range(1, len(HEADER) + 1):
+    for column_number in range(1, 10):
         worksheet.cell(row=row_number, column=column_number).fill = pattern_fill_enrollment_state
 
 
