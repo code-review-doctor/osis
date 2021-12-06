@@ -15,8 +15,9 @@ def correct_entity_main_address(apps, schema_editor):
     )
     for entity_version in entity_versions:
         if len(entity_version.entityversionaddress_set.all()) == 1:
-            entity_version.is_main = True
-            entity_version.save()
+            entity_version_address = entity_version.entityversionaddress_set.all()[0]
+            entity_version_address.is_main = True
+            entity_version_address.save()
 
 
 class Migration(migrations.Migration):
