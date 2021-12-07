@@ -331,6 +331,8 @@ def pgm_manager_administration(request):
 def __search_offer_types():
     return EducationGroupType.objects.filter(
         category=Categories.TRAINING.name
+    ).exclude(
+        name__in=TrainingType.root_master_2m_types()
     )
 
 
@@ -445,7 +447,8 @@ def _get_trainings(academic_yr, entity_list, manager_person, education_group_typ
         management_entity__in={ev.entity_id for ev in entity_list},
         education_group_type__category=education_group_categories.TRAINING,
     ).exclude(
-        Q(acronym__contains='common-') | Q(acronym__icontains="11BA")
+        Q(acronym__contains='common-') | Q(acronym__icontains="11BA") |
+        Q(education_group_type__name__in=TrainingType.root_master_2m_types())
     ).select_related('management_entity', 'education_group_type')
 
     if education_group_type:
