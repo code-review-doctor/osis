@@ -54,6 +54,7 @@ from base.models.enums import education_group_categories
 from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import TrainingType
 from base.models.person import Person
+from base.views.autocomplete import EmployeeAutocomplete
 from base.views.mixins import AjaxTemplateMixin
 from ddd.logic.encodage_des_notes.encodage.dtos import GestionnaireCohortesDTO, ProprietesGestionnaireCohorteDTO
 from education_group.models.enums.cohort_name import CohortName
@@ -251,15 +252,9 @@ class MainProgramManagerPersonUpdateView(MainProgramManagerUpdateCommonView):
         )
 
 
-class PersonAutocomplete(autocomplete.Select2QuerySetView):
+class PersonAutocomplete(EmployeeAutocomplete):
     def get_result_label(self, item):
         return "{} {}, {}".format(item.last_name, item.first_name, item.email)
-
-    def get_queryset(self):
-        qs = Person.objects.all()
-        if self.q:
-            qs = qs.filter(Q(last_name__icontains=self.q) | Q(first_name__icontains=self.q))
-        return qs.order_by('last_name', 'first_name')
 
 
 class ProgramManagerForm(forms.ModelForm):
