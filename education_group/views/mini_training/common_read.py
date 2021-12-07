@@ -212,7 +212,8 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             "view_publish_btn":
                 self.request.user.has_perm('base.view_publish_btn') and
                 (self.have_general_information_tab() or self.have_skills_and_achievements_tab()),
-            "publish_url": self.get_publish_url()
+            "publish_url": self.get_publish_url(),
+            "active_tab": self.active_tab.name,
         }
 
     def get_permission_object(self):
