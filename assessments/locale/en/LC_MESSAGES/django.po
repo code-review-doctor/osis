@@ -281,6 +281,9 @@ msgid ""
 "no more than %(max_decimal)s decimal place."
 msgstr ""
 
+msgid "Invalid score."
+msgstr ""
+
 msgid "January"
 msgstr ""
 
