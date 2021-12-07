@@ -23,26 +23,28 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormulaireInscriptionCoursCommand
-from ddd.logic.preparation_programme_annuel_etudiant.domain.builder.formulaire_inscription_cours_builder import \
-    FormulaireInscriptionCoursBuilder
-from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import ICatalogueFormationsTranslator
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormulaireInscriptionCoursDTO
+from unittest import mock
+
+from django.test import SimpleTestCase
+
+from program_management.ddd.command import GetProgramTreeVersionCommand
 
 
-def get_formulaire_inscription_cours_service(
-        cmd: 'GetFormulaireInscriptionCoursCommand',
-        catalogue_formations_translator: 'ICatalogueFormationsTranslator',
-) -> 'FormulaireInscriptionCoursDTO':
-    # GIVEN
-    formation = catalogue_formations_translator.get_formation(
-        sigle=cmd.sigle_formation,
-        annee=cmd.annee_formation,
-        version=cmd.version_formation,
-    )
+class CatalogueFormationsTranslatorTest(SimpleTestCase):
 
-    # WHEN
-    formulaire = FormulaireInscriptionCoursBuilder.build(formation)
+    def setUp(self) -> None:
+        # mock appel service bus => retour GetProgramTreeVersionCommand : ProgramTreeVersionFactory()
+        self.patch_message_bus = mock.patch(
+            "infrastructure.messages_bus.invoke",
+            side_effect=self.__mock_message_bus_invoke
+        )
+        self.message_bus_mocked = self.patch_message_bus.start()
+        self.addCleanup(self.patch_message_bus.stop)
 
-    # THEN
-    return formulaire
+    def __mock_message_bus_invoke(self, cmd):
+        if isinstance(cmd, GetProgramTreeVersionCommand):
+            # return ProgramTreeVersionFactory(entity_id__version_name="")
+            raise NotImplementedError
+
+    def test_should_convertir_version_standard(self):
+        raise NotImplementedError

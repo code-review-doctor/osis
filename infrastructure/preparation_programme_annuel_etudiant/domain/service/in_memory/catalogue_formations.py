@@ -23,26 +23,26 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormulaireInscriptionCoursCommand
-from ddd.logic.preparation_programme_annuel_etudiant.domain.builder.formulaire_inscription_cours_builder import \
-    FormulaireInscriptionCoursBuilder
-from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import ICatalogueFormationsTranslator
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormulaireInscriptionCoursDTO
+from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import \
+    ICatalogueFormationsTranslator
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO
 
 
-def get_formulaire_inscription_cours_service(
-        cmd: 'GetFormulaireInscriptionCoursCommand',
-        catalogue_formations_translator: 'ICatalogueFormationsTranslator',
-) -> 'FormulaireInscriptionCoursDTO':
-    # GIVEN
-    formation = catalogue_formations_translator.get_formation(
-        sigle=cmd.sigle_formation,
-        annee=cmd.annee_formation,
-        version=cmd.version_formation,
-    )
+class CatalogueFormationsTranslatorInMemory(ICatalogueFormationsTranslator):
 
-    # WHEN
-    formulaire = FormulaireInscriptionCoursBuilder.build(formation)
+    dtos = [
+        FormationDTO(
+            programme_detaille=...,  # TODO :: to implement
+            annee=2020,
+            sigle='ECGE1BA',
+            version='STANDARD',
+            intitule_complet='Bachelier ...',
+        ),
+    ]
 
-    # THEN
-    return formulaire
+    @classmethod
+    def get_formation(cls, sigle: str, annee: int, version: str) -> 'FormationDTO':
+        return next(
+            dto for dto in cls.dtos
+            if dto.sigle == sigle and dto.annee == annee and dto.version == version
+        )
