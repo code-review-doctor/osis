@@ -44,6 +44,7 @@ from base.models.entity_version import EntityVersion
 from base.models.enums.groups import TUTOR, UE_CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP, \
     CENTRAL_MANAGER_GROUP, UE_FACULTY_MANAGER_GROUP, PROGRAM_MANAGER_GROUP, ENTITY_MANAGER_GROUP
 from base.models.person import Person
+from education_group.models.enums.cohort_name import FIRST_YEAR
 from osis_common.document import xls_build
 from osis_role.contrib.helper import EntityRoleHelper, Row
 
@@ -197,7 +198,7 @@ def _extract_xls_data(user_data: Person, context: Dict[str, Dict[PersonId, List[
         entities_acronym = get_entities_acronym(group.name, context, user_data.pk)
         if group.name == PROGRAM_MANAGER_GROUP:
             trainings_acronym = '\n'.join(
-                [row.most_recent_acronym or '' for row in user_data.programmanager_set.all()]
+                ["{}{}".format(row.most_recent_acronym or '', '-1' if row.cohort and row.cohort == FIRST_YEAR else '') for row in user_data.programmanager_set.all()]
             ) if user_data.programmanager_set.all() else ''
 
         data_by_group_name = [
