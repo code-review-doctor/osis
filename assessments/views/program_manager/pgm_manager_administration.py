@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import json
+import urllib
 from collections import OrderedDict
 from typing import Dict, Union, List
 
@@ -145,7 +146,8 @@ class ProgramManagerMixin(PermissionRequiredMixin, AjaxTemplateMixin):
     def get_success_url(self):
         url = reverse_lazy('program_manager_list') + "?"
         for nom_cohorte in self.nom_cohortes_selected:
-            url += "nom_cohortes_selected={}&".format(nom_cohorte)
+            urlencoded_nom_cohorte = urllib.parse.quote_plus(nom_cohorte)
+            url += "nom_cohortes_selected={}&".format(urlencoded_nom_cohorte)
         return url
 
     def get_queryset(self):
