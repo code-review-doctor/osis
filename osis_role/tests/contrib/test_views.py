@@ -24,7 +24,6 @@
 #
 ##############################################################################
 from django.contrib.auth.models import Permission
-from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 from django.test.client import RequestFactory
 from rest_framework import status
@@ -33,6 +32,7 @@ from rest_framework.response import Response
 
 from base.tests.factories.user import UserFactory
 from osis_role.contrib.views import APIPermissionRequiredMixin
+
 
 class TestApiPermissionRequiredMixin(TestCase):
 
@@ -130,13 +130,9 @@ class TestApiPermissionRequiredMixin(TestCase):
         # Check result -> authorized access as no permission is required for this request
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_no_user(self):
-        # Simulate a get request with the specified user
+    def test_no_authenticated_user(self):
+        # Simulate a get request with an anonymous user
         request = self.factory.post('/osis_role/tests_views/')
-        request.user = None
-        request._user = None
         response = self.api_view.as_view()(request)
-        # Check result -> authorized access as no permission is required for this request
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-
+        # Check result -> unauthorized access as the user isn't authenticated
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
