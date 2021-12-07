@@ -55,6 +55,7 @@ class UpdateClassView(CommonClassView, FormView):
         )
 
     def get_context_data(self, **kwargs):
+        print('get_context_data')
         context = super().get_context_data(**kwargs)
         context['effective_class'] = self.effective_class
         context['learning_unit'] = self.learning_unit
@@ -69,6 +70,7 @@ class UpdateClassView(CommonClassView, FormView):
         return kwargs
 
     def post(self, request, *args, **kwargs):
+        print('post')
         form = UpdateClassForm(
             request.POST,
             learning_unit=self.learning_unit,
@@ -82,6 +84,9 @@ class UpdateClassView(CommonClassView, FormView):
 
         return render(request, self.template_name, {
             "form": form,
+            "effective_class": self.effective_class,
+            "learning_unit": self.learning_unit,
+            "cancel_url": self.cancel_url,
         })
 
     def redirect_to_effective_class_identification(self):
