@@ -90,7 +90,7 @@ def get_queryset(acronym: str, management_entity: str) -> Iterable:
             education_group_type__category=Categories.TRAINING.name,
             academic_year=academic_year.current_academic_year()
         ).exclude(
-            Q(acronym__icontains="common-") | Q(acronym__icontains="11BA") | Q(acronym__icontains="2M"),
+            Q(acronym__icontains="common-") | Q(acronym__icontains="11BA") | Q(acronym__iendswith="2M"),
         ).annotate(
             sigle=F('acronym'),
         ).select_related(
@@ -111,7 +111,7 @@ def get_queryset(acronym: str, management_entity: str) -> Iterable:
             academic_year=academic_year.current_academic_year(),
             cohortyear__name=CohortName.FIRST_YEAR.name
         ).exclude(
-            Q(acronym__icontains="common-") | Q(acronym__icontains="11BA") | Q(acronym__icontains="2M"),
+            Q(acronym__icontains="common-") | Q(acronym__icontains="11BA") | Q(acronym__iendswith="2M"),
         ).annotate(
             sigle=Replace('acronym', Value('1BA'), Value('11BA')),
         ).filter(
