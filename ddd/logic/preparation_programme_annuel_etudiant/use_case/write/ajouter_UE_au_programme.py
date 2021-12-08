@@ -23,30 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
-
-import attr
-
-from osis_common.ddd import interface
+from ddd.logic.preparation_programme_annuel_etudiant.commands import AjouterUEAuProgrammeCommand
 
 
-@attr.s(frozen=True, slots=True)
-class GetFormulaireInscriptionCoursCommand(interface.CommandRequest):
-    annee_formation = attr.ib(type=int)
-    sigle_formation = attr.ib(type=str)
-    version_formation = attr.ib(type=str)
+def ajouter_UE_au_programme(
+        cmd: 'AjouterUEAuProgrammeCommand',
+        # programmeinscriptioncours_repository: 'IProgrammeInscriptionCoursRepository',
+) -> 'ProgrammeInscriptionCoursIdentity':
+    # GIVEN
+    programme_inscription_cours = programme_inscription_cours_repository.get(entity_id=cmd.entity_id)
 
+    # WHEN
 
-@attr.s(frozen=True, slots=True)
-class UniteEnseignementCommand(interface.CommandRequest):
-    annee = attr.ib(type=int)
-    code = attr.ib(type=str)
+    # THEN
 
-
-@attr.s(frozen=True, slots=True)
-class AjouterUEAuProgrammeCommand(interface.CommandRequest):
-    annee_formation = attr.ib(type=int)
-    sigle_formation = attr.ib(type=str)
-    version_formation = attr.ib(type=str)
-    position_dans_programme = attr.ib(type=str)  # exemple : LDROI100B | LDROI110A | LDROI1001
-    unites_enseignements = attr.ib(type=List[UniteEnseignementCommand])
+    return entity_id
