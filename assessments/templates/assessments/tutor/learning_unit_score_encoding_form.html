@@ -228,13 +228,15 @@
         $(document).ready(function () {
             const SCORE_INPUTS = $("input[id^='id_form'][class='form-control']");
             const SUBMIT_LINKS = $("#lnk_submit_up, #lnk_submit_down");
+            const DECIMAL_AUTHORIZED = {% if feuille_de_notes.note_decimale_est_autorisee %} true {% else %} false {% endif %};
+
+            function isDecimal(score){
+                return score.includes('.') || score.includes(',');
+            }
 
             const is_valid_score = function (score) {
-                const is_decimal = {% if feuille_de_notes.note_decimale_est_autorisee %} true {% else %}
-                    false {% endif %};
                 score = score.replace(',', '.');
-
-                const regex = (is_decimal) ? /^\d+(\.\d{0,1})?$/ : /^\d+$/;
+                const regex = (DECIMAL_AUTHORIZED) ? /^\d+(\.\d{0,1})?$/ : /^\d+$/;
                 if (!regex.test(score)) {
                     return false;
                 }
@@ -247,19 +249,33 @@
                 return justificationAvailables.indexOf(justification) > -1;
             }
 
+            function displayErrorMessage(value_encoded, spanErrorTag){
+                let error_message = "{% trans 'Invalid score.' %} {% trans 'Score legend' %} : {% trans 'number between 0-20 (0=Score of presence)' %}, A={% trans 'Absent' %}, T={% trans 'Cheating' %} ";
+                if (isDecimal(value_encoded) && !DECIMAL_AUTHORIZED){
+                    error_message = "{% trans 'Decimal scores not authorized' %}";
+                }
+                spanErrorTag.innerHTML = "<br>" + error_message;
+            }
+
+            function hideErrorMessage(spanErrorTag){
+                spanErrorTag.innerHTML = "";
+            }
+
             const validate_form = function () {
                 let has_error = false;
                 SCORE_INPUTS.each(function () {
                     const value_encoded = $(this).val();
                     const spanErrorId = 'error_' + $(this).attr('id');
-                    const error = document.getElementById(spanErrorId);
-                    if (value_encoded === "" || is_valid_justification(value_encoded) || is_valid_score(value_encoded)) {
+                    const spanErrorTag = document.getElementById(spanErrorId);
+                    const is_score_valid = is_valid_score(value_encoded);
+                    const is_justification_valid = is_valid_justification(value_encoded);
+                    if (value_encoded === "" || is_justification_valid || is_score_valid) {
                         $(this).css("border", "1px solid #D3D3D3");
-                        error.innerHTML = "";
+                        hideErrorMessage(spanErrorTag);
                     } else {
-                        $(this).css("border", "1px solid #ff0000");
-                        error.innerHTML = "<br>{% trans 'Invalid score.' %} {% trans 'Score legend' %} : {% trans 'number between 0-20 (0=Score of presence)' %}, A={% trans 'Absent' %}, T={% trans 'Cheating' %} ";
                         has_error = true;
+                        $(this).css("border", "1px solid #ff0000");
+                        displayErrorMessage(value_encoded, spanErrorTag);
                     }
                 });
                 SUBMIT_LINKS.prop('disabled', has_error);
