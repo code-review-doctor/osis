@@ -314,6 +314,9 @@ msgstr ""
 "Note invalide ligne %(row_number)s : %(decimal_value)s. Assurez-vous qu'il "
 "n'y a pas plus de %(max_decimal)s chiffre après la virgule."
 
+msgid "Invalid score."
+msgstr "Note non valide."
+
 msgid "January"
 msgstr "Janvier"
 
