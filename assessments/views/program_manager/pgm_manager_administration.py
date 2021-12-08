@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import json
+import urllib
 from collections import OrderedDict
 from typing import Dict, Union, List
 
@@ -53,6 +54,7 @@ from base.models.enums import education_group_categories
 from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import TrainingType
 from base.models.person import Person
+from base.views.autocomplete import EmployeeAutocomplete
 from base.views.mixins import AjaxTemplateMixin
 from ddd.logic.encodage_des_notes.encodage.dtos import GestionnaireCohortesDTO, ProprietesGestionnaireCohorteDTO
 from education_group.models.enums.cohort_name import CohortName
@@ -145,7 +147,8 @@ class ProgramManagerMixin(PermissionRequiredMixin, AjaxTemplateMixin):
     def get_success_url(self):
         url = reverse_lazy('program_manager_list') + "?"
         for nom_cohorte in self.nom_cohortes_selected:
-            url += "nom_cohortes_selected={}&".format(nom_cohorte)
+            urlencoded_nom_cohorte = urllib.parse.quote_plus(nom_cohorte)
+            url += "nom_cohortes_selected={}&".format(urlencoded_nom_cohorte)
         return url
 
     def get_queryset(self):
@@ -249,15 +252,9 @@ class MainProgramManagerPersonUpdateView(MainProgramManagerUpdateCommonView):
         )
 
 
-class PersonAutocomplete(autocomplete.Select2QuerySetView):
+class PersonAutocomplete(EmployeeAutocomplete):
     def get_result_label(self, item):
         return "{} {}, {}".format(item.last_name, item.first_name, item.email)
-
-    def get_queryset(self):
-        qs = Person.objects.all()
-        if self.q:
-            qs = qs.filter(Q(last_name__icontains=self.q) | Q(first_name__icontains=self.q))
-        return qs.order_by('last_name', 'first_name')
 
 
 class ProgramManagerForm(forms.ModelForm):
@@ -329,6 +326,8 @@ def pgm_manager_administration(request):
 def __search_offer_types():
     return EducationGroupType.objects.filter(
         category=Categories.TRAINING.name
+    ).exclude(
+        name__in=TrainingType.root_master_2m_types()
     )
 
 
@@ -443,7 +442,8 @@ def _get_trainings(academic_yr, entity_list, manager_person, education_group_typ
         management_entity__in={ev.entity_id for ev in entity_list},
         education_group_type__category=education_group_categories.TRAINING,
     ).exclude(
-        Q(acronym__contains='common-') | Q(acronym__icontains="11BA")
+        Q(acronym__contains='common-') | Q(acronym__icontains="11BA") |
+        Q(education_group_type__name__in=TrainingType.root_master_2m_types())
     ).select_related('management_entity', 'education_group_type')
 
     if education_group_type:
