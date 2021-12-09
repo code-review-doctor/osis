@@ -38,7 +38,7 @@ MANDATORY_PNG = static('img/education_group_year/mandatory.png')
 
 CHILD_BRANCH = """\
 <tr>
-    <td style="padding-left:{padding}em;">        
+    <td style="padding-left:{padding}em;"> 
         <div style="word-break: keep-all;">
             <img src="{icon_list_2}" height="10" width="10">
             {value} <br>

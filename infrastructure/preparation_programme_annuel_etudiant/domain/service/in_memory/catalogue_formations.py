@@ -25,14 +25,34 @@
 ##############################################################################
 from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import \
     ICatalogueFormationsTranslator
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, GroupementCatalogueDTO, \
+    ProgrammeDetailleDTO
 
 
 class CatalogueFormationsTranslatorInMemory(ICatalogueFormationsTranslator):
 
+    groupement1 = GroupementCatalogueDTO(
+        inclus_dans=None,
+        intitule='Groupement 1',
+        obligatoire=True,
+        remarque='Remarque 1',
+        commentaire=None
+
+    )
+    groupement2 = GroupementCatalogueDTO(
+        inclus_dans=None,
+        intitule='Groupement 2',
+        obligatoire=False,
+        remarque='Remarque 2',
+        commentaire='Commentaire 2'
+    )
+    programme_detaille = ProgrammeDetailleDTO(
+        groupements=[groupement1, groupement2],
+        unites_enseignement=[]
+    )
     dtos = [
         FormationDTO(
-            programme_detaille=...,  # TODO :: to implement
+            programme_detaille=programme_detaille,
             annee=2020,
             sigle='ECGE1BA',
             version='STANDARD',
