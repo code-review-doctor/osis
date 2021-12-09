@@ -29,6 +29,7 @@ from django.templatetags.static import static
 from django.utils.safestring import mark_safe
 
 from base.templatetags.education_group import register
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormulaireInscriptionCoursDTO, ProgrammeDetailleDTO
 from program_management.ddd.business_types import *
 
 # TODO :: Remove this file and move the code into a Serializer
@@ -51,9 +52,9 @@ CHILD_BRANCH = """\
 
 
 @register.filter
-def tree_list(formation: 'FormationDTO'):
+def tree_list(programme: ProgrammeDetailleDTO):
     # TODO : To be completed only one level of group for the moment - Need a complete algorithm
-    return mark_safe(list_formatter(formation.programme_detaille.groupements))
+    return mark_safe(list_formatter(programme.groupements))
 
 
 def list_formatter(groupements: List['GroupementCatalogueDTO']):

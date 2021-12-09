@@ -26,10 +26,20 @@
 from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import \
     ICatalogueFormationsTranslator
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO
+from program_management.ddd.command import GetProgramTreeVersionCommand
+from infrastructure.messages_bus import message_bus_instance
 
 
 class CatalogueFormationsTranslator(ICatalogueFormationsTranslator):
     @classmethod
     def get_formation(cls, sigle: str, annee: int, version: str) -> 'FormationDTO':
         # reutiliser GetProgramTreeVersionCommand et convertir ProgramTreeVersion en FormationDTO
+        cmd = GetProgramTreeVersionCommand(
+            year=annee,
+            acronym=sigle,
+            version_name=version,
+            transition_name=None
+        )
+        program_tree_version = message_bus_instance.invoke(cmd)
+
         raise NotImplementedError

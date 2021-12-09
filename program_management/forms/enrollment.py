@@ -27,7 +27,7 @@ from django import forms
 
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormulaireInscriptionCoursCommand
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, GroupementCatalogueDTO, \
-    UniteEnseignementCatalogueDTO, ProgrammeDetailleDTO
+    UniteEnseignementCatalogueDTO, ProgrammeDetailleDTO, FormulaireInscriptionCoursDTO
 from program_management.forms.education_groups import STANDARD
 from infrastructure.messages_bus import message_bus_instance
 
@@ -46,18 +46,23 @@ class DefaultEnrollmentForm(forms.Form):
             version_name: str,
             **kwargs
     ):
+        # programme = programme_detaille,
+        # annee_formation = 2020,
+        # sigle_formation = 'ECGE1BA',
+        # version = 'STANDARD',
+        # intitule_complet_formation = 'Bachelier ...',
         super().__init__(*args, **kwargs)
 
         formation_dto = self._get_formation_dto(year, acronym, version_name)
         self.fields['code'].initial = "{}{}".format(
-            formation_dto.sigle,
-            formation_dto.version if formation_dto.version != STANDARD else ''
+            formation_dto.sigle_formation,
+            formation_dto.version_formation if formation_dto.version_formation != STANDARD else ''
         )
-        self.fields['title'].initial = formation_dto.intitule_complet
+        self.fields['title'].initial = formation_dto.intitule_complet_formation
         self.fields['academic_year'].initial = "{}-{}".format(year, str(year + 1)[-2:])
-        self.program = formation_dto
+        self.program = formation_dto.programme
 
-    def _get_formation_dto(self, year: int, acronym: str, version_name: str) -> FormationDTO:
+    def _get_formation_dto(self, year: int, acronym: str, version_name: str) -> FormulaireInscriptionCoursDTO:
         # TODO : recupérer objet DTO réel
         # cmd = GetFormulaireInscriptionCoursCommand(
         #     annee_formation=year,
@@ -104,11 +109,11 @@ class DefaultEnrollmentForm(forms.Form):
             unites_enseignement=[ue_1, ue_2],
             groupements=[groupement1, groupement2]
         )
-        formation_dto_simule = FormationDTO(
-            programme_detaille=programme_detaille,
-            annee=2020,
-            sigle='ECGE1BA',
-            version='STANDARD',
-            intitule_complet='Bachelier ...',
+        formation_dto_simule = FormulaireInscriptionCoursDTO(
+            programme=programme_detaille,
+            annee_formation=2020,
+            sigle_formation='ECGE1BA',
+            version_formation='STANDARD',
+            intitule_complet_formation='Bachelier ...',
         )
         return formation_dto_simule
