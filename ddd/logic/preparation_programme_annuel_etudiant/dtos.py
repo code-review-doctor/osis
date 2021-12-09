@@ -81,6 +81,9 @@ class UniteEnseignementCatalogueDTO(DTO):
 class GroupementCatalogueDTO(DTO):
     inclus_dans = attr.ib(type='GroupementCatalogueDTO')
     intitule = attr.ib(type=str)
+    obligatoire = attr.ib(type=bool)
+    remarque = attr.ib(type=str)
+    commentaire = attr.ib(type=str)
 
 
 @attr.s(frozen=True, slots=True)

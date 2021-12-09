@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-25 14:34+0200\n"
+"POT-Creation-Date: 2021-12-09 09:53+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -364,6 +364,9 @@ msgstr "Prénom"
 
 msgid "For approval,"
 msgstr "Pour accord,"
+
+msgid "Form view"
+msgstr "Vue formulaire"
 
 msgid "Formation catalogue"
 msgstr "Catalogue des formations"
@@ -783,6 +786,9 @@ msgstr "Produire un fichier Excel avec la liste des formations"
 msgid "Professionnal title"
 msgstr "Titre professionnel"
 
+msgid "Program"
+msgstr "Parcours étudiant"
+
 msgid "Program organized with other institutes"
 msgstr "Programme co-organisés avec d'autres institutions"
 
@@ -858,6 +864,9 @@ msgstr "Recherche"
 
 msgid "Search..."
 msgstr "Recherche..."
+
+msgid "Sections and programs"
+msgstr "Sections et programmes"
 
 msgid "Select a language"
 msgstr "Sélectionner une langue"
@@ -1074,6 +1083,9 @@ msgid ""
 msgstr ""
 "La formation <a href='%(link)s'> %(offer_acronym)s[%(acronym)s] "
 "(%(academic_year)s) </a> a été modifiée avec succés"
+
+msgid "Training configuration"
+msgstr "Configuration de la formation"
 
 #, python-format
 msgid ""

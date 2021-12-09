@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-25 14:34+0200\n"
+"POT-Creation-Date: 2021-12-09 09:53+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -329,6 +329,9 @@ msgid "Firstname"
 msgstr ""
 
 msgid "For approval,"
+msgstr ""
+
+msgid "Form view"
 msgstr ""
 
 msgid "Formation catalogue"
@@ -718,6 +721,9 @@ msgstr ""
 msgid "Professionnal title"
 msgstr ""
 
+msgid "Program"
+msgstr ""
+
 msgid "Program organized with other institutes"
 msgstr ""
 
@@ -792,6 +798,9 @@ msgid "Search"
 msgstr ""
 
 msgid "Search..."
+msgstr ""
+
+msgid "Sections and programs"
 msgstr ""
 
 msgid "Select a language"
@@ -975,6 +984,9 @@ msgstr ""
 msgid ""
 "Training <a href='%(link)s'> %(offer_acronym)s[%(acronym)s] "
 "(%(academic_year)s) </a> successfully updated."
+msgstr ""
+
+msgid "Training configuration"
 msgstr ""
 
 #, python-format
