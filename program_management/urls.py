@@ -167,4 +167,8 @@ urlpatterns = [
     path('<int:year>/<acronym:acronym>/', include([
         path('default_enrollment_form/', DefaultEnrollmentFormView.as_view(), name='default_enrollment_form'),
     ])),
+    path('<int:year>/<acronym:acronym>/<str:version_name>/', include([
+        path('default_enrollment_form/', DefaultEnrollmentFormView.as_view(), name='default_enrollment_form'),
+    ])),
+
 ]

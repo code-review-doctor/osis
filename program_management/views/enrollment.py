@@ -44,4 +44,5 @@ class DefaultEnrollmentFormView(FormView):
         kwargs = super().get_form_kwargs()
         kwargs['year'] = self.kwargs['year']
         kwargs['acronym'] = self.kwargs['acronym']
+        kwargs['version_name'] = self.kwargs.get('version_name')
         return kwargs

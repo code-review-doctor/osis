@@ -25,9 +25,11 @@
 ##############################################################################
 from django import forms
 
+from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormulaireInscriptionCoursCommand
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, GroupementCatalogueDTO, \
     UniteEnseignementCatalogueDTO, ProgrammeDetailleDTO
 from program_management.forms.education_groups import STANDARD
+from infrastructure.messages_bus import message_bus_instance
 
 
 class DefaultEnrollmentForm(forms.Form):
@@ -41,21 +43,28 @@ class DefaultEnrollmentForm(forms.Form):
             *args,
             year: int,
             acronym: str,
+            version_name: str,
             **kwargs
     ):
         super().__init__(*args, **kwargs)
 
-        formation_dto_simule = self._get_formation_dto(year, acronym)
+        formation_dto = self._get_formation_dto(year, acronym, version_name)
         self.fields['code'].initial = "{}{}".format(
-            formation_dto_simule.sigle,
-            formation_dto_simule.version if formation_dto_simule.version != STANDARD else ''
+            formation_dto.sigle,
+            formation_dto.version if formation_dto.version != STANDARD else ''
         )
-        self.fields['title'].initial = formation_dto_simule.intitule_complet
+        self.fields['title'].initial = formation_dto.intitule_complet
         self.fields['academic_year'].initial = "{}-{}".format(year, str(year + 1)[-2:])
-        self.program = formation_dto_simule
+        self.program = formation_dto
 
-    def _get_formation_dto(self, year: int, acronym: str):
+    def _get_formation_dto(self, year: int, acronym: str, version_name: str) -> FormationDTO:
         # TODO : recupérer objet DTO réel
+        # cmd = GetFormulaireInscriptionCoursCommand(
+        #     annee_formation=year,
+        #     sigle_formation=acronym,
+        #     version_formation=version_name
+        # )
+        # return message_bus_instance.invoke(cmd)
         groupement1 = GroupementCatalogueDTO(
             inclus_dans=None,
             intitule='Groupement 1',
