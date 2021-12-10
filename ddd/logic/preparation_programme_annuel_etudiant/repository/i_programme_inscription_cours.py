@@ -23,29 +23,31 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+from typing import Optional, List
 
-import attr
-
+from ddd.logic.preparation_programme_annuel_etudiant.domain.model.programme_inscription_cours import \
+    ProgrammeInscriptionCoursIdentity, ProgrammeInscriptionCours
 from osis_common.ddd import interface
+from osis_common.ddd.interface import ApplicationService
 
 
-@attr.s(frozen=True, slots=True, auto_attribs=True)
-class GetFormulaireInscriptionCoursCommand(interface.CommandRequest):
-    annee_formation: int
-    sigle_formation: str
-    version_formation: str
+class IProgrammeInscriptionCoursRepository(interface.AbstractRepository):
+    @classmethod
+    def get(cls, entity_id: ProgrammeInscriptionCoursIdentity) -> ProgrammeInscriptionCours:
+        pass
 
+    @classmethod
+    def search(
+            cls,
+            entity_ids: Optional[List[ProgrammeInscriptionCoursIdentity]] = None,
+            **kwargs
+    ) -> List[ProgrammeInscriptionCours]:
+        pass
 
-@attr.s(frozen=True, slots=True, auto_attribs=True)
-class UniteEnseignementCommand(interface.CommandRequest):
-    code: str
+    @classmethod
+    def delete(cls, entity_id: ProgrammeInscriptionCoursIdentity, **kwargs: ApplicationService) -> None:
+        pass
 
-
-@attr.s(frozen=True, slots=True, auto_attribs=True)
-class AjouterUEAuProgrammeCommand(interface.CommandRequest):
-    annee_formation: int
-    sigle_formation: str
-    version_formation: str
-    a_inclure_dans: str  # code groupement
-    unites_enseignements: List[UniteEnseignementCommand]
+    @classmethod
+    def save(cls, entity: ProgrammeInscriptionCours) -> None:
+        pass

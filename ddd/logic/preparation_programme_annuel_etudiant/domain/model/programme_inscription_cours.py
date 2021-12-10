@@ -31,21 +31,45 @@ from osis_common.ddd import interface
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
-class GetFormulaireInscriptionCoursCommand(interface.CommandRequest):
+class ProgrammeInscriptionCoursIdentity(interface.EntityIdentity):
     annee_formation: int
     sigle_formation: str
     version_formation: str
 
 
-@attr.s(frozen=True, slots=True, auto_attribs=True)
-class UniteEnseignementCommand(interface.CommandRequest):
-    code: str
+@attr.s(slots=True, auto_attribs=True)
+class ProgrammeInscriptionCours(interface.RootEntity):
+    entity_id: ProgrammeInscriptionCoursIdentity
+    ues: List['UniteEnseignement']
+    groupements: List['Groupement']
+
+    def ajouter_unite_enseignement(self, unite_enseignement: 'CodeUniteEnseignement', a_inclure_dans: 'CodeGroupement'):
+        raise NotImplementedError
+
+
+# à déplacer dans groupement.py
+CodeGroupement = str
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
-class AjouterUEAuProgrammeCommand(interface.CommandRequest):
-    annee_formation: int
-    sigle_formation: str
-    version_formation: str
-    a_inclure_dans: str  # code groupement
-    unites_enseignements: List[UniteEnseignementCommand]
+class GroupementIdentity(interface.EntityIdentity):
+    code: CodeGroupement
+
+
+@attr.s(slots=True, auto_attribs=True)
+class Groupement(interface.Entity):
+    inclus_dans: List['Groupement']
+
+
+# à déplacer dans unite_enseignement.py
+CodeUniteEnseignement = str
+
+
+@attr.s(frozen=True, slots=True, auto_attribs=True)
+class UniteEnseignementIdentity(interface.EntityIdentity):
+    code: CodeUniteEnseignement
+
+
+@attr.s(slots=True, auto_attribs=True)
+class UniteEnseignement(interface.Entity):
+    inclus_dans: List['Groupement']

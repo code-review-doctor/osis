@@ -23,29 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
-
-import attr
-
+from ddd.logic.preparation_programme_annuel_etudiant.commands import AjouterUEAuProgrammeCommand
+from ddd.logic.preparation_programme_annuel_etudiant.domain.model.programme_inscription_cours import \
+    ProgrammeInscriptionCoursIdentity
 from osis_common.ddd import interface
 
 
-@attr.s(frozen=True, slots=True, auto_attribs=True)
-class GetFormulaireInscriptionCoursCommand(interface.CommandRequest):
-    annee_formation: int
-    sigle_formation: str
-    version_formation: str
-
-
-@attr.s(frozen=True, slots=True, auto_attribs=True)
-class UniteEnseignementCommand(interface.CommandRequest):
-    code: str
-
-
-@attr.s(frozen=True, slots=True, auto_attribs=True)
-class AjouterUEAuProgrammeCommand(interface.CommandRequest):
-    annee_formation: int
-    sigle_formation: str
-    version_formation: str
-    a_inclure_dans: str  # code groupement
-    unites_enseignements: List[UniteEnseignementCommand]
+class ProgrammeInscriptionCoursIdentityBuilder(interface.EntityIdentityBuilder):
+    @classmethod
+    def build_from_command(cls, cmd: 'AjouterUEAuProgrammeCommand') -> 'ProgrammeInscriptionCoursIdentity':
+        raise NotImplementedError
