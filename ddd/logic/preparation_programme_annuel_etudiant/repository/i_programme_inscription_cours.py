@@ -27,6 +27,7 @@ from typing import Optional, List
 
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.programme_inscription_cours import \
     ProgrammeInscriptionCoursIdentity, ProgrammeInscriptionCours
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import ProgrammeInscriptionCoursDTO
 from osis_common.ddd import interface
 from osis_common.ddd.interface import ApplicationService
 
@@ -34,6 +35,10 @@ from osis_common.ddd.interface import ApplicationService
 class IProgrammeInscriptionCoursRepository(interface.AbstractRepository):
     @classmethod
     def get(cls, entity_id: ProgrammeInscriptionCoursIdentity) -> ProgrammeInscriptionCours:
+        pass
+
+    @classmethod
+    def get_dto(cls, entity_id: ProgrammeInscriptionCoursIdentity) -> ProgrammeInscriptionCoursDTO:
         pass
 
     @classmethod
@@ -51,3 +56,4 @@ class IProgrammeInscriptionCoursRepository(interface.AbstractRepository):
     @classmethod
     def save(cls, entity: ProgrammeInscriptionCours) -> None:
         pass
+

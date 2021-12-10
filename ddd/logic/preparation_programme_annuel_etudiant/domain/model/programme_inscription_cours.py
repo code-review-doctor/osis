@@ -23,25 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import uuid as uuid
 from typing import List
 
 import attr
 
 from osis_common.ddd import interface
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
 class ProgrammeInscriptionCoursIdentity(interface.EntityIdentity):
-    annee_formation: int
-    sigle_formation: str
-    version_formation: str
+    uuid: uuid.UUID
 
 
 @attr.s(slots=True, auto_attribs=True)
 class ProgrammeInscriptionCours(interface.RootEntity):
     entity_id: ProgrammeInscriptionCoursIdentity
-    ues: List['UniteEnseignement']
-    groupements: List['Groupement']
+    version_programme: ProgramTreeVersionIdentity
+    unites_enseignement_ajoutees: List['UniteEnseignement']
 
     def ajouter_unite_enseignement(self, unite_enseignement: 'CodeUniteEnseignement', a_inclure_dans: 'CodeGroupement'):
         raise NotImplementedError

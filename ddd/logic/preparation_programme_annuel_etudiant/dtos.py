@@ -65,6 +65,16 @@ class FormulaireInscriptionCoursDTO(DTO):
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
+class ProgrammeInscriptionCoursDTO(DTO):
+    annee_formation: int
+    sigle_formation: str
+    version_formation: str
+    intitule_complet_formation: str  # intitulé de la formation + version formation
+    ues: List[UniteEnseignementDTO]
+    groupements: List[GroupementDTO]
+
+
+@attr.s(frozen=True, slots=True, auto_attribs=True)
 class UniteEnseignementCatalogueDTO(DTO):
     inclus_dans: 'GroupementCatalogueDTO'
     bloc: int

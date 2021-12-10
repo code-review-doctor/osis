@@ -34,11 +34,11 @@ from ddd.logic.preparation_programme_annuel_etudiant.repository.i_programme_insc
 
 def ajouter_UE_au_programme(
         cmd: 'AjouterUEAuProgrammeCommand',
-        programme_inscription_cours_repository: 'IProgrammeInscriptionCoursRepository',
+        repository: 'IProgrammeInscriptionCoursRepository',
 ) -> 'ProgrammeInscriptionCoursIdentity':
     # GIVEN
     programme_inscription_cours_identity = ProgrammeInscriptionCoursIdentityBuilder.build_from_command(cmd)
-    programme_inscription_cours = programme_inscription_cours_repository.get(
+    programme_inscription_cours = repository.get(
         entity_id=programme_inscription_cours_identity
     )
 
@@ -50,4 +50,5 @@ def ajouter_UE_au_programme(
         )
 
     # THEN
-    return programme_inscription_cours_identity
+    repository.save(programme_inscription_cours)
+    return programme_inscription_cours.entity_id

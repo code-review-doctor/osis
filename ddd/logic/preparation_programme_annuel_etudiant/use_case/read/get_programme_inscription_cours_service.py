@@ -23,36 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
 
-import attr
-
-from osis_common.ddd import interface
-
-
-@attr.s(frozen=True, slots=True, auto_attribs=True)
-class GetFormulaireInscriptionCoursCommand(interface.CommandRequest):
-    annee_formation: int
-    sigle_formation: str
-    version_formation: str
+from ddd.logic.preparation_programme_annuel_etudiant.commands import GetProgrammeInscriptionCoursServiceCommand
+from ddd.logic.preparation_programme_annuel_etudiant.domain.builder.programme_inscription_cours_identity_builder import \
+    ProgrammeInscriptionCoursIdentityBuilder
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import ProgrammeInscriptionCoursDTO
+from ddd.logic.preparation_programme_annuel_etudiant.repository.i_programme_inscription_cours import \
+    IProgrammeInscriptionCoursRepository
 
 
-@attr.s(frozen=True, slots=True, auto_attribs=True)
-class UniteEnseignementCommand(interface.CommandRequest):
-    code: str
-
-
-@attr.s(frozen=True, slots=True, auto_attribs=True)
-class AjouterUEAuProgrammeCommand(interface.CommandRequest):
-    annee_formation: int
-    sigle_formation: str
-    version_formation: str
-    a_inclure_dans: str  # code groupement
-    unites_enseignements: List[UniteEnseignementCommand]
-
-
-@attr.s(frozen=True, slots=True, auto_attribs=True)
-class GetProgrammeInscriptionCoursServiceCommand(interface.CommandRequest):
-    annee_formation: int
-    sigle_formation: str
-    version_formation: str
+def get_programme_inscription_cours(
+        cmd: 'GetProgrammeInscriptionCoursServiceCommand',
+        repository: 'IProgrammeInscriptionCoursRepository',
+) -> 'ProgrammeInscriptionCoursDTO':
+    programme_inscription_cours_identity = ProgrammeInscriptionCoursIdentityBuilder.build_from_command(cmd)
+    return repository.get_dto(entity_id=programme_inscription_cours_identity)

@@ -23,7 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.preparation_programme_annuel_etudiant.commands import AjouterUEAuProgrammeCommand
+from typing import Union
+
+from ddd.logic.preparation_programme_annuel_etudiant.commands import AjouterUEAuProgrammeCommand, \
+    GetProgrammeInscriptionCoursServiceCommand
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.programme_inscription_cours import \
     ProgrammeInscriptionCoursIdentity
 from osis_common.ddd import interface
@@ -31,5 +34,8 @@ from osis_common.ddd import interface
 
 class ProgrammeInscriptionCoursIdentityBuilder(interface.EntityIdentityBuilder):
     @classmethod
-    def build_from_command(cls, cmd: 'AjouterUEAuProgrammeCommand') -> 'ProgrammeInscriptionCoursIdentity':
+    def build_from_command(
+            cls,
+            cmd: Union['AjouterUEAuProgrammeCommand', 'GetProgrammeInscriptionCoursServiceCommand']
+    ) -> 'ProgrammeInscriptionCoursIdentity':
         raise NotImplementedError
