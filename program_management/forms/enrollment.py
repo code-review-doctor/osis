@@ -25,11 +25,9 @@
 ##############################################################################
 from django import forms
 
-from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormulaireInscriptionCoursCommand
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, GroupementCatalogueDTO, \
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import GroupementCatalogueDTO, \
     UniteEnseignementCatalogueDTO, ProgrammeDetailleDTO, FormulaireInscriptionCoursDTO
 from program_management.forms.education_groups import STANDARD
-from infrastructure.messages_bus import message_bus_instance
 
 
 class DefaultEnrollmentForm(forms.Form):
@@ -46,11 +44,6 @@ class DefaultEnrollmentForm(forms.Form):
             version_name: str,
             **kwargs
     ):
-        # programme = programme_detaille,
-        # annee_formation = 2020,
-        # sigle_formation = 'ECGE1BA',
-        # version = 'STANDARD',
-        # intitule_complet_formation = 'Bachelier ...',
         super().__init__(*args, **kwargs)
 
         formation_dto = self._get_formation_dto(year, acronym, version_name)
@@ -78,6 +71,22 @@ class DefaultEnrollmentForm(forms.Form):
             commentaire=None
 
         )
+        groupement1_1 = GroupementCatalogueDTO(
+            inclus_dans=groupement1,
+            intitule='Groupement 1 1',
+            obligatoire=True,
+            remarque='Remarque 1',
+            commentaire=None
+
+        )
+        groupement1_1_1 = GroupementCatalogueDTO(
+            inclus_dans=groupement1_1,
+            intitule='Groupement 1 1 1',
+            obligatoire=True,
+            remarque='Remarque 1',
+            commentaire=None
+
+        )
         groupement2 = GroupementCatalogueDTO(
             inclus_dans=None,
             intitule='Groupement 2',
@@ -86,28 +95,48 @@ class DefaultEnrollmentForm(forms.Form):
             commentaire='Commentaire 2'
         )
         ue_1 = UniteEnseignementCatalogueDTO(
-            inclus_dans=groupement1,
+            inclus_dans=groupement1_1,
             bloc=1,
             code='ue1',
-            intitule_complet='UE1 root',
+            intitule_complet='UE1',
             quadrimestre='Q1',
             credits_absolus=10,
             volume_annuel_pm=5,
             volume_annuel_pp=5,
         )
         ue_2 = UniteEnseignementCatalogueDTO(
-            inclus_dans=groupement1,
+            inclus_dans=groupement1_1,
             bloc=1,
             code='ue2',
-            intitule_complet='UE2 root',
+            intitule_complet='UE2',
+            quadrimestre='Q1',
+            credits_absolus=10,
+            volume_annuel_pm=5,
+            volume_annuel_pp=5,
+        )
+        ue_3 = UniteEnseignementCatalogueDTO(
+            inclus_dans=groupement1_1_1,
+            bloc=1,
+            code='ue3',
+            intitule_complet='UE3 ',
+            quadrimestre='Q1',
+            credits_absolus=10,
+            volume_annuel_pm=5,
+            volume_annuel_pp=5,
+        )
+        ue_4 = UniteEnseignementCatalogueDTO(
+            inclus_dans=groupement2,
+            bloc=1,
+            code='ue4',
+            intitule_complet='UE4 ',
             quadrimestre='Q1',
             credits_absolus=10,
             volume_annuel_pm=5,
             volume_annuel_pp=5,
         )
         programme_detaille = ProgrammeDetailleDTO(
-            unites_enseignement=[ue_1, ue_2],
-            groupements=[groupement1, groupement2]
+            unites_enseignement=[ue_1, ue_2, ue_3, ue_4],
+            groupements=[groupement1, groupement2, groupement1_1, groupement1_1_1]
         )
         formation_dto_simule = FormulaireInscriptionCoursDTO(
             programme=programme_detaille,

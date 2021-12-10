@@ -32,10 +32,6 @@
 <li class="active">{{ form.code.initial }}</li>
 {% endblock %}
 {% block content %}
-        <div class="page-header">
-            <h3>{{ form.code.initial }} {{ form.academic_year.initial }}</h3>
-            <h4>{{ form.title.initial }}</h4>
-        </div>
     <div class="panel panel-default">
         <div class="panel-body" id="tabs">
             <ul class="nav nav-tabs" role="tablist">
@@ -50,7 +46,12 @@
                 <div id="tab_form_view" class="tab-pane fade in active">
                     <strong>{{ form.title.initial }}</strong>
                     <hr>
-                    {{ form.program|tree_list }}
+                    <table>
+                        <tbody>
+                        {{ form.program|tree_list }}
+                        </tbody>
+                    </table>
+
                 </div>
             </div>
         </div>
