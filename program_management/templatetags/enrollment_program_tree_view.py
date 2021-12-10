@@ -42,8 +42,7 @@ CHILD_BRANCH2 = """\
             <img src="{icon_list_2}" height="10" width="10">            
             {value} <br>
             {remark}
-            {comment}
-            
+            {comment}            
         </div>
     </td>
 </tr>
