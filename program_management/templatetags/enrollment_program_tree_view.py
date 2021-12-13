@@ -111,7 +111,7 @@ def list_formatter(groups: dict, parent_children: dict, output=[], depth=None):
         padding = 2 * depth
         if children:
             append_output(group, output, padding)
-            grps = {}
+            grps = OrderedDict()
             for c in children:
                 if isinstance(c, UniteEnseignementCatalogueDTO):
                     append_output(c, output, padding + 2)
