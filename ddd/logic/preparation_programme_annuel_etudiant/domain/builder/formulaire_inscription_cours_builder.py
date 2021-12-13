@@ -23,11 +23,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, FormulaireInscriptionCoursDTO
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, FormulaireInscriptionCoursDTO, \
+    ProgrammeDTO
 from osis_common.ddd import interface
 
 
 class FormulaireInscriptionCoursBuilder(interface.RootEntityBuilder):
     @classmethod
     def build(cls, formation_dto: 'FormationDTO') -> 'FormulaireInscriptionCoursDTO':
-        raise NotImplementedError
+        return FormulaireInscriptionCoursDTO(
+            annee_formation=formation_dto.annee,
+            sigle_formation=formation_dto.sigle,
+            version_formation=formation_dto.version,
+            intitule_complet_formation=formation_dto.intitule_complet,
+            programme=ProgrammeDTO(
+                ues=formation_dto.programme_detaille.unites_enseignement,
+                groupements=formation_dto.programme_detaille.groupements
+            )
+        )
