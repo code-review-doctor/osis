@@ -45,12 +45,11 @@
             <br>
             <div class="tab-content">
                 <div id="tab_form_view" class="tab-pane fade in active">
-                    <strong>{{ form.title.initial }}</strong>
-                    <hr>
+
                     <table>
                         <thead>
-                        <tr>
-                            <th style="width:{{ main_part_col_length }}px;"></th>
+                        <tr style="border-bottom: solid;">
+                            <th style="width:{{ main_part_col_length }}px;"><strong>{{ form.title.initial }}</strong></th>
                             {% for cpt in 1|range_for:form.max_block %}
                                 <th style="width:15px;text-align: center;">An {{ cpt }}</th>
                             {% endfor %}

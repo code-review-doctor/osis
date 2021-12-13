@@ -75,6 +75,9 @@ class UniteEnseignementCatalogueDTO(DTO):
     credits_absolus = attr.ib(type=Decimal)
     volume_annuel_pm = attr.ib(type=int)
     volume_annuel_pp = attr.ib(type=int)
+    obligatoire = attr.ib(type=bool)
+    detail = attr.ib(type=str)  # TODO : doute sur le mot détail ça comprends plusieurs infos.
+    # Exemple :   LCOPS1124 Philosophie [30h + 0h] (5 crédits)
 
 
 @attr.s(frozen=True, slots=True)
@@ -84,6 +87,8 @@ class GroupementCatalogueDTO(DTO):
     obligatoire = attr.ib(type=bool)
     remarque = attr.ib(type=str)
     commentaire = attr.ib(type=str)
+    detail = attr.ib(type=str)  # TODO : doute sur le mot détail ça comprends plusieurs infos.
+    # Exemple : Programme de base (150 crédits)
 
 
 @attr.s(frozen=True, slots=True)

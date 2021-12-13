@@ -76,105 +76,105 @@ class DefaultEnrollmentForm(forms.Form):
 
     def _get_formation_dto(self, year: int, acronym: str, version_name: str) -> FormulaireInscriptionCoursDTO:
         # TODO : recupérer objet DTO réel
-        # cmd = GetFormulaireInscriptionCoursCommand(
-        #     annee_formation=year,
-        #     sigle_formation=acronym,
-        #     version_formation=version_name if version_name else ''
+        cmd = GetFormulaireInscriptionCoursCommand(
+            annee_formation=year,
+            sigle_formation=acronym,
+            version_formation=version_name if version_name else ''
+        )
+        return message_bus_instance.invoke(cmd)
+        # groupement1 = GroupementCatalogueDTO(
+        #     inclus_dans=None,
+        #     intitule='Content:',
+        #     obligatoire=True,
+        #     remarque='Remarque 1',
+        #     commentaire=None
+        #
         # )
-        # return message_bus_instance.invoke(cmd)
-        groupement1 = GroupementCatalogueDTO(
-            inclus_dans=None,
-            intitule='Content:',
-            obligatoire=True,
-            remarque='Remarque 1',
-            commentaire=None
-
-        )
-        groupement1_1 = GroupementCatalogueDTO(
-            inclus_dans=groupement1,
-            intitule='Groupement 1 1',
-            obligatoire=True,
-            remarque='Remarque 1',
-            commentaire=None
-
-        )
-        groupement1_1_1 = GroupementCatalogueDTO(
-            inclus_dans=groupement1_1,
-            intitule='Groupement 1 1 1',
-            obligatoire=True,
-            remarque='Remarque 1',
-            commentaire=None
-
-        )
-        groupement2 = GroupementCatalogueDTO(
-            inclus_dans=None,
-            intitule='Groupement 2',
-            obligatoire=False,
-            remarque='Remarque 2',
-            commentaire='Commentaire 2'
-        )
-        ue_0 = UniteEnseignementCatalogueDTO(
-            inclus_dans=groupement1,
-            bloc=1,
-            code='LESPO1113',
-            intitule_complet='Sociologie et anthropologie des mondes contemporains',
-            quadrimestre='Q1',
-            credits_absolus=10,
-            volume_annuel_pm=5,
-            volume_annuel_pp=5,
-        )
-        ue_1 = UniteEnseignementCatalogueDTO(
-            inclus_dans=groupement1_1,
-            bloc=1,
-            code='ue1',
-            intitule_complet='UE1',
-            quadrimestre='Q1',
-            credits_absolus=10,
-            volume_annuel_pm=5,
-            volume_annuel_pp=5,
-        )
-        ue_2 = UniteEnseignementCatalogueDTO(
-            inclus_dans=groupement1_1,
-            bloc=1,
-            code='ue2',
-            intitule_complet='UE2',
-            quadrimestre='Q1',
-            credits_absolus=10,
-            volume_annuel_pm=5,
-            volume_annuel_pp=5,
-        )
-        ue_3 = UniteEnseignementCatalogueDTO(
-            inclus_dans=groupement1_1_1,
-            bloc=1,
-            code='ue3',
-            intitule_complet='UE3 ',
-            quadrimestre='Q1',
-            credits_absolus=10,
-            volume_annuel_pm=5,
-            volume_annuel_pp=5,
-        )
-        ue_4 = UniteEnseignementCatalogueDTO(
-            inclus_dans=groupement2,
-            bloc=1,
-            code='ue4',
-            intitule_complet='UE4 ',
-            quadrimestre='Q1',
-            credits_absolus=10,
-            volume_annuel_pm=5,
-            volume_annuel_pp=5,
-        )
-        programme_detaille = ProgrammeDTO(
-            ues=[ue_0, ue_1, ue_2, ue_3, ue_4],
-            groupements=[groupement1, groupement2, groupement1_1, groupement1_1_1]
-        )
-        formation_dto_simule = FormulaireInscriptionCoursDTO(
-            programme=programme_detaille,
-            annee_formation=2021,
-            sigle_formation='ECGE1BA',
-            version_formation='STANDARD',
-            intitule_complet_formation='Bachelier en sciences économiques et de gestion',
-        )
-        return formation_dto_simule
+        # groupement1_1 = GroupementCatalogueDTO(
+        #     inclus_dans=groupement1,
+        #     intitule='Groupement 1 1',
+        #     obligatoire=True,
+        #     remarque='Remarque 1',
+        #     commentaire=None
+        #
+        # )
+        # groupement1_1_1 = GroupementCatalogueDTO(
+        #     inclus_dans=groupement1_1,
+        #     intitule='Groupement 1 1 1',
+        #     obligatoire=True,
+        #     remarque='Remarque 1',
+        #     commentaire=None
+        #
+        # )
+        # groupement2 = GroupementCatalogueDTO(
+        #     inclus_dans=None,
+        #     intitule='Groupement 2',
+        #     obligatoire=False,
+        #     remarque='Remarque 2',
+        #     commentaire='Commentaire 2'
+        # )
+        # ue_0 = UniteEnseignementCatalogueDTO(
+        #     inclus_dans=groupement1,
+        #     bloc=1,
+        #     code='LESPO1113',
+        #     intitule_complet='Sociologie et anthropologie des mondes contemporains',
+        #     quadrimestre='Q1',
+        #     credits_absolus=10,
+        #     volume_annuel_pm=5,
+        #     volume_annuel_pp=5,
+        # )
+        # ue_1 = UniteEnseignementCatalogueDTO(
+        #     inclus_dans=groupement1_1,
+        #     bloc=1,
+        #     code='ue1',
+        #     intitule_complet='UE1',
+        #     quadrimestre='Q1',
+        #     credits_absolus=10,
+        #     volume_annuel_pm=5,
+        #     volume_annuel_pp=5,
+        # )
+        # ue_2 = UniteEnseignementCatalogueDTO(
+        #     inclus_dans=groupement1_1,
+        #     bloc=1,
+        #     code='ue2',
+        #     intitule_complet='UE2',
+        #     quadrimestre='Q1',
+        #     credits_absolus=10,
+        #     volume_annuel_pm=5,
+        #     volume_annuel_pp=5,
+        # )
+        # ue_3 = UniteEnseignementCatalogueDTO(
+        #     inclus_dans=groupement1_1_1,
+        #     bloc=1,
+        #     code='ue3',
+        #     intitule_complet='UE3 ',
+        #     quadrimestre='Q1',
+        #     credits_absolus=10,
+        #     volume_annuel_pm=5,
+        #     volume_annuel_pp=5,
+        # )
+        # ue_4 = UniteEnseignementCatalogueDTO(
+        #     inclus_dans=groupement2,
+        #     bloc=1,
+        #     code='ue4',
+        #     intitule_complet='UE4 ',
+        #     quadrimestre='Q1',
+        #     credits_absolus=10,
+        #     volume_annuel_pm=5,
+        #     volume_annuel_pp=5,
+        # )
+        # programme_detaille = ProgrammeDTO(
+        #     ues=[ue_0, ue_1, ue_2, ue_3, ue_4],
+        #     groupements=[groupement1, groupement2, groupement1_1, groupement1_1_1]
+        # )
+        # formation_dto_simule = FormulaireInscriptionCoursDTO(
+        #     programme=programme_detaille,
+        #     annee_formation=2021,
+        #     sigle_formation='ECGE1BA',
+        #     version_formation='STANDARD',
+        #     intitule_complet_formation='Bachelier en sciences économiques et de gestion',
+        # )
+        # return formation_dto_simule
 
 
 def get_main_part_col_length(max_block):

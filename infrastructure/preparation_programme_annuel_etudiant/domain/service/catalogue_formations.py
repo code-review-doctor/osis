@@ -23,7 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from decimal import Decimal
+
 from django.utils.datastructures import OrderedSet
+
+from base.models.enums.constraint_type import ConstraintTypeEnum
 
 from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import \
     ICatalogueFormationsTranslator
@@ -31,6 +35,9 @@ from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, G
     ProgrammeDetailleDTO, UniteEnseignementCatalogueDTO
 from program_management.ddd.command import GetProgramTreeVersionCommand
 from program_management.ddd.domain.link import LinkIdentity
+from program_management import formatter
+from program_management.templatetags.enrollment_program_tree_view import CHILD_COMMENT
+from django.utils.translation import gettext_lazy as _
 
 
 class CatalogueFormationsTranslator(ICatalogueFormationsTranslator):
@@ -45,11 +52,10 @@ class CatalogueFormationsTranslator(ICatalogueFormationsTranslator):
             transition_name=""
         ))
         tree = program_tree_version.get_tree()
-
         groupements = OrderedSet()
         ues = OrderedSet()
         parents_par_niveau = {}
-        noeud_parents_par_niveau = {}
+        noeud_parents_par_niveau = {0: tree.root_node}
         tous_liens = tree.get_all_links()
         for path, child_node in tree.root_node.descendents:
             level = len(path.split("|")) - 1
@@ -65,7 +71,9 @@ class CatalogueFormationsTranslator(ICatalogueFormationsTranslator):
                     quadrimestre=child_node.quadrimester,
                     credits_absolus=child_node.credits,
                     volume_annuel_pm=child_node.volume_total_lecturing,
-                    volume_annuel_pp=child_node.volume_total_practical
+                    volume_annuel_pp=child_node.volume_total_practical,
+                    obligatoire=lien.is_mandatory if lien else False,
+                    detail=_get_detail_lien(lien)
                 )
                 ues.add(ue)
             else:
@@ -78,18 +86,19 @@ class CatalogueFormationsTranslator(ICatalogueFormationsTranslator):
                     intitule=child_node.title,
                     commentaire=lien.comment if lien else '',
                     remarque=child_node.remark_fr,
-                    obligatoire=lien.is_mandatory if lien else ''
+                    obligatoire=lien.is_mandatory if lien else False,
+                    detail=_get_detail_lien(lien)
                 )
                 parents_par_niveau.update({level: ce_group})
                 noeud_parents_par_niveau.update({level: child_node})
                 groupements.add(ce_group)
-
+        # TODO : Question Langue on fait quoi?  Tj francais ou il faut traiter
         return FormationDTO(
             programme_detaille=ProgrammeDetailleDTO(groupements=groupements, unites_enseignement=ues),
             annee=annee,
             sigle=sigle,
             version=version,
-            intitule_complet=tree.root_node.title
+            intitule_complet=tree.root_node.offer_title_fr
         )
 
     @classmethod
@@ -107,3 +116,60 @@ class CatalogueFormationsTranslator(ICatalogueFormationsTranslator):
                 None
             )
         return None
+
+
+def _get_verbose_comment(link: 'Link'):
+    comment_from_lang = link.comment
+
+    return CHILD_COMMENT.format(
+        comment_value=comment_from_lang
+    ) if comment_from_lang else ""
+
+
+def get_verbose_title_group(node: 'NodeGroupYear'):
+    if node.is_finality():
+        return format_complete_title_label(node, node.offer_partial_title_en, node.offer_partial_title_fr)
+    if node.is_option():
+        return format_complete_title_label(node, node.offer_title_en, node.offer_title_fr)
+    else:
+        return node.group_title_fr
+
+
+def format_complete_title_label(node, title_en, title_fr):
+    version_complete_label = formatter.format_version_complete_name(node, "fr-be")
+    return "{}{}".format(title_fr, version_complete_label)
+
+
+def get_verbose_credits(link: 'Link'):
+    if link.relative_credits or link.child.credits:
+        return "{} ({} {})".format(
+            get_verbose_title_group(link.child),
+            link.relative_credits or link.child.credits or 0, _("credits")  # FIXME :: Duplicated line
+        )
+    else:
+        return "{}".format(get_verbose_title_group(link.child))
+
+
+def get_verbose_title_ue(node: 'NodeLearningUnitYear'):
+    verbose_title_fr = node.full_title_fr
+    return verbose_title_fr
+
+
+def _get_detail_lien(link: 'Link'):
+    if link.is_link_with_group():
+        return get_verbose_credits(link)
+    elif link.is_link_with_learning_unit():
+        return "{} {} [{}] ({} {})".format(
+            link.child.code,
+            get_verbose_title_ue(link.child),
+            get_volume_total_verbose(link.child),
+            link.relative_credits or link.child.credits or 0, _("credits")  # FIXME :: Duplicated line
+        )
+
+
+def get_volume_total_verbose(node: 'NodeLearningUnitYear'):
+    return "%(total_lecturing)gh + %(total_practical)gh" % {
+        "total_lecturing": node.volume_total_lecturing or Decimal(0.0),
+        "total_practical": node.volume_total_practical or Decimal(0.0)
+    }
+

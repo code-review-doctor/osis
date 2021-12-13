@@ -35,7 +35,13 @@ from ddd.logic.preparation_programme_annuel_etudiant.dtos import \
 
 OPTIONAL_PNG = static('img/education_group_year/optional.png')
 MANDATORY_PNG = static('img/education_group_year/mandatory.png')
-CHILD_BRANCH2 = """\
+VALIDATE_CASE_JPG = static('img/education_group_year/validate_case.jpg')
+INVALIDATE_CASE_JPG = static('img/education_group_year/invalidate_case.png')
+DELTA = static('img/education_group_year/delta.png')
+ACTIVITY_DISPENSED = static('img/education_group_year/bisannual_even.png')
+ACTIVITY_NOT_DISPENSED = static('img/education_group_year/bisannual_odd.png')
+PREREQUIS = static('img/education_group_year/prerequis.gif')
+CHILD_BRANCH = """\
 <tr>
     <td style="padding-left:{padding}em;"> 
         <div style="word-break: keep-all;">
@@ -47,11 +53,12 @@ CHILD_BRANCH2 = """\
     </td>
 </tr>
 """
-CHILD_LEAF2 = """\
+CHILD_LEAF = """\
 <tr>
     <td style="padding-left:{padding}em;">
-        <div style="word-break: keep-all;">
-            {value}
+        <div style="word-break: keep-all;">            
+            <img src="{icon_list_2}" height="10" width="10">            
+            {value}                        
         </div>
     </td>
     <td style="text-align: center;">{an_1}</td>
@@ -61,6 +68,14 @@ CHILD_LEAF2 = """\
     <td style="text-align: center;">{an_5}</td>
     <td style="text-align: center;">{an_6}</td>    
 </tr>
+"""
+
+# margin-left is there to align the value with the remark.
+# We use 14px which is the size of the image before the value
+CHILD_COMMENT = """\
+        <div style="word-break: keep-all;margin-left: 32px;">
+            ({comment_value})
+        </div>
 """
 
 
@@ -136,10 +151,12 @@ def append_output(
         object: Union[GroupementCatalogueDTO, UniteEnseignementCatalogueDTO], output: List[str], padding: int
 ):
     if isinstance(object, UniteEnseignementCatalogueDTO):
+
         output.append(
-            CHILD_LEAF2.format(
+            CHILD_LEAF.format(
                 padding=padding,
-                value="{} {}".format(object.code, object.intitule_complet),
+                icon_list_2=get_mandatory_picture(object),
+                value=object.detail,
                 an_1=check_block(object.bloc, 1),
                 an_2=check_block(object.bloc, 2),
                 an_3=check_block(object.bloc, 3),
@@ -151,10 +168,10 @@ def append_output(
         )
     else:
         output.append(
-            CHILD_BRANCH2.format(
+            CHILD_BRANCH.format(
                 padding=padding,
                 icon_list_2=get_mandatory_picture(object),
-                value=object.intitule,
+                value=object.detail,
                 remark=object.remarque if object.remarque else '',
                 comment=object.commentaire if object.commentaire else ''
 
@@ -162,8 +179,8 @@ def append_output(
         )
 
 
-def get_mandatory_picture(groupement: 'GroupementCatalogueDTO'):
-    return MANDATORY_PNG if groupement.obligatoire else OPTIONAL_PNG
+def get_mandatory_picture(object: Union['GroupementCatalogueDTO', 'UniteEnseignementCatalogueDTO']):
+    return MANDATORY_PNG if object.obligatoire else OPTIONAL_PNG
 
 
 def check_block(bloc, value):
