@@ -42,7 +42,9 @@ class ProgrammeInscriptionCours(interface.RootEntity):
     entity_id: ProgrammeInscriptionCoursIdentity
     version_programme: ProgramTreeVersionIdentity
     unites_enseignement_ajoutees: List['UniteEnseignement']
+    unites_enseignement_retirees: List['UniteEnseignement']
 
+    # comment vérifier qu'une unité d'enseignement n'est pas déjà existante dans le programme
     def ajouter_unite_enseignement(self, unite_enseignement: 'CodeUniteEnseignement', a_inclure_dans: 'CodeGroupement'):
         raise NotImplementedError
 

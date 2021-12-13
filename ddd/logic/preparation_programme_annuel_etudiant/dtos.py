@@ -41,12 +41,15 @@ class UniteEnseignementDTO(DTO):
     credits_absolus: Decimal
     volume_annuel_pm: int
     volume_annuel_pp: int
+    obligatoire: bool
+    session_derogation: str
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
 class GroupementDTO(DTO):
     inclus_dans: List['GroupementDTO']
     intitule: str
+    obligatoire: bool
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)

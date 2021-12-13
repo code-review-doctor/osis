@@ -65,3 +65,9 @@ class RetirerUEDuProgrammeCommand(interface.CommandRequest):
     version_formation: str
     a_retirer_de: str  # code groupement
     unites_enseignements: List[UniteEnseignementCommand]
+
+
+@attr.s(frozen=True, slots=True, auto_attribs=True)
+class GetContenuGroupementCommand(interface.CommandRequest):
+    code: str
+    annee: int
