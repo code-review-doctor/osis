@@ -25,9 +25,17 @@
 ##############################################################################
 from django import forms
 
+from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormulaireInscriptionCoursCommand
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import GroupementCatalogueDTO, \
-    UniteEnseignementCatalogueDTO, ProgrammeDetailleDTO, FormulaireInscriptionCoursDTO
+    UniteEnseignementCatalogueDTO, ProgrammeDetailleDTO, FormulaireInscriptionCoursDTO, ProgrammeDTO
+from infrastructure.messages_bus import message_bus_instance
 from program_management.forms.education_groups import STANDARD
+
+MAX_NUMBER_OF_BLOCK = 6
+CURRENT_SIZE_FOR_ANNUAL_COLUMN = 15
+MAIN_PART_INIT_SIZE = 650
+PADDING = 10
+USUAL_NUMBER_OF_BLOCKS = 3
 
 
 class DefaultEnrollmentForm(forms.Form):
@@ -35,6 +43,8 @@ class DefaultEnrollmentForm(forms.Form):
     code = forms.CharField()
     academic_year = forms.CharField()
     program = None
+    max_block = 0
+    main_part_col_length = 0
 
     def __init__(
             self,
@@ -54,13 +64,22 @@ class DefaultEnrollmentForm(forms.Form):
         self.fields['title'].initial = formation_dto.intitule_complet_formation
         self.fields['academic_year'].initial = "{}-{}".format(year, str(year + 1)[-2:])
         self.program = formation_dto.programme
+        self.max_block = self._get_number_of_distinct_blocks()
+        self.main_part_col_length = get_main_part_col_length(self.max_block)
+
+    def _get_number_of_distinct_blocks(self):
+        blocks = set()
+        for ue in self.program.ues:
+            if ue.bloc:
+                blocks.add(ue.bloc)
+        return len(blocks)
 
     def _get_formation_dto(self, year: int, acronym: str, version_name: str) -> FormulaireInscriptionCoursDTO:
         # TODO : recupérer objet DTO réel
         # cmd = GetFormulaireInscriptionCoursCommand(
         #     annee_formation=year,
         #     sigle_formation=acronym,
-        #     version_formation=version_name
+        #     version_formation=version_name if version_name else ''
         # )
         # return message_bus_instance.invoke(cmd)
         groupement1 = GroupementCatalogueDTO(
@@ -144,8 +163,8 @@ class DefaultEnrollmentForm(forms.Form):
             volume_annuel_pm=5,
             volume_annuel_pp=5,
         )
-        programme_detaille = ProgrammeDetailleDTO(
-            unites_enseignement=[ue_0, ue_1, ue_2, ue_3, ue_4],
+        programme_detaille = ProgrammeDTO(
+            ues=[ue_0, ue_1, ue_2, ue_3, ue_4],
             groupements=[groupement1, groupement2, groupement1_1, groupement1_1_1]
         )
         formation_dto_simule = FormulaireInscriptionCoursDTO(
@@ -156,3 +175,10 @@ class DefaultEnrollmentForm(forms.Form):
             intitule_complet_formation='Bachelier en sciences économiques et de gestion',
         )
         return formation_dto_simule
+
+
+def get_main_part_col_length(max_block):
+    if max_block <= USUAL_NUMBER_OF_BLOCKS:
+        return MAIN_PART_INIT_SIZE
+    else:
+        return MAIN_PART_INIT_SIZE - ((max_block-USUAL_NUMBER_OF_BLOCKS) * (CURRENT_SIZE_FOR_ANNUAL_COLUMN + PADDING))

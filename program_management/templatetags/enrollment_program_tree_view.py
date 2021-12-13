@@ -54,6 +54,12 @@ CHILD_LEAF2 = """\
             {value}
         </div>
     </td>
+    <td style="text-align: center;">{an_1}</td>
+    <td style="text-align: center;">{an_2}</td>
+    <td style="text-align: center;">{an_3}</td>
+    <td style="text-align: center;">{an_4}</td>
+    <td style="text-align: center;">{an_5}</td>
+    <td style="text-align: center;">{an_6}</td>    
 </tr>
 """
 
@@ -134,6 +140,12 @@ def append_output(
             CHILD_LEAF2.format(
                 padding=padding,
                 value="{} {}".format(object.code, object.intitule_complet),
+                an_1=check_block(object.bloc, 1),
+                an_2=check_block(object.bloc, 2),
+                an_3=check_block(object.bloc, 3),
+                an_4=check_block(object.bloc, 4),
+                an_5=check_block(object.bloc, 5),
+                an_6=check_block(object.bloc, 6),
 
             )
         )
@@ -152,3 +164,7 @@ def append_output(
 
 def get_mandatory_picture(groupement: 'GroupementCatalogueDTO'):
     return MANDATORY_PNG if groupement.obligatoire else OPTIONAL_PNG
+
+
+def check_block(bloc, value):
+    return "X" if bloc and str(value) in str(bloc) else ""
