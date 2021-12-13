@@ -56,3 +56,12 @@ class GetProgrammeInscriptionCoursServiceCommand(interface.CommandRequest):
     annee_formation: int
     sigle_formation: str
     version_formation: str
+
+
+@attr.s(frozen=True, slots=True, auto_attribs=True)
+class RetirerUEDuProgrammeCommand(interface.CommandRequest):
+    annee_formation: int
+    sigle_formation: str
+    version_formation: str
+    a_retirer_de: str  # code groupement
+    unites_enseignements: List[UniteEnseignementCommand]
