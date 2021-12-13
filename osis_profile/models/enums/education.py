@@ -62,3 +62,9 @@ class ForeignDiplomaTypes(ChoiceEnum):
     NATIONAL_BACHELOR = _("National Bachelor (or government diploma, ...)")
     EUROPEAN_BACHELOR = _("European Bachelor (Schola Europaea)")
     INTERNATIONAL_BACCALAUREATE = _("International Baccalaureate")
+
+
+class Equivalence(ChoiceEnum):
+    YES = _("Yes")
+    NO = _("No")
+    PENDING = _("Pending")

@@ -32,6 +32,7 @@ from osis_profile.models.enums.education import (
     BelgianCommunitiesOfEducation,
     DiplomaResults,
     EducationalType,
+    Equivalence,
     ForeignDiplomaTypes,
 )
 from reference.models.country import Country
@@ -169,4 +170,10 @@ class ForeignHighSchoolDiploma(HighSchoolDiploma):
         verbose_name=_("Organizing country"),
         on_delete=models.CASCADE,
         related_name="+",
+    )
+    equivalence = models.CharField(
+        _("Is this diploma subject to an equivalence decision by the services of the French community of Belgium?"),
+        choices=Equivalence.choices(),
+        max_length=25,
+        null=True,
     )
