@@ -30,8 +30,8 @@ from django.templatetags.static import static
 from django.utils.safestring import mark_safe
 
 from base.templatetags.education_group import register
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import ProgrammeDetailleDTO, \
-    GroupementCatalogueDTO, UniteEnseignementCatalogueDTO
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import \
+    GroupementCatalogueDTO, UniteEnseignementCatalogueDTO, ProgrammeDTO
 
 OPTIONAL_PNG = static('img/education_group_year/optional.png')
 MANDATORY_PNG = static('img/education_group_year/mandatory.png')
@@ -59,11 +59,11 @@ CHILD_LEAF2 = """\
 
 
 @register.filter
-def tree_list(programme: ProgrammeDetailleDTO):
+def tree_list(programme: ProgrammeDTO):
     # TODO : To be completed
     link_parent_children = _get_parents_and_children(
         _get_parent_groups(programme.groupements),
-        programme.unites_enseignement
+        programme.ues
     )
 
     return mark_safe(
