@@ -166,6 +166,9 @@ from ddd.logic.learning_unit.use_case.write.create_effective_class_service impor
 from ddd.logic.learning_unit.use_case.write.create_learning_unit_service import create_learning_unit
 from ddd.logic.learning_unit.use_case.write.delete_effective_class_service import delete_effective_class
 from ddd.logic.learning_unit.use_case.write.update_effective_class_service import update_effective_class
+from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormulaireInscriptionCoursCommand
+from ddd.logic.preparation_programme_annuel_etudiant.use_case.read.get_formulaire_inscription_cours_service import \
+    get_formulaire_inscription_cours_service
 from ddd.logic.shared_kernel.academic_year.commands import SearchAcademicYearCommand
 from ddd.logic.shared_kernel.academic_year.use_case.read.search_academic_years_service import search_academic_years
 from ddd.logic.shared_kernel.campus.commands import GetCampusCommand, SearchUclouvainCampusesCommand
@@ -215,15 +218,18 @@ from infrastructure.learning_unit.domain.service.tutor_distributed_to_class impo
 from infrastructure.learning_unit.repository.effective_class import EffectiveClassRepository
 from infrastructure.learning_unit.repository.entity import UclEntityRepository
 from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
+from infrastructure.preparation_programme_annuel_etudiant.domain.service.catalogue_formations import \
+    CatalogueFormationsTranslator
 from infrastructure.shared_kernel.academic_year.repository.academic_year import AcademicYearRepository
 from infrastructure.shared_kernel.campus.repository.uclouvain_campus import UclouvainCampusRepository
 from infrastructure.shared_kernel.entite.repository.entiteucl import EntiteUCLRepository
 from infrastructure.shared_kernel.language.repository.language import LanguageRepository
 from infrastructure.utils import AbstractMessageBusCommands, load_message_bus_instance
 from osis_common.ddd.interface import ApplicationServiceResult, CommandRequest
-from program_management.ddd.command import BulkUpdateLinkCommand, GetReportCommand
+from program_management.ddd.command import BulkUpdateLinkCommand, GetReportCommand, GetProgramTreeVersionCommand
 from program_management.ddd.repositories import program_tree as program_tree_repo
 from program_management.ddd.repositories.report import ReportRepository
+from program_management.ddd.service.read.get_program_tree_version_service import get_program_tree_version
 from program_management.ddd.service.read.get_report_service import get_report
 from program_management.ddd.service.write.bulk_update_link_service import bulk_update_and_postpone_links
 
@@ -510,6 +516,11 @@ class MessageBusCommands(AbstractMessageBusCommands):
             cmd,
             TutorAttributionToLearningUnitTranslator(),
             TutorRepository(),
+        ),
+        GetProgramTreeVersionCommand: lambda cmd: get_program_tree_version(cmd),
+        GetFormulaireInscriptionCoursCommand: lambda cmd: get_formulaire_inscription_cours_service(
+            cmd,
+            CatalogueFormationsTranslator()
         ),
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 
