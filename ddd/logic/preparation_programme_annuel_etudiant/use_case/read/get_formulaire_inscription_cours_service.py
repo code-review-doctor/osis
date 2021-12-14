@@ -40,6 +40,7 @@ def get_formulaire_inscription_cours_service(
         sigle=cmd.sigle_formation,
         annee=cmd.annee_formation,
         version=cmd.version_formation,
+        transition_name=cmd.transition_formation
     )
 
     # WHEN

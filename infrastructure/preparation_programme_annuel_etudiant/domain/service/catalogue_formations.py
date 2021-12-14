@@ -36,20 +36,18 @@ from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, G
 from program_management.ddd.command import GetProgramTreeVersionCommand
 from program_management.ddd.domain.link import LinkIdentity
 from program_management import formatter
-from program_management.templatetags.enrollment_program_tree_view import CHILD_COMMENT
 from django.utils.translation import gettext_lazy as _
 
 
 class CatalogueFormationsTranslator(ICatalogueFormationsTranslator):
     @classmethod
-    def get_formation(cls, sigle: str, annee: int, version: str) -> 'FormationDTO':
-        # reutiliser GetProgramTreeVersionCommand et convertir ProgramTreeVersion en FormationDTO
+    def get_formation(cls, sigle: str, annee: int, version: str, transition_name: str) -> 'FormationDTO':
         from infrastructure.messages_bus import message_bus_instance
         program_tree_version = message_bus_instance.invoke(GetProgramTreeVersionCommand(
             year=annee,
             acronym=sigle,
             version_name=version,
-            transition_name=""
+            transition_name=transition_name
         ))
         tree = program_tree_version.get_tree()
         groupements = OrderedSet()
@@ -73,7 +71,7 @@ class CatalogueFormationsTranslator(ICatalogueFormationsTranslator):
                     volume_annuel_pm=child_node.volume_total_lecturing,
                     volume_annuel_pp=child_node.volume_total_practical,
                     obligatoire=lien.is_mandatory if lien else False,
-                    detail=_get_detail_lien(lien)
+                    informations_principales_agregees=_get_detail_lien(lien)
                 )
                 ues.add(ue)
             else:
@@ -84,15 +82,14 @@ class CatalogueFormationsTranslator(ICatalogueFormationsTranslator):
                 ce_group = GroupementCatalogueDTO(
                     inclus_dans=group_inclus_dans,
                     intitule=child_node.title,
-                    commentaire=lien.comment if lien else '',
                     remarque=child_node.remark_fr,
                     obligatoire=lien.is_mandatory if lien else False,
-                    detail=_get_detail_lien(lien)
+                    informations_principales_agregees=_get_detail_lien(lien)
                 )
                 parents_par_niveau.update({level: ce_group})
                 noeud_parents_par_niveau.update({level: child_node})
                 groupements.add(ce_group)
-        # TODO : Question Langue on fait quoi?  Tj francais ou il faut traiter
+
         return FormationDTO(
             programme_detaille=ProgrammeDetailleDTO(groupements=groupements, unites_enseignement=ues),
             annee=annee,
@@ -118,29 +115,21 @@ class CatalogueFormationsTranslator(ICatalogueFormationsTranslator):
         return None
 
 
-def _get_verbose_comment(link: 'Link'):
-    comment_from_lang = link.comment
-
-    return CHILD_COMMENT.format(
-        comment_value=comment_from_lang
-    ) if comment_from_lang else ""
-
-
-def get_verbose_title_group(node: 'NodeGroupYear'):
+def get_verbose_title_group(node: 'NodeGroupYear') -> str:
     if node.is_finality():
-        return format_complete_title_label(node, node.offer_partial_title_en, node.offer_partial_title_fr)
+        return format_complete_title_label(node, node.offer_partial_title_fr)
     if node.is_option():
-        return format_complete_title_label(node, node.offer_title_en, node.offer_title_fr)
+        return format_complete_title_label(node, node.offer_title_fr)
     else:
         return node.group_title_fr
 
 
-def format_complete_title_label(node, title_en, title_fr):
+def format_complete_title_label(node, title_fr) -> str:
     version_complete_label = formatter.format_version_complete_name(node, "fr-be")
     return "{}{}".format(title_fr, version_complete_label)
 
 
-def get_verbose_credits(link: 'Link'):
+def get_verbose_credits(link: 'Link') -> str:
     if link.relative_credits or link.child.credits:
         return "{} ({} {})".format(
             get_verbose_title_group(link.child),
@@ -150,12 +139,12 @@ def get_verbose_credits(link: 'Link'):
         return "{}".format(get_verbose_title_group(link.child))
 
 
-def get_verbose_title_ue(node: 'NodeLearningUnitYear'):
+def get_verbose_title_ue(node: 'NodeLearningUnitYear') -> str:
     verbose_title_fr = node.full_title_fr
     return verbose_title_fr
 
 
-def _get_detail_lien(link: 'Link'):
+def _get_detail_lien(link: 'Link') -> str:
     if link.is_link_with_group():
         return get_verbose_credits(link)
     elif link.is_link_with_learning_unit():
@@ -167,7 +156,7 @@ def _get_detail_lien(link: 'Link'):
         )
 
 
-def get_volume_total_verbose(node: 'NodeLearningUnitYear'):
+def get_volume_total_verbose(node: 'NodeLearningUnitYear') -> str:
     return "%(total_lecturing)gh + %(total_practical)gh" % {
         "total_lecturing": node.volume_total_lecturing or Decimal(0.0),
         "total_practical": node.volume_total_practical or Decimal(0.0)

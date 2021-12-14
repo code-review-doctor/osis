@@ -26,43 +26,56 @@
 from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import \
     ICatalogueFormationsTranslator
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, GroupementCatalogueDTO, \
-    ProgrammeDetailleDTO
+    ProgrammeDetailleDTO, UniteEnseignementCatalogueDTO
 
 
 class CatalogueFormationsTranslatorInMemory(ICatalogueFormationsTranslator):
 
-    groupement1 = GroupementCatalogueDTO(
+    groupement_1 = GroupementCatalogueDTO(
         inclus_dans=None,
-        intitule='Groupement 1',
+        intitule='Content:',
         obligatoire=True,
         remarque='Remarque 1',
-        commentaire=None
-
-    )
-    groupement2 = GroupementCatalogueDTO(
-        inclus_dans=None,
-        intitule='Groupement 2',
-        obligatoire=False,
-        remarque='Remarque 2',
-        commentaire='Commentaire 2'
-    )
-    programme_detaille = ProgrammeDetailleDTO(
-        groupements=[groupement1, groupement2],
-        unites_enseignement=[]
+        informations_principales_agregees="{} ({} crédits) ".format('Content:', 150)
     )
     dtos = [
         FormationDTO(
-            programme_detaille=programme_detaille,
-            annee=2020,
+            programme_detaille=ProgrammeDetailleDTO(
+                groupements=[
+                    groupement_1,
+                    GroupementCatalogueDTO(
+                        inclus_dans=None,
+                        intitule='Groupement 2',
+                        obligatoire=False,
+                        remarque='Remarque 2',
+                        informations_principales_agregees="{} ({} crédits) ".format('Groupement 2', 150)
+                    )
+                ],
+                unites_enseignement=[
+                    UniteEnseignementCatalogueDTO(
+                        inclus_dans=groupement_1,
+                        bloc=1,
+                        code='LESPO1113',
+                        intitule_complet='Sociologie et anthropologie des mondes contemporains',
+                        quadrimestre='Q1 ou Q2',
+                        credits_absolus=5,
+                        volume_annuel_pm=40,
+                        volume_annuel_pp=0,
+                        obligatoire=True,
+                        informations_principales_agregees='LESPO1113 Philosophie [30h + 0h] (5 crédits)'
+                    )
+                ]
+            ),
+            annee=2021,
             sigle='ECGE1BA',
             version='STANDARD',
-            intitule_complet='Bachelier ...',
+            intitule_complet='Bachelier en sciences économiques et de gestion',
         ),
     ]
 
     @classmethod
-    def get_formation(cls, sigle: str, annee: int, version: str) -> 'FormationDTO':
+    def get_formation(cls, sigle: str, annee: int, version: str, transition: str) -> 'FormationDTO':
         return next(
             dto for dto in cls.dtos
-            if dto.sigle == sigle and dto.annee == annee and dto.version == version
+            if dto.sigle == sigle and dto.annee == annee and dto.version == version and dto.transition == transition
         )

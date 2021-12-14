@@ -35,6 +35,7 @@ class GetFormulaireInscriptionCoursCommand(interface.CommandRequest):
     annee_formation = attr.ib(type=int)
     sigle_formation = attr.ib(type=str)
     version_formation = attr.ib(type=str)
+    transition_formation = attr.ib(type=str)
 
 
 @attr.s(frozen=True, slots=True)

@@ -1,4 +1,4 @@
-############################################################################
+##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -22,71 +22,23 @@
 #    at the root of the source code of this program.  If not,
 #    see http://www.gnu.org/licenses/.
 #
-############################################################################
+##############################################################################
 from collections import OrderedDict
-from typing import Union, List
+from typing import List, Union
 
 from django.templatetags.static import static
 from django.utils.safestring import mark_safe
 
-from base.templatetags.education_group import register
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import \
-    GroupementCatalogueDTO, UniteEnseignementCatalogueDTO, ProgrammeDTO
-
-OPTIONAL_PNG = static('img/education_group_year/optional.png')
-MANDATORY_PNG = static('img/education_group_year/mandatory.png')
-VALIDATE_CASE_JPG = static('img/education_group_year/validate_case.jpg')
-INVALIDATE_CASE_JPG = static('img/education_group_year/invalidate_case.png')
-DELTA = static('img/education_group_year/delta.png')
-ACTIVITY_DISPENSED = static('img/education_group_year/bisannual_even.png')
-ACTIVITY_NOT_DISPENSED = static('img/education_group_year/bisannual_odd.png')
-PREREQUIS = static('img/education_group_year/prerequis.gif')
-CHILD_BRANCH = """\
-<tr>
-    <td style="padding-left:{padding}em;"> 
-        <div style="word-break: keep-all;">
-            <img src="{icon_list_2}" height="10" width="10">            
-            {value} <br>
-            {remark}
-            {comment}            
-        </div>
-    </td>
-</tr>
-"""
-CHILD_LEAF = """\
-<tr>
-    <td style="padding-left:{padding}em;">
-        <div style="word-break: keep-all;">            
-            <img src="{icon_list_2}" height="10" width="10">            
-            {value}                        
-        </div>
-    </td>
-    <td style="text-align: center;">{an_1}</td>
-    <td style="text-align: center;">{an_2}</td>
-    <td style="text-align: center;">{an_3}</td>
-    <td style="text-align: center;">{an_4}</td>
-    <td style="text-align: center;">{an_5}</td>
-    <td style="text-align: center;">{an_6}</td>    
-</tr>
-"""
-
-# margin-left is there to align the value with the remark.
-# We use 14px which is the size of the image before the value
-CHILD_COMMENT = """\
-        <div style="word-break: keep-all;margin-left: 32px;">
-            ({comment_value})
-        </div>
-"""
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import ProgrammeDTO, GroupementCatalogueDTO, \
+    UniteEnseignementCatalogueDTO
 
 
-@register.filter
 def tree_list(programme: ProgrammeDTO):
-    # TODO : To be completed
+
     link_parent_children = _get_parents_and_children(
         _get_parent_groups(programme.groupements),
         programme.ues
     )
-
     return mark_safe(
         list_formatter(_get_first_level_parents(link_parent_children), link_parent_children)
     )
@@ -156,7 +108,7 @@ def append_output(
             CHILD_LEAF.format(
                 padding=padding,
                 icon_list_2=get_mandatory_picture(object),
-                value=object.detail,
+                value=object.informations_principales_agregees,
                 an_1=check_block(object.bloc, 1),
                 an_2=check_block(object.bloc, 2),
                 an_3=check_block(object.bloc, 3),
@@ -171,10 +123,8 @@ def append_output(
             CHILD_BRANCH.format(
                 padding=padding,
                 icon_list_2=get_mandatory_picture(object),
-                value=object.detail,
+                value=object.informations_principales_agregees,
                 remark=object.remarque if object.remarque else '',
-                comment=object.commentaire if object.commentaire else ''
-
             )
         )
 
@@ -185,3 +135,69 @@ def get_mandatory_picture(object: Union['GroupementCatalogueDTO', 'UniteEnseigne
 
 def check_block(bloc, value):
     return "X" if bloc and str(value) in str(bloc) else ""
+
+
+def _get_inscription_formulaire_affichage_arbre(formation_dto):
+    max_blocks = _get_number_of_distinct_blocks(formation_dto.programme)
+    return {
+        'max_block': max_blocks,
+        'main_part_col_length': get_main_part_col_length(max_blocks),
+        'tree_list': tree_list(formation_dto.programme)
+    }
+
+
+MAX_NUMBER_OF_BLOCK = 6
+CURRENT_SIZE_FOR_ANNUAL_COLUMN = 15
+MAIN_PART_INIT_SIZE = 650
+PADDING = 10
+USUAL_NUMBER_OF_BLOCKS = 3
+OPTIONAL_PNG = static('img/education_group_year/optional.png')
+MANDATORY_PNG = static('img/education_group_year/mandatory.png')
+VALIDATE_CASE_JPG = static('img/education_group_year/validate_case.jpg')
+INVALIDATE_CASE_JPG = static('img/education_group_year/invalidate_case.png')
+DELTA = static('img/education_group_year/delta.png')
+ACTIVITY_DISPENSED = static('img/education_group_year/bisannual_even.png')
+ACTIVITY_NOT_DISPENSED = static('img/education_group_year/bisannual_odd.png')
+PREREQUIS = static('img/education_group_year/prerequis.gif')
+CHILD_BRANCH = """\
+<tr>
+    <td style="padding-left:{padding}em;"> 
+        <div style="word-break: keep-all;">
+            <img src="{icon_list_2}" height="10" width="10">            
+            {value} <br>
+            {remark}            
+        </div>
+    </td>
+</tr>
+"""
+CHILD_LEAF = """\
+<tr>
+    <td style="padding-left:{padding}em;">
+        <div style="word-break: keep-all;">            
+            <img src="{icon_list_2}" height="10" width="10">            
+            {value}                        
+        </div>
+    </td>
+    <td style="text-align: center;">{an_1}</td>
+    <td style="text-align: center;">{an_2}</td>
+    <td style="text-align: center;">{an_3}</td>
+    <td style="text-align: center;">{an_4}</td>
+    <td style="text-align: center;">{an_5}</td>
+    <td style="text-align: center;">{an_6}</td>    
+</tr>
+"""
+
+
+def _get_number_of_distinct_blocks(program):
+    blocks = set()
+    for ue in program.ues:
+        if ue.bloc:
+            blocks.add(ue.bloc)
+    return len(blocks)
+
+
+def get_main_part_col_length(max_block):
+    if max_block <= USUAL_NUMBER_OF_BLOCKS:
+        return MAIN_PART_INIT_SIZE
+    else:
+        return MAIN_PART_INIT_SIZE - ((max_block - USUAL_NUMBER_OF_BLOCKS) * (CURRENT_SIZE_FOR_ANNUAL_COLUMN + PADDING))

@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% load static %}
 {% load i18n %}
-{% load bootstrap3 enrollment_program_tree_view range %}
+{% load bootstrap3 range %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -45,19 +45,19 @@
             <br>
             <div class="tab-content">
                 <div id="tab_form_view" class="tab-pane fade in active">
-
                     <table>
                         <thead>
                         <tr style="border-bottom: solid;">
-                            <th style="width:{{ main_part_col_length }}px;"><strong>{{ form.title.initial }}</strong></th>
-                            {% for cpt in 1|range_for:form.max_block %}
+                            <th style="width:{{ inscription_formulaire_affichage_arbre.main_part_col_length }}px;">
+                                <strong>{{ title }}</strong>
+                            </th>
+                            {% for cpt in 1|range_for:inscription_formulaire_affichage_arbre.max_block %}
                                 <th style="width:15px;text-align: center;">An {{ cpt }}</th>
                             {% endfor %}
-
                         </tr>
                         </thead>
                         <tbody>
-                        {{ form.program|tree_list }}
+                        {{ inscription_formulaire_affichage_arbre.tree_list }}
                         </tbody>
                     </table>
 
