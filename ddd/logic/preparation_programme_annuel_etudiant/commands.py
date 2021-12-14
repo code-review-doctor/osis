@@ -69,5 +69,7 @@ class RetirerUEDuProgrammeCommand(interface.CommandRequest):
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
 class GetContenuGroupementCommand(interface.CommandRequest):
+    sigle_formation: str
+    version_formation: str
     code: str
     annee: int

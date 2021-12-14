@@ -53,6 +53,12 @@ class GroupementDTO(DTO):
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
+class ContenuGroupementDTO(DTO):
+    ues: List[UniteEnseignementDTO]
+    groupement: GroupementDTO
+
+
+@attr.s(frozen=True, slots=True, auto_attribs=True)
 class ProgrammeDTO(DTO):
     ues: List[UniteEnseignementDTO]
     groupements: List[GroupementDTO]
@@ -91,6 +97,7 @@ class UniteEnseignementCatalogueDTO(DTO):
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
 class GroupementCatalogueDTO(DTO):
+    # groupement provenant du catalogue (sans surcharge d'ajout, suppression ou modification)
     inclus_dans: 'GroupementCatalogueDTO'
     intitule: str
 

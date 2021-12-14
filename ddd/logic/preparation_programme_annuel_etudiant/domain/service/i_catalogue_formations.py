@@ -24,7 +24,7 @@
 ##############################################################################
 import abc
 
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, GroupementDTO
 from osis_common.ddd import interface
 
 
@@ -33,4 +33,15 @@ class ICatalogueFormationsTranslator(interface.DomainService):
     @classmethod
     @abc.abstractmethod
     def get_formation(cls, sigle: str, annee: int, version: str) -> 'FormationDTO':
+        raise NotImplementedError()
+
+    @classmethod
+    @abc.abstractmethod
+    def get_groupement(
+            cls,
+            sigle_formation: str,
+            annee: int,
+            version_formation: str,
+            code_groupement: str
+    ) -> 'GroupementDTO':
         raise NotImplementedError()
