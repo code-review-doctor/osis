@@ -133,8 +133,10 @@ class MyAttributionsSummaryEditable(LoginRequiredMixin, TemplateView):
             messages.add_message(
                 self.request,
                 messages.WARNING,
-                _('Force majeure case : Some fields of the description fiche can be edited from %(start_date)s '
-                  'to %(end_date)s.') % {
+                _(
+                    'Force majeure case : Some fields of the description fiche can be edited from %(start_date)s '
+                    'to %(end_date)s.'
+                ) % {
                     "start_date": force_majeure_academic_event.start_date.strftime('%d/%m/%Y'),
                     "end_date": force_majeure_academic_event.end_date.strftime('%d/%m/%Y'),
                 }

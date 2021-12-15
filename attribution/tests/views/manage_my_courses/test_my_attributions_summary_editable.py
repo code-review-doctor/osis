@@ -151,12 +151,12 @@ class ListMyAttributionsSummaryEditableTestCase(TestCase):
         msg = get_messages_from_response(response)
         self.assertEqual(
             msg[0].get('message'),
-            _("Force majeure case : Some fields of the description fiche can be edited from %(start_date)s to "
-              "%(end_date)s.") % {
-                "start_date":
-                    self.summary_course_force_majeure_calendar.start_date.strftime('%d/%m/%Y'),
-                "end_date":
-                    self.summary_course_force_majeure_calendar.end_date.strftime('%d/%m/%Y'),
+            _(
+                "Force majeure case : Some fields of the description fiche can be edited from %(start_date)s to "
+                "%(end_date)s."
+            ) % {
+                "start_date": self.summary_course_force_majeure_calendar.start_date.strftime('%d/%m/%Y'),
+                "end_date": self.summary_course_force_majeure_calendar.end_date.strftime('%d/%m/%Y'),
             }
         )
         self.assertEqual(msg[0].get('level'), messages.WARNING)
