@@ -48,7 +48,10 @@ class GetAdresseFeuilleDeNotesDTODomainService(interface.DomainService):
             entite_repository: 'IEntiteUCLRepository',
             entites_cohorte_translator: 'IEntitesCohorteTranslator',
     ) -> AdresseFeuilleDeNotesDTO:
-        annee_academique = periode_soumission_note_translator.get().annee_concernee
+        periode_soumission = periode_soumission_note_translator.get() or \
+                             periode_soumission_note_translator.get_prochaine_periode()
+        annee_academique = periode_soumission.annee_concernee
+
         identite = AdresseFeuilleDeNotesIdentityBuilder().build_from_nom_cohorte_and_annee_academique(
             nom_cohorte,
             annee_academique

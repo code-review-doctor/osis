@@ -8,7 +8,7 @@
 * The core business involves the administration of students, teachers,
 * courses, programs and so on.
 *
-* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+* Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -38,8 +38,8 @@
     <form method="get" action="{% url 'students'%}" id="form_students" name="search">
         <div class="panel-body">
             <div class="row">
-                {% bootstrap_field form.registration_id form_group_class="col-md-3" %}
-                {% bootstrap_field form.name form_group_class="col-md-3" %}
+                {% bootstrap_field filter.form.registration_id form_group_class="col-md-3" %}
+                {% bootstrap_field filter.form.name form_group_class="col-md-3" %}
                 <br>
                 <div class="col-md-1">
                     <div class="btn-toolbar pull-right">
@@ -51,27 +51,63 @@
     </form>
 
     <div>
-        {% if students %}
-        <table id="table_students" class="table table-striped table-hover">
-            <thead>
-            <th>{% trans 'Registration Id'%}</th>
-            <th>{% trans 'Name'%}</th>
-            <th>{% trans 'Gender'%}</th>
-            </thead>
-            {% for student in students %}
-            <tr>
-                <td id="td_student_{{ forloop.counter }}"><a href="{% url 'student_read' student.id %}"
-                       id="lnk_student_{{student.id}}">
-                    {{ student.registration_id }}</a></td>
-                <td><span id="spn_student_name_{{ forloop.counter }}">{{ student.person }}</span></td>
-                <td>{{ student.person.get_gender_display| default_if_none:''}}</td>
-            </tr>
-            {% endfor %}
-        </table>
-        <div class="text-center">
-            {% bootstrap_pagination students extra=request.GET.urlencode %}
-        </div>
+        {% if object_list %}
+            <table id="table_students" class="table table-striped table-hover">
+                <thead>
+                <tr>
+                <th>{% trans 'Registration Id'%}</th>
+                <th>{% trans 'Name'%}</th>
+                <th>{% trans 'Gender'%}</th>
+                    </tr>
+                </thead>
+            </table>
+            <div class="text-center">
+                {% bootstrap_pagination page_obj extra=request.GET.urlencode %}
+            </div>
         {% endif %}
     </div>
 </div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        $(document).ready(function() {
+            let domTable =  $('#table_students');
+            domTable.DataTable({
+                "columnDefs": [
+                    {
+                        "name": "registration_id",
+                        "targets": 0,
+                        "orderable": false,
+                        "render" : function (data, type, row, meta) {
+                            const href = row['select_url'];
+                            return "<a href='"+ href + "'>" + row['registration_id'] + "</a>";
+
+                        }
+                    },
+                    {"name": "name", "targets": 1, "data": "name"},
+                    {"name": "gender", "targets": 2, "data": "gender"},
+
+                ],
+                "stateSave": true,
+                "paging": false,
+                "orderMulti": false,
+                "ordering": false,
+                "serverSide": true,
+                "ajax" : {
+                    "url": "{% url 'students' %}",
+                    "type": "GET",
+                    "dataSrc": "object_list",
+                    "data": function(d) {
+                        let pageNumber = {{ page_obj.number }};
+                        return getDataAjaxTable("form_students", domTable, d, pageNumber);
+                    },
+                    "traditional": true
+                },
+                "info"  : false,
+                "searching" : false,
+
+            });
+        });
+    </script>
 {% endblock %}

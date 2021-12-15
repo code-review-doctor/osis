@@ -166,34 +166,36 @@
                 <tr>
                     <th id="status" style="width: 5%">{% trans 'Status' %}</th>
                     <th id="program" style="width: 13%">{% trans 'Program' context 'encoding' %}</th>
-                    <th id="registration_number" style="width: 13%">{% trans 'Registration number' %}</th>
                     <th id="peps_data" style="width: 17%">
                         {% trans 'Type' %}
                         <span class="badge warning-color">
                             PEPS
                         </span>
                     </th>
+                     <th id="registration_number"
+                        style="width: 13%">{% trans 'Registration number' context 'assessments' %}</th>
                     <th id="name" style="width: 22%">{% trans 'Name' %}</th>
                     <th id="score" style="width: 15%">{% trans 'Score' %}</th>
                     <th id="deadline" style="width: 15%">{% trans 'Teacher deadline' %}</th>
                 </tr>
                 </thead>
                 <tbody>
-                     {% for note_etudiant in feuille_de_notes.notes_etudiants %}
-                        <tr class="result" style="{% include 'assessments/common/row-background-color.html' %}">
-                            <td style="text-align:center;" id="enrollment_status_{{ forloop.counter }}" headers="status">
-                                {% if note_etudiant.date_echeance_atteinte %}
-                                    <span class="glyphicon glyphicon-lock" aria-hidden="true" style="color: #8B008B;" title="{% trans 'Deadline reached' %}"></span>
-                                {% endif %}
-                                {% if note_etudiant.est_soumise %}
-                                    <span class="glyphicon glyphicon-send" aria-hidden="true" style="color: green;"
-                                          data-toggle="tooltip" title="{% trans 'Score submitted' %}"></span>
-                                {% endif %}
-                            </td>
-                            <td headers="program">{{ note_etudiant.nom_cohorte }}</td>
-                            <td headers="registration_number">{{ note_etudiant.noma }}</td>
-                            {% include 'assessments/common/peps_column.html' %}
-                            <td headers="name">{{ note_etudiant.nom }}, {{ note_etudiant.prenom }}</td>
+                {% for note_etudiant in feuille_de_notes.notes_etudiants %}
+                    <tr class="result" style="{% include 'assessments/common/row-background-color.html' with date_echeance_atteinte=note_etudiant.date_echeance_gestionnaire_atteinte %}">
+                        <td style="text-align:center;" id="enrollment_status_{{ forloop.counter }}" headers="status">
+                            {% if note_etudiant.date_echeance_gestionnaire_atteinte %}
+                                <span class="glyphicon glyphicon-lock" aria-hidden="true" style="color: #8B008B;"
+                                      data-toggle="tooltip" title="{% trans 'Deadline reached' %}"></span>
+                            {% endif %}
+                            {% if note_etudiant.est_soumise %}
+                                <span class="glyphicon glyphicon-send" aria-hidden="true" style="color: green;"
+                                      data-toggle="tooltip" title="{% trans 'Score submitted' %}"></span>
+                            {% endif %}
+                        </td>
+                        <td headers="program">{{ note_etudiant.nom_cohorte }}</td>
+                         {% include 'assessments/common/peps_column.html' %}
+                        <td headers="registration_number">{{ note_etudiant.noma }}</td>
+                        <td headers="name">{{ note_etudiant.nom }}, {{ note_etudiant.prenom }}</td>
                             <td id="enrollment_note_{{ forloop.counter }}" headers="score">
                                 {% include 'assessments/common/note_read.html' %}
                             </td>

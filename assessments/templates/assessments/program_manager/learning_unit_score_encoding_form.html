@@ -109,7 +109,7 @@
                     {% if feuille_de_notes.note_decimale_est_autorisee %}
                         {% trans 'Decimal values in scores are accepted.' %}
                     {% else %}
-                        {% trans "Decimal values in scores are NOT accepted." %}{% trans "If you try to put decimal values, it will be ignored." %}
+                        {% trans "Decimal values in scores are NOT accepted." %} {% trans "If you try to put decimal values, it will be ignored." %}
                     {% endif %}
                 </span>
             </div>
@@ -137,12 +137,14 @@
                     <tr>
                         <th id="status" style="width: 5%">{% trans 'Status' %}</th>
                         <th id="program" style="width: 13%">{% trans 'Program' context 'encoding' %}</th>
-                        <th id="registration_number" style="width: 13%">{% trans 'Registration number' %}</th>
                         <th id="peps_data" style="width: 17%">
                             {% trans 'Type' %}
                             <span class="badge warning-color">
                             PEPS
-                        </span>
+                            </span>
+                        </th>
+                        <th id="registration_number" style="width: 13%">
+                            {% trans 'Registration number' context 'assessments' %}
                         </th>
                         <th id="name" style="width: 22%">{% trans 'Name' %}</th>
                         <th id="score" style="width: 15%">
@@ -152,24 +154,30 @@
                                     data-toggle="tooltip"
                                     data-placement="top"
                                     data-html="true"
-                                    title="{% trans "Score legend" %}:
+                                    title="{% trans "Score legend for program manager" %}:
                                         <ul>
                                             <li> {% trans "number between 0-20 (0=Score of presence)" %}
                                             <li>S : {% trans "Absence unjustified" %}</li>
                                             <li>M : {% trans "Absence justified" %}</li>
                                             <li>T : {% trans "Cheating" %}</li>
+                                        </ul>
+                                        {% trans "Score legend for tutor" %}:
+                                        <ul>
+                                            <li> {% trans "number between 0-20 (0=Score of presence)" %}</li>
+                                            <li>A : {% trans "Absence" %}</li>
+                                            <li>T : {% trans "Cheating" %}</li>
                                         </ul>">
                                 </span>
-                            </th>
-                            <th id="deadline" style="width: 15%">{% trans 'Teacher deadline' %}</th>
-                        </tr>
+                        </th>
+                        <th id="deadline" style="width: 15%">{% trans 'Teacher deadline' %}</th>
+                    </tr>
                     </thead>
                     <tbody>
                     {% for note_etudiant in feuille_de_notes.notes_etudiants %}
-                        <tr class="result" style="{% include 'assessments/common/row-background-color.html' %}">
+                        <tr class="result" style="{% include 'assessments/common/row-background-color.html' with date_echeance_atteinte=note_etudiant.date_echeance_gestionnaire_atteinte %}">
                             <td style="text-align:center;" id="enrollment_status_{{ forloop.counter }}"
                                 headers="status">
-                                {% if note_etudiant.date_echeance_atteinte %}
+                                {% if note_etudiant.date_echeance_gestionnaire_atteinte %}
                                     <span class="glyphicon glyphicon-lock" aria-hidden="true" style="color: #8B008B;"
                                           data-toggle="tooltip" title="{% trans 'Deadline reached' %}"></span>
                                 {% endif %}
@@ -179,11 +187,11 @@
                                 {% endif %}
                             </td>
                             <td headers="program">{{ note_etudiant.nom_cohorte }}</td>
-                            <td headers="registration_number">{{ note_etudiant.noma }}</td>
                             {% include 'assessments/common/peps_column.html' %}
+                            <td headers="registration_number">{{ note_etudiant.noma }}</td>
                             <td headers="name">{{ note_etudiant.nom }}, {{ note_etudiant.prenom }}</td>
                             <td id="enrollment_note_{{ forloop.counter0 }}" headers="score">
-                                {% if not note_etudiant.date_echeance_atteinte and not note_etudiant.desinscrit_tardivement %}
+                                {% if not note_etudiant.date_echeance_gestionnaire_atteinte and not note_etudiant.desinscrit_tardivement %}
                                     {% with score_encoding_form=form|index:forloop.counter0 %}
                                         {% bootstrap_field score_encoding_form.note show_label=False %}
                                         {% bootstrap_field score_encoding_form.noma %}
@@ -233,11 +241,11 @@
                     false {% endif %};
                 score = score.replace(',', '.');
 
-                const regex = (is_decimal) ? /^\d+(\.\d{0,2})?$/ : /^\d+$/;
+                const regex = (is_decimal) ? /^\d+(\.\d{0,1})?$/ : /^\d+$/;
                 if (!regex.test(score)) {
                     return false;
                 }
-                score = parseFloat(score).toFixed(2)
+                score = parseFloat(score).toFixed(1)
                 return !(score > 20 || score < 0);
             }
 

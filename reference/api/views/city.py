@@ -32,9 +32,9 @@ from reference.models.zipcode import ZipCode
 
 
 class CityFilter(filters.FilterSet):
-    name = filters.CharFilter(field_name="municipality", lookup_expr='icontains')
-    country_iso_code = filters.CharFilter(field_name="country__iso_code", lookup_expr="icontains")
-    zip_code = filters.CharFilter(field_name="zip_code", lookup_expr="icontains")
+    name = filters.CharFilter(field_name="municipality")
+    country_iso_code = filters.CharFilter(field_name="country__iso_code")
+    zip_code = filters.CharFilter(field_name="zip_code")
 
 
 class CityList(generics.ListAPIView):

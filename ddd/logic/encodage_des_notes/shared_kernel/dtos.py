@@ -28,10 +28,10 @@ from datetime import date
 from typing import List, Optional, Iterable
 
 import attr
-
-from osis_common.ddd import interface
-from base.models.enums import peps_type
 from django.utils.translation import ugettext as _
+
+from base.models.enums import peps_type
+from osis_common.ddd import interface
 
 
 @attr.s(frozen=True, slots=True)
@@ -120,8 +120,15 @@ class NoteEtudiantDTO(interface.DTO):
     desinscrit_tardivement = attr.ib(type=bool)  # inscription examen
 
     @property
-    def date_echeance_atteinte(self) -> bool:
-        date_dto = self.date_remise_de_notes
+    def date_echeance_gestionnaire_atteinte(self) -> bool:
+        return self._is_date_echeance_atteinte(self.date_remise_de_notes)
+
+    @property
+    def date_echeance_enseignant_atteinte(self) -> bool:
+        return self._is_date_echeance_atteinte(self.echeance_enseignant)
+
+    @staticmethod
+    def _is_date_echeance_atteinte(date_dto):
         date_de_remise = datetime.date(day=date_dto.jour, month=date_dto.mois, year=date_dto.annee)
         aujourdhui = datetime.date.today()
         return aujourdhui > date_de_remise

@@ -37,7 +37,7 @@ from infrastructure.encodage_de_notes.shared_kernel.service.periode_encodage_not
 
 
 @patch.object(ScoresExamSubmissionCalendar, 'get_opened_academic_events')
-class PeriodeSoumissionNotesTest(SimpleTestCase):
+class PeriodeSoumissionNotesGetTest(SimpleTestCase):
 
     def setUp(self):
         self.annee_concernee = 2020
@@ -86,3 +86,30 @@ class PeriodeSoumissionNotesTest(SimpleTestCase):
             fin_periode_soumission=DateDTO(jour=aujourdhui.day, mois=aujourdhui.month, annee=aujourdhui.year),
         )
         self.assertEqual(expected_result, self.translator.get())
+
+
+@patch.object(ScoresExamSubmissionCalendar, 'get_next_academic_event')
+class PeriodeSoumissionNotesGetProchainePeriodeTest(SimpleTestCase):
+    def setUp(self):
+        self.annee_concernee = 2020
+        self.translator = PeriodeEncodageNotesTranslator()
+
+    def test_should_renvoyer_prochaine_periode_ouverte(self, mock_opened_events):
+        demain = datetime.date.today() + datetime.timedelta(days=1)
+        periode_fermee = AcademicSessionEvent(
+            id=1,
+            title="Periode de soumission des notes session 2",
+            authorized_target_year=self.annee_concernee,
+            start_date=demain,
+            end_date=demain,
+            type=AcademicCalendarTypes.SCORES_EXAM_SUBMISSION.name,
+            session=2,
+        )
+        mock_opened_events.return_value = periode_fermee
+        expected_result = PeriodeEncodageNotesDTO(
+            annee_concernee=self.annee_concernee,
+            session_concernee=2,
+            debut_periode_soumission=DateDTO(jour=demain.day, mois=demain.month, annee=demain.year),
+            fin_periode_soumission=DateDTO(jour=demain.day, mois=demain.month, annee=demain.year),
+        )
+        self.assertEqual(expected_result, self.translator.get_prochaine_periode())

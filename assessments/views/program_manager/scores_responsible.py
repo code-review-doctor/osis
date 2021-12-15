@@ -37,6 +37,7 @@ from django_filters.views import FilterView
 
 from assessments.api.serializers.scores_responsible import ScoresResponsibleListSerializer
 from assessments.forms.scores_responsible import ScoresResponsiblesFilter
+from assessments.views.score_encoding import get_latest_closest_session_information_message
 from base.models import session_exam_calendar
 from base.models.academic_year import AcademicYear
 from base.models.learning_unit_year import LearningUnitYear
@@ -52,6 +53,7 @@ from ddd.logic.encodage_des_notes.soumission.commands import AssignerResponsable
 from ddd.logic.encodage_des_notes.soumission.dtos import ResponsableDeNotesDTO
 from infrastructure.messages_bus import message_bus_instance
 from learning_unit.models.learning_class_year import LearningClassYear
+from django.utils.translation import gettext_lazy as _
 
 
 @attr.s(frozen=True, slots=True)
@@ -63,13 +65,12 @@ class AttributionDTO:
     responsable_de_notes = attr.ib(type=bool)
 
 
-class ScoresResponsiblesSearch(LoginRequiredMixin, PermissionRequiredMixin, CacheFilterMixin, FilterView):
+class ScoresResponsiblesSearch(LoginRequiredMixin, CacheFilterMixin, FilterView):
     model = LearningUnitYear
     paginate_by = 20
     template_name = "assessments/score_responsible/score_responsibles.html"
 
     filterset_class = ScoresResponsiblesFilter
-    permission_required = 'assessments.view_scoresresponsible'
 
     def get_filterset_kwargs(self, filterset_class):
         return {
@@ -78,6 +79,9 @@ class ScoresResponsiblesSearch(LoginRequiredMixin, PermissionRequiredMixin, Cach
         }
 
     def render_to_response(self, context, **response_kwargs):
+        messages = get_latest_closest_session_information_message()
+        context.update({"session_messages": messages})
+
         if self.request.is_ajax():
             serializer = ScoresResponsibleListSerializer(context['object_list'], many=True)
             return JsonResponse({'object_list': serializer.data})

@@ -53,11 +53,12 @@ def rechercher_notes(
     PeriodeEncodageOuverte().verifier(periode_encodage_note_translator)
     periode_encodage = periode_encodage_note_translator.get()
     gestionnaire_parcours = GestionnaireParcoursBuilder().get(
-        cmd.matricule_fgs_gestionnaire,
-        cohortes_gestionnaire_translator
+        matricule_gestionnaire=cmd.matricule_fgs_gestionnaire,
+        annee_concernee=periode_encodage.annee_concernee,
+        cohortes_gestionnaire_translator=cohortes_gestionnaire_translator
     )
     return RechercheNotesEtudiant().search(
-        nom_cohorte=cmd.nom_cohorte,
+        noms_cohortes=cmd.noms_cohortes,
         noma=cmd.noma,
         nom=cmd.nom,
         prenom=cmd.prenom,

@@ -39,10 +39,11 @@ def search_formations(
     # if cmd.inclure_entites_gestion_subordonnees:
     #     entities = get_entities_ids(entity_acronym=cmd.sigle_entite_gestion, with_entity_subordinated=True)
     #     entites_de_gestion += entities
-    # TODO :: gérer cmd. inclure_entites_gestion_subordonnees et cmd.sigle_entite_gestion (shared kernel UCLEntity)
     # TODO :: unit tests
     return training_repository.search_dtos(
         sigle=cmd.sigle,
         annee=cmd.annee,
         type=cmd.type,
+        sigle_entite_gestion=cmd.sigle_entite_gestion,
+        inclure_entites_gestion_subordonnees=cmd.inclure_entites_gestion_subordonnees,
     )
