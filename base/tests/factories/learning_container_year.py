@@ -28,15 +28,16 @@ import operator
 
 import factory.fuzzy
 
+from base.models.enums import learning_container_year_types
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.learning_container import LearningContainerFactory
-from base.models.enums import learning_container_year_types
 
 
 class LearningContainerYearFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = "base.LearningContainerYear"
+        django_get_or_create = ('learning_container', 'academic_year')
 
     external_id = factory.Sequence(lambda n: '10000000%02d' % n)
     academic_year = factory.SubFactory(AcademicYearFactory)

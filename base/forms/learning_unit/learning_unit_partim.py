@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -210,7 +210,8 @@ class PartimForm(LearningUnitBaseForm):
         return bool(self.instance)
 
     def save(self, commit=True):
-        learning_unit_instance = self.instance.learning_unit if self.instance else self.learning_unit_full_instance
+        learning_unit_instance = self.learning_unit_instance if self.learning_unit_instance \
+            else self.learning_unit_full_instance
 
         start_year = learning_unit_instance.start_year if (self._is_update() or not self.start_anac) \
             else self.start_anac

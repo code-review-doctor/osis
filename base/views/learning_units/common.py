@@ -140,11 +140,14 @@ def get_common_context_learning_unit_year(person,
     else:
         learning_unit_year = query_set.get(acronym=code, academic_year__year=year)
 
-    return {
+    context = {
         'learning_unit_year': learning_unit_year,
         'current_academic_year': mdl.academic_year.starting_academic_year(),
         'is_person_linked_to_entity': person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year),
+        'learning_unit_year_choices': (reversed(learning_unit_year.learning_unit.learningunityear_set.all()),),
     }
+    context.update(get_common_context_to_publish(person, learning_unit_year))
+    return context
 
 
 def get_text_label_translated(text_lb, user_language):

@@ -97,12 +97,12 @@ class TransitionVersionForm(forms.Form):
         )
         choices_years = [
             (year, display_as_academic_year(year))
-            for year in range(self.tree_version_identity.year, max_year + 1)
+            for year in reversed(range(self.tree_version_identity.year, max_year + 1))
         ]
 
         self.fields["end_year"].choices = choices_years
         if not self.fields["end_year"].initial:
-            self.fields["end_year"].initial = choices_years[0]
+            self.fields["end_year"].initial = choices_years[-1]
 
     def _set_remote_validation_on_transition_name(self):
         if self.tree_version_identity.version_name:

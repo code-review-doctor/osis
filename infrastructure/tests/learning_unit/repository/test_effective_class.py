@@ -41,7 +41,9 @@ class EffectiveClassRepositoryTestCase(TestCase):
             learning_unit_code=self.learning_unit_year.acronym,
             learning_unit_year=self.learning_unit_year.academic_year.year,
             title_fr='Titre en francais',
+            full_title_fr="Titre de l'UE + Titre en francais",
             title_en='TItle in english',
+            full_title_en='Title of LearningUnit + TItle in english',
             teaching_place_uuid=self.campus.uuid,
             derogation_quadrimester=DerogationQuadrimester.Q1.name,
             session_derogation=DerogationSession.DEROGATION_SESSION_123.value,
@@ -69,6 +71,21 @@ class EffectiveClassRepositoryTestCase(TestCase):
         self.class_repository.delete(class_identity)
         self.assertEqual(LearningClassYearDb.objects.all().count(), 0)
 
+    def test_search(self):
+        ue = LearningUnitYearFactory()
+        class_db = LearningClassYearFactory(learning_component_year__learning_unit_year=ue)
+
+        entity_id = EffectiveClassIdentityBuilder.build_from_code_and_learning_unit_identity_data(
+            class_code=class_db.acronym,
+            learning_unit_code=ue.acronym,
+            learning_unit_year=ue.academic_year.year
+        )
+        result = self.class_repository.search(
+            entity_ids=[entity_id]
+        )
+
+        self.assertEqual(len(result), 1)
+
     def test_get_all_identities(self):
         classes_db = [LearningClassYearFactory() for _ in range(5)]
         identities = [
@@ -86,22 +103,79 @@ class EffectiveClassRepositoryTestCase(TestCase):
         # assert lists contain same elements regardless order
         self.assertCountEqual(identities, self.class_repository.get_all_identities())
 
-    def test_get_effective_class(self):
-        ue = LearningUnitYearFactory()
-        class_db = LearningClassYearFactory(learning_component_year__learning_unit_year=ue)
-        effective_class = self.class_repository.get(
-            entity_id=EffectiveClassIdentityBuilder.build_from_code_and_learning_unit_identity_data(
-                class_code=class_db.acronym,
-                learning_unit_code=ue.acronym,
-                learning_unit_year=ue.academic_year.year
-            )
+
+class SearchDtosTest(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.annee = 2020
+        cls.code_unite_enseignement = 'LDROI1001'
+        cls.lettre_classe = 'A'
+        cls.code_complet_classe = cls.code_unite_enseignement + cls.lettre_classe
+        cls.class_repository = EffectiveClassRepository()
+        cls.class_db = LearningClassYearFactory(
+            acronym=cls.lettre_classe,
+            learning_component_year__learning_unit_year__acronym=cls.code_unite_enseignement,
+            learning_component_year__learning_unit_year__academic_year__year=cls.annee,
+            learning_component_year__type=LECTURING,
         )
-        self.assertEqual(effective_class.entity_id.class_code, class_db.acronym)
-        self.assertEqual(effective_class.entity_id.learning_unit_identity.code, ue.acronym)
-        self.assertEqual(effective_class.entity_id.learning_unit_identity.academic_year.year, ue.academic_year.year)
-        self.assertEqual(effective_class.titles.fr, class_db.title_fr)
-        self.assertEqual(effective_class.titles.en, class_db.title_en)
-        self.assertEqual(effective_class.derogation_quadrimester.value, class_db.quadrimester)
-        self.assertEqual(DerogationSession[effective_class.session_derogation].value, class_db.session)
-        self.assertEqual(effective_class.volumes.volume_first_quadrimester, class_db.hourly_volume_partial_q1)
-        self.assertEqual(effective_class.volumes.volume_second_quadrimester, class_db.hourly_volume_partial_q2)
+
+    def test_should_trouver_aucun_resultat_pour_unite_enseignement(self):
+        result = self.class_repository.search_dtos(codes={self.code_unite_enseignement}, annee=self.annee)
+        self.assertListEqual(list(), result)
+
+    def test_should_trouver_aucun_resultat_pour_classe_inexistante(self):
+        code_classe_non_existant = 'LABCD9876'
+        result = self.class_repository.search_dtos(codes={code_classe_non_existant}, annee=self.annee)
+        self.assertListEqual(list(), result)
+
+    def test_should_renvoyer_code_et_annee(self):
+        dto = self.class_repository.search_dtos(codes={self.code_complet_classe}, annee=self.annee)[0]
+        self.assertEqual(dto.class_code, self.lettre_classe)
+        self.assertEqual(dto.learning_unit_code, self.code_unite_enseignement)
+        self.assertEqual(dto.learning_unit_year, self.annee)
+        self.assertEqual(dto.code_complet_classe, self.code_unite_enseignement + "-" + self.lettre_classe)
+
+    def test_should_renvoyer_intitules(self):
+        dto = self.class_repository.search_dtos(codes={self.code_complet_classe}, annee=self.annee)[0]
+        self.assertEqual(dto.title_fr, self.class_db.title_fr)
+        self.assertEqual(dto.title_en, self.class_db.title_en)
+        self.assertNotEqual(dto.title_fr, self.class_db.learning_component_year.learning_unit_year.specific_title)
+        self.assertNotEqual(
+            dto.title_en,
+            self.class_db.learning_component_year.learning_unit_year.specific_title_english
+        )
+
+    def test_should_renvoyer_intitules_complets(self):
+        dto = self.class_repository.search_dtos(codes={self.code_complet_classe}, annee=self.annee)[0]
+        intitule_complet_fr = "{} - {}".format(
+            self.class_db.learning_component_year.learning_unit_year.learning_container_year.common_title,
+            self.class_db.title_fr,
+        )
+        self.assertEqual(
+            dto.full_title_fr,
+            intitule_complet_fr,
+        )
+        intitule_complet_en = "{} - {}".format(
+            self.class_db.learning_component_year.learning_unit_year.learning_container_year.common_title_english,
+            self.class_db.title_en,
+        )
+        self.assertEqual(
+            dto.full_title_en,
+            intitule_complet_en,
+        )
+
+    def test_should_renvoyer_volumes(self):
+        dto = self.class_repository.search_dtos(codes={self.code_complet_classe}, annee=self.annee)[0]
+        self.assertEqual(dto.derogation_quadrimester, self.class_db.quadrimester)
+        self.assertEqual(dto.session_derogation, self.class_db.session)
+        self.assertEqual(dto.volume_q1, self.class_db.hourly_volume_partial_q1)
+        self.assertEqual(dto.volume_q2, self.class_db.hourly_volume_partial_q2)
+
+    def test_should_renvoyer_lieu_enseignement_classe(self):
+        dto = self.class_repository.search_dtos(codes={self.code_complet_classe}, annee=self.annee)[0]
+        self.assertEqual(dto.teaching_place_uuid, self.class_db.campus.uuid)
+
+    def test_should_renvoyer_type_de_classe(self):
+        dto = self.class_repository.search_dtos(codes={self.code_complet_classe}, annee=self.annee)[0]
+        self.assertEqual(dto.class_type, self.class_db.learning_component_year.type)

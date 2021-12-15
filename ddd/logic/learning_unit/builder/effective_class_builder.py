@@ -25,7 +25,6 @@
 ##############################################################################
 from typing import Type
 
-from base.business.learning_unit_proposal import _get_value_from_enum
 from base.models.enums.learning_component_year_type import PRACTICAL_EXERCISES
 from base.models.enums.learning_unit_year_session import DerogationSession
 from base.models.enums.quadrimesters import DerogationQuadrimester
@@ -58,7 +57,7 @@ class EffectiveClassBuilder(interface.RootEntityBuilder):
             titles=ClassTitles(fr=cmd.title_fr, en=cmd.title_en),
             teaching_place=UclouvainCampusIdentityBuilder.build_from_uuid(cmd.teaching_place_uuid),
             derogation_quadrimester=DerogationQuadrimester[quadri] if quadri else None,
-            session_derogation=DerogationSession(cmd.session_derogation).name if cmd.session_derogation else None,
+            session_derogation=DerogationSession(cmd.session_derogation) if cmd.session_derogation else None,
             volumes=ClassVolumes(
                 volume_first_quadrimester=cmd.volume_first_quadrimester,
                 volume_second_quadrimester=cmd.volume_second_quadrimester,
@@ -67,11 +66,7 @@ class EffectiveClassBuilder(interface.RootEntityBuilder):
 
     @classmethod
     def build_from_repository_dto(cls, dto_object: 'EffectiveClassFromRepositoryDTO') -> 'EffectiveClass':
-        class_identity = EffectiveClassIdentityBuilder.build_from_code_and_learning_unit_identity_data(
-            class_code=dto_object.class_code,
-            learning_unit_code=dto_object.learning_unit_code,
-            learning_unit_year=dto_object.learning_unit_year
-        )
+        class_identity = EffectiveClassIdentityBuilder.build_from_repository_dto(dto_object)
         dto_quadrimester = dto_object.derogation_quadrimester
         dto_session = dto_object.session_derogation
         return _get_effective_class_type_with_dto(dto_object)(
@@ -82,7 +77,7 @@ class EffectiveClassBuilder(interface.RootEntityBuilder):
             ),
             teaching_place=UclouvainCampusIdentityBuilder.build_from_uuid(dto_object.teaching_place_uuid),
             derogation_quadrimester=DerogationQuadrimester[dto_quadrimester] if dto_quadrimester else None,
-            session_derogation=DerogationSession(dto_session).name if dto_session else None,
+            session_derogation=DerogationSession(dto_session) if dto_session else None,
             volumes=ClassVolumes(
                 volume_first_quadrimester=dto_object.volume_q1,
                 volume_second_quadrimester=dto_object.volume_q2,

@@ -25,25 +25,20 @@
 ##############################################################################
 from django.db import models
 
-from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
+from osis_common.models import osis_model_admin
 
 
-class DecreeAdmin(SerializableModelAdmin):
+class DecreeAdmin(osis_model_admin.OsisModelAdmin):
     list_display = ('name', 'start_date', 'end_date')
     ordering = ('name',)
     search_fields = ['name']
 
 
-class Decree(SerializableModel):
+class Decree(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     name = models.CharField(max_length=80, unique=True)
     start_date = models.DateField(blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)
-
-    # def save(self, *args, **kwargs):
-    #     # WARNING
-    #     # In case a new decree is created, we MUST migrate data from domain and ExternalOffer to the last domain.
-    #     super(models.Model, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.name

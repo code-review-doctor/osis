@@ -70,7 +70,7 @@
                             <ul class="dropdown-menu">
                                 {% if perms.base.can_access_offer %}
                                     <li>
-                                        <a href="{% url 'offers' %}" id="lnk_dropdown_offers">
+                                        <a href="{% url 'offers_search' %}" id="lnk_dropdown_offers">
                                             <span class="fa fa-map-marker-alt"></span>
                                             {% trans 'Addresses' %}
                                         </a>
@@ -133,15 +133,12 @@
                                         </a>
                                     </li>
                                 {% endif %}
-                                {% view_academicactors as can_view_academicactors %}
-                                {% if can_view_academicactors %}
-                                    <li>
-                                        <a href="{% url 'academic_actors' %}" id="lnk_dropdown_academic actors">
-                                            <span class="fa fa-users"></span>
-                                            {% trans 'Academic actors' %}
-                                        </a>
-                                    </li>
-                                {% endif %}
+                                <li>
+                                    <a href="{% url 'academic_actors' %}" id="lnk_dropdown_academic actors">
+                                        <span class="fa fa-users"></span>
+                                        {% trans 'Academic actors' %}
+                                    </a>
+                                </li>
                                 {% if perms.base.can_access_academicyear and perms.base.can_access_academic_calendar %}
                                     <li>
                                         <a href="{% url 'academic_calendars' %}" id="lnk_academic_calendars">
@@ -268,7 +265,7 @@
                         </ul>
                     </li>
                     <li>
-                        <a href="{{ user_manual.global }}" role="button" id="bt_help" title="{% trans 'Help' %}">
+                        <a href="{{ user_manual.global }}" role="button" id="bt_help" title="{% trans 'Help' %}" target="_blank">
                             <span class="glyphicon glyphicon-question-sign"></span>
                             <span class="visible-xs-inline">{% trans 'Help' %}</span>
                         </a>

@@ -25,13 +25,15 @@
 ##############################################################################
 import datetime
 from abc import ABC
-from typing import List, Union, Optional
+from typing import List, Union
 
 import attr
 from django.db.models import F
 from django.utils.functional import cached_property
+from django.utils.translation import gettext_lazy as _
 
 from base.models.academic_calendar import AcademicCalendar
+from base.models.enums import number_session
 from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 
 
@@ -64,6 +66,16 @@ class AcademicEvent:
 @attr.s(frozen=True, slots=True)
 class AcademicSessionEvent(AcademicEvent):
     session = attr.ib(type=int)
+
+    def month_session_name(self):
+        if self.session == number_session.ONE:
+            return _('January')
+        elif self.session == number_session.TWO:
+            return _('June')
+        elif self.session == number_session.THREE:
+            return _('September')
+        else:
+            return _('unknown')
 
 
 class AcademicEventFactory:

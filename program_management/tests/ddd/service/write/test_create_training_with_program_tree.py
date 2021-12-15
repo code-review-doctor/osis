@@ -39,6 +39,7 @@ from education_group.ddd.domain.training import TrainingIdentity
 from education_group.ddd.validators._hops_validator import TRAINING_TYPES_FOR_WHICH_ARES_GRACA_IS_OPTIONAL
 from education_group.tests.ddd.factories.domain.group import GroupFactory
 from program_management.ddd.command import GetProgramTreeVersionCommand
+from program_management.ddd.domain.exception import CodePatternException
 from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION, STANDARD
 from program_management.ddd.domain.service.calculate_end_postponement import DEFAULT_YEARS_TO_POSTPONE
 from program_management.ddd.service.read import get_program_tree_version_service
@@ -55,10 +56,10 @@ class TestCreateAndReportTrainingWithProgramTree(DDDTestCase):
         super().setUp()
 
         self.cmd = command.CreateAndPostponeTrainingAndProgramTreeCommand(
-            code="INFO1BA",
+            code="LINFO100B",
             year=2021,
             type=TrainingType.BACHELOR.name,
-            abbreviated_title="INFO100B",
+            abbreviated_title="INFO1BA",
             title_fr="Bachelier en info",
             title_en="Bachelor info",
             keywords="",
@@ -131,6 +132,12 @@ class TestCreateAndReportTrainingWithProgramTree(DDDTestCase):
 
         with self.assertRaisesBusinessException(AcronymAlreadyExist):
             create_training_with_program_tree.create_and_report_training_with_program_tree(self.cmd)
+
+    def test_should_raise_error_if_code_do_not_respect_regex(self):
+        cmd = attr.evolve(self.cmd, code='INFO1100B')
+
+        with self.assertRaisesBusinessException(CodePatternException):
+            create_training_with_program_tree.create_and_report_training_with_program_tree(cmd)
 
     def test_start_year_cannot_be_greater_than_end_year(self):
         cmd = attr.evolve(self.cmd, end_year=self.cmd.start_year - 1)

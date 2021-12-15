@@ -23,14 +23,58 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+import abc
+from typing import List, Optional, Set
 
-from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
+from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity, EffectiveClass
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
+from ddd.logic.learning_unit.dtos import EffectiveClassFromRepositoryDTO
 from osis_common.ddd import interface
+from osis_common.ddd.interface import ApplicationService
 
 
 class IEffectiveClassRepository(interface.AbstractRepository):
 
     @classmethod
+    @abc.abstractmethod
+    def search(cls, entity_ids: Optional[List[EffectiveClassIdentity]] = None, **kwargs) -> List[EffectiveClass]:
+        pass
+
+    @classmethod
+    @abc.abstractmethod
+    def search_dtos_by_learning_unit(
+            cls,
+            learning_unit_id: Optional[LearningUnitIdentity] = None,
+            **kwargs
+    ) -> List['EffectiveClassFromRepositoryDTO']:
+        pass
+
+    @classmethod
+    @abc.abstractmethod
+    def delete(cls, entity_id: EffectiveClassIdentity, **kwargs: ApplicationService) -> None:
+        pass
+
+    @classmethod
+    @abc.abstractmethod
+    def save(cls, entity: EffectiveClass) -> None:
+        pass
+
+    @classmethod
+    @abc.abstractmethod
     def get_all_identities(cls) -> List['EffectiveClassIdentity']:
         raise NotImplementedError
+
+    @classmethod
+    @abc.abstractmethod
+    def get(cls, entity_id: 'EffectiveClassIdentity') -> 'EffectiveClass':
+        raise NotImplementedError
+
+    @classmethod
+    @abc.abstractmethod
+    def search_dtos(cls, codes: Set[str], annee: int) -> List['EffectiveClassFromRepositoryDTO']:
+        pass
+
+    @classmethod
+    @abc.abstractmethod
+    def get_dto(cls, code: str, annee: int) -> 'EffectiveClassFromRepositoryDTO':
+        pass

@@ -93,6 +93,7 @@ class VolumeEditionForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         self.component = kwargs.pop('component')
+        self.has_effective_classes = self.component.learningclassyear_set.all().exists()
         self.learning_unit_year = kwargs.pop('learning_unit_year')
         self.entities = kwargs.pop('entities', [])
         self.is_faculty_manager = kwargs.pop('is_faculty_manager', False)
@@ -309,6 +310,7 @@ class SimplifiedVolumeForm(forms.ModelForm, PermissionFieldMixin):
         self.label = component_type[1]
         self.instance.type = component_type[0]
         self.instance.acronym = DEFAULT_ACRONYM_COMPONENT[self.instance.type]
+        self.has_effective_classes = self.instance.learningclassyear_set.all().exists()
 
     class Meta:
         model = LearningComponentYear

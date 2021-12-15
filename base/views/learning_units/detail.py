@@ -41,6 +41,7 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.views.common import display_warning_messages, add_to_session
+from base.views.learning_units.common import get_common_context_to_publish
 from osis_common.utils.models import get_object_or_none
 
 SEARCH_URL_PART = 'learning_units/by_'
@@ -106,6 +107,8 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['current_academic_year'] = self.current_academic_year
+        context['learning_unit_year_choices'] = \
+            reversed(self.object.learning_unit.learningunityear_set.all()),
         context['is_person_linked_to_entity'] = self.person.is_linked_to_entity_in_charge_of_learning_unit_year(
             self.object
         )
@@ -149,7 +152,7 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
             'can_edit_learning_unit_proposal': self.person.user.has_perm('base.can_edit_learning_unit_proposal', obj),
             'can_consolidate_proposal': self.person.user.has_perm('base.can_consolidate_learningunit_proposal', obj),
         }
-
+        context.update(get_common_context_to_publish(self.person, self.object))
         return context
 
     def get_versions(self):

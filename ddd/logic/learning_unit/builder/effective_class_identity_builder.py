@@ -23,15 +23,30 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Union
+
+from ddd.logic.effective_class_repartition.commands import DistributeClassToTutorCommand, \
+    EditClassVolumeRepartitionToTutorCommand
 from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
-from ddd.logic.learning_unit.commands import CreateEffectiveClassCommand
+from ddd.logic.learning_unit.commands import CreateEffectiveClassCommand, UpdateEffectiveClassCommand, \
+    DeleteEffectiveClassCommand
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity, EffectiveClassCode
+from ddd.logic.learning_unit.dtos import EffectiveClassFromRepositoryDTO
 from osis_common.ddd.interface import EntityIdentityBuilder, DTO
 
 
 class EffectiveClassIdentityBuilder(EntityIdentityBuilder):
     @classmethod
-    def build_from_command(cls, cmd: 'CreateEffectiveClassCommand') -> 'EffectiveClassIdentity':
+    def build_from_command(
+            cls,
+            cmd: Union[
+                'CreateEffectiveClassCommand',
+                'UpdateEffectiveClassCommand',
+                'DeleteEffectiveClassCommand',
+                'DistributeClassToTutorCommand',
+                'EditClassVolumeRepartitionToTutorCommand'
+            ]
+    ) -> 'EffectiveClassIdentity':
         return EffectiveClassIdentity(
             class_code=cmd.class_code,
             learning_unit_identity=LearningUnitIdentityBuilder.build_from_code_and_year(
@@ -41,8 +56,12 @@ class EffectiveClassIdentityBuilder(EntityIdentityBuilder):
         )
 
     @classmethod
-    def build_from_repository_dto(cls, dto_object: 'DTO') -> 'EffectiveClassIdentity':
-        raise NotImplementedError
+    def build_from_repository_dto(cls, dto_object: 'EffectiveClassFromRepositoryDTO') -> 'EffectiveClassIdentity':
+        learning_unit_identity = LearningUnitIdentityBuilder.build_from_code_and_year(
+            code=dto_object.learning_unit_code,
+            year=dto_object.learning_unit_year
+        )
+        return EffectiveClassIdentity(class_code=dto_object.class_code, learning_unit_identity=learning_unit_identity)
 
     @classmethod
     def build_from_code_and_learning_unit_identity_data(

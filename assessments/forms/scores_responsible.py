@@ -30,17 +30,21 @@ from django.db.models.functions import Concat
 from django.utils.translation import gettext_lazy as _
 
 from assessments.business import scores_responsible as business_scores_responsible
-from attribution.models.attribution import Attribution
+from assessments.models.score_responsible import ScoreResponsible
+from attribution.models.attribution_charge_new import AttributionChargeNew
+from attribution.models.attribution_new import AttributionNew
 from base.forms.learning_unit.search.simple import filter_by_entities
 from base.models.entity_version import EntityVersion
+from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
 
 
-class ScoresResponsibleFilter(django_filters.FilterSet):
+class ScoresResponsiblesFilter(django_filters.FilterSet):
     acronym = django_filters.CharFilter(
         field_name='acronym',
         lookup_expr='icontains',
-        label=_('LU code'),
+        label=_('LU'),
+        widget=forms.TextInput(attrs={'placeholder': _('Code')})
     )
     learning_unit_title = django_filters.CharFilter(
         field_name='full_title',
@@ -53,7 +57,7 @@ class ScoresResponsibleFilter(django_filters.FilterSet):
     )
     scores_responsible = django_filters.CharFilter(
         method='filter_score_responsible',
-        label=_('Scores responsible tutor'),
+        label=_('Scores responsible'),
     )
     requirement_entity = django_filters.CharFilter(
         method='filter_requirement',
@@ -76,13 +80,16 @@ class ScoresResponsibleFilter(django_filters.FilterSet):
     )
 
     def filter_tutor(self, queryset, name, value):
-        return queryset.filter(Q(attribution__tutor__person__first_name__icontains=value)
-                               | Q(attribution__tutor__person__last_name__icontains=value))
+        return queryset.filter(
+            Q(learningcomponentyear__attributionchargenew__attribution__tutor__person__first_name__icontains=value) |
+            Q(learningcomponentyear__attributionchargenew__attribution__tutor__person__last_name__icontains=value)
+        )
 
     def filter_score_responsible(self, queryset, name, value):
-        return queryset.filter(Q(attribution__tutor__person__first_name__icontains=value) |
-                               Q(attribution__tutor__person__last_name__icontains=value),
-                               attribution__score_responsible=True)
+        return queryset.filter(
+            Q(scoreresponsible__tutor__person__first_name__icontains=value) |
+            Q(scoreresponsible__tutor__person__last_name__icontains=value)
+        )
 
     def filter_requirement(self, queryset, name, value):
         return filter_by_entities(name, queryset, value, self.form.cleaned_data['with_entity_subordinated'])
@@ -116,6 +123,7 @@ class ScoresResponsibleFilter(django_filters.FilterSet):
         queryset = business_scores_responsible.filter_learning_unit_year_according_person(
             queryset,
             self.request.user.person,
+            self.academic_year
         )
         queryset = super().filter_queryset(queryset)
 
@@ -125,15 +133,41 @@ class ScoresResponsibleFilter(django_filters.FilterSet):
             OuterRef('academic_year__start_date')
         ).values('acronym')[:1]
         queryset = LearningUnitYearQuerySet.annotate_entities_allocation_and_requirement_acronym(queryset)
-        return queryset.select_related('learning_container_year').prefetch_related(
+        return queryset.select_related(
+            'learning_container_year'
+        ).prefetch_related(
             Prefetch(
-                'attribution_set',
-                queryset=Attribution.objects.all().select_related('tutor__person').order_by(
-                    '-score_responsible',
+                'learningcomponentyear_set',
+                queryset=LearningComponentYear.objects.prefetch_related(
+                    Prefetch(
+                        'attributionchargenew_set',
+                        queryset=AttributionChargeNew.objects.all().select_related(
+                            'attribution',
+                            'attribution__tutor__person'
+                        )
+                    )
+                )
+            ),
+            Prefetch(
+                'learning_container_year__attributionnew_set',
+                queryset=AttributionNew.objects.all().select_related(
+                    'tutor__person'
+                ).order_by(
+                    'tutor__person__last_name',
+                    'tutor__person__first_name'
+                )
+            ),
+            Prefetch(
+                "scoreresponsible_set",
+                queryset=ScoreResponsible.objects.filter(
+                    learning_class_year__isnull=True
+                ).select_related(
+                    'tutor__person'
+                ).order_by(
                     'tutor__person__last_name',
                     'tutor__person__first_name'
                 )
             )
         ).annotate(
             requirement_entity=Subquery(entity_requirement)
-        )
+        ).distinct()

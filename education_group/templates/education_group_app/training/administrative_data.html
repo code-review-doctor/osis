@@ -88,8 +88,8 @@
         <div class="panel-body">
             <div class="row">
                 <div class="col-md-6">
-                    {% bootstrap_label _("Weighting") label_class='d-block'%}
-                    <p>{{ additional_informations.weighting | yesno | title }}</p>
+                    {% bootstrap_label _("Weighting type") label_class='d-block'%}
+                    <p>{% if additional_informations.weighting %}{% trans 'Weighting' %}{% else %}{% trans 'No weighting(same weight)' %}{% endif %}</p>
                 </div>
                 <div class="col-md-6">
                     {% bootstrap_label _("Default learning unit enrollment") label_class='d-block'%}

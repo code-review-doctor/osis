@@ -26,7 +26,7 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-<form role="form" method="POST" action="" novalidate>
+<form role="form" method="POST" action="" class="learningUnitForm" novalidate>
     {% csrf_token %}
     <table class="table volumes">
         {% for learning_unit, formset in formsets.items %}

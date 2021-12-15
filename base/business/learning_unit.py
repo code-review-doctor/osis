@@ -31,8 +31,8 @@ from django.db.models import Prefetch, Max
 from base.business.learning_unit_year_with_context import volume_learning_component_year
 from base.models import learning_achievement, academic_year
 from base.models.academic_year import AcademicYear
-from base.models.enums import learning_unit_year_subtypes
 from base.models.enums import entity_container_year_link_type
+from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES
 from base.models.enums.quadrimesters import LearningUnitYearQuadrimester
 from base.models.learning_component_year import LearningComponentYear
@@ -75,7 +75,6 @@ def get_same_container_year_components(learning_unit_year):
                     learning_class_year)
 
         used_by_learning_unit = learning_component_year.learning_unit_year == learning_unit_year
-
         components.append(
             {
                 'learning_component_year': learning_component_year,

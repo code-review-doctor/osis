@@ -49,7 +49,7 @@ from learning_unit.tests.factories.central_manager import CentralManagerFactory
 from learning_unit.tests.factories.faculty_manager import FacultyManagerFactory
 
 
-def create_person(first_name, last_name, email="", language=None):
+def create_person(first_name, last_name, email="", language="en"):
     a_person = person.Person(first_name=first_name, last_name=last_name, email=email, language=language)
     a_person.save()
     return a_person
@@ -223,12 +223,12 @@ class PersonTest(PersonTestCase):
         self.assertEqual(self.person_with_user.get_first_name(), self.person_with_user.first_name)
 
     def test_show_first_name_from_person_without_first_name(self):
-        self.person_with_user.first_name = None
+        self.person_with_user.first_name = ''
         self.person_with_user.save()
         self.assertEqual(self.person_with_user.get_first_name(), self.person_with_user.user.first_name)
 
     def test_show_first_name_from_person_without_user(self):
-        self.person_with_user.first_name = None
+        self.person_with_user.first_name = ''
         self.person_with_user.user = None
         self.person_with_user.save()
         self.assertEqual(self.person_with_user.get_first_name(), "-")
@@ -238,11 +238,6 @@ class PersonTest(PersonTestCase):
 
     def test_get_user_interface_language_with_user_without_person(self):
         self.assertEqual(get_user_interface_language(self.an_user), "fr-be")
-
-    def test_get_user_interface_language_with_person_without_language(self):
-        user_1 = user.UserFactory()
-        PersonFactory(user=user_1, language=None)
-        self.assertEqual(get_user_interface_language(user_1), "fr-be")
 
     def test_str_function_with_data(self):
         self.person_with_user.middle_name = "Junior"

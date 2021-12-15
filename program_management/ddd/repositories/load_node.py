@@ -246,7 +246,7 @@ def __load_multiple_node_learning_unit_year(node_learning_unit_year_ids: List[in
         common_title_en=F('learning_container_year__common_title_english'),
         volume_total_lecturing=Subquery(subquery_component_pm.values('hourly_volume_total_annual')),
         volume_total_practical=Subquery(subquery_component_pp.values('hourly_volume_total_annual')),
-
+        language_code=F('language__code')
     ).values(
         'id',
         'type',
@@ -268,4 +268,8 @@ def __load_multiple_node_learning_unit_year(node_learning_unit_year_ids: List[in
         'quadrimester',
         'volume_total_lecturing',
         'volume_total_practical',
+        'exchange_students',
+        'french_friendly',
+        'english_friendly',
+        'language_code'
     )

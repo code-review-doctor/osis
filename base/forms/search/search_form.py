@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -26,6 +26,8 @@
 from django import forms
 from django_filters import fields as django_filter_fields
 
+SEARCH_TYPE_FIELD_NAME = 'search_type'
+
 
 class BaseSearchForm(forms.Form):
 
@@ -44,12 +46,13 @@ def get_research_criteria(search_form):
     # TODO : find what is it and what is it use
     tuples_label_value = []
     for field_name, field in search_form.fields.items():
-        if not search_form.cleaned_data.get(field_name):
-            continue
-        tuple_to_append = (str(field.label), search_form.cleaned_data[field_name])
-        if type(field) == forms.ChoiceField or type(field) == django_filter_fields.ChoiceField:
-            dict_choices = {str(key): value for key, value in field.choices}
-            label_choice = dict_choices[search_form.cleaned_data[field_name]]
-            tuple_to_append = (str(field.label), label_choice)
-        tuples_label_value.append(tuple_to_append)
+        if field_name != SEARCH_TYPE_FIELD_NAME:
+            if not search_form.cleaned_data.get(field_name):
+                continue
+            tuple_to_append = (str(field.label), search_form.cleaned_data[field_name])
+            if type(field) == forms.ChoiceField or type(field) == django_filter_fields.ChoiceField:
+                dict_choices = {str(key): value for key, value in field.choices}
+                label_choice = dict_choices[search_form.cleaned_data[field_name]]
+                tuple_to_append = (str(field.label), label_choice)
+            tuples_label_value.append(tuple_to_append)
     return tuples_label_value

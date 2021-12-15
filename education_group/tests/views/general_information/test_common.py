@@ -103,18 +103,24 @@ class TestCommonGeneralInformation(TestCase):
 class TestUpdateCommonGetGeneralInformation(TestCase):
     @classmethod
     def setUpTestData(cls):
-        AcademicYearFactory(current=True)
-        cls.common_education_group_year = EducationGroupYearCommonFactory(academic_year__year=2018)
+        current_academic_year = AcademicYearFactory(current=True)
+        cls.common_education_group_year = EducationGroupYearCommonFactory(
+            academic_year__year=current_academic_year.year
+        )
         cls.central_manager = CentralManagerFactory(entity=cls.common_education_group_year.management_entity)
         OpenAcademicCalendarFactory(
             reference=AcademicCalendarTypes.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT.name,
-            data_year__year=2018
+            data_year__year=current_academic_year.year
         )
 
         cls.label_name = random.choice(general_information_sections.SECTIONS_PER_OFFER_TYPE['common']['specific'])
         TextLabelFactory(label=cls.label_name, entity=entity_name.OFFER_YEAR)
 
-        cls.url = reverse('update_common_general_information', kwargs={'year': 2018}) + "?label=" + cls.label_name
+        cls.url = reverse(
+            'update_common_general_information',
+            kwargs={
+                'year': current_academic_year.year
+            }) + "?label=" + cls.label_name
 
     def setUp(self) -> None:
         self.client.force_login(self.central_manager.person.user)

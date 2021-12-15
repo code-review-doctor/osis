@@ -23,7 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import uuid
 
+from assessments.tests.factories.score_responsible import ScoreResponsibleFactory
 from attribution.models.attribution_new import AttributionNew
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from attribution.tests.factories.attribution_new import AttributionNewFactory
@@ -62,7 +64,7 @@ class TestChargeRepartitionMixin:
 
     def setUp(self):
         self.attribution = AttributionNewFactory(
-            learning_container_year=self.learning_unit_year.learning_container_year
+            learning_container_year=self.learning_unit_year.learning_container_year,
         )
         attribution_id = self.attribution.id
         self.charge_lecturing = AttributionChargeNewFactory(
@@ -76,6 +78,7 @@ class TestChargeRepartitionMixin:
 
         self.attribution_full = self.attribution
         self.attribution_full.id = None
+        self.attribution_full.uuid = uuid.uuid4()
         self.attribution_full.save()
         self.charge_lecturing_full = AttributionChargeNewFactory(
             attribution=self.attribution_full,
@@ -87,6 +90,10 @@ class TestChargeRepartitionMixin:
         )
 
         self.attribution = AttributionNew.objects.get(id=attribution_id)
+        self.score_responsible = ScoreResponsibleFactory(
+            tutor=self.attribution.tutor,
+            learning_unit_year=self.learning_unit_year
+        )
         self.client.force_login(self.person.user)
 
     def clean_partim_charges(self):

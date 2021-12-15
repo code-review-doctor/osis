@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-31 09:38+0200\n"
+"POT-Creation-Date: 2021-09-24 14:18+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -663,6 +663,9 @@ msgstr ""
 msgid "No result!"
 msgstr ""
 
+msgid "No weighting(same weight)"
+msgstr ""
+
 msgid "Non university Bachelors"
 msgstr ""
 
@@ -879,6 +882,9 @@ msgstr ""
 msgid "This education group is not editable during this period."
 msgstr ""
 
+msgid "This education group is not editable in the past."
+msgstr ""
+
 msgid "Title"
 msgstr ""
 
@@ -981,6 +987,9 @@ msgstr ""
 msgid "Weighting"
 msgstr ""
 
+msgid "Weighting type"
+msgstr ""
+
 msgid "Yes, I confirm."
 msgstr ""
 
@@ -1061,6 +1070,9 @@ msgid "filter by section"
 msgstr ""
 
 msgid "hops"
+msgstr ""
+
+msgid "is empty"
 msgstr ""
 
 msgid "is using in"

@@ -26,8 +26,11 @@
 from django.contrib import admin
 from django.core import validators
 from django.db import models
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
 
-from base.models.utils.utils import filter_with_list_or_object
+from assessments.models.score_responsible import ScoreResponsible
+from attribution.models.attribution_class import AttributionClass
 
 MIN_ALLOCATION_CHARGE = 0
 
@@ -47,19 +50,30 @@ class AttributionChargeNew(models.Model):
     changed = models.DateTimeField(null=True, auto_now=True)
     attribution = models.ForeignKey('AttributionNew', on_delete=models.CASCADE)
     learning_component_year = models.ForeignKey('base.LearningComponentYear', on_delete=models.CASCADE)
-    allocation_charge = models.DecimalField(max_digits=6, decimal_places=1, blank=True, null=True,
-                                            validators=[validators.MinValueValidator(MIN_ALLOCATION_CHARGE)])
-    objects = models.Manager()
+    allocation_charge = models.DecimalField(
+        max_digits=6,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        validators=[validators.MinValueValidator(MIN_ALLOCATION_CHARGE)]
+    )
 
     def __str__(self):
         return u"%s" % self.attribution
 
 
-def search(*args, **kwargs):
-    qs = AttributionChargeNew.objects.all()
-    if "learning_component_year" in kwargs:
-        qs = filter_with_list_or_object('learning_component_year', AttributionChargeNew, **kwargs)
-    if "attribution" in kwargs:
-        qs = qs.filter(attribution=kwargs['attribution'])
-
-    return qs.select_related('learning_component_year', 'attribution')
+@receiver(post_delete, sender=AttributionChargeNew)
+def _attribution_new_delete(sender, instance, **kwargs):
+    if AttributionChargeNew.objects.filter(
+            attribution__tutor=instance.attribution.tutor,
+            learning_component_year__learning_unit_year=instance.learning_component_year.learning_unit_year
+    ).count() == 0:
+        learning_unit_year = instance.learning_component_year.learning_unit_year
+        ScoreResponsible.objects.filter(
+            learning_unit_year=learning_unit_year,
+            tutor=instance.attribution.tutor
+        ).delete()
+        AttributionClass.objects.filter(
+            attribution_charge__attribution__tutor=instance.attribution.tutor,
+            learning_class_year__learning_component_year__learning_unit_year=learning_unit_year
+        ).delete()

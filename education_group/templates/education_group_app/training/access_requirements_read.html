@@ -57,8 +57,10 @@
                 {% include 'education_group_app/blocks/access_requirements_text.html' with section_name="ca_bacs_cond_speciales" text=_("Special Requirements to access some programmes") field=common_access_requirements.special_conditions.text_fr field_en=common_access_requirements.special_conditions.text_en can_edit=False %}
             {% endif %}
 
-            <!-- Conditions spécifiques d'admission -->
-            {% include 'education_group_app/blocks/access_requirements_text.html' with section_name="free" text=_("Specific Access Requirements") field=access_requirements.admission_requirements.text_fr field_en=access_requirements.admission_requirements.text_en can_edit=True %}
+            {% if not training.is_bachelor %}
+                <!-- Conditions spécifiques d'admission -->
+                {% include 'education_group_app/blocks/access_requirements_text.html' with section_name="free" text=_("Specific Access Requirements") field=access_requirements.admission_requirements.text_fr field_en=access_requirements.admission_requirements.text_en can_edit=True %}
+            {% endif %}
 
             {% if training.is_aggregation %}
                 <!-- Maîtrise de la langue française -->

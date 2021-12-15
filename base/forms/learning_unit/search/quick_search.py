@@ -25,14 +25,14 @@ from django import forms
 from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from django_filters import FilterSet, filters, OrderingFilter
 
-from base.models.academic_year import AcademicYear
+from backoffice.settings.base import MINIMUM_LUE_YEAR
 from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
+from ddd.logic.shared_kernel.academic_year.commands import SearchAcademicYearCommand
+from infrastructure.messages_bus import message_bus_instance
 
 
 class QuickLearningUnitYearFilter(FilterSet):
-    academic_year = filters.ModelChoiceFilter(
-        queryset=AcademicYear.objects.all(),
-        to_field_name="year",
+    academic_year__year = filters.ChoiceFilter(
         required=False,
         label=_('Ac yr.'),
         empty_label=pgettext_lazy("female plural", "All"),
@@ -63,16 +63,22 @@ class QuickLearningUnitYearFilter(FilterSet):
     class Meta:
         model = LearningUnitYear
         fields = [
-            "academic_year",
+            "academic_year__year",
             "acronym",
             "title",
         ]
 
     def __init__(self, *args, initial=None, **kwargs):
         super().__init__(*args, **kwargs)
+        self.__init_academic_year_field()
         self.queryset = self.get_queryset()
         if initial:
-            self.form.fields["academic_year"].initial = initial["academic_year"]
+            self.form.fields["academic_year__year"].initial = initial["academic_year__year"]
+
+    def __init_academic_year_field(self):
+        all_academic_year = message_bus_instance.invoke(SearchAcademicYearCommand(year=MINIMUM_LUE_YEAR))
+        choices = [(ac_year.year, str(ac_year)) for ac_year in all_academic_year]
+        self.form.fields['academic_year__year'].choices = choices
 
     def get_queryset(self):
         # Need this close so as to return empty query by default when form is unbound

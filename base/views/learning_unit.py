@@ -43,7 +43,7 @@ from base.business.learning_unit import get_cms_label_data, \
     get_components_identification
 from base.business.learning_unit_proposal import _get_value_from_enum, clean_attribute_initial_value
 from base.business.learning_units.comparison import FIELDS_FOR_LEARNING_UNIT_YR_COMPARISON, \
-    FIELDS_FOR_LEARNING_CONTAINER_YR_COMPARISON, FIELDS_FOR_COMMON_TITLE_COMPARISON
+    FIELDS_FOR_LEARNING_CONTAINER_YR_COMPARISON, FIELDS_FOR_COMMON_TITLE_COMPARISON, _get_boolean_translation
 from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, PLANNED_CLASSES, \
     VOLUME_REQUIREMENT_ENTITY, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2
 from base.forms.learning_unit_specifications import LearningUnitSpecificationsForm, LearningUnitSpecificationsEditForm
@@ -59,16 +59,15 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.views.common import display_success_messages
-from base.views.learning_units.common import get_common_context_learning_unit_year, get_text_label_translated, \
-    get_common_context_to_publish
+from base.views.learning_units.common import get_common_context_learning_unit_year, get_text_label_translated
 from cms.models.text_label import TextLabel
 from cms.models.translated_text_label import TranslatedTextLabel
+from learning_unit.models.learning_class_year import LearningClassYear
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.repositories.node import NodeRepository
 from program_management.ddd.service.read.search_program_trees_using_node_service import search_program_trees_using_node
 from program_management.serializers.program_trees_utilizations import utilizations_serializer
 from reference.models.language import find_language_in_settings
-from django.contrib.messages import get_messages
 
 ORGANIZATION_KEYS = ['ALLOCATION_ENTITY', 'REQUIREMENT_ENTITY',
                      'ADDITIONAL_REQUIREMENT_ENTITY_1', 'ADDITIONAL_REQUIREMENT_ENTITY_2',
@@ -85,13 +84,24 @@ def learning_unit_formations(request, learning_unit_year_id=None, code=None, yea
     node_identity = NodeIdentity(code=learn_unit_year.acronym, year=learn_unit_year.academic_year.year)
     utilizations = utilizations_serializer(node_identity, search_program_trees_using_node, NodeRepository())
     context['direct_parents'] = utilizations
-
-    context['root_formations'] = education_group_year.find_with_enrollments_count(learn_unit_year)
+    root_formations = education_group_year.find_with_enrollments_count(learn_unit_year)
+    context['root_formations'] = root_formations
     context['total_formation_enrollments'] = 0
     context['total_learning_unit_enrollments'] = 0
-    for root_formation in context['root_formations']:
-        context['total_formation_enrollments'] += root_formation.count_formation_enrollments
-        context['total_learning_unit_enrollments'] += root_formation.count_learning_unit_enrollments
+    context['classes'] = LearningClassYear.objects.filter(
+        learning_component_year__learning_unit_year__id=learning_unit_year_id
+    ).distinct('pk')
+
+    totals_classes = {}
+    for root_formation in root_formations:
+        context['total_learning_unit_enrollments'] += root_formation.count_learning_unit_enrollments + \
+                                                      root_formation.count_learning_unit_enrollments_first_year
+        if root_formation.classes_counter:
+            for class_id, class_counter in root_formation.classes_counter.items():
+                tot = totals_classes.get(class_id, 0)
+                tot = tot + class_counter.get('main', 0) + class_counter.get('first_year', 0)
+                totals_classes.update({class_id: tot})
+    context['totals_classes'] = totals_classes
     context['tab_active'] = "learning_unit_formations"  # Corresponds to url_name
     return render(request, "learning_unit/formations.html", context)
 
@@ -137,7 +147,6 @@ def learning_unit_specifications(request, learning_unit_year_id=None, code=None,
         'base.can_update_learning_achievement', learning_unit_year
     )
     context['tab_active'] = 'learning_unit_specifications'  # Corresponds to url_name
-    context.update(get_common_context_to_publish(person, learning_unit_year))
     return render(request, "learning_unit/specifications.html", context)
 
 
@@ -471,12 +480,15 @@ def get_learning_container_year_context(learning_unit_year):
 
 def get_learning_unit_context(learning_unit_year):
     learning_unit_year_fields = OrderedDict()
+    boolean_fields = ['stage_dimona', 'individual_loan', 'exchange_students', 'english_friendly', 'french_friendly']
     for field in FIELDS_FOR_LEARNING_UNIT_YR_COMPARISON:
         field_name = learning_unit_year._meta.get_field(field).verbose_name
         if field == 'periodicity':
             value = _get_value_from_enum(PERIODICITY_TYPES, getattr(learning_unit_year, field))
         elif field == 'attribution_procedure':
             value = _get_value_from_enum(ATTRIBUTION_PROCEDURES, getattr(learning_unit_year, field))
+        elif field in boolean_fields:
+            value = _get_boolean_translation(getattr(learning_unit_year, field)).capitalize()
         else:
             value = getattr(learning_unit_year, field)
         learning_unit_year_fields[field_name] = value
@@ -542,3 +554,14 @@ def proposal_is_on_future_year(proposal, base_luy):
 
 def proposal_is_on_same_year(proposal, base_luy):
     return proposal.learning_unit_year.academic_year.year == base_luy.academic_year.year
+
+
+def _group_by_education_group_year(classes):
+    group_by_education_group_year = {}
+    for classe in classes:
+        key = classe.offer_enrollment.education_group_year.pk
+        if key in group_by_education_group_year:
+            group_by_education_group_year[key] += group_by_education_group_year[key]
+        else:
+            group_by_education_group_year[key] = 1
+    return group_by_education_group_year

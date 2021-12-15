@@ -212,6 +212,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
                 (self.have_general_information_tab() or self.have_access_requirements_tab() or
                  self.have_skills_and_achievements_tab()),
             "publish_url": self.get_publish_url(),
+            "active_tab": self.active_tab.name,
 
         }
 

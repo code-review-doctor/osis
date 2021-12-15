@@ -35,11 +35,10 @@ from base.views.learning_units.search.common import SearchTypes
 
 
 class ServiceCourseFilter(LearningUnitFilter):
-    academic_year = filters.ModelChoiceFilter(
-        queryset=AcademicYear.objects.all(),
+    academic_year__year = filters.ChoiceFilter(
         required=True,
         label=_('Ac yr.'),
-        empty_label=None
+        empty_label=None,
     )
     search_type = filters.CharFilter(
         field_name="acronym",
@@ -52,7 +51,7 @@ class ServiceCourseFilter(LearningUnitFilter):
     def filter_queryset(self, queryset):
         qs = super().filter_queryset(queryset)
 
-        academic_year = self.form.cleaned_data["academic_year"]
+        academic_year = AcademicYear.objects.get(year=self.form.cleaned_data["academic_year__year"])
         entity_structure = load_main_entity_structure(academic_year.start_date)
         service_courses_ids = [luy.id for luy in qs if _is_service_course(luy, entity_structure)]
         return qs.filter(pk__in=service_courses_ids)

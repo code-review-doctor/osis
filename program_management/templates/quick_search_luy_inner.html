@@ -17,7 +17,7 @@
 {% endblock navbar %}
 
 {% block form_field %}
-    {% bootstrap_field form.academic_year form_group_class="col-md-2" %}
+    {% bootstrap_field form.academic_year__year form_group_class="col-md-2" %}
     {% bootstrap_field form.acronym form_group_class="col-md-2" %}
     {% bootstrap_field form.title form_group_class="col-md-6" %}
 {% endblock form_field %}
@@ -70,7 +70,7 @@
                 "targets": 2,
                 "data": "acronym",
                 "render": function ( data, type, row, meta ) {
-                    return '<a href="'+ row['osis_url'] +'">'+ data + '</a>';
+                    return data;
                 }
             },
             { "name": "title", "targets": 3, "data": "title"},

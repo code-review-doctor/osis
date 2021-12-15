@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -26,14 +26,92 @@
 from django.core.validators import RegexValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from reversion.admin import VersionAdmin
 
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.enums import quadrimesters, learning_unit_year_session
+from base.models.enums.component_type import LECTURING
+from base.models.enums.learning_component_year_type import PRACTICAL_EXERCISES
+from base.models.learning_unit_year import LearningUnitYear
+from learning_unit.business.create_class_copy_report import create_class_copy_report
 from osis_common.models import osis_model_admin
 
 
-class LearningClassYearAdmin(osis_model_admin.OsisModelAdmin):
-    list_display = ('learning_component_year', 'acronym')
+def copy_to_next_year(modeladmin, request, queryset):
+    from ddd.logic.learning_unit.commands import CreateEffectiveClassCommand
+    from ddd.logic.learning_unit.commands import GetEffectiveClassCommand
+    from infrastructure.messages_bus import message_bus_instance
+    qs = queryset.select_related("learning_component_year")
+
+    report = []
+    for obj in qs:
+        classe_source = "{}{}{} — {}".format(
+            obj.learning_component_year.learning_unit_year.acronym,
+            '_' if obj.learning_component_year.type == PRACTICAL_EXERCISES else '-',
+            obj.acronym,
+            obj.learning_component_year.learning_unit_year.academic_year
+        )
+        classe_result = ''
+        copy_exception = ''
+        # Have to check if the ue's acronym is the same in the destination year
+        lc = obj.learning_component_year.learning_unit_year.learning_container_year.learning_container
+        destination_year = obj.learning_component_year.learning_unit_year.academic_year.year + 1
+        destination_luy = LearningUnitYear.objects.get(
+            academic_year__year=destination_year,
+            learning_container_year__learning_container=lc
+        )
+        cmd = CreateEffectiveClassCommand(
+            class_code=obj.acronym,
+            learning_unit_code=destination_luy.acronym,
+            year=destination_year,
+            title_fr=obj.title_fr,
+            title_en=obj.title_en,
+            teaching_place_uuid=obj.campus.uuid,
+            derogation_quadrimester=obj.quadrimester,
+            session_derogation=obj.session,
+            volume_first_quadrimester=obj.hourly_volume_partial_q1,
+            volume_second_quadrimester=obj.hourly_volume_partial_q2
+
+        )
+        try:
+            new_classe_identity = message_bus_instance.invoke(cmd)
+            cmd_get_effective_class_created = GetEffectiveClassCommand(
+                class_code=new_classe_identity.class_code,
+                learning_unit_code=new_classe_identity.learning_unit_identity.code,
+                learning_unit_year=new_classe_identity.learning_unit_identity.academic_year.year
+            )
+            effective_class_created = message_bus_instance.invoke(cmd_get_effective_class_created)
+            classe_result = "{} — {}".format(
+                effective_class_created.complete_acronym,
+                effective_class_created.entity_id.learning_unit_identity.academic_year
+            )
+
+        except MultipleBusinessExceptions as multiple_exceptions:
+            copy_exception = ", ". join([str(ex.message) for ex in list(multiple_exceptions.exceptions)])
+
+        report.append({
+            'source': classe_source,
+            'result': classe_result,
+            'exception': copy_exception})
+
+    return create_class_copy_report(request.user, report)
+
+
+copy_to_next_year.short_description = _("Copy to next year")
+
+
+class LearningClassYearAdmin(VersionAdmin, osis_model_admin.OsisModelAdmin):
+    list_display = ('learning_component_year', 'acronym', 'get_academic_year')
+    list_filter = ('learning_component_year__learning_unit_year__academic_year',)
     search_fields = ['acronym', 'learning_component_year__learning_unit_year__acronym']
+
+    actions = [copy_to_next_year]
+
+    def get_academic_year(self, obj: 'LearningClassYear'):
+        return obj.learning_component_year.learning_unit_year.academic_year
+
+    get_academic_year.admin_order_field = 'academic_year'
+    get_academic_year.short_description = 'Academic Year'
 
 
 class LearningClassYearManager(models.Manager):
@@ -80,3 +158,18 @@ class LearningClassYear(models.Model):
             self.acronym,
             self.learning_component_year.get_type_display()
         )
+
+    @property
+    def effective_class_complete_acronym(self):
+        return "{}{}{}".format(
+            self.learning_component_year.learning_unit_year.acronym,
+            '-' if self.learning_component_year.type == LECTURING else '_',
+            self.acronym
+        )
+
+    @property
+    def volume_annual(self):
+        volume_total_of_classes = 0
+        volume_total_of_classes += self.hourly_volume_partial_q1 or 0
+        volume_total_of_classes += self.hourly_volume_partial_q2 or 0
+        return volume_total_of_classes

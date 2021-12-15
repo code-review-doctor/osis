@@ -31,9 +31,11 @@ from django.urls import reverse
 
 from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.person import PersonWithPermissionsFactory
+from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.user import UserFactory
 from base.utils.urls import reverse_with_get
 from education_group.ddd.domain.group import Group
+from education_group.models.enums.cohort_name import CohortName
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
 
@@ -132,3 +134,13 @@ class TestTrainingReadAdministrativeData(TestCase):
         self.assertFalse(response.context['tab_urls'][Tab.UTILIZATION]['active'])
         self.assertFalse(response.context['tab_urls'][Tab.SKILLS_ACHIEVEMENTS]['active'])
         self.assertFalse(response.context['tab_urls'][Tab.GENERAL_INFO]['active'])
+
+    def test_assert_program_manager_only_without_cohorte_displayed(self):
+        ProgramManagerFactory(education_group=self.training_version.offer.education_group)
+        ProgramManagerFactory(
+            education_group=self.training_version.offer.education_group,
+            cohort=CohortName.FIRST_YEAR.name,
+        )
+
+        response = self.client.get(self.url)
+        self.assertEqual(len(response.context["program_managers"]), 1)

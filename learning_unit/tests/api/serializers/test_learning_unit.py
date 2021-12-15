@@ -95,6 +95,7 @@ class LearningUnitSerializerTestCase(TestCase):
             'subtype',
             'subtype_text',
             'has_proposal',
+            'has_classes',
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
@@ -142,6 +143,7 @@ class LearningUnitDetailedSerializerTestCase(TestCase):
             'subtype',
             'subtype_text',
             'has_proposal',
+            'has_classes',
             'quadrimester',
             'quadrimester_text',
             'periodicity',
@@ -149,6 +151,9 @@ class LearningUnitDetailedSerializerTestCase(TestCase):
             'campus',
             'team',
             'language',
+            'exchange_students',
+            'french_friendly',
+            'english_friendly',
             'components',
             'parent',
             'partims',
@@ -156,7 +161,7 @@ class LearningUnitDetailedSerializerTestCase(TestCase):
             'summary_status',
             'professional_integration',
             'remark',
-            'remark_en'
+            'remark_en',
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
@@ -205,6 +210,7 @@ class ExternalLearningUnitDetailedSerializerTestCase(TestCase):
             'subtype',
             'subtype_text',
             'has_proposal',
+            'has_classes',
             'quadrimester',
             'quadrimester_text',
             'periodicity',
@@ -212,6 +218,9 @@ class ExternalLearningUnitDetailedSerializerTestCase(TestCase):
             'campus',
             'team',
             'language',
+            'exchange_students',
+            'french_friendly',
+            'english_friendly',
             'components',
             'parent',
             'partims',

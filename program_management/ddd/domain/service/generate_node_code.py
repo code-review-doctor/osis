@@ -64,9 +64,9 @@ class GenerateNodeCode(interface.DomainService):
     def __generate_node_code_from_code(self, base_code: str) -> str:
         match_regex_numeric_part = re.search(REGEX_NUMERIC_PART, base_code)
         start, end = match_regex_numeric_part.start(), match_regex_numeric_part.end()
-        numeric_part = int(base_code[start:end])
+        numeric_part = max(int(base_code[start:end]), 100)  # OSIS-5792 to ensure numeric part does not begin with 0
 
-        code_generated = base_code
+        code_generated = "{}{}{}".format(base_code[:start], str(numeric_part), base_code[end:])
         while code_generated in self.existing_codes:
             numeric_part += 1
             code_generated = "{}{}{}".format(code_generated[:start], str(numeric_part), code_generated[end:])

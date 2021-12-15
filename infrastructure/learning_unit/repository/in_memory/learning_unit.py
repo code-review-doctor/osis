@@ -1,24 +1,37 @@
-from typing import Optional, List
+from typing import Optional, List, Set, Tuple
 
+from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity, LearningUnit
 from ddd.logic.learning_unit.dtos import LearningUnitSearchDTO
 from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepository
-from osis_common.ddd.interface import ApplicationService
 
 
-class LearningUnitRepository(ILearningUnitRepository):
-    learning_units = list()  # type: List['LearningUnit']
+class LearningUnitRepository(InMemoryGenericRepository, ILearningUnitRepository):
+    entities = list()  # type: List[LearningUnit]
 
     @classmethod
-    def search_learning_units_dto(
-            cls,
-            code: str = None,
-            year: int = None,
-            full_title: str = None,
-            type: str = None,
-            responsible_entity_code: str = None
-    ) -> List['LearningUnitSearchDTO']:
-        pass
+    def search(cls, entity_ids: Optional[List['LearningUnitIdentity']] = None, **kwargs) -> List['LearningUnit']:
+        raise NotImplementedError
+
+    @classmethod
+    def search_learning_units_dto(cls, code_annee_values: Set[Tuple[str, int]] = None) -> List['LearningUnitSearchDTO']:
+        return [
+            cls._convert_learning_unit_to_search_dto(entity)
+            for entity in cls.entities
+            if (entity.code, entity.year) in code_annee_values
+        ]
+
+    @classmethod
+    def _convert_learning_unit_to_search_dto(cls, learning_unit: 'LearningUnit') -> 'LearningUnitSearchDTO':
+        return LearningUnitSearchDTO(
+            year=learning_unit.year,
+            code=learning_unit.code,
+            full_title=learning_unit.complete_title_fr,
+            type=learning_unit.type,
+            responsible_entity_code=learning_unit.responsible_entity_identity.code,
+            responsible_entity_title="",
+            partims=learning_unit.get_partims_information()
+        )
 
     # TODO: To implement when Proposals are in DDD
     @classmethod
@@ -29,26 +42,3 @@ class LearningUnitRepository(ILearningUnitRepository):
     @classmethod
     def has_enrollments(cls, learning_unit: 'LearningUnit') -> bool:
         return False
-
-    @classmethod
-    def get(cls, entity_id: 'LearningUnitIdentity') -> 'LearningUnit':
-        for lu in cls.learning_units:
-            if lu.entity_id == entity_id:
-                return lu
-        return None
-
-    @classmethod
-    def search(cls, entity_ids: Optional[List['LearningUnitIdentity']] = None, **kwargs) -> List['LearningUnit']:
-        pass
-
-    @classmethod
-    def delete(cls, entity_id: 'LearningUnitIdentity', **kwargs: ApplicationService) -> None:
-        pass
-
-    @classmethod
-    def save(cls, entity: 'LearningUnit') -> None:
-        cls.learning_units.append(entity)
-
-    @classmethod
-    def get_all_identities(cls) -> List['LearningUnitIdentity']:
-        return [lu.entity_id for lu in cls.learning_units]

@@ -37,10 +37,14 @@ def copy_existing_11ba_in_cohort_year(apps, shema_editor):
     pattern_11ba = re.compile(r'11BA')
     for my_11ba in all_11bas:
         acronym_1ba = pattern_11ba.sub(BAC_CODE, my_11ba.acronym)
-        corresponding_training = EducationGroupYear.objects.get(
-            acronym=acronym_1ba,
-            academic_year=my_11ba.academic_year
-        )
+        try:
+            corresponding_training = EducationGroupYear.objects.get(
+                acronym=acronym_1ba,
+                academic_year=my_11ba.academic_year
+            )
+        except Exception:
+            print('ERROR : Training not found : {}'.format(my_11ba.acronym))
+            continue
         if corresponding_training.administration_entity == my_11ba.administration_entity:
             administration_entity = None
         else:
@@ -50,6 +54,7 @@ def copy_existing_11ba_in_cohort_year(apps, shema_editor):
             name='FIRST_YEAR',
             defaults={
                 "administration_entity": administration_entity,
+                "external_id": my_11ba.external_id.replace('education_group_year', 'cohort_year'),
             }
         )
 

@@ -23,37 +23,48 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db import transaction
+from django.core.exceptions import ObjectDoesNotExist
 
 from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from ddd.logic.learning_unit.commands import CreateEffectiveClassCommand
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
-from ddd.logic.learning_unit.domain.service.create_effective_class import CreateEffectiveClass
+from ddd.logic.learning_unit.domain.service.can_save_effective_class import CanCreateEffectiveClass
+from ddd.logic.learning_unit.domain.service.i_student_enrollments import IStudentEnrollmentsTranslator
+from ddd.logic.learning_unit.domain.service.save_effective_class import SaveEffectiveClass
 from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
 from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepository
 
 
-@transaction.atomic()
 def create_effective_class(
         cmd: 'CreateEffectiveClassCommand',
         learning_unit_repository: 'ILearningUnitRepository',
-        class_repository: 'IEffectiveClassRepository'
-
+        class_repository: 'IEffectiveClassRepository',
+        student_enrollment_translator: 'IStudentEnrollmentsTranslator'
 ) -> 'EffectiveClassIdentity':
     # Given
-    learning_unit = learning_unit_repository.get(
-        entity_id=LearningUnitIdentityBuilder.build_from_code_and_year(cmd.learning_unit_code, cmd.year)
+    try:
+        learning_unit = learning_unit_repository.get(
+            entity_id=LearningUnitIdentityBuilder.build_from_code_and_year(cmd.learning_unit_code, cmd.year)
+        )
+    except ObjectDoesNotExist:
+        learning_unit = None
+
+    CanCreateEffectiveClass().verify(
+        learning_unit=learning_unit,
+        learning_unit_repository=learning_unit_repository,
+        student_enrollment_translator=student_enrollment_translator,
+        year=cmd.year
     )
     all_existing_class_identities = class_repository.get_all_identities()
 
     # When
-    effective_class = CreateEffectiveClass().create(
+    effective_class = SaveEffectiveClass().create(
         cmd=cmd,
-        learning_unit_repository=learning_unit_repository,
         all_existing_class_identities=all_existing_class_identities,
         learning_unit=learning_unit
     )
 
     # Then
     class_repository.save(effective_class)
+
     return effective_class.entity_id

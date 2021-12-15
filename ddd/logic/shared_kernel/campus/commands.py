@@ -31,3 +31,8 @@ from osis_common.ddd import interface
 @attr.s(frozen=True, slots=True)
 class SearchUclouvainCampusesCommand(interface.CommandRequest):
     pass  # Filters can ba added later when it's needed
+
+
+@attr.s(frozen=True, slots=True)
+class GetCampusCommand(interface.CommandRequest):
+    uuid = attr.ib(type=str)

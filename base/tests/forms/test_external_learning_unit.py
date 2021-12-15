@@ -233,7 +233,7 @@ class TestExternalPartimForm(TestCase):
     def test_external_learning_unit_form_save(self):
         data = get_valid_external_learning_unit_form_data(self.academic_year, entity=self.manager.entity)
         form = ExternalPartimForm(person=self.person, academic_year=self.academic_year, data=data,
-                                  start_year=self.academic_year.year,
+                                  start_year=self.academic_year,
                                   learning_unit_full_instance=self.learning_unit_year.learning_unit)
         self.assertTrue(form.is_valid(), form.errors)
         luy = form.save()

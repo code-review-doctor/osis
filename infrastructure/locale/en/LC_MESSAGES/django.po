@@ -1,0 +1,64 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-11-04 10:49+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, python-format
+msgid "(Noma: %(noma)s, Score: %(score)s)"
+msgstr ""
+
+msgid "Absence justified"
+msgstr ""
+
+msgid "Absence unjustified"
+msgstr ""
+
+msgid "Absent"
+msgstr ""
+
+msgid "Cheating"
+msgstr ""
+
+msgctxt "applications"
+msgid "Code"
+msgstr ""
+
+msgid "Name"
+msgstr ""
+
+msgctxt "Submission email table header"
+msgid "Program"
+msgstr ""
+
+msgctxt "Submission email table header"
+msgid "Registration number"
+msgstr ""
+
+msgid "Score"
+msgstr ""
+
+msgctxt "Submission email table header"
+msgid "Session number"
+msgstr ""
+
+#, python-format
+msgid "The following scores %(scores_with_noma)s has been encoded"
+msgstr ""
+
+#, python-format
+msgid "The following scores %(scores_with_noma)s has been submitted"
+msgstr ""

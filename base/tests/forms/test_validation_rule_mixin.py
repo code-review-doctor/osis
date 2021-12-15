@@ -112,7 +112,8 @@ class TestValidationRuleMixin(TestCase):
             data={
                 'name': "Zoubiland",
                 'iso_code': 'LB',
-                'cref_code': 'LA'
+                'cref_code': 'LA',
+                'name_en': 'ZoubiLand'
             }
         )
         self.assertTrue(form.is_valid())

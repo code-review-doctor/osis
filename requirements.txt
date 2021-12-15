@@ -1,9 +1,9 @@
 coverage==5.5
-Django==2.2.13
+Django==2.2.24
 pika==0.12.0
 openpyxl==2.3.2
-Pillow==7.2.0
-psycopg2-binary==2.7.5
+Pillow==8.3.2
+psycopg2-binary==2.8.6
 reportlab==3.5.34
 django-analytical==2.4.0
 django-localflavor==1.6
@@ -11,7 +11,7 @@ django-statici18n==1.8.3
 factory_boy==2.8.1
 django-dotenv==1.4.2
 pendulum==1.2.0
-djangorestframework==3.9.4
+djangorestframework==3.12.4
 gitpython==2.1.9
 requests==2.20.0
 django-bootstrap3==11.1.0
@@ -26,7 +26,7 @@ python-magic==0.4.15
 django-ajax-selects==1.7.1
 celery==4.4.7
 django-celery-beat==1.5.0
-django-celery-results==1.1.2
+django-celery-results==1.2.1
 django-filter==2.2.0
 django-hijack==2.1.10
 django-hijack-admin==2.1.10
@@ -44,9 +44,19 @@ numpy==1.17.4
 # setuptools 50.0 causes issues
 setuptools==49.6.0
 tblib==1.7.0
+uritemplate==3.0.1
+pyyaml==5.4.1
+unidecode==1.3.2
+
+# Modules transverses
+git+https://github.com/uclouvain/osis-async.git@dev#egg=osis_async
+git+https://github.com/uclouvain/osis-document.git@dev#egg=osis_document
+git+https://github.com/uclouvain/osis-history.git@dev#egg=osis_history
+git+https://github.com/uclouvain/osis-notification.git@dev#egg=osis_notification
+git+https://github.com/uclouvain/osis-signature.git@dev#egg=osis_signature
+git+https://github.com/uclouvain/osis-mail-template.git@dev#egg=osis_mail_template
+git+https://github.com/uclouvain/osis-export.git@dev#egg=osis_export
 
 -r ./osis_common/requirements.txt
 -r ./internship/requirements.txt
 -r ./osis_role/requirements.txt
--r ./osis_mail_template/requirements.txt
-

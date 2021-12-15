@@ -29,9 +29,12 @@ import attr
 
 from base.models.enums.learning_unit_year_session import DerogationSession
 from base.models.enums.quadrimesters import DerogationQuadrimester
+from ddd.logic.learning_unit.commands import UpdateEffectiveClassCommand
 from ddd.logic.learning_unit.domain.model._class_titles import ClassTitles
+from ddd.logic.learning_unit.domain.model._financial_volumes_repartition import DurationUnit
 from ddd.logic.learning_unit.domain.model._volumes_repartition import ClassVolumes
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
+from ddd.logic.learning_unit.domain.validator.validators_by_business_action import UpdateEffectiveClassValidatorList
 from ddd.logic.shared_kernel.campus.domain.model.uclouvain_campus import UclouvainCampusIdentity
 from osis_common.ddd import interface
 
@@ -50,28 +53,83 @@ class EffectiveClassIdentity(interface.EntityIdentity):
     def __str__(self):
         return "{} - ({})".format(self.class_code, str(self.learning_unit_identity.academic_year))
 
+    @property
+    def complete_class_code(self):
+        return self.learning_unit_identity.code + self.class_code
+
 
 @attr.s(slots=True, hash=False, eq=False)
 class EffectiveClass(interface.RootEntity, abc.ABC):
     entity_id = attr.ib(type=EffectiveClassIdentity)
     titles = attr.ib(type=ClassTitles)
     teaching_place = attr.ib(type=UclouvainCampusIdentity)
-    derogation_quadrimester = attr.ib(type=DerogationQuadrimester)
-    session_derogation = attr.ib(type=DerogationSession)
     volumes = attr.ib(type=ClassVolumes)
+    derogation_quadrimester = attr.ib(type=DerogationQuadrimester, default=None)
+    session_derogation = attr.ib(type=DerogationSession, default=None)
+
+    def __str__(self):
+        return "{} ({})".format(self.complete_acronym, self.entity_id.learning_unit_identity.academic_year)
 
     @property
-    def complete_acronym(self):
+    def class_code(self):
+        return self.entity_id.class_code
+
+    @property
+    def learning_unit_identity(self):
+        return self.entity_id.learning_unit_identity
+
+    @property
+    def complete_acronym(self) -> str:
         return "{}{}{}".format(
-            self.entity_id.learning_unit_identity.code,
+            self.learning_unit_code,
             '-' if isinstance(self, LecturingEffectiveClass) else '_',
-            self.entity_id.class_code
+            self.class_code
         )
+
+    @property
+    def learning_unit_code(self) -> str:
+        return self.entity_id.learning_unit_identity.code
+
+    @property
+    def year(self) -> int:
+        return self.entity_id.learning_unit_identity.academic_year.year
+
+    def update(self, cmd: UpdateEffectiveClassCommand) -> None:
+        UpdateEffectiveClassValidatorList(command=cmd).validate()
+        self.titles = ClassTitles(fr=cmd.title_fr, en=cmd.title_en)
+        self.teaching_place = UclouvainCampusIdentity(uuid=cmd.teaching_place_uuid)
+        quadri = cmd.derogation_quadrimester
+        self.derogation_quadrimester = DerogationQuadrimester[quadri] if quadri else None
+        self.session_derogation = DerogationSession(cmd.session_derogation) if cmd.session_derogation else None
+        self.volumes = ClassVolumes(
+            volume_first_quadrimester=cmd.volume_first_quadrimester,
+            volume_second_quadrimester=cmd.volume_second_quadrimester
+        )
+
+    def is_volume_first_quadrimester_greater_than(self, volume: DurationUnit) -> bool:
+        return self.volumes.volume_first_quadrimester and self.volumes.volume_first_quadrimester > volume
+
+    def is_volume_second_quadrimester_greater_than(self, volume: DurationUnit) -> bool:
+        return self.volumes.volume_second_quadrimester and self.volumes.volume_second_quadrimester > volume
+
+    @property
+    def is_practical(self):
+        return False
+
+    @property
+    def is_lecturing(self):
+        return False
 
 
 class PracticalEffectiveClass(EffectiveClass):
-    pass
+
+    @property
+    def is_practical(self):
+        return True
 
 
 class LecturingEffectiveClass(EffectiveClass):
-    pass
+
+    @property
+    def is_lecturing(self):
+        return True

@@ -42,7 +42,6 @@ from program_management.ddd.domain.link import Link
 from program_management.tests.ddd.factories.domain.prerequisite.prerequisite import PrerequisitesFactory
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
-from program_management.tests.ddd.factories.prerequisite import PrerequisiteFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
@@ -179,13 +178,17 @@ class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
             'code',
             'remark',
             'remark_en',
+            'language',
+            'exchange_students',
+            'french_friendly',
+            'english_friendly',
             'lecturing_volume',
             'practical_exercise_volume',
             'with_prerequisite',
             'periodicity',
             'quadrimester',
             'status',
-            'proposal_type'
+            'proposal_type',
         ]
         self.assertListEqual(list(self.serializer.data['children'][0]['children'][0].keys()), expected_fields)
 
@@ -341,7 +344,7 @@ class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
         self.assertTrue(serializer.data['children'][0]['with_prerequisite'])
 
     def test_get_appropriate_credits_for_luy(self):
-        luy = NodeLearningUnitYearFactory(year=self.year)
+        luy = NodeLearningUnitYearFactory(year=self.year, credits=5)
         gey = LinkFactory(
             parent__node_type=GroupType.COMMON_CORE,
             child=luy,

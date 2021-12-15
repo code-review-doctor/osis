@@ -41,7 +41,7 @@ class TestExcelGeneration(TestRenderToExcelMixin, TestCase):
         cls.luys = LearningUnitYearFactory.create_batch(4, academic_year__current=True)
         cls.url = reverse("learning_units_summary")
         cls.get_data = {
-            "academic_year": random.choice(cls.academic_years).id,
+            "academic_year__year": random.choice(cls.academic_years).year,
         }
         cls.tuples_xls_status_value_with_xls_method_function = (
             ("xls_teaching_material",

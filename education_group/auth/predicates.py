@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _, pgettext
 from rules import predicate
 
+from base.models.academic_year import current_academic_year
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import TrainingType
@@ -14,15 +15,11 @@ from education_group.calendar.education_group_extended_daily_management import \
 from education_group.calendar.education_group_limited_daily_management import \
     EducationGroupLimitedDailyManagementCalendar
 from education_group.calendar.education_group_preparation_calendar import EducationGroupPreparationCalendar
-from education_group.calendar.education_group_switch_calendar import EducationGroupSwitchCalendar
 from education_group.models.group_year import GroupYear
 from osis_common.ddd import interface
 from osis_role.cache import predicate_cache
 from osis_role.errors import predicate_failed_msg, set_permission_error, get_permission_error
 from program_management.ddd.domain import exception
-from program_management.ddd.domain.service import identity_search
-from program_management.ddd.repositories import load_tree_version, \
-    program_tree_version as program_tree_version_repository
 from program_management.models.element import Element
 
 
@@ -159,20 +156,23 @@ def is_element_only_inside_standard_program(
         user: User,
         education_group_year: Union[EducationGroupYear, GroupYear] = None
 ):
+    from program_management.ddd.repositories import program_tree_version
     if isinstance(education_group_year, GroupYear):
         element_id = Element.objects.get(group_year=education_group_year).id
         try:
+            from program_management.ddd.domain.service import identity_search
             node_identity = identity_search.NodeIdentitySearch.get_from_element_id(element_id)
             tree_version_identity = identity_search.ProgramTreeVersionIdentitySearch(
             ).get_from_node_identity(
                 node_identity
             )
-            tree_version = tree_version_identity and program_tree_version_repository.ProgramTreeVersionRepository(
+            tree_version = tree_version_identity and program_tree_version.ProgramTreeVersionRepository(
             ).get(tree_version_identity)
             if tree_version and not tree_version.is_official_standard:
                 return False
         except (interface.BusinessException, exception.ProgramTreeVersionNotFoundException):
             pass
+        from program_management.ddd.repositories import load_tree_version
         tree_versions = load_tree_version.load_tree_versions_from_children([element_id])
         return all((version.is_official_standard for version in tree_versions))
     return education_group_year
@@ -264,4 +264,13 @@ def is_group_year_an_eligible_transition(
             all_parents_transition = all(parent.partial_acronym.upper().startswith('T') for parent in parents)
             return is_transition and all_parents_transition
         return is_transition
+    return None
+
+
+@predicate(bind=True)
+@predicate_failed_msg(message=_("This education group is not editable in the past."))
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
+def is_education_group_year_not_in_past(self, user, obj: Union['GroupYear', 'EducationGroupYear']):
+    if obj:
+        return obj.academic_year.year >= current_academic_year().year
     return None

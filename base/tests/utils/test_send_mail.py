@@ -54,10 +54,6 @@ class TestSendMessage(TestCase):
         cls.persons = [cls.person_1, cls.person_2]
 
         cls.person_3 = PersonWithPermissionsFactory("can_receive_emails_about_automatic_postponement")
-        cls.person_without_language = test_person.create_person(
-            "language", last_name="without", email="personwithoutlang@test.com", language=None
-        )
-
         cls.academic_year = test_academic_year.create_academic_year()
         test_academic_year.create_academic_year(year=cls.academic_year.year - 1)
 
@@ -151,73 +147,6 @@ class TestSendMessage(TestCase):
         self.assertIsNone(args.get('attachment'))
 
     @patch("osis_common.messaging.send_message.send_messages")
-    @patch("osis_common.messaging.message_config.create_table")
-    def test_with_one_enrollment(self, mock_create_table,  mock_send_messages):
-        send_mail.send_message_after_all_encoded_by_manager(
-            [self.person_1, self.person_without_language],
-            [self.exam_enrollment_1],
-            self.learning_unit_year.acronym,
-            self.educ_group_year.acronym,
-            [self.exam_enrollment_1.id],
-            {self.educ_group_year}
-        )
-        args = mock_create_table.call_args[0]
-        self.assertEqual(args[0], 'enrollments')
-
-        self.assertListEqual(
-            list(args[2]['data'][0]),
-            [
-                self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.education_group_year.acronym,
-                self.exam_enrollment_1.session_exam.number_session,
-                self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.registration_id,
-                self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.person.last_name,
-                self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.person.first_name,
-                self.exam_enrollment_1.score_final if self.exam_enrollment_1.score_final else '',
-                self.exam_enrollment_1.justification_final if self.exam_enrollment_1.justification_final else '',
-            ]
-        )
-        args = mock_send_messages.call_args[0][0]
-        self.assertEqual(self.learning_unit_year.acronym, args.get('subject_data').get('learning_unit_acronym'))
-        self.assertEqual(self.educ_group_year.acronym, args.get('subject_data').get('offer_acronym'))
-        self.assertIsNotNone(args.get('attachment'))
-        self.assertEqual(args.get('html_template_ref'),
-                         "{}_html".format(send_mail.ASSESSMENTS_ALL_SCORES_BY_PGM_MANAGER))
-        self.assertEqual(args.get('txt_template_ref'),
-                         "{}_txt".format(send_mail.ASSESSMENTS_ALL_SCORES_BY_PGM_MANAGER))
-
-        self.assertEqual(mock_create_table.call_count, 1)
-
-        fr_headers = [
-            'Sigle',
-            'Session',
-            'Noma',
-            'Nom',
-            'Prénom',
-            'Note',
-            'Justification'
-        ]
-        enrollment_data = [
-            (self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.education_group_year.acronym,
-             self.exam_enrollment_1.session_exam.number_session,
-             self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.registration_id,
-             self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.person.last_name,
-             self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.person.first_name,
-             self.exam_enrollment_1.score_final if self.exam_enrollment_1.score_final else '',
-             self.exam_enrollment_1.justification_final if self.exam_enrollment_1.justification_final else '',)
-            ]
-        data = {
-            'style': ['background-color: lime;'],
-            'data': enrollment_data,
-            'txt_complementary_first_col': {'header': 'Mis à jour', 'rows_content': ['*']}
-        }
-
-        mock_create_table.assert_has_calls(
-            [
-                call('enrollments', fr_headers, data, data_translatable=['Justification']),
-            ]
-        )
-
-    @patch("osis_common.messaging.send_message.send_messages")
     def test_send_mail_for_educational_information_update(self, mock_send_messages):
         add_message_template_html_education_update()
         add_message_template_txt_education_update()
@@ -225,40 +154,6 @@ class TestSendMessage(TestCase):
         args = mock_send_messages.call_args[0][0]
         self.assertEqual(len(args.get('receivers')), 1)
         self.assertEqual([self.learning_unit_year], args.get('template_base_data').get('learning_unit_years'))
-
-    @patch("osis_common.messaging.send_message.send_messages")
-    @patch("osis_common.messaging.message_config.create_table")
-    def test_send_mail_after_scores_submission(self, mock_create_table, mock_send_messages):
-        for person in self.persons:
-            send_mail.send_mail_after_scores_submission(
-                [person],
-                self.learning_unit_year.acronym,
-                [self.exam_enrollment_1],
-                True
-            )
-            args = mock_create_table.call_args[0]
-            self.assertEqual(args[0], 'submitted_enrollments')
-            self.assertCountEqual(list(args[1]), send_mail.get_enrollment_headers(person.language))
-            self.assertListEqual(
-                list(args[2][0]),
-                [self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.education_group_year.acronym,
-                 self.exam_enrollment_1.session_exam.number_session,
-                 self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.registration_id,
-                 self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.person.last_name,
-                 self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.person.first_name,
-                 self.exam_enrollment_1.score_final if self.exam_enrollment_1.score_final else '',
-                 self.exam_enrollment_1.justification_final if self.exam_enrollment_1.justification_final else '',
-                 ])
-
-            args = mock_send_messages.call_args[0][0]
-            self.assertEqual(self.learning_unit_year.acronym, args.get('subject_data').get('learning_unit_name'))
-
-            self.assertEqual(len(args.get('receivers')), 1)
-            self.assertEqual(args.get('html_template_ref'),
-                             "{}_html".format(send_mail.ASSESSMENTS_SCORES_SUBMISSION_MESSAGE_TEMPLATE))
-            self.assertEqual(args.get('txt_template_ref'),
-                             "{}_txt".format(send_mail.ASSESSMENTS_SCORES_SUBMISSION_MESSAGE_TEMPLATE))
-            self.assertEqual(self.learning_unit_year.acronym, args.get('template_base_data').get('learning_unit_name'))
 
     def test_get_encoding_status_not_all_encoded(self):
         self.assertEqual(send_mail._get_encoding_status(LANGUAGE_CODE_EN, False), 'It remains notes to encode.')
@@ -271,12 +166,12 @@ class TestSendMessage(TestCase):
                          'Toutes les notes ont été soumises.')
 
     def test_check_table_headers_fr_be(self):
-        expected = ['Sigle', 'Session', 'Noma', 'Nom', 'Prénom', 'Note', 'Justification']
+        expected = ['Sigle', 'Session', 'Noma', 'Nom', 'Note', 'Justification']
         self.assertListEqual(expected, send_mail.get_enrollment_headers('fr-be'))
 
     def test_check_table_headers_en(self):
         expected = [
-            'Program', 'Session number', 'Registration number', 'Last name', 'First name', 'Score', 'Justification'
+            'Program', 'Session number', 'Registration number', 'Name', 'Score', 'Justification'
         ]
         self.assertListEqual(expected, send_mail.get_enrollment_headers('en'))
 

@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import uuid
 from datetime import datetime
 from typing import Optional
 
@@ -33,10 +34,11 @@ from django.utils.safestring import mark_safe
 from base.models.entity_version import EntityVersion
 from base.models.entity_version_address import EntityVersionAddress
 from base.models.enums import organization_type
-from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
+
+from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
-class OrganizationAdmin(SerializableModelAdmin):
+class OrganizationAdmin(OsisModelAdmin):
     list_display = ('name', 'acronym', 'type', 'changed', 'logo_tag')
     search_fields = ['acronym', 'name']
     list_filter = ['type']
@@ -58,12 +60,13 @@ class OrganizationManager(models.Manager):
         )
 
 
-class Organization(SerializableModel):
+class Organization(models.Model):
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, db_index=True)
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     name = models.CharField(max_length=255)
-    code = models.CharField(max_length=50, blank=True)
     acronym = models.CharField(max_length=20, blank=True)
+    code = models.CharField(max_length=50, blank=True)
     type = models.CharField(max_length=30, blank=True, choices=organization_type.ORGANIZATION_TYPE, default='')
     prefix = models.CharField(max_length=30, blank=True)
     logo = models.ImageField(upload_to='organization_logos', null=True, blank=True)
@@ -128,10 +131,10 @@ class Organization(SerializableModel):
         return None
 
     def __get_current_root_entity_version(self) -> EntityVersion:
-        return EntityVersion.objects.current(datetime.now()).filter(entity__organization=self.pk).only_roots()\
+        return EntityVersion.objects.current(datetime.now()).filter(entity__organization=self.pk).only_roots() \
             .prefetch_related(
-                Prefetch(
-                    'entityversionaddress_set',
-                    queryset=EntityVersionAddress.objects.all().select_related('country')
-                )
-            ).order_by('-start_date').first()
+            Prefetch(
+                'entityversionaddress_set',
+                queryset=EntityVersionAddress.objects.all().select_related('country')
+            )
+        ).order_by('-start_date').first()

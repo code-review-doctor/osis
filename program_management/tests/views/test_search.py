@@ -290,7 +290,7 @@ class TestEducationGroupDataSearchFilter(TestCase):
                                   result_expected[idx])
 
     def test_search_with_academic_year_only(self):
-        response = self.client.get(self.url, data={"academic_year": self.current_academic_year.id})
+        response = self.client.get(self.url, data={"academic_year__year": self.current_academic_year.year})
 
         self.assertTemplateUsed(response, SEARCH_TEMPLATE)
 
@@ -446,7 +446,7 @@ class TestEducationGroupDataSearchFilter(TestCase):
     def test_with_multiple_criteria(self):
         response = self.client.get(
             self.url, data={
-                "academic_year": self.current_academic_year.id,
+                "academic_year__year": self.current_academic_year.year,
                 "acronym": self.education_group_arke2a.acronym,
                 "management_entity": self.envi_entity_v.acronym,
                 "with_entity_subordinated": True

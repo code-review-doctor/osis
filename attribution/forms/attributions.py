@@ -1,4 +1,4 @@
-############################################################################
+###########################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -92,6 +92,13 @@ class AttributionCreationForm(AttributionForm):
         instance.learning_container_year = self.learning_unit_year.learning_container_year
         tutor, _ = Tutor.objects.get_or_create(person=self.cleaned_data["person"])
         instance.tutor = tutor
+
+        if self.learning_unit_year.learning_container_year.container_type != learning_container_year_types.COURSE or \
+                self.learning_unit_year.is_partim():
+            if instance.start_year is None:
+                instance.start_year = self.learning_unit_year.academic_year.year
+            if instance.end_year is None:
+                instance.end_year = self.learning_unit_year.academic_year.year
         if commit:
             instance.save()
         return instance

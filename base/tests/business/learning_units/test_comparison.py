@@ -135,8 +135,6 @@ class LearningUnitYearComparaisonTest(TestCase):
         data = compare_learning_component_year(l_comp_yr_current, l_comp_yr_previous, l_comp_yr_next)
         self.assertEqual(data.get('acronym'),
                          [l_comp_yr_previous.acronym, l_comp_yr_current.acronym, l_comp_yr_next.acronym])
-        self.assertEqual(data.get('real_classes'),
-                         [l_comp_yr_previous.real_classes, l_comp_yr_current.real_classes, l_comp_yr_next.real_classes])
 
     def test_compare_volumes(self):
         previous_volume_global = 12.0

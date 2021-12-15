@@ -32,8 +32,8 @@ from django.utils.translation import gettext_lazy as _
 
 from assistant.models.tutoring_learning_unit_year import TutoringLearningUnitYear
 from assistant.tests.factories.assistant_mandate import AssistantMandateFactory
-from attribution.tests.factories.attribution import AttributionNewFactory
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
+from attribution.tests.factories.attribution_new import AttributionNewFactory
 from attribution.tests.factories.tutor_application import TutorApplicationFactory
 from base.business.learning_unit import CMS_LABEL_SPECIFICATIONS, CMS_LABEL_PEDAGOGY, CMS_LABEL_SUMMARY
 from base.business.learning_units.simple import deletion
@@ -344,14 +344,12 @@ class LearningUnitYearDeletion(TestCase):
         manager = FacultyManagerFactory(entity=entity_version.entity)
 
         # Creation UE
-        learning_unit = LearningUnitFactory()
         l_containeryear = LearningContainerYearFactory(
             academic_year=self.academic_year,
             container_type=learning_container_year_types.COURSE,
             requirement_entity=entity_version.entity
         )
         learning_unit_year = LearningUnitYearFactory(
-            learning_unit=learning_unit,
             academic_year=self.academic_year,
             learning_container_year=l_containeryear,
             subtype=learning_unit_year_subtypes.FULL
@@ -361,8 +359,11 @@ class LearningUnitYearDeletion(TestCase):
         self.assertFalse(manager.person.user.has_perm('base.can_delete_learningunit', learning_unit_year))
 
         # Can remove PARTIM COURSE
-        learning_unit_year.subtype = learning_unit_year_subtypes.PARTIM
-        learning_unit_year.save()
+        learning_unit_year = LearningUnitYearFactory(
+            academic_year=self.academic_year,
+            learning_container_year=l_containeryear,
+            subtype=learning_unit_year_subtypes.PARTIM
+        )
         self.assertTrue(manager.person.user.has_perm('base.can_delete_learningunit', learning_unit_year))
 
         # invalidate cache
@@ -406,10 +407,12 @@ class LearningUnitYearDeletion(TestCase):
 
     @mock.patch("base.models.person.Person.is_linked_to_entity_in_charge_of_learning_unit_year", return_value=True)
     def test_cannot_delete_if_has_application_another_year(self, mock_is_linked):
+        next_anac = AcademicYearFactory(year=self.academic_year.year + 1)
         luy_next_year = LearningUnitYearFactory(
             learning_unit=self.learning_unit,
-            academic_year=AcademicYearFactory(year=self.academic_year.year + 1),
+            academic_year=next_anac,
             learning_container_year=LearningContainerYearFactory(
+                academic_year=next_anac,
                 learning_container=self.l_container_year.learning_container
             ),
             subtype=learning_unit_year_subtypes.FULL,

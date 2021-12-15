@@ -36,11 +36,9 @@ from django.contrib.auth.views import LoginView
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.shortcuts import redirect, render
 from django.urls import reverse
-from django.utils import translation
 from django.utils.translation import gettext_lazy as _, get_language
 
 from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmissionCalendar
-from base import models as mdl
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType
 from base.models.utils import native
 from osis_common.models import application_notice
@@ -97,10 +95,13 @@ def common_context_processor(request):
         sentry_dns = ''
     release_tag = settings.RELEASE_TAG if hasattr(settings, 'RELEASE_TAG') else None
 
-    context = {'installed_apps': settings.INSTALLED_APPS,
-               'environment': env,
-               'sentry_dns': sentry_dns,
-               'release_tag': release_tag}
+    context = {
+        'installed_apps': settings.INSTALLED_APPS,
+        'environment': env,
+        'sentry_dns': sentry_dns,
+        'release_tag': release_tag,
+        'email_service_desk': settings.EMAIL_SERVICE_DESK,
+    }
     _check_notice(request, context)
     return context
 
@@ -122,14 +123,7 @@ def login(request):
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
-        user = authenticate(username=username, password=password)
-        person = mdl.person.find_by_user(user)
-        # ./manage.py createsuperuser (in local) doesn't create automatically a Person associated to User
-        if person:
-            if person.language:
-                user_language = person.language
-                translation.activate(user_language)
-                request.session[translation.LANGUAGE_SESSION_KEY] = user_language
+        authenticate(username=username, password=password)
     elif settings.OVERRIDED_LOGIN_URL:
         return redirect(settings.OVERRIDED_LOGIN_URL)
     return LoginView.as_view()(request)
@@ -144,7 +138,7 @@ def home(request):
 
 def _get_highlight_events():
     return [
-        {**attr.asdict(event), 'url': reverse('scores_encoding')}
+        {**attr.asdict(event), 'url': reverse('score_encoding_progress_overview')}
         for event in ScoresExamSubmissionCalendar().get_opened_academic_events()
     ]
 

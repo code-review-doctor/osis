@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-31 09:38+0200\n"
+"POT-Creation-Date: 2021-09-24 14:18+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -701,6 +701,9 @@ msgstr "Nouvelle Formation"
 msgid "No result!"
 msgstr "Aucun résultat!"
 
+msgid "No weighting(same weight)"
+msgstr "Pas de pondération par crédit (poids égal)"
+
 msgid "Non university Bachelors"
 msgstr "Bacheliers non universitaires"
 
@@ -937,6 +940,9 @@ msgstr ""
 "La période de modification des formations n'est pas ouverte durant cette "
 "période."
 
+msgid "This education group is not editable in the past."
+msgstr "Il n'est pas possible de modifier dans le passé."
+
 msgid "Title"
 msgstr "Intitulé"
 
@@ -1051,6 +1057,9 @@ msgstr "Ré-inscription par internet"
 msgid "Weighting"
 msgstr "Pondération par crédit"
 
+msgid "Weighting type"
+msgstr "Type de pondération"
+
 msgid "Yes, I confirm."
 msgstr "Oui, je confirme."
 
@@ -1143,6 +1152,9 @@ msgstr "préfiltrer par rubrique"
 msgid "hops"
 msgstr "ares"
 
+msgid "is empty"
+msgstr "est vide"
+
 msgid "is using in"
 msgstr "est utilisée dans"
 
@@ -1187,6 +1199,3 @@ msgstr "indéterminé"
 
 msgid "with certificate aims"
 msgstr "avec attendus du diplôme"
-
-#~ msgid "Own comment"
-#~ msgstr "Commentaire propre"

@@ -46,8 +46,8 @@ MANDATORY_PNG = static('img/education_group_year/mandatory.png')
 VALIDATE_CASE_JPG = static('img/education_group_year/validate_case.jpg')
 INVALIDATE_CASE_JPG = static('img/education_group_year/invalidate_case.png')
 DELTA = static('img/education_group_year/delta.png')
-BISANNUAL_EVEN = static('img/education_group_year/bisannual_even.png')
-BISANNUAL_ODD = static('img/education_group_year/bisannual_odd.png')
+ACTIVITY_DISPENSED = static('img/education_group_year/bisannual_even.png')
+ACTIVITY_NOT_DISPENSED = static('img/education_group_year/bisannual_odd.png')
 PREREQUIS = static('img/education_group_year/prerequis.gif')
 CHILD_BRANCH = """\
 <tr>
@@ -254,12 +254,12 @@ def get_status_picture(node: 'NodeLearningUnitYear'):
 
 
 def get_biennial_picture(node: 'NodeLearningUnitYear'):
+    is_even_year = node.year % 2 == 0
     if node.periodicity == PeriodicityEnum.BIENNIAL_EVEN:
-        return BISANNUAL_EVEN
+        return ACTIVITY_DISPENSED if is_even_year else ACTIVITY_NOT_DISPENSED
     elif node.periodicity == PeriodicityEnum.BIENNIAL_ODD:
-        return BISANNUAL_ODD
-    else:
-        return ""
+        return ACTIVITY_NOT_DISPENSED if is_even_year else ACTIVITY_DISPENSED
+    return ""
 
 
 def get_mandatory_picture(link: 'Link'):

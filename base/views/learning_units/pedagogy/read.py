@@ -34,14 +34,14 @@ from django.db.models import Prefetch, Case, When, Value, IntegerField, Q
 from django.shortcuts import get_object_or_404, render
 from reversion.models import Version
 
-from attribution.models.attribution import Attribution
+from attribution.models.attribution_new import AttributionNew
 from base import models as mdl
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FR_ONLY, \
     CMS_LABEL_PEDAGOGY, CMS_LABEL_PEDAGOGY_FORCE_MAJEURE
 from base.models.person import Person
 from base.models.teaching_material import TeachingMaterial
 from base.views.common import add_to_session
-from base.views.learning_units.common import get_common_context_learning_unit_year, get_common_context_to_publish
+from base.views.learning_units.common import get_common_context_learning_unit_year
 from base.views.learning_units.detail import SEARCH_URL_PART
 from cms.enums.entity_name import LEARNING_UNIT_YEAR
 from cms.models.translated_text import TranslatedText
@@ -62,16 +62,16 @@ def read_learning_unit_pedagogy(request, learning_unit_year_id: int, context, te
     context.update(get_common_context_learning_unit_year(person, learning_unit_year_id, code, year))
     learning_unit_year = context['learning_unit_year']
 
-    context.update(get_common_context_to_publish(person, learning_unit_year))
-
     user_language = mdl.person.get_user_interface_language(request.user)
 
     cms_pedagogy_labels_translated = _get_cms_pedagogy_labels_translated(learning_unit_year.id, user_language)
     cms_force_majeure_labels_translated = _get_cms_force_majeure_labels_translated(learning_unit_year.id, user_language)
     teaching_materials = TeachingMaterial.objects.filter(learning_unit_year=learning_unit_year).order_by('order')
-    attributions = Attribution.objects.filter(learning_unit_year=learning_unit_year).select_related(
+    attributions = AttributionNew.objects.filter(
+        attributionchargenew__learning_component_year__learning_unit_year=learning_unit_year
+    ).select_related(
         "tutor__person"
-    ).order_by("tutor__person")
+    ).distinct().order_by("tutor__person")
 
     translated_text_ids = itertools.chain.from_iterable(
         (*translated_label.text_label.text_fr, *translated_label.text_label.text_en)

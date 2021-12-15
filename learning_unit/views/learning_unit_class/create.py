@@ -39,11 +39,11 @@ from ddd.logic.learning_unit.commands import GetLearningUnitCommand, CanCreateEf
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
 from infrastructure.messages_bus import message_bus_instance
-from learning_unit.forms.classes.create import ClassForm
+from learning_unit.forms.classes.update import ClassForm
 
 
 class CreateClassView(PermissionRequiredMixin, FormView):
-    template_name = "class/creation.html"
+    template_name = "class/update.html"
     form_class = ClassForm
     permission_required = 'base.can_create_class'
 
@@ -61,6 +61,22 @@ class CreateClassView(PermissionRequiredMixin, FormView):
             GetLearningUnitCommand(code=self.learning_unit_code, year=self.year)
         )
 
+    @cached_property
+    def cancel_url(self):
+        return reverse(
+            'learning_unit',
+            kwargs={
+                'acronym': self.learning_unit_code,
+                'year': self.learning_unit.year,
+            }
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['cancel_url'] = self.cancel_url
+        context['learning_unit'] = self.learning_unit
+        return context
+
     def get(self, request, *args, **kwargs):
         try:
             message_bus_instance.invoke(
@@ -68,7 +84,9 @@ class CreateClassView(PermissionRequiredMixin, FormView):
             )
         except MultipleBusinessExceptions as e:
             display_error_messages(request, [exc.message for exc in e.exceptions])
-            return self.redirect_to_learning_unit_identification()
+            return redirect(
+                reverse('learning_unit', kwargs={'acronym': self.learning_unit_code, 'year': self.year})
+            )
 
         return super().get(request, *args, **kwargs)
 
@@ -92,18 +110,23 @@ class CreateClassView(PermissionRequiredMixin, FormView):
         effective_class_identity = form.save()
         if not form.errors:
             display_success_messages(request, self.get_success_msg(effective_class_identity), extra_tags='safe')
-            return self.redirect_to_learning_unit_identification()
+            return redirect(
+                reverse(
+                    'class_identification',
+                    kwargs={
+                        'learning_unit_code': self.learning_unit_code,
+                        'learning_unit_year': self.year,
+                        'class_code': effective_class_identity.class_code
+                    }
+                )
+            )
 
         return render(request, self.template_name, {
             "form": form,
         })
 
-    def redirect_to_learning_unit_identification(self):
-        return redirect(
-            reverse('learning_unit', kwargs={'acronym': self.learning_unit_code, 'year': self.year})
-        )
-
-    def get_success_msg(self, effective_class_identity: 'EffectiveClassIdentity') -> str:
+    @staticmethod
+    def get_success_msg(effective_class_identity: 'EffectiveClassIdentity') -> str:
         effective_class = message_bus_instance.invoke(
             GetEffectiveClassCommand(
                 class_code=effective_class_identity.class_code,

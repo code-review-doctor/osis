@@ -116,5 +116,22 @@ fabric.properties
 .idea/modules.xml
 .idea/preferred-vcs.xml
 .idea/encodings.xml
+.idea/vcs.xml
 
 .idea
+
+# Sous module dans le gitignore pour ne jamais les pousser sur le projet osis
+/admission
+/assistant
+/continuing_education
+/dissertation
+/internship
+/osis_async
+/osis_common
+/osis_document
+/osis_history
+/osis_mail_template
+/osis_notification
+/osis_signature
+/partnership
+

@@ -253,8 +253,7 @@ def _raise_if_entity_version_does_not_exist(new_lcy, new_academic_year):
 def _duplicate_learning_component_year(new_learn_unit_year, old_learn_unit_year):
     old_components = old_learn_unit_year.learningcomponentyear_set.all()
     for old_component in old_components:
-        new_component = update_related_object(old_component, 'learning_unit_year', new_learn_unit_year)
-        _duplicate_learning_class_year(new_component)
+        update_related_object(old_component, 'learning_unit_year', new_learn_unit_year)
 
 
 def _duplicate_learning_class_year(new_component):
@@ -327,10 +326,14 @@ def update_learning_unit_year_with_report(
         luy_to_update: LearningUnitYear,
         fields_to_update: Dict[str, Any],
         entities_by_type_to_update: Dict,
-        **kwargs) -> None:
+        **kwargs
+) -> None:
     with_report = kwargs.get('with_report', True)
     override_postponement_consistency = kwargs.get('override_postponement_consistency', False)
     lu_to_consolidate = kwargs.get('lu_to_consolidate', None)
+
+    if lu_to_consolidate:
+        _check_if_learning_unit_is_consistent_with_classes(lu_to_consolidate)
 
     conflict_report = {}
     if with_report:
@@ -352,6 +355,16 @@ def update_learning_unit_year_with_report(
         _report_volume(lu_to_consolidate, luy_to_update_list)
         postpone_teaching_materials(luy_to_update)
         _descriptive_fiche_and_achievements_update(lu_to_consolidate, luy_to_update)
+
+
+def _check_if_learning_unit_is_consistent_with_classes(lu_to_consolidate: 'LearningUnitYear'):
+    for component in lu_to_consolidate.learningcomponentyear_set.all():
+        has_effective_classes = component.learningclassyear_set.all()
+        if has_effective_classes and component.hourly_volume_total_annual in [None, 0]:
+            raise IntegrityError(
+                _("Volumes of %(code_ue)s are inconsistent: you can't consolidate a learning unit whose volume has"
+                  " been deleted on a component having classes") % {'code_ue': lu_to_consolidate.acronym}
+            )
 
 
 # TODO :: Use LearningUnitPostponementForm to extend/shorten a LearningUnit and remove all this code
@@ -434,6 +447,11 @@ def _check_postponement_conflict_on_learning_unit_year(luy, next_luy):
         'quadrimester': _('Quadrimester'),
         'campus': _('Campus'),
         'language': _('Language'),
+        'stage_dimona': _('Stage-Dimona'),
+        'individual_loan': _('Individual loan'),
+        'exchange_students': _('Exchange students'),
+        'english_friendly': _('English-friendly'),
+        'french_friendly': _('French-friendly')
     }
     return _get_differences(luy, next_luy, fields_to_compare)
 

@@ -117,8 +117,12 @@ class ValidationRuleMixin(WarningFormMixin):
                     )
 
                 if rule.regex_rule:
-                    field.validators.append(RegexValidator(rule.regex_rule, rule.regex_error_message or None))
-                    field.widget.attrs.update({"pattern": rule.regex_rule})
+                    # OSIS-5297 do not block modification if value has not changed but do not respect regex
+                    initial_value = self.initial.get(name, None)
+                    regex_rule = "{}|{}".format(initial_value, rule.regex_rule) if initial_value else rule.regex_rule
+
+                    field.validators.append(RegexValidator(regex_rule, rule.regex_error_message or None))
+                    field.widget.attrs.update({"pattern": regex_rule})
 
     @staticmethod
     def change_status(field, rule):
