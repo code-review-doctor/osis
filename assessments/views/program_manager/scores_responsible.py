@@ -37,7 +37,7 @@ from django_filters.views import FilterView
 
 from assessments.api.serializers.scores_responsible import ScoresResponsibleListSerializer
 from assessments.forms.scores_responsible import ScoresResponsiblesFilter
-from assessments.views.score_encoding import get_latest_closest_session_information_message
+from assessments.views.score_encoding.outside_period import get_latest_closest_session_information_message
 from base.models import session_exam_calendar
 from base.models.academic_year import AcademicYear
 from base.models.learning_unit_year import LearningUnitYear
