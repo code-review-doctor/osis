@@ -482,6 +482,12 @@ msgstr ""
 msgid "Cancel the proposal?"
 msgstr ""
 
+msgid "Catalog viewer"
+msgstr ""
+
+msgid "Catalog viewers"
+msgstr ""
+
 msgid "Catalogue"
 msgstr ""
 
