@@ -215,7 +215,7 @@
                 {"name": "type", "targets": 3,  "data": "type_text"},
                 {"name": "subtype", "targets": 4,  "data": "subtype_text"},
                 {
-                    "name": "requirement_entity", "targets": 5, "data": "requirement_entity",
+                    "name": "ent_requirement_acronym", "targets": 5, "data": "ent_requirement_acronym",
                     "render": function ( data, type, row, meta ) {
                         if (row['active_entity_requirement_version'] === true)
                             return data;
@@ -235,7 +235,7 @@
                     }
                 },
                 {
-                    "name": "allocation_entity", "targets": 6, "data": "allocation_entity",
+                    "name": "ent_allocation_acronym", "targets": 6, "data": "ent_allocation_acronym",
                     "render": function ( data, type, row, meta ) {
                         if (row['active_entity_allocation_version'] === true)
                             return data;
