@@ -32,7 +32,7 @@
         </button>
 
         {# Cache action menu because permission/role change not frequently #}
-        {% cache 600 education_group_identification_action_bar user.username group_year.pk %}
+        {% cache 600 education_group_identification_action_bar user.username group_year.pk active_tab %}
             <ul class="dropdown-menu dropdown-menu-large row text-right pull-right">
             {% if create_group_url %}
                 <li>

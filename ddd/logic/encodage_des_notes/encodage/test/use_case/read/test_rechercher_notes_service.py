@@ -54,7 +54,7 @@ class TestRechercherNotes(SimpleTestCase):
             nom="",
             prenom="",
             etat="",
-            nom_cohorte="",
+            noms_cohortes=[],
             matricule_fgs_gestionnaire="22220000"
         )
         self.note_etudiant_repo = NoteEtudiantInMemoryRepository()
@@ -94,14 +94,14 @@ class TestRechercherNotes(SimpleTestCase):
         self.assertEqual(len(result), 4)
 
     def test_when_nom_cohorte_est_donnee_should_retourner_les_notes_de_cette_offre(self):
-        cmd = attr.evolve(self.cmd, nom_cohorte="DROI1BA")
+        cmd = attr.evolve(self.cmd, noms_cohortes=["DROI1BA"])
 
         result = message_bus_instance.invoke(cmd)
 
         self.assertEqual(len(result), 4)
 
     def test_should_raise_exception_when_nom_cohorte_n_est_pas_une_cohorte_du_gestionnaire(self):
-        cmd = attr.evolve(self.cmd, nom_cohorte="ECGE1BA")
+        cmd = attr.evolve(self.cmd, noms_cohortes=["ECGE1BA"])
 
         with self.assertRaises(MultipleBusinessExceptions):
             message_bus_instance.invoke(cmd)
@@ -169,7 +169,7 @@ class TestRechercherNotes(SimpleTestCase):
         )
 
     def test_should_return_notes_correspondantes_when_plusieurs_criteres_sont_selectionnes(self):
-        cmd = attr.evolve(self.cmd, nom_cohorte="DROI1BA", etat=NOTE_MANQUANTE)
+        cmd = attr.evolve(self.cmd, noms_cohortes=["DROI1BA"], etat=NOTE_MANQUANTE)
 
         result = message_bus_instance.invoke(cmd)
 

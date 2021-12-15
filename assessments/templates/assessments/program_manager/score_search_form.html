@@ -55,6 +55,7 @@
 
             <div class="tab-content">
                 <div id="tab_score_search" class="tab-pane fade in active">
+                    {{ search_form.media }}
                     <form id="score_search_form" method="GET" action="{{ request.path }}" style="margin-top: 20px;">
                         <div class="row">
                             <div class="col-md-2">
@@ -70,7 +71,7 @@
                                 {% bootstrap_field search_form.etat %}
                             </div>
                             <div class="col-md-2">
-                                {% bootstrap_field search_form.nom_cohorte %}
+                                {% bootstrap_field search_form.noms_cohortes %}
                             </div>
                             <div class="col-md-1">
                                 <button id="bt_submit_score_search" class="btn btn-primary" type="submit" role="button"
@@ -112,13 +113,13 @@
                                         <th id="program"
                                             style="width: 10%">{% trans 'Program' context 'encoding' %}</th>
                                         <th id="learning_unit" style="width: 20%">{% trans 'Learning unit' %}</th>
-                                        <th id="registration_number" style="width: 10%">{% trans 'Reg. No.' %}</th>
                                         <th id="peps_data" style="width: 15%">
                                             {% trans 'Type' %}
                                             <span class="badge warning-color">
                                                 PEPS
                                             </span>
                                         </th>
+                                        <th id="registration_number" style="width: 10%">{% trans 'Reg. No.' %}</th>
                                         <th id="name" style="width: 20%">{% trans 'Name' %}</th>
                                         <th id="score" style="width: 10%" style="width: 70px;">
                                             {% trans 'Score' %}
@@ -127,13 +128,19 @@
                                                     data-toggle="tooltip"
                                                     data-placement="top"
                                                     data-html="true"
-                                                    title="{% trans "Score legend" %}:
-                                                <ul>
-                                                    <li> {% trans "number between 0-20 (0=Score of presence)" %}
-                                                    <li>S : {% trans "Absence unjustified" %}</li>
-                                                    <li>M : {% trans "Absence justified" %}</li>
-                                                    <li>T : {% trans "Cheating" %}</li>
-                                                </ul>">
+                                                    title="{% trans "Score legend for program manager" %}:
+                                                    <ul>
+                                                        <li> {% trans "number between 0-20 (0=Score of presence)" %}
+                                                        <li>S : {% trans "Absence unjustified" %}</li>
+                                                        <li>M : {% trans "Absence justified" %}</li>
+                                                        <li>T : {% trans "Cheating" %}</li>
+                                                    </ul>
+                                                    {% trans "Score legend for tutor" %}:
+                                                    <ul>
+                                                        <li> {% trans "number between 0-20 (0=Score of presence)" %}</li>
+                                                        <li>A : {% trans "Absence" %}</li>
+                                                        <li>T : {% trans "Cheating" %}</li>
+                                                    </ul>">
                                             </span>
                                         </th>
                                     </tr>
@@ -141,7 +148,7 @@
                                     <tbody>
                                     {% for note_etudiant in notes_etudiant_filtered %}
                                         <tr class="result"
-                                            style="{% include 'assessments/common/row-background-color.html' %}">
+                                            style="{% include 'assessments/common/row-background-color.html' with date_echeance_atteinte=note_etudiant.date_echeance_atteinte %}">
                                             <td style="text-align:center;" id="enrollment_status_{{ forloop.counter }}"
                                                 headers="status">
                                                 {% if note_etudiant.date_echeance_atteinte %}
@@ -161,11 +168,11 @@
                                                 title="{{ note_etudiant.intitule_complet_unite_enseignement }}">
                                                 {{ note_etudiant.code_unite_enseignement |add:" - " |add:note_etudiant.intitule_complet_unite_enseignement| truncatechars:45}}
                                             </td>
-                                            <td headers="registration_number">{{ note_etudiant.noma }}</td>
                                             {% include 'assessments/common/peps_column.html' %}
+                                            <td headers="registration_number">{{ note_etudiant.noma }}</td>
                                             <td headers="name">{{ note_etudiant.nom }}, {{ note_etudiant.prenom }}</td>
                                             <td id="enrollment_note_{{ forloop.counter0 }}" headers="score">
-                                                {% if not note_etudiant.date_echeance_atteinte and not note_etudiant.desinscrit_tardivement %}
+                                                {% if not note_etudiant.date_echeance_gestionnaire_atteinte and not note_etudiant.desinscrit_tardivement %}
                                                     {% with score_encoding_form=form|index:forloop.counter0 %}
                                                         {% bootstrap_field score_encoding_form.note show_label=False %}
                                                         {% bootstrap_field score_encoding_form.noma %}
@@ -210,12 +217,11 @@
 
             const is_valid_score = function (score, is_decimal) {
                 score = score.replace(',', '.');
-
-                const regex = (is_decimal) ? /^\d+(\.\d{0,2})?$/ : /^\d+$/;
+                const regex = (is_decimal) ? /^\d+(\.\d{0,1})?$/ : /^\d+$/;
                 if (!regex.test(score)) {
                     return false;
                 }
-                score = parseFloat(score).toFixed(2)
+                score = parseFloat(score).toFixed(1)
                 return !(score > 20 || score < 0);
             }
 
@@ -261,5 +267,10 @@
                 next.focus();
             }
         });
+
+        setTimeout(function () {
+            $('.select2-selection__clear').attr('title', '');
+            $('.select2-selection__choice').attr('title', '');
+        }, 1);
     </script>
 {% endblock %}

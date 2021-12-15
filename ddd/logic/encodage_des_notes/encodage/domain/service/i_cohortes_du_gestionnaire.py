@@ -37,5 +37,6 @@ class ICohortesDuGestionnaire(interface.DomainService):
     def search(
             cls,
             matricule_gestionnaire: str,
+            annee_concernee: int,
     ) -> Set['CohorteGestionnaireDTO']:
         raise NotImplementedError

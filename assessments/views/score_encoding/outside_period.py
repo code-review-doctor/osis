@@ -56,8 +56,14 @@ class OutsidePeriod(LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestM
         return bool(message_bus_instance.invoke(GetPeriodeEncodageCommand()))
 
     def get_context_data(self, **kwargs):
-        self._manage_latest_session_exam_warning()
-        self._manage_closest_new_session_exam_warning()
+        messages_str = self.get_latest_closest_session_information_message()
+
+        for message in messages_str:
+            messages.add_message(
+                self.request,
+                messages.WARNING,
+                message
+            )
 
         if not messages.get_messages(self.request):
             messages.add_message(self.request, messages.WARNING, _("The period of scores' encoding is not opened"))
@@ -66,26 +72,22 @@ class OutsidePeriod(LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestM
             **super().get_context_data(**kwargs)
         }
 
-    def _manage_closest_new_session_exam_warning(self):
-        closest_new_session_exam = mdl.session_exam_calendar.get_closest_new_session_exam()
-        if closest_new_session_exam:
-            month_session = closest_new_session_exam.month_session_name()
-            str_date = closest_new_session_exam.start_date.strftime(self.date_format)
-            messages.add_message(
-                self.request,
-                messages.WARNING,
-                _("The period of scores' encoding for %(month_session)s session will be open %(str_date)s")
-                % {'month_session': month_session, 'str_date': str_date}
-            )
-
-    def _manage_latest_session_exam_warning(self):
+    @staticmethod
+    def get_latest_closest_session_information_message():
+        messages_str = []
+        date_format = str(_('date_format'))
         latest_session_exam = mdl.session_exam_calendar.get_latest_session_exam()
+        closest_new_session_exam = mdl.session_exam_calendar.get_closest_new_session_exam()
         if latest_session_exam:
             month_session = latest_session_exam.month_session_name()
-            str_date = latest_session_exam.end_date.strftime(self.date_format)
-            messages.add_message(
-                self.request,
-                messages.WARNING,
+            str_date = latest_session_exam.end_date.strftime(date_format)
+            messages_str.append(
                 _("The period of scores' encoding for %(month_session)s session is closed since %(str_date)s")
-                % {'month_session': month_session, 'str_date': str_date}
-            )
+                % {'month_session': month_session, 'str_date': str_date})
+        if closest_new_session_exam:
+            month_session = closest_new_session_exam.month_session_name()
+            str_date = closest_new_session_exam.start_date.strftime(date_format)
+            messages_str.append(
+                _("The period of scores' encoding for %(month_session)s session will be open %(str_date)s")
+                % {'month_session': month_session, 'str_date': str_date})
+        return messages_str

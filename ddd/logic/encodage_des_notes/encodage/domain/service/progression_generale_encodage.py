@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Optional
+from typing import Optional, List
 
 from ddd.logic.encodage_des_notes.encodage.domain.model.gestionnaire_parcours import GestionnaireParcours
 from ddd.logic.encodage_des_notes.encodage.repository.note_etudiant import INoteEtudiantRepository
@@ -32,11 +32,11 @@ from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_attribution_ens
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_inscription_examen import IInscriptionExamenTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_signaletique_etudiant import \
     ISignaletiqueEtudiantTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_unite_enseignement import IUniteEnseignementTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.progression_generale import ProgressionGeneral
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import ProgressionGeneraleEncodageNotesDTO, PeriodeEncodageNotesDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_note_etudiant import INoteEtudiantRepository as \
     INoteEtudiantSoumissionRepository
-from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_unite_enseignement import IUniteEnseignementTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.dtos import ProgressionGeneraleEncodageNotesDTO, PeriodeEncodageNotesDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
 from osis_common.ddd import interface
 
@@ -56,18 +56,17 @@ class ProgressionGeneraleEncodage(interface.DomainService):
             inscription_examen_translator: 'IInscriptionExamenTranslator',
             attribution_translator: 'IAttributionEnseignantTranslator',
 
-            nom_cohorte: Optional[str],
+            noms_cohortes: Optional[List[str]],
             code_unite_enseignement: Optional[str],
             enseignant: Optional[str],
             seulement_notes_manquantes: bool = False
     ) -> 'ProgressionGeneraleEncodageNotesDTO':
-        noms_cohortes = gestionnaire.cohortes_gerees
-        if nom_cohorte:
-            gestionnaire.verifier_gere_cohorte(nom_cohorte)
-            noms_cohortes = [nom_cohorte]
-
+        cohortes = gestionnaire.cohortes_gerees
+        if noms_cohortes:
+            gestionnaire.verifier_gere_cohortes(set(noms_cohortes))
+            cohortes = noms_cohortes
         notes_identites = note_etudiant_repo.search_notes_identites(
-            noms_cohortes=noms_cohortes,
+            noms_cohortes=cohortes,
             annee_academique=periode_encodage.annee_concernee,
             numero_session=periode_encodage.session_concernee,
             code_unite_enseignement=code_unite_enseignement,

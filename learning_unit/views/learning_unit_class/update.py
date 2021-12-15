@@ -82,6 +82,9 @@ class UpdateClassView(CommonClassView, FormView):
 
         return render(request, self.template_name, {
             "form": form,
+            "effective_class": self.effective_class,
+            "learning_unit": self.learning_unit,
+            "cancel_url": self.cancel_url,
         })
 
     def redirect_to_effective_class_identification(self):

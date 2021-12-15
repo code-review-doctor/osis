@@ -11,7 +11,7 @@ servers:
  - url: https://osis.uclouvain.be/api/v1/reference/
    description: Production server
 info:
-  version: '1.16'
+  version: '1.17'
   title: Reference Service
   description: |-
     A set of API endpoints that allow you to get reference data.
@@ -180,6 +180,11 @@ paths:
           name: search
           schema:
             description: A search term which will look up at language name (french or english)
+            type: string
+        - in: query
+          name: code
+          schema:
+            description: Filter by code
             type: string
         - $ref: '#/components/parameters/Accept-Language'
         - $ref: '#/components/parameters/X-User-FirstName'

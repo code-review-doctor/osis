@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import abc
+from typing import Optional
 
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import PeriodeEncodageNotesDTO
 from osis_common.ddd import interface
@@ -33,5 +34,10 @@ class IPeriodeEncodageNotesTranslator(interface.DomainService):
 
     @classmethod
     @abc.abstractmethod
-    def get(cls) -> 'PeriodeEncodageNotesDTO':
+    def get(cls) -> Optional['PeriodeEncodageNotesDTO']:
+        raise NotImplementedError
+
+    @classmethod
+    @abc.abstractmethod
+    def get_prochaine_periode(cls) -> 'PeriodeEncodageNotesDTO':
         raise NotImplementedError

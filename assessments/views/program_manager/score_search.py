@@ -29,20 +29,19 @@ from django.contrib import messages
 from django.forms import formset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
+from django.template.defaultfilters import floatformat
 from django.urls import reverse
 from django.utils.functional import cached_property
-from django.views.generic import FormView
 from django.utils.translation import gettext_lazy as _, ngettext
+from django.views.generic import FormView
 
 from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmissionCalendar
 from assessments.forms.score_encoding import ScoreSearchForm, ScoreSearchEncodingForm, ScoreEncodingFormSet
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
-from base.views.common import display_warning_messages
 from ddd.logic.encodage_des_notes.encodage.commands import RechercherNotesCommand, EncoderNotesCommand, \
     EncoderNoteCommand
 from infrastructure.messages_bus import message_bus_instance
 from osis_role.contrib.views import PermissionRequiredMixin
-
 
 MAXIMUM_RESULTS_DISPLAYED = 1000
 
@@ -82,11 +81,7 @@ class ScoreSearchFormView(PermissionRequiredMixin, FormView):
         formset_initial = []
         for note_etudiant in self.notes_etudiant_filtered:
             if not note_etudiant.date_echeance_atteinte and not note_etudiant.desinscrit_tardivement:
-                formset_initial.append({
-                    'note': note_etudiant.note,
-                    'noma': note_etudiant.noma,
-                    'code_unite_enseignement': note_etudiant.code_unite_enseignement
-                })
+                formset_initial.append(self._get_initial_note_etudiant(note_etudiant))
             else:
                 formset_initial.append({})
         return formset_initial
@@ -165,7 +160,7 @@ class ScoreSearchFormView(PermissionRequiredMixin, FormView):
                 nom=search_form.cleaned_data['nom'],
                 prenom=search_form.cleaned_data['prenom'],
                 etat=search_form.cleaned_data['etat'],
-                nom_cohorte=search_form.cleaned_data['nom_cohorte'],
+                noms_cohortes=search_form.cleaned_data['noms_cohortes'],
                 matricule_fgs_gestionnaire=self.person.global_id
             )
             notes = message_bus_instance.invoke(cmd)
@@ -177,3 +172,15 @@ class ScoreSearchFormView(PermissionRequiredMixin, FormView):
 
     def get_score_encoding_progress_overview_url(self):
         return reverse('score_encoding_progress_overview')
+
+    def _get_initial_note_etudiant(self, note_etudiant):
+        try:
+            note_format = "1" if note_etudiant.note_decimale_est_autorisee else "0"
+            note_formated = floatformat(float(note_etudiant.note), note_format)
+        except ValueError:
+            note_formated = note_etudiant.note
+        return {
+            'note': note_formated,
+            'noma': note_etudiant.noma,
+            'code_unite_enseignement': note_etudiant.code_unite_enseignement
+        }
