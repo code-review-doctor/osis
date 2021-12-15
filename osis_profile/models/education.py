@@ -34,6 +34,7 @@ from osis_profile.models.enums.education import (
     EducationalType,
     Equivalence,
     ForeignDiplomaTypes,
+    LanguageKnowledgeGrade,
 )
 from reference.models.country import Country
 from reference.models.language import Language
@@ -177,3 +178,42 @@ class ForeignHighSchoolDiploma(HighSchoolDiploma):
         max_length=25,
         null=True,
     )
+
+
+class LanguageKnowledge(models.Model):
+    person = models.ForeignKey(
+        Person,
+        verbose_name=_("Person"),
+        on_delete=models.CASCADE,
+        related_name="languages_knowledge",
+        null=True,
+    )
+    language = models.ForeignKey(
+        Language,
+        verbose_name=_("Language"),
+        on_delete=models.CASCADE,
+        related_name="+",
+        blank=True,
+        null=True,
+    )
+    listening_comprehension = models.CharField(
+        _("Please rate your listening comprehension"),
+        choices=LanguageKnowledgeGrade.choices(),
+        max_length=25,
+        null=True,
+    )
+    speaking_ability = models.CharField(
+        _("Please rate your speaking ability"),
+        choices=LanguageKnowledgeGrade.choices(),
+        max_length=25,
+        null=True,
+    )
+    writing_ability = models.CharField(
+        _("Please rate your writing ability"),
+        choices=LanguageKnowledgeGrade.choices(),
+        max_length=25,
+        null=True,
+    )
+
+    class Meta:
+        unique_together = ("person", "language")
