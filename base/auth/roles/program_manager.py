@@ -124,7 +124,7 @@ class ProgramManager(EducationGroupRoleModel):
             ),
             'base.view_publish_btn': rules.always_deny,
             'learning_unit.view_learningclassyear': rules.always_allow,
-            'preparation_programme.can_add_unites_enseignement_to_programme': is_linked_to_offer,
+            'preparation_programme.can_add_unites_enseignement_au_programme': is_linked_to_offer,
 
         })
 
