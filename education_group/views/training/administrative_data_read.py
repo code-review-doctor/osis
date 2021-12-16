@@ -108,4 +108,6 @@ class TrainingReadAdministrativeData(TrainingRead):
             education_group__educationgroupyear__academic_year__year=self.training_identity.year,
         ).filter(
             Q(cohort__isnull=True) | Q(cohort__exact='')
+        ).select_related(
+            'person'
         ).order_by("person__last_name", "person__first_name")

@@ -58,7 +58,9 @@ class EncoderAdresseFeuilleDeNotesDomainService(interface.DomainService):
             repo: IAdresseFeuilleDeNotesRepository,
             periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
     ) -> 'IdentiteAdresseFeuilleDeNotes':
-        annee_academique = periode_soumission_note_translator.get().annee_concernee
+        periode_soumission = periode_soumission_note_translator.get() or \
+                             periode_soumission_note_translator.get_prochaine_periode()
+        annee_academique = periode_soumission.annee_concernee
 
         identite_adresse = AdresseFeuilleDeNotesIdentityBuilder().build_from_nom_cohorte_and_annee_academique(
             cmd.nom_cohorte,
@@ -78,7 +80,9 @@ class EncoderAdresseFeuilleDeNotesDomainService(interface.DomainService):
             entites_cohorte_translator: 'IEntitesCohorteTranslator',
             periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
     ) -> 'IdentiteAdresseFeuilleDeNotes':
-        annee_academique = periode_soumission_note_translator.get().annee_concernee
+        periode_soumission = periode_soumission_note_translator.get() or \
+                             periode_soumission_note_translator.get_prochaine_periode()
+        annee_academique = periode_soumission.annee_concernee
 
         EntiteAdresseFeuilleDeNotesPremiereAnneeDeBachelierEstDifferenteDeCelleDuBachelier(
         ).verifier(
@@ -122,7 +126,9 @@ class EncoderAdresseFeuilleDeNotesDomainService(interface.DomainService):
             repo: IAdresseFeuilleDeNotesRepository,
             periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
     ) -> 'IdentiteAdresseFeuilleDeNotes':
-        annee_academique = periode_soumission_note_translator.get().annee_concernee
+        periode_soumission = periode_soumission_note_translator.get() or \
+                             periode_soumission_note_translator.get_prochaine_periode()
+        annee_academique = periode_soumission.annee_concernee
 
         AdresseFeuilleDeNotesSpecifiquePremiereAnneeDeBachelierEstDifferenteDeCelleDuBachelier().verifier(
             cmd=cmd,

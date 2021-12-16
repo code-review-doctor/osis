@@ -89,15 +89,17 @@ class DTOSerializer(serializers.Serializer):
         for field in fields_info:
             # If the field comes from CommandRequest then do not take it.
             if issubclass(source, CommandRequest) and field.name == 'transaction_id':
+                declared_fields.pop(field.name, None)
                 continue
 
             # If the field is explicitly declared as None on the class then do not take it.
             if getattr(self, field.name, False) is None:
+                declared_fields.pop(field.name, None)
                 continue
 
             # If the field is explicitly declared on the class then use that.
             if field.name in declared_fields:
-                fields[field.name] = declared_fields[field.name]
+                fields[field.name] = declared_fields.pop(field.name)
                 continue
 
             extra_field_kwargs = extra_kwargs.get(field.name, {})
@@ -112,6 +114,10 @@ class DTOSerializer(serializers.Serializer):
 
             # Create the serializer field.
             fields[field.name] = field_class(**field_kwargs)
+
+        # Add the desired fields that are explicitly declared on the class but not on the DTO
+        for field_name in declared_fields:
+            fields[field_name] = declared_fields[field_name]
 
         return fields
 

@@ -37,12 +37,13 @@ from django_filters.views import FilterView
 
 from assessments.api.serializers.scores_responsible import ScoresResponsibleListSerializer
 from assessments.forms.scores_responsible import ScoresResponsiblesFilter
+from assessments.views.score_encoding.outside_period import get_latest_closest_session_information_message
 from base.models import session_exam_calendar
 from base.models.academic_year import AcademicYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.utils.cache import CacheFilterMixin
-from base.views.common import display_success_messages, display_error_messages
+from base.views.common import display_success_messages
 from ddd.logic.effective_class_repartition.commands import SearchAttributionsToLearningUnitCommand, \
     SearchTutorsDistributedToClassCommand
 from ddd.logic.effective_class_repartition.dtos import TutorAttributionToLearningUnitDTO
@@ -63,13 +64,12 @@ class AttributionDTO:
     responsable_de_notes = attr.ib(type=bool)
 
 
-class ScoresResponsiblesSearch(LoginRequiredMixin, PermissionRequiredMixin, CacheFilterMixin, FilterView):
+class ScoresResponsiblesSearch(LoginRequiredMixin, CacheFilterMixin, FilterView):
     model = LearningUnitYear
     paginate_by = 20
     template_name = "assessments/score_responsible/score_responsibles.html"
 
     filterset_class = ScoresResponsiblesFilter
-    permission_required = 'assessments.view_scoresresponsible'
 
     def get_filterset_kwargs(self, filterset_class):
         return {
@@ -78,6 +78,9 @@ class ScoresResponsiblesSearch(LoginRequiredMixin, PermissionRequiredMixin, Cach
         }
 
     def render_to_response(self, context, **response_kwargs):
+        messages = get_latest_closest_session_information_message()
+        context.update({"session_messages": messages})
+
         if self.request.is_ajax():
             serializer = ScoresResponsibleListSerializer(context['object_list'], many=True)
             return JsonResponse({'object_list': serializer.data})

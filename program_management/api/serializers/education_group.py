@@ -48,7 +48,7 @@ class EducationGroupSerializer(serializers.Serializer):
         slug_field='name',
         queryset=EducationGroupType.objects.all(),
     )
-    management_entity = serializers.StringRelatedField()
+    management_entity = serializers.StringRelatedField(source='entity_management_version')
     complete_title_fr = serializers.CharField()
     full_title_fr = serializers.CharField()
 
@@ -69,4 +69,4 @@ class EducationGroupSerializer(serializers.Serializer):
         )
 
     def get_main_teaching_campus(self, obj):
-        return obj.main_teaching_campus.name if obj.main_teaching_campus else '-'
+        return obj.main_teaching_campus_name if obj.main_teaching_campus_name else '-'

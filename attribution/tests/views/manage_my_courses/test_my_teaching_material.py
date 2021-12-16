@@ -25,8 +25,7 @@
 ##############################################################################
 import datetime
 
-import mock
-from django.http import HttpResponseForbidden, HttpResponse, HttpResponseNotAllowed
+from django.http import HttpResponseForbidden, HttpResponseNotAllowed
 from django.test import TestCase
 from django.urls import reverse
 
@@ -91,22 +90,6 @@ class TestTutorCreateTeachingMaterial(TestCase):
             self.assertTemplateUsed(response, "method_not_allowed.html")
             self.assertEqual(response.status_code, HttpResponseNotAllowed.status_code)
 
-    @mock.patch('attribution.views.manage_my_courses.manage_my_courses.teaching_material.create_view',
-                return_value=HttpResponse())
-    def test_assert_get_http_call_teachning_material_create_view(self, mock_teachning_material_create_view):
-        response = self.client.get(self.url)
-
-        self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTrue(mock_teachning_material_create_view.called)
-
-    @mock.patch('attribution.views.manage_my_courses.manage_my_courses.teaching_material.create_view',
-                return_value=HttpResponse())
-    def test_assert_post_http_call_teachning_material_create_view(self, mock_teachning_material_create_view):
-        response = self.client.post(self.url)
-
-        self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTrue(mock_teachning_material_create_view.called)
-
 
 class TestTutorUpdateTeachingMaterial(TestCase):
     @classmethod
@@ -163,22 +146,6 @@ class TestTutorUpdateTeachingMaterial(TestCase):
             self.assertTemplateUsed(response, "method_not_allowed.html")
             self.assertEqual(response.status_code, HttpResponseNotAllowed.status_code)
 
-    @mock.patch('attribution.views.manage_my_courses.manage_my_courses.teaching_material.update_view',
-                return_value=HttpResponse())
-    def test_assert_get_http_call_teachning_material_update_view(self, mock_teachning_material_update_view):
-        response = self.client.get(self.url)
-
-        self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTrue(mock_teachning_material_update_view.called)
-
-    @mock.patch('attribution.views.manage_my_courses.manage_my_courses.teaching_material.update_view',
-                return_value=HttpResponse())
-    def test_assert_post_http_call_teachning_material_update_view(self, mock_teachning_material_update_view):
-        response = self.client.post(self.url)
-
-        self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTrue(mock_teachning_material_update_view.called)
-
 
 class TestTutorDeleteTeachingMaterial(TestCase):
     @classmethod
@@ -234,19 +201,3 @@ class TestTutorDeleteTeachingMaterial(TestCase):
             response = getattr(self.client, method)(self.url)
             self.assertTemplateUsed(response, "method_not_allowed.html")
             self.assertEqual(response.status_code, HttpResponseNotAllowed.status_code)
-
-    @mock.patch('attribution.views.manage_my_courses.manage_my_courses.teaching_material.delete_view',
-                return_value=HttpResponse())
-    def test_assert_get_http_call_teachning_material_delete_view(self, mock_teachning_material_delete_view):
-        response = self.client.get(self.url)
-
-        self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTrue(mock_teachning_material_delete_view.called)
-
-    @mock.patch('attribution.views.manage_my_courses.manage_my_courses.teaching_material.delete_view',
-                return_value=HttpResponse())
-    def test_assert_post_http_call_teachning_material_delete_view(self, mock_teachning_material_delete_view):
-        response = self.client.post(self.url)
-
-        self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTrue(mock_teachning_material_delete_view.called)

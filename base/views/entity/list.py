@@ -24,30 +24,36 @@
 #
 ##############################################################################
 
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_http_methods
+import logging
 
-from base.views import teaching_material
-from learning_unit.views.utils import learning_unit_year_getter
-from osis_role.contrib.views import permission_required
+from django.conf import settings
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import JsonResponse
+from django_filters.views import FilterView
 
+from base.forms.entity import EntityVersionFilter, EntityListSerializer
+from base.models.entity_version import EntityVersion
+from base.utils.search import SearchMixin
 
-@login_required
-@require_http_methods(['POST', 'GET'])
-@permission_required('base.can_edit_learningunit_pedagogy', fn=learning_unit_year_getter, raise_exception=True)
-def create_teaching_material(request, learning_unit_year_id):
-    return teaching_material.create_view(request, learning_unit_year_id)
-
-
-@login_required
-@require_http_methods(['POST', 'GET'])
-@permission_required('base.can_edit_learningunit_pedagogy', fn=learning_unit_year_getter, raise_exception=True)
-def update_teaching_material(request, learning_unit_year_id, teaching_material_id):
-    return teaching_material.update_view(request, learning_unit_year_id, teaching_material_id)
+logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
-@login_required
-@require_http_methods(['POST', 'GET'])
-@permission_required('base.can_edit_learningunit_pedagogy', fn=learning_unit_year_getter, raise_exception=True)
-def delete_teaching_material(request, learning_unit_year_id, teaching_material_id):
-    return teaching_material.delete_view(request, learning_unit_year_id, teaching_material_id)
+class EntitySearch(LoginRequiredMixin, SearchMixin, FilterView):
+    model = EntityVersion
+    paginate_by = 25
+    template_name = "entities.html"
+    raise_exception = True
+    paginate_by = 25
+    filterset_class = EntityVersionFilter
+    ordering = ['acronym']
+
+    def render_to_response(self, context, **response_kwargs):
+        if self.request.is_ajax():
+            serializer = EntityListSerializer(context['object_list'], many=True)
+            return JsonResponse({'object_list': serializer.data})
+        return super().render_to_response(context, **response_kwargs)
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        return queryset.select_related('entity__organization').order_by('acronym')

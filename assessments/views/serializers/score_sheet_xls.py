@@ -29,7 +29,6 @@ import operator
 import attr
 from django.template.defaultfilters import floatformat
 from django.utils.translation import gettext_lazy as _
-
 from rest_framework import serializers
 
 from base.models.enums.peps_type import PepsTypes, HtmSubtypes, SportSubtypes
@@ -44,7 +43,7 @@ class _NoteEtudiantRowSerializer(serializers.Serializer):
     note = serializers.SerializerMethodField()
     nom_cohorte = serializers.CharField(read_only=True, default='')
     email = serializers.CharField(read_only=True, default='')
-    date_remise_de_notes = serializers.SerializerMethodField()
+    echeance_enseignant = serializers.SerializerMethodField()
     est_soumise = serializers.BooleanField(read_only=True, default=False)
     inscrit_tardivement = serializers.BooleanField(read_only=True, default=False)
     desinscrit_tardivement = serializers.BooleanField(read_only=True, default=False)
@@ -129,9 +128,9 @@ class _NoteEtudiantRowSerializer(serializers.Serializer):
         except ValueError:
             return note_etudiant.note
 
-    def get_date_remise_de_notes(self, note_etudiant: NoteEtudiantDTO) -> str:
-        if note_etudiant.date_remise_de_notes and not note_etudiant.desinscrit_tardivement:
-            return note_etudiant.date_remise_de_notes.to_date().strftime("%d/%m/%Y")
+    def get_echeance_enseignant(self, note_etudiant: NoteEtudiantDTO) -> str:
+        if note_etudiant.echeance_enseignant and not note_etudiant.desinscrit_tardivement:
+            return note_etudiant.echeance_enseignant.to_date().strftime("%d/%m/%Y")
         return ""
 
     def get_nom_complet(self, note_etudiant: NoteEtudiantDTO):
@@ -171,7 +170,7 @@ class ScoreSheetXLSSerializer(serializers.Serializer):
 
     def get_rows(self, obj):
         notes_etudiants_avec_date_echeance_non_atteinte = filter(
-            lambda n: not n.date_echeance_atteinte, obj['feuille_de_notes'].notes_etudiants
+            lambda n: not n.date_echeance_gestionnaire_atteinte, obj['feuille_de_notes'].notes_etudiants
         )
         serializer = _NoteEtudiantRowSerializer(
             instance=notes_etudiants_avec_date_echeance_non_atteinte,
@@ -211,4 +210,4 @@ class TutorScoreSheetXLSSerializer(ScoreSheetXLSSerializer):
         })
 
     def _get_notes_etudiants_filtered(self, feuille_de_notes):
-        return filter(lambda n: not n.date_echeance_atteinte, feuille_de_notes.notes_etudiants)
+        return filter(lambda n: not n.date_echeance_enseignant_atteinte, feuille_de_notes.notes_etudiants)

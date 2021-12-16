@@ -24,8 +24,8 @@
 ##############################################################################
 import re
 
+from django.utils import translation
 from unidecode import unidecode
-
 
 SPECIAL_CHARACTERS_PATTERN = r"[-'\s]"
 SPECIAL_CHARACTERS_REGEX = re.compile(SPECIAL_CHARACTERS_PATTERN)
@@ -35,3 +35,17 @@ def unaccent(s: str) -> str:
     string_without_special_characters = re.sub(SPECIAL_CHARACTERS_REGEX, "", s)
     lower_cased_character = str.lower(string_without_special_characters)
     return unidecode(lower_cased_character)
+
+
+def is_a_translation_of(translated_string: str, translation_string) -> bool:
+    """
+    Check whether translated_string is a valid translation of translation_string.
+    :param translated_string: a string
+    :param translation_string: a proxy string
+    :return: true if translated_string is a translation of translation_string
+    """
+    with translation.override('fr-be'):
+        fr_value = str(translation_string)
+    with translation.override('en'):
+        en_value = str(translation_string)
+    return translated_string in (fr_value, en_value)

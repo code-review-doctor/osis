@@ -34,3 +34,9 @@ register = template.Library()
 def view_academicactors(context):
     user = context['request'].user
     return perms.view_academicactors(user)
+
+
+@register.simple_tag(takes_context=True)
+def view_scores_responsible(context):
+    user = context['request'].user
+    return perms.view_scores_responsible(user)

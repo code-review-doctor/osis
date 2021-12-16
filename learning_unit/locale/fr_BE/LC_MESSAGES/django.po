@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-22 09:36+0100\n"
+"POT-Creation-Date: 2021-12-16 10:24+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -46,6 +46,10 @@ msgid ""
 msgstr ""
 "Etes-vous certain de vouloir supprimer définitivement cette classe en "
 "%(year)s ?"
+
+
+msgid "Are you sure you want to delete the teaching material?"
+msgstr "Êtes-vous sûr·e de vouloir supprimer le support de cours ?"
 
 msgid "Are you sure?"
 msgstr "Êtes-vous sûr·e?"
@@ -278,6 +282,9 @@ msgstr "Stage-Dimona"
 
 msgid "State"
 msgstr "Etat"
+
+msgid "Teaching material"
+msgstr "Supports de cours"
 
 msgid ""
 "The derogation session field must be completed ONLY if you want to encode an "

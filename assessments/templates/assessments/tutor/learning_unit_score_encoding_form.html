@@ -109,7 +109,7 @@
                     {% if feuille_de_notes.note_decimale_est_autorisee %}
                         {% trans 'Decimal values in scores are accepted.' %}
                     {% else %}
-                        {% trans "Decimal values in scores are NOT accepted." %}{% trans "If you try to put decimal values, it will be ignored." %}
+                        {% trans "Decimal values in scores are NOT accepted." %} {% trans "If you try to put decimal values, it will be ignored." %}
                     {% endif %}
                 </span>
             </div>
@@ -137,13 +137,14 @@
                     <tr>
                         <th id="status" style="width: 5%">{% trans 'Status' %}</th>
                         <th id="program" style="width: 13%">{% trans 'Program' context 'encoding' %}</th>
-                        <th id="registration_number" style="width: 13%">{% trans 'Registration number' %}</th>
                         <th id="peps_data" style="width: 17%">
                             {% trans 'Type' %}
                             <span class="badge warning-color">
                                 PEPS
                             </span>
                         </th>
+                        <th id="registration_number"
+                            style="width: 13%">{% trans 'Registration number' context 'assessments' %}</th>
                         <th id="name" style="width: 22%">{% trans 'Name' %}</th>
                         <th id="score" style="width: 15%">
                             {% trans 'Score' %}
@@ -165,10 +166,10 @@
                     </thead>
                     <tbody>
                     {% for note_etudiant in feuille_de_notes.notes_etudiants %}
-                        <tr class="result" style="{% include 'assessments/common/row-background-color.html' %}">
+                        <tr class="result" style="{% include 'assessments/common/row-background-color.html' with date_echeance_atteinte=note_etudiant.date_echeance_enseignant_atteinte %}">
                             <td style="text-align:center;" id="enrollment_status_{{ forloop.counter }}"
                                 headers="status">
-                                {% if note_etudiant.date_echeance_atteinte %}
+                                {% if note_etudiant.date_echeance_enseignant_atteinte %}
                                     <span class="glyphicon glyphicon-lock" aria-hidden="true" style="color: #8B008B;"
                                           data-toggle="tooltip" title="{% trans 'Deadline reached' %}"></span>
                                 {% endif %}
@@ -178,13 +179,14 @@
                                 {% endif %}
                             </td>
                             <td headers="program">{{ note_etudiant.nom_cohorte }}</td>
-                            <td headers="registration_number">{{ note_etudiant.noma }}</td>
                             {% include 'assessments/common/peps_column.html' %}
+                            <td headers="registration_number">{{ note_etudiant.noma }}</td>
                             <td headers="lastname">{{ note_etudiant.nom }}, {{ note_etudiant.prenom }}</td>
                             <td id="enrollment_note_{{ forloop.counter0 }}" headers="score">
-                                {% if not note_etudiant.est_soumise and not note_etudiant.date_echeance_atteinte and not note_etudiant.desinscrit_tardivement %}
+                                {% if not note_etudiant.est_soumise and not note_etudiant.date_echeance_enseignant_atteinte and not note_etudiant.desinscrit_tardivement %}
                                     {% with score_encoding_form=form|index:forloop.counter0 %}
                                         {% bootstrap_field score_encoding_form.note show_label=False %}
+                                        <span id="error_id_form-{{ forloop.counter0 }}-note" style="color: #ff0000"></span>
                                         {% bootstrap_field score_encoding_form.noma %}
                                     {% endwith %}
                                 {% else %}
@@ -226,17 +228,19 @@
         $(document).ready(function () {
             const SCORE_INPUTS = $("input[id^='id_form'][class='form-control']");
             const SUBMIT_LINKS = $("#lnk_submit_up, #lnk_submit_down");
+            const DECIMAL_AUTHORIZED = {% if feuille_de_notes.note_decimale_est_autorisee %} true {% else %} false {% endif %};
+
+            function isDecimal(score){
+                return score.includes('.') || score.includes(',');
+            }
 
             const is_valid_score = function (score) {
-                const is_decimal = {% if feuille_de_notes.note_decimale_est_autorisee %} true {% else %}
-                    false {% endif %};
                 score = score.replace(',', '.');
-
-                const regex = (is_decimal) ? /^\d+(\.\d{0,2})?$/ : /^\d+$/;
+                const regex = (DECIMAL_AUTHORIZED) ? /^\d+(\.\d{0,1})?$/ : /^\d+$/;
                 if (!regex.test(score)) {
                     return false;
                 }
-                score = parseFloat(score).toFixed(2)
+                score = parseFloat(score).toFixed(1)
                 return !(score > 20 || score < 0);
             }
 
@@ -245,15 +249,33 @@
                 return justificationAvailables.indexOf(justification) > -1;
             }
 
+            function displayErrorMessage(value_encoded, spanErrorTag){
+                let error_message = "{% trans 'Invalid score.' %} {% trans 'Score legend' %} : {% trans 'number between 0-20 (0=Score of presence)' %}, A={% trans 'Absent' %}, T={% trans 'Cheating' %} ";
+                if (isDecimal(value_encoded) && !DECIMAL_AUTHORIZED){
+                    error_message = "{% trans 'Decimal scores not authorized' %}";
+                }
+                spanErrorTag.innerHTML = "<br>" + error_message;
+            }
+
+            function hideErrorMessage(spanErrorTag){
+                spanErrorTag.innerHTML = "";
+            }
+
             const validate_form = function () {
                 let has_error = false;
                 SCORE_INPUTS.each(function () {
                     const value_encoded = $(this).val();
-                    if (value_encoded === "" || is_valid_justification(value_encoded) || is_valid_score(value_encoded)) {
+                    const spanErrorId = 'error_' + $(this).attr('id');
+                    const spanErrorTag = document.getElementById(spanErrorId);
+                    const is_score_valid = is_valid_score(value_encoded);
+                    const is_justification_valid = is_valid_justification(value_encoded);
+                    if (value_encoded === "" || is_justification_valid || is_score_valid) {
                         $(this).css("border", "1px solid #D3D3D3");
+                        hideErrorMessage(spanErrorTag);
                     } else {
-                        $(this).css("border", "1px solid #ff0000");
                         has_error = true;
+                        $(this).css("border", "1px solid #ff0000");
+                        displayErrorMessage(value_encoded, spanErrorTag);
                     }
                 });
                 SUBMIT_LINKS.prop('disabled', has_error);

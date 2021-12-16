@@ -88,6 +88,7 @@ class FeuilleDeNotesParCohorte(interface.DomainService):
         cohortes_gerees_par_gestionnaire = _get_cohortes_gerees_par_gestionnaire(
             cohortes_gestionnaire_translator,
             matricule_gestionnaire,
+            periode_encodage.annee_concernee
         )
 
         notes_triees = sorted(
@@ -114,6 +115,11 @@ class FeuilleDeNotesParCohorte(interface.DomainService):
         )
 
 
-def _get_cohortes_gerees_par_gestionnaire(cohortes_gestionnaire_translator, matricule_gestionnaire):
-    cohortes_gestionnaire = cohortes_gestionnaire_translator.search(matricule_gestionnaire=matricule_gestionnaire)
+def _get_cohortes_gerees_par_gestionnaire(
+        cohortes_gestionnaire_translator, matricule_gestionnaire: str, annee_concernee: int
+):
+    cohortes_gestionnaire = cohortes_gestionnaire_translator.search(
+        matricule_gestionnaire=matricule_gestionnaire,
+        annee_concernee=annee_concernee
+    )
     return {gestionnaire.nom_cohorte for gestionnaire in cohortes_gestionnaire}

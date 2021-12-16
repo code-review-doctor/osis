@@ -25,7 +25,6 @@
 from django import forms
 from django.utils.translation import gettext_lazy
 
-from assessments.models.enums.score_sheet_address_choices import ScoreSheetAddressEntityType
 from base.forms.exceptions import InvalidFormException
 from base.models.entity_version import EntityVersion
 from ddd.logic.encodage_des_notes.soumission.commands import GetChoixEntitesAdresseFeuilleDeNotesCommand, \
@@ -36,7 +35,6 @@ from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import 
     AdresseSpecifiquePremiereAnneeDeBachelierIdentiqueAuBachlierException
 from ddd.logic.encodage_des_notes.soumission.dtos import AdresseFeuilleDeNotesDTO
 from infrastructure.messages_bus import message_bus_instance
-from osis_common.ddd.interface import BusinessException
 from reference.models.country import Country
 
 
@@ -138,7 +136,9 @@ class ScoreSheetAddressForm(forms.Form):
 
 class FirstYearBachelorScoreSheetAddressForm(ScoreSheetAddressForm):
     specific_address = forms.BooleanField(
-        label=gettext_lazy("Define a specific address for the first year of bachelor"),
+        label=gettext_lazy(
+            "Define a specific address for the first year of bachelor (if different from the addresse of the bachelor)"
+        ),
         required=False
     )
 

@@ -52,19 +52,19 @@ class StudentsViewTest(TestCase):
         response = self.client.get(self.url)
 
         self.assertTemplateUsed(response, 'student/students.html')
-        self.assertFalse(response.context['students'].object_list)
+        self.assertFalse(response.context['student_list'])
 
     def test_search_by_registration_id(self):
         response = self.client.get(self.url, data={'registration_id': self.students_db[0].registration_id})
 
         self.assertTemplateUsed(response, 'student/students.html')
-        self.assertEqual(response.context['students'].object_list, [self.students_db[0]])
+        self.assertEqual(list(response.context['student_list']), [self.students_db[0]])
 
     def test_search_by_name(self):
         response = self.client.get(self.url, data={'name': self.students_db[1].person.last_name[:2]})
 
         self.assertTemplateUsed(response, 'student/students.html')
-        self.assertIn(self.students_db[1], response.context['students'].object_list)
+        self.assertIn(self.students_db[1], response.context['student_list'])
 
 
 class TestStudentRead(TestCase):
@@ -101,7 +101,7 @@ class TestStudentPicture(TestCase):
 
     @mock.patch('requests.get', side_effect=RequestException)
     def test_student_picture_unknown(self, mock_request_get):
-        from base.views.student import student_picture
+        from base.views.student.detail import student_picture
         from django.contrib.staticfiles.storage import staticfiles_storage
 
         request = RequestFactory().get(reverse(student_picture, args=[self.student_m.id]))
@@ -120,7 +120,7 @@ class TestStudentPicture(TestCase):
 
     @mock.patch('requests.get')
     def test_student_picture(self, mock_request_get):
-        from base.views.student import student_picture
+        from base.views.student.detail import student_picture
 
         mock_response = Mock()
         mock_response.json.return_value = {'photo_url': 'awesome/photo.png'}
@@ -140,7 +140,7 @@ class TestStudentPicture(TestCase):
         request = RequestFactory().get(reverse('student_picture', args=[non_existent_student_id]))
         request.user = self.program_manager.person.user
 
-        from base.views.student import student_picture
+        from base.views.student.detail import student_picture
         from django.http import Http404
 
         self.assertRaises(Http404, student_picture, request, non_existent_student_id)

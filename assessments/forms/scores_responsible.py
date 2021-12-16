@@ -43,7 +43,8 @@ class ScoresResponsiblesFilter(django_filters.FilterSet):
     acronym = django_filters.CharFilter(
         field_name='acronym',
         lookup_expr='icontains',
-        label=_('LU code'),
+        label=_('LU'),
+        widget=forms.TextInput(attrs={'placeholder': _('Code')})
     )
     learning_unit_title = django_filters.CharFilter(
         field_name='full_title',
@@ -56,7 +57,7 @@ class ScoresResponsiblesFilter(django_filters.FilterSet):
     )
     scores_responsible = django_filters.CharFilter(
         method='filter_score_responsible',
-        label=_('Scores responsible tutor'),
+        label=_('Scores responsible'),
     )
     requirement_entity = django_filters.CharFilter(
         method='filter_requirement',
