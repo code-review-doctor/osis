@@ -52,6 +52,7 @@ from base.views import learning_unit, common, institution, organization, academi
 from base.views.autocomplete import OrganizationAutocomplete, CountryAutocomplete, CampusAutocomplete, \
     EntityAutocomplete, AllocationEntityAutocomplete, AdditionnalEntity1Autocomplete, AdditionnalEntity2Autocomplete, \
     EntityRequirementAutocomplete, EmployeeAutocomplete, AcademicCalendarTypeAutocomplete
+from base.views.entity.detail import EntityRead, EntityDiagramRead, EntityVersionsRead, EntityReadByAcronym
 from base.views.entity.list import EntitySearch
 from base.views.learning_units.detail import DetailLearningUnitYearView, DetailLearningUnitYearViewBySlug
 from base.views.learning_units.external import create as create_external
@@ -60,8 +61,8 @@ from base.views.learning_units.pedagogy.read import learning_unit_pedagogy
 from base.views.learning_units.pedagogy.update import toggle_summary_locked
 from base.views.learning_units.proposal import create, update
 from base.views.learning_units.update import update_learning_unit, learning_unit_edition_end_date
-from base.views.student.list import StudentSearch
 from base.views.student.detail import StudentRead
+from base.views.student.list import StudentSearch
 from education_group import urls as education_group_urls
 from learning_unit import urls as learning_unit_urls
 from learning_unit.views.learning_unit.edit_educational_information import EditEducationalInformation, \
