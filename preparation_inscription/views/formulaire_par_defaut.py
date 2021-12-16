@@ -33,24 +33,24 @@ from education_group.ddd import command as command_education_group
 from education_group.ddd.domain.exception import GroupNotFoundException
 from education_group.ddd.service.read import get_group_service
 from infrastructure.messages_bus import message_bus_instance
-from program_management.business.tree_list import _get_inscription_formulaire_affichage_arbre
+from preparation_inscription.business.construction_arbre_html import _get_inscription_formulaire_affichage_arbre
 from program_management.forms.education_groups import STANDARD
 
 
-class DefaultEnrollmentFormView(TemplateView):
+class FormulaireParDefaultView(TemplateView):
     permission_required = 'base.view_educationgroup'  # TODO : check which permission needed
     raise_exception = True
 
-    template_name = "enrollment_form.html"
+    template_name = "formulaire_par_defaut.html"
 
     def get_context_data(self,
                          year: int,
                          acronym: str,
-                         version_name: str,
-                         transition_name: str = None,
+                         version_name: str = '',
+                         transition_name: str = '',
                          **kwargs):
         context = super().get_context_data(**kwargs)
-        formation_dto = _get_formation_dto(year, self.get_group_obj().abbreviated_title, version_name, transition_name)
+        formation_dto = _get_formation(year, self.get_group_obj().abbreviated_title, version_name, transition_name)
 
         context.update(
             {
@@ -77,7 +77,7 @@ class DefaultEnrollmentFormView(TemplateView):
             raise Http404
 
 
-def _get_formation_dto(year: int, acronym: str, version_name: str, transition_name: str) \
+def _get_formation(year: int, acronym: str, version_name: str, transition_name: str) \
         -> FormulaireInscriptionCoursDTO:
     cmd = GetFormulaireInscriptionCoursCommand(
         annee_formation=year,

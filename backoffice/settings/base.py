@@ -98,7 +98,8 @@ INSTALLED_APPS = (
     'osis_signature',
     'osis_export',
     'osis_notification',
-    'osis_async'
+    'osis_async',
+    'preparation_inscription',
 )
 
 
@@ -153,6 +154,7 @@ APPS_TO_TEST = (
     'program_management',
     'ddd',
     'infrastructure',
+    'preparation_inscription',
 )
 TEST_RUNNER = os.environ.get('TEST_RUNNER', 'osis_common.tests.runner.InstalledAppsTestRunner')
 SKIP_QUEUES_TESTS = os.environ.get('SKIP_QUEUES_TESTS', 'False').lower() == 'true'

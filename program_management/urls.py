@@ -34,7 +34,6 @@ from program_management.views import content
 from program_management.views import groupelementyear_read, element_utilization, excel, search, \
     tree, prerequisite_read, prerequisite_update
 from program_management.views import quick_search, create_element, publish_general_information
-from program_management.views.enrollment import DefaultEnrollmentFormView
 from program_management.views.proxy.content import ContentRedirectView
 from program_management.views.proxy.identification import IdentificationRedirectView
 from program_management.views.tree_version import create as create_program_tree_version, update_training, \
@@ -164,16 +163,4 @@ urlpatterns = [
             name="check_transition_name"
         ),
     ])),
-    path('<int:year>/<acronym:acronym>/', include([
-        path('default_enrollment_form/', DefaultEnrollmentFormView.as_view(), name='default_enrollment_form'),
-    ])),
-    path('<int:year>/<acronym:acronym>/<str:version_name>/', include([
-        path('default_enrollment_form/', DefaultEnrollmentFormView.as_view(), name='default_enrollment_form'),
-        path(
-            '<str:transition_name>/default_enrollment_form/',
-            DefaultEnrollmentFormView.as_view(),
-            name='default_enrollment_form'
-        ),
-    ])),
-
 ]
