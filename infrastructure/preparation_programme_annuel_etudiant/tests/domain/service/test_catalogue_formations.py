@@ -35,7 +35,7 @@ class CatalogueFormationsTranslatorTest(SimpleTestCase):
     def setUp(self) -> None:
         # mock appel service bus => retour GetProgramTreeVersionCommand : ProgramTreeVersionFactory()
         self.patch_message_bus = mock.patch(
-            "infrastructure.messages_bus.invoke",
+            "infrastructure.utils.MessageBus.invoke",
             side_effect=self.__mock_message_bus_invoke
         )
         self.message_bus_mocked = self.patch_message_bus.start()
@@ -43,7 +43,7 @@ class CatalogueFormationsTranslatorTest(SimpleTestCase):
 
     def __mock_message_bus_invoke(self, cmd):
         if isinstance(cmd, GetProgramTreeVersionCommand):
-            # return ProgramTreeVersionFactory(entity_id__version_name="")
+            # return StandardProgramTreeVersionFactory()
             raise NotImplementedError
 
     def test_should_convertir_version_standard(self):
