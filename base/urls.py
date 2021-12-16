@@ -49,7 +49,6 @@ from base.views import geocoding
 from base.views import learning_achievement, search, user_list
 from base.views import learning_unit, common, institution, organization, academic_calendar, \
     my_osis
-from base.views import teaching_material
 from base.views.autocomplete import OrganizationAutocomplete, CountryAutocomplete, CampusAutocomplete, \
     EntityAutocomplete, AllocationEntityAutocomplete, AdditionnalEntity1Autocomplete, AdditionnalEntity2Autocomplete, \
     EntityRequirementAutocomplete, EmployeeAutocomplete, AcademicCalendarTypeAutocomplete
@@ -59,14 +58,18 @@ from base.views.learning_units.detail import DetailLearningUnitYearView, DetailL
 from base.views.learning_units.external import create as create_external
 from base.views.learning_units.pedagogy.publish import publish_and_access_publication
 from base.views.learning_units.pedagogy.read import learning_unit_pedagogy
-from base.views.learning_units.pedagogy.update import learning_unit_pedagogy_edit, toggle_summary_locked, \
-    learning_unit_pedagogy_force_majeure_edit
+from base.views.learning_units.pedagogy.update import toggle_summary_locked
 from base.views.learning_units.proposal import create, update
 from base.views.learning_units.update import update_learning_unit, learning_unit_edition_end_date
 from base.views.student.detail import StudentRead
 from base.views.student.list import StudentSearch
 from education_group import urls as education_group_urls
 from learning_unit import urls as learning_unit_urls
+from learning_unit.views.learning_unit.edit_educational_information import EditEducationalInformation, \
+    EditEducationalInformationForceMajeure
+from learning_unit.views.learning_unit.teaching_material import CreateTeachingMaterial, UpdateTeachingMaterial, \
+    DeleteTeachingMaterial
+from base.views.entity.detail import EntityRead, EntityDiagramRead, EntityVersionsRead, EntityReadByAcronym
 
 urlpatterns = [
     url(r'^$', common.home, name='home'),
@@ -193,10 +196,10 @@ urlpatterns = [
             url(r'^attributions/$', attribution.learning_unit_attributions, name="learning_unit_attributions"),
             url(r'^pedagogy/', include([
                 url(r'^$', learning_unit_pedagogy, name="learning_unit_pedagogy"),
-                url(r'^edit/$', learning_unit_pedagogy_edit, name="learning_unit_pedagogy_edit"),
+                url(r'^edit/$', EditEducationalInformation.as_view(), name="learning_unit_pedagogy_edit"),
                 url(
                     r'^edit_force_majeure/$',
-                    learning_unit_pedagogy_force_majeure_edit,
+                    EditEducationalInformationForceMajeure.as_view(),
                     name="learning_unit_pedagogy_force_majeure_edit"
                 ),
                 url(r'^toggle_summary_locked/$', toggle_summary_locked,
@@ -239,10 +242,10 @@ urlpatterns = [
 
             ])),
             url(r'^teaching_materials/', include([
-                url(r'^create', teaching_material.create, name="teaching_material_create"),
-                url(r'^(?P<teaching_material_id>[0-9]+)/edit/', teaching_material.update,
+                url(r'^create', CreateTeachingMaterial.as_view(), name="teaching_material_create"),
+                url(r'^(?P<teaching_material_id>[0-9]+)/edit/', UpdateTeachingMaterial.as_view(),
                     name="teaching_material_edit"),
-                url(r'^(?P<teaching_material_id>[0-9]+)/delete/', teaching_material.delete,
+                url(r'^(?P<teaching_material_id>[0-9]+)/delete/', DeleteTeachingMaterial.as_view(),
                     name="teaching_material_delete")
             ])),
             url(r'^comparison/$', learning_unit.learning_unit_comparison, name="learning_unit_comparison"),

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -24,3 +24,17 @@
 #
 ##############################################################################
 
+from learning_unit.views.learning_unit.teaching_material import CreateTeachingMaterial, \
+    UpdateTeachingMaterial, DeleteTeachingMaterial
+
+
+class CreateMyTeachingMaterial(CreateTeachingMaterial):
+    pass
+
+
+class UpdateMyTeachingMaterial(UpdateTeachingMaterial):
+    pass
+
+
+class DeleteMyTeachingMaterial(DeleteTeachingMaterial):
+    pass

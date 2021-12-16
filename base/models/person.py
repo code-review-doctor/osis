@@ -248,7 +248,7 @@ def find_by_user(user: User):
         return None
 
 
-def get_user_interface_language(user):
+def get_user_interface_language(user: User) -> str:
     user_language = settings.LANGUAGE_CODE
     person = find_by_user(user)
 
