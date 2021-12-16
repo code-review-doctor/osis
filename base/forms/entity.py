@@ -25,11 +25,11 @@
 ##############################################################################
 import django_filters
 from django.forms import TextInput
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from rest_framework import serializers
 
 from base.models.entity_version import EntityVersion
-from rest_framework import serializers
-from django.urls import reverse
 
 
 class EntityVersionFilter(django_filters.FilterSet):
