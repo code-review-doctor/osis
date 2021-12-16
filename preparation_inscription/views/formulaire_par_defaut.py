@@ -38,7 +38,7 @@ from program_management.forms.education_groups import STANDARD
 
 
 class FormulaireParDefaultView(TemplateView):
-    permission_required = 'base.view_educationgroup'  # TODO : check which permission needed
+    permission_required = 'preparation_programme.view_formulaire_inscription_cours'
     raise_exception = True
 
     template_name = "formulaire_par_defaut.html"
