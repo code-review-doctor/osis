@@ -23,37 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
-import logging
-
-from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import JsonResponse
-from django_filters.views import FilterView
+from django.views.generic import TemplateView
 
-from base.forms.entity import EntityVersionFilter, EntityListSerializer
-from base.models.entity_version import EntityVersion
-from base.utils.search import SearchMixin
-
-logger = logging.getLogger(settings.DEFAULT_LOGGER)
+from osis_role.contrib.views import PermissionRequiredMixin
 
 
-class EntitySearch(LoginRequiredMixin, SearchMixin, FilterView):
-    model = EntityVersion
-    paginate_by = 25
-    template_name = "entities.html"
+class AssessmentsHome(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
+    template_name = "assessments/home.html"
+    permission_required = 'base.can_access_evaluation'
     raise_exception = True
-    paginate_by = 25
-    filterset_class = EntityVersionFilter
-    ordering = ['acronym']
-
-    def render_to_response(self, context, **response_kwargs):
-        if self.request.is_ajax():
-            serializer = EntityListSerializer(context['object_list'], many=True)
-            return JsonResponse({'object_list': serializer.data})
-        return super().render_to_response(context, **response_kwargs)
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-
-        return queryset.select_related('entity__organization').order_by('acronym')

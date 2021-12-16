@@ -23,37 +23,30 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.utils.functional import cached_property
+from django.views import View
+from rules.contrib.views import LoginRequiredMixin
 
-import logging
-
-from django.conf import settings
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import JsonResponse
-from django_filters.views import FilterView
-
-from base.forms.entity import EntityVersionFilter, EntityListSerializer
-from base.models.entity_version import EntityVersion
-from base.utils.search import SearchMixin
-
-logger = logging.getLogger(settings.DEFAULT_LOGGER)
+from assessments.views.program_manager.score_encoding_progress_overview import \
+    ScoreEncodingProgressOverviewProgramManagerView
+from assessments.views.tutor.score_encoding_progress_overview import ScoreEncodingProgressOverviewTutorView
+from base.auth.roles.program_manager import ProgramManager
+from base.auth.roles.tutor import Tutor
+from base.models.person import Person
+from osis_role.contrib.helper import EntityRoleHelper
 
 
-class EntitySearch(LoginRequiredMixin, SearchMixin, FilterView):
-    model = EntityVersion
-    paginate_by = 25
-    template_name = "entities.html"
-    raise_exception = True
-    paginate_by = 25
-    filterset_class = EntityVersionFilter
-    ordering = ['acronym']
+class ScoreEncodingProgressOverviewView(LoginRequiredMixin, View):
+    @cached_property
+    def person(self) -> Person:
+        return self.request.user.person
 
-    def render_to_response(self, context, **response_kwargs):
-        if self.request.is_ajax():
-            serializer = EntityListSerializer(context['object_list'], many=True)
-            return JsonResponse({'object_list': serializer.data})
-        return super().render_to_response(context, **response_kwargs)
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return self.handle_no_permission()
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
-
-        return queryset.select_related('entity__organization').order_by('acronym')
+        if EntityRoleHelper.has_role(self.person, Tutor):
+            return ScoreEncodingProgressOverviewTutorView.as_view()(request, *args, **kwargs)
+        elif EntityRoleHelper.has_role(self.person, ProgramManager):
+            return ScoreEncodingProgressOverviewProgramManagerView.as_view()(request, *args, **kwargs)
+        return self.handle_no_permission()
