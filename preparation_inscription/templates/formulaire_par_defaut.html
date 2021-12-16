@@ -1,4 +1,3 @@
-{% extends "layout.html" %}
 {% load static %}
 {% load i18n %}
 {% load bootstrap3 range %}
@@ -26,43 +25,22 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-{% block breadcrumb %}
-<li>{% trans 'Program' %}</li>
-<li>{% trans 'Training configuration' %}</li>
-<li>{% trans 'Sections and programs' %}</li>
-<li class="active">{{ form.code.initial }}</li>
-{% endblock %}
-{% block content %}
-    <div class="panel panel-default">
-        <div class="panel-body" id="tabs">
-            <ul class="nav nav-tabs" role="tablist">
-                <li role="presentation" class="active">
-                    <a data-toggle="tab" href="#tab_form_view" role="tab">
-                        {% trans 'Form view'%}
-                    </a>
-                </li>
-            </ul>
-            <br>
-            <div class="tab-content">
-                <div id="tab_form_view" class="tab-pane fade in active">
-                    <table>
-                        <thead>
-                        <tr style="border-bottom: solid;">
-                            <th style="width:{{ inscription_formulaire_affichage_arbre.main_part_col_length }}px;">
-                                <strong>{{ title }}</strong>
-                            </th>
-                            {% for cpt in 1|range_for:inscription_formulaire_affichage_arbre.max_block %}
-                                <th style="width:15px;text-align: center;">An {{ cpt }}</th>
-                            {% endfor %}
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {{ inscription_formulaire_affichage_arbre.tree_list }}
-                        </tbody>
-                    </table>
+<div id="tab_form_view" class="tab-pane fade in active">
+    <table>
+        <thead>
+        <tr style="border-bottom: solid;">
+            <th style="width:{{ inscription_formulaire_affichage_arbre.main_part_col_length }}px;">
+                <strong>{{ title }}</strong>
+            </th>
+            {% for cpt in 1|range_for:inscription_formulaire_affichage_arbre.max_block %}
+                <th style="width:15px;text-align: center;">An {{ cpt }}</th>
+            {% endfor %}
+        </tr>
+        </thead>
+        <tbody>
+        {{ inscription_formulaire_affichage_arbre.tree_list }}
+        </tbody>
+    </table>
 
-                </div>
-            </div>
-        </div>
-    </div>
-{% endblock %}
+</div>
+

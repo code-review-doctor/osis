@@ -41,7 +41,7 @@ class FormulaireParDefaultView(TemplateView):
     permission_required = 'preparation_programme.view_formulaire_inscription_cours'
     raise_exception = True
 
-    template_name = "formulaire_par_defaut.html"
+    template_name = "onglets.html"
 
     def get_context_data(self,
                          year: int,
