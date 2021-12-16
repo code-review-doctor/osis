@@ -73,3 +73,17 @@ class GetContenuGroupementCommand(interface.CommandRequest):
     version_formation: str
     code: str
     annee: int
+
+
+@attr.s(frozen=True, slots=True, auto_attribs=True)
+class UniteEnseignementAjustementCommand(interface.CommandRequest):
+    bloc: int
+
+
+@attr.s(frozen=True, slots=True, auto_attribs=True)
+class AjusterUEDuGroupementCommand(interface.CommandRequest):
+    annee_formation: int
+    sigle_formation: str
+    version_formation: str
+    a_ajuster_dans: str  # code groupement
+    unites_enseignements: List[UniteEnseignementAjustementCommand]

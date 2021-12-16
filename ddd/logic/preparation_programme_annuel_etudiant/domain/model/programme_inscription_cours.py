@@ -51,6 +51,9 @@ class ProgrammeInscriptionCours(interface.RootEntity):
     def retirer_unite_enseignement(self, unite_enseignement: 'CodeUniteEnseignement', a_retirer_de: 'CodeGroupement'):
         raise NotImplementedError
 
+    def ajuster_unite_enseignement(self, unite_enseignement: 'CodeUniteEnseignement', a_ajuster_dans: 'CodeGroupement'):
+        raise NotImplementedError
+
 
 # à déplacer dans groupement.py
 CodeGroupement = str
