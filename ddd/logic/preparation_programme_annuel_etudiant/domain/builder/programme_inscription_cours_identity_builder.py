@@ -26,7 +26,9 @@
 from typing import Union
 
 from ddd.logic.preparation_programme_annuel_etudiant.commands import AjouterUEAuProgrammeCommand, \
-    GetProgrammeInscriptionCoursServiceCommand
+    GetProgrammeInscriptionCoursServiceCommand, RetirerUEDuProgrammeCommand, AjusterUEDuGroupementCommand, \
+    AnnulerActionSurUEDuProgrammeCommand, DeplacerVersLeBasUEAjouteeDansProgrammeCommand, \
+    DeplacerVersLeHautUEAjouteeDansProgrammeCommand
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.programme_inscription_cours import \
     ProgrammeInscriptionCoursIdentity
 from osis_common.ddd import interface
@@ -36,6 +38,14 @@ class ProgrammeInscriptionCoursIdentityBuilder(interface.EntityIdentityBuilder):
     @classmethod
     def build_from_command(
             cls,
-            cmd: Union['AjouterUEAuProgrammeCommand', 'GetProgrammeInscriptionCoursServiceCommand']
+            cmd: Union[
+                'GetProgrammeInscriptionCoursServiceCommand',
+                'AjouterUEAuProgrammeCommand',
+                'RetirerUEDuProgrammeCommand',
+                'AjusterUEDuGroupementCommand',
+                'AnnulerActionSurUEDuProgrammeCommand',
+                'DeplacerVersLeHautUEAjouteeDansProgrammeCommand',
+                'DeplacerVersLeBasUEAjouteeDansProgrammeCommand'
+            ]
     ) -> 'ProgrammeInscriptionCoursIdentity':
         raise NotImplementedError

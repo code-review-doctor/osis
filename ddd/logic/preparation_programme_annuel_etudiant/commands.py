@@ -35,6 +35,7 @@ class GetFormulaireInscriptionCoursCommand(interface.CommandRequest):
     annee_formation: int
     sigle_formation: str
     version_formation: str
+    transition_formation: str
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
@@ -47,6 +48,7 @@ class AjouterUEAuProgrammeCommand(interface.CommandRequest):
     annee_formation: int
     sigle_formation: str
     version_formation: str
+    transition_formation: str
     a_inclure_dans: str  # code groupement
     unites_enseignements: List[UniteEnseignementCommand]
 
@@ -56,6 +58,7 @@ class GetProgrammeInscriptionCoursServiceCommand(interface.CommandRequest):
     annee_formation: int
     sigle_formation: str
     version_formation: str
+    transition_formation: str
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
@@ -63,6 +66,7 @@ class RetirerUEDuProgrammeCommand(interface.CommandRequest):
     annee_formation: int
     sigle_formation: str
     version_formation: str
+    transition_formation: str
     a_retirer_de: str  # code groupement
     unites_enseignements: List[UniteEnseignementCommand]
 
@@ -71,12 +75,14 @@ class RetirerUEDuProgrammeCommand(interface.CommandRequest):
 class GetContenuGroupementCommand(interface.CommandRequest):
     sigle_formation: str
     version_formation: str
+    transition_formation: str
     code: str
     annee: int
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
 class UniteEnseignementAjustementCommand(interface.CommandRequest):
+    code: str
     bloc: int
 
 
@@ -85,5 +91,36 @@ class AjusterUEDuGroupementCommand(interface.CommandRequest):
     annee_formation: int
     sigle_formation: str
     version_formation: str
+    transition_formation: str
     a_ajuster_dans: str  # code groupement
     unites_enseignements: List[UniteEnseignementAjustementCommand]
+
+
+@attr.s(frozen=True, slots=True, auto_attribs=True)
+class AnnulerActionSurUEDuProgrammeCommand(interface.CommandRequest):
+    annee_formation: int
+    sigle_formation: str
+    version_formation: str
+    transition_formation: str
+    a_annuler_dans: str  # code groupement
+    unite_enseignement: UniteEnseignementCommand
+
+
+@attr.s(frozen=True, slots=True, auto_attribs=True)
+class DeplacerVersLeHautUEAjouteeDansProgrammeCommand(interface.CommandRequest):
+    annee_formation: int
+    sigle_formation: str
+    version_formation: str
+    transition_formation: str
+    ajoutee_dans: str  # code groupement
+    unite_enseignement: UniteEnseignementCommand
+
+
+@attr.s(frozen=True, slots=True, auto_attribs=True)
+class DeplacerVersLeBasUEAjouteeDansProgrammeCommand(interface.CommandRequest):
+    annee_formation: int
+    sigle_formation: str
+    version_formation: str
+    transition_formation: str
+    ajoutee_dans: str  # code groupement
+    unite_enseignement: UniteEnseignementCommand

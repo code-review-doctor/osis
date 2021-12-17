@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from decimal import Decimal
-from typing import List
+from typing import List, Union
 
 import attr
 
@@ -54,7 +54,7 @@ class GroupementDTO(DTO):
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
 class ContenuGroupementDTO(DTO):
-    ues: List[UniteEnseignementDTO]
+    contenu: List[Union[GroupementDTO, UniteEnseignementDTO]]
     groupement: GroupementDTO
 
 

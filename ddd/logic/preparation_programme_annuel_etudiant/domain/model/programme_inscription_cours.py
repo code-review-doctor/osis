@@ -28,6 +28,10 @@ from typing import List
 
 import attr
 
+from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement import CodeGroupement
+from ddd.logic.preparation_programme_annuel_etudiant.domain.model.unite_enseignement import CodeUniteEnseignement, \
+    UniteEnseignementAjoutee, UniteEnseignementRetiree, UniteEnseignementAjustee
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import ContenuGroupementDTO
 from osis_common.ddd import interface
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 
@@ -41,8 +45,9 @@ class ProgrammeInscriptionCoursIdentity(interface.EntityIdentity):
 class ProgrammeInscriptionCours(interface.RootEntity):
     entity_id: ProgrammeInscriptionCoursIdentity
     version_programme: ProgramTreeVersionIdentity
-    unites_enseignement_ajoutees: List['UniteEnseignement']
-    unites_enseignement_retirees: List['UniteEnseignement']
+    unites_enseignement_ajoutees: List['UniteEnseignementAjoutee']
+    unites_enseignement_retirees: List['UniteEnseignementRetiree']
+    unites_enseignement_ajustees: List['UniteEnseignementAjustee']
 
     # comment vérifier qu'une unité d'enseignement n'est pas déjà existante dans le programme
     def ajouter_unite_enseignement(self, unite_enseignement: 'CodeUniteEnseignement', a_inclure_dans: 'CodeGroupement'):
@@ -54,30 +59,25 @@ class ProgrammeInscriptionCours(interface.RootEntity):
     def ajuster_unite_enseignement(self, unite_enseignement: 'CodeUniteEnseignement', a_ajuster_dans: 'CodeGroupement'):
         raise NotImplementedError
 
+    def annuler_action_sur_unite_enseignement(
+            self,
+            unite_enseignement: 'CodeUniteEnseignement',
+            a_annuler_dans: 'CodeGroupement'
+    ):
+        # une seule action disponible à la fois
+        # => retirer dans unites_enseignement_ajoutees | unites_enseignement_retirees | unites_enseignement_ajustees
+        raise NotImplementedError
 
-# à déplacer dans groupement.py
-CodeGroupement = str
+    def deplacer_vers_le_haut_unite_enseignement_ajoutee(
+            self,
+            unite_enseignement: 'CodeUniteEnseignement',
+            contenu_groupement: 'ContenuGroupementDTO'
+    ):
+        raise NotImplementedError
 
-
-@attr.s(frozen=True, slots=True, auto_attribs=True)
-class GroupementIdentity(interface.EntityIdentity):
-    code: CodeGroupement
-
-
-@attr.s(slots=True, auto_attribs=True)
-class Groupement(interface.Entity):
-    inclus_dans: List['Groupement']
-
-
-# à déplacer dans unite_enseignement.py
-CodeUniteEnseignement = str
-
-
-@attr.s(frozen=True, slots=True, auto_attribs=True)
-class UniteEnseignementIdentity(interface.EntityIdentity):
-    code: CodeUniteEnseignement
-
-
-@attr.s(slots=True, auto_attribs=True)
-class UniteEnseignement(interface.Entity):
-    inclus_dans: List['Groupement']
+    def deplacer_vers_le_bas_unite_enseignement_ajoutee(
+            self,
+            unite_enseignement: 'CodeUniteEnseignement',
+            contenu_groupement: 'ContenuGroupementDTO'
+    ):
+        raise NotImplementedError

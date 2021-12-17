@@ -23,18 +23,22 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.preparation_programme_annuel_etudiant.commands import AjusterUEDuGroupementCommand
-from ddd.logic.preparation_programme_annuel_etudiant.domain.builder.programme_inscription_cours_identity_builder \
-    import ProgrammeInscriptionCoursIdentityBuilder
+
+from ddd.logic.preparation_programme_annuel_etudiant.commands import DeplacerVersLeBasUEAjouteeDansProgrammeCommand
+from ddd.logic.preparation_programme_annuel_etudiant.domain.builder.programme_inscription_cours_identity_builder import \
+    ProgrammeInscriptionCoursIdentityBuilder
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.programme_inscription_cours import \
     ProgrammeInscriptionCoursIdentity
 from ddd.logic.preparation_programme_annuel_etudiant.repository.i_programme_inscription_cours import \
     IProgrammeInscriptionCoursRepository
+from infrastructure.preparation_programme_annuel_etudiant.domain.service.catalogue_formations import \
+    CatalogueFormationsTranslator
 
 
-def ajuster_UE_du_programme(
-        cmd: 'AjusterUEDuGroupementCommand',
+def deplacer_vers_le_bas_UE_ajoutee_dans_programme(
+        cmd: 'DeplacerVersLeBasUEAjouteeDansProgrammeCommand',
         repository: 'IProgrammeInscriptionCoursRepository',
+        translator: 'CatalogueFormationsTranslator',
 ) -> 'ProgrammeInscriptionCoursIdentity':
     # GIVEN
     programme_inscription_cours_identity = ProgrammeInscriptionCoursIdentityBuilder.build_from_command(cmd)
@@ -42,13 +46,20 @@ def ajuster_UE_du_programme(
         entity_id=programme_inscription_cours_identity
     )
 
+    contenu_groupement = translator.get_contenu_groupement(
+        sigle_formation=cmd.sigle_formation,
+        version_formation=cmd.version_formation,
+        annee=cmd.annee_formation,
+        code_groupement=cmd.ajoutee_dans,
+    )
+
     # WHEN
-    for cmd_ue in cmd.unites_enseignements:
-        programme_inscription_cours.ajuster_unite_enseignement(
-            unite_enseignement=cmd_ue.code,
-            a_ajuster_dans=cmd.a_ajuster_dans
-        )
+    programme_inscription_cours.deplacer_vers_le_bas_unite_enseignement_ajoutee(
+        unite_enseignement=cmd.unite_enseignement.code,
+        contenu_groupement=contenu_groupement
+    )
 
     # THEN
     repository.save(programme_inscription_cours)
     return programme_inscription_cours.entity_id
+

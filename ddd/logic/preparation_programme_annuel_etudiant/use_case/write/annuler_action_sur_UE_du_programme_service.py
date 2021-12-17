@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.preparation_programme_annuel_etudiant.commands import AjusterUEDuGroupementCommand
+from ddd.logic.preparation_programme_annuel_etudiant.commands import AnnulerActionSurUEDuProgrammeCommand
 from ddd.logic.preparation_programme_annuel_etudiant.domain.builder.programme_inscription_cours_identity_builder \
     import ProgrammeInscriptionCoursIdentityBuilder
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.programme_inscription_cours import \
@@ -32,8 +32,8 @@ from ddd.logic.preparation_programme_annuel_etudiant.repository.i_programme_insc
     IProgrammeInscriptionCoursRepository
 
 
-def ajuster_UE_du_programme(
-        cmd: 'AjusterUEDuGroupementCommand',
+def annuler_action_sur_UE_du_programme(
+        cmd: 'AnnulerActionSurUEDuProgrammeCommand',
         repository: 'IProgrammeInscriptionCoursRepository',
 ) -> 'ProgrammeInscriptionCoursIdentity':
     # GIVEN
@@ -43,11 +43,10 @@ def ajuster_UE_du_programme(
     )
 
     # WHEN
-    for cmd_ue in cmd.unites_enseignements:
-        programme_inscription_cours.ajuster_unite_enseignement(
-            unite_enseignement=cmd_ue.code,
-            a_ajuster_dans=cmd.a_ajuster_dans
-        )
+    programme_inscription_cours.annuler_action_sur_unite_enseignement(
+        unite_enseignement=cmd.unite_enseignement.code,
+        a_annuler_dans=cmd.a_annuler_dans
+    )
 
     # THEN
     repository.save(programme_inscription_cours)
