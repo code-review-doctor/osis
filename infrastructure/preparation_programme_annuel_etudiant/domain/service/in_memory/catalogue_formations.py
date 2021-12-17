@@ -36,7 +36,7 @@ class CatalogueFormationsTranslatorInMemory(ICatalogueFormationsTranslator):
         intitule='Content:',
         obligatoire=True,
         remarque='Remarque 1',
-        informations_principales_agregees="{} ({} crédits) ".format('Content:', 150)
+        informations_principales_agregees="Content: (150 crédits)"
     )
     dtos = [
         FormationDTO(
@@ -48,7 +48,7 @@ class CatalogueFormationsTranslatorInMemory(ICatalogueFormationsTranslator):
                         intitule='Groupement 2',
                         obligatoire=False,
                         remarque='Remarque 2',
-                        informations_principales_agregees="{} ({} crédits) ".format('Groupement 2', 150)
+                        informations_principales_agregees="Groupement 2 (150 crédits)"
                     )
                 ],
                 unites_enseignement=[
