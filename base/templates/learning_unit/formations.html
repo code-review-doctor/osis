@@ -1,6 +1,6 @@
 {% extends "learning_unit/layout_detail.html" %}
 {% load static %}
-{% load i18n %}
+{% load i18n dictionnary %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -55,34 +55,82 @@
                 <div class="panel-body">
                     <div class="tab-content" id="tab_content">
                         <div role="tabpanel" class="tab-pane active" id="learning_unit_enrollments">
-                            <table class="table">
-                                <thead>
-                                <tr>
-                                    <th>{% trans 'Training' %}</th>
-                                    <th>{% trans 'Enrolled to learning unit' %}</th>
-                                    <th>{% trans 'Total enrollments to training' %}</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {% for education_group_year in root_formations %}
-                                    {% url 'training_identification' education_group_year.academic_year.year education_group_year.partial_acronym as url_education_group_year %}
+                            <div class="table-responsive" >
+                                <table class="table">
+                                    <thead>
                                     <tr>
-                                        <td>
-                                            <a href="{{ url_education_group_year }}">
-                                                {{ education_group_year.acronym }}
-                                            </a>
-                                        </td>
-                                        <td>{{ education_group_year.count_learning_unit_enrollments }}</td>
-                                        <td>{{ education_group_year.count_formation_enrollments }}</td>
+                                        <th style="width: 15% !important;">{% trans 'Training' %}</th>
+                                        <th style="width: 15% !important;">{% trans 'Enrolled to training' %}</th>
+                                        <th>{% trans 'Enrolled to learning unit' %}</th>
+                                        {% for classe in classes %}
+                                            {% url 'class_identification' classe.learning_component_year.learning_unit_year.academic_year.year classe.learning_component_year.learning_unit_year.acronym classe.acronym as class_identification_url %}
+                                            <th>{% trans 'Enrolled to' %} <a href="{{ class_identification_url }}">{{ classe.effective_class_complete_acronym }}</a></th>
+                                        {% endfor %}
                                     </tr>
-                                {% endfor %}
-                                <tr>
-                                    <td><strong>{% trans 'Total' %}</strong></td>
-                                    <td><strong>{{ total_learning_unit_enrollments }}</strong></td>
-                                    <td><strong>{{ total_formation_enrollments }}</strong></td>
-                                </tr>
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                    {% for education_group_year in root_formations %}
+                                        {% url 'training_identification' education_group_year.academic_year.year education_group_year.partial_acronym as url_education_group_year %}
+                                        <tr>
+                                        {% if education_group_year.count_learning_unit_enrollments_first_year == 0 %}
+                                            <td>
+                                                <a href="{{ url_education_group_year }}">
+                                                    {{ education_group_year.acronym }}
+                                                </a>
+                                            </td>
+                                            <td>{{ education_group_year.count_formation_enrollments }}</td>
+                                            <td>{{ education_group_year.count_learning_unit_enrollments }}</td>
+                                            {% if education_group_year.classes_counter %}
+                                                {% for classe in classes %}
+                                                    {% with class_count=education_group_year.classes_counter|get_item_or_zero:classe.pk %}
+                                                    <td>{{ class_count|get_item_or_zero:'main' }}</td>
+                                                    {% endwith %}
+                                                {% endfor %}
+                                            {% else %}
+                                                {% for classe in classes %}
+                                                    <td>0</td>
+                                                {% endfor %}
+                                            {% endif %}
+                                        {% else %}
+                                            <td>
+                                                <a href="{{ url_education_group_year }}">
+                                                    {{ education_group_year.acronym }}
+                                                </a>
+                                                <br/><span data-toggle="tooltip" data-placement="right" title="" data-original-title="{% trans 'Student.s enrolled in block 1' %}" style="margin-left: 1em;">{{ education_group_year.acronym }}-1</span>
+                                            </td>
+                                            <td>{{ education_group_year.count_formation_enrollments }}
+                                                <br/><span data-toggle="tooltip" data-placement="right" title="" data-original-title="{% trans 'Student.s enrolled in block 1' %}">{{ education_group_year.count_formation_enrollments_first_year }}</span>
+                                            </td>
+                                            <td>{{ education_group_year.count_learning_unit_enrollments }}
+                                                <br/><span data-toggle="tooltip" data-placement="right" title="" data-original-title="{% trans 'Student.s enrolled in block 1' %}">{{ education_group_year.count_learning_unit_enrollments_first_year }}</span>
+                                            </td>
+                                            {% if education_group_year.classes_counter %}
+                                                {% for classe in classes %}
+                                                    {% with class_count=education_group_year.classes_counter|get_item_or_zero:classe.pk %}
+                                                    <td>{{ class_count|get_item_or_zero:'main' }}
+                                                        <br/><span data-toggle="tooltip" data-placement="right" title="" data-original-title="{% trans 'Student.s enrolled in block 1' %}">{{ class_count|get_item_or_zero:'first_year' }}</span>
+                                                    </td>
+                                                    {% endwith %}
+                                                {% endfor %}
+                                            {% else %}
+                                                {% for classe in classes %}
+                                                    <td>0</td>
+                                                {% endfor %}
+                                            {% endif %}
+                                        {% endif %}
+                                    </tr>
+                                    {% endfor %}
+                                    <tr>
+                                        <td><strong>{% trans 'Total' %}</strong></td>
+                                        <td></td>
+                                        <td><strong>{{ total_learning_unit_enrollments }}</strong></td>
+                                        {% for classe in classes %}
+                                            <td><strong>{{ totals_classes|get_item_or_zero:classe.pk }}</strong></td>
+                                        {% endfor %}
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>

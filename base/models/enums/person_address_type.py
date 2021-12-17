@@ -31,3 +31,4 @@ from base.models.utils.utils import ChoiceEnum
 class PersonAddressType(ChoiceEnum):
     RESIDENTIAL = _("Residential")
     PROFESSIONAL = _("Professional")
+    CONTACT = _("Contact")

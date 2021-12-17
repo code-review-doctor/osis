@@ -45,4 +45,5 @@ def check_can_create_effective_class(
         learning_unit=learning_unit,
         learning_unit_repository=learning_unit_repository,
         student_enrollment_translator=student_enrollment_translator,
+        year=cmd.learning_unit_year,
     )

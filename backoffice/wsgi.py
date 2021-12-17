@@ -82,12 +82,6 @@ if hasattr(settings, 'QUEUES') and settings.QUEUES:
 
     # Queue in which are sent scores sheets json data
     # This queue is used only if assessments module is installed
-    if 'assessments' in settings.INSTALLED_APPS:
-        from assessments.views.score_encoding import send_json_scores_sheets_to_response_queue
-        _listen_to_queue_with_callback(
-            callback=send_json_scores_sheets_to_response_queue,
-            queue_name='SCORE_ENCODING_PDF_REQUEST'
-        )
 
     if 'attribution' in settings.INSTALLED_APPS:
         from infrastructure.application.queue import application_response_callback

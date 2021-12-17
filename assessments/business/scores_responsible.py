@@ -32,7 +32,7 @@ from base.models.person import Person
 from osis_role.contrib.helper import EntityRoleHelper
 
 
-def filter_learning_unit_year_according_person(queryset: QuerySet, person: Person) -> QuerySet:
+def filter_learning_unit_year_according_person(queryset: QuerySet, person: Person, academic_year) -> QuerySet:
     """
     This function will filter the learning unit year queryset according to permission of person.
        * As Entity Manager, we will filter on linked entities
@@ -48,7 +48,8 @@ def filter_learning_unit_year_according_person(queryset: QuerySet, person: Perso
     structure = entity_version.build_current_entity_version_structure_in_memory()
     learning_units_of_prgm_mngr = program_manager.get_learning_unit_years_attached_to_program_managers(
         person.programmanager_set.all(),
-        structure
+        structure,
+        academic_year
     )
     queryset = queryset.filter(
         Q(learning_container_year__requirement_entity_id__in=entities_with_descendants)

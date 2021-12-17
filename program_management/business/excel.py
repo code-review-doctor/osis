@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -64,7 +64,15 @@ FONT_HYPERLINK = Font(underline='single', color='0563C1')
 HeaderLine = namedtuple('HeaderLine', ['egy_acronym', 'egy_title', 'code_header', 'title_header', 'credits_header',
                                        'block_header', 'mandatory_header'])
 OfficialTextLine = namedtuple('OfficialTextLine', ['text'])
-LearningUnitYearLine = namedtuple('LearningUnitYearLine', ['luy_acronym', 'luy_title'])
+LearningUnitYearLine = namedtuple(
+    'LearningUnitYearLine',
+    ['luy_acronym', 'luy_title', 'empty_col1', 'empty_col2', 'credits', 'blocks', 'mandatory_status']
+)
+LearningUnitYearLinePrerequisiteOf = \
+    namedtuple(
+        'LearningUnitYearLinePrerequisiteOf',
+        ['luy_acronym', 'luy_title', 'empty_col1', 'credits', 'blocks', 'is_mandatory']
+    )
 PrerequisiteItemLine = namedtuple(
     'PrerequisiteItemLine',
     ['text', 'operator', 'luy_acronym', 'luy_title', 'credits', 'block', 'mandatory']
@@ -103,7 +111,7 @@ def generate_prerequisites_workbook(tree: 'ProgramTree') -> Workbook:
 
     excel_lines = _build_excel_lines(tree)
 
-    return _get_workbook(tree, excel_lines, workbook, worksheet_title, 7)
+    return _get_workbook(tree, excel_lines, workbook, worksheet_title, 4)
 
 
 def _build_excel_lines(tree: 'ProgramTree') -> List:
@@ -124,10 +132,25 @@ def _build_excel_lines(tree: 'ProgramTree') -> List:
     )
 
     for node in tree.get_nodes_that_have_prerequisites():
-        content.append(
-            LearningUnitYearLine(luy_acronym=node.code, luy_title=complete_title(node))
+        node_identity = NodeIdentity(node.code, node.year)
+        credits = tree.get_distinct_credits_repr(
+            node_identity
         )
+        blocks = tree.get_blocks_values(node_identity)
+        mandatory = tree.get_mandatory_status(node_identity)
+        mandatory_status = _("Yes") if mandatory and mandatory else _("No")
 
+        content.append(
+            LearningUnitYearLine(
+                luy_acronym=node.code,
+                luy_title=complete_title(node),
+                empty_col1='',
+                empty_col2='',
+                credits=" ; ".join(sorted(credits)) if credits else '',
+                blocks=blocks,
+                mandatory_status=mandatory_status if mandatory_status else '',
+            )
+        )
         for group_number, group in enumerate(tree.get_prerequisite(node).prerequisite_item_groups, start=1):
             for position, prerequisite_item in enumerate(group.prerequisite_items, start=1):
                 prerequisite_item_links = tree.search_links_using_node(
@@ -187,8 +210,17 @@ def _get_fill_to_apply(excel_lines: list) -> Dict:
         elif isinstance(row, LearningUnitYearLine):
             style_to_apply_dict[FILL_GRAY].append("A{index}".format(index=index))
             style_to_apply_dict[FILL_LIGHT_GRAY].append("B{index}".format(index=index))
+            style_to_apply_dict[FILL_LIGHT_GRAY].append("E{index}".format(index=index))
+            style_to_apply_dict[FILL_LIGHT_GRAY].append("F{index}".format(index=index))
+            style_to_apply_dict[FILL_LIGHT_GRAY].append("G{index}".format(index=index))
             last_luy_line_index = index
-
+        elif isinstance(row, LearningUnitYearLinePrerequisiteOf):
+            style_to_apply_dict[FILL_GRAY].append("A{index}".format(index=index))
+            style_to_apply_dict[FILL_LIGHT_GRAY].append("B{index}".format(index=index))
+            style_to_apply_dict[FILL_LIGHT_GRAY].append("D{index}".format(index=index))
+            style_to_apply_dict[FILL_LIGHT_GRAY].append("E{index}".format(index=index))
+            style_to_apply_dict[FILL_LIGHT_GRAY].append("F{index}".format(index=index))
+            last_luy_line_index = index
         elif isinstance(row, PrerequisiteItemLine):
             if (last_luy_line_index - index) % 2 == 1:
                 style_to_apply_dict[FILL_LIGHTER_GRAY].append("C{index}".format(index=index))
@@ -234,7 +266,7 @@ def _get_border_to_apply(excel_lines: list) -> Dict:
 def _merge_cells(excel_lines, workbook: Workbook, end_column):
     worksheet = workbook.worksheets[0]
     for index, row in enumerate(excel_lines, 1):
-        if isinstance(row, LearningUnitYearLine):
+        if isinstance(row, LearningUnitYearLine) or isinstance(row, LearningUnitYearLinePrerequisiteOf):
             worksheet.merge_cells(start_row=index, end_row=index, start_column=2, end_column=end_column)
 
 
@@ -278,7 +310,7 @@ def generate_ue_is_prerequisite_for_workbook(tree: 'ProgramTree') -> Workbook:
     workbook = Workbook()
 
     excel_lines = _build_excel_lines_prerequisited(tree)
-    return _get_workbook(tree, excel_lines, workbook, worksheet_title, 6)
+    return _get_workbook(tree, excel_lines, workbook, worksheet_title, 3)
 
 
 def _get_workbook(tree: 'ProgramTree',
@@ -319,9 +351,28 @@ def _build_excel_lines_prerequisited(tree: 'ProgramTree') -> List:
     )
     for child_node in tree.get_nodes_that_are_prerequisites():
         if tree.is_prerequisite(child_node):
+            credits = set()
+            blocks = set()
+            mandatory_status = None
+            for prerequisite_node in tree.search_is_prerequisite_of(child_node):
+                if child_node.year == prerequisite_node.year:
+                    for link in tree.search_links_using_node(child_node):
+                        blocks.add(str(link.block))
+                        credits.add(link.relative_credits_repr)
+                        if mandatory_status is None:
+                            mandatory_status = _("Yes") if link.is_mandatory else _("No")
+
             content.append(
-                LearningUnitYearLine(luy_acronym=child_node.code, luy_title=child_node.title)
+                LearningUnitYearLinePrerequisiteOf(
+                    luy_acronym=child_node.code,
+                    luy_title=child_node.title,
+                    empty_col1='',
+                    credits=" ; ".join(credits) if credits else '',
+                    blocks=" ; ".join(sorted(blocks)) if blocks else '',
+                    is_mandatory=mandatory_status if mandatory_status else '',
+                )
             )
+
             first = True
             for prerequisite_node in tree.search_is_prerequisite_of(child_node):
                 if child_node.year == prerequisite_node.year:

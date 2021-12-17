@@ -25,6 +25,7 @@
 ##############################################################################
 
 import attr
+import mock
 from django.test import SimpleTestCase
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
@@ -35,13 +36,13 @@ from ddd.logic.learning_unit.domain.validator.exceptions import ShouldBeAlphanum
     CodeClassAlreadyExistForUeException, ClassTypeInvalidException, AnnualVolumeInvalidException, \
     LearningUnitHasPartimException, LearningUnitHasProposalException, LearningUnitHasEnrollmentException, \
     LearningUnitHasNoVolumeException, TeachingPlaceRequiredException, DerogationQuadrimesterInvalidChoiceException, \
-    DerogationSessionInvalidChoiceException
+    DerogationSessionInvalidChoiceException, LearningUnitNotExistingException
 from ddd.logic.learning_unit.tests.factory.learning_unit import CourseWithPracticalVolumesOnly, \
     CourseWithLecturingVolumesOnly, CourseWithLecturingAndPracticalVolumes, \
     LDROI1002ExternalLearningUnitFactory, CourseWithOnePartim, LDROI1004CourseWithoutVolumesLearningUnitFactory
 from ddd.logic.learning_unit.use_case.write.create_effective_class_service import create_effective_class
-from infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class import \
-    StudentEnrollmentsTranslator
+from infrastructure.learning_unit.domain.service.in_memory.student_enrollments_to_effective_class import \
+    StudentEnrollmentsTranslatorInMemory
 from infrastructure.learning_unit.repository.in_memory.effective_class import EffectiveClassRepository
 from infrastructure.learning_unit.repository.in_memory.learning_unit import LearningUnitRepository
 
@@ -49,13 +50,13 @@ from infrastructure.learning_unit.repository.in_memory.learning_unit import Lear
 class CreateEffectiveClassService(SimpleTestCase):
     def setUp(self):
         self.learning_unit_repository = LearningUnitRepository()
-        self.learning_unit_repository.entities.clear()
+        self.learning_unit_repository.reset()
         self.ue_with_lecturing_and_practical_volumes = CourseWithLecturingAndPracticalVolumes()
         self.learning_unit_repository.save(self.ue_with_lecturing_and_practical_volumes)
-        self.student_enrollment_translator = StudentEnrollmentsTranslator()
-        self.student_enrollment_translator.has_enrollments_to_learning_unit = lambda *args: False
+        self.student_enrollment_translator = StudentEnrollmentsTranslatorInMemory()
 
         self.effective_class_repository = EffectiveClassRepository()
+        self.effective_class_repository.reset()
 
         self.create_class_cmd = CreateEffectiveClassCommand(
             class_code="A",
@@ -189,10 +190,12 @@ class CreateEffectiveClassService(SimpleTestCase):
             ClassTypeInvalidException
         )
 
-    def test_should_learning_unit_not_have_proposal(self):
-        learning_unit_repository = LearningUnitRepository()
-        learning_unit_repository.has_proposal_this_year_or_in_past = lambda *args, **kwargs: True
-
+    @mock.patch(
+        'infrastructure.learning_unit.repository.in_memory.learning_unit.LearningUnitRepository.'
+        'has_proposal_this_year_or_in_past',
+        return_value=True
+    )
+    def test_should_learning_unit_not_have_proposal(self, mock_proposal):
         cmd = attr.evolve(
             self.create_class_cmd,
             class_code="Z",
@@ -200,7 +203,7 @@ class CreateEffectiveClassService(SimpleTestCase):
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             create_effective_class(
                 cmd,
-                learning_unit_repository,
+                self.learning_unit_repository,
                 self.effective_class_repository,
                 self.student_enrollment_translator
             )
@@ -210,19 +213,18 @@ class CreateEffectiveClassService(SimpleTestCase):
         )
 
     def test_should_learning_unit_not_have_enrollment(self):
-        self.student_enrollment_translator.has_enrollments_to_learning_unit = lambda *args: True
-        learning_unit_repository = LearningUnitRepository()
-
         cmd = attr.evolve(
             self.create_class_cmd,
             class_code="Z",
         )
+        student_enrollment_translator = StudentEnrollmentsTranslatorInMemory()
+        student_enrollment_translator.has_enrollments_to_learning_unit = lambda *args: True
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             create_effective_class(
                 cmd,
-                learning_unit_repository,
+                self.learning_unit_repository,
                 self.effective_class_repository,
-                self.student_enrollment_translator
+                student_enrollment_translator
             )
         self.assertIsInstance(
             class_exceptions.exception.exceptions.pop(),
@@ -362,4 +364,24 @@ class CreateEffectiveClassService(SimpleTestCase):
         self.assertIsInstance(
             class_exceptions.exception.exceptions.pop(),
             DerogationSessionInvalidChoiceException
+        )
+
+    def test_should_learning_unit_year_exists(self):
+        cmd = attr.evolve(
+            self.create_class_cmd,
+            class_code="A",
+            year=self.ue_with_lecturing_and_practical_volumes.year+1
+        )
+
+        with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
+            # Trying to create the same class a second time
+            create_effective_class(
+                cmd,
+                self.learning_unit_repository,
+                self.effective_class_repository,
+                self.student_enrollment_translator
+            )
+        self.assertIsInstance(
+            class_exceptions.exception.exceptions.pop(),
+            LearningUnitNotExistingException
         )

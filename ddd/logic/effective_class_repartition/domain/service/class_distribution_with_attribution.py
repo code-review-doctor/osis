@@ -25,11 +25,14 @@
 ##############################################################################
 from typing import List
 
+from ddd.logic.effective_class_repartition.builder.tutor_identity_builder import TutorIdentityBuilder
+from ddd.logic.effective_class_repartition.domain.model.tutor import Tutor
 from ddd.logic.effective_class_repartition.domain.service.i_tutor_attribution import \
     ITutorAttributionToLearningUnitTranslator
-from ddd.logic.effective_class_repartition.dtos import TutorClassRepartitionDTO
+from ddd.logic.effective_class_repartition.dtos import TutorClassRepartitionDTO, TutorAttributionToLearningUnitDTO
 from ddd.logic.effective_class_repartition.repository.i_tutor import ITutorRepository
-from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
+from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity, EffectiveClass
+from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
 from osis_common.ddd import interface
 
 
@@ -40,38 +43,127 @@ class ClassDistributionWithAttribution(interface.DomainService):
             cls,
             effective_class_identity: 'EffectiveClassIdentity',
             tutor_attribution_translator: 'ITutorAttributionToLearningUnitTranslator',
-            tutor_repository: 'ITutorRepository'
+            tutor_repository: 'ITutorRepository',
+            effective_class_repository: 'IEffectiveClassRepository'
     ) -> List['TutorClassRepartitionDTO']:
         attributions = tutor_attribution_translator.search_attributions_to_learning_unit(
             effective_class_identity.learning_unit_identity
         )
 
         result = []
-        for tutor in tutor_repository.search(effective_class_identity=effective_class_identity):
-            for effective_class in tutor.distributed_effective_classes:
-                attribution = next(
-                    att for att in attributions if att.attribution_uuid == effective_class.attribution.uuid
-                )
-                result.append(
-                    TutorClassRepartitionDTO(
-                        attribution_uuid=effective_class.attribution.uuid,
-                        last_name=attribution.last_name,
-                        first_name=attribution.first_name,
-                        function=attribution.function,
-                        distributed_volume_to_class=effective_class.distributed_volume,
-                        personal_id_number=tutor.entity_id.personal_id_number
-                    )
-                )
+        tutors = tutor_repository.search(effective_class_identity=effective_class_identity)
+        effective_classes = _get_effective_classes_from_tutors(tutors, effective_class_repository)
+        for tutor in tutors:
+            result.extend(_get_tutor_class_repartition_dtos(tutor, attributions, effective_classes))
 
-        return cls._order_tutors_by_last_name_and_first_name(result)
+        return _order_tutors_by_last_name_and_first_name(result)
 
     @classmethod
-    def _order_tutors_by_last_name_and_first_name(
+    def search_by_matricule_enseignant(
             cls,
-            result: List['TutorClassRepartitionDTO']
+            matricule_enseignant: str,
+            annee: int,
+            tutor_attribution_translator: 'ITutorAttributionToLearningUnitTranslator',
+            tutor_repository: 'ITutorRepository',
+            effective_class_repository: 'IEffectiveClassRepository'
     ) -> List['TutorClassRepartitionDTO']:
-        def last_name_first_name(tutor: 'TutorClassRepartitionDTO') -> str:
-            return tutor.last_name + tutor.first_name
+        tutor_identity = TutorIdentityBuilder.build_from_personal_id_number(matricule_enseignant)
+        tutor = tutor_repository.get(entity_id=tutor_identity)
+        if not tutor:
+            return []
 
-        result = sorted(result, key=last_name_first_name)
-        return result
+        effective_classes = _get_effective_classes_from_tutors([tutor], effective_class_repository)
+        attribution_uuids = {
+            distributed_class.attribution.uuid for distributed_class in tutor.distributed_effective_classes
+        }
+        attributions = tutor_attribution_translator.search_learning_unit_attributions(attribution_uuids)
+        tutor_class_repartition_dtos = _get_tutor_class_repartition_dtos(tutor, attributions, effective_classes)
+        return [dto for dto in tutor_class_repartition_dtos if dto.annee == annee]
+
+    @classmethod
+    def search_par_nom_prenom_enseignant(
+            cls,
+            annee: int,
+            nom_prenom: str,
+            tutor_attribution_translator: 'ITutorAttributionToLearningUnitTranslator',
+            tutor_repository: 'ITutorRepository',
+    ) -> List['TutorClassRepartitionDTO']:
+        attributions = tutor_attribution_translator.search_par_nom_prenom_enseignant(annee, nom_prenom)
+        identites_enseignants = [
+            TutorIdentityBuilder.build_from_personal_id_number(attrib.personal_id_number)
+            for attrib in attributions
+        ]
+        tutor_dtos = tutor_repository.search_dto(entity_ids=identites_enseignants)
+
+        attributions_par_uuid = {attrib.attribution_uuid: attrib for attrib in attributions}
+        result = []
+        for tutor in tutor_dtos:
+            for classe_distribuee in tutor.distributed_classes:
+                if classe_distribuee.learning_unit_year != annee:
+                    continue  # FIXME :: l'identité DOIT contenir l'année - code à supprimer...
+                attrib = attributions_par_uuid[classe_distribuee.attribution_uuid]
+                result.append(
+                    TutorClassRepartitionDTO(
+                        attribution_uuid=classe_distribuee.attribution_uuid,
+                        last_name=attrib.last_name,
+                        first_name=attrib.first_name,
+                        function=attrib.function,
+                        distributed_volume_to_class=classe_distribuee.distributed_volume,
+                        personal_id_number=tutor.personal_id_number,
+                        complete_class_code=classe_distribuee.code_complet_classe,
+                        annee=classe_distribuee.learning_unit_year,
+                    )
+                )
+        return sorted(result, key=lambda dto: (dto.last_name, dto.first_name))
+
+
+def _get_effective_classes_from_tutors(
+        tutors: List['Tutor'],
+        effective_class_repository: 'IEffectiveClassRepository'
+) -> List['EffectiveClass']:
+    effective_class_identities = [
+        class_volume_repartition.effective_class
+        for tutor in tutors
+        for class_volume_repartition in tutor.distributed_effective_classes
+    ]
+    return effective_class_repository.search(entity_ids=effective_class_identities)
+
+
+def _order_tutors_by_last_name_and_first_name(
+        result: List['TutorClassRepartitionDTO']
+) -> List['TutorClassRepartitionDTO']:
+    def last_name_first_name(tutor: 'TutorClassRepartitionDTO') -> str:
+        return tutor.last_name + tutor.first_name
+
+    result = sorted(result, key=last_name_first_name)
+    return result
+
+
+def _get_tutor_class_repartition_dtos(
+        tutor,
+        attributions: List['TutorAttributionToLearningUnitDTO'],
+        effective_classes: List['EffectiveClass']
+) -> List['TutorClassRepartitionDTO']:
+    if not attributions:
+        return []
+    liste_repartition_dtos = []
+    for class_repartition in tutor.distributed_effective_classes:
+        attribution = next(
+            att for att in attributions if att.attribution_uuid == class_repartition.attribution.uuid
+        )
+        effective_class = next(
+            class_obj for class_obj in effective_classes
+            if class_obj.entity_id == class_repartition.effective_class
+        )
+        dto = TutorClassRepartitionDTO(
+            attribution_uuid=class_repartition.attribution.uuid,
+            last_name=attribution.last_name,
+            first_name=attribution.first_name,
+            function=attribution.function,
+            distributed_volume_to_class=class_repartition.distributed_volume,
+            personal_id_number=tutor.entity_id.personal_id_number,
+            complete_class_code=effective_class.complete_acronym,
+            annee=class_repartition.effective_class.learning_unit_identity.year,
+        )
+        liste_repartition_dtos.append(dto)
+    return liste_repartition_dtos

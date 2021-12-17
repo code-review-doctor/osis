@@ -25,31 +25,37 @@
 ##############################################################################
 from django.conf.urls import url, include
 
-from attribution.views import manage_my_courses, attribution
+from attribution.views import attribution
 from attribution.views.charge_repartition.create import SelectAttributionView, AddChargeRepartition
 from attribution.views.charge_repartition.update import EditChargeRepartition
 from attribution.views.learning_unit.create import CreateAttribution
 from attribution.views.learning_unit.delete import DeleteAttribution
 from attribution.views.learning_unit.update import UpdateAttributionView
+from attribution.views.manage_my_courses.edit_my_educational_information import \
+    EditMyEducationalInformationForceMajeure, EditMyEducationalInformation
+from attribution.views.manage_my_courses.my_attributions_summary_editable import MyAttributionsSummaryEditable
+from attribution.views.manage_my_courses.my_educational_information import EducationalInformation
+from attribution.views.manage_my_courses.my_teaching_material import UpdateMyTeachingMaterial, \
+    CreateMyTeachingMaterial, DeleteMyTeachingMaterial
 
 urlpatterns = [
     url(r'^manage_my_courses/', include([
-        url(r'^$', manage_my_courses.list_my_attributions_summary_editable,
+        url(r'^$', MyAttributionsSummaryEditable.as_view(),
             name='list_my_attributions_summary_editable'),
         url(r'^(?P<learning_unit_year_id>[0-9]+)/', include([
-            url(r'^educational_information/$', manage_my_courses.view_educational_information,
+            url(r'^educational_information/$', EducationalInformation.as_view(),
                 name='view_educational_information'),
             url(r'^edit_educational_information/$',
-                manage_my_courses.edit_educational_information,
+                EditMyEducationalInformation.as_view(),
                 name='tutor_edit_educational_information'),
             url(r'^edit_educational_information_force_majeure/$',
-                manage_my_courses.edit_educational_information_force_majeure,
+                EditMyEducationalInformationForceMajeure.as_view(),
                 name='tutor_edit_educational_information_force_majeure'),
             url(r'^teaching_materials/', include([
-                url(r'^create', manage_my_courses.create_teaching_material, name="tutor_teaching_material_create"),
-                url(r'^(?P<teaching_material_id>[0-9]+)/edit/', manage_my_courses.update_teaching_material,
+                url(r'^create', CreateMyTeachingMaterial.as_view(), name="tutor_teaching_material_create"),
+                url(r'^(?P<teaching_material_id>[0-9]+)/edit/', UpdateMyTeachingMaterial.as_view(),
                     name="tutor_teaching_material_edit"),
-                url(r'^(?P<teaching_material_id>[0-9]+)/delete/', manage_my_courses.delete_teaching_material,
+                url(r'^(?P<teaching_material_id>[0-9]+)/delete/', DeleteMyTeachingMaterial.as_view(),
                     name="tutor_teaching_material_delete")
             ])),
         ]))

@@ -25,7 +25,7 @@
 ##############################################################################
 from ajax_select import urls as ajax_select_urls
 from django.conf import settings
-from django.conf.urls import url, include
+from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.urls import path
 
@@ -43,25 +43,33 @@ import base.views.learning_units.search.proposal
 import base.views.learning_units.search.service_course
 import base.views.learning_units.search.simple
 import base.views.learning_units.update
+import base.views.student.detail
 from attribution.views import attribution
 from base.views import geocoding
 from base.views import learning_achievement, search, user_list
-from base.views import learning_unit, offer, common, institution, organization, academic_calendar, \
-    my_osis, student
-from base.views import teaching_material
+from base.views import learning_unit, common, institution, organization, academic_calendar, \
+    my_osis
 from base.views.autocomplete import OrganizationAutocomplete, CountryAutocomplete, CampusAutocomplete, \
     EntityAutocomplete, AllocationEntityAutocomplete, AdditionnalEntity1Autocomplete, AdditionnalEntity2Autocomplete, \
     EntityRequirementAutocomplete, EmployeeAutocomplete, AcademicCalendarTypeAutocomplete
+from base.views.entity.detail import EntityRead, EntityDiagramRead, EntityVersionsRead, EntityReadByAcronym
+from base.views.entity.list import EntitySearch
 from base.views.learning_units.detail import DetailLearningUnitYearView, DetailLearningUnitYearViewBySlug
 from base.views.learning_units.external import create as create_external
 from base.views.learning_units.pedagogy.publish import publish_and_access_publication
 from base.views.learning_units.pedagogy.read import learning_unit_pedagogy
-from base.views.learning_units.pedagogy.update import learning_unit_pedagogy_edit, toggle_summary_locked, \
-    learning_unit_pedagogy_force_majeure_edit
+from base.views.learning_units.pedagogy.update import toggle_summary_locked
 from base.views.learning_units.proposal import create, update
 from base.views.learning_units.update import update_learning_unit, learning_unit_edition_end_date
+from base.views.student.detail import StudentRead
+from base.views.student.list import StudentSearch
 from education_group import urls as education_group_urls
 from learning_unit import urls as learning_unit_urls
+from learning_unit.views.learning_unit.edit_educational_information import EditEducationalInformation, \
+    EditEducationalInformationForceMajeure
+from learning_unit.views.learning_unit.teaching_material import CreateTeachingMaterial, UpdateTeachingMaterial, \
+    DeleteTeachingMaterial
+from base.views.entity.detail import EntityRead, EntityDiagramRead, EntityVersionsRead, EntityReadByAcronym
 
 urlpatterns = [
     url(r'^$', common.home, name='home'),
@@ -116,15 +124,16 @@ urlpatterns = [
     url(r'^catalog/$', common.catalog, name='catalog'),
 
     url(r'^entities/', include([
-        url(r'^$', institution.entities_search, name='entities'),
+        url(r'^$', EntitySearch.as_view(), name='entities'),
         url(r'^(?P<entity_version_id>[0-9]+)/', include([
-            url(r'^$', institution.entity_read, name='entity_read'),
+            url(r'^$', EntityRead.as_view(), name='entity_read'),
             url(r'^address/$', institution.get_entity_address, name='entity_address'),
-            url(r'^diagram/$', institution.entity_diagram, name='entity_diagram'),
-            url(r'^versions/$', institution.entities_version, name='entities_version'),
+            url(r'^diagram/$', EntityDiagramRead.as_view(), name='entity_diagram'),
+            url(r'^versions/$', EntityVersionsRead.as_view(), name='entities_version'),
         ])),
         url(r'^(?P<entity_acronym>[A-Z]+)/', include([
-            url(r'^$', institution.entity_read_by_acronym, name='entity_read'),
+            url(r'^$', EntityReadByAcronym.as_view(), name='entity_read'),
+            url(r'^address/$', institution.get_entity_address_by_acronym, name='entity_address'),
         ])),
     ])),
 
@@ -187,10 +196,10 @@ urlpatterns = [
             url(r'^attributions/$', attribution.learning_unit_attributions, name="learning_unit_attributions"),
             url(r'^pedagogy/', include([
                 url(r'^$', learning_unit_pedagogy, name="learning_unit_pedagogy"),
-                url(r'^edit/$', learning_unit_pedagogy_edit, name="learning_unit_pedagogy_edit"),
+                url(r'^edit/$', EditEducationalInformation.as_view(), name="learning_unit_pedagogy_edit"),
                 url(
                     r'^edit_force_majeure/$',
-                    learning_unit_pedagogy_force_majeure_edit,
+                    EditEducationalInformationForceMajeure.as_view(),
                     name="learning_unit_pedagogy_force_majeure_edit"
                 ),
                 url(r'^toggle_summary_locked/$', toggle_summary_locked,
@@ -233,10 +242,10 @@ urlpatterns = [
 
             ])),
             url(r'^teaching_materials/', include([
-                url(r'^create', teaching_material.create, name="teaching_material_create"),
-                url(r'^(?P<teaching_material_id>[0-9]+)/edit/', teaching_material.update,
+                url(r'^create', CreateTeachingMaterial.as_view(), name="teaching_material_create"),
+                url(r'^(?P<teaching_material_id>[0-9]+)/edit/', UpdateTeachingMaterial.as_view(),
                     name="teaching_material_edit"),
-                url(r'^(?P<teaching_material_id>[0-9]+)/delete/', teaching_material.delete,
+                url(r'^(?P<teaching_material_id>[0-9]+)/delete/', DeleteTeachingMaterial.as_view(),
                     name="teaching_material_delete")
             ])),
             url(r'^comparison/$', learning_unit.learning_unit_comparison, name="learning_unit_comparison"),
@@ -282,11 +291,6 @@ urlpatterns = [
 
     url(r'^noscript/$', common.noscript, name='noscript'),
 
-    url(r'^offers/', include([
-        url(r'^$', offer.offers, name='offers'),
-        url(r'^search$', offer.offers_search, name='offers_search'),
-    ])),
-
     url(r'^educationgroups/', include(education_group_urls.urlpatterns)),
 
     url(r'^organizations/', include([
@@ -303,10 +307,10 @@ urlpatterns = [
 
     url(r'^studies/$', common.studies, name='studies'),
     url(r'^students/', include([
-        url(r'^$', student.students, name='students'),
+        path('', StudentSearch.as_view(), name='students'),
         url(r'^(?P<student_id>[0-9]+)/', include([
-            url(r'^$', student.student_read, name='student_read'),
-            url(r'^picture$', student.student_picture, name='student_picture'),
+            url(r'^$', StudentRead.as_view(), name='student_read'),
+            url(r'^picture$', base.views.student.detail.student_picture, name='student_picture'),
         ]))
     ])),
     url(r'^ajax_select/', include(ajax_select_urls)),

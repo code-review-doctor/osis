@@ -42,21 +42,19 @@
                     <div class="col-md-1"><i class="fa fa-users" style="font-size: 400%; color: #6699FF;"></i></div>
                     <div class="col-md-5">
                         <h4 class="media-heading">
-                            <a href="{% url 'pgm_manager' %}" id="lnk_pgm_managers">{% trans 'Program Managers' %}</a>
+                            <a href="{% url 'program_manager' %}" id="lnk_pgm_managers">{% trans 'Program Managers' %}</a>
                         </h4>
                         <p>{% trans 'Management of the program managers' %}</p>
                     </div>
                 {% endif %}
 
-                {% if "assessments" in installed_apps and perms.assessments.view_scoresresponsible %}
-                    <div class="col-md-1"><i class="fa fa-users" style="font-size: 400%; color: #6699FF;"></i></div>
-                    <div class="col-md-5">
-                        <h4 class="media-heading">
-                            <a href="{% url 'scores_responsible_list' %}" id="lnk_srm_managers">{% trans 'Scores responsibles' %}</a>
-                        </h4>
-                        <p>{% trans 'Management of the scores responsibles managers' %}</p>
-                    </div>
-                {% endif %}
+                <div class="col-md-1"><i class="fa fa-users" style="font-size: 400%; color: #6699FF;"></i></div>
+                <div class="col-md-5">
+                    <h4 class="media-heading">
+                        <a href="{% url 'scores_responsibles_search' %}" id="lnk_srm_managers">{% trans 'Scores responsibles' %}</a>
+                    </h4>
+                    <p>{% trans 'Management of the scores responsibles managers' %}</p>
+                </div>
             </div>
             <br>
             {% if "dissertation" in installed_apps and perms.dissertation.change_offerproposition %}

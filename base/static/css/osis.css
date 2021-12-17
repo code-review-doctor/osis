@@ -267,6 +267,11 @@ div:target {
 .select2-selection--multiple{
     overflow: hidden !important;
     height: auto !important;
+    padding: inherit;
+}
+
+.select2-selection--single{
+    min-height: 34px;
 }
 
 #loader {
@@ -338,6 +343,9 @@ div.dataTables_wrapper div.dataTables_processing {
  * Take on https://www.starconfig.com.au/bootstrap-3-and-4-utilities-display-properties-how-to-hide-elements/
  * TODO: Need to remove after update to bootstrap 4
  */
+.w-100 {
+    width: 100%;
+}
 .d-none {
     display: none ! important;
 }
@@ -547,7 +555,7 @@ div.dataTables_wrapper div.dataTables_processing {
     padding-top: 0 !important;
 }
 .select2-container--default .select2-selection--multiple .select2-selection__rendered {
-    padding-left: 0 !important;
+    padding-left: 5px !important;
 }
 
 /* Override datatable default style */
@@ -666,6 +674,11 @@ table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, 
     white-space: pre-line;
 }
 
+/* Prevent from bad overlap of <li> selections */
+.prevent-select-multiple-overlap .select2-container--default .select2-selection--multiple .select2-selection__clear {
+    margin: 5px;
+}
+
 .cursor-not-allowed, .cursor-not-allowed * {
     cursor: not-allowed !important;
 }
@@ -730,4 +743,3 @@ https://stackoverflow.com/questions/16897285/bootstrap-datepicker-is-displaying-
 .bootstrap-datetimepicker-widget {
     z-index: 1600;
 }
-

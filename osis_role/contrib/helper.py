@@ -32,7 +32,7 @@ from base.models.entity import Entity
 from base.models.entity_version import EntityVersion
 from base.models.person import Person
 from osis_role import role
-from osis_role.contrib.models import EntityRoleModel
+from osis_role.contrib.models import EntityRoleModel, RoleModel
 
 Row = collections.namedtuple("Row", ['group_name', 'person_id', 'entity_id', 'entity_recent_acronym', 'scope'])
 
@@ -93,19 +93,19 @@ class EntityRoleHelper:
        Utility class to provide roles from a Person
     """
     @staticmethod
-    def get_all_roles(person: Person) -> List[EntityRoleModel]:
-        qs = []
+    def get_all_roles(person: Person) -> List['RoleModel']:
+        role_cls = []
         if not person:
-            return qs
+            return role_cls
 
         role_mdls = [
-            r for r in role.role_manager.roles if issubclass(r, EntityRoleModel)
+            r for r in role.role_manager.roles if issubclass(r, RoleModel)
         ]
 
         for role_mdl in role_mdls:
-            for s in role_mdl.objects.filter(person=person):
-                qs.append(type(s))
-        return qs
+            if role_mdl.objects.filter(person=person).exists():
+                role_cls.append(role_mdl)
+        return role_cls
 
     @classmethod
     def has_roles(cls, person: Person, role_cls_list: List['RoleModel']) -> bool:

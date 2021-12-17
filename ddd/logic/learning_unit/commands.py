@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from decimal import Decimal
+from typing import Set, Tuple
 
 import attr
 
@@ -105,11 +106,7 @@ class CreateCommand(interface.CommandRequest):
 
 @attr.s(frozen=True, slots=True)
 class LearningUnitSearchCommand(interface.CommandRequest):
-    code = attr.ib(type=str, default=None)
-    year = attr.ib(type=int, default=None)
-    type = attr.ib(type=str, default=None)
-    full_title = attr.ib(type=str, default=None)
-    responsible_entity_code = attr.ib(type=str, default=None)
+    code_annee_values = attr.ib(type=Set[Tuple[str, int]])
 
 
 @attr.s(frozen=True, slots=True)
@@ -133,6 +130,12 @@ class GetLearningUnitCommand(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
+class SearchDetailClassesEffectivesCommand(interface.CommandRequest):
+    codes_classes = attr.ib(type=Set[str])
+    annee = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
 class CanCreateEffectiveClassCommand(interface.CommandRequest):
     learning_unit_code = attr.ib(type=str)
     learning_unit_year = attr.ib(type=int)
@@ -143,6 +146,12 @@ class GetEffectiveClassCommand(interface.CommandRequest):
     class_code = attr.ib(type=str)
     learning_unit_code = attr.ib(type=str)
     learning_unit_year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class GetClassesEffectivesDepuisUniteDEnseignementCommand(interface.CommandRequest):
+    code_unite_enseignement = attr.ib(type=str)
+    annee_unite_enseignement = attr.ib(type=int)
 
 
 @attr.s(frozen=True, slots=True)

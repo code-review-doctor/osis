@@ -25,6 +25,7 @@
 ##############################################################################
 import datetime
 import operator
+import random
 
 import factory
 import factory.fuzzy
@@ -33,7 +34,7 @@ from django.contrib.auth.models import Group, Permission
 
 from base import models as mdl
 from base.models.enums.groups import CENTRAL_MANAGER_GROUP, SIC_GROUP, UE_FACULTY_MANAGER_GROUP, \
-    ADMINISTRATIVE_MANAGER_GROUP
+    CATALOG_VIEWER_GROUP
 from base.tests.factories.user import UserFactory
 
 
@@ -41,6 +42,12 @@ def generate_person_email(person, domain=None):
     if domain is None:
         domain = factory.Faker('domain_name').generate({})
     return '{0.first_name}.{0.last_name}@{1}'.format(person, domain).lower()
+
+
+def generate_global_id() -> str:
+    first_digit = str(random.randint(1, 9))
+    other_digits = [str(random.randint(0, 9)) for _ in range(8)]
+    return "".join([first_digit] + other_digits)
 
 
 class PersonFactory(factory.DjangoModelFactory):
@@ -56,15 +63,14 @@ class PersonFactory(factory.DjangoModelFactory):
     changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1))
     email = factory.LazyAttribute(lambda person: person.user.email if person.user else '')
     phone = factory.Faker('phone_number')
-    language = factory.Iterator(settings.LANGUAGES, getter=operator.itemgetter(0))
+    language = settings.LANGUAGE_CODE
     gender = factory.Iterator(mdl.person.Person.GENDER_CHOICES, getter=operator.itemgetter(0))
     user = factory.SubFactory(UserFactory)
-    global_id = None
+    global_id = factory.LazyFunction(generate_global_id)
 
     class Params:
         french = factory.Trait(language=settings.LANGUAGE_CODE_FR)
         english = factory.Trait(language=settings.LANGUAGE_CODE_EN)
-
 
 
 class SuperUserPersonFactory(PersonFactory):
@@ -109,9 +115,9 @@ class SICFactory(PersonWithPermissionsFactory):
         super().__init__(*permissions, groups=(SIC_GROUP, ), **kwargs)
 
 
-class AdministrativeManagerFactory(PersonWithPermissionsFactory):
+class CatalogViewerFactory(PersonWithPermissionsFactory):
     def __init__(self, *permissions, **kwargs):
-        super().__init__(*permissions, groups=(ADMINISTRATIVE_MANAGER_GROUP, ), **kwargs)
+        super().__init__(*permissions, groups=(CATALOG_VIEWER_GROUP,), **kwargs)
 
 
 def add_person_to_groups(person, groups):

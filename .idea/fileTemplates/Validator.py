@@ -7,7 +7,7 @@ from base.ddd.utils.business_validator import BusinessValidator
 
 
 @attr.s(frozen=True, slots=True)
-class ${$Validator}(BusinessValidator):
+class ${Validator}(BusinessValidator):
     attr = attr.ib(type=str)
 
     def validate(self, *args, **kwargs):

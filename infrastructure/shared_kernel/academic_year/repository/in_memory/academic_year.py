@@ -23,13 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+
 import datetime
 from typing import List, Optional
 
 from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 from ddd.logic.shared_kernel.academic_year.repository.i_academic_year import IAcademicYearRepository
-from osis_common.ddd.interface import ApplicationService
 from program_management.ddd.domain.academic_year import AcademicYear
 
 

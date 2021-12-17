@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2012 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,31 +23,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
 
-import mock
 from django.contrib.auth.models import Permission
-from django.http import HttpResponseRedirect, HttpResponse, HttpResponseForbidden
+from django.http import HttpResponse
 from django.test import TestCase
-from django.test.utils import override_settings
 from django.urls import reverse
 
-from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmissionCalendar
-from attribution.models.attribution import Attribution
-from attribution.tests.factories.attribution import AttributionFactory
+from assessments.tests.factories.score_responsible import ScoreResponsibleFactory
+from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.business.entities import create_entities_hierarchy
-from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity_manager import EntityManagerFactory
 from base.tests.factories.group import EntityManagerGroupFactory
-from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
-from base.tests.factories.person import PersonFactory
-from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
 from base.tests.factories.tutor import TutorFactory
-from base.tests.factories.user import UserFactory
 
 
 class ScoresResponsibleSearchTestCase(TestCase):
@@ -94,17 +84,25 @@ class ScoresResponsibleSearchTestCase(TestCase):
             learning_container_year__requirement_entity=cls.child_two_entity,
         )
 
-        cls.attribution = AttributionFactory(
-            tutor=cls.tutor,
+        cls.attribution = AttributionChargeNewFactory(
+            attribution__tutor=cls.tutor,
+            attribution__learning_container_year=cls.learning_unit_year.learning_container_year,
+            learning_component_year__learning_unit_year=cls.learning_unit_year,
+        )
+        cls.score_responsible = ScoreResponsibleFactory(
             learning_unit_year=cls.learning_unit_year,
-            score_responsible=True
+            tutor=cls.tutor
         )
-        cls.attribution_children = AttributionFactory(
-            tutor=cls.tutor,
+        cls.attribution_children = AttributionChargeNewFactory(
+            attribution__tutor=cls.tutor,
+            attribution__learning_container_year=cls.learning_unit_year_children.learning_container_year,
+            learning_component_year__learning_unit_year=cls.learning_unit_year_children,
+        )
+        cls.score_responsible = ScoreResponsibleFactory(
             learning_unit_year=cls.learning_unit_year_children,
-            score_responsible=True
+            tutor=cls.tutor
         )
-        cls.url = reverse('scores_responsible_list')
+        cls.url = reverse('scores_responsibles_search')
         cls.user.groups.add(group)
 
     def setUp(self):
@@ -114,20 +112,13 @@ class ScoresResponsibleSearchTestCase(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, 'scores_responsible/list.html')
+        self.assertTemplateUsed(response, 'assessments/score_responsible/score_responsibles.html')
 
     def test_case_when_user_not_logged(self):
         self.client.logout()
         response = self.client.get(self.url)
 
         self.assertRedirects(response, "/login/?next={}".format(self.url))
-
-    def test_case_user_without_perms(self):
-        unauthorized_user = UserFactory()
-        self.client.force_login(unauthorized_user)
-
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
     def test_case_search_without_filter_ensure_ordering(self):
         data = {
@@ -159,34 +150,6 @@ class ScoresResponsibleSearchTestCase(TestCase):
 
         self.assertEqual(qs_result.count(), 1)
         self.assertEqual(qs_result.first(), self.learning_unit_year)
-
-    def test_case_ajax_return_json_response(self):
-        data = {
-            'acronym': self.learning_unit_year.acronym,
-            'learning_unit_title': '',
-            'tutor': '',
-            'scores_responsible': self.tutor.person.last_name
-        }
-        response = self.client.get(self.url, data=data, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-
-        self.assertEqual(response.status_code, HttpResponse.status_code)
-
-        expected_response = [
-            {
-                'pk': self.learning_unit_year.pk,
-                'acronym': self.learning_unit_year.acronym,
-                'requirement_entity': 'CHILD_1_V',
-                'learning_unit_title': " - ".join([self.learning_unit_year.learning_container_year.common_title,
-                                                   self.learning_unit_year.specific_title]),
-                'attributions': [
-                    {'tutor': str(self.attribution.tutor), 'score_responsible': self.attribution.score_responsible}
-                ]
-            }
-        ]
-        self.assertJSONEqual(
-            str(response.content, encoding='utf8'),
-            {'object_list': expected_response}
-        )
 
     def test_case_search_by_requirement_entity(self):
         data = self._data_search_by_req_entity()
@@ -225,192 +188,3 @@ class ScoresResponsibleSearchTestCase(TestCase):
             'requirement_entity': self.learning_unit_yr_req_entity_acronym
         }
         return data
-
-
-class ScoresResponsibleManagementAsEntityManagerTestCase(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        group = EntityManagerGroupFactory()
-        group.permissions.add(Permission.objects.get(codename='view_scoresresponsible'))
-        group.permissions.add(Permission.objects.get(codename='change_scoresresponsible'))
-
-        cls.academic_year = AcademicYearFactory(year=datetime.date.today().year, start_date=datetime.date.today())
-
-        entities_hierarchy = create_entities_hierarchy()
-        cls.root_entity = entities_hierarchy.get('root_entity')
-
-        cls.entity_manager = EntityManagerFactory(
-            entity=cls.root_entity,
-        )
-        cls.entity_manager.person.user.groups.add(group)
-
-        cls.learning_unit_year = LearningUnitYearFactory(
-            academic_year=cls.academic_year,
-            acronym="LBIR1210",
-            learning_container_year__academic_year=cls.academic_year,
-            learning_container_year__acronym="LBIR1210",
-            learning_container_year__requirement_entity=cls.root_entity,
-        )
-
-    def setUp(self):
-        self.client.force_login(self.entity_manager.person.user)
-        self.url = reverse('scores_responsible_management')
-        self.get_data = {
-            'learning_unit_year': "learning_unit_year_%d" % self.learning_unit_year.pk
-        }
-        patcher = mock.patch(
-            "base.models.session_exam_calendar.current_sessions_academic_year",
-            return_value=self.academic_year
-        )
-        patcher.start()
-        self.addCleanup(patcher.stop)
-
-    def test_case_when_user_not_logged(self):
-        self.client.logout()
-        response = self.client.get(self.url)
-
-        self.assertRedirects(response, "/login/?next={}".format(self.url))
-
-    def test_case_user_without_perms(self):
-        unauthorized_user = UserFactory()
-        self.client.force_login(unauthorized_user)
-
-        response = self.client.get(self.url, data=self.get_data)
-        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
-
-    def test_case_user_which_cannot_managed_learning_unit_not_entity_managed(self):
-        unauthorized_learning_unit_year = LearningUnitYearFactory()
-
-        response = self.client.get(self.url, data={
-            'learning_unit_year': "learning_unit_year_%d" % unauthorized_learning_unit_year.pk
-        })
-        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
-
-    def test_assert_template_used(self):
-        response = self.client.get(self.url, data=self.get_data)
-
-        self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, 'scores_responsible_edit.html')
-
-
-class ScoresResponsibleManagementAsProgramManagerTestCase(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.academic_year = AcademicYearFactory(current=True)
-
-        entities_hierarchy = create_entities_hierarchy()
-        cls.root_entity = entities_hierarchy.get('root_entity')
-
-        cls.learning_unit_year = LearningUnitYearFactory(
-            academic_year=cls.academic_year,
-            acronym="LBIR1210",
-            learning_unit__start_year__year=2010,
-            learning_container_year__acronym="LBIR1210",
-            learning_container_year__requirement_entity=cls.root_entity,
-            learning_container_year__allocation_entity=cls.root_entity
-        )
-        cls.education_group_year = EducationGroupYearFactory(
-            academic_year=cls.academic_year,
-            education_group__start_year__year=2010,
-            administration_entity=cls.root_entity,
-            management_entity=cls.root_entity
-        )
-        cls.program_manager = ProgramManagerFactory(
-            education_group=cls.education_group_year.education_group,
-        )
-        offer_enrollment = OfferEnrollmentFactory(
-            education_group_year=cls.education_group_year,
-        )
-        LearningUnitEnrollmentFactory(offer_enrollment=offer_enrollment, learning_unit_year=cls.learning_unit_year)
-
-    def setUp(self):
-        self.client.force_login(self.program_manager.person.user)
-        self.url = reverse('scores_responsible_management')
-
-        patcher = mock.patch(
-            "base.models.session_exam_calendar.current_sessions_academic_year",
-            return_value=self.academic_year
-        )
-        patcher.start()
-        self.addCleanup(patcher.stop)
-
-    def test_case_user_which_cannot_managed_learning_unit_not_entity_managed(self):
-        unauthorized_learning_unit_year = LearningUnitYearFactory(academic_year=self.academic_year)
-
-        response = self.client.get(self.url, data={
-            'learning_unit_year': "learning_unit_year_%d" % unauthorized_learning_unit_year.pk
-        })
-        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
-
-    @override_settings(YEAR_LIMIT_LUE_MODIFICATION=2015)
-    def test_assert_template_used(self):
-        response = self.client.get(self.url, data={
-            'learning_unit_year': "learning_unit_year_%d" % self.learning_unit_year.pk
-        })
-
-        self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, 'scores_responsible_edit.html')
-
-
-class ScoresResponsibleAddTestCase(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        group = EntityManagerGroupFactory()
-        group.permissions.add(Permission.objects.get(codename='view_scoresresponsible'))
-        group.permissions.add(Permission.objects.get(codename='change_scoresresponsible'))
-
-        cls.person = PersonFactory()
-        cls.academic_year = AcademicYearFactory(year=datetime.date.today().year, start_date=datetime.date.today())
-
-        entities_hierarchy = create_entities_hierarchy()
-        cls.root_entity = entities_hierarchy.get('root_entity')
-
-        cls.entity_manager = EntityManagerFactory(
-            person=cls.person,
-            entity=cls.root_entity,
-        )
-        cls.entity_manager.person.user.groups.add(group)
-        cls.learning_unit_year = LearningUnitYearFactory(
-            academic_year=cls.academic_year,
-            acronym="LBIR1210",
-            learning_container_year__academic_year=cls.academic_year,
-            learning_container_year__acronym="LBIR1210",
-            learning_container_year__requirement_entity=cls.root_entity,
-        )
-
-    def setUp(self):
-        attrib = AttributionFactory(learning_unit_year=self.learning_unit_year, score_responsible=False)
-        self.url = reverse('scores_responsible_add', kwargs={'pk': self.learning_unit_year.pk})
-        self.post_data = {
-            'action': 'add',
-            'attribution': "attribution_%d" % attrib.pk
-        }
-        self.client.force_login(self.person.user)
-
-        patcher = mock.patch(
-            "base.models.session_exam_calendar.current_sessions_academic_year",
-            return_value=self.academic_year
-        )
-        patcher.start()
-        self.addCleanup(patcher.stop)
-
-    def test_case_when_user_not_logged(self):
-        self.client.logout()
-        response = self.client.post(self.url, data=self.post_data)
-
-        self.assertRedirects(response, "/login/?next={}".format(self.url))
-
-    def test_case_user_without_perms(self):
-        unauthorized_user = UserFactory()
-        self.client.force_login(unauthorized_user)
-
-        response = self.client.post(self.url)
-        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
-
-    def test_case_add_score_responsibles(self):
-        response = self.client.post(self.url, data=self.post_data)
-        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
-
-        self.assertTrue(
-            Attribution.objects.filter(learning_unit_year=self.learning_unit_year, score_responsible=True).exists()
-        )

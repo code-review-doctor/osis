@@ -33,13 +33,14 @@ from ddd.logic.effective_class_repartition.domain.service.i_tutor_attribution im
 from ddd.logic.effective_class_repartition.dtos import TutorClassRepartitionDTO
 from ddd.logic.effective_class_repartition.repository.i_tutor import ITutorRepository
 from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
+from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
 
 
-# TODO :: unit test
 def search_tutors_distributed_to_class(
         cmd: 'SearchTutorsDistributedToClassCommand',
         tutor_attribution_translator: 'ITutorAttributionToLearningUnitTranslator',
-        tutor_repository: 'ITutorRepository'
+        tutor_repository: 'ITutorRepository',
+        effective_class_repository: 'IEffectiveClassRepository'
 ) -> List['TutorClassRepartitionDTO']:
     class_identity = EffectiveClassIdentityBuilder.build_from_code_and_learning_unit_identity_data(
         class_code=cmd.class_code,
@@ -49,5 +50,6 @@ def search_tutors_distributed_to_class(
     return ClassDistributionWithAttribution().search_by_effective_class(
         class_identity,
         tutor_attribution_translator,
-        tutor_repository
+        tutor_repository,
+        effective_class_repository
     )

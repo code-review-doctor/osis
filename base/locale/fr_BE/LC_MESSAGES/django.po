@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-12 13:40+0200\n"
+"POT-Creation-Date: 2021-11-16 13:20+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -162,9 +162,6 @@ msgstr "Absence justifiée"
 
 msgid "Absence unjustified"
 msgstr "Absence injustifiée"
-
-msgid "Absent"
-msgstr "Absent"
 
 msgid "Ac yr."
 msgstr "Anac."
@@ -462,6 +459,12 @@ msgstr "Bisannuelle impaire"
 msgid "Birth Date"
 msgstr "Date de naissance"
 
+msgid "Birth country"
+msgstr "Pays de naissance"
+
+msgid "Birth year must be between 1000 and 2999"
+msgstr "L'année de naissance doit être entre 1000 et 2999"
+
 msgid "Block"
 msgstr "Bloc"
 
@@ -497,6 +500,12 @@ msgstr "Annuler la proposition"
 
 msgid "Cancel the proposal?"
 msgstr "Annuler la proposition ?"
+
+msgid "Catalog viewer"
+msgstr "Lecteur du catalogue"
+
+msgid "Catalog viewers"
+msgstr "Lecteurs du catalogue"
 
 msgid "Catalogue"
 msgstr "Catalogue"
@@ -636,6 +645,9 @@ msgstr "Consolider"
 msgid "Consolidate the proposal"
 msgstr "Consolider la proposition"
 
+msgid "Contact"
+msgstr "Contact"
+
 msgid "Continuing Education"
 msgstr "Formations Continues"
 
@@ -647,6 +659,9 @@ msgstr "Copier les données Reddot de l’année précédente."
 
 msgid "Country"
 msgstr "Pays"
+
+msgid "Country of citizenship"
+msgstr "Pays de nationalité"
 
 msgid "Course"
 msgstr "Cours"
@@ -915,8 +930,14 @@ msgstr "English-friendly"
 msgid "Enrolled"
 msgstr "Inscrit"
 
+msgid "Enrolled to"
+msgstr "Inscrits à"
+
 msgid "Enrolled to learning unit"
 msgstr "Inscrits à l'UE"
+
+msgid "Enrolled to training"
+msgstr "Inscrits à la formation"
 
 msgid "Enrollment campus"
 msgstr "Lieu d'inscription"
@@ -1056,6 +1077,10 @@ msgstr "Echec"
 
 msgid "Female"
 msgstr "Féminin"
+
+msgctxt "female gender"
+msgid "Female"
+msgstr "Femme"
 
 msgid "Fill this transition version"
 msgstr "Remplir cette version de transition"
@@ -1547,6 +1572,10 @@ msgstr "Liste au choix Majeures"
 msgid "Male"
 msgstr "Masculin"
 
+msgctxt "gender male"
+msgid "Male"
+msgstr "Homme"
+
 msgid "Manage volumes"
 msgstr "Gérer les volumes"
 
@@ -1660,6 +1689,9 @@ msgstr "Nombre minimum de relations autorisées"
 msgid "Minor list choice"
 msgstr "Liste au choix Mineures"
 
+msgid "Missing score"
+msgstr "Note manquante"
+
 msgid "Missing search address"
 msgstr "Adresse de recherche manquante"
 
@@ -1765,6 +1797,9 @@ msgstr "Aucune proposition n'a été sélectionnée."
 msgid "No result!"
 msgstr "Aucun résultat !"
 
+msgid "No weighting(same weight)"
+msgstr "Pas de pondération (même poids)"
+
 msgid "No. Session"
 msgstr "No. session"
 
@@ -1848,6 +1883,9 @@ msgstr "Organigramme"
 
 msgid "Organizations"
 msgstr "Organisations"
+
+msgid "Other"
+msgstr "Autre"
 
 msgid "Other academic responsible"
 msgstr "Autre responsable académique"
@@ -1942,6 +1980,12 @@ msgstr "Attention"
 msgid "Pay attention! This learning unit is used in more than one formation"
 msgstr ""
 "Attention cette unité d'enseignement fait partie de plusieurs formations :"
+
+msgid "Payment notice 1 warning"
+msgstr "Avertissement avis d'échéance de paiement 1"
+
+msgid "Payment notice 2 warning"
+msgstr "Avertissement avis d'échéance de paiement 2"
 
 msgid "Pending"
 msgstr "En attente"
@@ -2243,6 +2287,9 @@ msgctxt "Submission email table header"
 msgid "Registration number"
 msgstr "Noma"
 
+msgid "Relative credits"
+msgstr "Crédits relatifs"
+
 msgid "Remarks, comments and constraints"
 msgstr "Remarques, commentaires et contraintes"
 
@@ -2322,7 +2369,7 @@ msgid "Scores exam submission"
 msgstr "Encodage de notes"
 
 msgid "Scores must be between 0 and 20"
-msgstr "Les scores doivent être compris entre 0 et 20"
+msgstr "Les notes doivent être comprises entre 0 et 20"
 
 msgid "Scores responsibles"
 msgstr "Responsables de notes"
@@ -2444,6 +2491,9 @@ msgstr "Recherche étudiants"
 
 msgid "Student's dissertations management"
 msgstr "Gestion des mémoires des étudiants"
+
+msgid "Student.s enrolled in block 1"
+msgstr "Etudiant.e.s inscrit.e.s au bloc 1"
 
 msgid "Students"
 msgstr "Étudiants"
@@ -2593,6 +2643,14 @@ msgstr ""
 "Le champ session dérogation doit être complété UNIQUEMENT si l'on veut "
 "encoder une exception par rapport aux sessions calculées en fonction des "
 "quadrimestres."
+
+#, python-format
+msgid ""
+"The effective class %(acronym)s has %(count)d enrollments for the year "
+"%(year)s"
+msgstr ""
+"La classe %(acronym)s fait l'objet de %(count)d inscription(s) pour l'année "
+"%(year)s"
 
 #, python-format
 msgid ""
@@ -2917,9 +2975,6 @@ msgstr "Aujourd'hui"
 msgid "Total"
 msgstr "Total"
 
-msgid "Total enrollments to training"
-msgstr "Total d'inscrits à la formation"
-
 msgid "Training"
 msgstr "Formation"
 
@@ -3114,6 +3169,9 @@ msgstr "Semaine"
 
 msgid "Weighting"
 msgstr "Pondération par crédit"
+
+msgid "Weighting type"
+msgstr "Type de pondération"
 
 msgctxt "section title"
 msgid "Welcome"
@@ -3393,9 +3451,6 @@ msgstr "rôle (anglais)"
 
 msgid "role (french)"
 msgstr "rôle (français)"
-
-msgid "score(s) saved"
-msgstr "note(s) enregistrée(s)"
 
 msgid "search"
 msgstr "recherche"

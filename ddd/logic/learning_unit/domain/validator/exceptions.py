@@ -181,8 +181,8 @@ class AnnualVolumeInvalidException(BusinessException):
     def __init__(self, volume_annual: 'DurationUnit', *args, **kwargs):
         message = _(
             "The sum of first/second quadrimesters volumes should be equal to annual volume "
-            "of the learning unit ({})".format(volume_annual)
-        )
+            "of the learning unit ({})"
+        ).format(volume_annual)
         super().__init__(message, **kwargs)
 
 
@@ -219,4 +219,14 @@ class LearningUnitOfEffectiveClassHasEnrollmentException(BusinessException):
         message = _(
             "Class of learning unit having enrollment can't be delete"
         )
+        super().__init__(message, **kwargs)
+
+
+class LearningUnitNotExistingException(BusinessException):
+    def __init__(self, learning_unit_year: int, **kwargs):
+        message = _(
+            "You cannot create class in %(year)s because there is no learning unit corresponding in %(year)s"
+        ) % {
+            'year': learning_unit_year,
+        }
         super().__init__(message, **kwargs)

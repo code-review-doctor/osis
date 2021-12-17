@@ -98,8 +98,10 @@ def _should_class_volumes_be_consistent_with_learning_unit(
 
     if practical_part and not lecturing_part:
         volume_annual = practical_part.volumes.volume_annual
-    else:
+    elif lecturing_part:
         volume_annual = lecturing_part.volumes.volume_annual
+    else:
+        volume_annual = 0
 
     sum_q1_q2 = (volume_first_quadrimester or 0) + (volume_second_quadrimester or 0)
     if volume_annual <= 0 or sum_q1_q2 != volume_annual:

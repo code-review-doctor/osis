@@ -92,6 +92,13 @@ INSTALLED_APPS = (
     'reversion',
     'django.contrib.gis',
     'ddd',
+    'infrastructure',
+    'osis_document',
+    'osis_history',
+    'osis_signature',
+    'osis_export',
+    'osis_notification',
+    'osis_async'
 )
 
 
@@ -174,6 +181,10 @@ TEMPLATES = [
     },
 ]
 
+FORMAT_MODULE_PATH = [
+    'backoffice.formats',
+]
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
@@ -216,7 +227,7 @@ MEDIA_URL = os.environ.get('MEDIA_URL',  '/media/')
 CONTENT_TYPES = ['application/csv', 'application/doc', 'application/pdf', 'application/xls', 'application/xml',
                  'application/zip', 'image/jpeg', 'image/gif', 'image/png', 'text/html', 'text/plain']
 MAX_UPLOAD_SIZE = int(os.environ.get('MAX_UPLOAD_SIZE', 5242880))
-OSIS_DOCUMENT_BASE_URL = os.environ.get('OSIS_DOCUMENT_BASE_URL', '/osis_document/')
+OSIS_DOCUMENT_BASE_URL = os.environ.get('OSIS_DOCUMENT_BASE_URL', '')
 
 # Logging settings
 # Logging framework is defined in env settings (ex: dev.py)
@@ -402,6 +413,7 @@ LOGGING = {
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
+        'backoffice.settings.rest_framework.authentication.ESBAuthentication'
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
@@ -416,6 +428,7 @@ REST_FRAMEWORK = {
         'rest_framework.filters.SearchFilter',   # Search based on admin
     ),
 }
+REST_FRAMEWORK_ESB_AUTHENTICATION_SECRET_KEY = os.environ.get('REST_FRAMEWORK_ESB_AUTHENTICATION_SECRET_KEY')
 
 # ESB Configuration
 ESB_API_URL = os.environ.get('ESB_API_URL')
@@ -429,14 +442,6 @@ ESB_REFRESH_LEARNING_UNIT_PEDAGOGY_ENDPOINT = os.environ.get('ESB_REFRESH_LEARNI
 ESB_GEOCODING_ENDPOINT = os.environ.get('ESB_GEOCODING_ENDPOINT')
 ESB_ENTITIES_HISTORY_ENDPOINT = os.environ.get('ESB_ENTITIES_HISTORY_ENDPOINT')
 ESB_ENTITY_ADDRESS_ENDPOINT = os.environ.get('ESB_ENTITY_ADDRESS_ENDPOINT')
-
-# EPC Configuration
-EPC_API_URL = os.environ.get('EPC_API_URL')
-EPC_API_USER = os.environ.get('EPC_API_USER')
-EPC_API_PASSWORD = os.environ.get('EPC_API_PASSWORD')
-EPC_ATTRIBUTIONS_TUTOR_ENDPOINT = os.environ.get(
-    'EPC_ATTRIBUTIONS_TUTOR_ENDPOINT', "resources/AllocationCharges/tutors/{global_id}/{year}"
-)
 
 RELEASE_TAG = os.environ.get('RELEASE_TAG')
 
@@ -538,3 +543,11 @@ INTERNSHIP_SCORE_ENCODING_URL = os.environ.get("INTERNSHIP_SCORE_ENCODING_URL", 
 CONTINUING_EDUCATION_STUDENT_PORTAL_URL = os.environ.get("CONTINUING_EDUCATION_STUDENT_PORTAL_URL", "")
 
 SCHEDULE_APP_URL = os.environ.get("SCHEDULE_APP_URL", "")
+
+REGISTRATION_ADMINISTRATION_URL = os.environ.get('REGISTRATION_SERVICE_URL', '')
+
+OSIS_EXPORT_ASYNCHRONOUS_MANAGER_CLS = os.environ.get(
+    "OSIS_EXPORT_ASYNCHRONOUS_MANAGER_CLS", "backoffice.settings.osis_export.async_manager.AsyncTaskManager"
+)
+
+OSIS_DOCUMENT_API_SHARED_SECRET = os.environ.get("OSIS_DOCUMENT_API_SHARED_SECRET", "")

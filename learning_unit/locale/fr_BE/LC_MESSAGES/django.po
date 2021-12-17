@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-30 13:22+0200\n"
+"POT-Creation-Date: 2021-12-16 10:24+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -46,6 +46,10 @@ msgid ""
 msgstr ""
 "Etes-vous certain de vouloir supprimer définitivement cette classe en "
 "%(year)s ?"
+
+
+msgid "Are you sure you want to delete the teaching material?"
+msgstr "Êtes-vous sûr·e de vouloir supprimer le support de cours ?"
 
 msgid "Are you sure?"
 msgstr "Êtes-vous sûr·e?"
@@ -86,14 +90,14 @@ msgstr "Complément spécifique à la classe"
 msgid "Classes can only be created by a faculty manager"
 msgstr "Les classes ne peuvent être créées que par un gestionnaire facultaire"
 
+msgid "Classes copy report"
+msgstr "Rapport de copie de classes"
+
 msgid "Code"
 msgstr "Code"
 
 msgid "Common part"
 msgstr "Partie commune"
-
-msgid "Complete LU"
-msgstr "UE complète"
 
 msgid "Components"
 msgstr "Composants"
@@ -101,8 +105,14 @@ msgstr "Composants"
 msgid "Confirm"
 msgstr "Confirmer"
 
-msgid "Credits"
-msgstr "Crédits"
+msgid "Copy result"
+msgstr "Résultat de la copie"
+
+msgid "Copy source"
+msgstr "Origine de la copie"
+
+msgid "Copy to next year"
+msgstr "Copier en N+1"
 
 msgid "Delete"
 msgstr "Supprimer"
@@ -112,6 +122,15 @@ msgstr "Supprimer la classe définitivement"
 
 msgid "Derogation's session"
 msgstr "Session de dérogation"
+
+msgid "English-friendly"
+msgstr "English-friendly"
+
+msgid "Error"
+msgstr "Erreur"
+
+msgid "Exchange students"
+msgstr "Etudiants d'échange"
 
 msgid "Faculty manager"
 msgstr "Gestionnaire facultaire"
@@ -125,6 +144,9 @@ msgstr "Remarque de faculté (non publiée)"
 msgid "Formation catalogue"
 msgstr "Catalogue des formations"
 
+msgid "French-friendly"
+msgstr "French-friendly"
+
 msgid "Full"
 msgstr "Complet"
 
@@ -136,6 +158,9 @@ msgstr "Identification"
 
 msgid "Inactive"
 msgstr "Inactif"
+
+msgid "Individual loan"
+msgstr "Emprunt individuel"
 
 msgid "Institution"
 msgstr "Institution"
@@ -252,8 +277,14 @@ msgstr "Enregistrer"
 msgid "Session derogation"
 msgstr "Session dérogation"
 
+msgid "Stage-Dimona"
+msgstr "Stage-Dimona"
+
 msgid "State"
 msgstr "Etat"
+
+msgid "Teaching material"
+msgstr "Supports de cours"
 
 msgid ""
 "The derogation session field must be completed ONLY if you want to encode an "
@@ -272,6 +303,12 @@ msgstr ""
 "La date de cette unité d'enseignement n'est pas modifiable en raison de son "
 "type qui n'est pas parmi les types suivants: %(types)s"
 
+msgid "The learning unit has been updated"
+msgstr "L'unité d'enseignement a été modifiée"
+
+msgid "The learning unit has been updated (without report)."
+msgstr "L'unité d'enseignement a été modifiée (sans report)."
+
 msgid "The learning unit has proposal for this or a previous year"
 msgstr ""
 "L'unité d'enseignement est en proposition pour cette année ou une année "
@@ -283,6 +320,14 @@ msgstr ""
 
 msgid "The learning unit is a partim"
 msgstr "L'unité d'enseignement est un partim"
+
+#, python-format
+msgid ""
+"The learning unit is in proposal, the report from %(proposal_year)s will be "
+"done at consolidation"
+msgstr ""
+"L'UE étant en proposition, le report à partir de %(proposal_year)s sera "
+"effectué lors de la consolidation"
 
 msgid "The learning unit is not a partim"
 msgstr "L'unité d'enseignement n'est pas un partim"
@@ -480,8 +525,15 @@ msgid "You cannot modify a learning unit of a previous year"
 msgstr ""
 "Vous ne pouvez pas modifier l'unité d'enseignement d'une année dans le passé"
 
+msgid "You do not have sufficient access rights to delete a class."
+msgstr "Vous n'avez pas les droits nécessaires pour supprimer une classe."
+
 msgid "You do not have sufficient access rights to update a class."
 msgstr "Vous n'avez pas les droits nécessaires pour modifier une classe."
+
+#, python-format
+msgid "and postponed until %(year)s"
+msgstr "et reportée jusque %(year)s"
 
 msgid "external acronym rules"
 msgstr ""
@@ -496,3 +548,11 @@ msgstr "volume horaire partiel q1"
 
 msgid "hourly volume partial q2"
 msgstr "volume horaire partiel q2"
+
+#, python-format
+msgid ""
+"the report has not been done from %(proposal_year)s because the LU is in "
+"proposal"
+msgstr ""
+"le report n'a pas été effectué à partir de %(proposal_year)s parce que l'UE "
+"est en proposition"

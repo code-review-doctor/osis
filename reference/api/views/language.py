@@ -36,8 +36,10 @@ class LanguageList(generics.ListAPIView):
     name = 'languages_list'
     queryset = Language.objects.all()
     serializer_class = LanguageSerializer
+    filter_fields = ['code']
     search_fields = (
         'name',
+        'name_en'
     )
     ordering_fields = (
         'code',

@@ -24,7 +24,7 @@
 #
 ##############################################################################
 import re
-from typing import Optional
+from typing import Optional, Dict
 
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import Prefetch
@@ -39,6 +39,7 @@ from base.business.learning_units.edition import create_learning_unit_year_creat
 from base.models import proposal_learning_unit
 from base.models.learning_unit import REGEX_BY_SUBTYPE
 from base.models.learning_unit_year import LearningUnitYear
+from base.models.person import Person
 from base.views.common import display_success_messages
 from osis_common.decorators.ajax import ajax_required
 
@@ -116,16 +117,17 @@ def get_learning_unit_identification_context(learning_unit_year_id, person):
         'can_edit_learning_unit_proposal': person.user.has_perm('base.can_edit_learning_unit_proposal', luy),
         'can_consolidate_proposal': person.user.has_perm('base.can_consolidate_learningunit_proposal', luy),
         'can_manage_volume': person.user.has_perm('base.can_edit_learningunit', luy),
-        'can_cancel_proposal': person.user.has_perm('base.can_cancel_proposal', luy),
     })
 
     return context
 
 
-def get_common_context_learning_unit_year(person,
-                                          learning_unit_year_id: Optional[int] = None,
-                                          code: Optional[str] = None,
-                                          year: Optional[int] = None):
+def get_common_context_learning_unit_year(
+        person: Person,
+        learning_unit_year_id: Optional[int] = None,
+        code: Optional[str] = None,
+        year: Optional[int] = None
+) -> Dict:
     query_set = LearningUnitYear.objects.all().select_related(
         'learning_unit',
         'learning_container_year'
@@ -140,11 +142,18 @@ def get_common_context_learning_unit_year(person,
     else:
         learning_unit_year = query_set.get(acronym=code, academic_year__year=year)
 
-    return {
-        'learning_unit_year': learning_unit_year,
+    return get_common_context_for_learning_unit_year(person, learning_unit_year)
+
+
+def get_common_context_for_learning_unit_year(person: Person, luy: LearningUnitYear) -> Dict:
+    context = {
+        'learning_unit_year': luy,
         'current_academic_year': mdl.academic_year.starting_academic_year(),
-        'is_person_linked_to_entity': person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year),
+        'is_person_linked_to_entity': person.is_linked_to_entity_in_charge_of_learning_unit_year(luy),
+        'learning_unit_year_choices': (reversed(luy.learning_unit.learningunityear_set.all()),),
     }
+    context.update(get_common_context_to_publish(person, luy))
+    return context
 
 
 def get_text_label_translated(text_lb, user_language):

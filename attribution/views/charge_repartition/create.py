@@ -88,7 +88,7 @@ class AddChargeRepartition(UpdateAttributionView):
         copy_attribution.id = None
         copy_attribution.external_id = None
         copy_attribution.uuid = uuid.uuid4()
-        if self.luy.learning_container_year.container_type != learning_container_year_types.COURSE and \
+        if self.luy.learning_container_year.container_type != learning_container_year_types.COURSE or \
                 self.luy.is_partim():
             if copy_attribution.start_year is None:
                 copy_attribution.start_year = self.luy.academic_year.year

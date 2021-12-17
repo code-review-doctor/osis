@@ -75,8 +75,11 @@ class LearningUnitYearFactory(DjangoModelFactory):
         "base.tests.factories.learning_unit.LearningUnitFactory",
         start_year=factory.SelfAttribute('..academic_year')
     )
-    learning_container_year = factory.SubFactory(LearningContainerYearFactory,
-                                                 academic_year=factory.SelfAttribute('..academic_year'))
+    learning_container_year = factory.SubFactory(
+        LearningContainerYearFactory,
+        academic_year=factory.SelfAttribute('..academic_year'),
+        acronym=factory.SelfAttribute('..acronym'),
+    )
     changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1),
                                                datetime.datetime(2017, 3, 1))
     acronym = factory.Sequence(lambda n: 'LFAC1%03d' % n)
@@ -86,7 +89,6 @@ class LearningUnitYearFactory(DjangoModelFactory):
 
     internship_subtype = factory.LazyAttribute(_generate_internship_subtype)
     credits = factory.fuzzy.FuzzyDecimal(MINIMUM_CREDITS, MAXIMUM_CREDITS, precision=0)
-    decimal_scores = False
     status = True
     session = factory.Iterator(learning_unit_year_session.LEARNING_UNIT_YEAR_SESSION, getter=operator.itemgetter(0))
     quadrimester = factory.Iterator(quadrimesters.LearningUnitYearQuadrimester.choices(),
@@ -143,7 +145,6 @@ class LearningUnitYearFakerFactory(DjangoModelFactory):
     subtype = factory.Iterator(learning_unit_year_subtypes.LEARNING_UNIT_YEAR_SUBTYPES, getter=operator.itemgetter(0))
     internship_subtype = factory.Iterator(internship_subtypes.INTERNSHIP_SUBTYPES, getter=operator.itemgetter(0))
     credits = factory.fuzzy.FuzzyDecimal(MINIMUM_CREDITS, MAXIMUM_CREDITS, precision=0)
-    decimal_scores = False
     status = True
     session = factory.Iterator(learning_unit_year_session.LEARNING_UNIT_YEAR_SESSION, getter=operator.itemgetter(0))
     quadrimester = factory.Iterator(quadrimesters.LearningUnitYearQuadrimester.choices(),
@@ -161,6 +162,11 @@ class LearningUnitYearFullFactory(LearningUnitYearFactory):
 
 class LearningUnitYearPartimFactory(LearningUnitYearFactory):
     subtype = learning_unit_year_subtypes.PARTIM
+    learning_container_year = factory.SubFactory(
+        LearningContainerYearFactory,
+        academic_year=factory.SelfAttribute('..academic_year'),
+    )
+    acronym = factory.LazyAttribute(lambda o: o.learning_container_year.acronym + random.choice(string.ascii_letters))
 
 
 def create_learning_unit_year(academic_yr, title, learning_unit):

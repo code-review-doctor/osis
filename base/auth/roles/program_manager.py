@@ -42,11 +42,12 @@ from base.models.learning_unit_enrollment import LearningUnitEnrollment
 from education_group.auth.predicates import is_education_group_extended_daily_management_calendar_open
 from education_group.contrib.admin import EducationGroupRoleModelAdmin
 from education_group.contrib.models import EducationGroupRoleModel
+from education_group.models.enums.cohort_name import CohortName
 from osis_role.contrib import predicates as osis_role_predicates
 
 
 class ProgramManagerAdmin(VersionAdmin, EducationGroupRoleModelAdmin):
-    list_display = ('person', 'education_group_most_recent_acronym', 'changed',)
+    list_display = ('person', 'education_group_most_recent_acronym', 'cohort', 'changed',)
     raw_id_fields = ('person', 'education_group')
     search_fields = ('education_group__educationgroupyear__acronym', 'person__first_name', 'person__last_name')
 
@@ -57,6 +58,12 @@ class ProgramManager(EducationGroupRoleModel):
     person = models.ForeignKey('Person', on_delete=models.PROTECT, verbose_name=gettext_lazy("person"))
     education_group = models.ForeignKey(EducationGroup, on_delete=models.CASCADE)
     is_main = models.BooleanField(default=False, verbose_name=gettext_lazy('Main'))
+    cohort = models.CharField(
+        null=True,
+        max_length=25,
+        choices=CohortName.choices(),
+        verbose_name=_('Name'),
+    )
 
     @property
     def name(self):
@@ -73,7 +80,7 @@ class ProgramManager(EducationGroupRoleModel):
         verbose_name = _("Program manager")
         verbose_name_plural = _("Program managers")
         group_name = "program_managers"
-        unique_together = ('person', 'education_group',)
+        unique_together = ('person', 'education_group', 'cohort')
 
     @classmethod
     def rule_set(cls):
@@ -126,6 +133,7 @@ def find_by_person(a_person):
     )
 
 
+# TODO :: to remove ?
 def is_program_manager(user, learning_unit_year=None, education_group=None):
     """
     Args:
@@ -166,12 +174,11 @@ def find_by_management_entity(administration_entities: List['EntityVersion']):
     return None
 
 
-def get_learning_unit_years_attached_to_program_managers(programs_manager_qs, entity_structure):
-    current_ac = current_academic_year()
+def get_learning_unit_years_attached_to_program_managers(programs_manager_qs, entity_structure, academic_year):
     allowed_entities_scopes = set()
 
     offer_enrollments_education_group_year = LearningUnitEnrollment.objects.filter(
-        offer_enrollment__education_group_year__academic_year=current_ac,
+        offer_enrollment__education_group_year__academic_year=academic_year,
         offer_enrollment__education_group_year__education_group__in=programs_manager_qs.values_list(
             'education_group',
             flat=True
@@ -185,7 +192,7 @@ def get_learning_unit_years_attached_to_program_managers(programs_manager_qs, en
         )
     )
     lu_enrollments = LearningUnitEnrollment.objects.filter(
-        offer_enrollment__education_group_year__academic_year=current_ac,
+        offer_enrollment__education_group_year__academic_year=academic_year,
         offer_enrollment__education_group_year__education_group__in=programs_manager_qs.values_list(
             'education_group',
             flat=True
