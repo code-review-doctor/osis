@@ -25,6 +25,7 @@
 ##############################################################################
 from django.urls import include, path
 
+from preparation_inscription.views.ajouter_ue import RechercherUeView, ajouterUeView
 from preparation_inscription.views.formulaire_par_defaut import FormulaireParDefaultView
 
 urlpatterns = [
@@ -39,4 +40,6 @@ urlpatterns = [
             name='default_enrollment_form'
         ),
     ])),
+    path('search_ue/', RechercherUeView.as_view(), name='search_ue_to_program'),
+    path('add_ue/<int:year>/', ajouterUeView, name='add_ue_to_program'),
 ]

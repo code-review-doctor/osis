@@ -50,19 +50,8 @@ class FormulaireParDefaultView(TemplateView):
                          transition_name: str = '',
                          **kwargs):
         context = super().get_context_data(**kwargs)
-        formation_dto = _get_formation(year, self.get_group_obj().abbreviated_title, version_name, transition_name)
-
-        context.update(
-            {
-                'code': "{}{}".format(
-                    formation_dto.sigle_formation,
-                    formation_dto.version_formation if formation_dto.version_formation != STANDARD else ''
-                ),
-                'title': formation_dto.intitule_complet_formation,
-                'academic_year': "{}-{}".format(year, str(year + 1)[-2:]),
-                'inscription_formulaire_affichage_arbre': _get_inscription_formulaire_affichage_arbre(formation_dto),
-             }
-        )
+        sigle = self.get_group_obj().abbreviated_title
+        context.update(contexte_commun_preparation_inscription(sigle, transition_name, version_name, year))
 
         return context
 
@@ -86,3 +75,18 @@ def _get_formation(year: int, acronym: str, version_name: str, transition_name: 
         transition_formation=transition_name if transition_name else '',
     )
     return message_bus_instance.invoke(cmd)
+
+
+def contexte_commun_preparation_inscription(sigle, transition_name, version_name, year):
+    formation_dto = _get_formation(year, sigle, version_name, transition_name)
+    return {
+            'code': "{}{}".format(
+                formation_dto.sigle_formation,
+                formation_dto.version_formation if formation_dto.version_formation != STANDARD else ''
+            ),
+            'title': formation_dto.intitule_complet_formation,
+            'academic_year': "{}-{}".format(year, str(year + 1)[-2:]),
+            'inscription_formulaire_affichage_arbre': _get_inscription_formulaire_affichage_arbre(formation_dto),
+            'year': year
+        }
+

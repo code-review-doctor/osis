@@ -33,20 +33,23 @@
 <li class="active">{{ form.code.initial }}</li>
 {% endblock %}
 {% block content %}
+    {% url 'search_ue_to_program' as url_search_ue_to_program %}
+    {% url 'add_ue_to_program' year as url_add_ue_to_program %}
+
     <div class="panel panel-default">
         <div class="panel-body" id="tabs">
             <ul class="nav nav-tabs" role="tablist">
-{#                <li role="presentation">#}
-{#                    <a data-toggle="tab" href="#tab_content" role="tab">#}
-{#                        {% trans 'Content'%}#}
-{#                    </a>#}
-{#                </li>#}
+                <li role="presentation" {% if request.path == url_search_ue_to_program or request.path == url_add_ue_to_program %} class="active"{% endif %}>
+                    <a data-toggle="tab" href="#tab_programme" role="tab">
+                        {% trans 'Program'%}
+                    </a>
+                </li>
 {#                <li role="presentation">#}
 {#                    <a data-toggle="tab" href="#tab_list_lus" role="tab">#}
 {#                        {% trans 'Learning units view list' %}#}
 {#                    </a>#}
 {#                </li>#}
-                <li role="presentation" class="active">
+                <li role="presentation" {% if request.path != url_search_ue_to_program and request.path != url_add_ue_to_program %} class="active"{% endif %}>
                     <a data-toggle="tab" href="#tab_form_view" role="tab">
                         {% trans 'Form view'%}
                     </a>
@@ -54,8 +57,57 @@
             </ul>
             <br>
             <div class="tab-content">
-                {% include 'formulaire_par_defaut.html' %}
+                <div id="tab_programme" class="tab-pane fade in {% if request.path == url_search_ue_to_program %} active{% endif %}">
+                    {% include 'programme.html' %}
+                </div>
+                <div id="tab_form_view" class="tab-pane fade in {% if request.path != url_search_ue_to_program %} active{% endif %}">
+                    {% include 'formulaire_par_defaut.html' %}
+                </div>
             </div>
         </div>
     </div>
 {% endblock %}
+
+{% block script %}
+    <script src="{% static "js/osis_datatable.js" %}"></script>
+    <script>
+        $(document).ready(function()
+        {
+            columnDefs = [
+                {
+                    "name": "checkbox",
+                    "targets": 0,
+                    "checkboxes": {
+                                "selectRow": true
+                    },
+                    "render": function(data, type, row, meta){
+                        return '<input type="checkbox" class="dt-checkboxes" name="selected_ue" value="' + row['acronym'] + '">'
+                    },
+                },
+                {
+                    "name": "academic_year",
+                    "targets": 1,
+                    "data": "academic_year",
+                    "render": function(data, type, row, meta){
+                        let year = data;
+                        let nextYear = data + 1;
+                        return `${year}-${nextYear.toString().slice(2)}`;
+                    }
+                },
+                {
+                    "name": "acronym",
+                    "targets": 2,
+                    "data": "acronym",
+                },
+                { "name": "title", "targets": 3, "data": "title"},
+                { orderable: false, targets: 0 }
+            ];
+
+            initializeDataTable("search_form", "table_learning_units", "learningUnitIds", {{ page_obj.number }},
+                {{ items_per_page }}, "{{ request.path }}", columnDefs);
+
+        });
+
+    </script>
+
+{% endblock script %}

@@ -1,6 +1,5 @@
 {% load static %}
 {% load i18n %}
-{% load bootstrap3 range %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -24,19 +23,12 @@
 * at the root of the source code of this program.  If not,
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
-
-    <table>
-        <thead>
-        <tr style="border-bottom: solid;">
-            <th style="width:{{ inscription_formulaire_affichage_arbre.main_part_col_length }}px;">
-                <strong>{{ title }}</strong>
-            </th>
-            {% for cpt in 1|range_for:inscription_formulaire_affichage_arbre.max_block %}
-                <th style="width:15px;text-align: center;">An {{ cpt }}</th>
-            {% endfor %}
-        </tr>
-        </thead>
-        <tbody>
-        {{ inscription_formulaire_affichage_arbre.tree_list }}
-        </tbody>
-    </table>
+<div class="row">
+    <div class="pull-right">
+        <button type="submit" id="btn-confirm" class="btn btn-primary"
+                title="{% trans 'Add selected learning units to program' %}">
+            <span class="glyphicon glyphicon-floppy-save"
+                  aria-hidden="true"></span> {% trans 'Add selected learning units to program' %}
+        </button>
+    </div>
+</div>

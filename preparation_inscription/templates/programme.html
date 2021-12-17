@@ -1,0 +1,104 @@
+{% load static %}
+{% load i18n %}
+{% load bootstrap3 range %}
+{% comment "License" %}
+* OSIS stands for Open Student Information System. It's an application
+* designed to manage the core business of higher education institutions,
+* such as universities, faculties, institutes and professional schools.
+* The core business involves the administration of students, teachers,
+* courses, programs and so on.
+*
+* Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* A copy of this license - GNU General Public License - is available
+* at the root of the source code of this program.  If not,
+* see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+<div id="tab_content" class="tab-pane fade in active">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">{% trans 'Program' %}</div>
+                <div class="panel-body">
+                    <p>On imagine l'affichage du programme ECGE1BA.</p>
+                    <p>Le bouton ci-dessous devrait faire partir d'un menu contextuel cliquable à partir d'un groupe. Ici on va ajouter au groupe MAT7ECGE LECGE107R du pgm de formation ECGE1BA</p>
+                    <br>
+                    <a href="{{ url_search_ue_to_program }}" class="btn btn-primary">Ajouter UE</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8" id="search_div">
+
+            {% if request.path == url_search_ue_to_program %}
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    {% trans 'Add learning units' %}
+                     <div class="btn-toolbar pull-right" >
+                         <a href="#" class="btn btn-default" style="margin:-5px" role="button" onclick="$('#search_div').empty();">
+                                {% trans 'Cancel' %}
+                            </a>
+                     </div>
+                </div>
+                <div class="panel-body">
+                    <form method="get" id="search_form">
+                        <div class="row">
+                            {% bootstrap_field form.academic_year__year form_group_class="col-md-2" %}
+                            <div class="col-md-2">
+                                {% bootstrap_label form.acronym.label %}
+                                {% bootstrap_field form.acronym show_label=False %}
+                            </div>
+                            <div class="col-md-3">
+                                {% bootstrap_label form.title.label %}
+                                {% bootstrap_field form.title show_label=False %}
+                            </div>
+                            <div class="btn-toolbar pull-right col-md-1">
+                                {% bootstrap_button "" value=_('Learning unit search') button_type="submit" button_class="btn-primary" icon="search" %}
+                            </div>
+                        </div>
+                    </form>
+                    <form method="post" action="{{ url_add_ue_to_program }}">
+                        {% csrf_token %}
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                {% include 'blocks/bouton_ajout.html' %}
+                            </div>
+                            <div class="panel-body">
+                                <div>
+                                    <table id="table_learning_units" class="table table-striped table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th id="th_0_checkbox"></th>
+                                                <th id="th_1_academic_year.year">{% trans 'Ac yr.' %}</th>
+                                                <th id="th_2_acronym">{% trans 'Code' %}</th>
+                                                <th id="th_3_title">{% trans 'Title' %}</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                    <div style="text-align:center">
+                                        {% bootstrap_pagination page_obj extra=request.GET.urlencode %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel-footer">
+                                {% include 'blocks/bouton_ajout.html' %}
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
