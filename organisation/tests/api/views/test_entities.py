@@ -83,7 +83,7 @@ class EntitesListViewTestCase(APITestCase):
             ])
 
 
-class EntityDetailTestCase(APITestCase):
+class EntiteDetailTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
         cls.entity_version = EntityVersionFactory(entity__organization__acronym='UCL')
