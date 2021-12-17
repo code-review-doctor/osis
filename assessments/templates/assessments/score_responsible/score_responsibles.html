@@ -8,7 +8,7 @@
  * The core business involves the administration of students, teachers,
  * courses, programs and so on.
  *
- * Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+ * Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@
     {% if can_view_scores_responsible %}
         <div class="alert alert-info" style="display:inline-block;">
             <i class="fa fa-info-circle"></i>
-            {% trans 'For classes, you must modify scores responsible via full LU. Example: For LCOPS1113-B, you must search and modify via LCOPS1113.' %}
+            {% trans 'For classes, you must search the full LU below and then click on ' %}<span class="glyphicon glyphicon-edit" style="padding-left: 5px; padding-right: 5px;"></span>{% trans 'to modify.' %}
         </div>
 
         <div class="panel panel-default">

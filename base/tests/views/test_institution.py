@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -78,13 +78,13 @@ class EntityViewTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_entities_search(self):
-        url = reverse(institution.entities_search)
+        url = reverse('entities')
         response = self.client.get(url, data={"acronym": "ENTITY_CHILDREN", "title": "", "entity_type": ""})
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.context['entities_version']), 1)
+        self.assertEqual(len(response.context['object_list']), 1)
 
     def test_entity_read(self):
-        url = reverse(institution.entity_read, args=[self.entity_version.id])
+        url = reverse('entity_read', args=[self.entity_version.id])
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         context = response.context

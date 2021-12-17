@@ -501,6 +501,12 @@ msgstr "Annuler la proposition"
 msgid "Cancel the proposal?"
 msgstr "Annuler la proposition ?"
 
+msgid "Catalog viewer"
+msgstr "Lecteur du catalogue"
+
+msgid "Catalog viewers"
+msgstr "Lecteurs du catalogue"
+
 msgid "Catalogue"
 msgstr "Catalogue"
 

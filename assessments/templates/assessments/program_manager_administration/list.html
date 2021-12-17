@@ -29,14 +29,14 @@
             </td>
             <td>
                 <input type="checkbox" name="all_main"
-                       data-url="{% url 'update_main_person' global_id=person %}?nom_cohortes_selected={{nom_cohortes_selected|join:','}}"
+                       data-url="{% url 'update_main_person' global_id=person %}?nom_cohortes_selected={{nom_cohortes_selected|join:','|iriencode}}"
                        data-target=".{{ person|slugify }}_checkbox"
                 {% if not perms.base.change_programmanager %} disabled {% endif %}>
             </td>
             <td>
                 {% if perms.base.change_programmanager %}
                     <a class="btn btn-default pull-right trigger_modal"
-                       data-url="{% url 'delete_manager_person' global_id=person %}?nom_cohortes_selected={{nom_cohortes_selected|join:','}}">
+                       data-url="{% url 'delete_manager_person' global_id=person %}?nom_cohortes_selected={{nom_cohortes_selected|join:','|iriencode}}">
                         <span class="fa fa-minus"></span>
                     </a>
                 {% endif %}
@@ -49,13 +49,13 @@
                 <td>
                     <input type="checkbox" class="{{ person|slugify }}_checkbox"
                            name="is_main" {% if offer.est_principal %}checked{% endif %}
-                           data-url="{% url 'update_main' global_id=person acronym=offer.nom_cohorte %}?nom_cohortes_selected={{nom_cohortes_selected|join:','}}"
+                           data-url="{% url 'update_main' global_id=person acronym=offer.nom_cohorte %}?nom_cohortes_selected={{nom_cohortes_selected|join:','|iriencode}}"
                         {% if not perms.base.change_programmanager %} disabled {% endif %}>
                 </td>
                 <td>
                     {% if perms.base.change_programmanager %}
                         <a class="btn btn-default btn-sm pull-right trigger_modal"
-                           data-url="{% url 'delete_manager' global_id=person acronym=offer.nom_cohorte %}?nom_cohortes_selected={{nom_cohortes_selected|join:','}}">
+                           data-url="{% url 'delete_manager' global_id=person acronym=offer.nom_cohorte %}?nom_cohortes_selected={{nom_cohortes_selected|join:','|iriencode}}">
                             <span class="fa fa-minus"></span>
                         </a>
                     {% endif %}
@@ -71,7 +71,7 @@
 {% if nom_cohortes_selected and perms.base.change_programmanager  %}
     <a class="btn btn-primary pull-right trigger_modal"
        title="{% trans 'Add manager' %}"
-       data-url="{% url 'create_program_manager_person' %}?nom_cohortes_selected={{nom_cohortes_selected|join:','}}">
+       data-url="{% url 'create_program_manager_person' %}?nom_cohortes_selected={{nom_cohortes_selected|join:','|iriencode}}">
         <span class="fa fa-plus"></span>
     </a>
 {% endif %}
