@@ -25,7 +25,7 @@
 ##############################################################################
 from django.conf.urls import url, include
 
-from attribution.views import attribution
+from attribution.views.attribution import LearningUnitAttributions
 from attribution.views.charge_repartition.create import SelectAttributionView, AddChargeRepartition
 from attribution.views.charge_repartition.update import EditChargeRepartition
 from attribution.views.learning_unit.create import CreateAttribution
@@ -61,7 +61,7 @@ urlpatterns = [
         ]))
     ])),
     url(r'^(?P<learning_unit_year_id>[0-9]+)/attributions/', include([
-        url(r'^$', attribution.learning_unit_attributions,
+        url(r'^$', LearningUnitAttributions.as_view(),
             name="learning_unit_attributions"),
         url(r'^select/$', SelectAttributionView.as_view(), name="select_attribution"),
         url(r'^update/(?P<attribution_id>[0-9]+)/$', UpdateAttributionView.as_view(),
@@ -78,7 +78,7 @@ urlpatterns = [
         ])),
     ])),
     url(r'^(?P<code>[A-Za-z0-9]+)/(?P<year>[0-9]+)/attributions/', include([
-        url(r'^$', attribution.learning_unit_attributions, name="learning_unit_attributions"),
+        url(r'^$', LearningUnitAttributions.as_view(), name="learning_unit_attributions"),
         url(r'^select/$', SelectAttributionView.as_view(), name="select_attribution"),
     ])),
 ]

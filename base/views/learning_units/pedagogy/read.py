@@ -104,7 +104,6 @@ def read_learning_unit_pedagogy(request, learning_unit_year_id: int, context, te
     context['attributions'] = attributions
     context["version"] = _get_modification_history(cms_pedagogy_last_modification_qs)
     context["force_majeure_version"] = _get_modification_history(cms_force_majeure_last_modification_qs)
-    context['tab_active'] = 'learning_unit_pedagogy'  # Corresponds to url_name
     return render(request, template, context)
 
 
