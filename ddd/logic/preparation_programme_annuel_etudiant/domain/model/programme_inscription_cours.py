@@ -24,14 +24,13 @@
 #
 ##############################################################################
 import uuid as uuid
-from typing import List
+from typing import List, Union
 
 import attr
 
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement import CodeGroupement
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.unite_enseignement import CodeUniteEnseignement, \
-    UniteEnseignementAjoutee, UniteEnseignementRetiree, UniteEnseignementAjustee
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import ContenuGroupementDTO
+    UniteEnseignementAjoutee, UniteEnseignementRetiree, UniteEnseignementAjustee, UniteEnseignementIdentity
 from osis_common.ddd import interface
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 
@@ -68,16 +67,9 @@ class ProgrammeInscriptionCours(interface.RootEntity):
         # => retirer dans unites_enseignement_ajoutees | unites_enseignement_retirees | unites_enseignement_ajustees
         raise NotImplementedError
 
-    def deplacer_vers_le_haut_unite_enseignement_ajoutee(
+    def deplacer_unite_enseignement_ajoutee(
             self,
-            unite_enseignement: 'CodeUniteEnseignement',
-            contenu_groupement: 'ContenuGroupementDTO'
-    ):
-        raise NotImplementedError
-
-    def deplacer_vers_le_bas_unite_enseignement_ajoutee(
-            self,
-            unite_enseignement: 'CodeUniteEnseignement',
-            contenu_groupement: 'ContenuGroupementDTO'
+            unite_enseignement_identity: 'UniteEnseignementIdentity',
+            a_la_suite_de: Union['CodeUniteEnseignement', 'CodeGroupement']
     ):
         raise NotImplementedError

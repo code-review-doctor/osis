@@ -27,8 +27,12 @@
 from ddd.logic.preparation_programme_annuel_etudiant.commands import DeplacerVersLeBasUEAjouteeDansProgrammeCommand
 from ddd.logic.preparation_programme_annuel_etudiant.domain.builder.programme_inscription_cours_identity_builder import \
     ProgrammeInscriptionCoursIdentityBuilder
+from ddd.logic.preparation_programme_annuel_etudiant.domain.builder.unite_enseignement_identity_builder import \
+    UniteEnseignementIdentityBuilder
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.programme_inscription_cours import \
     ProgrammeInscriptionCoursIdentity
+
+from ddd.logic.preparation_programme_annuel_etudiant.domain.service.deplacer_UE_ajoutee import DeplacerUEAjoutee
 from ddd.logic.preparation_programme_annuel_etudiant.repository.i_programme_inscription_cours import \
     IProgrammeInscriptionCoursRepository
 from infrastructure.preparation_programme_annuel_etudiant.domain.service.catalogue_formations import \
@@ -41,6 +45,8 @@ def deplacer_vers_le_bas_UE_ajoutee_dans_programme(
         translator: 'CatalogueFormationsTranslator',
 ) -> 'ProgrammeInscriptionCoursIdentity':
     # GIVEN
+    unite_enseignement_identity = UniteEnseignementIdentityBuilder.build_from_command(cmd.unite_enseignement)
+
     programme_inscription_cours_identity = ProgrammeInscriptionCoursIdentityBuilder.build_from_command(cmd)
     programme_inscription_cours = repository.get(
         entity_id=programme_inscription_cours_identity
@@ -54,12 +60,13 @@ def deplacer_vers_le_bas_UE_ajoutee_dans_programme(
     )
 
     # WHEN
-    programme_inscription_cours.deplacer_vers_le_bas_unite_enseignement_ajoutee(
-        unite_enseignement=cmd.unite_enseignement.code,
-        contenu_groupement=contenu_groupement
+    DeplacerUEAjoutee.deplacer_vers_le_bas(
+        programme_inscription_cours=programme_inscription_cours,
+        contenu_groupement=contenu_groupement,
+        unite_enseignement_identity=unite_enseignement_identity,
+        repository=repository
     )
 
     # THEN
-    repository.save(programme_inscription_cours)
     return programme_inscription_cours.entity_id
 
