@@ -43,12 +43,12 @@ from osis_role.contrib.views import PermissionRequiredMixin
 
 
 #  FIXME Use a read service to fetch offers
-@attr.s(frozen=True, slots=True)
+@attr.s(frozen=True, slots=True, auto_attribs=True)
 class OfferSearchDTO:
-    acronym = attr.ib(type=str)
-    title = attr.ib(type=str)
-    management_entity_acronym = attr.ib(type=str)
-    url = attr.ib(type=str)
+    acronym: str
+    title: str
+    management_entity_acronym: str
+    url: str
 
     @property
     def is_first_year_bachelor(self):

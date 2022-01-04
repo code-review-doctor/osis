@@ -55,13 +55,13 @@ from infrastructure.messages_bus import message_bus_instance
 from learning_unit.models.learning_class_year import LearningClassYear
 
 
-@attr.s(frozen=True, slots=True)
+@attr.s(frozen=True, slots=True, auto_attribs=True)
 class AttributionDTO:
-    code = attr.ib(type=str)
-    matricule_fgs = attr.ib(type=str)
-    enseignant = attr.ib(type=str)
-    statut = attr.ib(type=str)
-    responsable_de_notes = attr.ib(type=bool)
+    code: str
+    matricule_fgs: str
+    enseignant: str
+    statut: str
+    responsable_de_notes: bool
 
 
 class ScoresResponsiblesSearch(LoginRequiredMixin, CacheFilterMixin, FilterView):
