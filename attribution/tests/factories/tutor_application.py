@@ -30,7 +30,7 @@ import factory.fuzzy
 from faker import Faker
 
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
-from base.tests.factories.tutor import TutorFactory
+from base.tests.factories.person import PersonFactory
 from osis_common.utils.datetime import get_tzinfo
 
 fake = Faker()
@@ -42,7 +42,7 @@ class TutorApplicationFactory(factory.django.DjangoModelFactory):
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     changed = fake.date_time_this_decade(before_now=True, after_now=True, tzinfo=get_tzinfo())
-    tutor = factory.SubFactory(TutorFactory)
+    person = factory.SubFactory(PersonFactory)
     learning_container_year = factory.SubFactory(LearningContainerYearFactory)
     volume_lecturing = factory.fuzzy.FuzzyDecimal(99)
     volume_pratical_exercice = factory.fuzzy.FuzzyDecimal(99)
