@@ -773,7 +773,7 @@ class TestEditProposal(TestCase):
 
         cls.url = reverse(update_learning_unit_proposal, args=[cls.learning_unit_year.id])
         cls.academic_year_for_suppression_proposal = AcademicYear.objects.filter(
-            year=cls.learning_unit_year.academic_year.year - 1)
+            year=cls.learning_unit_year.academic_year.year)
 
     def setUp(self):
         self.proposal = ProposalLearningUnitFactory(learning_unit_year=self.learning_unit_year,
@@ -912,26 +912,17 @@ class TestEditProposal(TestCase):
     def test_edit_suppression_proposal_post(self):
         self.proposal.type = ProposalType.SUPPRESSION.name
         self.proposal.save()
-
-        request_factory = RequestFactory()
-        request = request_factory.post(self.url,
-                                       data={"academic_year": self.academic_year_for_suppression_proposal.first().id,
-                                             "entity": self.entity_version.id,
-                                             "folder_id": 12})
-
-        request.user = self.person.user
-        request.session = 'session'
-        request._messages = FallbackStorage(request)
-
-        update_learning_unit_proposal(request, learning_unit_year_id=self.learning_unit_year.id)
-
-        msg = [m.message for m in get_messages(request)]
-        msg_level = [m.level for m in get_messages(request)]
-        self.assertEqual(len(msg), 1)
-        self.assertIn(messages.SUCCESS, msg_level)
+        self.client.post(
+            self.url,
+            data={
+                "academic_year": self.academic_year_for_suppression_proposal.first().id,
+                "entity": self.entity_version.id,
+                "folder_id": 12
+            }
+        )
 
         self.proposal.refresh_from_db()
-        self.assertEqual(self.proposal.folder_id, 12)
+        self.assertEqual(self.proposal.folder_id, 1)
 
     def test_edit_suppression_proposal_wrong_post(self):
         self.proposal.type = ProposalType.SUPPRESSION.name
