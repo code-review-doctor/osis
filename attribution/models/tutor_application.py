@@ -31,7 +31,6 @@ from django.db import models
 class TutorApplicationAdmin(admin.ModelAdmin):
     list_display = (
         'person',
-        'person',
         'learning_container_year',
         'volume_lecturing',
         'volume_pratical_exercice',
