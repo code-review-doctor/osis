@@ -26,7 +26,7 @@
 import datetime
 
 from django.contrib import messages
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, Permission
 from django.contrib.messages.api import get_messages
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.core.exceptions import PermissionDenied
@@ -64,6 +64,8 @@ class LearningUnitDelete(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.user = UserFactory(username="jeandp")
+        edit_learning_unit_proposal_permission = Permission.objects.get(codename="can_delete_learningunit")
+        cls.user.user_permissions.add(edit_learning_unit_proposal_permission)
         cls.entity_version = EntityVersionFactory(entity_type=entity_type.FACULTY, acronym="SST",
                                                   start_date=datetime.date(year=1990, month=1, day=1),
                                                   end_date=None)

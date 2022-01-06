@@ -27,6 +27,7 @@ import datetime
 from unittest import mock
 
 from django.contrib import messages
+from django.contrib.auth.models import Permission
 from django.contrib.messages import get_messages
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.http import HttpResponseNotFound, HttpResponse, HttpResponseForbidden
@@ -111,6 +112,7 @@ class TestLearningUnitModificationProposal(TestCase):
             subtype=learning_unit_year_subtypes.FULL,
             academic_year=current_academic_year,
             learning_container_year=learning_container_year,
+            learning_unit__start_year=current_academic_year,
             quadrimester=None,
             specific_title_english="title english",
             campus=CampusFactory(organization=an_organization, is_administration=True),
@@ -761,10 +763,13 @@ class TestEditProposal(TestCase):
                                                   end_date=None)
 
         cls.generated_container = GenerateContainer(cls.current_academic_year, end_year, parent_entity=cls.entity)
-        cls.generated_container_first_year = cls.generated_container.generated_container_years[1]
+        cls.generated_container_first_year = cls.generated_container.generated_container_years[0]
         cls.learning_unit_year = cls.generated_container_first_year.learning_unit_year_full
         cls.requirement_entity_of_luy = cls.generated_container_first_year.requirement_entity_container_year
         cls.person = FacultyManagerFactory(entity=cls.entity, with_child=True).person
+
+        edit_learning_unit_proposal_permission = Permission.objects.get(codename="can_edit_learning_unit_proposal")
+        cls.person.user.user_permissions.add(edit_learning_unit_proposal_permission)
 
         cls.url = reverse(update_learning_unit_proposal, args=[cls.learning_unit_year.id])
         cls.academic_year_for_suppression_proposal = AcademicYear.objects.filter(
