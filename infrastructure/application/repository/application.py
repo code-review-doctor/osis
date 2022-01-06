@@ -32,7 +32,6 @@ from django.db import models
 from django.db.models import F, Q, OuterRef, fields, Case, When, Subquery
 
 from attribution.models.tutor_application import TutorApplication
-from base.auth.roles.tutor import Tutor
 from base.models.enums import learning_component_year_type, learning_unit_year_subtypes
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_container_year import LearningContainerYear
@@ -65,7 +64,7 @@ class ApplicationRepository(IApplicationRepository):
             )
             qs = qs.filter(filter_clause)
         if applicant_id is not None:
-            qs = qs.filter(tutor__person__global_id=applicant_id.global_id)
+            qs = qs.filter(person__global_id=applicant_id.global_id)
         results = []
         for row_as_dict in qs:
             dto_from_database = ApplicationFromRepositoryDTO(**row_as_dict)
