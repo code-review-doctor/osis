@@ -27,6 +27,7 @@ import datetime
 from unittest import mock
 
 from django.contrib import messages
+from django.contrib.auth.models import Permission
 from django.contrib.messages import get_messages
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.http import HttpResponseNotFound, HttpResponse, HttpResponseForbidden
@@ -111,6 +112,7 @@ class TestLearningUnitModificationProposal(TestCase):
             subtype=learning_unit_year_subtypes.FULL,
             academic_year=current_academic_year,
             learning_container_year=learning_container_year,
+            learning_unit__start_year=current_academic_year,
             quadrimester=None,
             specific_title_english="title english",
             campus=CampusFactory(organization=an_organization, is_administration=True),
@@ -761,14 +763,17 @@ class TestEditProposal(TestCase):
                                                   end_date=None)
 
         cls.generated_container = GenerateContainer(cls.current_academic_year, end_year, parent_entity=cls.entity)
-        cls.generated_container_first_year = cls.generated_container.generated_container_years[1]
+        cls.generated_container_first_year = cls.generated_container.generated_container_years[0]
         cls.learning_unit_year = cls.generated_container_first_year.learning_unit_year_full
         cls.requirement_entity_of_luy = cls.generated_container_first_year.requirement_entity_container_year
         cls.person = FacultyManagerFactory(entity=cls.entity, with_child=True).person
 
+        edit_learning_unit_proposal_permission = Permission.objects.get(codename="can_edit_learning_unit_proposal")
+        cls.person.user.user_permissions.add(edit_learning_unit_proposal_permission)
+
         cls.url = reverse(update_learning_unit_proposal, args=[cls.learning_unit_year.id])
         cls.academic_year_for_suppression_proposal = AcademicYear.objects.filter(
-            year=cls.learning_unit_year.academic_year.year - 1)
+            year=cls.learning_unit_year.academic_year.year)
 
     def setUp(self):
         self.proposal = ProposalLearningUnitFactory(learning_unit_year=self.learning_unit_year,
@@ -907,26 +912,17 @@ class TestEditProposal(TestCase):
     def test_edit_suppression_proposal_post(self):
         self.proposal.type = ProposalType.SUPPRESSION.name
         self.proposal.save()
-
-        request_factory = RequestFactory()
-        request = request_factory.post(self.url,
-                                       data={"academic_year": self.academic_year_for_suppression_proposal.first().id,
-                                             "entity": self.entity_version.id,
-                                             "folder_id": 12})
-
-        request.user = self.person.user
-        request.session = 'session'
-        request._messages = FallbackStorage(request)
-
-        update_learning_unit_proposal(request, learning_unit_year_id=self.learning_unit_year.id)
-
-        msg = [m.message for m in get_messages(request)]
-        msg_level = [m.level for m in get_messages(request)]
-        self.assertEqual(len(msg), 1)
-        self.assertIn(messages.SUCCESS, msg_level)
+        self.client.post(
+            self.url,
+            data={
+                "academic_year": self.academic_year_for_suppression_proposal.first().id,
+                "entity": self.entity_version.id,
+                "folder_id": 12
+            }
+        )
 
         self.proposal.refresh_from_db()
-        self.assertEqual(self.proposal.folder_id, 12)
+        self.assertEqual(self.proposal.folder_id, 1)
 
     def test_edit_suppression_proposal_wrong_post(self):
         self.proposal.type = ProposalType.SUPPRESSION.name
