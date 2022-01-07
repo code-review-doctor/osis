@@ -25,9 +25,11 @@
 ##############################################################################
 import json
 import logging
+from typing import Any
 
 from django.conf import settings
 
+from attribution.models.tutor_application import TutorApplication
 from ddd.logic.application.domain.model.application import Application
 from infrastructure.application.serializer.application import ApplicationSerializer
 from osis_common.queue import queue_sender
@@ -71,3 +73,58 @@ def application_response_callback(message_payload: any):
         log_msg = 'Error during processing tutor application in EPC: {} \n JSON: {}'.format(error_epc, str(json_data))
         queue_exception_logger.error(log_msg)
         raise Exception(log_msg)
+
+    operation = application.get('operation')
+    global_id = application.get('global_id')
+    acronym = application.get('learning_container_year', {}).get('acronym')
+    year = application.get('learning_container_year', {}).get('year')
+    num_ele_itv = application.get('num_ele_itv')
+    if not (global_id and acronym and year and operation and num_ele_itv):
+        log_msg = 'Missing mandatory data in tutor application response from EPC. JSON: {}'.format(str(json_data))
+        queue_exception_logger.error(log_msg)
+        raise Exception(log_msg)
+
+    if operation == "update":
+        __update_tutor_application(global_id, acronym, year, num_ele_itv)
+    if operation == "delete":
+        __delete_tutor_application(num_ele_itv)
+
+
+def __update_tutor_application(global_id: str, acronym: str, year: Any, num_ele_itv: str):
+    external_id_computed = 'osis.tutor_application_{num_ele_itv}'.format(num_ele_itv=num_ele_itv)
+    existing_application = TutorApplication.objects.get(
+        learning_container_year__academic_year__year=int(year),
+        learning_container_year__acronym=acronym,
+        tutor__person__global_id=global_id
+    )
+    if existing_application.external_id == external_id_computed:
+        return
+    if existing_application.external_id and existing_application.external_id != external_id_computed:
+        log_msg = """
+               Multiple external_id for same tutor application [global_id: {global_id} / course: {acronym}-{year}]
+               current: {current_external_id} / new: {external_id_computed}
+           """.format(
+            global_id=global_id,
+            acronym=acronym,
+            year=str(year),
+            current_external_id=existing_application.external_id,
+            external_id_computed=external_id_computed
+        )
+        queue_exception_logger.error(log_msg)
+        raise Exception(log_msg)
+
+    existing_application.external_id = external_id_computed
+    existing_application.save()
+    log_msg = "Tutor Application [global_id: {global_id} / course: {acronym}-{year}] external_id updated".format(
+        global_id=global_id,
+        acronym=acronym,
+        year=str(year),
+    )
+    queue_exception_logger.info(log_msg)
+
+
+def __delete_tutor_application(num_ele_itv: str):
+    external_id_computed = 'osis.tutor_application_{num_ele_itv}'.format(num_ele_itv=num_ele_itv)
+    TutorApplication.objects.filter(external_id=external_id_computed).delete()
+    log_msg = "Tutor Application [external_id: {}] deleted".format(external_id_computed)
+    queue_exception_logger.info(log_msg)
