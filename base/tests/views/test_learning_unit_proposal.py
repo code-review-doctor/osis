@@ -752,6 +752,7 @@ class TestEditProposal(TestCase):
         today = datetime.date.today()
         cls.academic_years = AcademicYearFactory.produce_in_future(quantity=5)
         cls.current_academic_year = cls.academic_years[0]
+        cls.previous_academic_year = AcademicYearFactory(year=cls.current_academic_year.year-1)
         end_year = AcademicYearFactory(year=cls.current_academic_year.year + 10)
         generate_proposal_calendars(cls.academic_years)
         cls.language = FrenchLanguageFactory()
@@ -762,7 +763,7 @@ class TestEditProposal(TestCase):
                                                   start_date=today.replace(year=1900),
                                                   end_date=None)
 
-        cls.generated_container = GenerateContainer(cls.current_academic_year, end_year, parent_entity=cls.entity)
+        cls.generated_container = GenerateContainer(cls.previous_academic_year, end_year, parent_entity=cls.entity)
         cls.generated_container_first_year = cls.generated_container.generated_container_years[0]
         cls.learning_unit_year = cls.generated_container_first_year.learning_unit_year_full
         cls.requirement_entity_of_luy = cls.generated_container_first_year.requirement_entity_container_year
@@ -772,8 +773,7 @@ class TestEditProposal(TestCase):
         cls.person.user.user_permissions.add(edit_learning_unit_proposal_permission)
 
         cls.url = reverse(update_learning_unit_proposal, args=[cls.learning_unit_year.id])
-        cls.academic_year_for_suppression_proposal = AcademicYear.objects.filter(
-            year=cls.learning_unit_year.academic_year.year)
+        cls.academic_year_for_suppression_proposal = [cls.previous_academic_year]
 
     def setUp(self):
         self.proposal = ProposalLearningUnitFactory(learning_unit_year=self.learning_unit_year,
@@ -896,10 +896,17 @@ class TestEditProposal(TestCase):
         self.assertEqual(self.proposal.state, ProposalState.FACULTY.name)
 
     def test_edit_suppression_proposal_get(self):
-        self.proposal.type = ProposalType.SUPPRESSION.name
-        self.proposal.save()
+        learning_unit_year = LearningUnitYearFactory(academic_year=self.current_academic_year)
+        ProposalLearningUnitFactory(
+            learning_unit_year=learning_unit_year,
+            state=ProposalState.FACULTY.name,
+            folder_id=1,
+            entity=self.entity,
+            type=ProposalType.SUPPRESSION.name
+        )
 
-        response = self.client.get(self.url)
+        url = reverse(update_learning_unit_proposal, args=[learning_unit_year.id])
+        response = self.client.get(url)
 
         self.assertTemplateUsed(response, 'learning_unit/proposal/update_suppression.html')
         self.assertIsInstance(response.context['form_end_date'], LearningUnitProposalEndDateForm)
@@ -915,7 +922,7 @@ class TestEditProposal(TestCase):
         self.client.post(
             self.url,
             data={
-                "academic_year": self.academic_year_for_suppression_proposal.first().id,
+                "academic_year": self.academic_year_for_suppression_proposal[0].id,
                 "entity": self.entity_version.id,
                 "folder_id": 12
             }
