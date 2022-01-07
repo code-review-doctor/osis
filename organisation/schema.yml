@@ -11,7 +11,7 @@ servers:
   - url: https://osis.uclouvain.be/api/v1/organisation/
     description: 'Production server'
 info:
-  version: '1.1'
+  version: '1.2'
   title: 'Organisations Service'
   description: |-
     A set of API endpoints that allow you to get information about organizations
@@ -73,6 +73,13 @@ paths:
       description: Return the detail of the entity
       operationId: get_entity
       parameters:
+        - in: path
+          name: organisation_code
+          required: true
+          schema:
+            description: Filter entities by the name of their organization
+            type: string
+            example: "UCL"
         - in: path
           name: uuid
           required: true
