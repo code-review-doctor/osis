@@ -106,7 +106,7 @@ class LearningUnitProposalEndDateForm(LearningUnitEndDateForm):
             )
 
         self.luy_current_year = self.learning_unit_year.academic_year.year
-        # Allow previous year as last organisation year for suppression proposal
+        # Allow only previous year as last organisation year for suppression proposal
         return AcademicYear.objects.filter(year=self.luy_current_year - 1)
 
     def clean_academic_year(self):
