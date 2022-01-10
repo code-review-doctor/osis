@@ -54,7 +54,7 @@ class VacantCourseRepository(IVacantCourseRepository):
     @classmethod
     def search(cls, entity_ids: Optional[List[VacantCourseIdentity]] = None, **kwargs) -> List[VacantCourse]:
         qs = _vacant_course_base_qs()
-        if entity_ids is not None:
+        if entity_ids:
             filter_clause = functools.reduce(
                 operator.or_,
                 ((Q(code=entity_id.code) & Q(year=entity_id.year)) for entity_id in entity_ids)
