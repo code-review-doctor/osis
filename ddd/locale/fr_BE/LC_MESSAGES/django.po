@@ -111,7 +111,7 @@ msgid "No student to encode by excel"
 msgstr "Aucun étudiant à encoder par Excel "
 
 msgid "No vacant corresponding activity"
-msgstr "Pas d'activité vacante correspondante"
+msgstr "Pas de cours vacant correspondant"
 
 msgid "Other educational facilities"
 msgstr "Autre aménagement"
@@ -307,7 +307,7 @@ msgstr ""
 "n'y a pas de classe prévue."
 
 msgid "You have already applied on vacant course"
-msgstr "Vous avez déjà candidaté.e pour ce cours"
+msgstr "Vous avez déjà candidaté pour ce cours"
 
 #, python-brace-format
 msgid ""
