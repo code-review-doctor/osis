@@ -95,7 +95,7 @@ def __update_tutor_application(global_id: str, acronym: str, year: Any, num_ele_
     existing_application = TutorApplication.objects.get(
         learning_container_year__academic_year__year=int(year),
         learning_container_year__acronym=acronym,
-        tutor__person__global_id=global_id
+        person__global_id=global_id
     )
     if existing_application.external_id == external_id_computed:
         return

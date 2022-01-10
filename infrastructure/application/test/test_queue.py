@@ -30,22 +30,22 @@ from django.test import TestCase
 
 from attribution.models.tutor_application import TutorApplication
 from attribution.tests.factories.tutor_application import TutorApplicationFactory
-from base.tests.factories.tutor import TutorFactory
+from base.tests.factories.person import PersonFactory
 from infrastructure.application import queue
 
 
 class ApplicationUpdateResponseCallbackTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.tutor = TutorFactory(person__global_id='987654321')
+        cls.person = PersonFactory(global_id='987654321')
         cls.tutor_application_ldroi1200 = TutorApplicationFactory(
-            tutor=cls.tutor,
+            person=cls.person,
             learning_container_year__acronym='LDROI1200',
             learning_container_year__academic_year__year=2022,
             external_id=''
         )
         cls.tutor_application_lagro1500 = TutorApplicationFactory(
-            tutor=cls.tutor,
+            person=cls.person,
             learning_container_year__acronym='LAGRO1500',
             learning_container_year__academic_year__year=2022,
             external_id='osis.tutor_application_23456697'
@@ -54,7 +54,7 @@ class ApplicationUpdateResponseCallbackTest(TestCase):
     def setUp(self) -> None:
         self.epc_response_ldroi1200 = {
             'operation': 'update',
-            'global_id': self.tutor.person.global_id,
+            'global_id': self.person.global_id,
             'learning_container_year': {
                 'acronym': 'LDROI1200',
                 'year': 2022
@@ -64,7 +64,7 @@ class ApplicationUpdateResponseCallbackTest(TestCase):
 
         self.epc_response_lagro1500 = {
             'operation': 'update',
-            'global_id': self.tutor.person.global_id,
+            'global_id': self.person.global_id,
             'learning_container_year': {
                 'acronym': 'LAGRO1500',
                 'year': 2022
@@ -120,11 +120,11 @@ class ApplicationUpdateResponseCallbackTest(TestCase):
 class ApplicationDeleteResponseCallbackTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.tutor = TutorFactory(person__global_id='987654321')
+        cls.person = PersonFactory(global_id='987654321')
 
     def setUp(self) -> None:
         self.tutor_application_lfopa1650 = TutorApplicationFactory(
-            tutor=self.tutor,
+            person=self.person,
             learning_container_year__acronym='LFOPA1650',
             learning_container_year__academic_year__year=2022,
             external_id='osis.tutor_application_23456697'
@@ -132,7 +132,7 @@ class ApplicationDeleteResponseCallbackTest(TestCase):
 
         self.epc_response_lfopa1650 = {
             'operation': 'delete',
-            'global_id': self.tutor.person.global_id,
+            'global_id': self.person.global_id,
             'learning_container_year': {
                 'acronym': 'LFOPA1650',
                 'year': 2022
