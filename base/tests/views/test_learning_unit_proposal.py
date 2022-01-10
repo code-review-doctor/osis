@@ -763,7 +763,7 @@ class TestEditProposal(TestCase):
                                                   end_date=None)
 
         cls.generated_container = GenerateContainer(cls.current_academic_year, end_year, parent_entity=cls.entity)
-        cls.generated_container_first_year = cls.generated_container.generated_container_years[0]
+        cls.generated_container_first_year = cls.generated_container.generated_container_years[1]
         cls.learning_unit_year = cls.generated_container_first_year.learning_unit_year_full
         cls.requirement_entity_of_luy = cls.generated_container_first_year.requirement_entity_container_year
         cls.person = FacultyManagerFactory(entity=cls.entity, with_child=True).person
@@ -773,7 +773,7 @@ class TestEditProposal(TestCase):
 
         cls.url = reverse(update_learning_unit_proposal, args=[cls.learning_unit_year.id])
         cls.academic_year_for_suppression_proposal = AcademicYear.objects.filter(
-            year=cls.learning_unit_year.academic_year.year)
+            year=cls.learning_unit_year.academic_year.year-1)
 
     def setUp(self):
         self.proposal = ProposalLearningUnitFactory(learning_unit_year=self.learning_unit_year,
@@ -922,7 +922,7 @@ class TestEditProposal(TestCase):
         )
 
         self.proposal.refresh_from_db()
-        self.assertEqual(self.proposal.folder_id, 1)
+        self.assertEqual(self.proposal.folder_id, 12)
 
     def test_edit_suppression_proposal_wrong_post(self):
         self.proposal.type = ProposalType.SUPPRESSION.name

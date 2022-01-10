@@ -323,10 +323,13 @@ class FullForm(LearningUnitBaseForm):
                 commit=commit
             )
         else:
-            first_ue = LearningUnitYear.objects.filter(
-                acronym=self.data["acronym_0"] + self.data["acronym_1"],
-                academic_year=self.start_year
-            ).first()
+            if self.learning_unit_instance:
+                first_ue = LearningUnitYear.objects.filter(learning_unit=self.learning_unit_instance).first()
+            else:
+                first_ue = LearningUnitYear.objects.filter(
+                    acronym=self.data["acronym_0"] + self.data["acronym_1"],
+                    academic_year=self.start_year
+                ).first()
             learning_unit = self.learning_unit_form.save(
                 start_year=self.start_year,
                 learning_container=first_ue.learning_container_year.learning_container,
