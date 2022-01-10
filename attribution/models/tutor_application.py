@@ -30,7 +30,7 @@ from django.db import models
 
 class TutorApplicationAdmin(admin.ModelAdmin):
     list_display = (
-        'tutor',
+        'person',
         'learning_container_year',
         'volume_lecturing',
         'volume_pratical_exercice',
@@ -38,14 +38,14 @@ class TutorApplicationAdmin(admin.ModelAdmin):
     )
     list_filter = ('learning_container_year__academic_year', )
     fieldsets = ((None, {'fields': ('last_changed', 'learning_container_year',
-                                    'tutor', 'volume_lecturing', 'volume_pratical_exercice',
+                                    'person', 'volume_lecturing', 'volume_pratical_exercice',
                                     'remark', 'course_summary')}),)
-    raw_id_fields = ('learning_container_year', 'tutor')
+    raw_id_fields = ('learning_container_year', 'person')
     search_fields = [
-        'tutor__person__first_name',
-        'tutor__person__last_name',
+        'person__first_name',
+        'person__last_name',
         'learning_container_year__acronym',
-        'tutor__person__global_id',
+        'person__global_id',
     ]
 
 
@@ -54,7 +54,7 @@ class TutorApplication(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     learning_container_year = models.ForeignKey('base.LearningContainerYear', on_delete=models.PROTECT)
-    tutor = models.ForeignKey('base.Tutor', on_delete=models.CASCADE)
+    person = models.ForeignKey('base.Person', on_delete=models.CASCADE)
     volume_lecturing = models.DecimalField(max_digits=6, decimal_places=1, blank=True, null=True)
     volume_pratical_exercice = models.DecimalField(max_digits=6, decimal_places=1, blank=True, null=True)
     remark = models.TextField(blank=True, null=True)
@@ -62,4 +62,4 @@ class TutorApplication(models.Model):
     last_changed = models.DateTimeField(null=True)
 
     def __str__(self):
-        return str(self.tutor)
+        return str(self.person)
