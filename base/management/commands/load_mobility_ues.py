@@ -13,7 +13,7 @@ EXCHANGE_STUDENTS_TITLE = "Etudiants d'échange"
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        workbook = load_workbook("mobility_ues.xlsx", read_only=True, data_only=True)
+        workbook = load_workbook("mobility_lus.xlsx", read_only=True, data_only=True)
         ws = workbook.worksheets[0]
 
         xls_rows = list(ws.rows)
@@ -46,10 +46,6 @@ class Command(BaseCommand):
                     if mobility_ues:
                         nb_of_distinct_acronyms_treated += 1
                         for ue in mobility_ues:
-                            # self.stdout.write("Learning unit year modified : {}/{}".format(
-                            #     ue.acronym,
-                            #     ue.academic_year.year)
-                            # )
                             ue.english_friendly = self._get_boolean_value(
                                 row[cols_references.get(ENGLISH_FRIENDLY_TITLE)].value,
                                 line_index,
