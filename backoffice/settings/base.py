@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -98,7 +98,7 @@ INSTALLED_APPS = (
     'osis_signature',
     'osis_export',
     'osis_notification',
-    'osis_async'
+    'osis_async',
 )
 
 
@@ -153,6 +153,7 @@ APPS_TO_TEST = (
     'program_management',
     'ddd',
     'infrastructure',
+    'preparation_inscription',
 )
 TEST_RUNNER = os.environ.get('TEST_RUNNER', 'osis_common.tests.runner.InstalledAppsTestRunner')
 SKIP_QUEUES_TESTS = os.environ.get('SKIP_QUEUES_TESTS', 'False').lower() == 'true'
