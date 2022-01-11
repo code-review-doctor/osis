@@ -89,5 +89,11 @@ class Command(BaseCommand):
         elif value_to_convert == "non":
             return False
         else:
-            self.stderr.write("Unexpected value : '{}'! Corresponds to Xls line {}, column '{}'".format(value, line_index, column_title))
+            self.stderr.write(
+                "Unexpected value : '{}'! Corresponds to Xls line {}, column '{}'".format(
+                    value,
+                    line_index,
+                    column_title
+                )
+            )
             raise SystemExit(1)
