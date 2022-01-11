@@ -7,4 +7,5 @@ from backoffice.celery import app as celery_app
 def run() -> dict:
     ApplicationCoursesCalendar.ensure_consistency_until_n_plus_6()
     AccessScheduleCalendar.ensure_consistency_until_n_plus_6()
+    ApplicationCoursesCalendar.send_emails_to_teachers_with_ending_attributions()
     return {}

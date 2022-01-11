@@ -25,10 +25,16 @@
 ##############################################################################
 import datetime
 
+from django.utils.translation import pgettext_lazy
+
+from attribution.models.attribution_new import AttributionNew
 from base.business.academic_calendar import AcademicEventCalendarHelper
+from base.business.education_group import DATE_FORMAT
 from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import AcademicYear
 from base.models.enums.academic_calendar_type import AcademicCalendarTypes
+from ddd.logic.application.commands import GetAttributionsAboutToExpireCommand
+from osis_common.messaging import message_config, send_message as message_service
 
 
 class ApplicationCoursesCalendar(AcademicEventCalendarHelper):
@@ -49,3 +55,58 @@ class ApplicationCoursesCalendar(AcademicEventCalendarHelper):
                     "end_date": datetime.date(ac_year.year, 2, 14),
                 }
             )
+
+    @classmethod
+    def send_emails_to_teachers_with_ending_attributions(cls):
+        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        #  To be executed once a day
+        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        today = datetime.date.today()
+
+        current_academic_year = AcademicYear.objects.current()
+        next_year = AcademicYear.objects.get(year=current_academic_year.year+1)
+
+        opened_calendar = AcademicCalendar.objects.filter(
+            reference=cls.event_reference,
+            data_year=next_year,
+            start_date=today).first()
+
+        if opened_calendar:
+            html_template_ref = 'ending_attributions_html'
+            txt_template_ref = 'ending_attributions_txt'
+            attributions = AttributionNew.objects.filter(
+                learning_container_year__academic_year=current_academic_year
+            ).distinct('tutor__person')
+
+            for attribution in attributions:
+                person = attribution.tutor.person
+                global_id = attribution.tutor.person.global_id
+                cmd = GetAttributionsAboutToExpireCommand(global_id=global_id)
+                from infrastructure.messages_bus import message_bus_instance
+                attributions_ending = message_bus_instance.invoke(cmd)
+                if len(attributions_ending) > 0:
+                    receivers = [message_config.create_receiver(person.id, person.email, person.language)]
+                    table_applications = message_config.create_table(
+                        'ending_attributions',
+                        [pgettext_lazy("applications", "Code"), 'Vol. 1', 'Vol. 2'],
+                        [
+                            (
+                                attributions_ending.code,
+                                attributions_ending.lecturing_volume,
+                                attributions_ending.practical_volume,
+                            )
+                            for attributions_ending in attributions_ending
+                        ]
+                    )
+                    template_base_data = {'first_name': person.first_name,
+                                          'last_name': person.last_name,
+                                          'end_date': opened_calendar.end_date.strftime(DATE_FORMAT)
+                                          }
+                    message_content = message_config.create_message_content(
+                        html_template_ref,
+                        txt_template_ref,
+                        [table_applications],
+                        receivers,
+                        template_base_data
+                    )
+                    message_service.send_messages(message_content)
