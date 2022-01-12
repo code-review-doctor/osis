@@ -98,7 +98,8 @@ INSTALLED_APPS = (
     'osis_signature',
     'osis_export',
     'osis_notification',
-    'osis_async'
+    'osis_async',
+    'mockup',
 )
 
 
