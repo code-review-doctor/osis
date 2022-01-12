@@ -1,13 +1,17 @@
+import rest_framework.exceptions as drf_exceptions
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import redirect_to_login
 from django.core.exceptions import PermissionDenied
+from django.http import HttpRequest
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
-import rest_framework.exceptions as drf_exceptions
-from rules.contrib.views import PermissionRequiredMixin as PermissionRequiredMixinRules, \
-    objectgetter as objectgetterrules, \
-    permission_required as permission_requiredrules
+from rest_framework.request import Request
+from rules.contrib.views import (
+    PermissionRequiredMixin as PermissionRequiredMixinRules,
+    objectgetter as objectgetterrules,
+    permission_required as permission_requiredrules,
+)
 
 # Wraps django-rules
 from osis_role.errors import get_permission_error
@@ -42,15 +46,36 @@ class APIPermissionRequiredMixin:
 
         request_permissions = self.permission_mapping.get(method)
 
+        # Get the object to check for permission against
+        obj = self.get_permission_object()
+
+        if request_permissions is None and self.permission_classes:
+            # We try given the permission classes by creating a pseudo request
+            request = HttpRequest()
+            request.method = method
+            request = Request(request)
+            request.user = user
+
+            for permission in self.get_permissions():
+                if not obj and not permission.has_permission(request, self):
+                    self.permission_denied(
+                        request,
+                        message=getattr(permission, 'message', None),
+                        code=getattr(permission, 'code', None)
+                    )
+                elif obj and not permission.has_object_permission(request, self, obj):
+                    self.permission_denied(
+                        request,
+                        message=getattr(permission, 'message', None),
+                        code=getattr(permission, 'code', None)
+                    )
+
         if request_permissions is None:
             # No permission is specified for this request then we skip the checking
             return
 
         if isinstance(request_permissions, str):
             request_permissions = (request_permissions, )
-
-        # Eventually get the object to check for permission against
-        obj = self.get_permission_object()
 
         # Check the permissions
         for permission in request_permissions:
