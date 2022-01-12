@@ -1,3 +1,5 @@
+from typing import Optional
+
 import rest_framework.exceptions as drf_exceptions
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import redirect_to_login
@@ -34,7 +36,7 @@ class APIPermissionRequiredMixin:
 
     permission_mapping = {}
 
-    def check_method_permissions(self, user, method):
+    def check_method_permissions(self, user, method) -> Optional[str]:
         """
         Check that a user has the right to use a method.
         Returns the message related to the first invalid permission, otherwise returns None.
@@ -58,17 +60,9 @@ class APIPermissionRequiredMixin:
 
             for permission in self.get_permissions():
                 if not obj and not permission.has_permission(request, self):
-                    self.permission_denied(
-                        request,
-                        message=getattr(permission, 'message', None),
-                        code=getattr(permission, 'code', None)
-                    )
+                    return getattr(permission, 'message', _("Method '{}' not allowed".format(method)))
                 elif obj and not permission.has_object_permission(request, self, obj):
-                    self.permission_denied(
-                        request,
-                        message=getattr(permission, 'message', None),
-                        code=getattr(permission, 'code', None)
-                    )
+                    return getattr(permission, 'message', _("Method '{}' not allowed".format(method)))
 
         if request_permissions is None:
             # No permission is specified for this request then we skip the checking
