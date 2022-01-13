@@ -2,6 +2,7 @@ from typing import Union
 
 import attr
 
+from ddd.logic.preparation_programme_annuel_etudiant.domain.model.chemin_acces import CheminAcces
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement import Groupement
 from osis_common.ddd import interface
 
@@ -11,13 +12,14 @@ CodeGroupement = str
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
 class UniteEnseignementIdentity(interface.EntityIdentity):
-    code: CodeUniteEnseignement
-    inclus_dans: Groupement
+    chemin_acces: CheminAcces  # Exemple : 'LDROI1001B|LDROI102C|LDROI1001
 
 
 @attr.s(slots=True, auto_attribs=True)
 class UniteEnseignement(interface.Entity):
     entity_id: UniteEnseignementIdentity
+    code: CodeUniteEnseignement
+    inclus_dans: Groupement
 
 
 @attr.s(slots=True, auto_attribs=True)
