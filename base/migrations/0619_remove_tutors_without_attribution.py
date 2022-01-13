@@ -22,14 +22,15 @@ def delete_tutors_without_attribution(apps, schema_editor):
     for tutor in problematic_tutors:
         user = tutor.person.user
         if user:
-            print("Removing {} from tutors group".format(tutor))
+            print("Removing {} from tutors group".format(tutor.person))
             user.groups.remove(group)
+    print("Removing {} tutors".format(len(problematic_tutors)))
     problematic_tutors.delete()
 
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('base', '0617_entity_address_is_main_correction'),
+        ('base', '0618_merge_20211215_1448'),
     ]
 
     operations = [
