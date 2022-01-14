@@ -9,5 +9,5 @@ def run() -> dict:
     #  To be executed once a day
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     cmd = SendAttributionEndDateReachedSummaryCommand()
-    message_bus_instance.invoke(cmd)   # <Call service send_attribution_end_date_reached_summary>
+    message_bus_instance.invoke(cmd)
     return {}

@@ -45,12 +45,4 @@ def send_emails_to_teachers_with_ending_attributions(
     application_calendar = application_calendar_repository.get_current_application_calendar()
 
     # WHEN
-    if application_calendar.start_date == datetime.date.today():
-        applicants = applicant_repository.search(year=application_calendar.authorized_target_year.year)
-        for applicant in applicants:
-            attributions_ending = applicant.get_attributions_about_to_expire(
-                AcademicYearIdentityBuilder.build_from_year(application_calendar.authorized_target_year.year)
-            )
-            if len(attributions_ending) > 0:
-                # THEN
-                application_summary.send(applicant, attributions_ending, application_calendar.end_date)
+    application_summary.send(application_calendar, applicant_repository)

@@ -23,21 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
 import logging
-from typing import List
 
 from django.conf import settings
 from django.utils.translation import pgettext_lazy
 
 from base.business.education_group import DATE_FORMAT
 from base.models.person import Person
-from ddd.logic.application.domain.model._attribution import Attribution
-from ddd.logic.application.domain.model.applicant import Applicant
+from ddd.logic.application.domain.model.application_calendar import ApplicationCalendar
 from ddd.logic.application.domain.service.attributions_end_date_reached_summary import \
     IAttributionsEndDateReachedSummary
+from ddd.logic.application.repository.i_applicant_respository import IApplicantRepository
+from ddd.logic.effective_class_repartition.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
 from osis_common.messaging import message_config, send_message as message_service
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
+
+HTML_TEMPLATE_REF = 'ending_attributions_html'
+TXT_TEMPLATE_REF = 'ending_attributions_txt'
 
 
 class AttributionsEndDateReachedSummary(IAttributionsEndDateReachedSummary):
@@ -45,39 +49,42 @@ class AttributionsEndDateReachedSummary(IAttributionsEndDateReachedSummary):
     @classmethod
     def send(
             cls,
-            applicant: Applicant,
-            attributions_ending: List[Attribution],
-            end_date: str
+            application_calendar: ApplicationCalendar,
+            applicant_repository: IApplicantRepository
     ):
-
-        html_template_ref = 'ending_attributions_html'
-        txt_template_ref = 'ending_attributions_txt'
-
-        person = Person.objects.get(global_id=applicant.entity_id.global_id)
-        receivers = [message_config.create_receiver(person.id, person.email, person.language)]
-        table_ending_attributions = message_config.create_table(
-            'ending_attributions',
-            [pgettext_lazy("applications", "Code"), 'Vol. 1', 'Vol. 2'],
-            [
-                (
-                    attributions_ending.course_id.code,
-                    attributions_ending.lecturing_volume,
-                    attributions_ending.practical_volume,
+        if application_calendar.start_date == datetime.date.today():
+            applicants = applicant_repository.search(year=application_calendar.authorized_target_year.year)
+            for applicant in applicants:
+                attributions_about_to_expire = applicant.get_attributions_about_to_expire_renewable_with_functions(
+                    AcademicYearIdentityBuilder.build_from_year(application_calendar.authorized_target_year.year)
                 )
-                for attributions_ending in attributions_ending
-            ]
-        )
-        template_base_data = {
-            'first_name': person.first_name,
-            'last_name': person.last_name,
-            'end_date': end_date.strftime(DATE_FORMAT)
-        }
-        message_content = message_config.create_message_content(
-            html_template_ref,
-            txt_template_ref,
-            [table_ending_attributions],
-            receivers,
-            template_base_data,
-            None
-        )
-        message_service.send_messages(message_content)
+
+                if len(attributions_about_to_expire) > 0:
+                    person = Person.objects.get(global_id=applicant.entity_id.global_id)
+                    receivers = [message_config.create_receiver(person.id, person.email, person.language)]
+                    table_ending_attributions = message_config.create_table(
+                        'ending_attributions',
+                        [pgettext_lazy("applications", "Code"), 'Vol. 1', 'Vol. 2'],
+                        [
+                            (
+                                attributions_ending.course_id.code,
+                                attributions_ending.lecturing_volume,
+                                attributions_ending.practical_volume,
+                            )
+                            for attributions_ending in attributions_about_to_expire
+                        ]
+                    )
+                    template_base_data = {
+                        'first_name': person.first_name,
+                        'last_name': person.last_name,
+                        'end_date': application_calendar.end_date.strftime(DATE_FORMAT)
+                    }
+                    message_content = message_config.create_message_content(
+                        HTML_TEMPLATE_REF,
+                        TXT_TEMPLATE_REF,
+                        [table_ending_attributions],
+                        receivers,
+                        template_base_data,
+                        None
+                    )
+                    message_service.send_messages(message_content)

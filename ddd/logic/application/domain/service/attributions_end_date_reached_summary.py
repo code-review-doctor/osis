@@ -24,10 +24,9 @@
 #
 ##############################################################################
 import abc
-from typing import List
 
-from ddd.logic.application.domain.model.applicant import Applicant
-from ddd.logic.application.dtos import ApplicationByApplicantDTO
+from ddd.logic.application.domain.model.application_calendar import ApplicationCalendar
+from ddd.logic.application.repository.i_applicant_respository import IApplicantRepository
 from osis_common.ddd import interface
 
 
@@ -37,8 +36,7 @@ class IAttributionsEndDateReachedSummary(interface.DomainService, abc.ABC):
     @abc.abstractmethod
     def send(
             cls,
-            applicant: Applicant,
-            applications: List[ApplicationByApplicantDTO],
-            end_date: str
+            application_calendar: ApplicationCalendar,
+            applicant_repository: IApplicantRepository
     ):
         pass
