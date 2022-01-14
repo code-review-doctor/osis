@@ -23,24 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import \
-    ICatalogueFormationsTranslator
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, ContenuGroupementDTO
+
+from ddd.logic.preparation_programme_annuel_etudiant.commands import GetProgrammeInscriptionCoursServiceCommand
+from ddd.logic.preparation_programme_annuel_etudiant.domain.builder.programme_inscription_cours_identity_builder import \
+    ProgrammeInscriptionCoursIdentityBuilder
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import ProgrammeInscriptionCoursDTO
+from ddd.logic.preparation_programme_annuel_etudiant.repository.i_programme_inscription_cours import \
+    IProgrammeInscriptionCoursRepository
 
 
-class CatalogueFormationsTranslator(ICatalogueFormationsTranslator):
-    @classmethod
-    def get_formation(cls, sigle: str, annee: int, version: str) -> 'FormationDTO':
-        # reutiliser GetProgramTreeVersionCommand et convertir ProgramTreeVersion en FormationDTO
-        raise NotImplementedError
-
-    @classmethod
-    def get_contenu_groupement(
-            cls,
-            sigle_formation: str,
-            annee: int,
-            version_formation: str,
-            code_groupement: str
-    ) -> 'ContenuGroupementDTO':
-        # reutiliser get_formation pour récupérer le groupement et son contenu dans le FormationDTO
-        raise NotImplementedError
+def get_programme_inscription_cours(
+        cmd: 'GetProgrammeInscriptionCoursServiceCommand',
+        repository: 'IProgrammeInscriptionCoursRepository',
+) -> 'ProgrammeInscriptionCoursDTO':
+    programme_inscription_cours_identity = ProgrammeInscriptionCoursIdentityBuilder.build_from_command(cmd)
+    return repository.get_dto(entity_id=programme_inscription_cours_identity)

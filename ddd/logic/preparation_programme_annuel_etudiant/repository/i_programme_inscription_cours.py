@@ -23,24 +23,37 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import \
-    ICatalogueFormationsTranslator
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, ContenuGroupementDTO
+from typing import Optional, List
+
+from ddd.logic.preparation_programme_annuel_etudiant.domain.model.programme_inscription_cours import \
+    ProgrammeInscriptionCoursIdentity, ProgrammeInscriptionCours
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import ProgrammeInscriptionCoursDTO
+from osis_common.ddd import interface
+from osis_common.ddd.interface import ApplicationService
 
 
-class CatalogueFormationsTranslator(ICatalogueFormationsTranslator):
+class IProgrammeInscriptionCoursRepository(interface.AbstractRepository):
     @classmethod
-    def get_formation(cls, sigle: str, annee: int, version: str) -> 'FormationDTO':
-        # reutiliser GetProgramTreeVersionCommand et convertir ProgramTreeVersion en FormationDTO
-        raise NotImplementedError
+    def get(cls, entity_id: ProgrammeInscriptionCoursIdentity) -> ProgrammeInscriptionCours:
+        pass
 
     @classmethod
-    def get_contenu_groupement(
+    def get_dto(cls, entity_id: ProgrammeInscriptionCoursIdentity) -> ProgrammeInscriptionCoursDTO:
+        pass
+
+    @classmethod
+    def search(
             cls,
-            sigle_formation: str,
-            annee: int,
-            version_formation: str,
-            code_groupement: str
-    ) -> 'ContenuGroupementDTO':
-        # reutiliser get_formation pour récupérer le groupement et son contenu dans le FormationDTO
-        raise NotImplementedError
+            entity_ids: Optional[List[ProgrammeInscriptionCoursIdentity]] = None,
+            **kwargs
+    ) -> List[ProgrammeInscriptionCours]:
+        pass
+
+    @classmethod
+    def delete(cls, entity_id: ProgrammeInscriptionCoursIdentity, **kwargs: ApplicationService) -> None:
+        pass
+
+    @classmethod
+    def save(cls, entity: ProgrammeInscriptionCours) -> None:
+        pass
+

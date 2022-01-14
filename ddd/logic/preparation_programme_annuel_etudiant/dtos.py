@@ -23,76 +23,93 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from collections import namedtuple
 from decimal import Decimal
-from typing import Optional, List
+from typing import List
 
 import attr
 
 from osis_common.ddd.interface import DTO
 
 
-@attr.s(frozen=True, slots=True)
+@attr.s(frozen=True, slots=True, auto_attribs=True)
 class UniteEnseignementDTO(DTO):
-    inclus_dans = attr.ib(type='GroupementDTO')
-    bloc = attr.ib(type=int)
-    code = attr.ib(type=str)
-    intitule_complet = attr.ib(type=str)
-    quadrimestre = attr.ib(type=str)
-    credits_absolus = attr.ib(type=Decimal)
-    volume_annuel_pm = attr.ib(type=int)
-    volume_annuel_pp = attr.ib(type=int)
+    bloc: int
+    code: str
+    intitule_complet: str
+    quadrimestre: str
+    credits_absolus: Decimal
+    volume_annuel_pm: int
+    volume_annuel_pp: int
+    obligatoire: bool
+    session_derogation: str
+    chemin_acces: str  # Exemple : 'LDROI1001B|LDROI102C|LDROI1001
 
 
-@attr.s(frozen=True, slots=True)
+@attr.s(frozen=True, slots=True, auto_attribs=True)
 class GroupementDTO(DTO):
-    inclus_dans = attr.ib(type='GroupementDTO')
-    intitule = attr.ib(type=str)
+    intitule: str
+    obligatoire: bool
+    chemin_acces: str  # Exemple : 'LDROI1001B|LDROI102C|LDROI1001
 
 
-@attr.s(frozen=True, slots=True)
-class ProgrammeDTO(DTO):
-    ues = attr.ib(type=List[UniteEnseignementDTO])
-    groupements = attr.ib(type=List[GroupementDTO])
+@attr.s(frozen=True, slots=True, auto_attribs=True)
+class ContenuGroupementDTO(DTO):
+    groupement_contenant: GroupementDTO
+    unites_enseignement_contenues: List['UniteEnseignementDTO']
+    groupements_contenus: List['ContenuGroupementDTO']
 
 
-@attr.s(frozen=True, slots=True)
+@attr.s(frozen=True, slots=True, auto_attribs=True)
 class FormulaireInscriptionCoursDTO(DTO):
-    annee_formation = attr.ib(type=int)
-    sigle_formation = attr.ib(type=str)
-    version_formation = attr.ib(type=str)
-    intitule_complet_formation = attr.ib(type=str)  # intitulé de la formation + version formation
-    programme = attr.ib(type=ProgrammeDTO)
+    annee_formation: int
+    sigle_formation: str
+    version_formation: str
+    intitule_complet_formation: str  # intitulé de la formation + version formation
+    racine: ContenuGroupementDTO
 
 
-@attr.s(frozen=True, slots=True)
+@attr.s(frozen=True, slots=True, auto_attribs=True)
+class ProgrammeInscriptionCoursDTO(DTO):
+    annee_formation: int
+    sigle_formation: str
+    version_formation: str
+    intitule_complet_formation: str  # intitulé de la formation + version formation
+    racine: ContenuGroupementDTO
+
+
+@attr.s(frozen=True, slots=True, auto_attribs=True)
 class UniteEnseignementCatalogueDTO(DTO):
-    inclus_dans = attr.ib(type='GroupementCatalogueDTO')
-    bloc = attr.ib(type=int)
-    code = attr.ib(type=str)
-    intitule_complet = attr.ib(type=str)
-    quadrimestre = attr.ib(type=str)
-    credits_absolus = attr.ib(type=Decimal)
-    volume_annuel_pm = attr.ib(type=int)
-    volume_annuel_pp = attr.ib(type=int)
+    bloc: int
+    code: str
+    intitule_complet: str
+    quadrimestre: str
+    credits_absolus: Decimal
+    volume_annuel_pm: int
+    volume_annuel_pp: int
+    obligatoire: bool
+    session_derogation: str
+    chemin_acces: str  # Exemple : 'LDROI1001B|LDROI102C|LDROI1001
 
 
-@attr.s(frozen=True, slots=True)
+@attr.s(frozen=True, slots=True, auto_attribs=True)
 class GroupementCatalogueDTO(DTO):
-    inclus_dans = attr.ib(type='GroupementCatalogueDTO')
-    intitule = attr.ib(type=str)
+    # groupement provenant du catalogue (sans surcharge d'ajout, suppression ou modification)
+    inclus_dans: 'GroupementCatalogueDTO'
+    intitule: str
+    chemin_acces: str  # Exemple : 'LDROI1001B|LDROI102C|LDROI1001
 
 
-@attr.s(frozen=True, slots=True)
-class ProgrammeDetailleDTO(DTO):
-    unites_enseignement = attr.ib(type=List[UniteEnseignementCatalogueDTO])
-    groupements = attr.ib(type=List[GroupementCatalogueDTO])
+@attr.s(frozen=True, slots=True, auto_attribs=True)
+class ContenuGroupementCatalogueDTO(DTO):
+    groupement_contenant: GroupementCatalogueDTO
+    unites_enseignement_contenues: List['UniteEnseignementCatalogueDTO']
+    groupements_contenus: List['ContenuGroupementCatalogueDTO']
 
 
-@attr.s(frozen=True, slots=True)
+@attr.s(frozen=True, slots=True, auto_attribs=True)
 class FormationDTO(DTO):
-    programme_detaille = attr.ib(type=ProgrammeDetailleDTO)
-    annee = attr.ib(type=int)
-    sigle = attr.ib(type=str)
-    version = attr.ib(type=str)
-    intitule_complet = attr.ib(type=str)  # intitulé de la formation + version formation
+    racine: ContenuGroupementCatalogueDTO
+    annee: int
+    sigle: str
+    version: str
+    intitule_complet: str  # intitulé de la formation + version formation

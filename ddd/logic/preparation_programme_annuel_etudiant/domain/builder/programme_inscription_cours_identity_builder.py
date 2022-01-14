@@ -23,24 +23,29 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import \
-    ICatalogueFormationsTranslator
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, ContenuGroupementDTO
+from typing import Union
+
+from ddd.logic.preparation_programme_annuel_etudiant.commands import AjouterUEAuProgrammeCommand, \
+    GetProgrammeInscriptionCoursServiceCommand, RetirerUEDuProgrammeCommand, AjusterUEDuGroupementCommand, \
+    AnnulerActionSurUEDuProgrammeCommand, DeplacerVersLeBasUEAjouteeDansProgrammeCommand, \
+    DeplacerVersLeHautUEAjouteeDansProgrammeCommand
+from ddd.logic.preparation_programme_annuel_etudiant.domain.model.programme_inscription_cours import \
+    ProgrammeInscriptionCoursIdentity
+from osis_common.ddd import interface
 
 
-class CatalogueFormationsTranslator(ICatalogueFormationsTranslator):
+class ProgrammeInscriptionCoursIdentityBuilder(interface.EntityIdentityBuilder):
     @classmethod
-    def get_formation(cls, sigle: str, annee: int, version: str) -> 'FormationDTO':
-        # reutiliser GetProgramTreeVersionCommand et convertir ProgramTreeVersion en FormationDTO
-        raise NotImplementedError
-
-    @classmethod
-    def get_contenu_groupement(
+    def build_from_command(
             cls,
-            sigle_formation: str,
-            annee: int,
-            version_formation: str,
-            code_groupement: str
-    ) -> 'ContenuGroupementDTO':
-        # reutiliser get_formation pour récupérer le groupement et son contenu dans le FormationDTO
+            cmd: Union[
+                'GetProgrammeInscriptionCoursServiceCommand',
+                'AjouterUEAuProgrammeCommand',
+                'RetirerUEDuProgrammeCommand',
+                'AjusterUEDuGroupementCommand',
+                'AnnulerActionSurUEDuProgrammeCommand',
+                'DeplacerVersLeHautUEAjouteeDansProgrammeCommand',
+                'DeplacerVersLeBasUEAjouteeDansProgrammeCommand'
+            ]
+    ) -> 'ProgrammeInscriptionCoursIdentity':
         raise NotImplementedError

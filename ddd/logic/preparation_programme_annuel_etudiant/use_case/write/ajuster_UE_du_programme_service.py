@@ -23,18 +23,32 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.preparation_programme_annuel_etudiant.commands import AjouterUEAuProgrammeCommand
+from ddd.logic.preparation_programme_annuel_etudiant.commands import AjusterUEDuGroupementCommand
+from ddd.logic.preparation_programme_annuel_etudiant.domain.builder.programme_inscription_cours_identity_builder \
+    import ProgrammeInscriptionCoursIdentityBuilder
+from ddd.logic.preparation_programme_annuel_etudiant.domain.model.programme_inscription_cours import \
+    ProgrammeInscriptionCoursIdentity
+from ddd.logic.preparation_programme_annuel_etudiant.repository.i_programme_inscription_cours import \
+    IProgrammeInscriptionCoursRepository
 
 
-def ajouter_UE_au_programme(
-        cmd: 'AjouterUEAuProgrammeCommand',
-        # programmeinscriptioncours_repository: 'IProgrammeInscriptionCoursRepository',
+def ajuster_UE_du_programme(
+        cmd: 'AjusterUEDuGroupementCommand',
+        repository: 'IProgrammeInscriptionCoursRepository',
 ) -> 'ProgrammeInscriptionCoursIdentity':
     # GIVEN
-    programme_inscription_cours = programme_inscription_cours_repository.get(entity_id=cmd.entity_id)
+    programme_inscription_cours_identity = ProgrammeInscriptionCoursIdentityBuilder.build_from_command(cmd)
+    programme_inscription_cours = repository.get(
+        entity_id=programme_inscription_cours_identity
+    )
 
     # WHEN
+    for cmd_ue in cmd.unites_enseignements:
+        programme_inscription_cours.ajuster_unite_enseignement(
+            unite_enseignement=cmd_ue.code,
+            a_ajuster_dans=cmd.a_ajuster_dans
+        )
 
     # THEN
-
-    return entity_id
+    repository.save(programme_inscription_cours)
+    return programme_inscription_cours.entity_id
