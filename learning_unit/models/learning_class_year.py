@@ -25,6 +25,9 @@
 ##############################################################################
 from django.core.validators import RegexValidator
 from django.db import models
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
@@ -173,3 +176,13 @@ class LearningClassYear(models.Model):
         volume_total_of_classes += self.hourly_volume_partial_q1 or 0
         volume_total_of_classes += self.hourly_volume_partial_q2 or 0
         return volume_total_of_classes
+
+
+@receiver(post_delete, sender=LearningClassYear)
+def _learningclassyear_delete(sender, instance: LearningClassYear, **kwargs):
+    from base.models.learning_unit_year import LearningUnitYear
+    luy = LearningUnitYear.objects.get(
+        id=instance.learning_component_year.learning_unit_year_id
+    )
+    luy.changed = timezone.now()
+    luy.save()
