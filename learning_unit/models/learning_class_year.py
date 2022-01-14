@@ -180,6 +180,9 @@ class LearningClassYear(models.Model):
 
 @receiver(post_delete, sender=LearningClassYear)
 def _learningclassyear_delete(sender, instance: LearningClassYear, **kwargs):
+    # This post_delete is used to update field subdivise into epc (for the learning_unit_year)
+    # When the learning unit year has no classes, set it to false
+    # But when deleting all classes, there are no updated changed field.
     from base.models.learning_unit_year import LearningUnitYear
     luy = LearningUnitYear.objects.get(
         id=instance.learning_component_year.learning_unit_year_id
