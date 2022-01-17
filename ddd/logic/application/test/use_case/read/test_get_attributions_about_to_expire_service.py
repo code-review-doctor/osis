@@ -70,6 +70,7 @@ class TestGetAttributionsAboutToExpireService(TestCase):
                 academic_year=AcademicYearIdentityBuilder.build_from_year(year=2017),
             ),
             course_title="Introduction au droit",
+            course_is_in_suppression_proposal=False,
             function=Functions.CO_HOLDER,
             end_year=AcademicYearIdentityBuilder.build_from_year(year=2017),
             start_year=AcademicYearIdentityBuilder.build_from_year(year=2016),
@@ -149,7 +150,8 @@ class TestGetAttributionsAboutToExpireService(TestCase):
             start_year=AcademicYearIdentityBuilder.build_from_year(year=2016),
             lecturing_volume=Decimal(10),
             practical_volume=Decimal(15),
-            is_substitute=False
+            is_substitute=False,
+            course_is_in_suppression_proposal=False
         )]
 
         cmd = GetAttributionsAboutToExpireCommand(global_id=self.global_id)

@@ -23,20 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import decimal
 import json
+from typing import List
 
 from django.utils.translation import gettext_lazy as _, pgettext_lazy
-
 from openpyxl.worksheet import Worksheet
 from rest_framework import serializers
 
+from assessments.export.score_sheet_xls import HEADER_MANDATORY_PART
+from base.utils.string import is_a_translation_of
 
-HEADER = [_('Academic year'), _('Session'), _('Learning unit'), pgettext_lazy('encoding', 'Program'),
-          _('Registration number'), _('Lastname'), _('Firstname'), _('Email'), _('Numbered scores'),
-          _('Justification (A,T)'), _('End date Prof'), _('Type of specific profile'), _('Extra time (33% generally)'),
-          _('Large print'), _('Specific room of examination'), _('Other educational facilities'),
-          _('Details other educational facilities'), _('Educational tutor'),
-          ]
+MAXIMAL_NUMBER_OF_DECIMALS = 1
 
 
 class ScoreSheetXLSImportSerializerError(ValueError):
@@ -51,21 +49,42 @@ class _XLSNoteEtudiantRowImportSerializer(serializers.Serializer):
     noma = serializers.SerializerMethodField()
     row_number = serializers.SerializerMethodField()
 
-    def get_code_unite_enseignement(self, obj: tuple):
-        col_unite_enseignement = HEADER.index(_('Learning unit'))
+    @staticmethod
+    def get_code_unite_enseignement(obj: tuple) -> str:
+        col_unite_enseignement = HEADER_MANDATORY_PART.index(_('Learning unit'))
         return str(obj[col_unite_enseignement].value)
 
-    def get_note(self, obj: tuple):
-        col_note = HEADER.index(_('Numbered scores'))
+    def get_note(self, obj: tuple) -> str:
+        col_note = HEADER_MANDATORY_PART.index(_('Score'))
         raw_value = str(obj[col_note].value) if obj[col_note].value is not None else ''
-        return raw_value.replace(",", ".")
+        note_value = raw_value.replace(",", ".")
+        try:
+            # FIXME :: à déplacer dans le DDD ; cela est une règle métier, ce n'est pas le role du Serializer
+            number_of_decimal = decimal.Decimal(note_value).as_tuple().exponent * -1
+            if number_of_decimal > MAXIMAL_NUMBER_OF_DECIMALS:
+                raise ScoreSheetXLSImportSerializerError(
+                    _('Invalid score line %(row_number)s : %(decimal_value)s. Ensure that there are no more '
+                      'than %(max_decimal)s decimal place.') %
+                    {
+                        'decimal_value': note_value,
+                        'max_decimal': MAXIMAL_NUMBER_OF_DECIMALS,
+                        'row_number': str(self.get_row_number(obj))
+                    }
+                )
+        except decimal.DecimalException:
+            # Note is a letter
+            pass
 
-    def get_email(self, obj: tuple):
-        col_email = HEADER.index(_('Email'))
+        return note_value
+
+    @staticmethod
+    def get_email(obj: tuple) -> str:
+        col_email = HEADER_MANDATORY_PART.index(_('Email'))
         return str(obj[col_email].value)
 
-    def get_noma(self, obj: tuple):
-        col_noma = HEADER.index(_('Registration number'))
+    @staticmethod
+    def get_noma(obj: tuple) -> str:
+        col_noma = HEADER_MANDATORY_PART.index(pgettext_lazy('assessments', 'Registration number'))
         return str(obj[col_noma].value)
 
     def get_row_number(self, obj: tuple) -> int:
@@ -78,7 +97,9 @@ class ScoreSheetXLSImportSerializer(serializers.Serializer):
     notes_etudiants = serializers.SerializerMethodField()
 
     def get_numero_session(self, worksheet: Worksheet) -> int:
-        col_session = HEADER.index(_('Session'))
+        self._check_headers_consistency(worksheet)
+
+        col_session = HEADER_MANDATORY_PART.index(_('Session'))
         session_found = set()
         for count, row in enumerate(self.__get_student_rows(worksheet)):
             raw_session_value = row[col_session].value
@@ -96,7 +117,7 @@ class ScoreSheetXLSImportSerializer(serializers.Serializer):
         return session_found.pop()
 
     def get_annee_academique(self, worksheet: Worksheet) -> int:
-        col_academic_year = HEADER.index(_('Academic year'))
+        col_academic_year = HEADER_MANDATORY_PART.index(_('Academic year'))
         academic_year_found = set()
 
         for count, row in enumerate(self.__get_student_rows(worksheet)):
@@ -115,21 +136,23 @@ class ScoreSheetXLSImportSerializer(serializers.Serializer):
             )
         return academic_year_found.pop()
 
-    def __is_student_score_row(self, row) -> bool:
-        col_registration_id = HEADER.index(_('Registration number'))
+    @staticmethod
+    def __is_student_score_row(row) -> bool:
+        col_registration_id = HEADER_MANDATORY_PART.index(pgettext_lazy('assessments', 'Registration number'))
         raw_registration_id = row[col_registration_id].value
         return raw_registration_id and str(raw_registration_id).isdigit()
 
     def __get_student_rows(self, worksheet: Worksheet):
         return filter(self.__is_student_score_row, worksheet.rows)
 
-    def __convert_to_integer(self, raw_cell_value) -> int:
+    @staticmethod
+    def __convert_to_integer(raw_cell_value) -> int:
         try:
             return int(raw_cell_value)
         except (ValueError, TypeError,):
             return raw_cell_value
 
-    def get_notes_etudiants(self, worksheet: Worksheet):
+    def get_notes_etudiants(self, worksheet: Worksheet) -> List[_XLSNoteEtudiantRowImportSerializer]:
         notes_etudiants = []
         for row in self.__get_student_rows(worksheet):
             row_serialized = _XLSNoteEtudiantRowImportSerializer(instance=row, context={'row_number': row[0].row}).data
@@ -143,6 +166,28 @@ class ScoreSheetXLSImportSerializer(serializers.Serializer):
         representation = super().to_representation(instance)
         json_str = json.dumps(representation)
         return json.loads(json_str)
+
+    @staticmethod
+    def _check_headers_consistency(worksheet):
+        headers_line_found = False
+        for count, row in enumerate(worksheet.rows):
+            if is_a_translation_of(row[0].value, HEADER_MANDATORY_PART[0]):
+                headers_line_found = True
+                for header_count, header in enumerate(HEADER_MANDATORY_PART):
+                    try:
+                        if not is_a_translation_of(row[header_count].value, header):
+                            raise ScoreSheetXLSImportSerializerError(
+                                _("File error : The file is not consistent. No scores injected."),
+                            )
+                    except Exception as e:
+                        raise ScoreSheetXLSImportSerializerError(
+                            _("File error : The file is not consistent. No scores injected."),
+                        )
+                break
+        if not headers_line_found:
+            raise ScoreSheetXLSImportSerializerError(
+                _("File error : The file is not consistent. No scores injected."),
+            )
 
 
 class ProgramManagerScoreSheetXLSImportSerializer(ScoreSheetXLSImportSerializer):

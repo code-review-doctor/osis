@@ -65,9 +65,9 @@ from program_management.tests.factories.education_group_version import \
 from program_management.tests.factories.element import ElementFactory
 from reference.tests.factories.country import CountryFactory
 
-TRAINING_TITLE_COLUMN = 39
-TRAINING_CODE_COLUMN = 38
-GATHERING_COLUMN = 35
+TRAINING_TITLE_COLUMN = 40
+TRAINING_CODE_COLUMN = 39
+GATHERING_COLUMN = 36
 ROOT_ACRONYM = 'DRTI'
 VERSION_ACRONYM = 'CRIM'
 
@@ -195,6 +195,7 @@ class TestUeUtilization(TestCase):
                                  str(_('Exchange students')),
                                  str(_('Individual loan')),
                                  str(_('Stage-Dimona')),
+                                 str(_('Team management')),
                                  str(_('Other remark (intended for publication)')),
                                  str(_('Other remark in english (intended for publication)')),
                                  str(_('Gathering')),
@@ -403,6 +404,7 @@ class TestUeUtilization(TestCase):
             _('yes') if luy.exchange_students else _('no'),
             _('yes') if luy.individual_loan else _('no'),
             _('yes') if luy.stage_dimona else _('no'),
+            _('yes') if luy.learning_container_year.team else _('no'),
             luy.other_remark,
             luy.other_remark_english,
             "{}".format(self.a_group_year_parent.partial_acronym),

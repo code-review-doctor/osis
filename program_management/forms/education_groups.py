@@ -207,7 +207,11 @@ class GroupFilter(FilterSet):
         )
         group_clause = Q(educationgroupversion__isnull=True)
         not_transition_clause = Q(educationgroupversion__transition_name=NOT_A_TRANSITION)
-        return GroupYear.objects.all().select_related('element', 'academic_year').annotate(
+        return GroupYear.objects.all().select_related(
+            'element',
+            'academic_year',
+            'education_group_type',
+        ).annotate(
             type_ordering=Case(
                 *[When(education_group_type__name=key, then=Value(str(_(val))))
                   for i, (key, val) in enumerate(education_group_types.ALL_TYPES)],
@@ -237,7 +241,8 @@ class GroupFilter(FilterSet):
         ).annotate_full_titles().annotate(
             main_teaching_campus_name=Case(
                 default='main_teaching_campus__name',
-                output_field=CharField())
+                output_field=CharField()
+            )
         )
 
     def filter_queryset(self, queryset):

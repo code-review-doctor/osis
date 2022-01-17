@@ -29,7 +29,7 @@ import warnings
 from typing import Optional, List
 
 from django.db import IntegrityError
-from django.db.models import Subquery, OuterRef, Prefetch, QuerySet, Q, Max
+from django.db.models import Subquery, OuterRef, Prefetch, QuerySet, Q, Max, TextField
 
 from base.models import entity_version
 from base.models.academic_year import AcademicYear as AcademicYearModelDb
@@ -57,6 +57,7 @@ from base.models.enums.internship_presence import InternshipPresence
 from base.models.enums.rate_code import RateCode
 from base.models.enums.schedule_type import ScheduleTypeEnum
 from base.models.hops import Hops as HopsModelDb
+from base.utils.cte import CTESubquery
 from ddd.logic.formation_catalogue.builder.training_builder import TrainingBuilder
 from ddd.logic.formation_catalogue.dtos import TrainingDto, _SecondaryDomainDTO, _CoorganizationDTO, \
     _CertificateAimDTO, BachelorDto
@@ -140,6 +141,8 @@ class TrainingRepository(interface.AbstractRepository):
             sigle: str = None,
             annee: int = None,
             type: str = None,
+            sigle_entite_gestion: str = None,
+            inclure_entites_gestion_subordonnees: bool = False,
     ) -> List['TrainingDto']:
         qs = _get_training_base_queryset()
         if sigle:
@@ -148,6 +151,23 @@ class TrainingRepository(interface.AbstractRepository):
             qs = qs.filter(academic_year__year=annee)
         if type:
             qs = qs.filter(education_group_type__name=type)
+        if sigle_entite_gestion and not inclure_entites_gestion_subordonnees:
+            qs = qs.annotate(
+                management_entity_acronym=Subquery(
+                    EntityVersion.objects.filter(
+                        entity_id=OuterRef('management_entity'),
+                    ).values('management_entity_acronym')[:1],
+                ),
+            ).filter(management_entity_acronym=sigle_entite_gestion)
+        elif sigle_entite_gestion and inclure_entites_gestion_subordonnees:
+            qs = qs.annotate(
+                management_path_as_string=CTESubquery(
+                    EntityVersion.objects.with_acronym_path(
+                        entity_id=OuterRef('management_entity'),
+                    ).values('path_as_string')[:1],
+                    output_field=TextField(),
+                ),
+            ).filter(management_path_as_string__contains=sigle_entite_gestion)
         return [_convert_education_group_year_to_dto(education_group_year_db) for education_group_year_db in qs]
 
     @classmethod
@@ -453,7 +473,6 @@ def _get_training_base_queryset() -> QuerySet:
         'education_group_type',
         'hops',
         'management_entity',
-        'administration_entity',
         'administration_entity',
         'enrollment_campus__organization',
         'isced_domain',

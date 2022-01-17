@@ -26,18 +26,24 @@ import attr
 import mock
 from django.test import SimpleTestCase
 
+from assessments.models.enums.score_sheet_address_choices import ScoreSheetAddressEntityType
 from ddd.logic.encodage_des_notes.soumission.commands import GetAdresseFeuilleDeNotesServiceCommand
 from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_notes import AdresseFeuilleDeNotes
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_entites_cohorte import EntitesCohorteDTO
 from ddd.logic.encodage_des_notes.soumission.dtos import AdresseFeuilleDeNotesDTO
 from ddd.logic.encodage_des_notes.tests.factory.adresse_feuille_de_notes import \
     AdresseFeuilleDeNotesSpecifiqueFactory, \
     AdresseFeuilleDeNotesBaseeSurEntiteFactory, AdresseFeuilleDeNotesVideFactory
+from ddd.logic.shared_kernel.entite.tests.factory.entiteucl import EPLEntiteFactory
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.periode_encodage_notes import \
     PeriodeEncodageNotesTranslatorInMemory
+from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.entites_cohorte import \
+    EntitesCohorteTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.repository.in_memory.adresse_feuille_de_notes import \
     AdresseFeuilleDeNotesInMemoryRepository
 from infrastructure.messages_bus import message_bus_instance
 from infrastructure.shared_kernel.academic_year.repository.in_memory.academic_year import AcademicYearInMemoryRepository
+from infrastructure.shared_kernel.entite.repository.in_memory.entiteucl import EntiteUCLInMemoryRepository
 
 
 class TestGetAdresseFeuilleDeNotesService(SimpleTestCase):
@@ -51,6 +57,18 @@ class TestGetAdresseFeuilleDeNotesService(SimpleTestCase):
         self.periode_encodage_notes_translator = PeriodeEncodageNotesTranslatorInMemory()
         self.academic_year_repository = AcademicYearInMemoryRepository()
 
+        self.entite_repository = EntiteUCLInMemoryRepository()
+        self.epl_entite = EPLEntiteFactory()
+        self.entite_repository.entities.append(EPLEntiteFactory())
+
+        self.entites_cohorte_translator = EntitesCohorteTranslatorInMemory()
+        self.entites_cohorte_translator.datas.append(
+            EntitesCohorteDTO(
+                administration=self.epl_entite.entity_id,
+                gestion=self.epl_entite.entity_id,
+            )
+        )
+
         self.__mock_service_bus()
 
     def __mock_service_bus(self):
@@ -58,13 +76,28 @@ class TestGetAdresseFeuilleDeNotesService(SimpleTestCase):
             'infrastructure.messages_bus',
             AdresseFeuilleDeNotesRepository=lambda: self.repository,
             PeriodeEncodageNotesTranslator=lambda: self.periode_encodage_notes_translator,
-            AcademicYearRepository=lambda: self.academic_year_repository
+            AcademicYearRepository=lambda: self.academic_year_repository,
+            EntiteUCLRepository=lambda: self.entite_repository,
+            EntitesCohorteTranslator=lambda: self.entites_cohorte_translator,
         )
         message_bus_patcher.start()
         self.addCleanup(message_bus_patcher.stop)
         self.message_bus = message_bus_instance
 
     def test_should_return_dto(self):
+        adresse = AdresseFeuilleDeNotesSpecifiqueFactory()
+        cmd = attr.evolve(self.cmd, nom_cohorte=adresse.nom_cohorte)
+        self.repository.save(adresse)
+
+        result = message_bus_instance.invoke(cmd)
+        self.assert_dto_corresponds_to_adress(
+            result,
+            adresse,
+        )
+
+    def test_should_considerer_la_prochaine_periode_encodage_si_aucune_periode_ouverte(self):
+        self.periode_encodage_notes_translator.get = lambda *args, **kwargs: None
+
         adresse = AdresseFeuilleDeNotesSpecifiqueFactory()
         cmd = attr.evolve(self.cmd, nom_cohorte=adresse.nom_cohorte)
         self.repository.save(adresse)
@@ -87,16 +120,25 @@ class TestGetAdresseFeuilleDeNotesService(SimpleTestCase):
             adresse,
         )
 
-    def test_should_retourner_adresse_de_feuille_de_notes_vide_si_adresse_non_definie_pour_la_cohorte(self):
+    def test_should_retourner_adresse_de_feuille_de_notes_entite_gestion_si_adresse_non_definie_pour_la_cohorte(self):
         cmd = attr.evolve(self.cmd, nom_cohorte="DROI1BA")
 
         result = message_bus_instance.invoke(cmd)
 
-        expected = AdresseFeuilleDeNotesVideFactory(entity_id__nom_cohorte=cmd.nom_cohorte)
-        self.assert_dto_corresponds_to_adress(
-            result,
-            expected
+        expected = AdresseFeuilleDeNotesDTO(
+            nom_cohorte=cmd.nom_cohorte,
+            annee_academique=2020,
+            type_entite=ScoreSheetAddressEntityType.ENTITY_MANAGEMENT.name,
+            destinataire="{} - {}".format(self.epl_entite.sigle, self.epl_entite.intitule),
+            rue_numero=self.epl_entite.adresse.rue_numero,
+            code_postal=self.epl_entite.adresse.code_postal,
+            ville=self.epl_entite.adresse.ville,
+            pays=self.epl_entite.adresse.pays,
+            telephone=self.epl_entite.adresse.telephone,
+            fax=self.epl_entite.adresse.fax,
+            email=''
         )
+        self.assertEqual(result, expected)
 
     def assert_dto_corresponds_to_adress(
             self,

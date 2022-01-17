@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2012 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,31 +23,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
 
-import mock
 from django.contrib.auth.models import Permission
-from django.http import HttpResponseRedirect, HttpResponse, HttpResponseForbidden
+from django.http import HttpResponse
 from django.test import TestCase
-from django.test.utils import override_settings
 from django.urls import reverse
 
-from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmissionCalendar
 from assessments.tests.factories.score_responsible import ScoreResponsibleFactory
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.business.entities import create_entities_hierarchy
-from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity_manager import EntityManagerFactory
 from base.tests.factories.group import EntityManagerGroupFactory
-from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
-from base.tests.factories.person import PersonFactory
-from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
 from base.tests.factories.tutor import TutorFactory
-from base.tests.factories.user import UserFactory
 
 
 class ScoresResponsibleSearchTestCase(TestCase):
@@ -129,13 +119,6 @@ class ScoresResponsibleSearchTestCase(TestCase):
         response = self.client.get(self.url)
 
         self.assertRedirects(response, "/login/?next={}".format(self.url))
-
-    def test_case_user_without_perms(self):
-        unauthorized_user = UserFactory()
-        self.client.force_login(unauthorized_user)
-
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
     def test_case_search_without_filter_ensure_ordering(self):
         data = {

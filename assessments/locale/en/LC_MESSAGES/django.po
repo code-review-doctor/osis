@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-04 10:48+0100\n"
+"POT-Creation-Date: 2021-12-15 14:47+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -37,15 +37,6 @@ msgid ""
 "                                "
 msgstr ""
 
-msgid ""
-"\n"
-"                                For first year bachelor, the address of "
-"reference is by default the one from the bachelor.\n"
-"                                It is possible to define a specific address "
-"for the first year of the bachelor by checking the box.\n"
-"                            "
-msgstr ""
-
 #, python-format
 msgid ""
 "\n"
@@ -72,6 +63,9 @@ msgid ""
 "LCOPS1113-A</i> </p> <p> For a practical effective class (PP), use '_' <br/> "
 "<i>Example : LCOPS1113-A</i> </p> <p> For a partim, put the letter against "
 "the the acronym <br/> <i>Example : LCOPS1113A</i> </p>"
+msgstr ""
+
+msgid "Absence"
 msgstr ""
 
 msgid "Absence justified"
@@ -174,6 +168,9 @@ msgstr ""
 msgid "Deadline reached"
 msgstr ""
 
+msgid "Decimal scores not authorized"
+msgstr ""
+
 msgid "Decimal values in scores are NOT accepted."
 msgstr ""
 
@@ -183,7 +180,9 @@ msgstr ""
 msgid "Decimals authorized for this learning unit"
 msgstr ""
 
-msgid "Define a specific address for the first year of bachelor"
+msgid ""
+"Define a specific address for the first year of bachelor (if different from "
+"the addresse of the bachelor)"
 msgstr ""
 
 msgid "Details other educational facilities"
@@ -225,6 +224,7 @@ msgstr ""
 msgid "Evaluations"
 msgstr ""
 
+#, python-format
 msgid "Extra time (33% generally)"
 msgstr ""
 
@@ -238,7 +238,13 @@ msgstr ""
 msgid "File error : No value in the column Session. No scores injected."
 msgstr ""
 
+msgid "File error : The file is not consistent. No scores injected."
+msgstr ""
+
 msgid "Firstname"
+msgstr ""
+
+msgid "For classes, you must search the full LU below and then click on "
 msgstr ""
 
 msgid "Get Excel file"
@@ -261,23 +267,32 @@ msgstr ""
 msgid "Inject"
 msgstr ""
 
-msgid "Inject XLS file"
+msgid "Inject Excel file"
+msgstr ""
+
+msgid "Inject encoded scores into Excel file."
 msgstr ""
 
 msgid "Institution"
 msgstr ""
 
-msgid "January"
+#, python-format
+msgid ""
+"Invalid score line %(row_number)s : %(decimal_value)s. Ensure that there are "
+"no more than %(max_decimal)s decimal place."
 msgstr ""
 
-msgid "Justification (A,T)"
+msgid "Invalid score."
+msgstr ""
+
+msgid "January"
 msgstr ""
 
 #, python-format
 msgid "Justification legend: %(justification_label_authorized)s"
 msgstr ""
 
-msgid "LU code"
+msgid "LU"
 msgstr ""
 
 msgid "Large print"
@@ -344,9 +359,6 @@ msgstr ""
 msgid "Number of enrollments"
 msgstr ""
 
-msgid "Numbered scores"
-msgstr ""
-
 msgid "Online"
 msgstr ""
 
@@ -373,10 +385,10 @@ msgstr ""
 msgid "Please choose at least one criteria!"
 msgstr ""
 
-msgid "Please select an XLS file for injection"
+msgid "Please select an address"
 msgstr ""
 
-msgid "Please select an address"
+msgid "Please select the Excel file for injection"
 msgstr ""
 
 msgid "Postal code"
@@ -404,12 +416,10 @@ msgstr ""
 msgid "Recipient"
 msgstr ""
 
-msgid "Refresh list"
-msgstr ""
-
 msgid "Reg. No."
 msgstr ""
 
+msgctxt "assessments"
 msgid "Registration number"
 msgstr ""
 
@@ -424,6 +434,9 @@ msgid ""
 "number surrounded by parenthesis is the number of scores encoded by the "
 "tutor that aren't submitted yet ('draft' state)"
 msgstr ""
+"Represents the quantity of scores submitted to the administration. The "
+"number surrounded by parenthesis is the scores encoded by the score "
+"responsible that aren't submitted to the faculty yet"
 
 msgid "Req. Entity"
 msgstr ""
@@ -442,10 +455,19 @@ msgstr ""
 msgid "Save"
 msgstr ""
 
+msgid "Save scores"
+msgstr ""
+
 msgid "Score"
 msgstr ""
 
 msgid "Score legend"
+msgstr ""
+
+msgid "Score legend for program manager"
+msgstr ""
+
+msgid "Score legend for tutor"
 msgstr ""
 
 #, python-brace-format
@@ -474,9 +496,6 @@ msgstr ""
 msgid "Scores responsible"
 msgstr ""
 
-msgid "Scores responsible tutor"
-msgstr ""
-
 msgid "Scores responsibles"
 msgstr ""
 
@@ -487,9 +506,6 @@ msgid "Search of annual programs"
 msgstr ""
 
 msgid "Select an encoding type"
-msgstr ""
-
-msgid "Select an excel file to inject scores."
 msgstr ""
 
 msgid "Select/deselect all"
@@ -590,7 +606,7 @@ msgid_plural "There are %(error_counter)s errors in form"
 msgstr[0] ""
 msgstr[1] ""
 
-msgid "There is no enrollment for this course"
+msgid "There is no enrollment to the exam for this learning unit"
 msgstr ""
 
 msgid "This process helps tutor while encoding notes for the exams sessions."
@@ -649,8 +665,8 @@ msgstr ""
 #, python-format
 msgid ""
 "Warning: %(scores)s score(s) ready to be submitted. Only score responsible "
-"(%(responsable_nom)s, %(responsable_prenom)s) will be allowed to submit the "
-"scores to faculty."
+"<strong>(%(responsable_nom)s, %(responsable_prenom)s)</strong> will be "
+"allowed to submit the scores to faculty."
 msgstr ""
 
 msgid "Yes"
@@ -690,4 +706,7 @@ msgid "students"
 msgstr ""
 
 msgid "the"
+msgstr ""
+
+msgid "to modify."
 msgstr ""

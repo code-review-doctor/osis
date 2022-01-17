@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-04 10:48+0100\n"
+"POT-Creation-Date: 2021-12-15 14:47+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -43,20 +43,6 @@ msgstr ""
 "l'adresse affichée sur les pages d'encodage de notes pour la formation "
 "%(acronym)s. Cela ne changera jamais l'adresse d'une structure. La liste ci-"
 "dessous vous aidera à pré-remplir le formulaire."
-
-msgid ""
-"\n"
-"                                For first year bachelor, the address of "
-"reference is by default the one from the bachelor.\n"
-"                                It is possible to define a specific address "
-"for the first year of the bachelor by checking the box.\n"
-"                            "
-msgstr ""
-"\n"
-"Pour la première année de bachelier, l'adresse de référence par défaut est "
-"celle du bachelier. Il est néanmoins possible de définir une adresse "
-"spécifique à la première année de bachelier en cochant la case "
-"correspondante."
 
 #, python-format
 msgid ""
@@ -98,6 +84,9 @@ msgstr ""
 "utilisez l’underscore. <br/> <i>Exemple : LCOPS1113_A</i> </p> <p> Pour un "
 "partim, accolez directement la lettre au code.  <br/> <i>Exemple : "
 "LCOPS1113A</i> </p>"
+
+msgid "Absence"
+msgstr "Absence"
 
 msgid "Absence justified"
 msgstr "Absence justifiée"
@@ -203,6 +192,9 @@ msgstr "Tri descendant de la table de données"
 msgid "Deadline reached"
 msgstr "Date d'échéance atteinte"
 
+msgid "Decimal scores not authorized"
+msgstr "Notes décimales non autorisées"
+
 msgid "Decimal values in scores are NOT accepted."
 msgstr "Les valeurs décimales dans les notes ne sont PAS acceptées."
 
@@ -212,8 +204,12 @@ msgstr "Les valeurs décimales dans les notes sont acceptées."
 msgid "Decimals authorized for this learning unit"
 msgstr "Les notes décimales sont autorisées pour ce cours"
 
-msgid "Define a specific address for the first year of bachelor"
-msgstr "Définir une adresse spécifique à la première année de bachelier"
+msgid ""
+"Define a specific address for the first year of bachelor (if different from "
+"the addresse of the bachelor)"
+msgstr ""
+"Définir une adresse spécifique à la première année de bachelier (si "
+"différente de l'adresse du bachelier)"
 
 msgid "Details other educational facilities"
 msgstr "Détails autre aménagement"
@@ -254,6 +250,7 @@ msgstr "Entité"
 msgid "Evaluations"
 msgstr "Evaluations"
 
+# python-format
 msgid "Extra time (33% generally)"
 msgstr "Tiers-Temps"
 
@@ -271,8 +268,16 @@ msgstr ""
 "Erreur dans le fichier : Aucune valeur dans la colonne Session. Aucune note "
 "injectée."
 
+msgid "File error : The file is not consistent. No scores injected."
+msgstr "Fichier non conforme. Aucune note injectée."
+
 msgid "Firstname"
 msgstr "Prénom"
+
+msgid "For classes, you must search the full LU below and then click on "
+msgstr ""
+"Pour modifier les classes, il faut chercher ci-dessous l'UE complète et "
+"ensuite cliquer sur "
 
 msgid "Get Excel file"
 msgstr "Récupérer le fichier Excel"
@@ -297,25 +302,36 @@ msgstr "Inclure les entités subordonnées"
 msgid "Inject"
 msgstr "Injecter"
 
-msgid "Inject XLS file"
-msgstr "Injecter le fichier XLS"
+msgid "Inject Excel file"
+msgstr "Injecter le fichier Excel"
+
+msgid "Inject encoded scores into Excel file."
+msgstr "Injecter les notes encodées dans le fichier Excel"
 
 msgid "Institution"
 msgstr "Institution"
 
+#, python-format
+msgid ""
+"Invalid score line %(row_number)s : %(decimal_value)s. Ensure that there are "
+"no more than %(max_decimal)s decimal place."
+msgstr ""
+"Note invalide ligne %(row_number)s : %(decimal_value)s. Assurez-vous qu'il "
+"n'y a pas plus de %(max_decimal)s chiffre après la virgule."
+
+msgid "Invalid score."
+msgstr "Note non valide."
+
 msgid "January"
 msgstr "Janvier"
-
-msgid "Justification (A,T)"
-msgstr "Justification (A,T)"
 
 #, python-format
 msgid "Justification legend: %(justification_label_authorized)s"
 msgstr ""
 "Légende pour le champ 'Justification': %(justification_label_authorized)s"
 
-msgid "LU code"
-msgstr "Code de l'UE"
+msgid "LU"
+msgstr "Code"
 
 msgid "Large print"
 msgstr "Copie adaptée"
@@ -385,9 +401,6 @@ msgstr "Aucun"
 msgid "Number of enrollments"
 msgstr "Nombre d'inscriptions"
 
-msgid "Numbered scores"
-msgstr "Notes chiffrées"
-
 msgid "Online"
 msgstr "En ligne"
 
@@ -415,11 +428,11 @@ msgstr "Téléphone"
 msgid "Please choose at least one criteria!"
 msgstr "Veuillez choisir au moins un critère!"
 
-msgid "Please select an XLS file for injection"
-msgstr "Veuillez sélectionner un fichier XLS pour injection"
-
 msgid "Please select an address"
 msgstr "Veuillez sélectionner une adresse"
+
+msgid "Please select the Excel file for injection"
+msgstr "Veuillez sélectionner le fichier Excel pour injection"
 
 msgid "Postal code"
 msgstr "Code postal"
@@ -446,12 +459,10 @@ msgstr "Progression"
 msgid "Recipient"
 msgstr "Destinataire"
 
-msgid "Refresh list"
-msgstr "rafraîchir la liste"
-
 msgid "Reg. No."
 msgstr "Noma"
 
+msgctxt "assessments"
 msgid "Registration number"
 msgstr "Noma"
 
@@ -466,9 +477,9 @@ msgid ""
 "number surrounded by parenthesis is the number of scores encoded by the "
 "tutor that aren't submitted yet ('draft' state)"
 msgstr ""
-"Représente la quantité de notes soumises à l'administration. Le nombre "
-"entouré de parenthèses est le nombre de notes encodées par l'enseignant.e "
-"qui n'ont pas encore été soumises (état 'brouillon')"
+"Représente le nombre de notes soumises à l'administration. Le nombre entre "
+"parenthèses représente les notes que le ou la responsable des notes doit "
+"encore soumettre à la faculté"
 
 msgid "Req. Entity"
 msgstr "Ent. charge"
@@ -489,11 +500,20 @@ msgstr "S=Absence Injustifiée"
 msgid "Save"
 msgstr "Enregistrer"
 
+msgid "Save scores"
+msgstr "Enregistrer les notes"
+
 msgid "Score"
 msgstr "Note"
 
 msgid "Score legend"
 msgstr "Valeurs acceptées"
+
+msgid "Score legend for program manager"
+msgstr "Valeurs acceptées pour le ou la gestionnaire"
+
+msgid "Score legend for tutor"
+msgstr "Valeurs acceptées pour l'enseignant·e"
 
 #, python-brace-format
 msgid "Score legend: A=Absent, T=Cheating, {score} (0=Score of presence)"
@@ -521,9 +541,6 @@ msgstr "Encodage de notes"
 msgid "Scores responsible"
 msgstr "Responsable de notes"
 
-msgid "Scores responsible tutor"
-msgstr "Enseignant·e responsable des notes"
-
 msgid "Scores responsibles"
 msgstr "Responsables de notes"
 
@@ -535,9 +552,6 @@ msgstr "Recherche des programmes annualisés"
 
 msgid "Select an encoding type"
 msgstr "Sélectionnez un type d'encodage"
-
-msgid "Select an excel file to inject scores."
-msgstr "Sélectionnez un fichier excel pour injecter des notes."
 
 msgid "Select/deselect all"
 msgstr "Sélectionner/Dé-sélectionner tout"
@@ -650,8 +664,8 @@ msgid_plural "There are %(error_counter)s errors in form"
 msgstr[0] "Il y a %(error_counter)s erreur dans le formulaire"
 msgstr[1] "Il y a %(error_counter)s erreurs dans le formulaire"
 
-msgid "There is no enrollment for this course"
-msgstr "Il n'y a pas d'inscription pour ce cours"
+msgid "There is no enrollment to the exam for this learning unit"
+msgstr "Aucune inscription à l'examen pour cette unité d'enseignement"
 
 msgid "This process helps tutor while encoding notes for the exams sessions."
 msgstr ""
@@ -711,12 +725,12 @@ msgstr "Attention: %(scores)s note(s) prête(s) à être soumise(s)."
 #, python-format
 msgid ""
 "Warning: %(scores)s score(s) ready to be submitted. Only score responsible "
-"(%(responsable_nom)s, %(responsable_prenom)s) will be allowed to submit the "
-"scores to faculty."
+"<strong>(%(responsable_nom)s, %(responsable_prenom)s)</strong> will be "
+"allowed to submit the scores to faculty."
 msgstr ""
 "Attention:  %(scores)s note(s) prête(s) à être soumise(s). Seul le "
-"responsable de note (%(responsable_nom)s, %(responsable_prenom)s) pourra "
-"soumettre les notes à la faculté."
+"responsable de notes <strong>(%(responsable_nom)s, %(responsable_prenom)s)</"
+"strong> pourra soumettre les notes à la faculté."
 
 msgid "Yes"
 msgstr "Oui"
@@ -756,3 +770,6 @@ msgstr "étudiants"
 
 msgid "the"
 msgstr "le"
+
+msgid "to modify."
+msgstr "pour modifier."

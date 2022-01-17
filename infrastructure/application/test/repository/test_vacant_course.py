@@ -29,13 +29,15 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase
 
 from base.models.enums import learning_container_year_types
+from base.models.enums.proposal_type import ProposalType
 from base.models.enums.vacant_declaration_type import VacantDeclarationType
 from base.tests.factories.entity_version import MainEntityVersionFactory
 from base.tests.factories.learning_component_year import LecturingLearningComponentYearFactory, \
     PracticalLearningComponentYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from ddd.logic.application.domain.model.vacant_course import VacantCourseIdentity, VacantCourse
-from ddd.logic.application.dtos import VacantCourseSearchDTO, VacantCourseDTO
+from ddd.logic.application.dtos import VacantCourseDTO
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 from infrastructure.application.repository.vacant_course import VacantCourseRepository
 
@@ -128,10 +130,15 @@ class VacantCourseRepositorySearch(TestCase):
     def test_assert_filter_by_entity_ids(self):
         entity_ids = [
             VacantCourseIdentity(academic_year=AcademicYearIdentity(year=2020), code='LAGRO1500'),
-            VacantCourseIdentity(academic_year=AcademicYearIdentity(year=2020), code='LDROI1200')
         ]
 
         results = self.repository.search(entity_ids=entity_ids)
+        self.assertEqual(len(results), 1)
+
+    def test_should_return_all_vacant_courses_if_no_entity_ids(self):
+        results = self.repository.search(entity_ids=[])
+        self.assertEqual(len(results), 2)
+        results = self.repository.search(entity_ids=None)
         self.assertEqual(len(results), 2)
 
 
@@ -249,3 +256,11 @@ class VacantCourseRepositorySearchDTO(TestCase):
             ]
         )
         self.assertEqual(len(filtered_results), 3)
+
+    def test_search_assert_filtered_course_not_in_suppression_proposal(self):
+        filtered_results = self.repository.search_vacant_course_dto(code=self.ldroi1200_db.acronym)
+        self.assertEqual(len(filtered_results), 1)
+
+        ProposalLearningUnitFactory(learning_unit_year=self.ldroi1200_db, type=ProposalType.SUPPRESSION.name)
+        filtered_results = self.repository.search_vacant_course_dto(code=self.ldroi1200_db.acronym)
+        self.assertEqual(len(filtered_results), 0)

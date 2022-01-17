@@ -40,12 +40,10 @@ def get_choix_entites_adresse_feuille_de_notes(
         entite_repository: 'IEntiteUCLRepository',
         entites_cohorte_translator: 'IEntitesCohorteTranslator',
         periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
-        academic_year_repo: 'IAcademicYearRepository'
 ) -> EntitesPossiblesAdresseFeuilleDeNotesDTO:
     return EntiteAdresseFeuilleDeNotes().search(
         cmd.nom_cohorte,
         entite_repository,
         entites_cohorte_translator,
         periode_soumission_note_translator,
-        academic_year_repo
     )

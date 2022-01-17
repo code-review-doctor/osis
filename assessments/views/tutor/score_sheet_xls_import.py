@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import contextlib
+from typing import Dict
 
 from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
@@ -36,25 +37,12 @@ from infrastructure.messages_bus import message_bus_instance
 
 
 class ScoreSheetXLSImportTutorView(ScoreSheetXLSImportBaseView):
-    def call_command(self, matricule, score_sheet_serialized):
+    def call_command(self, matricule: str, score_sheet_serialized: Dict):
         if not score_sheet_serialized['notes_etudiants']:
             messages.error(self.request, _("No score injected"))
             return
 
-        cmd = EncoderNotesEtudiantCommand(
-            code_unite_enseignement=score_sheet_serialized['notes_etudiants'][0]['code_unite_enseignement'],
-            annee_unite_enseignement=score_sheet_serialized['annee_academique'],
-            numero_session=score_sheet_serialized['numero_session'],
-            matricule_fgs_enseignant=matricule,
-            notes=[
-                EncoderNoteCommand(
-                    noma_etudiant=note_etudiant['noma'],
-                    email_etudiant=note_etudiant['email'],
-                    note=note_etudiant['note'],
-                )
-                for note_etudiant in score_sheet_serialized['notes_etudiants']
-            ]
-        )
+        cmd = self._get_command(matricule, score_sheet_serialized)
 
         with contextlib.suppress(MultipleBusinessExceptions):
             message_bus_instance.invoke(cmd)
@@ -75,3 +63,20 @@ class ScoreSheetXLSImportTutorView(ScoreSheetXLSImportBaseView):
             messages.success(self.request, "{} {}".format(str(nombre_notes_enregistrees), _("Score(s) saved")))
         else:
             messages.error(self.request, _("No score injected"))
+
+    @staticmethod
+    def _get_command(matricule: str, score_sheet_serialized: Dict) -> 'EncoderNotesEtudiantCommand':
+        return EncoderNotesEtudiantCommand(
+            code_unite_enseignement=score_sheet_serialized['notes_etudiants'][0]['code_unite_enseignement'],
+            annee_unite_enseignement=score_sheet_serialized['annee_academique'],
+            numero_session=score_sheet_serialized['numero_session'],
+            matricule_fgs_enseignant=matricule,
+            notes=[
+                EncoderNoteCommand(
+                    noma_etudiant=note_etudiant['noma'],
+                    email_etudiant=note_etudiant['email'],
+                    note=note_etudiant['note'],
+                )
+                for note_etudiant in score_sheet_serialized['notes_etudiants'] if note_etudiant['note']
+            ]
+        )

@@ -27,9 +27,11 @@ from django.test import TestCase
 from django.urls import reverse
 
 from assessments.forms.score_file import ScoreFileForm
+from assessments.views.tutor.score_sheet_xls_import import ScoreSheetXLSImportTutorView
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
 from base.tests.factories.tutor import TutorFactory
+from ddd.logic.encodage_des_notes.soumission.commands import EncoderNoteCommand
 
 
 class ScoreSheetXLSImportViewTest(TestCase):
@@ -68,3 +70,38 @@ class ScoreSheetXLSImportViewTest(TestCase):
     def test_assert_contexts(self):
         response = self.client.get(self.url)
         self.assertIsInstance(response.context['form'], ScoreFileForm)
+
+    def test_should_pas_ecraser_notes(self):
+        score_sheet_serialized = {
+            'annee_academique': 2020,
+            'numero_session': 1,
+            'notes_etudiants': [
+                {
+                    'code_unite_enseignement': 'LDROI1001',
+                    'noma': '20180001',
+                    'email': 'etudiant1@email.be',
+                    'note': '',
+                },
+                {
+                    'code_unite_enseignement': 'LDROI1001',
+                    'noma': '20180002',
+                    'email': 'etudiant2@email.be',
+                    'note': None,
+                },
+                {
+                    'code_unite_enseignement': 'LDROI1001',
+                    'noma': '20180003',
+                    'email': 'etudiant3@email.be',
+                    'note': '0',
+                },
+            ],
+        }
+        cmd = ScoreSheetXLSImportTutorView._get_command('12345678', score_sheet_serialized)
+        expected = EncoderNoteCommand(
+            noma_etudiant='20180003',
+            email_etudiant='etudiant3@email.be',
+            note='0',
+        )
+        assertion = "Les notes vides ne peuvent pas être soumises à la commande ; " \
+                    "sinon, elles écraseront les notes déjà encodées"
+        self.assertListEqual(cmd.notes, [expected], assertion)

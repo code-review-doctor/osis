@@ -37,11 +37,9 @@ def encoder_adresse_feuille_de_notes_specifique(
         cmd: EncoderAdresseFeuilleDeNotesSpecifique,
         repo: IAdresseFeuilleDeNotesRepository,
         periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
-        academic_year_repo: 'IAcademicYearRepository'
 ) -> 'IdentiteAdresseFeuilleDeNotes':
     return EncoderAdresseFeuilleDeNotesDomainService().encoder_adresse_specifique(
         cmd,
         repo,
         periode_soumission_note_translator,
-        academic_year_repo
     )

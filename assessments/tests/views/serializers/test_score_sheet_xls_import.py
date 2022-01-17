@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import random
+
 from typing import Union
 
 from django.test import SimpleTestCase
@@ -30,6 +32,9 @@ from openpyxl import Workbook
 
 from assessments.views.serializers.score_sheet_xls_import import ScoreSheetXLSImportSerializer, \
     ScoreSheetXLSImportSerializerError, ProgramManagerScoreSheetXLSImportSerializer
+from unittest import mock
+from assessments.export.score_sheet_xls import HEADER
+from openpyxl.utils import get_column_letter
 
 
 class ScoreSheetXLSImportSerializerTest(SimpleTestCase):
@@ -49,7 +54,10 @@ class ScoreSheetXLSImportSerializerTest(SimpleTestCase):
             email="dummy@gmail.com",
         )
 
-    def test_serialize_worksheet(self):
+    @mock.patch(
+        "assessments.views.serializers.score_sheet_xls_import.ScoreSheetXLSImportSerializer._check_headers_consistency"
+    )
+    def test_serialize_worksheet(self, mock_check_headers_consistency):
         score_sheet_serialized = self.serializer_cls(self.workbook.active).data
 
         self.assertEqual(score_sheet_serialized['annee_academique'], 2020)
@@ -93,7 +101,9 @@ class ScoreSheetXLSImportSerializerTest(SimpleTestCase):
         with self.assertRaises(ScoreSheetXLSImportSerializerError):
             self.serializer_cls(self.workbook.active).data
 
-    def test_assert_serialize_zero_as_value(self):
+    @mock.patch(
+        "assessments.views.serializers.score_sheet_xls_import.ScoreSheetXLSImportSerializer._check_headers_consistency")
+    def test_assert_serialize_zero_as_value(self, mock_check_headers_consistency):
         worksheet = self.workbook.active
         _add_row_to_worksheet(
             worksheet,
@@ -109,7 +119,9 @@ class ScoreSheetXLSImportSerializerTest(SimpleTestCase):
         serialized_data = self.serializer_cls(self.workbook.active).data
         self.assertEqual(serialized_data['notes_etudiants'][0]['note'], '0')
 
-    def test_assert_convert_comma_to_dot(self):
+    @mock.patch(
+        "assessments.views.serializers.score_sheet_xls_import.ScoreSheetXLSImportSerializer._check_headers_consistency")
+    def test_assert_convert_comma_to_dot(self, mock_check_headers_consistency):
         worksheet = self.workbook.active
         _add_row_to_worksheet(
             worksheet,
@@ -124,13 +136,41 @@ class ScoreSheetXLSImportSerializerTest(SimpleTestCase):
         serialized_data = self.serializer_cls(self.workbook.active).data
         self.assertEqual(serialized_data['notes_etudiants'][0]['note'], '10.6')
 
+    def test_check_headers_consitency_no_headers(self):
+        worksheet = self.workbook.active
+        with self.assertRaises(ScoreSheetXLSImportSerializerError):
+            self.serializer_cls._check_headers_consistency(worksheet)
+
+    def test_check_headers_consitency_headers_ok(self):
+        worksheet = self.workbook.active
+        self._build_correct_headers(worksheet)
+        self.serializer_cls._check_headers_consistency(worksheet)
+
+    def test_check_headers_consitency_wrong_headers(self):
+        worksheet = self.workbook.active
+        self._build_correct_headers(worksheet)
+        self.serializer_cls._check_headers_consistency(worksheet)
+
+    @staticmethod
+    def _build_correct_headers(worksheet):
+        for count, header in enumerate(HEADER, start=1):
+            worksheet[get_column_letter(count) + '1'].value = str(header)
+
+    @staticmethod
+    def _build_wrong_headers(worksheet):
+
+        for count, header in enumerate(random.shuffle(HEADER), start=1):
+            worksheet[get_column_letter(count) + '1'].value = str(header)
+
 
 class ProgramManagerScoreSheetXLSImportSerializerTest(SimpleTestCase):
     def setUp(self) -> None:
         self.workbook = Workbook()
         self.serializer_cls = ProgramManagerScoreSheetXLSImportSerializer
 
-    def test_assert_A_letter_transformed_to_S_letter(self):
+    @mock.patch(
+        "assessments.views.serializers.score_sheet_xls_import.ScoreSheetXLSImportSerializer._check_headers_consistency")
+    def test_assert_A_letter_transformed_to_S_letter(self, mock_check_headers_consistency):
         worksheet = self.workbook.active
 
         _add_row_to_worksheet(
@@ -161,5 +201,5 @@ def _add_row_to_worksheet(
     worksheet['B' + str(row_number)].value = numero_session
     worksheet['C' + str(row_number)].value = code_cours
     worksheet['E' + str(row_number)].value = noma
-    worksheet['I' + str(row_number)].value = note
-    worksheet['H' + str(row_number)].value = email
+    worksheet['H' + str(row_number)].value = note
+    worksheet['G' + str(row_number)].value = email

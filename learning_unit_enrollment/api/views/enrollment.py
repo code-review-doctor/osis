@@ -85,9 +85,15 @@ class LearningUnitEnrollmentsListView(generics.ListAPIView):
         return self.kwargs['year']
 
     def get_queryset(self):
+        if self._acronym_corresponds_to_ue():
+            full_acronym = self.kwargs['acronym']
+        else:
+            # Which means Classe or Partim
+            full_acronym = self.kwargs['acronym'][:-1]
+
         return LearningUnitEnrollment.objects.filter(
             learning_unit_year__academic_year__year=self.year,
-            learning_unit_year__acronym__contains=self.kwargs['acronym'][:-1],
+            learning_unit_year__acronym__contains=full_acronym,
             offer_enrollment__enrollment_state__in=[SUBSCRIBED, PROVISORY]
         ).annotate(
             learning_unit_academic_year=F('learning_unit_year__academic_year__year'),
@@ -99,7 +105,10 @@ class LearningUnitEnrollmentsListView(generics.ListAPIView):
                 default=F('learning_unit_year__acronym')
             )
         ).filter(
-            learning_unit_acronym=self.kwargs['acronym'],
+            (
+                Q(learning_unit_acronym=self.kwargs['acronym']) |
+                Q(learning_unit_year__learning_container_year__acronym=self.kwargs['acronym'])
+            )
         ).annotate(
             student_last_name=F('offer_enrollment__student__person__last_name'),
             student_first_name=F('offer_enrollment__student__person__first_name'),
@@ -145,6 +154,16 @@ class LearningUnitEnrollmentsListView(generics.ListAPIView):
             'offer_enrollment__cohort_year__education_group_year',
             'learning_unit_year__academic_year',
         )
+
+    def _acronym_corresponds_to_ue(self):
+        for idx, character in enumerate(list(self.kwargs['acronym'])):
+            if not character.isalpha():
+                number_code = self.kwargs['acronym'][idx:]
+                if len(number_code) > 4:
+                    return False
+                break
+
+        return True
 
 
 class MyLearningUnitEnrollmentsListView(LearningUnitEnrollmentsListView):

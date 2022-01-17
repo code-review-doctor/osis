@@ -24,25 +24,25 @@
 #
 ##############################################################################
 import datetime
-import functools
-import operator
+from typing import Tuple, List, Optional
 
 from dal import autocomplete
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.postgres.aggregates import ArrayAgg, StringAgg
-from django.db.models import F, CharField, Value, When, Case, OuterRef, Subquery, Q
+from django.db.models import CharField, Value, When, Case
 from django.db.models.functions import Concat
+from django.http import JsonResponse
 from django.urls import reverse
 from django.utils.functional import cached_property
 
 from assessments.forms.score_encoding import ScoreEncodingProgressFilterForm
 from assessments.views.common.score_encoding_progress_overview import ScoreEncodingProgressOverviewBaseView
-from attribution.models.attribution_new import AttributionNew
 from base.models import synchronization
-from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
+from base.models.enums.learning_component_year_type import PRACTICAL_EXERCISES
 from base.models.learning_unit_year import LearningUnitYear
+from base.models.person import Person
 from ddd.logic.encodage_des_notes.encodage.commands import GetProgressionGeneraleGestionnaireCommand, \
-    GetPeriodeEncodageCommand, SearchEnseignantsCommand
+    GetPeriodeEncodageCommand, SearchEnseignantsCommand, GetCohortesGestionnaireCommand
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import ProgressionGeneraleEncodageNotesDTO, PeriodeEncodageNotesDTO
 from infrastructure.messages_bus import message_bus_instance
 from learning_unit.models.learning_class_year import LearningClassYear
 
@@ -64,25 +64,25 @@ class ScoreEncodingProgressOverviewProgramManagerView(ScoreEncodingProgressOverv
         }
 
     @cached_property
-    def get_search_form(self):
+    def get_search_form(self) -> 'ScoreEncodingProgressFilterForm':
         return ScoreEncodingProgressFilterForm(
             matricule_fgs_gestionnaire=self.person.global_id,
             data=self.request.GET or None
         )
 
     @cached_property
-    def periode_encodage(self):
+    def periode_encodage(self) -> 'PeriodeEncodageNotesDTO':
         cmd = GetPeriodeEncodageCommand()
         return message_bus_instance.invoke(cmd)
 
     @cached_property
-    def progression_generale(self):
+    def progression_generale(self) -> Optional['ProgressionGeneraleEncodageNotesDTO']:
         search_form = self.get_search_form
         if search_form.is_bound:
             cmd_kwargs = {'matricule_fgs_gestionnaire': self.person.global_id}
             if search_form.is_valid():
                 cmd_kwargs.update({
-                    'nom_cohorte': search_form.cleaned_data['cohorte_name'],
+                    'noms_cohortes': search_form.cleaned_data['cohorte_name'],
                     'code_unite_enseignement': search_form.cleaned_data['learning_unit_code'],
                     'enseignant': search_form.cleaned_data['tutor'],
                     'seulement_notes_manquantes': search_form.cleaned_data['incomplete_encodings_only'],
@@ -91,24 +91,26 @@ class ScoreEncodingProgressOverviewProgramManagerView(ScoreEncodingProgressOverv
             return message_bus_instance.invoke(cmd)
         return None
 
-    def get_last_synchronization(self):
+    @staticmethod
+    def get_last_synchronization() -> datetime.date:
         return synchronization.find_last_synchronization_date()
 
-    def get_learning_unit_count(self):
+    def get_learning_unit_count(self) -> Optional[int]:
         return len(self.progression_generale.progression_generale) if self.progression_generale else None
 
-    def get_cohorte_count(self):
+    def get_cohorte_count(self) -> int:
         search_form = self.get_search_form
         if search_form.is_valid() and search_form.cleaned_data['cohorte_name']:
-            return 1
+            return len(search_form.cleaned_data['cohorte_name'])
         return len(search_form.fields['cohorte_name'].choices) - 1
 
-    def get_score_search_url(self):
+    @staticmethod
+    def get_score_search_url() -> str:
         return reverse('score_search')
 
 
 class CodeUniteEnseignementAutocomplete(LoginRequiredMixin, autocomplete.Select2ListView):
-    def get_list(self):
+    def get_list(self) -> List[str]:
         recherche = self.q
         minimum_chars_to_search = 2
         if recherche and len(recherche) > minimum_chars_to_search:
@@ -158,7 +160,8 @@ class CodeUniteEnseignementAutocomplete(LoginRequiredMixin, autocomplete.Select2
         else:
             return [recherche]
 
-    def __separer_filtre_ue_et_classe(self, recherche):
+    @staticmethod
+    def __separer_filtre_ue_et_classe(recherche: str) -> Tuple[str, bool]:
         filtre_sur_ue = recherche
         has_filtre_sur_classe = False
         if '-' in filtre_sur_ue:
@@ -173,10 +176,27 @@ class CodeUniteEnseignementAutocomplete(LoginRequiredMixin, autocomplete.Select2
 
 
 class EnseignantAutocomplete(LoginRequiredMixin, autocomplete.Select2ListView):
-    def get_list(self):
+    def get_list(self) -> List[str]:
         recherche = self.q
         minimum_chars_to_search = 2
         if recherche and len(recherche) > minimum_chars_to_search:
             enseignants = message_bus_instance.invoke(SearchEnseignantsCommand(recherche))
             return [recherche] + ['{} {}'.format(enseignant.nom, enseignant.prenom) for enseignant in enseignants]
         return [recherche]
+
+
+class FormationAutocomplete(LoginRequiredMixin, autocomplete.Select2ListView):
+    def get(self, request, *args, **kwargs):
+        matricule_fgs_gestionnaire = Person.objects.filter(
+            user=self.request.user
+        ).values_list('global_id', flat=True)[0]
+        cmd = GetCohortesGestionnaireCommand(matricule_fgs_gestionnaire=matricule_fgs_gestionnaire)
+        results = message_bus_instance.invoke(cmd)
+        choices = (
+            (cohorte.nom_cohorte, cohorte.nom_cohorte,) for cohorte in results
+        )
+        if self.q:
+            choices = filter(lambda cohorte_tuple: self.q.upper() in cohorte_tuple[1], choices)
+
+        results = [{'id': id, 'text': value, 'title': ' '} for id, value in sorted(choices, key=lambda x: x[1])]
+        return JsonResponse({'results': results})

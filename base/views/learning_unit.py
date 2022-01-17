@@ -102,7 +102,6 @@ def learning_unit_formations(request, learning_unit_year_id=None, code=None, yea
                 tot = tot + class_counter.get('main', 0) + class_counter.get('first_year', 0)
                 totals_classes.update({class_id: tot})
     context['totals_classes'] = totals_classes
-    context['tab_active'] = "learning_unit_formations"  # Corresponds to url_name
     return render(request, "learning_unit/formations.html", context)
 
 
@@ -123,9 +122,7 @@ def learning_unit_components(request, learning_unit_year_id=None, code=None, yea
     context['REQUIREMENT_ENTITY'] = data_components.get('REQUIREMENT_ENTITY')
     context['ADDITIONAL_REQUIREMENT_ENTITY_1'] = data_components.get('ADDITIONAL_REQUIREMENT_ENTITY_1')
     context['ADDITIONAL_REQUIREMENT_ENTITY_2'] = data_components.get('ADDITIONAL_REQUIREMENT_ENTITY_2')
-    context['tab_active'] = 'components'
     context['can_manage_volume'] = request.user.has_perm('base.can_edit_learningunit', learning_unit_year)
-    context['tab_active'] = 'learning_unit_components'  # Corresponds to url_name
     return render(request, "learning_unit/components.html", context)
 
 
@@ -146,7 +143,6 @@ def learning_unit_specifications(request, learning_unit_year_id=None, code=None,
     context['can_update_learning_achievement'] = person.user.has_perm(
         'base.can_update_learning_achievement', learning_unit_year
     )
-    context['tab_active'] = 'learning_unit_specifications'  # Corresponds to url_name
     return render(request, "learning_unit/specifications.html", context)
 
 

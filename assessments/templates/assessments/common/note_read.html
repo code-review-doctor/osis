@@ -35,7 +35,7 @@
     {% trans 'Absence justified' %} (M)
 {% else %}
     {% if feuille_de_notes.note_decimale_est_autorisee %}
-        {{ note_etudiant.note|floatformat:2|default:"-" }}
+        {{ note_etudiant.note|floatformat:1|default:"-" }}
     {% else %}
         {{ note_etudiant.note|floatformat:0|default:"-" }}
     {% endif %}

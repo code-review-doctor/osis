@@ -45,6 +45,7 @@ class GetChargeSummary(TestCase):
                         academic_year=AcademicYearIdentityBuilder.build_from_year(year=2019)
                     ),
                     course_title='Introduction au droit',
+                    course_is_in_suppression_proposal=False,
                     function=Functions.CO_HOLDER,
                     end_year=AcademicYearIdentityBuilder.build_from_year(year=2030),
                     start_year=AcademicYearIdentityBuilder.build_from_year(year=2016),
@@ -106,6 +107,7 @@ class GetChargeSummary(TestCase):
         self.assertEqual(results[0].code, "LDROI1200")
         self.assertEqual(results[0].year, 2019)
         self.assertEqual(results[0].title, "Introduction au droit")
+        self.assertEqual(results[0].course_is_in_suppression_proposal, False)
         self.assertEqual(results[0].start_year, 2016)
         self.assertEqual(results[0].end_year, 2030)
         self.assertEqual(results[0].function, Functions.CO_HOLDER)
