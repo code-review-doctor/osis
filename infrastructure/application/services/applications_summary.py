@@ -26,7 +26,7 @@
 from typing import List
 
 from django.utils import translation
-from django.utils.translation import pgettext_lazy
+from django.utils.translation import pgettext_lazy, gettext_lazy as _
 
 from base.models.person import Person
 from ddd.logic.application.domain.model.applicant import Applicant
@@ -55,9 +55,10 @@ class ApplicationsMailSummary(IApplicationsSummary):
 
         table_applications = message_config.create_table(
             'applications',
-            [pgettext_lazy("applications", "Code"), 'Vol. 1', 'Vol. 2'],
+            [pgettext_lazy("applications", "Code"), _("Title"), 'Vol. 1', 'Vol. 2'],
             [
-                (application.code, application.lecturing_volume, application.practical_volume,)
+                (application.code, application.course_title,
+                 application.lecturing_volume, application.practical_volume,)
                 for application in applications
             ]
         )
