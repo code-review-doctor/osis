@@ -317,6 +317,9 @@ msgctxt "male plural"
 msgid "All"
 msgstr ""
 
+msgid "All the scores are encoded."
+msgstr ""
+
 msgid "Alloc. Ent."
 msgstr ""
 
@@ -1289,6 +1292,9 @@ msgid "Isolated classes"
 msgstr ""
 
 msgid "It is necessary to indicate the internship subtype."
+msgstr ""
+
+msgid "It remains notes to encode."
 msgstr ""
 
 msgid "January"
