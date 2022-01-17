@@ -55,7 +55,7 @@ class ApplicantRepository(IApplicantRepository):
             )
             qs = qs.filter(filter_clause)
 
-        attributions_qs = _prefetch_attributions(qs, kwargs.get('year'))
+        attributions_qs = _prefetch_attributions(qs)
         results = []
         for row_as_dict in qs:
             attribution_filtered = [
@@ -91,15 +91,11 @@ def _applicant_base_qs() -> QuerySet:
     )
 
 
-def _prefetch_attributions(applicant_qs, year: int = None) -> List[AttributionFromRepositoryDTO]:
+def _prefetch_attributions(applicant_qs) -> List[AttributionFromRepositoryDTO]:
     subqs = AttributionChargeNew.objects.filter(attribution__id=OuterRef('id'))
 
-    basic_filter = AttributionNew.objects.filter(
-        tutor__person__global_id__in=applicant_qs.values_list('global_id', flat=True), decision_making='')
-    if year:
-        basic_filter = basic_filter.filter(learning_container_year__academic_year__year=year)
-
-    attributions_as_dict = basic_filter.exclude(
+    attributions_as_dict = AttributionNew.objects.filter(
+        tutor__person__global_id__in=applicant_qs.values_list('global_id', flat=True), decision_making='').exclude(
         attributionchargenew__learning_component_year__learning_unit_year__subtype=learning_unit_year_subtypes.PARTIM
     ).annotate(
         course_id_code=F('learning_container_year__acronym'),
