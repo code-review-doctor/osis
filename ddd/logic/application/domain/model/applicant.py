@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ from typing import List
 
 import attr
 
+from attribution.models.enums.function import Functions
 from ddd.logic.application.domain.model._attribution import Attribution
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 from osis_common.ddd import interface
@@ -49,4 +50,12 @@ class Applicant(interface.RootEntity):
             attribution for attribution in self.attributions
             if attribution.end_year == academic_year_identity and
             attribution.course_id.academic_year == academic_year_identity
+        ]
+
+    def get_attributions_about_to_expire_renewable_with_functions(self, academic_year_identity: AcademicYearIdentity):
+        return [
+            attribution_about_to_expire for attribution_about_to_expire in self.get_attributions_about_to_expire(
+                academic_year_identity
+            )
+            if attribution_about_to_expire.function in (Functions.CO_HOLDER, Functions.HOLDER)
         ]

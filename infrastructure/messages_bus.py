@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@ from ddd.logic.application.commands import (
     SearchVacantCoursesCommand,
     SendApplicationsSummaryCommand,
     UpdateApplicationCommand,
+    SendAttributionEndDateReachedSummaryCommand,
 )
 from ddd.logic.application.use_case.read.get_attributions_about_to_expire_service import \
     get_attributions_about_to_expire
@@ -46,6 +47,8 @@ from ddd.logic.application.use_case.write.apply_on_vacant_course_service import 
 from ddd.logic.application.use_case.write.delete_application_service import delete_application
 from ddd.logic.application.use_case.write.renew_multiple_attributions_service import renew_multiple_attributions
 from ddd.logic.application.use_case.write.send_applications_summary import send_applications_summary
+from ddd.logic.application.use_case.write.send_attribution_end_date_reached_summary import \
+    send_emails_to_teachers_with_ending_attributions
 from ddd.logic.application.use_case.write.update_application_service import update_application
 from ddd.logic.effective_class_repartition.commands import (
     DistributeClassToTutorCommand,
@@ -180,6 +183,7 @@ from infrastructure.application.repository.application import ApplicationReposit
 from infrastructure.application.repository.application_calendar import ApplicationCalendarRepository
 from infrastructure.application.repository.vacant_course import VacantCourseRepository
 from infrastructure.application.services.applications_summary import ApplicationsMailSummary
+from infrastructure.application.services.attribution_end_date_reached_summary import AttributionsEndDateReachedSummary
 from infrastructure.application.services.learning_unit_service import LearningUnitTranslator
 from infrastructure.effective_class_repartition.domain.service.tutor_attribution import \
     TutorAttributionToLearningUnitTranslator
@@ -510,6 +514,11 @@ class MessageBusCommands(AbstractMessageBusCommands):
             cmd,
             TutorAttributionToLearningUnitTranslator(),
             TutorRepository(),
+        ),
+        SendAttributionEndDateReachedSummaryCommand: lambda cmd: send_emails_to_teachers_with_ending_attributions(
+            ApplicationCalendarRepository(),
+            ApplicantRepository(),
+            AttributionsEndDateReachedSummary()
         ),
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 
