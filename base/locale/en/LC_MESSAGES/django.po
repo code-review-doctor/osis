@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-16 13:20+0100\n"
+"POT-Creation-Date: 2022-01-17 11:07+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -317,9 +317,6 @@ msgctxt "male plural"
 msgid "All"
 msgstr ""
 
-msgid "All the scores are encoded."
-msgstr ""
-
 msgid "Alloc. Ent."
 msgstr ""
 
@@ -349,9 +346,6 @@ msgid "Apply postponement on learning unit year"
 msgstr ""
 
 msgid "Are you certain that you want to delete the learning unit ?"
-msgstr ""
-
-msgid "Are you sure you want to delete the teaching material?"
 msgstr ""
 
 msgid "Are you sure?"
@@ -781,6 +775,9 @@ msgstr ""
 msgid "Dissertations"
 msgstr ""
 
+msgid "Divorced"
+msgstr ""
+
 msgid "Do not assign"
 msgstr ""
 
@@ -1063,9 +1060,6 @@ msgstr ""
 msgid "Finality 180 list choice"
 msgstr ""
 
-msgid "First name"
-msgstr ""
-
 msgid "Firstname"
 msgstr ""
 
@@ -1297,9 +1291,6 @@ msgstr ""
 msgid "It is necessary to indicate the internship subtype."
 msgstr ""
 
-msgid "It remains notes to encode."
-msgstr ""
-
 msgid "January"
 msgstr ""
 
@@ -1330,9 +1321,6 @@ msgid "Language classes"
 msgstr ""
 
 msgid "Last modifications"
-msgstr ""
-
-msgid "Last name"
 msgstr ""
 
 msgid "Last update description fiche (force majeure) by"
@@ -1428,6 +1416,9 @@ msgid "Lecturing planned classes"
 msgstr ""
 
 msgid "Lecturing vol."
+msgstr ""
+
+msgid "Legal cohabitant"
 msgstr ""
 
 msgid "Legend"
@@ -1584,6 +1575,9 @@ msgid "Mark selected messages as read"
 msgstr ""
 
 msgid "Marks presentation"
+msgstr ""
+
+msgid "Married"
 msgstr ""
 
 msgid "Master MA 120"
@@ -2312,9 +2306,6 @@ msgstr ""
 msgid "Search for an organization"
 msgstr ""
 
-msgid "Search of annual programs"
-msgstr ""
-
 msgid "Search type"
 msgstr ""
 
@@ -2365,6 +2356,9 @@ msgid "Signatory"
 msgstr ""
 
 msgid "Signatory qualification"
+msgstr ""
+
+msgid "Single"
 msgstr ""
 
 msgid "Society minor"
@@ -3027,6 +3021,9 @@ msgstr ""
 
 msgctxt "section title"
 msgid "Welcome"
+msgstr ""
+
+msgid "Widowed"
 msgstr ""
 
 msgid "Yes"
