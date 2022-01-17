@@ -90,7 +90,7 @@ def copy_to_next_year(modeladmin, request, queryset):
             )
 
         except MultipleBusinessExceptions as multiple_exceptions:
-            copy_exception = ", ". join([str(ex.message) for ex in list(multiple_exceptions.exceptions)])
+            copy_exception = ", ".join([str(ex.message) for ex in list(multiple_exceptions.exceptions)])
 
         report.append({
             'source': classe_source,
@@ -184,8 +184,7 @@ def _learningclassyear_delete(sender, instance: LearningClassYear, **kwargs):
     # When the learning unit year has no classes, set it to false
     # But when deleting all classes, there are no updated changed field.
     from base.models.learning_unit_year import LearningUnitYear
-    luy = LearningUnitYear.objects.get(
+    luy = LearningUnitYear.objects.filter(
         id=instance.learning_component_year.learning_unit_year_id
     )
-    luy.changed = timezone.now()
-    luy.save()
+    luy.update(changed=timezone.now())
