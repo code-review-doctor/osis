@@ -62,6 +62,24 @@ class EntitiesListView(generics.ListAPIView):
     serializer_class = EntitySerializer
     filterset_class = EntitiesFilter
     ordering = ('acronym',)
+    search_fields = (
+        'acronym',
+        'title'
+    )
+
+    def get_queryset(self):
+        return EntityVersion.objects.filter(
+            entity__organization__acronym__iexact=self.kwargs['organisation_code']
+        )
+
+
+class EntityDetailView(generics.RetrieveAPIView):
+    """
+        Return the detail of the entity
+    """
+    name = 'entity-detail'
+    serializer_class = EntitySerializer
+    lookup_field = 'uuid'
 
     def get_queryset(self):
         return EntityVersion.objects.filter(

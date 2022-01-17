@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-16 13:20+0100\n"
+"POT-Creation-Date: 2022-01-17 11:07+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -368,9 +368,6 @@ msgstr ""
 "Etes-vous certain de vouloir supprimer définitivement cette unité "
 "d'enseignement ?"
 
-msgid "Are you sure you want to delete the teaching material?"
-msgstr "Êtes-vous sûr·e de vouloir supprimer le support de cours ?"
-
 msgid "Are you sure?"
 msgstr "Êtes-vous sûr·e ?"
 
@@ -500,6 +497,12 @@ msgstr "Annuler la proposition"
 
 msgid "Cancel the proposal?"
 msgstr "Annuler la proposition ?"
+
+msgid "Catalog viewer"
+msgstr "Lecteur du catalogue"
+
+msgid "Catalog viewers"
+msgstr "Lecteurs du catalogue"
 
 msgid "Catalogue"
 msgstr "Catalogue"
@@ -796,6 +799,9 @@ msgstr "Remise du mémoire"
 msgid "Dissertations"
 msgstr "Mémoires"
 
+msgid "Divorced"
+msgstr "Divorcé.e"
+
 msgid "Do not assign"
 msgstr "Ne pas attribuer"
 
@@ -1085,9 +1091,6 @@ msgstr "Liste au choix de Finalités (120)"
 msgid "Finality 180 list choice"
 msgstr "Liste au choix de Finalités (180)"
 
-msgid "First name"
-msgstr "Prénom"
-
 msgid "Firstname"
 msgstr "Prénom"
 
@@ -1368,9 +1371,6 @@ msgstr "Cours de langue"
 msgid "Last modifications"
 msgstr "Dernières modifications"
 
-msgid "Last name"
-msgstr "Nom"
-
 msgid "Last update description fiche (force majeure) by"
 msgstr "Dernière modification fiche descriptive (force majeure) par"
 
@@ -1468,6 +1468,9 @@ msgstr "Classes prévues PM"
 
 msgid "Lecturing vol."
 msgstr "Vol. PM"
+
+msgid "Legal cohabitant"
+msgstr "Cohabitant.e légal.e"
 
 msgid "Legend"
 msgstr "Légende"
@@ -1631,6 +1634,9 @@ msgstr "Marquer les messages sélectionnés comme lus"
 
 msgid "Marks presentation"
 msgstr "Remise des notes"
+
+msgid "Married"
+msgstr "Marié.e"
 
 msgid "Master MA 120"
 msgstr "Master en 120 crédits à finalité approfondie"
@@ -2377,9 +2383,6 @@ msgstr "Rechercher une entité"
 msgid "Search for an organization"
 msgstr "Recherche d'organisations"
 
-msgid "Search of annual programs"
-msgstr "Recherche des programmes annualisés"
-
 msgid "Search type"
 msgstr "Type de recherche"
 
@@ -2431,6 +2434,9 @@ msgstr "Signataire"
 
 msgid "Signatory qualification"
 msgstr "Qualification du signataire"
+
+msgid "Single"
+msgstr "Célibataire"
 
 msgid "Society minor"
 msgstr "Mineure de société"
@@ -3170,6 +3176,9 @@ msgstr "Type de pondération"
 msgctxt "section title"
 msgid "Welcome"
 msgstr "Accueil"
+
+msgid "Widowed"
+msgstr "Veuf.ve"
 
 msgid "Yes"
 msgstr "Oui"

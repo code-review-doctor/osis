@@ -23,31 +23,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
 
-import mock
 from django.contrib.auth.models import Permission
-from django.http import HttpResponseRedirect, HttpResponse, HttpResponseForbidden
+from django.http import HttpResponse
 from django.test import TestCase
-from django.test.utils import override_settings
 from django.urls import reverse
 
-from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmissionCalendar
 from assessments.tests.factories.score_responsible import ScoreResponsibleFactory
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.business.entities import create_entities_hierarchy
-from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity_manager import EntityManagerFactory
 from base.tests.factories.group import EntityManagerGroupFactory
-from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
-from base.tests.factories.person import PersonFactory
-from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
 from base.tests.factories.tutor import TutorFactory
-from base.tests.factories.user import UserFactory
 
 
 class ScoresResponsibleSearchTestCase(TestCase):

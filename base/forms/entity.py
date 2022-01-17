@@ -25,7 +25,9 @@
 ##############################################################################
 import django_filters
 from django.forms import TextInput
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from rest_framework import serializers
 
 from base.models.entity_version import EntityVersion
 
@@ -40,3 +42,22 @@ class EntityVersionFilter(django_filters.FilterSet):
     class Meta:
         model = EntityVersion
         fields = ["entity_type"]
+
+
+class EntityListSerializer(serializers.Serializer):
+    acronym = serializers.CharField()
+    title = serializers.CharField()
+    entity_type = serializers.CharField()
+    # Display human readable value
+    entity_type_text = serializers.CharField(source='get_entity_type_display', read_only=True)
+    organization = serializers.SerializerMethodField()
+    select_url = serializers.SerializerMethodField()
+
+    def get_organization(self, obj):
+        return str(obj.entity.organization)
+
+    def get_select_url(self, obj):
+        return reverse(
+            "entity_read",
+            kwargs={'entity_version_id': obj.id}
+        )

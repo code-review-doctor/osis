@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -41,6 +41,7 @@ class StudentSpecificProfileAdmin(VersionAdmin, ModelAdmin):
         'guide__first_name', 'guide__last_name',
         'student__person__first_name', 'student__person__last_name'
     ]
+    raw_id_fields = ('guide', 'student', )
 
 
 class StudentSpecificProfile(Model):

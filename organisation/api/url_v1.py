@@ -26,12 +26,13 @@
 from django.urls import path, include
 
 from organisation.api.views.addresses import AddressesListView
-from organisation.api.views.entities import EntitiesListView
+from organisation.api.views.entities import EntitiesListView, EntityDetailView
 
 app_name = "organisation"
 urlpatterns = [
     path('<str:organisation_code>/entites/', include([
         path('', EntitiesListView.as_view(), name=EntitiesListView.name),
+        path('<str:uuid>', EntityDetailView.as_view(), name=EntityDetailView.name),
         path('<str:uuid>/addresses', AddressesListView.as_view(), name=AddressesListView.name)
     ]))
 ]
