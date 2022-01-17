@@ -36,6 +36,7 @@ from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from osis_document.contrib import FileField
 
 from base.models.enums import person_source_type
+from base.models.enums.civil_state import CivilState
 from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP, SIC_GROUP, \
     UE_FACULTY_MANAGER_GROUP, CATALOG_VIEWER_GROUP, PROGRAM_MANAGER_GROUP, UE_CENTRAL_MANAGER_GROUP
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin, SerializableModelManager
@@ -67,6 +68,7 @@ class Person(SerializableModel):
         ('F', _('Female')),
         ('M', _('Male'))
     )
+
     YEAR_REGEX = RegexValidator(
         regex=r'^[1-2]\d{3}$',
         message=_('Birth year must be between 1000 and 2999'),
@@ -91,6 +93,7 @@ class Person(SerializableModel):
     language = models.CharField(max_length=30, choices=settings.LANGUAGES, default=settings.LANGUAGE_CODE)
     birth_date = models.DateField(blank=True, null=True)
 
+    civil_state = models.CharField(max_length=30, blank=True, default='', choices=CivilState.choices())
     sex = models.CharField(max_length=1, blank=True, default='', choices=SEX_CHOICES)
     first_name_in_use = models.CharField(max_length=50, default='', blank=True)
     birth_year = models.IntegerField(blank=True, null=True, validators=[YEAR_REGEX])
