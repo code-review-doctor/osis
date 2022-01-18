@@ -30,7 +30,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 
-from base.views.common import display_success_messages
+from base.views.common import display_success_messages, display_error_messages
 from ddd.logic.learning_unit.commands import GetEffectiveClassCommand
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
 from infrastructure.messages_bus import message_bus_instance
@@ -80,6 +80,7 @@ class UpdateClassView(CommonClassView, FormView):
             display_success_messages(request, self.get_success_msg(effective_class_identity), extra_tags='safe')
             return self.redirect_to_effective_class_identification()
 
+        display_error_messages(request, _("Error(s) in form: The modifications are not saved"))
         return render(request, self.template_name, {
             "form": form,
             "effective_class": self.effective_class,
