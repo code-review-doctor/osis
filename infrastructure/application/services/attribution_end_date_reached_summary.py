@@ -64,10 +64,11 @@ class AttributionsEndDateReachedSummary(IAttributionsEndDateReachedSummary):
                     receivers = [message_config.create_receiver(person.id, person.email, person.language)]
                     table_ending_attributions = message_config.create_table(
                         'ending_attributions',
-                        [pgettext_lazy("applications", "Code"), 'Vol. 1', 'Vol. 2'],
+                        [pgettext_lazy("applications", "Code"), 'Title', 'Vol. 1', 'Vol. 2'],
                         [
                             (
                                 attributions_ending.course_id.code,
+                                attributions_ending.course_title,
                                 attributions_ending.lecturing_volume,
                                 attributions_ending.practical_volume,
                             )
