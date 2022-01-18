@@ -195,14 +195,14 @@ class ForeignHighSchoolDiploma(HighSchoolDiploma):
     )
     high_school_transcript_translation = FileField(
         verbose_name=_("A certified translation of your official transcript of marks for your final year of "
-                "secondary education"),
+                       "secondary education"),
         max_files=1,
         upload_to=education_directory_path,
         blank=True,
     )
     high_school_diploma_translation = FileField(
         verbose_name=_("A certified translation of your official transcript of marks for your final year of "
-                "secondary education"),
+                       "secondary education"),
         max_files=1,
         upload_to=education_directory_path,
         blank=True,
