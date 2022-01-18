@@ -30,7 +30,7 @@ msgstr "Un suppléant ne peut pas reconduire sa fonction de suppléant"
 msgid ""
 "Application on this vacant course is not reserved for interns/open for extern"
 msgstr ""
-"La candidature sur cette activité vacante est réservé pour les internes/"
+"La candidature sur ce cours vacant est réservée pour les internes/"
 "ouverte pour les externes"
 
 msgid "Can't create a learning unit lower than 2019-20"
@@ -111,7 +111,7 @@ msgid "No student to encode by excel"
 msgstr "Aucun étudiant à encoder par Excel "
 
 msgid "No vacant corresponding activity"
-msgstr "Pas d'activité vacante correspondante"
+msgstr "Pas de cours vacant correspondant"
 
 msgid "Other educational facilities"
 msgstr "Autre aménagement"
@@ -307,7 +307,7 @@ msgstr ""
 "n'y a pas de classe prévue."
 
 msgid "You have already applied on vacant course"
-msgstr "Vous avez déjà candidaté.e pour cette unité d'enseignement"
+msgstr "Vous avez déjà candidaté pour ce cours"
 
 #, python-brace-format
 msgid ""

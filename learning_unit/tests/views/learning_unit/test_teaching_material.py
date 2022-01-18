@@ -81,7 +81,7 @@ class TeachingMaterialCreateTestCase(TestCase):
     def test_teaching_material_create_template_used(self, mock_is_linked_to_entity_charge):
         mock_is_linked_to_entity_charge.return_value = True
         response = self.client.get(self.url)
-        self.assertTemplateUsed(response, 'learning_unit/teaching_material/modal_edit.html')
+        self.assertTemplateUsed(response, 'learning_unit/blocks/modal/modal_teaching_material_edit.html')
         self.assertIsInstance(response.context['form'], TeachingMaterialModelForm)
 
     @mock.patch('base.models.person.Person.is_linked_to_entity_in_charge_of_learning_unit_year')
@@ -193,7 +193,7 @@ class TeachingMaterialUpdateTestCase(TestCase):
         mock_is_linked_to_entity_charge.return_value = True
         response = self.client.get(self.url)
 
-        self.assertTemplateUsed(response, 'learning_unit/teaching_material/modal_edit.html')
+        self.assertTemplateUsed(response, 'learning_unit/blocks/modal/modal_teaching_material_edit.html')
         self.assertIsInstance(response.context['form'], TeachingMaterialModelForm)
 
     @mock.patch('base.models.person.Person.is_linked_to_entity_in_charge_of_learning_unit_year')
@@ -241,7 +241,7 @@ class TeachingMaterialDeleteTestCase(TestCase):
     def test_teaching_material_create_template_used(self, mock_is_linked_to_entity_charge):
         mock_is_linked_to_entity_charge.return_value = True
         response = self.client.get(self.url)
-        self.assertTemplateUsed(response, 'learning_unit/teaching_material/modal_delete.html')
+        self.assertTemplateUsed(response, 'learning_unit/blocks/modal/modal_teaching_material_delete.html')
 
     @mock.patch('base.models.person.Person.is_linked_to_entity_in_charge_of_learning_unit_year')
     def test_should_delete_teaching_material_when_successfull_post(self,  mock_is_linked_to_entity_charge):

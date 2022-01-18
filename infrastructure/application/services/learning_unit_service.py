@@ -51,27 +51,27 @@ class LearningUnitTranslator(ILearningUnitService):
     def search_learning_unit_volumes_dto(
             self, entity_ids: List[LearningUnitIdentity]
     ) -> List[LearningUnitVolumeFromServiceDTO]:
-        filter_clause = functools.reduce(
-            operator.or_,
-            (
-                (Q(acronym=entity_id.code) & Q(academic_year__year=entity_id.academic_year.year))
-                for entity_id in entity_ids
+        results = []
+        if entity_ids:
+            filter_clause = functools.reduce(
+                operator.or_,
+                (
+                    (Q(acronym=entity_id.code) & Q(academic_year__year=entity_id.academic_year.year))
+                    for entity_id in entity_ids
+                )
             )
-        )
 
-        qs = LearningUnitYear.objects.filter(filter_clause).\
-            annotate_volume_total().\
-            annotate(
+            qs = LearningUnitYear.objects.filter(filter_clause).annotate_volume_total().annotate(
                 code=F('acronym'),
                 year=F('academic_year__year')
-            ).\
-            values(
+            ).values(
                 'code',
                 'year',
                 'lecturing_volume_total',
                 'practical_volume_total',
             )
-        return [LearningUnitVolumeFromServiceDTO(**row_as_dict) for row_as_dict in qs]
+            results = [LearningUnitVolumeFromServiceDTO(**row_as_dict) for row_as_dict in qs]
+        return results
 
     # TODO: Refactor use learning unit application service instead
     def search_tutor_attribution_dto(
