@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ def score_display(value, decimal_option):
     else:
         try:
             if decimal_option:
-                return "{0:.2f}".format(value)
+                return "{0:.1f}".format(value)
             else:
                 return "{0:.0f}".format(value)
         except:

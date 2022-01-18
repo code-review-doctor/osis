@@ -26,9 +26,9 @@
 from django.conf.urls import url, include
 from django.urls import path, register_converter
 
-from assessments.views import score_encoding
 from assessments.views.address.score_sheet import ScoreSheetAddressView, FirstYearBachelorScoreSheetAddressView
 from assessments.views.address.search import OffersSearch
+from assessments.views.home import AssessmentsHome
 from assessments.views.program_manager import pgm_manager_administration as pgm_manager_administration_new
 from assessments.views.program_manager.pgm_manager_administration import \
     ProgramManagerListView as ProgramManagerListViewNew, ProgramManagerDeleteView as ProgramManagerDeleteViewNew, \
@@ -37,12 +37,15 @@ from assessments.views.program_manager.pgm_manager_administration import \
     MainProgramManagerPersonUpdateView as MainProgramManagerPersonUpdateViewNew, \
     ProgramManagerPersonDeleteView as ProgramManagerPersonDeleteViewNew, PersonAutocomplete
 from assessments.views.program_manager.score_encoding_progress_overview import CodeUniteEnseignementAutocomplete, \
-    EnseignantAutocomplete
+    EnseignantAutocomplete, FormationAutocomplete
 from assessments.views.program_manager.score_search import ScoreSearchFormView
 from assessments.views.program_manager.scores_responsible import ScoresResponsiblesSearch, SelectScoreResponsible
-from assessments.views.score_encoding import LearningUnitScoreEncodingView, LearningUnitScoreEncodingFormView, \
-    ScoreSheetXLSExportView, ScoreSheetXLSImportView, ScoreEncodingProgressOverviewView, \
-    ScoreSheetsPDFExportView
+from assessments.views.score_encoding.edit_learning_unit_score import LearningUnitScoreEncodingFormView
+from assessments.views.score_encoding.learning_unit_score import LearningUnitScoreEncodingView
+from assessments.views.score_encoding.outside_period import OutsidePeriod
+from assessments.views.score_encoding.overview import ScoreEncodingProgressOverviewView
+from assessments.views.score_encoding.pdf import ScoreSheetsPDFExportView
+from assessments.views.score_encoding.xls import ScoreSheetXLSExportView, ScoreSheetXLSImportView
 from assessments.views.tutor.learning_unit_score_encoding_submit import LearningUnitScoreEncodingTutorSubmitView
 from education_group.converters import AcronymConverter
 
@@ -51,7 +54,7 @@ register_converter(AcronymConverter, 'acronym')
 urlpatterns = [
     url(r'^scores_encoding/', include([
         url(r'^outside_period/$',
-            score_encoding.outside_period, name='outside_scores_encodings_period'),
+            OutsidePeriod.as_view(), name='outside_scores_encodings_period'),
 
         # New URL's
         path('overview', ScoreEncodingProgressOverviewView.as_view(), name="score_encoding_progress_overview"),
@@ -65,6 +68,11 @@ urlpatterns = [
             'search_enseignants',
             EnseignantAutocomplete.as_view(),
             name='enseignants-autocomplete',
+        ),
+        path(
+            'search_formation',
+            FormationAutocomplete.as_view(),
+            name='formations-autocomplete',
         ),
         path('<str:learning_unit_code>/', include(([
             path('', LearningUnitScoreEncodingView.as_view(), name='learning_unit_score_encoding'),
@@ -113,6 +121,5 @@ urlpatterns = [
         path('select/<acronym:code>/', SelectScoreResponsible.as_view(), name='score_responsible_select'),
     ])),
 
-
-    url(r'^$', score_encoding.assessments, name="assessments"),
+    url(r'^$', AssessmentsHome.as_view(), name="assessments"),
 ]

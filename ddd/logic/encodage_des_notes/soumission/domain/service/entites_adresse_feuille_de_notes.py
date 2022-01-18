@@ -81,7 +81,9 @@ class EntiteAdresseFeuilleDeNotes(interface.DomainService):
             entites_cohorte_translator: 'IEntitesCohorteTranslator',
             periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
     ) -> EntitesPossiblesAdresseFeuilleDeNotesDTO:
-        annee_academique = periode_soumission_note_translator.get().annee_concernee
+        periode_soumission = periode_soumission_note_translator.get() or \
+                             periode_soumission_note_translator.get_prochaine_periode()
+        annee_academique = periode_soumission.annee_concernee
         identites_administration_et_gestion = entites_cohorte_translator.search_entite_administration_et_gestion(
             nom_cohorte,
             annee_academique

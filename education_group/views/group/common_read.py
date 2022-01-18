@@ -125,6 +125,7 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
             "tree_json_url": self.get_tree_json_url(),
             "tree_root_id": self.get_root_id(),
             "is_root_node": self.is_root_node,
+            "active_tab": self.active_tab.name,
         }
 
     @functools.lru_cache()

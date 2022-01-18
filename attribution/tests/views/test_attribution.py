@@ -25,7 +25,6 @@
 ##############################################################################
 import uuid
 
-from django.http import HttpResponse
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
@@ -93,26 +92,21 @@ class TestViewAttributions(TestCase):
         self.assertQuerysetEqual(context["attributions"], [self.attribution], transform=lambda obj: obj)
         self.assertEqual(context["learning_unit_year"], self.luy)
 
-    def test_tab_active_url(self):
-        url = reverse("learning_unit_attributions", args=[self.luy.id])
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTrue("tab_active" in response.context)
-        self.assertEqual(response.context["tab_active"], 'learning_unit_attributions')
-
-        url_tab_active = reverse(response.context["tab_active"], args=[self.luy.id])
-        response = self.client.get(url_tab_active)
-        self.assertEqual(response.status_code, HttpResponse.status_code)
-
 
 class TestGetChargeRepartitionWarningMessage(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.full_luy = LearningUnitYearFullFactory()
-        cls.partim_luy_1 = LearningUnitYearPartimFactory(academic_year=cls.full_luy.academic_year,
-                                                         learning_container_year=cls.full_luy.learning_container_year)
-        cls.partim_luy_2 = LearningUnitYearPartimFactory(academic_year=cls.full_luy.academic_year,
-                                                         learning_container_year=cls.full_luy.learning_container_year)
+        cls.partim_luy_1 = LearningUnitYearPartimFactory(
+            academic_year=cls.full_luy.academic_year,
+            learning_container_year=cls.full_luy.learning_container_year,
+            acronym=cls.full_luy.learning_container_year.acronym + 'A'
+        )
+        cls.partim_luy_2 = LearningUnitYearPartimFactory(
+            academic_year=cls.full_luy.academic_year,
+            learning_container_year=cls.full_luy.learning_container_year,
+            acronym=cls.full_luy.learning_container_year.acronym + 'B'
+        )
         cls.attribution_full = AttributionNewFactory(
             learning_container_year=cls.full_luy.learning_container_year
         )
@@ -186,8 +180,7 @@ class TestGetChargeRepartitionWarningMessage(TestCase):
     def test_should_not_give_warning_messages_when_volume_partim_inferior_or_equal_to_volume_parent(self):
         msgs = get_charge_repartition_warning_messages(self.full_luy.learning_container_year)
 
-        self.assertEqual(msgs,
-                         [])
+        self.assertEqual(msgs, [])
 
     def test_should_not_fail_when_no_charges(self):
         self.charge_lecturing_1.allocation_charge = None
@@ -201,8 +194,7 @@ class TestGetChargeRepartitionWarningMessage(TestCase):
 
         msgs = get_charge_repartition_warning_messages(self.full_luy.learning_container_year)
 
-        self.assertEqual(msgs,
-                         [])
+        self.assertEqual(msgs, [])
 
     def test_should_give_warning_messages_when_volume_partim_superior_to_volume_parent(self):
         self.charge_lecturing_1.allocation_charge = 50

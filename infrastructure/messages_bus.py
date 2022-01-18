@@ -300,7 +300,7 @@ class MessageBusCommands(AbstractMessageBusCommands):
         ),
         RenewMultipleAttributionsCommand: lambda cmd: renew_multiple_attributions(
             cmd, ApplicationRepository(), ApplicationCalendarRepository(),
-            ApplicantRepository(), VacantCourseRepository()
+            ApplicantRepository(), VacantCourseRepository(), LearningUnitTranslator()
         ),
         DeleteApplicationCommand: lambda cmd: delete_application(cmd, ApplicationRepository()),
         SearchApplicationByApplicantCommand: lambda cmd: search_applications_by_applicant(

@@ -44,7 +44,7 @@ class RechercheNotesEtudiant(interface.DomainService):
     @classmethod
     def search(
             cls,
-            nom_cohorte: str,
+            noms_cohortes: Optional[List[str]],
             noma: str,
             nom: str,
             prenom: str,
@@ -58,7 +58,7 @@ class RechercheNotesEtudiant(interface.DomainService):
             inscription_examen_translator: 'IInscriptionExamenTranslator',
     ) -> List['RechercheNoteEtudiantDTO']:
         note_etudiant_filtered = cls._get_notes_etudiants_filtered(
-            nom_cohorte=nom_cohorte,
+            noms_cohortes=noms_cohortes,
             noma=noma,
             nom=nom,
             prenom=prenom,
@@ -140,7 +140,7 @@ class RechercheNotesEtudiant(interface.DomainService):
     @classmethod
     def _get_notes_etudiants_filtered(
             cls,
-            nom_cohorte: str,
+            noms_cohortes: Optional[List[str]],
             noma: str,
             nom: str,
             prenom: str,
@@ -150,11 +150,10 @@ class RechercheNotesEtudiant(interface.DomainService):
             note_etudiant_repo: 'INoteEtudiantRepository',
             signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
     ):
-        noms_cohortes = gestionnaire_parcours.cohortes_gerees
-        if nom_cohorte:
-            gestionnaire_parcours.verifier_gere_cohorte(nom_cohorte)
-            noms_cohortes = [nom_cohorte]
-
+        cohortes = gestionnaire_parcours.cohortes_gerees
+        if noms_cohortes:
+            gestionnaire_parcours.verifier_gere_cohortes(set(noms_cohortes))
+            cohortes = noms_cohortes
         note_manquante = etat == NOTE_MANQUANTE
         justification = None
         if etat and etat != NOTE_MANQUANTE:
@@ -171,7 +170,7 @@ class RechercheNotesEtudiant(interface.DomainService):
                 return []
 
         return note_etudiant_repo.search(
-            noms_cohortes=noms_cohortes,
+            noms_cohortes=cohortes,
             nomas=nomas_searched,
             annee_academique=periode_encodage.annee_concernee,
             numero_session=periode_encodage.session_concernee,

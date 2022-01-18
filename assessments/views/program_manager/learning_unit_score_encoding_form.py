@@ -26,10 +26,9 @@
 from gettext import ngettext
 
 import attr
-from django.utils.translation import gettext_lazy as _
-
 from django.contrib import messages
 from django.utils.functional import cached_property
+from django.utils.translation import gettext_lazy as _
 
 from assessments.views.common.learning_unit_score_encoding_form import LearningUnitScoreEncodingBaseFormView
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
@@ -107,7 +106,7 @@ class LearningUnitScoreEncodingProgramManagerFormView(LearningUnitScoreEncodingB
     def get_initial(self):
         formset_initial = []
         for note_etudiant in self.feuille_de_notes.notes_etudiants:
-            if not note_etudiant.date_echeance_atteinte and not note_etudiant.desinscrit_tardivement:
+            if not note_etudiant.date_echeance_gestionnaire_atteinte and not note_etudiant.desinscrit_tardivement:
                 initial_note_etudiant = self._get_initial_note_etudiant(note_etudiant)
                 formset_initial.append(initial_note_etudiant)
             else:

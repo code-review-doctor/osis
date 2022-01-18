@@ -24,15 +24,12 @@
 #
 ##############################################################################
 from dal import autocomplete
-from dal_select2_tagging.widgets import TaggingSelect2
 from django import forms
 from django.forms import HiddenInput, BaseFormSet
 from django.utils.translation import pgettext_lazy, gettext_lazy as _
 
-
 from base.forms.utils import choice_field
 from base.models.enums.exam_enrollment_justification_type import StateTypes
-from base.models.learning_unit_year import LearningUnitYear
 from ddd.logic.encodage_des_notes.encodage.commands import GetCohortesGestionnaireCommand
 from education_group.forms.fields import UpperCaseCharField
 from infrastructure.messages_bus import message_bus_instance
@@ -67,6 +64,12 @@ class ScoreSearchEncodingForm(forms.Form):
         super().__init__(**kwargs)
         self.fields['note'].widget.attrs['style'] = 'width:70px; '
 
+    def clean_note(self):
+        note = self.cleaned_data['note']
+        if note:
+            return note.replace(",", ".")
+        return note
+
 
 class ScoreSearchForm(forms.Form):
     noma = forms.CharField(required=False, label=_("Reg. No."))
@@ -80,13 +83,20 @@ class ScoreSearchForm(forms.Form):
         required=False,
         label=_("State")
     )
-    nom_cohorte = forms.ChoiceField(required=False, label=pgettext_lazy('encoding', 'Program'))
+    noms_cohortes = forms.MultipleChoiceField(
+        required=False,
+        label=pgettext_lazy('encoding', 'Program'),
+        widget=autocomplete.Select2Multiple(
+            url='formations-autocomplete',
+            attrs={'data-html': True, 'data-placeholder': _('Acronym/Short title')},
+        )
+    )
 
     def __init__(self, matricule_fgs_gestionnaire: str = '', **kwargs):
         super().__init__(**kwargs)
-        self.fields['nom_cohorte'].choices = self.get_nom_cohorte_choices(matricule_fgs_gestionnaire)
+        self.fields['noms_cohortes'].choices = self.get_noms_cohortes_choices(matricule_fgs_gestionnaire)
 
-    def get_nom_cohorte_choices(self, matricule_fgs_gestionnaire: str):
+    def get_noms_cohortes_choices(self, matricule_fgs_gestionnaire: str):
         cmd = GetCohortesGestionnaireCommand(matricule_fgs_gestionnaire=matricule_fgs_gestionnaire)
         results = message_bus_instance.invoke(cmd)
         choices = (
@@ -101,14 +111,21 @@ class ScoreSearchForm(forms.Form):
             cleaned_data['nom'],
             cleaned_data['prenom'],
             cleaned_data['etat'],
-            cleaned_data['nom_cohorte'],
+            cleaned_data['noms_cohortes'],
         ]):
             self.add_error(None, _("Please choose at least one criteria!"))
         return cleaned_data
 
 
 class ScoreEncodingProgressFilterForm(forms.Form):
-    cohorte_name = forms.ChoiceField(required=False, label=pgettext_lazy('encoding', 'Program'))
+    cohorte_name = forms.MultipleChoiceField(
+        required=False,
+        label=pgettext_lazy('encoding', 'Program'),
+        widget=autocomplete.Select2Multiple(
+            url='formations-autocomplete',
+            attrs={'data-html': True, 'data-placeholder': _('Acronym/Short title')},
+        )
+    )
     tutor = forms.ChoiceField(
         required=False,
         label=_('Tutor'),
@@ -125,6 +142,7 @@ class ScoreEncodingProgressFilterForm(forms.Form):
         )
     )
     incomplete_encodings_only = forms.BooleanField(required=False, label=_('Missing score'))
+    form_has_changed = forms.CharField(widget=HiddenInput())
 
     def __init__(self, matricule_fgs_gestionnaire: str = '', **kwargs):
         super().__init__(**kwargs)

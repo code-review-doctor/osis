@@ -44,6 +44,7 @@ from base.models.entity_version import EntityVersion
 from base.models.enums.groups import TUTOR, UE_CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP, \
     CENTRAL_MANAGER_GROUP, UE_FACULTY_MANAGER_GROUP, PROGRAM_MANAGER_GROUP, ENTITY_MANAGER_GROUP
 from base.models.person import Person
+from education_group.models.enums.cohort_name import FIRST_YEAR
 from osis_common.document import xls_build
 from osis_role.contrib.helper import EntityRoleHelper, Row
 
@@ -53,6 +54,7 @@ XLS_DESCRIPTION = _("List of users")
 XLS_FILENAME = _('List_of_users')
 WORKSHEET_TITLE = _("List of users")
 BOLD_FONT = Font(bold=True)
+SUFFIX_COHORT_FIRST_YEAR = "-1"
 
 
 class UserListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
@@ -197,7 +199,12 @@ def _extract_xls_data(user_data: Person, context: Dict[str, Dict[PersonId, List[
         entities_acronym = get_entities_acronym(group.name, context, user_data.pk)
         if group.name == PROGRAM_MANAGER_GROUP:
             trainings_acronym = '\n'.join(
-                [row.most_recent_acronym or '' for row in user_data.programmanager_set.all()]
+                [
+                    "{}{}".format(
+                        row.most_recent_acronym or '',
+                        SUFFIX_COHORT_FIRST_YEAR if row.cohort and row.cohort == FIRST_YEAR else ''
+                    ) for row in user_data.programmanager_set.all()
+                ]
             ) if user_data.programmanager_set.all() else ''
 
         data_by_group_name = [

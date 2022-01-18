@@ -11,7 +11,7 @@ servers:
  - url: https://osis.uclouvain.be/api/v1/reference/
    description: Production server
 info:
-  version: '1.14'
+  version: '1.17'
   title: Reference Service
   description: |-
     A set of API endpoints that allow you to get reference data.
@@ -181,6 +181,11 @@ paths:
           schema:
             description: A search term which will look up at language name (french or english)
             type: string
+        - in: query
+          name: code
+          schema:
+            description: Filter by code
+            type: string
         - $ref: '#/components/parameters/Accept-Language'
         - $ref: '#/components/parameters/X-User-FirstName'
         - $ref: '#/components/parameters/X-User-LastName'
@@ -226,6 +231,41 @@ paths:
           $ref: '#/components/responses/Unauthorized'
       tags:
         - academic_years
+  /academic_calendars/:
+    get:
+      description: Return a list of academic calendars with optional filtering.
+      operationId: academic_calendars_list
+      parameters:
+        - in: query
+          name: data_year
+          schema:
+            description: Search by data_year
+            type: integer
+        - in: query
+          name: reference
+          schema:
+            description: Search by reference
+            type: string
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
+        - $ref: '#/components/parameters/PaginationLimit'
+        - $ref: '#/components/parameters/PaginationOffset'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAcademicCalendars'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      tags:
+        - academic_calendars
 components:
   securitySchemes:
     Token:
@@ -408,6 +448,15 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/AcademicYear'
+    PaginatedAcademicCalendars:
+      allOf:
+        - $ref: '#/components/schemas/Paging'
+        - type: object
+          properties:
+            results:
+              type: array
+              items:
+                $ref: '#/components/schemas/AcademicCalendar'
     AcademicYear:
       type: object
       properties:
@@ -425,6 +474,28 @@ components:
           type: string
           format: date
           example: '2021-09-17'
+    AcademicCalendar:
+      type: object
+      properties:
+        reference:
+          type: string
+          description: The reference of the academic calendar
+        title:
+          type: string
+          description: The title of the academic calendar
+        data_year:
+          type: integer
+          description: The academic year which the calendar relates to
+          example: 2021
+        start_date:
+          type: string
+          format: date
+          example: '2019-08-17'
+        end_date:
+          type: string
+          format: date
+          example: '2020-07-15'
+          nullable: true
     Language:
       type: object
       properties:

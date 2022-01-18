@@ -1,5 +1,5 @@
 {% extends "layout.html" %}
-{% load static bootstrap3 i18n %}
+{% load static bootstrap3 i18n perms %}
 
 {% comment "License" %}
  * OSIS stands for Open Student Information System. It's an application
@@ -8,7 +8,7 @@
  * The core business involves the administration of students, teachers,
  * courses, programs and so on.
  *
- * Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+ * Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,46 +32,63 @@
 {% endblock %}
 
 {% block content %}
-     <div class="page-header">
-        <h2>{% trans 'Scores responsibles' %} - {{ filter.academic_year }}</h2>
-    </div>
-    <div class="panel panel-default">
-        <div class="panel-heading">
-             <form id="search_form" method="GET">
-                 <div class="row">
-                    {% bootstrap_field filter.form.acronym form_group_class="col-md-1" %}
-                    {% bootstrap_field filter.form.learning_unit_title form_group_class="col-md-3" %}
-                    {% bootstrap_field filter.form.tutor form_group_class="col-md-3" %}
-                    {% bootstrap_field filter.form.scores_responsible form_group_class="col-md-2" %}
-                    {% bootstrap_field filter.form.requirement_entity form_group_class="col-md-1" %}
-                    {% bootstrap_field filter.form.with_entity_subordinated form_group_class="col-md-1" %}
-                    {% bootstrap_field filter.form.ordering %}
-                    <div class="col-md-1 form-group" style="margin-top:25px">
-                        <button type="submit" id="bt_submit_search" class="btn btn-primary" role="button"
-                                title="{% trans 'Search' %}">
-                            <span class="glyphicon glyphicon-search"></span>
-                        </button>
-                    </div>
-                 </div>
-             </form>
+    {% view_scores_responsible as can_view_scores_responsible %}
+    {% if not can_view_scores_responsible and session_messages %}
+        <div class="alert-warning">
+            <ul>
+                {% for message in session_messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
         </div>
-         <div class="panel-body">
-            <table id="tb_scores_responsible" class="table table-striped table-hover">
-                <thead>
-                    <tr>
-                        <th>{% trans 'Entity' %}</th>
-                        <th>{% trans 'Code' %}</th>
-                        <th>{% trans 'Title' %}</th>
-                        <th>{% trans 'Tutor' %}</th>
-                        <th></th>
-                    </tr>
-                </thead>
-            </table>
-            <div class="text-center">
-                {% bootstrap_pagination page_obj extra=request.GET.urlencode %}
+    {% endif %}
+    <div class="page-header">
+        <h2>{% trans 'Scores responsibles' %}{% if filter.academic_year %} - {{ filter.academic_year }}{% endif %}</h2>
+    </div>
+    {% if can_view_scores_responsible %}
+        <div class="alert alert-info" style="display:inline-block;">
+            <i class="fa fa-info-circle"></i>
+            {% trans 'For classes, you must search the full LU below and then click on ' %}<span class="glyphicon glyphicon-edit" style="padding-left: 5px; padding-right: 5px;"></span>{% trans 'to modify.' %}
+        </div>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                 <form id="search_form" method="GET">
+                     <div class="row">
+                        {% bootstrap_field filter.form.acronym form_group_class="col-md-1" %}
+                        {% bootstrap_field filter.form.learning_unit_title form_group_class="col-md-3" %}
+                        {% bootstrap_field filter.form.tutor form_group_class="col-md-3" %}
+                        {% bootstrap_field filter.form.scores_responsible form_group_class="col-md-2" %}
+                        {% bootstrap_field filter.form.requirement_entity form_group_class="col-md-1" %}
+                        {% bootstrap_field filter.form.with_entity_subordinated form_group_class="col-md-1" %}
+                        {% bootstrap_field filter.form.ordering %}
+                        <div class="col-md-1 form-group" style="margin-top:25px">
+                            <button type="submit" id="bt_submit_search" class="btn btn-primary" role="button"
+                                    title="{% trans 'Search' %}">
+                                <span class="glyphicon glyphicon-search"></span>
+                            </button>
+                        </div>
+                     </div>
+                 </form>
+            </div>
+             <div class="panel-body">
+                <table id="tb_scores_responsible" class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>{% trans 'Entity' %}</th>
+                            <th>{% trans 'Code' %}</th>
+                            <th>{% trans 'Title' %}</th>
+                            <th>{% trans 'Tutor' %}</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                </table>
+                <div class="text-center">
+                    {% bootstrap_pagination page_obj extra=request.GET.urlencode %}
+                </div>
             </div>
         </div>
-    </div>
+    {% endif %}
 {% endblock %}
 
 {% block script %}

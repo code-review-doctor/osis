@@ -30,3 +30,7 @@ def view_academicactors(user):
     return user.has_perm('base.view_programmanager') \
            or ("assessments" in settings.INSTALLED_APPS and user.has_perm('assessments.view_scoresresponsible')) \
            or ("dissertation" in settings.INSTALLED_APPS and user.has_perm('dissertation.change_offerproposition'))
+
+
+def view_scores_responsible(user):
+    return "assessments" in settings.INSTALLED_APPS and user.has_perm('assessments.view_scoresresponsible')

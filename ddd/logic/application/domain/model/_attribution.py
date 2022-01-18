@@ -37,6 +37,7 @@ from osis_common.ddd import interface
 class Attribution(interface.ValueObject):
     course_id = attr.ib(type=LearningUnitIdentity)
     course_title = attr.ib(type=str)
+    course_is_in_suppression_proposal = attr.ib(type=bool)
     function = attr.ib(type=Functions)
     end_year = attr.ib(type=AcademicYearIdentity)
     start_year = attr.ib(type=AcademicYearIdentity)

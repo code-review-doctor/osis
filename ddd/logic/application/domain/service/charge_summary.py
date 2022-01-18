@@ -90,6 +90,7 @@ class ApplicantAttributionChargeSummary(interface.DomainService):
                     code=attribution.course_id.code,
                     year=attribution.course_id.year,
                     title=attribution.course_title,
+                    course_is_in_suppression_proposal=attribution.course_is_in_suppression_proposal,
                     start_year=attribution.start_year.year,
                     end_year=attribution.end_year.year,
                     function=attribution.function,
