@@ -121,6 +121,7 @@ class CreateClassView(PermissionRequiredMixin, FormView):
                 )
             )
 
+        display_error_messages(request, _("Error(s) in form: The modifications are not saved"))
         return render(request, self.template_name, {
             "form": form,
         })
