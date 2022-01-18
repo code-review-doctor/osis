@@ -41,10 +41,10 @@ from reference.models.country import Country
 from reference.models.language import Language
 
 
-def education_directory_path(person: Person, filename: str):
+def education_directory_path(diploma: 'HighSchoolDiploma', filename: str):
     """Return the file upload directory path."""
     return 'education/{}/{}'.format(
-        person.uuid,
+        diploma.person.uuid,
         filename
     )
 
