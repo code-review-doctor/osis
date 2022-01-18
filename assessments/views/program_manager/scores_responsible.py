@@ -37,13 +37,13 @@ from django_filters.views import FilterView
 
 from assessments.api.serializers.scores_responsible import ScoresResponsibleListSerializer
 from assessments.forms.scores_responsible import ScoresResponsiblesFilter
-from assessments.views.score_encoding import get_latest_closest_session_information_message
+from assessments.views.score_encoding.outside_period import get_latest_closest_session_information_message
 from base.models import session_exam_calendar
 from base.models.academic_year import AcademicYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.utils.cache import CacheFilterMixin
-from base.views.common import display_success_messages, display_error_messages
+from base.views.common import display_success_messages
 from ddd.logic.effective_class_repartition.commands import SearchAttributionsToLearningUnitCommand, \
     SearchTutorsDistributedToClassCommand
 from ddd.logic.effective_class_repartition.dtos import TutorAttributionToLearningUnitDTO
@@ -53,7 +53,6 @@ from ddd.logic.encodage_des_notes.soumission.commands import AssignerResponsable
 from ddd.logic.encodage_des_notes.soumission.dtos import ResponsableDeNotesDTO
 from infrastructure.messages_bus import message_bus_instance
 from learning_unit.models.learning_class_year import LearningClassYear
-from django.utils.translation import gettext_lazy as _
 
 
 @attr.s(frozen=True, slots=True)

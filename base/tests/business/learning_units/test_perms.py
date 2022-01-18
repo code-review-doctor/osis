@@ -35,7 +35,7 @@ from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.person import AdministrativeManagerFactory
+from base.tests.factories.person import CatalogViewerFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from learning_unit.tests.factories.central_manager import CentralManagerFactory
 from learning_unit.tests.factories.faculty_manager import FacultyManagerFactory
@@ -104,9 +104,9 @@ class TestPerms(TestCase):
 
         self.assertTrue(faculty_manager.person.user.has_perm('base.can_edit_learning_unit_proposal', learning_unit_yr))
 
-    def test_is_not_eligible_to_modify_cause_user_is_administrative_manager(self):
-        administrative_manager = AdministrativeManagerFactory()
-        self.assertFalse(administrative_manager.user.has_perm('base.can_edit_learningunit', self.luy))
+    def test_is_not_eligible_to_modify_cause_user_is_catalog_viewer(self):
+        catalog_viewer = CatalogViewerFactory()
+        self.assertFalse(catalog_viewer.user.has_perm('base.can_edit_learningunit', self.luy))
 
     def test_is_not_eligible_to_update_learning_achievement_cause_before_2018(self):
         self.luy.academic_year = AcademicYearFactory(year=2015)

@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
 from typing import Optional, List, Set
 
 from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
@@ -45,7 +46,7 @@ class EffectiveClassRepository(InMemoryGenericRepository, IEffectiveClassReposit
         EffectiveClassFromRepositoryDTO(
             class_code='A',
             learning_unit_code='LDROI1001',
-            learning_unit_year=2020,
+            learning_unit_year=datetime.date.today().year-1,
             title_fr='Intitulé spécifique à la classe effective',
             full_title_fr='Intit. unité enseignement Intitulé spécifique à la classe effective',
             title_en='Specific title of the effective class',
@@ -60,7 +61,7 @@ class EffectiveClassRepository(InMemoryGenericRepository, IEffectiveClassReposit
         EffectiveClassFromRepositoryDTO(
             class_code='X',
             learning_unit_code='LDROI1001',
-            learning_unit_year=2021,
+            learning_unit_year=datetime.date.today().year,
             title_fr='Intitulé spécifique à la classe effective',
             full_title_fr='Intit. unité enseignement Intitulé spécifique à la classe effective',
             title_en='Specific title of the effective class',

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-30 14:16+0200\n"
+"POT-Creation-Date: 2021-12-16 10:24+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -44,6 +44,9 @@ msgstr ""
 #, python-format
 msgid ""
 "Are you certain that you want to definitively delete the class in %(year)s ?"
+msgstr ""
+
+msgid "Are you sure you want to delete the teaching material?"
 msgstr ""
 
 msgid "Are you sure?"
@@ -271,6 +274,9 @@ msgstr "Stage-Dimona"
 msgid "State"
 msgstr ""
 
+msgid "Teaching material"
+msgstr ""
+
 msgid ""
 "The derogation session field must be completed ONLY if you want to encode an "
 "exception in relation to the sessions calculated according to the "
@@ -283,6 +289,12 @@ msgid ""
 "which is not among those types: %(types)s"
 msgstr ""
 
+msgid "The learning unit has been updated"
+msgstr ""
+
+msgid "The learning unit has been updated (without report)."
+msgstr ""
+
 msgid "The learning unit has proposal for this or a previous year"
 msgstr ""
 
@@ -290,6 +302,12 @@ msgid "The learning unit has proposal for this or any other year"
 msgstr ""
 
 msgid "The learning unit is a partim"
+msgstr ""
+
+#, python-format
+msgid ""
+"The learning unit is in proposal, the report from %(proposal_year)s will be "
+"done at consolidation"
 msgstr ""
 
 msgid "The learning unit is not a partim"
@@ -468,6 +486,10 @@ msgstr ""
 msgid "You do not have sufficient access rights to update a class."
 msgstr ""
 
+#, python-format
+msgid "and postponed until %(year)s"
+msgstr ""
+
 msgid "external acronym rules"
 msgstr ""
 
@@ -475,4 +497,13 @@ msgid "hourly volume partial q1"
 msgstr ""
 
 msgid "hourly volume partial q2"
+msgstr ""
+
+#, python-format
+msgid ""
+"the report has not been done from %(proposal_year)s because the LU is in "
+"proposal"
+msgstr ""
+
+msgid "Error(s) in form: The modifications are not saved"
 msgstr ""
