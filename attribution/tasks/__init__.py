@@ -1,4 +1,5 @@
 from . import check_academic_calendar
+from . import send_attribution_end_date_reached_summary
 
 from celery.schedules import crontab
 from backoffice.celery import app as celery_app
