@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,29 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+
+
+import uuid as uuid
 from typing import Union
 
-from ddd.logic.preparation_programme_annuel_etudiant.commands import AjouterUEAuProgrammeCommand, \
-    GetProgrammeInscriptionCoursServiceCommand, RetirerUEDuProgrammeCommand, AjusterUEDuGroupementCommand, \
-    AnnulerActionSurUEDuProgrammeCommand, DeplacerVersLeBasUEAjouteeDansProgrammeCommand, \
-    DeplacerVersLeHautUEAjouteeDansProgrammeCommand
-from ddd.logic.preparation_programme_annuel_etudiant.domain.model.programme_inscription_cours import \
-    IdentiteProgrammeInscriptionCours
+import attr
+
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
+from education_group.ddd.domain.group import GroupIdentity
 from osis_common.ddd import interface
 
 
-class ProgrammeInscriptionCoursIdentityBuilder(interface.EntityIdentityBuilder):
-    @classmethod
-    def build_from_command(
-            cls,
-            cmd: Union[
-                'GetProgrammeInscriptionCoursServiceCommand',
-                'AjouterUEAuProgrammeCommand',
-                'RetirerUEDuProgrammeCommand',
-                'AjusterUEDuGroupementCommand',
-                'AnnulerActionSurUEDuProgrammeCommand',
-                'DeplacerVersLeHautUEAjouteeDansProgrammeCommand',
-                'DeplacerVersLeBasUEAjouteeDansProgrammeCommand'
-            ]
-    ) -> 'IdentiteProgrammeInscriptionCours':
-        raise NotImplementedError
+@attr.s(frozen=True, slots=True, auto_attribs=True)
+class UniteEnseignementAjouteeIdentity(interface.EntityIdentity):
+    uuid: uuid.UUID
+
+
+@attr.s(slots=True, auto_attribs=True)
+class UniteEnseignementAjoutee(interface.Entity):
+    entity_id: 'UniteEnseignementAjouteeIdentity'
+    unite_enseignement_identity: 'LearningUnitIdentity'
+    a_la_suite_de: Union['LearningUnitIdentity', 'GroupIdentity']

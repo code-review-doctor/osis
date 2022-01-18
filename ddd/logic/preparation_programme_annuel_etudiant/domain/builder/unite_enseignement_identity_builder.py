@@ -24,11 +24,12 @@
 #
 ##############################################################################
 from ddd.logic.preparation_programme_annuel_etudiant.commands import UniteEnseignementCommand
-from ddd.logic.preparation_programme_annuel_etudiant.domain.model.unite_enseignement import UniteEnseignementIdentity
+from ddd.logic.preparation_programme_annuel_etudiant.domain.model.unite_enseignement_ajoutee import \
+    UniteEnseignementAjouteeIdentity
 from osis_common.ddd import interface
 
 
 class UniteEnseignementIdentityBuilder(interface.EntityIdentityBuilder):
     @classmethod
-    def build_from_command(cls, cmd: 'UniteEnseignementCommand') -> 'UniteEnseignementIdentity':
+    def build_from_command(cls, cmd: 'UniteEnseignementCommand') -> 'UniteEnseignementAjouteeIdentity':
         raise NotImplementedError

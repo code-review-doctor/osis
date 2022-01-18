@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,22 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import uuid as uuid
-from typing import List
+from django.utils.translation import gettext_lazy as _
 
-import attr
-
-from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
-    GroupementAjusteInscriptionCours
-from osis_common.ddd import interface
+from osis_common.ddd.interface import BusinessException
 
 
-@attr.s(frozen=True, slots=True, auto_attribs=True)
-class IdentiteProgrammeInscriptionCours(interface.EntityIdentity):
-    uuid: uuid.UUID
+class PasGestionnaireParcoursExceptionException(BusinessException):
+    def __init__(self, **kwargs):
+        message = _("You're not a program manager (no assigned formations found)")
+        super().__init__(message, **kwargs)
 
 
-@attr.s(slots=True, auto_attribs=True)
-class ProgrammeInscriptionCours(interface.RootEntity):
-    entity_id: IdentiteProgrammeInscriptionCours
-    sous_programme: List['GroupementAjusteInscriptionCours']

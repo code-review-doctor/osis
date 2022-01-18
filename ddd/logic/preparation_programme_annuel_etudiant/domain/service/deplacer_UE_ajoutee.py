@@ -1,6 +1,7 @@
-from ddd.logic.preparation_programme_annuel_etudiant.domain.model.programme_inscription_cours import \
-    ProgrammeInscriptionCours
-from ddd.logic.preparation_programme_annuel_etudiant.domain.model.unite_enseignement import UniteEnseignementIdentity
+from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
+    GroupementAjusteInscriptionCours
+from ddd.logic.preparation_programme_annuel_etudiant.domain.model.unite_enseignement_ajoutee import \
+    UniteEnseignementAjouteeIdentity
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import ContenuGroupementDTO
 from ddd.logic.preparation_programme_annuel_etudiant.repository.i_programme_inscription_cours import \
     IProgrammeInscriptionCoursRepository
@@ -11,9 +12,9 @@ class DeplacerUEAjoutee(interface.DomainService):
     @classmethod
     def deplacer_vers_le_bas(
         cls,
-        programme_inscription_cours: ProgrammeInscriptionCours,
+        groupement_ajuste_inscr_cours: GroupementAjusteInscriptionCours,
         contenu_groupement: ContenuGroupementDTO,
-        unite_enseignement_identity: UniteEnseignementIdentity,
+        unite_enseignement_identity: UniteEnseignementAjouteeIdentity,
         repository: IProgrammeInscriptionCoursRepository
     ) -> None:
 
@@ -21,18 +22,18 @@ class DeplacerUEAjoutee(interface.DomainService):
         #  et déterminer le code de l'UE ou du groupement qui précède l'UE déplacée
         #  (modifier a_la_suite_de pour toutes les UE et déterminer a_la_suite_de pour l'UE déplacée)
 
-        programme_inscription_cours.deplacer_unite_enseignement_ajoutee(
+        groupement_ajuste_inscr_cours.deplacer_unite_enseignement_ajoutee(
             unite_enseignement_identity=unite_enseignement_identity,
             # a_la_suite_de=a_la_suite_de
         )
-        repository.save(programme_inscription_cours)
+        repository.save(groupement_ajuste_inscr_cours)  # TODO :: pq pas .save() dans le use case et pq DomainService ?
 
     @classmethod
     def deplacer_vers_le_haut(
         cls,
-        programme_inscription_cours: ProgrammeInscriptionCours,
+        groupement_ajuste_inscr_cours: 'GroupementAjusteInscriptionCours',
         contenu_groupement: ContenuGroupementDTO,
-        unite_enseignement_identity: UniteEnseignementIdentity,
+        unite_enseignement_identity: UniteEnseignementAjouteeIdentity,
         repository: IProgrammeInscriptionCoursRepository
     ) -> None:
 
@@ -40,8 +41,8 @@ class DeplacerUEAjoutee(interface.DomainService):
         #  et déterminer le code de l'UE ou du groupement qui précède l'UE déplacée
         #  (modifier a_la_suite_de pour toutes les UE et déterminer a_la_suite_de pour l'UE déplacée)
 
-        programme_inscription_cours.deplacer_unite_enseignement_ajoutee(
+        groupement_ajuste_inscr_cours.deplacer_unite_enseignement_ajoutee(
             unite_enseignement_identity=unite_enseignement_identity,
             # a_la_suite_de=a_la_suite_de
         )
-        repository.save(programme_inscription_cours)
+        repository.save(groupement_ajuste_inscr_cours)  # TODO :: pq pas .save() dans le use case et pq DomainService ?
