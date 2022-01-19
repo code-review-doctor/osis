@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,30 +23,33 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.preparation_programme_annuel_etudiant.commands import AnnulerActionSurUEDuProgrammeCommand
-from ddd.logic.preparation_programme_annuel_etudiant.domain.builder.groupement_ajuste_inscription_cours_identity_builder import \
-    GroupementAjusteInscriptionCoursIdentityBuilder
+from typing import Optional, List
+
+from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
+    GroupementAjusteInscriptionCours
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
     IdentiteGroupementAjusteInscriptionCours
-from ddd.logic.preparation_programme_annuel_etudiant.repository.i_groupement_ajuste_inscription_cours import \
-    IGroupementAjusteInscriptionCoursRepository
+from osis_common.ddd import interface
+from osis_common.ddd.interface import ApplicationService
 
 
-def annuler_action_sur_UE_du_programme(
-        cmd: 'AnnulerActionSurUEDuProgrammeCommand',
-        repository: 'IGroupementAjusteInscriptionCoursRepository',
-) -> 'IdentiteGroupementAjusteInscriptionCours':
-    # GIVEN
-    identite_groupement_ajuste = GroupementAjusteInscriptionCoursIdentityBuilder.build_from_command(cmd)
-    groupement_ajuste = repository.get(
-        entity_id=identite_groupement_ajuste
-    )
+class IGroupementAjusteInscriptionCoursRepository(interface.AbstractRepository):
+    @classmethod
+    def get(cls, entity_id: 'IdentiteGroupementAjusteInscriptionCours') -> 'GroupementAjusteInscriptionCours':
+        pass
 
-    # WHEN
-    groupement_ajuste.annuler_action_sur_unite_enseignement(
-        unite_enseignement=cmd.unite_enseignement.code,
-    )
+    @classmethod
+    def search(
+            cls,
+            entity_ids: Optional[List['IdentiteGroupementAjusteInscriptionCours']] = None,
+            **kwargs
+    ) -> List['GroupementAjusteInscriptionCours']:
+        pass
 
-    # THEN
-    repository.save(groupement_ajuste)
-    return groupement_ajuste.entity_id
+    @classmethod
+    def delete(cls, entity_id: 'IdentiteGroupementAjusteInscriptionCours', **kwargs: ApplicationService) -> None:
+        pass
+
+    @classmethod
+    def save(cls, entity: 'GroupementAjusteInscriptionCours') -> None:
+        pass

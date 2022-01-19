@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,13 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.preparation_programme_annuel_etudiant.commands import GetUniteEnseignementCommand
-from ddd.logic.preparation_programme_annuel_etudiant.domain.model.unite_enseignement_ajoutee import \
-    UniteEnseignementAjouteeIdentity
-from osis_common.ddd import interface
+from django.utils.translation import gettext_lazy as _
+
+from osis_common.ddd.interface import BusinessException
 
 
-class UniteEnseignementIdentityBuilder(interface.EntityIdentityBuilder):
-    @classmethod
-    def build_from_command(cls, cmd: 'GetUniteEnseignementCommand') -> 'UniteEnseignementAjouteeIdentity':
-        raise NotImplementedError
+class PasGestionnaireParcoursExceptionException(BusinessException):
+    def __init__(self, **kwargs):
+        message = _("You're not a program manager (no assigned formations found)")
+        super().__init__(message, **kwargs)
+
+

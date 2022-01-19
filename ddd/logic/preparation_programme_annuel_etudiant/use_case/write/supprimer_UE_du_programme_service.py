@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -24,47 +24,33 @@
 #
 ##############################################################################
 
-from ddd.logic.preparation_programme_annuel_etudiant.commands import DeplacerVersLeHautUEAjouteeDansProgrammeCommand
+from ddd.logic.preparation_programme_annuel_etudiant.commands import RetirerUEDuProgrammeCommand
 from ddd.logic.preparation_programme_annuel_etudiant.domain.builder.groupement_ajuste_inscription_cours_identity_builder import \
     GroupementAjusteInscriptionCoursIdentityBuilder
-from ddd.logic.preparation_programme_annuel_etudiant.domain.builder.unite_enseignement_identity_builder import \
-    UniteEnseignementIdentityBuilder
+from ddd.logic.preparation_programme_annuel_etudiant.domain.builder.programme_inscription_cours_identity_builder import \
+    ProgrammeInscriptionCoursIdentityBuilder
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
     IdentiteGroupementAjusteInscriptionCours
-from ddd.logic.preparation_programme_annuel_etudiant.domain.service.deplacer_UE_ajoutee import DeplacerUEAjoutee
 from ddd.logic.preparation_programme_annuel_etudiant.repository.i_groupement_ajuste_inscription_cours import \
     IGroupementAjusteInscriptionCoursRepository
-from infrastructure.preparation_programme_annuel_etudiant.domain.service.catalogue_formations import \
-    CatalogueFormationsTranslator
 
 
-def deplacer_vers_le_haut_UE_ajoutee_dans_programme(
-        cmd: 'DeplacerVersLeHautUEAjouteeDansProgrammeCommand',
+def supprimer_UE_du_programme(
+        cmd: 'RetirerUEDuProgrammeCommand',
         repository: 'IGroupementAjusteInscriptionCoursRepository',
-        translator: 'CatalogueFormationsTranslator',
 ) -> 'IdentiteGroupementAjusteInscriptionCours':
     # GIVEN
-    unite_enseignement_identity = UniteEnseignementIdentityBuilder.build_from_command(cmd.unite_enseignement)
-
     identite_groupement_ajuste = GroupementAjusteInscriptionCoursIdentityBuilder.build_from_command(cmd)
     groupement_ajuste = repository.get(
         entity_id=identite_groupement_ajuste
     )
 
-    contenu_groupement = translator.get_contenu_groupement(
-        sigle_formation=cmd.sigle_formation,
-        version_formation=cmd.version_formation,
-        annee=cmd.annee_formation,
-        code_groupement=cmd.ajoutee_dans,
-    )
-
     # WHEN
-    DeplacerUEAjoutee.deplacer_vers_le_haut(
-        groupement_ajuste_inscr_cours=groupement_ajuste,
-        contenu_groupement=contenu_groupement,
-        unite_enseignement_identity=unite_enseignement_identity,
-        repository=repository
-    )
+    for cmd_ue in cmd.unites_enseignements:
+        groupement_ajuste.retirer_unite_enseignement(
+            unite_enseignement=cmd_ue.code,
+        )
 
     # THEN
+    repository.save(groupement_ajuste)
     return groupement_ajuste.entity_id

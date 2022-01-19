@@ -24,52 +24,21 @@
 #
 ##############################################################################
 import uuid as uuid
-from typing import List, Union
+from typing import List
 
 import attr
 
-from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement import CodeGroupement
-from ddd.logic.preparation_programme_annuel_etudiant.domain.model.unite_enseignement import CodeUniteEnseignement, \
-    UniteEnseignementAjoutee, UniteEnseignementRetiree, UniteEnseignementAjustee, UniteEnseignementIdentity
+from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
+    GroupementAjusteInscriptionCours
 from osis_common.ddd import interface
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
-class ProgrammeInscriptionCoursIdentity(interface.EntityIdentity):
+class IdentiteProgrammeInscriptionCours(interface.EntityIdentity):
     uuid: uuid.UUID
 
 
 @attr.s(slots=True, auto_attribs=True)
 class ProgrammeInscriptionCours(interface.RootEntity):
-    entity_id: ProgrammeInscriptionCoursIdentity
-    version_programme: ProgramTreeVersionIdentity
-    unites_enseignement_ajoutees: List['UniteEnseignementAjoutee']
-    unites_enseignement_retirees: List['UniteEnseignementRetiree']
-    unites_enseignement_ajustees: List['UniteEnseignementAjustee']
-
-    # comment vérifier qu'une unité d'enseignement n'est pas déjà existante dans le programme
-    def ajouter_unite_enseignement(self, unite_enseignement: 'CodeUniteEnseignement', a_inclure_dans: 'CodeGroupement'):
-        raise NotImplementedError
-
-    def retirer_unite_enseignement(self, unite_enseignement: 'CodeUniteEnseignement', a_retirer_de: 'CodeGroupement'):
-        raise NotImplementedError
-
-    def ajuster_unite_enseignement(self, unite_enseignement: 'CodeUniteEnseignement', a_ajuster_dans: 'CodeGroupement'):
-        raise NotImplementedError
-
-    def annuler_action_sur_unite_enseignement(
-            self,
-            unite_enseignement: 'CodeUniteEnseignement',
-            a_annuler_dans: 'CodeGroupement'
-    ):
-        # une seule action disponible à la fois
-        # => retirer dans unites_enseignement_ajoutees | unites_enseignement_retirees | unites_enseignement_ajustees
-        raise NotImplementedError
-
-    def deplacer_unite_enseignement_ajoutee(
-            self,
-            unite_enseignement_identity: 'UniteEnseignementIdentity',
-            a_la_suite_de: Union['CodeUniteEnseignement', 'CodeGroupement']
-    ):
-        raise NotImplementedError
+    entity_id: IdentiteProgrammeInscriptionCours
+    sous_programme: List['GroupementAjusteInscriptionCours']

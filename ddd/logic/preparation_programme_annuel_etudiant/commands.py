@@ -39,7 +39,7 @@ class GetFormulaireInscriptionCoursCommand(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
-class UniteEnseignementCommand(interface.CommandRequest):
+class GetUniteEnseignementCommand(interface.CommandRequest):
     code: str
 
 
@@ -49,8 +49,8 @@ class AjouterUEAuProgrammeCommand(interface.CommandRequest):
     sigle_formation: str
     version_formation: str
     transition_formation: str
-    a_inclure_dans: str  # code groupement
-    unites_enseignements: List[UniteEnseignementCommand]
+    groupement_uuid: str  # TODO :: code groupement ou uuid groupement ?
+    unites_enseignements: List[GetUniteEnseignementCommand]
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
@@ -67,8 +67,8 @@ class RetirerUEDuProgrammeCommand(interface.CommandRequest):
     sigle_formation: str
     version_formation: str
     transition_formation: str
-    a_retirer_de: str  # code groupement
-    unites_enseignements: List[UniteEnseignementCommand]
+    groupement_uuid: str  # TODO :: code groupement ou uuid groupement ?
+    unites_enseignements: List[GetUniteEnseignementCommand]
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
@@ -76,24 +76,25 @@ class GetContenuGroupementCommand(interface.CommandRequest):
     sigle_formation: str
     version_formation: str
     transition_formation: str
-    code: str
+    code: str  # TODO :: code groupement ou uuid groupement ?
     annee: int
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
-class UniteEnseignementAjustementCommand(interface.CommandRequest):
+class ModifierUniteEnseignementCommand(interface.CommandRequest):
     code: str
+    annee: int
     bloc: int
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
-class AjusterUEDuGroupementCommand(interface.CommandRequest):
+class ModifierUEDuGroupementCommand(interface.CommandRequest):
     annee_formation: int
     sigle_formation: str
     version_formation: str
     transition_formation: str
-    a_ajuster_dans: str  # code groupement
-    unites_enseignements: List[UniteEnseignementAjustementCommand]
+    a_ajuster_dans: str  # TODO :: code groupement ou uuid groupement ?
+    unites_enseignements: List[ModifierUniteEnseignementCommand]
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
@@ -102,8 +103,8 @@ class AnnulerActionSurUEDuProgrammeCommand(interface.CommandRequest):
     sigle_formation: str
     version_formation: str
     transition_formation: str
-    a_annuler_dans: str  # code groupement
-    unite_enseignement: UniteEnseignementCommand
+    a_annuler_dans: str  # TODO :: code groupement ou uuid groupement ?
+    unite_enseignement: GetUniteEnseignementCommand
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
@@ -112,8 +113,8 @@ class DeplacerVersLeHautUEAjouteeDansProgrammeCommand(interface.CommandRequest):
     sigle_formation: str
     version_formation: str
     transition_formation: str
-    ajoutee_dans: str  # code groupement
-    unite_enseignement: UniteEnseignementCommand
+    ajoutee_dans: str  # TODO :: code groupement ou uuid groupement ?
+    unite_enseignement: GetUniteEnseignementCommand
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
@@ -122,5 +123,5 @@ class DeplacerVersLeBasUEAjouteeDansProgrammeCommand(interface.CommandRequest):
     sigle_formation: str
     version_formation: str
     transition_formation: str
-    ajoutee_dans: str  # code groupement
-    unite_enseignement: UniteEnseignementCommand
+    ajoutee_dans: str  # TODO :: code groupement ou uuid groupement ?
+    unite_enseignement: GetUniteEnseignementCommand

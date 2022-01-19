@@ -26,7 +26,7 @@
 from typing import Optional, List
 
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.programme_inscription_cours import \
-    ProgrammeInscriptionCoursIdentity, ProgrammeInscriptionCours
+    IdentiteProgrammeInscriptionCours, ProgrammeInscriptionCours
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import ProgrammeInscriptionCoursDTO
 from osis_common.ddd import interface
 from osis_common.ddd.interface import ApplicationService
@@ -34,23 +34,23 @@ from osis_common.ddd.interface import ApplicationService
 
 class IProgrammeInscriptionCoursRepository(interface.AbstractRepository):
     @classmethod
-    def get(cls, entity_id: ProgrammeInscriptionCoursIdentity) -> ProgrammeInscriptionCours:
+    def get(cls, entity_id: IdentiteProgrammeInscriptionCours) -> ProgrammeInscriptionCours:
         pass
 
     @classmethod
-    def get_dto(cls, entity_id: ProgrammeInscriptionCoursIdentity) -> ProgrammeInscriptionCoursDTO:
+    def get_dto(cls, entity_id: IdentiteProgrammeInscriptionCours) -> ProgrammeInscriptionCoursDTO:
         pass
 
     @classmethod
     def search(
             cls,
-            entity_ids: Optional[List[ProgrammeInscriptionCoursIdentity]] = None,
+            entity_ids: Optional[List[IdentiteProgrammeInscriptionCours]] = None,
             **kwargs
     ) -> List[ProgrammeInscriptionCours]:
         pass
 
     @classmethod
-    def delete(cls, entity_id: ProgrammeInscriptionCoursIdentity, **kwargs: ApplicationService) -> None:
+    def delete(cls, entity_id: IdentiteProgrammeInscriptionCours, **kwargs: ApplicationService) -> None:
         pass
 
     @classmethod

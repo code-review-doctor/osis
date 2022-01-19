@@ -23,30 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.preparation_programme_annuel_etudiant.commands import AnnulerActionSurUEDuProgrammeCommand
-from ddd.logic.preparation_programme_annuel_etudiant.domain.builder.groupement_ajuste_inscription_cours_identity_builder import \
-    GroupementAjusteInscriptionCoursIdentityBuilder
+
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
     IdentiteGroupementAjusteInscriptionCours
-from ddd.logic.preparation_programme_annuel_etudiant.repository.i_groupement_ajuste_inscription_cours import \
-    IGroupementAjusteInscriptionCoursRepository
+from osis_common.ddd import interface
 
 
-def annuler_action_sur_UE_du_programme(
-        cmd: 'AnnulerActionSurUEDuProgrammeCommand',
-        repository: 'IGroupementAjusteInscriptionCoursRepository',
-) -> 'IdentiteGroupementAjusteInscriptionCours':
-    # GIVEN
-    identite_groupement_ajuste = GroupementAjusteInscriptionCoursIdentityBuilder.build_from_command(cmd)
-    groupement_ajuste = repository.get(
-        entity_id=identite_groupement_ajuste
-    )
-
-    # WHEN
-    groupement_ajuste.annuler_action_sur_unite_enseignement(
-        unite_enseignement=cmd.unite_enseignement.code,
-    )
-
-    # THEN
-    repository.save(groupement_ajuste)
-    return groupement_ajuste.entity_id
+class GroupementAjusteInscriptionCoursIdentityBuilder(interface.EntityIdentityBuilder):
+    @classmethod
+    def build_from_command(
+            cls,
+            cmd: interface.CommandRequest
+    ) -> 'IdentiteGroupementAjusteInscriptionCours':
+        raise NotImplementedError
