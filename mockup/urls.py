@@ -23,9 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf.urls import include
 from django.urls import path
 
-urlpatterns = [
+from mockup.views.event_modeling import EventModelingView
 
+urlpatterns = [
+    path('event_modeling/', EventModelingView.as_view(), name=EventModelingView.name),
 ]
