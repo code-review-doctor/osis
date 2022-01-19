@@ -1,0 +1,12 @@
+{% for node in tree %}
+  <ul>
+    <li id="{{ node.id }}">
+        {{ node.text }}
+        {% if node.children %}
+          {% with tree=node.children template_name="tree_view_template.html" %}
+             {% include 'mockup/tree.html' %}
+          {% endwith %}
+        {% endif %}
+    </li>
+  </ul>
+{% endfor %}

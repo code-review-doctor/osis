@@ -23,9 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf.urls import include
 from django.urls import path
 
-urlpatterns = [
+from mockup.views.main import DetailView, TreeHTMLView
 
+urlpatterns = [
+    path('view', DetailView.as_view(), name=DetailView.name),
+    path('tree', TreeHTMLView.as_view(), name=TreeHTMLView.name),
 ]

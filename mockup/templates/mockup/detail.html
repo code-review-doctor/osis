@@ -1,0 +1,117 @@
+{% extends "layout.html" %}
+{% load static i18n bootstrap3 %}
+
+{% comment "License" %}
+ * OSIS stands for Open Student Information System. It's an application
+ * designed to manage the core business of higher education institutions,
+ * such as universities, faculties, institutes and professional schools.
+ * The core business involves the administration of students, teachers,
+ * courses, programs and so on.
+ *
+ * Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * A copy of this license - GNU General Public License - is available
+ * at the root of the source code of this program.  If not,
+ * see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+{% block breadcrumb %}
+  <li class="active">{% trans 'breadcrumb' %}</li>
+{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h2>{% trans 'Page header' %}</h2>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4>{% trans "Panel heading" %}</h4>
+    </div>
+
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-3">
+                <div id="tree"></div>
+                <script>
+                    $(document).ready(() => {
+                        const $tree = $('#tree');
+                        $tree.jstree({
+                            'core': {
+                                "animation": 0,
+                                "check_callback": true,
+                                'data': {
+                                    'url': "{% url "tree-view" %}",
+                                    'data': function (node) {
+                                        return {'id': node.id};
+                                    }
+                                }
+                            },
+                            "plugins": [
+                                "contextmenu",
+                                "state",
+                            ],
+                            "state": {
+                                "key": `tree_state_` + $tree.attr('id'),
+                                "opened": true,
+                                "selected": false,
+                                "ttl": 3600000
+                            },
+                            "contextmenu": {
+                                "select_node": false,
+                                "items": function ($node) {
+                                    return {
+                                        "action_1": {
+                                            "label": gettext("Action 1"),
+                                            "action": function (node) {
+                                                window.alert("Action 1");
+                                            },
+                                            "_disabled": function (node) {
+                                                return false;
+                                            }
+                                        },
+                                        "action_2": {
+                                            "label": gettext("Action 2"),
+                                            "action": function (node) {
+                                                window.alert("Action 2");
+                                            },
+                                            "_disabled": function (node) {
+                                                return true;
+                                            }
+                                        },
+                                        "open_all": {
+                                            "separator_before": true,
+                                            "label": gettext("Open all"),
+                                            "action": function (node) {
+                                                $tree.jstree('open_all');
+                                            }
+                                        },
+                                        "close_all": {
+                                            "label": gettext("Close all"),
+                                            "action": function (node) {
+                                                $tree.jstree('close_all');
+                                            }
+                                        },
+                                    }
+                                }
+                            }
+                        });
+                    });
+                </script>
+            </div>
+            <div class="col-md-9">
+                champs2
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
