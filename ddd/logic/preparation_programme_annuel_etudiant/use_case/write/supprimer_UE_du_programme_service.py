@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,17 +23,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.preparation_programme_annuel_etudiant.commands import AjusterUEDuGroupementCommand
+
+from ddd.logic.preparation_programme_annuel_etudiant.commands import RetirerUEDuProgrammeCommand
 from ddd.logic.preparation_programme_annuel_etudiant.domain.builder.groupement_ajuste_inscription_cours_identity_builder import \
     GroupementAjusteInscriptionCoursIdentityBuilder
+from ddd.logic.preparation_programme_annuel_etudiant.domain.builder.programme_inscription_cours_identity_builder import \
+    ProgrammeInscriptionCoursIdentityBuilder
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
     IdentiteGroupementAjusteInscriptionCours
 from ddd.logic.preparation_programme_annuel_etudiant.repository.i_groupement_ajuste_inscription_cours import \
     IGroupementAjusteInscriptionCoursRepository
 
 
-def ajuster_UE_du_programme(
-        cmd: 'AjusterUEDuGroupementCommand',
+def supprimer_UE_du_programme(
+        cmd: 'RetirerUEDuProgrammeCommand',
         repository: 'IGroupementAjusteInscriptionCoursRepository',
 ) -> 'IdentiteGroupementAjusteInscriptionCours':
     # GIVEN
@@ -44,7 +47,7 @@ def ajuster_UE_du_programme(
 
     # WHEN
     for cmd_ue in cmd.unites_enseignements:
-        groupement_ajuste.ajuster_unite_enseignement(
+        groupement_ajuste.retirer_unite_enseignement(
             unite_enseignement=cmd_ue.code,
         )
 

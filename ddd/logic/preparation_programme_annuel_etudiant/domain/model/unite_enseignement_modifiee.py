@@ -28,14 +28,16 @@ import uuid as uuid
 
 import attr
 
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 from osis_common.ddd import interface
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
-class UniteEnseignementAjusteeIdentity(interface.EntityIdentity):
+class UniteEnseignementModifieeIdentity(interface.EntityIdentity):
     uuid: uuid.UUID
 
 
 @attr.s(slots=True, auto_attribs=True)
-class UniteEnseignementAjustee(interface.Entity):
-    entity_id: UniteEnseignementAjusteeIdentity
+class UniteEnseignementModifiee(interface.Entity):  # TODO  Entity VS ValueObject ?
+    entity_id: UniteEnseignementModifieeIdentity
+    unite_enseignement_identity: 'LearningUnitIdentity'

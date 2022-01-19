@@ -26,7 +26,7 @@
 from typing import Union
 
 from ddd.logic.preparation_programme_annuel_etudiant.commands import AjouterUEAuProgrammeCommand, \
-    GetProgrammeInscriptionCoursServiceCommand, RetirerUEDuProgrammeCommand, AjusterUEDuGroupementCommand, \
+    GetProgrammeInscriptionCoursServiceCommand, RetirerUEDuProgrammeCommand, ModifierUEDuGroupementCommand, \
     AnnulerActionSurUEDuProgrammeCommand, DeplacerVersLeBasUEAjouteeDansProgrammeCommand, \
     DeplacerVersLeHautUEAjouteeDansProgrammeCommand
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.programme_inscription_cours import \
@@ -42,7 +42,7 @@ class ProgrammeInscriptionCoursIdentityBuilder(interface.EntityIdentityBuilder):
                 'GetProgrammeInscriptionCoursServiceCommand',
                 'AjouterUEAuProgrammeCommand',
                 'RetirerUEDuProgrammeCommand',
-                'AjusterUEDuGroupementCommand',
+                'ModifierUEDuGroupementCommand',
                 'AnnulerActionSurUEDuProgrammeCommand',
                 'DeplacerVersLeHautUEAjouteeDansProgrammeCommand',
                 'DeplacerVersLeBasUEAjouteeDansProgrammeCommand'

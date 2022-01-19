@@ -31,13 +31,14 @@ import attr
 
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.unite_enseignement_ajoutee import \
     UniteEnseignementAjoutee, UniteEnseignementAjouteeIdentity
-from ddd.logic.preparation_programme_annuel_etudiant.domain.model.unite_enseignement_ajustee import \
-    UniteEnseignementAjustee
-from ddd.logic.preparation_programme_annuel_etudiant.domain.model.unite_enseignement_retiree import \
-    UniteEnseignementRetiree
+from ddd.logic.preparation_programme_annuel_etudiant.domain.model.unite_enseignement_modifiee import \
+    UniteEnseignementModifiee
+from ddd.logic.preparation_programme_annuel_etudiant.domain.model.unite_enseignement_supprimee import \
+    UniteEnseignementSupprimee
 from education_group.ddd.domain.group import GroupIdentity
 from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
 from osis_common.ddd import interface
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
@@ -48,10 +49,11 @@ class IdentiteGroupementAjusteInscriptionCours(interface.EntityIdentity):
 @attr.s(slots=True, auto_attribs=True)
 class GroupementAjusteInscriptionCours(interface.RootEntity):
     entity_id: IdentiteGroupementAjusteInscriptionCours
+    version_programme_id: 'ProgramTreeVersionIdentity'
     groupement_id: GroupIdentity
     unites_enseignement_ajoutees: List['UniteEnseignementAjoutee']
-    unites_enseignement_retirees: List['UniteEnseignementRetiree']
-    unites_enseignement_ajustees: List['UniteEnseignementAjustee']
+    unites_enseignement_supprimees: List['UniteEnseignementSupprimee']
+    unites_enseignement_modifiees: List['UniteEnseignementModifiee']
 
     @property
     def annee(self):
