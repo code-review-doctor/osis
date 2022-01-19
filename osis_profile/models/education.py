@@ -28,6 +28,7 @@ from django.utils.translation import gettext_lazy as _
 
 from base.models.academic_year import AcademicYear
 from base.models.person import Person
+from osis_document.contrib import FileField
 from osis_profile.models.enums.education import (
     BelgianCommunitiesOfEducation,
     DiplomaResults,
@@ -38,6 +39,14 @@ from osis_profile.models.enums.education import (
 )
 from reference.models.country import Country
 from reference.models.language import Language
+
+
+def education_directory_path(diploma: 'HighSchoolDiploma', filename: str):
+    """Return the file upload directory path."""
+    return '{}/education/{}'.format(
+        diploma.person.uuid,
+        filename,
+    )
 
 
 class Schedule(models.Model):
@@ -90,6 +99,18 @@ class HighSchoolDiploma(models.Model):
         max_length=25,
         null=True,
     )
+    high_school_transcript = FileField(
+        verbose_name=_("A transcript or your last year at high school"),
+        max_files=1,
+        upload_to=education_directory_path,
+        blank=True,
+    )
+    high_school_diploma = FileField(
+        verbose_name=_("High school diploma"),
+        max_files=1,
+        upload_to=education_directory_path,
+        blank=True,
+    )
 
     class Meta:
         abstract = True
@@ -114,12 +135,6 @@ class BelgianHighSchoolDiploma(HighSchoolDiploma):
         max_length=50,
         default="",
         blank=True,
-    )
-    course_repeat = models.BooleanField(
-        _("Did you repeat certain study years during your studies?"), default=False
-    )
-    course_orientation = models.BooleanField(
-        _("Did you change of orientation during your studies?"), default=False
     )
     # TODO change by a FK when we got the related service to look for institutes
     institute = models.CharField(_("Institute"), default="", blank=True, max_length=25)
@@ -177,6 +192,20 @@ class ForeignHighSchoolDiploma(HighSchoolDiploma):
         choices=Equivalence.choices(),
         max_length=25,
         null=True,
+    )
+    high_school_transcript_translation = FileField(
+        verbose_name=_("A certified translation of your official transcript of marks for your final year of "
+                       "secondary education"),
+        max_files=1,
+        upload_to=education_directory_path,
+        blank=True,
+    )
+    high_school_diploma_translation = FileField(
+        verbose_name=_("A certified translation of your official transcript of marks for your final year of "
+                       "secondary education"),
+        max_files=1,
+        upload_to=education_directory_path,
+        blank=True,
     )
 
 

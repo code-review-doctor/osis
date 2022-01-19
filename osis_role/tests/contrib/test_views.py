@@ -23,10 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib.auth.models import Permission
+from django.contrib.auth.models import AnonymousUser, Permission
+from django.utils.translation import gettext_lazy as _
 from django.test import TestCase
 from django.test.client import RequestFactory
 from rest_framework import status
+from rest_framework.exceptions import NotAuthenticated
 from rest_framework.permissions import IsAdminUser
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -82,6 +84,7 @@ class TestApiPermissionRequiredMixin(TestCase):
 
         # Check result -> authorized access
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIsNone(self.api_view().check_method_permissions(user, 'GET'))
 
     def test_user_with_right_permissions_tuple(self):
         # Create a user with the right permissions (defined in the class as a tuple)
@@ -96,6 +99,7 @@ class TestApiPermissionRequiredMixin(TestCase):
 
         # Check result -> authorized access
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIsNone(self.api_view().check_method_permissions(user, 'PUT'))
 
     def test_user_with_wrong_permissions(self):
         # Create a user without the necessary permission
@@ -110,6 +114,10 @@ class TestApiPermissionRequiredMixin(TestCase):
 
         # Check result -> non authorized access
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(
+            self.api_view().check_method_permissions(user, 'GET'),
+            _("Method '{}' not allowed".format('GET')),
+        )
 
     def test_not_configured_request(self):
         # Create a user with the right permission
@@ -124,6 +132,7 @@ class TestApiPermissionRequiredMixin(TestCase):
 
         # Check result -> authorized access as no permission is required for this request
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIsNone(self.api_view().check_method_permissions(user, 'DELETE'))
 
     def test_no_request_permission(self):
         # Create a user with the right permission
@@ -137,6 +146,7 @@ class TestApiPermissionRequiredMixin(TestCase):
 
         # Check result -> authorized access as no permission is required for this request
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIsNone(self.api_view().check_method_permissions(user, 'POST'))
 
     def test_no_authenticated_user(self):
         # Simulate a get request with an anonymous user
@@ -144,6 +154,8 @@ class TestApiPermissionRequiredMixin(TestCase):
         response = self.api_view.as_view()(request)
         # Check result -> unauthorized access as the user isn't authenticated
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        with self.assertRaises(NotAuthenticated):
+            self.api_view().check_method_permissions(AnonymousUser(), 'GET')
 
     def test_without_mapping_as_admin(self):
         # Create a user with the right permission
@@ -157,6 +169,7 @@ class TestApiPermissionRequiredMixin(TestCase):
 
         # Check result -> access granted
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIsNone(self.api_view_without_mapping().check_method_permissions(user, 'GET'))
 
     def test_without_mapping_without_permission(self):
         # Create a user without permissions
@@ -168,5 +181,9 @@ class TestApiPermissionRequiredMixin(TestCase):
         request._force_auth_user = user
         response = self.api_view_without_mapping.as_view()(request)
 
-        # Check result -> access granted
+        # Check result -> access not granted
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(
+            self.api_view_without_mapping().check_method_permissions(user, 'GET'),
+            _("Method '{}' not allowed".format('GET')),
+        )

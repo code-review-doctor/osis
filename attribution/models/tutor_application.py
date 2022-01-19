@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import uuid as uuid
+
 from django.contrib import admin
 from django.db import models
 
@@ -55,8 +56,8 @@ class TutorApplication(models.Model):
     changed = models.DateTimeField(null=True, auto_now=True)
     learning_container_year = models.ForeignKey('base.LearningContainerYear', on_delete=models.PROTECT)
     person = models.ForeignKey('base.Person', on_delete=models.CASCADE)
-    volume_lecturing = models.DecimalField(max_digits=6, decimal_places=1, blank=True, null=True)
-    volume_pratical_exercice = models.DecimalField(max_digits=6, decimal_places=1, blank=True, null=True)
+    volume_lecturing = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
+    volume_pratical_exercice = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
     remark = models.TextField(blank=True, null=True)
     course_summary = models.TextField(blank=True, null=True)
     last_changed = models.DateTimeField(null=True)
