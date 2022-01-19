@@ -83,12 +83,16 @@
                 <table id="table_search_list" class="table table-hover">
                     <thead>
                     <tr>
-                        <th id="code_ue" class="col-md-2 text-center">{% trans 'Code UE' %}</th>
+                        <th id="code_ue" class="col-md-1 text-center">{% trans 'Code UE' %}</th>
                         <th id="intitule" class="col-md-2">{% trans 'Intitule' %}</th>
-                        <th id="volumes" class="col-md-2">{% trans 'Volumes PM/PP' %}</th>
-                        <th id="bloc" class="col-md-2">{% trans 'Bloc' %}</th>
-                        <th id="quadri" class="col-md-2">{% trans 'Quadri' %}</th>
+                        <th id="volumes" class="col-md-1">{% trans 'Volumes PM/PP' %}</th>
+                        <th id="bloc" class="col-md-1">{% trans 'Bloc' %}</th>
+                        <th id="quadri" class="col-md-1">{% trans 'Quadri' %}</th>
                         <th id="credits" class="col-md-1">{% trans 'Credits' %}</th>
+                        <th id="session" class="col-md-1">{% trans 'Sess.' %}</th>
+                        <th id="obligatoire" class="col-md-1">{% trans 'Obli.' %}</th>
+                        <th id="commentaire_fr" class="col-md-1">{% trans 'Com. Fr.' %}</th>
+                        <th id="commentaire_en" class="col-md-1">{% trans 'Com. Ang.' %}</th>
                         <th id="action" class="col-md-1"></th>
                     </tr>
                     </thead>
@@ -112,6 +116,18 @@
                             </td>
                             <td headers="credits">
                                 {{ element.credits }}
+                            </td>
+                            <td headers="session">
+                                {{ element.session }}
+                            </td>
+                            <td headers="obligatoire">
+                                {{ element.obligatoire }}
+                            </td>
+                            <td headers="commentaire_fr">
+                                {{ element.commentaire_fr }}
+                            </td>
+                            <td headers="commentaire_en">
+                                {{ element.commentaire_en }}
                             </td>
                             <td headers="action">
                                 <div class="pull-right">
