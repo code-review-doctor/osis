@@ -23,76 +23,73 @@
 #
 ##############################################################################
 
-
 from django import forms
-from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import FormView
+from django.views.generic import TemplateView
 from rules.contrib.views import LoginRequiredMixin
 
-from base.forms.utils.choice_field import add_blank
-from base.models.enums.active_status import ActiveStatusEnum
+from ddd.logic.shared_kernel.academic_year.commands import SearchAcademicYearCommand
 from education_group.forms.fields import UpperCaseCharField
+from infrastructure.messages_bus import message_bus_instance
 
 
 class SearchLearningUnitForm(forms.Form):
     annee_academique = forms.ChoiceField(
-        initial=ActiveStatusEnum.ACTIVE.name,
-        choices=add_blank(list(ActiveStatusEnum.choices())),
         label=_("Academic year").capitalize(),
         required=False
     )
     code = UpperCaseCharField(max_length=15, label=_("Code").capitalize(), required=False)
     intitule = forms.CharField(max_length=30, label=_("Title").capitalize(), required=False)
 
-    def __init__(self, *args, user: User, **kwargs):
-        self.user = user
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.__init_academic_year_field()
+
+    def __init_academic_year_field(self):
+        all_academic_year = message_bus_instance.invoke(
+            SearchAcademicYearCommand()
+        )
+        self.fields['annee_academique'].choices = [(ac_year.year, str(ac_year)) for ac_year in all_academic_year]
 
 
-class AddLearningUnitFormView(LoginRequiredMixin, FormView):
+class AddLearningUnitFormView(LoginRequiredMixin, TemplateView):
     name = 'add-learning-unit'
 
     # FormView
     template_name = "preparation_inscription/add.html"
 
-    form_class = SearchLearningUnitForm
-
     def get_search_form(self):
-        return SearchLearningUnitForm(data=self.request.GET or None, user=self.request.user)
+        return SearchLearningUnitForm(
+            data=self.request.GET or None,
+            initial={
+                'annee_academique': 2021
+            }
+        )
 
     def get_search_result(self):
         data = [
             {
-                'annee_academique': '1',
-                'code': '2',
-                'intitule': '3',
+                'annee_academique': '2021',
+                'code': 'LSINF1452',
+                'intitule': 'Test en EPC',
             },
             {
-                'annee_academique': '1',
-                'code': '2',
-                'intitule': '3',
+                'annee_academique': '2021',
+                'code': 'LECGE12547',
+                'intitule': 'Finance en Osis',
             },
         ]  # TODO :: message_bus.invoke(Command)
         return data
 
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['user'] = self.request.user
-        return kwargs
-
-    def form_valid(self, formset):
+    def post(self, request, *args, **kwargs):
+        selected_ues = request.POST.getlist('selected_ue')
         # TODO :: to implement
         # cmd = Command(...)
         # message__bus.invoke(cmd)
         # display_error_messages(self.request, messages)
         # display_success_messages(self.request, messages)
         # self.render_to_response(self.get_context_data(form=self.get_form(self.form_class)))
-        return super().form_valid(formset)
-
-    def get_success_url(self):
-        # TODO :: redirect to pae main page
-        return ""
+        return self.get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         return {
