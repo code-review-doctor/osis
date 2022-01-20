@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -124,3 +124,11 @@ class DeplacerVersLeBasUEAjouteeDansProgrammeCommand(interface.CommandRequest):
     transition_formation: str
     ajoutee_dans: str  # code groupement
     unite_enseignement: UniteEnseignementCommand
+
+
+@attr.s(frozen=True, slots=True)
+class GetFormationDtoCommand(interface.CommandRequest):
+    annee = attr.ib(type=int)
+    code = attr.ib(type=str)
+    version = attr.ib(type=str)
+    transition = attr.ib(type=str)

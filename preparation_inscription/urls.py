@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,28 +23,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormulaireInscriptionCoursCommand
-from ddd.logic.preparation_programme_annuel_etudiant.domain.builder.formulaire_inscription_cours_builder import \
-    FormulaireInscriptionCoursBuilder
-from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import \
-    ICatalogueFormationsTranslator
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormulaireInscriptionCoursDTO
+from django.urls import include, path
 
+from preparation_inscription.views.formulaire_par_defaut import FormulaireParDefaultView
 
-def get_formulaire_inscription_cours_service(
-        cmd: 'GetFormulaireInscriptionCoursCommand',
-        catalogue_formations_translator: 'ICatalogueFormationsTranslator',
-) -> 'FormulaireInscriptionCoursDTO':
-    # GIVEN
-    formation = catalogue_formations_translator.get_formation(
-        sigle=cmd.sigle_formation,
-        annee=cmd.annee_formation,
-        version=cmd.version_formation,
-        transition_name=cmd.transition_formation
-    )
-
-    # WHEN
-    formulaire = FormulaireInscriptionCoursBuilder.build(formation)
-
-    # THEN
-    return formulaire
+urlpatterns = [
+    path('<int:year>/<acronym:acronym>/', include([
+        path('default_enrollment_form/', FormulaireParDefaultView.as_view(), name='default_enrollment_form'),
+    ])),
+    path('<int:year>/<acronym:acronym>/<str:version_name>/', include([
+        path('default_enrollment_form/', FormulaireParDefaultView.as_view(), name='default_enrollment_form'),
+        path(
+            '<str:transition_name>/default_enrollment_form/',
+            FormulaireParDefaultView.as_view(),
+            name='default_enrollment_form'
+        ),
+    ])),
+]

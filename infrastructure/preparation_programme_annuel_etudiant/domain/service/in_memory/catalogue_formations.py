@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -25,15 +25,21 @@
 ##############################################################################
 from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import \
     ICatalogueFormationsTranslator
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, ContenuGroupementCatalogueDTO, \
+    GroupementDTO
 
 
 class CatalogueFormationsTranslatorInMemory(ICatalogueFormationsTranslator):
+    contenu = ContenuGroupementCatalogueDTO(
+        groupement_contenant=None,
+        groupements_contenus=[],
+        unites_enseignement_contenues=[]
+    )
 
     dtos = [
         FormationDTO(
-            programme_detaille=...,  # TODO :: to implement
-            annee=2020,
+            racine=contenu,
+            annee=2021,
             sigle='ECGE1BA',
             version='STANDARD',
             intitule_complet='Bachelier ...',
@@ -41,8 +47,18 @@ class CatalogueFormationsTranslatorInMemory(ICatalogueFormationsTranslator):
     ]
 
     @classmethod
-    def get_formation(cls, sigle: str, annee: int, version: str) -> 'FormationDTO':
+    def get_formation(cls, sigle: str, annee: int, version: str, transition_name: str) -> 'FormationDTO':
         return next(
             dto for dto in cls.dtos
             if dto.sigle == sigle and dto.annee == annee and dto.version == version
         )
+
+    @classmethod
+    def get_groupement(
+            cls,
+            sigle_formation: str,
+            annee: int,
+            version_formation: str,
+            code_groupement: str
+    ) -> 'GroupementDTO':
+        raise NotImplementedError()

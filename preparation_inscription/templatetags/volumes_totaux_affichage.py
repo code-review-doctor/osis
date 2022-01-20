@@ -23,28 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormulaireInscriptionCoursCommand
-from ddd.logic.preparation_programme_annuel_etudiant.domain.builder.formulaire_inscription_cours_builder import \
-    FormulaireInscriptionCoursBuilder
-from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import \
-    ICatalogueFormationsTranslator
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormulaireInscriptionCoursDTO
+from decimal import Decimal
+from django import template
+register = template.Library()
 
 
-def get_formulaire_inscription_cours_service(
-        cmd: 'GetFormulaireInscriptionCoursCommand',
-        catalogue_formations_translator: 'ICatalogueFormationsTranslator',
-) -> 'FormulaireInscriptionCoursDTO':
-    # GIVEN
-    formation = catalogue_formations_translator.get_formation(
-        sigle=cmd.sigle_formation,
-        annee=cmd.annee_formation,
-        version=cmd.version_formation,
-        transition_name=cmd.transition_formation
-    )
-
-    # WHEN
-    formulaire = FormulaireInscriptionCoursBuilder.build(formation)
-
-    # THEN
-    return formulaire
+@register.filter
+def volumes_totaux_affichage(unite_catalogue_dto: 'UniteEnseignementCatalogueDTO') -> str:
+    return "%(total_lecturing)gh + %(total_practical)gh" % {
+        "total_lecturing": unite_catalogue_dto.volume_annuel_pm or Decimal(0.0),
+        "total_practical": unite_catalogue_dto.volume_annuel_pp or Decimal(0.0)
+    }

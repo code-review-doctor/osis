@@ -24,9 +24,11 @@
 ##############################################################################
 from typing import Optional
 
+from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormationDtoCommand
 from program_management.ddd.command import GetProgramTreeVersionCommand
 from program_management.ddd.domain import program_tree_version, exception
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
+from program_management.ddd.dtos import ProgrammeDeFormationDTO
 from program_management.ddd.repositories import program_tree_version as program_tree_version_repository
 
 
@@ -40,5 +42,19 @@ def get_program_tree_version(cmd: GetProgramTreeVersionCommand) -> Optional['Pro
 
     try:
         return program_tree_version_repository.ProgramTreeVersionRepository().get(entity_id=identity)
+    except exception.ProgramTreeVersionNotFoundException:
+        return None
+
+
+def get_programme_formation(cmd: GetFormationDtoCommand) -> Optional['ProgrammeDeFormationDTO']:
+    identity = program_tree_version.ProgramTreeVersionIdentity(
+        offer_acronym=cmd.code,
+        year=cmd.annee,
+        version_name=cmd.version,
+        transition_name=cmd.transition
+    )
+
+    try:
+        return program_tree_version_repository.ProgramTreeVersionRepository().get_dto(identity)
     except exception.ProgramTreeVersionNotFoundException:
         return None

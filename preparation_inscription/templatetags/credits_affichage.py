@@ -23,28 +23,29 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormulaireInscriptionCoursCommand
-from ddd.logic.preparation_programme_annuel_etudiant.domain.builder.formulaire_inscription_cours_builder import \
-    FormulaireInscriptionCoursBuilder
-from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import \
-    ICatalogueFormationsTranslator
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormulaireInscriptionCoursDTO
+from django import template
+from django.utils.translation import gettext_lazy as _
+
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import UniteEnseignementCatalogueDTO, GroupementCatalogueDTO
+
+register = template.Library()
 
 
-def get_formulaire_inscription_cours_service(
-        cmd: 'GetFormulaireInscriptionCoursCommand',
-        catalogue_formations_translator: 'ICatalogueFormationsTranslator',
-) -> 'FormulaireInscriptionCoursDTO':
-    # GIVEN
-    formation = catalogue_formations_translator.get_formation(
-        sigle=cmd.sigle_formation,
-        annee=cmd.annee_formation,
-        version=cmd.version_formation,
-        transition_name=cmd.transition_formation
-    )
+@register.filter
+def credits_pour_ue(groupement_contenant: 'UniteEnseignementCatalogueDTO')-> str:
+    if groupement_contenant and (groupement_contenant.credits_absolus or groupement_contenant.credits_relatifs):
+        return "({} {})".format(
+            groupement_contenant.credits_absolus.normalize() or groupement_contenant.credits_relatifs.normalize() or 0,
+            _("credits")
+        )
+    return ""
 
-    # WHEN
-    formulaire = FormulaireInscriptionCoursBuilder.build(formation)
 
-    # THEN
-    return formulaire
+@register.filter
+def credits_pour_groupement(groupement_contenant: 'GroupementCatalogueDTO') -> str:
+    if groupement_contenant and groupement_contenant.credits:
+        return "({} {})".format(
+            groupement_contenant.credits or 0,
+            _("credits")
+        )
+    return ""

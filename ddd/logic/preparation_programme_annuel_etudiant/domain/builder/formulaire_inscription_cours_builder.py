@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,11 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, FormulaireInscriptionCoursDTO
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, FormulaireInscriptionCoursDTO, \
+    ContenuGroupementDTO
 from osis_common.ddd import interface
 
 
 class FormulaireInscriptionCoursBuilder(interface.RootEntityBuilder):
     @classmethod
-    def build(cls, formation_dto: 'FormationDTO') -> 'FormulaireInscriptionCoursDTO':
-        raise NotImplementedError
+    def build(cls, formation: 'FormationDTO') -> 'FormulaireInscriptionCoursDTO':
+        unites_enseignement_contenues = formation.racine.unites_enseignement_contenues if formation.racine else []
+        groupements_contenus = formation.racine.groupements_contenus if formation.racine else []
+
+        return FormulaireInscriptionCoursDTO(
+            annee_formation=formation.annee,
+            sigle_formation=formation.sigle,
+            version_formation=formation.version,
+            intitule_complet_formation=formation.intitule_complet,
+            racine=ContenuGroupementDTO(
+                groupement_contenant=None,
+                unites_enseignement_contenues=unites_enseignement_contenues,
+                groupements_contenus=groupements_contenus
+            )
+        )
