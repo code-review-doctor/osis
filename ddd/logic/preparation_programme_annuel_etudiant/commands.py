@@ -88,7 +88,7 @@ class ModifierUniteEnseignementCommand(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
-class AjusterUEDuGroupementCommand(interface.CommandRequest):
+class ModifierUEDuGroupementCommand(interface.CommandRequest):
     annee_formation: int
     sigle_formation: str
     version_formation: str
