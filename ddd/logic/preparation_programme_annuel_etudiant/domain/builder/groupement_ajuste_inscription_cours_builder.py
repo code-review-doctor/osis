@@ -23,9 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Union
-
 import uuid
+from typing import Union
 
 from ddd.logic.preparation_programme_annuel_etudiant.commands import AjouterUEAuProgrammeCommand
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
@@ -34,17 +33,17 @@ from ddd.logic.preparation_programme_annuel_etudiant.repository.i_groupement_aju
     IGroupementAjusteInscriptionCoursRepository
 from education_group.ddd.domain.group import GroupIdentity
 from osis_common.ddd import interface
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentityBuilder
 
 
-class GroupementAjusteInscriptionCoursBuilder(interface.EntityIdentityBuilder):
+class GroupementAjusteInscriptionCoursBuilder(interface.RootEntityBuilder):
     @classmethod
     def build_from_command(
             cls,
             cmd: Union['AjouterUEAuProgrammeCommand'],
             repository: 'IGroupementAjusteInscriptionCoursRepository'
     ) -> 'GroupementAjusteInscriptionCours':
-        version_programme_id = ProgramTreeVersionIdentity(
+        version_programme_id = ProgramTreeVersionIdentityBuilder().build(
             offer_acronym=cmd.sigle_formation,
             year=cmd.annee_formation,
             version_name=cmd.version_formation,
