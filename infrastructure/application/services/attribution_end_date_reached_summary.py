@@ -52,14 +52,24 @@ class AttributionsEndDateReachedSummary(IAttributionsEndDateReachedSummary):
             application_calendar: ApplicationCalendar,
             applicant_repository: IApplicantRepository
     ):
+        logger.info("In AttributionsEndDateReachedSummary method send ")
         if application_calendar.start_date == datetime.date.today():
-            applicants = applicant_repository.search(year=application_calendar.authorized_target_year.year)
+            logger.info("application_calendar.start_date ({}) is today {}".format(
+                application_calendar.start_date,
+                datetime.date.today())
+            )
+            applicants = applicant_repository.search()
+            logger.info("Number of applicants {}".format(len(applicants)))
             for applicant in applicants:
                 attributions_about_to_expire = applicant.get_attributions_about_to_expire_renewable_with_functions(
                     AcademicYearIdentityBuilder.build_from_year(application_calendar.authorized_target_year.year)
                 )
 
                 if len(attributions_about_to_expire) > 0:
+                    logger.info("Number of attribution about to expired {} for {}".format(
+                        len(attributions_about_to_expire),
+                        applicant.entity_id.global_id)
+                    )
                     person = Person.objects.get(global_id=applicant.entity_id.global_id)
                     receivers = [message_config.create_receiver(person.id, person.email, person.language)]
                     table_ending_attributions = message_config.create_table(
@@ -89,3 +99,12 @@ class AttributionsEndDateReachedSummary(IAttributionsEndDateReachedSummary):
                         None
                     )
                     message_service.send_messages(message_content)
+                else:
+                    logger.info("No attribution about to expired for {}".format(
+                        applicant.entity_id.global_id)
+                    )
+        else:
+            logger.info("application_calendar.start_date ({}) is NOT today {}".format(
+                application_calendar.start_date,
+                datetime.date.today())
+            )
