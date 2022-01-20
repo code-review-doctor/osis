@@ -50,4 +50,4 @@ def send_applications_summary(
     )
 
     # Then
-    application_summary.send(applicant, application_calendar, applications)
+    application_summary.send(applicant, applications)

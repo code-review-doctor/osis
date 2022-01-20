@@ -25,31 +25,31 @@
 ##############################################################################
 
 from ddd.logic.preparation_programme_annuel_etudiant.commands import DeplacerVersLeBasUEAjouteeDansProgrammeCommand
-from ddd.logic.preparation_programme_annuel_etudiant.domain.builder.programme_inscription_cours_identity_builder import \
-    ProgrammeInscriptionCoursIdentityBuilder
+from ddd.logic.preparation_programme_annuel_etudiant.domain.builder.groupement_ajuste_inscription_cours_identity_builder import \
+    GroupementAjusteInscriptionCoursIdentityBuilder
 from ddd.logic.preparation_programme_annuel_etudiant.domain.builder.unite_enseignement_identity_builder import \
     UniteEnseignementIdentityBuilder
-from ddd.logic.preparation_programme_annuel_etudiant.domain.model.programme_inscription_cours import \
-    ProgrammeInscriptionCoursIdentity
+from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
+    IdentiteGroupementAjusteInscriptionCours
 
 from ddd.logic.preparation_programme_annuel_etudiant.domain.service.deplacer_UE_ajoutee import DeplacerUEAjoutee
-from ddd.logic.preparation_programme_annuel_etudiant.repository.i_programme_inscription_cours import \
-    IProgrammeInscriptionCoursRepository
+from ddd.logic.preparation_programme_annuel_etudiant.repository.i_groupement_ajuste_inscription_cours import \
+    IGroupementAjusteInscriptionCoursRepository
 from infrastructure.preparation_programme_annuel_etudiant.domain.service.catalogue_formations import \
     CatalogueFormationsTranslator
 
 
 def deplacer_vers_le_bas_UE_ajoutee_dans_programme(
         cmd: 'DeplacerVersLeBasUEAjouteeDansProgrammeCommand',
-        repository: 'IProgrammeInscriptionCoursRepository',
+        repository: 'IGroupementAjusteInscriptionCoursRepository',
         translator: 'CatalogueFormationsTranslator',
-) -> 'ProgrammeInscriptionCoursIdentity':
+) -> 'IdentiteGroupementAjusteInscriptionCours':
     # GIVEN
     unite_enseignement_identity = UniteEnseignementIdentityBuilder.build_from_command(cmd.unite_enseignement)
 
-    programme_inscription_cours_identity = ProgrammeInscriptionCoursIdentityBuilder.build_from_command(cmd)
-    programme_inscription_cours = repository.get(
-        entity_id=programme_inscription_cours_identity
+    identite_groupement_ajuste = GroupementAjusteInscriptionCoursIdentityBuilder.build_from_command(cmd)
+    groupement_ajuste = repository.get(
+        entity_id=identite_groupement_ajuste
     )
 
     contenu_groupement = translator.get_contenu_groupement(
@@ -61,12 +61,12 @@ def deplacer_vers_le_bas_UE_ajoutee_dans_programme(
 
     # WHEN
     DeplacerUEAjoutee.deplacer_vers_le_bas(
-        programme_inscription_cours=programme_inscription_cours,
+        groupement_ajuste_inscr_cours=groupement_ajuste,
         contenu_groupement=contenu_groupement,
         unite_enseignement_identity=unite_enseignement_identity,
         repository=repository
     )
 
     # THEN
-    return programme_inscription_cours.entity_id
+    return groupement_ajuste.entity_id
 

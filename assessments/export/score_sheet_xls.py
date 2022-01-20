@@ -28,7 +28,7 @@ import decimal
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from openpyxl import Workbook
-from openpyxl.styles import Font, colors, Color, PatternFill, Border, Side
+from openpyxl.styles import Font, colors, Color, PatternFill, Border, Side, Style
 from openpyxl.styles.borders import BORDER_MEDIUM
 from openpyxl.writer.excel import save_virtual_workbook
 
@@ -178,10 +178,9 @@ def _build_rows(worksheet, feuille_de_notes_serialized):
 
         for column_number in range(1, 8):
             __set_non_editable_color(worksheet, column_number, current_row_number)
-        for column_number in range(9, len(HEADER) + 1):
-            __set_non_editable_color(worksheet, column_number, current_row_number)
         if row['est_soumise']:
             __set_non_editable_color(worksheet, 8, current_row_number)
+        __set_non_editable_color(worksheet, 9, current_row_number)
 
         if row['inscrit_tardivement']:
             __set_late_subscribe_row_color(worksheet, current_row_number)
@@ -198,24 +197,25 @@ def __set_non_editable_color(worksheet, column_number, row_number):
 
 def __set_late_subscribe_row_color(worksheet, row_number):
     pattern_fill_enrollment_state = PatternFill(patternType='solid', fgColor='dff0d8')
-    for column_number in range(1, len(HEADER) + 1):
+    for column_number in range(1, 10):
         worksheet.cell(row=row_number, column=column_number).fill = pattern_fill_enrollment_state
 
 
 def __set_late_unsubscribe_row_color(worksheet, row_number):
     pattern_fill_enrollment_state = PatternFill(patternType='solid', fgColor='f2dede')
-    for column_number in range(1, len(HEADER) + 1):
+    for column_number in range(1, 10):
         worksheet.cell(row=row_number, column=column_number).fill = pattern_fill_enrollment_state
 
 
 def __set_border_on_first_peps_cell(worksheet, row_number):
     first_peps_cell = worksheet["J{}".format(row_number)]
-    if first_peps_cell.has_style:
-        c = first_peps_cell.style
-        c.border = Border(
-            left=Side(border_style=BORDER_MEDIUM, color=Color('FF000000')),
-        )
-        first_peps_cell.style = c
+    medium_black_border = Border(
+        left=Side(border_style=BORDER_MEDIUM, color=Color('FF000000')),
+    )
+    cell_style = first_peps_cell.style if first_peps_cell.has_style else Style()
+    cell_style.border = medium_black_border
+
+    first_peps_cell.style = cell_style
 
 
 def _format_note(note: str) -> str:

@@ -38,5 +38,6 @@ class EntitySerializer(serializers.Serializer):
     end_date = serializers.DateField()
     logo = serializers.ImageField()
 
-    def get_entity_type_text(self, obj):
+    @staticmethod
+    def get_entity_type_text(obj):
         return obj.get_entity_type_display()

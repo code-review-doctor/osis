@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -92,6 +92,7 @@ if 'osis_async' in settings.INSTALLED_APPS:
     )
 if 'preparation_inscription' in settings.INSTALLED_APPS:
     urlpatterns += (url(r'^preparation_inscription/', include('preparation_inscription.urls')),)
+
 handler404 = 'base.views.common.page_not_found'
 handler403 = 'base.views.common.access_denied'
 handler405 = 'base.views.common.method_not_allowed'

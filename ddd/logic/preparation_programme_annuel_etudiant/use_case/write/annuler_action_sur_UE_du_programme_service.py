@@ -24,30 +24,29 @@
 #
 ##############################################################################
 from ddd.logic.preparation_programme_annuel_etudiant.commands import AnnulerActionSurUEDuProgrammeCommand
-from ddd.logic.preparation_programme_annuel_etudiant.domain.builder.programme_inscription_cours_identity_builder \
-    import ProgrammeInscriptionCoursIdentityBuilder
-from ddd.logic.preparation_programme_annuel_etudiant.domain.model.programme_inscription_cours import \
-    ProgrammeInscriptionCoursIdentity
-from ddd.logic.preparation_programme_annuel_etudiant.repository.i_programme_inscription_cours import \
-    IProgrammeInscriptionCoursRepository
+from ddd.logic.preparation_programme_annuel_etudiant.domain.builder.groupement_ajuste_inscription_cours_identity_builder import \
+    GroupementAjusteInscriptionCoursIdentityBuilder
+from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
+    IdentiteGroupementAjusteInscriptionCours
+from ddd.logic.preparation_programme_annuel_etudiant.repository.i_groupement_ajuste_inscription_cours import \
+    IGroupementAjusteInscriptionCoursRepository
 
 
 def annuler_action_sur_UE_du_programme(
         cmd: 'AnnulerActionSurUEDuProgrammeCommand',
-        repository: 'IProgrammeInscriptionCoursRepository',
-) -> 'ProgrammeInscriptionCoursIdentity':
+        repository: 'IGroupementAjusteInscriptionCoursRepository',
+) -> 'IdentiteGroupementAjusteInscriptionCours':
     # GIVEN
-    programme_inscription_cours_identity = ProgrammeInscriptionCoursIdentityBuilder.build_from_command(cmd)
-    programme_inscription_cours = repository.get(
-        entity_id=programme_inscription_cours_identity
+    identite_groupement_ajuste = GroupementAjusteInscriptionCoursIdentityBuilder.build_from_command(cmd)
+    groupement_ajuste = repository.get(
+        entity_id=identite_groupement_ajuste
     )
 
     # WHEN
-    programme_inscription_cours.annuler_action_sur_unite_enseignement(
+    groupement_ajuste.annuler_action_sur_unite_enseignement(
         unite_enseignement=cmd.unite_enseignement.code,
-        a_annuler_dans=cmd.a_annuler_dans
     )
 
     # THEN
-    repository.save(programme_inscription_cours)
-    return programme_inscription_cours.entity_id
+    repository.save(groupement_ajuste)
+    return groupement_ajuste.entity_id

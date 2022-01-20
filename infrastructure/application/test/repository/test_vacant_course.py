@@ -130,10 +130,15 @@ class VacantCourseRepositorySearch(TestCase):
     def test_assert_filter_by_entity_ids(self):
         entity_ids = [
             VacantCourseIdentity(academic_year=AcademicYearIdentity(year=2020), code='LAGRO1500'),
-            VacantCourseIdentity(academic_year=AcademicYearIdentity(year=2020), code='LDROI1200')
         ]
 
         results = self.repository.search(entity_ids=entity_ids)
+        self.assertEqual(len(results), 1)
+
+    def test_should_return_all_vacant_courses_if_no_entity_ids(self):
+        results = self.repository.search(entity_ids=[])
+        self.assertEqual(len(results), 2)
+        results = self.repository.search(entity_ids=None)
         self.assertEqual(len(results), 2)
 
 

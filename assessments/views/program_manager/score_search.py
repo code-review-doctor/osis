@@ -32,18 +32,16 @@ from django.shortcuts import redirect
 from django.template.defaultfilters import floatformat
 from django.urls import reverse
 from django.utils.functional import cached_property
-from django.views.generic import FormView
 from django.utils.translation import gettext_lazy as _, ngettext
+from django.views.generic import FormView
 
 from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmissionCalendar
 from assessments.forms.score_encoding import ScoreSearchForm, ScoreSearchEncodingForm, ScoreEncodingFormSet
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
-from base.views.common import display_warning_messages
 from ddd.logic.encodage_des_notes.encodage.commands import RechercherNotesCommand, EncoderNotesCommand, \
     EncoderNoteCommand
 from infrastructure.messages_bus import message_bus_instance
 from osis_role.contrib.views import PermissionRequiredMixin
-
 
 MAXIMUM_RESULTS_DISPLAYED = 1000
 

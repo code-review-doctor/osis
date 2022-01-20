@@ -42,7 +42,7 @@ OPTIONAL_APPS = (
     'backoffice',
     'admission',
     'organisation',
-    'preparation_inscription',
+    'preparation_inscription'
 )
 OPTIONAL_MIDDLEWARES = ()
 OPTIONAL_INTERNAL_IPS = ()

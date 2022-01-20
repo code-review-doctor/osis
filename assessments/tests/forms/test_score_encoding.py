@@ -23,9 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from unittest import mock
+
 from django.test import TestCase
 from django.utils.translation import gettext_lazy as _
-from unittest import mock
 
 from assessments.forms.score_encoding import ScoreSearchForm
 

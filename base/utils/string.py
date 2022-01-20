@@ -27,7 +27,6 @@ import re
 from django.utils import translation
 from unidecode import unidecode
 
-
 SPECIAL_CHARACTERS_PATTERN = r"[-'\s]"
 SPECIAL_CHARACTERS_REGEX = re.compile(SPECIAL_CHARACTERS_PATTERN)
 

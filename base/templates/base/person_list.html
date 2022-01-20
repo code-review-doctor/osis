@@ -158,7 +158,7 @@
                         <td>
                             <ul>
                                 {% for ed in object.programmanager_set.all %}
-                                    <li>{{ ed.most_recent_acronym }}</li>
+                                    <li>{{ ed.most_recent_acronym }}{% if ed.cohort and ed.cohort == 'FIRST_YEAR'%}-1{% endif %}</li>
                                 {% endfor %}
                             </ul>
                         </td>
