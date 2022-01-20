@@ -23,5 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.urls import path
 
-urlpatterns = []
+from preparation_inscription.views.add import AddLearningUnitFormView
+
+urlpatterns = [
+    path('add', AddLearningUnitFormView.as_view(), name=AddLearningUnitFormView.name),
+]
