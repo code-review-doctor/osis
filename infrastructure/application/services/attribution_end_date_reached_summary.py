@@ -54,9 +54,11 @@ class AttributionsEndDateReachedSummary(IAttributionsEndDateReachedSummary):
     ):
         logger.info("In AttributionsEndDateReachedSummary method send ")
         if application_calendar.start_date == datetime.date.today():
-            logger.info("application_calendar.start_date ({}) is today {}".format(
-                application_calendar.start_date,
-                datetime.date.today())
+            logger.info(
+                "application_calendar.start_date ({}) is today {}".format(
+                    application_calendar.start_date,
+                    datetime.date.today()
+                )
             )
             applicants = applicant_repository.search()
             logger.info("Number of applicants {}".format(len(applicants)))
@@ -100,11 +102,15 @@ class AttributionsEndDateReachedSummary(IAttributionsEndDateReachedSummary):
                     )
                     message_service.send_messages(message_content)
                 else:
-                    logger.info("No attribution about to expired for {}".format(
-                        applicant.entity_id.global_id)
+                    logger.info(
+                        "No attribution about to expired for {}".format(
+                            applicant.entity_id.global_id
+                        )
                     )
         else:
-            logger.info("application_calendar.start_date ({}) is NOT today {}".format(
-                application_calendar.start_date,
-                datetime.date.today())
+            logger.info(
+                "application_calendar.start_date ({}) is NOT today {}".format(
+                    application_calendar.start_date,
+                    datetime.date.today()
+                )
             )
