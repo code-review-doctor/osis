@@ -24,10 +24,13 @@
 ##############################################################################
 
 from django import forms
+from django.shortcuts import redirect
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from rules.contrib.views import LoginRequiredMixin
 
+from base.utils.htmx import HtmxMixin
 from ddd.logic.shared_kernel.academic_year.commands import SearchAcademicYearCommand
 from education_group.forms.fields import UpperCaseCharField
 from infrastructure.messages_bus import message_bus_instance
@@ -52,11 +55,12 @@ class SearchLearningUnitForm(forms.Form):
         self.fields['annee_academique'].choices = [(ac_year.year, str(ac_year)) for ac_year in all_academic_year]
 
 
-class AddLearningUnitFormView(LoginRequiredMixin, TemplateView):
+class AddLearningUnitFormView(LoginRequiredMixin, HtmxMixin, TemplateView):
     name = 'add-learning-unit'
 
     # FormView
     template_name = "preparation_inscription/add.html"
+    htmx_template_name = "preparation_inscription/html_add.html"
 
     def get_search_form(self):
         return SearchLearningUnitForm(
@@ -89,7 +93,7 @@ class AddLearningUnitFormView(LoginRequiredMixin, TemplateView):
         # display_error_messages(self.request, messages)
         # display_success_messages(self.request, messages)
         # self.render_to_response(self.get_context_data(form=self.get_form(self.form_class)))
-        return self.get(request, *args, **kwargs)
+        return redirect("detail-program")
 
     def get_context_data(self, **kwargs):
         return {
@@ -97,5 +101,6 @@ class AddLearningUnitFormView(LoginRequiredMixin, TemplateView):
             'search_form': self.get_search_form(),
             'search_result': self.get_search_result(),
             'intitule_groupement': "MAT1ECGE - Formation pluridisciplinaires en sciences humaines",
-            'intitule_programme': 'ECGE1BA - 2021-2022'
+            'intitule_programme': 'ECGE1BA - 2021-2022',
+            'cancel_url': reverse('detail-program')
         }

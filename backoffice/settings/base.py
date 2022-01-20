@@ -99,6 +99,7 @@ INSTALLED_APPS = (
     'osis_export',
     'osis_notification',
     'osis_async',
+    'django_htmx',
 )
 
 
@@ -127,6 +128,7 @@ MIDDLEWARE = (
     'base.middlewares.extra_http_responses_midleware.ExtraHttpResponsesMiddleware',
     'waffle.middleware.WaffleMiddleware',
     'base.middlewares.reversion_middleware.BaseRevisionMiddleware',
+    'django_htmx.middleware.HtmxMiddleware',
 )
 
 
