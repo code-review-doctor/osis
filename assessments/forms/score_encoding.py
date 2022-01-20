@@ -24,15 +24,12 @@
 #
 ##############################################################################
 from dal import autocomplete
-from dal_select2_tagging.widgets import TaggingSelect2
 from django import forms
 from django.forms import HiddenInput, BaseFormSet
 from django.utils.translation import pgettext_lazy, gettext_lazy as _
 
-
 from base.forms.utils import choice_field
 from base.models.enums.exam_enrollment_justification_type import StateTypes
-from base.models.learning_unit_year import LearningUnitYear
 from ddd.logic.encodage_des_notes.encodage.commands import GetCohortesGestionnaireCommand
 from education_group.forms.fields import UpperCaseCharField
 from infrastructure.messages_bus import message_bus_instance

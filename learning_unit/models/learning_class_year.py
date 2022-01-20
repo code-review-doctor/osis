@@ -25,6 +25,9 @@
 ##############################################################################
 from django.core.validators import RegexValidator
 from django.db import models
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
@@ -87,7 +90,7 @@ def copy_to_next_year(modeladmin, request, queryset):
             )
 
         except MultipleBusinessExceptions as multiple_exceptions:
-            copy_exception = ", ". join([str(ex.message) for ex in list(multiple_exceptions.exceptions)])
+            copy_exception = ", ".join([str(ex.message) for ex in list(multiple_exceptions.exceptions)])
 
         report.append({
             'source': classe_source,
@@ -173,3 +176,15 @@ class LearningClassYear(models.Model):
         volume_total_of_classes += self.hourly_volume_partial_q1 or 0
         volume_total_of_classes += self.hourly_volume_partial_q2 or 0
         return volume_total_of_classes
+
+
+@receiver(post_delete, sender=LearningClassYear)
+def _learningclassyear_delete(sender, instance: LearningClassYear, **kwargs):
+    # This post_delete is used to update field subdivise into epc (for the learning_unit_year)
+    # When the learning unit year has no classes, set it to false
+    # But when deleting all classes, there are no updated changed field.
+    from base.models.learning_unit_year import LearningUnitYear
+    luy = LearningUnitYear.objects.filter(
+        id=instance.learning_component_year.learning_unit_year_id
+    )
+    luy.update(changed=timezone.now())

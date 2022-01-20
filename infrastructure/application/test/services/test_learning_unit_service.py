@@ -94,6 +94,10 @@ class LearningUnitTranslatorSearchLearningUnitVolumes(TestCase):
             results
         )
 
+    def test_should_return_empty_list_if_no_entity_ids(self):
+        results = self.service.search_learning_unit_volumes_dto([])
+        self.assertEqual(len(results), 0)
+
 
 class LearningUnitTranslatorSearchTutorAttribution(TestCase):
     @classmethod

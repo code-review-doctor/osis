@@ -33,13 +33,14 @@ from django.db.models import Value
 from django.db.models.functions import Concat, Lower
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _, pgettext_lazy
+from osis_document.contrib import FileField
 
 from base.models.enums import person_source_type
+from base.models.enums.civil_state import CivilState
 from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP, SIC_GROUP, \
-    UE_FACULTY_MANAGER_GROUP, ADMINISTRATIVE_MANAGER_GROUP, PROGRAM_MANAGER_GROUP, UE_CENTRAL_MANAGER_GROUP
+    UE_FACULTY_MANAGER_GROUP, CATALOG_VIEWER_GROUP, PROGRAM_MANAGER_GROUP, UE_CENTRAL_MANAGER_GROUP
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin, SerializableModelManager
 from osis_common.utils.models import get_object_or_none
-from osis_document.contrib import FileField
 
 FILE_MAX_SIZE = None  # TODO : ??
 
@@ -67,6 +68,7 @@ class Person(SerializableModel):
         ('F', _('Female')),
         ('M', _('Male'))
     )
+
     YEAR_REGEX = RegexValidator(
         regex=r'^[1-2]\d{3}$',
         message=_('Birth year must be between 1000 and 2999'),
@@ -91,6 +93,7 @@ class Person(SerializableModel):
     language = models.CharField(max_length=30, choices=settings.LANGUAGES, default=settings.LANGUAGE_CODE)
     birth_date = models.DateField(blank=True, null=True)
 
+    civil_state = models.CharField(max_length=30, blank=True, default='', choices=CivilState.choices())
     sex = models.CharField(max_length=1, blank=True, default='', choices=SEX_CHOICES)
     first_name_in_use = models.CharField(max_length=50, default='', blank=True)
     birth_year = models.IntegerField(blank=True, null=True, validators=[YEAR_REGEX])
@@ -185,8 +188,8 @@ class Person(SerializableModel):
         return self.user.groups.filter(name=UE_FACULTY_MANAGER_GROUP).exists()
 
     @cached_property
-    def is_administrative_manager(self):
-        return self.user.groups.filter(name=ADMINISTRATIVE_MANAGER_GROUP).exists()
+    def is_catalog_viewer(self):
+        return self.user.groups.filter(name=CATALOG_VIEWER_GROUP).exists()
 
     @cached_property
     def is_program_manager(self):
@@ -248,7 +251,7 @@ def find_by_user(user: User):
         return None
 
 
-def get_user_interface_language(user):
+def get_user_interface_language(user: User) -> str:
     user_language = settings.LANGUAGE_CODE
     person = find_by_user(user)
 

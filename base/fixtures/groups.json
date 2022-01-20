@@ -257,58 +257,5 @@
                 ]
             ]
         }
-    },
-    {
-        "model": "auth.group",
-        "fields": {
-            "name": "administrative_managers",
-            "permissions": [
-                [
-                    "view_learningclassyear",
-                    "learning_unit",
-                    "learningclassyear"
-                ],
-                [
-                    "can_access_learningunitcomponentyear",
-                    "base",
-                    "learningcomponentyear"
-                ],
-                [
-                    "can_access_learningcontaineryear",
-                    "base",
-                    "learningcontaineryear"
-                ],
-                [
-                    "can_access_learningunit",
-                    "base",
-                    "learningunit"
-                ],
-                [
-                    "can_access_externallearningunityear",
-                    "base",
-                    "externallearningunityear"
-                ],
-                [
-                    "view_educationgroup",
-                    "base",
-                    "educationgroup"
-                ],
-                [
-                    "is_institution_administrator",
-                    "base",
-                    "person"
-                ],
-                [
-                    "view_learningclassyear",
-                    "learning_unit",
-                    "learningclassyear"
-                ],
-                [
-                    "can_access_catalog",
-                    "base",
-                    "offer"
-                ]
-            ]
-        }
     }
 ]

@@ -40,8 +40,8 @@ class EffectiveClassSerializer(serializers.Serializer):
     derogation_quadrimester = serializers.CharField()
     derogation_quadrimester_text = serializers.SerializerMethodField()
     session_derogation = serializers.CharField()
-    volume_q1 = serializers.DecimalField(max_digits=5, decimal_places=2)
-    volume_q2 = serializers.DecimalField(max_digits=5, decimal_places=2)
+    volume_q1 = serializers.DecimalField(max_digits=6, decimal_places=2)
+    volume_q2 = serializers.DecimalField(max_digits=6, decimal_places=2)
     type = serializers.CharField()
     type_text = serializers.SerializerMethodField()
 
