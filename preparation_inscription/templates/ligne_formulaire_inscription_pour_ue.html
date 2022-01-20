@@ -30,7 +30,7 @@
         <span style="padding-left: {% widthratio depth 1 10 %}px;">
             <img src="{% if contenu.obligatoire %}{% static 'img/education_group_year/mandatory.png' %}{% else %}{% static 'img/education_group_year/optional.png' %}{% endif %}">
             {{ contenu.code }} {{ contenu.intitule_complet }}
-            [{{ contenu|volume_total_affichage }}]
+            [{{ contenu|volumes_totaux_affichage }}]
             {{ contenu|credits_pour_ue }}
         </span>
     </td>
