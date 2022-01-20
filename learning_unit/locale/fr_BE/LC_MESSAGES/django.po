@@ -556,3 +556,6 @@ msgid ""
 msgstr ""
 "le report n'a pas été effectué à partir de %(proposal_year)s parce que l'UE "
 "est en proposition"
+
+msgid "Error(s) in form: The modifications are not saved"
+msgstr "Erreur(s) dans le formulaire: Les modifications n'ont pas été enregistrées"
