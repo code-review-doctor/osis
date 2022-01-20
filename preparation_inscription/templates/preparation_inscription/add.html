@@ -28,11 +28,11 @@
 {% block breadcrumb %}
     <li><a href="#" id="lnk_preparation_PAE">{% trans 'Preparation PAE' %}</a></li>
     <li><a href="#" id="lnk_form_inscr_cours">{% trans "Formulaire d'inscriptions aux cours PAE" %}</a></li>
-    <li class="active">{% trans 'ECGE1BA - 2021-2022' %}</li>
+    <li class="active">{{ intitule_programme }}</li>
 {% endblock %}
 {% block content %}
     <div class="page-header">
-        <h2>{% trans 'Page header' %}</h2>
+        <h2>{% trans 'Add learning units' %}</h2>
     </div>
 
     <div class="row">
@@ -50,7 +50,7 @@
                             </ul>
                         </div>
                     </div>
-                    <h4>{% trans "Programme" %}</h4>
+                    <h4>{% trans "Program" %}</h4>
                 </div>
 
                 <div class="panel-body">
@@ -62,7 +62,7 @@
         <div class="col-md-9">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h5>{% trans "MAT1ECGE - Formation pluridisciplinaires en sciences humaines" %}</h5>
+                    <h5>{{ intitule_groupement }}</h5>
                 </div>
 
                 <div class="panel-body">
@@ -72,13 +72,13 @@
                         {{ formulaire_recherche_ues.media }}
                         <div class="row">
                             <div class="col-md-3">
-                                {% bootstrap_field formulaire_recherche_ues.annee_academique %}
+                                {% bootstrap_field search_form.annee_academique %}
                             </div>
                             <div class="col-md-3">
-                                {% bootstrap_field formulaire_recherche_ues.code %}
+                                {% bootstrap_field search_form.code %}
                             </div>
                             <div class="col-md-2">
-                                {% bootstrap_field formulaire_recherche_ues.intitule %}
+                                {% bootstrap_field search_form.intitule %}
                             </div>
                             <div class="col-md-1">
                                 <br>
@@ -95,34 +95,59 @@
 
                     </form>
 
-                    <table id="table_rechercher_ues_a_ajouter" class="table table-hover">
-                        <thead>
-                        <tr>
-                            <th id="select" class="col-md-1 text-center"></th>
-                            <th id="annee_academique" class="col-md-1 text-center">{% trans 'Academic year' %}</th>
-                            <th id="code" class="col-md-2">{% trans 'Code' %}</th>
-                            <th id="intitule" class="col-md-1">{% trans 'Title' %}</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for element in search_result %}
+                    <br>
+
+                    <form action="#" method="POST" id="form_ajouter_ues">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-1 col-md-offset-8">
+                                <button class="btn btn-default">{% trans 'Cancel' %}</button>
+                            </div>
+                            <div class="col-md-1">
+                                <button type="submit" class="btn btn-primary">{% trans 'Add selected learning units' %}</button>
+                            </div>
+                        </div>
+
+
+                        <table id="table_rechercher_ues_a_ajouter" class="table table-hover">
+                            <thead>
                             <tr>
-                                <td headers="select">
-                                    select
-                                </td>
-                                <td headers="annee_academique">
-                                    {{ element.annee_academique }}
-                                </td>
-                                <td headers="code">
-                                    {{ element.code }}
-                                </td>
-                                <td headers="intitule">
-                                    {{ element.intitule }}
-                                </td>
+                                <th id="select" class="col-md-1 text-center"></th>
+                                <th id="annee_academique" class="col-md-1 text-center">{% trans 'Academic year' %}</th>
+                                <th id="code" class="col-md-2">{% trans 'Code' %}</th>
+                                <th id="intitule" class="col-md-1">{% trans 'Title' %}</th>
                             </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                            {% for element in search_result %}
+                                <tr>
+                                    <td headers="select" class="col-md-1">
+                                        <input type="checkbox" name="selected_ue" value="{{ element.code }}">
+                                    </td>
+                                    <td headers="annee_academique" class="col-md-2">
+                                        {{ element.annee_academique }}
+                                    </td>
+                                    <td headers="code" class="col-md-2">
+                                        {{ element.code }}
+                                    </td>
+                                    <td headers="intitule" class="col-md-7">
+                                        {{ element.intitule }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+
+                        <div class="row">
+                            <div class="col-md-1 col-md-offset-8">
+                                <button class="btn btn-default">{% trans 'Cancel' %}</button>
+                            </div>
+                            <div class="col-md-1">
+                                <button type="submit" class="btn btn-primary">{% trans 'Add selected learning units' %}</button>
+                            </div>
+                        </div>
+
+                    </form>
 
                 </div>
             </div>

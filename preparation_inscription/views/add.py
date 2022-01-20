@@ -35,7 +35,7 @@ from base.models.enums.active_status import ActiveStatusEnum
 from education_group.forms.fields import UpperCaseCharField
 
 
-class AddLearningUnitForm(forms.Form):
+class SearchLearningUnitForm(forms.Form):
     annee_academique = forms.ChoiceField(
         initial=ActiveStatusEnum.ACTIVE.name,
         choices=add_blank(list(ActiveStatusEnum.choices())),
@@ -56,7 +56,25 @@ class AddLearningUnitFormView(LoginRequiredMixin, FormView):
     # FormView
     template_name = "preparation_inscription/add.html"
 
-    form_class = AddLearningUnitForm
+    form_class = SearchLearningUnitForm
+
+    def get_search_form(self):
+        return SearchLearningUnitForm(data=self.request.GET or None, user=self.request.user)
+
+    def get_search_result(self):
+        data = [
+            {
+                'annee_academique': '1',
+                'code': '2',
+                'intitule': '3',
+            },
+            {
+                'annee_academique': '1',
+                'code': '2',
+                'intitule': '3',
+            },
+        ]  # TODO :: message_bus.invoke(Command)
+        return data
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -73,11 +91,14 @@ class AddLearningUnitFormView(LoginRequiredMixin, FormView):
         return super().form_valid(formset)
 
     def get_success_url(self):
-        # TODO :: to implement or to remove
-        return super().get_success_url()
+        # TODO :: redirect to pae main page
+        return ""
 
     def get_context_data(self, **kwargs):
         return {
             **super().get_context_data(**kwargs),
-            'formulaire_recherche_ues': self.get_form(self.form_class),
+            'search_form': self.get_search_form(),
+            'search_result': self.get_search_result(),
+            'intitule_groupement': "MAT1ECGE - Formation pluridisciplinaires en sciences humaines",
+            'intitule_programme': 'ECGE1BA - 2021-2022'
         }
