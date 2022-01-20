@@ -23,15 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
+import logging
 
+from django.conf import settings
 from django.db import transaction
 
 from ddd.logic.application.domain.service.attributions_end_date_reached_summary import \
     IAttributionsEndDateReachedSummary
 from ddd.logic.application.repository.i_applicant_respository import IApplicantRepository
 from ddd.logic.application.repository.i_application_calendar_repository import IApplicationCalendarRepository
-from ddd.logic.effective_class_repartition.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
+
+logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
 @transaction.atomic()
@@ -40,7 +42,7 @@ def send_emails_to_teachers_with_ending_attributions(
         applicant_repository: IApplicantRepository,
         application_summary: IAttributionsEndDateReachedSummary,
 ) -> None:
-
+    logger.info("In function send_emails_to_teachers_with_ending_attributions")
     # GIVEN
     application_calendar = application_calendar_repository.get_current_application_calendar()
 
