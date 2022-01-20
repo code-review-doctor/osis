@@ -26,11 +26,13 @@
 import itertools
 from typing import Set
 
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import models
-from django.db.models import Sum
-from django.shortcuts import render
+from django.db.models import Sum, Prefetch
+from django.shortcuts import get_object_or_404
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
+from django.views.generic import TemplateView
 
 from attribution.business import attribution_charge_new
 from attribution.models.attribution_charge_new import AttributionChargeNew
@@ -40,23 +42,72 @@ from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.views.common import display_warning_messages
-from base.views.learning_units.common import get_common_context_learning_unit_year
+from base.views.learning_units.common import get_common_context_for_learning_unit_year
+from osis_role.contrib.views import PermissionRequiredMixin
 
 
-@login_required
-@permission_required('base.can_access_learningunit', raise_exception=True)
-def learning_unit_attributions(request, learning_unit_year_id=None, code=None, year=None):
-    context = get_common_context_learning_unit_year(request.user.person, learning_unit_year_id, code, year)
-    luy = context["learning_unit_year"]
-    context['attributions'] = attribution_charge_new.find_attributions_with_charges(luy.id)
-    context["can_add_charge_repartition"] = request.user.has_perm('base.can_add_charge_repartition', luy)
-    context["can_change_attribution"] = request.user.has_perm('base.can_change_attribution', luy)
-    context["can_delete_attribution"] = request.user.has_perm('base.can_delete_attribution', luy)
-    context["tab_active"] = "learning_unit_attributions"  # Corresponds to url_name
-    warning_msgs = get_charge_repartition_warning_messages(context["learning_unit_year"].learning_container_year)
-    warning_msgs.extend(_get_classes_charge_repartition_warning_messages(context["learning_unit_year"]))
-    display_warning_messages(request, warning_msgs)
-    return render(request, "attribution/attributions.html", context)
+class LearningUnitAttributions(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
+    template_name = "attribution/attributions.html"
+    permission_required = "base.can_access_learningunit"
+    raise_exception = True
+
+    @cached_property
+    def learning_unit_year(self):
+        query_set = LearningUnitYear.objects.all().select_related(
+            'learning_unit',
+            'learning_container_year'
+        ).prefetch_related(
+            Prefetch(
+                'learning_unit__learningunityear_set',
+                queryset=LearningUnitYear.objects.select_related('academic_year')
+            )
+        )
+        if self.learning_unit_year_id:
+            return get_object_or_404(query_set, pk=self.learning_unit_year_id)
+        return query_set.get(acronym=self.code, academic_year__year=self.year)
+
+    @cached_property
+    def person(self):
+        return self.request.user.person
+
+    @property
+    def learning_unit_year_id(self):
+        return self.kwargs.get('learning_unit_year_id')
+
+    @property
+    def code(self):
+        return self.kwargs.get('code')
+
+    @property
+    def year(self):
+        return self.kwargs.get('year')
+
+    def get_context_permissions(self):
+        return {
+            "can_add_charge_repartition": self.request.user.has_perm(
+                'base.can_add_charge_repartition',
+                self.learning_unit_year
+            ),
+            "can_change_attribution": self.request.user.has_perm(
+                'base.can_change_attribution',
+                self.learning_unit_year
+            ),
+            "can_delete_attribution": self.request.user.has_perm(
+                'base.can_delete_attribution',
+                self.learning_unit_year
+            ),
+        }
+
+    def get_context_data(self, **kwargs):
+        warning_msgs = get_charge_repartition_warning_messages(self.learning_unit_year.learning_container_year)
+        warning_msgs.extend(_get_classes_charge_repartition_warning_messages(self.learning_unit_year))
+        display_warning_messages(self.request, warning_msgs)
+        return {
+            **super().get_context_data(**kwargs),
+            **get_common_context_for_learning_unit_year(self.person, self.learning_unit_year),
+            **self.get_context_permissions(),
+            'attributions': attribution_charge_new.find_attributions_with_charges(self.learning_unit_year.id),
+        }
 
 
 def get_charge_repartition_warning_messages(learning_container_year):

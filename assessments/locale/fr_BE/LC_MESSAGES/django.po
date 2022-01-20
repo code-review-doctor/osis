@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-30 10:15+0100\n"
+"POT-Creation-Date: 2021-12-15 14:47+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -192,6 +192,9 @@ msgstr "Tri descendant de la table de données"
 msgid "Deadline reached"
 msgstr "Date d'échéance atteinte"
 
+msgid "Decimal scores not authorized"
+msgstr "Notes décimales non autorisées"
+
 msgid "Decimal values in scores are NOT accepted."
 msgstr "Les valeurs décimales dans les notes ne sont PAS acceptées."
 
@@ -271,10 +274,10 @@ msgstr "Fichier non conforme. Aucune note injectée."
 msgid "Firstname"
 msgstr "Prénom"
 
-msgid ""
-"For classes, you must modify scores responsible via full LU. Example: For "
-"LCOPS1113-B, you must search and modify via LCOPS1113."
-msgstr "Pour les classes, il faut modifier les responsables via l'UE complète. Exemple: pour LCOPS1113-B, il faut chercher et modifier via LCOPS1113."
+msgid "For classes, you must search the full LU below and then click on "
+msgstr ""
+"Pour modifier les classes, il faut chercher ci-dessous l'UE complète et "
+"ensuite cliquer sur "
 
 msgid "Get Excel file"
 msgstr "Récupérer le fichier Excel"
@@ -315,6 +318,9 @@ msgid ""
 msgstr ""
 "Note invalide ligne %(row_number)s : %(decimal_value)s. Assurez-vous qu'il "
 "n'y a pas plus de %(max_decimal)s chiffre après la virgule."
+
+msgid "Invalid score."
+msgstr "Note non valide."
 
 msgid "January"
 msgstr "Janvier"
@@ -452,9 +458,6 @@ msgstr "Progression"
 
 msgid "Recipient"
 msgstr "Destinataire"
-
-msgid "Refresh list"
-msgstr "rafraîchir la liste"
 
 msgid "Reg. No."
 msgstr "Noma"
@@ -767,3 +770,6 @@ msgstr "étudiants"
 
 msgid "the"
 msgstr "le"
+
+msgid "to modify."
+msgstr "pour modifier."
