@@ -62,7 +62,7 @@ class CreditType(ChoiceEnum):
     SEMESTERS = _('Semesters')
 
 
-class ForeignStudyCycle(ChoiceEnum):
+class ForeignStudyCycleType(ChoiceEnum):
     BACHELOR = _('Bachelor')
     DOCTORATE = _('Doctorate')
     MASTER = _('Master')

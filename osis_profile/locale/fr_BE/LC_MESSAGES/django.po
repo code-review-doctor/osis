@@ -1,0 +1,188 @@
+msgid "Academic year"
+msgstr "Année académique"
+
+msgid "Experience valuated from this accepted admission."
+msgstr "Expérience évaluée à partir de cette admission approuvée"
+
+msgid "Type"
+msgstr "Type"
+
+msgid "Country"
+msgstr "Pays"
+
+msgid "Institute name"
+msgstr "Nom de l'institut"
+
+msgid "Institute city"
+msgstr "Ville de l'institut"
+
+msgid "Institute"
+msgstr "Institut"
+
+msgid "Institute postal code"
+msgstr "Code postal de l'institut"
+
+msgid "Program name"
+msgstr "Nom du programme"
+
+msgid "Result"
+msgstr "Résultat"
+
+msgid "Is it your graduation year?"
+msgstr "Est-ce l'année au cours de laquelle vous avez obtenu votre diplôme ?"
+
+msgid "Obtained grade"
+msgstr "Grade obtenu"
+
+msgid "Diploma ranked"
+msgstr "Rang dans le diplôme"
+
+msgid "Issue diploma date"
+msgstr "Date de délivrance du diplôme"
+
+msgid "Credit type"
+msgstr "Type de crédits"
+
+msgid "Entered credit number"
+msgstr "Crédits inscrits"
+
+msgid "Acquired credit number"
+msgstr "Crédits acquis"
+
+msgid "Transcript"
+msgstr "Relevé de notes"
+
+msgid "Graduate degree"
+msgstr "Diplôme d'études supérieures"
+
+msgid "Access certificate after a 60 master"
+msgstr "Attestation d'accès après un master 60"
+
+msgid "Dissertation title"
+msgstr "Titre du mémoire"
+
+msgid "Dissertation score"
+msgstr "Note du mémoire"
+
+msgid "Dissertation summary"
+msgstr "Résumé du mémoire"
+
+msgid "Education community"
+msgstr "Communauté d'enseignement"
+
+msgid "Program"
+msgstr "Programme"
+
+msgid "Study system"
+msgstr "Système d'études"
+
+msgid "Curriculum"
+msgstr "Curriculum vitae"
+
+msgid "Must be detailed, dated and signed"
+msgstr "Doit être détaillé, daté et signé"
+
+msgid "Study cycle type"
+msgstr "Type du cycle d'études"
+
+msgid "Linguistic regime"
+msgstr "Régime linguistique"
+
+msgid "Transcript translation"
+msgstr "Traduction du relevé de notes"
+
+msgid "Graduate degree translation"
+msgstr "Traduction du diplôme d'études supérieures"
+
+msgid "Activity type"
+msgstr "Type d'activité"
+
+msgid "Other activity type"
+msgstr "Autre type d'activité"
+
+msgid "Activity certificate"
+msgstr "Attestation d'activité"
+
+msgid "Position"
+msgstr "Fonction occupée"
+
+msgid "Other"
+msgstr "Autre"
+
+msgid "Belgian university higher education"
+msgstr "Enseignement supérieur universitaire belge"
+
+msgid "Foreign university higher education"
+msgstr "Enseignement supérieur universitaire étranger"
+
+msgid "Continuing education"
+msgstr "Promotion sociale"
+
+msgid "Full-time education"
+msgstr "Plein exercice"
+
+msgid "Failure"
+msgstr "Échec"
+
+msgid "No result"
+msgstr "Pas de résultat"
+
+msgid "Success"
+msgstr "Réussite"
+
+msgid "Success with residual credits"
+msgstr "Réussite avec crédits résiduels"
+
+msgid "Greater distinction"
+msgstr "La plus grande distinction"
+
+msgid "Great distinction"
+msgstr "Grande distinction"
+
+msgid "Distinction"
+msgstr "Distinction"
+
+msgid "Satisfaction"
+msgstr "Satisfaction"
+
+msgid "Success without distinction"
+msgstr "Réussite sans mention"
+
+msgid "No grade"
+msgstr "Pas de grade"
+
+msgid "European Union credits"
+msgstr "Crédits de l'Union Européenne"
+
+msgid "Non European Union credits"
+msgstr "Crédits non UE"
+
+msgid "Semesters"
+msgstr "Semestres"
+
+msgid "Bachelor"
+msgstr "Bachelier"
+
+msgid "Doctorate"
+msgstr "Doctorat"
+
+msgid "Master"
+msgstr "Master"
+
+msgid "Other higher education"
+msgstr "Autres études supérieures"
+
+msgid "Illness"
+msgstr "Maladie"
+
+msgid "Internship"
+msgstr "Stage"
+
+msgid "Unemployment"
+msgstr "Chômage"
+
+msgid "Volunteering"
+msgstr "Bénévolat"
+
+msgid "Work"
+msgstr "Travail"

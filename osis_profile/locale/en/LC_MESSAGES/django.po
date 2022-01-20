@@ -1,0 +1,188 @@
+msgid "Academic year"
+msgstr ""
+
+msgid "Experience valuated from this accepted admission."
+msgstr ""
+
+msgid "Type"
+msgstr ""
+
+msgid "Country"
+msgstr ""
+
+msgid "Institute name"
+msgstr ""
+
+msgid "Institute city"
+msgstr ""
+
+msgid "Institute"
+msgstr ""
+
+msgid "Institute postal code"
+msgstr ""
+
+msgid "Program name"
+msgstr ""
+
+msgid "Result"
+msgstr ""
+
+msgid "Is it your graduation year?"
+msgstr ""
+
+msgid "Obtained grade"
+msgstr ""
+
+msgid "Diploma ranked"
+msgstr ""
+
+msgid "Issue diploma date"
+msgstr ""
+
+msgid "Credit type"
+msgstr ""
+
+msgid "Entered credit number"
+msgstr ""
+
+msgid "Acquired credit number"
+msgstr ""
+
+msgid "Transcript"
+msgstr ""
+
+msgid "Graduate degree"
+msgstr ""
+
+msgid "Access certificate after a 60 master"
+msgstr ""
+
+msgid "Dissertation title"
+msgstr ""
+
+msgid "Dissertation score"
+msgstr ""
+
+msgid "Dissertation summary"
+msgstr ""
+
+msgid "Education community"
+msgstr ""
+
+msgid "Program"
+msgstr ""
+
+msgid "Study system"
+msgstr ""
+
+msgid "Curriculum"
+msgstr ""
+
+msgid "Must be detailed, dated and signed"
+msgstr ""
+
+msgid "Study cycle type"
+msgstr ""
+
+msgid "Linguistic regime"
+msgstr ""
+
+msgid "Transcript translation"
+msgstr ""
+
+msgid "Graduate degree translation"
+msgstr ""
+
+msgid "Activity type"
+msgstr ""
+
+msgid "Other activity type"
+msgstr ""
+
+msgid "Activity certificate"
+msgstr ""
+
+msgid "Position"
+msgstr ""
+
+msgid "Other"
+msgstr ""
+
+msgid "Belgian university higher education"
+msgstr ""
+
+msgid "Foreign university higher education"
+msgstr ""
+
+msgid "Continuing education"
+msgstr ""
+
+msgid "Full-time education"
+msgstr ""
+
+msgid "Failure"
+msgstr ""
+
+msgid "No result"
+msgstr ""
+
+msgid "Success"
+msgstr ""
+
+msgid "Success with residual credits"
+msgstr ""
+
+msgid "Greater distinction"
+msgstr ""
+
+msgid "Great distinction"
+msgstr ""
+
+msgid "Distinction"
+msgstr ""
+
+msgid "Satisfaction"
+msgstr ""
+
+msgid "Success without distinction"
+msgstr ""
+
+msgid "No grade"
+msgstr ""
+
+msgid "European Union credits"
+msgstr ""
+
+msgid "Non European Union credits"
+msgstr ""
+
+msgid "Semesters"
+msgstr ""
+
+msgid "Bachelor"
+msgstr ""
+
+msgid "Doctorate"
+msgstr ""
+
+msgid "Master"
+msgstr ""
+
+msgid "Other higher education"
+msgstr ""
+
+msgid "Illness"
+msgstr ""
+
+msgid "Internship"
+msgstr ""
+
+msgid "Unemployment"
+msgstr ""
+
+msgid "Volunteering"
+msgstr ""
+
+msgid "Work"
+msgstr ""

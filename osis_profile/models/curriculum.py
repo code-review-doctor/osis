@@ -31,8 +31,8 @@ from admission.contrib.models import DoctorateAdmission
 from base.models.academic_year import AcademicYear
 from base.models.person import Person
 from osis_document.contrib.fields import FileField
-from osis_profile.models.enums.curriculum import ExperienceTypes, StudySystems, Result, Grade, CreditType, \
-    ForeignStudyCycle, ActivityTypes
+from osis_profile.models.enums.curriculum import ExperienceTypes, StudySystems, Result, Grade, CreditType,\
+    ActivityTypes, ForeignStudyCycleType
 from osis_profile.models.enums.education import BelgianCommunitiesOfEducation
 from reference.models.language import Language
 
@@ -43,16 +43,16 @@ class CurriculumYear(models.Model):
         on_delete=models.CASCADE,
         null=True,
     )
-    academic_graduation_year = models.ForeignKey(
+    academic_year = models.ForeignKey(
         AcademicYear,
         on_delete=models.CASCADE,
-        verbose_name=_("Academic graduation year"),
+        verbose_name=_("Academic year"),
         related_name="+",
     )
 
     class Meta:
-        unique_together = ["person", "academic_graduation_year"]
-        ordering = ["-academic_graduation_year__year"]
+        unique_together = ["person", "academic_year"]
+        ordering = ["-academic_year__year"]
 
 
 class ExperienceManager(models.Manager):
@@ -91,29 +91,29 @@ class Experience(models.Model):
         related_name='+',
         verbose_name=_('Country'),
     )
-    other_institute_name = models.CharField(
-        _("Other institute name"),
+    institute_name = models.CharField(
+        _("Institute name"),
         blank=True,
         max_length=255,
         null=True,
     )
-    other_institute_city = models.CharField(
-        _("Other institute city"),
+    institute_city = models.CharField(
+        _("Institute city"),
         blank=True,
         null=True,
         max_length=255,
     )
     # Common university higher education
     institute = models.ForeignKey(
-        'partnership.Partnership',  # TODO base.EntityVersion for belgian studies ?
+        'base.organization',
         blank=True,
         null=True,
         on_delete=models.SET_NULL,
         related_name="+",
         verbose_name=_("Institute"),
     )
-    other_institute_postal_code = models.CharField(
-        _("Other institute postal code"),
+    institute_postal_code = models.CharField(
+        _("Institute postal code"),
         blank=True,
         max_length=20,
         null=True,
@@ -132,7 +132,7 @@ class Experience(models.Model):
         null=True,
     )
     graduation_year = models.BooleanField(
-        _('Is it the graduation year?'),
+        _('Is it your graduation year?'),
         blank=True,
         null=True,
     )
@@ -237,12 +237,13 @@ class Experience(models.Model):
         mimetypes=['application/pdf'],
         null=True,
         verbose_name=_('Curriculum'),
+        help_text=_('Must be detailed, dated and signed'),
     )
     # Foreign higher education
-    foreign_study_cycle = models.CharField(
-        _("Foreign study cycle"),
+    study_cycle_type = models.CharField(
+        _("Study cycle type"),
         blank=True,
-        choices=ForeignStudyCycle.choices(),
+        choices=ForeignStudyCycleType.choices(),
         max_length=50,
         null=True,
     )
