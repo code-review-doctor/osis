@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,14 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.urls import path, include
+from django.urls import reverse
+from django.views.generic import TemplateView
+from rules.contrib.views import LoginRequiredMixin
 
-from preparation_inscription.views.detail import PreparationInscriptionMainView
-from preparation_inscription.views.program_tree import ProgramTreeHTMLView
 
-urlpatterns = [
-   path('<int:year>/<acronym:acronym>/', include([
-       path('', PreparationInscriptionMainView.as_view(), name=PreparationInscriptionMainView.name),
-       path('tree', ProgramTreeHTMLView.as_view(), name=ProgramTreeHTMLView.name),
-   ])),
-]
+class PreparationInscriptionMainView(LoginRequiredMixin, TemplateView):
+    name = 'preparation-inscription-main-view'
+
+    # TemplateView
+    template_name = "preparation_inscription/main.html"
+
+    def get_context_data(self, **kwargs):
+        return {
+            **super().get_context_data(**kwargs),
+            'tree_view_url': self.get_tree_view_url()
+        }
+
+    def get_tree_view_url(self) -> str:
+        return reverse('program-tree-view', kwargs={
+            'year': self.kwargs['year'],
+            'acronym': self.kwargs['acronym']
+        })

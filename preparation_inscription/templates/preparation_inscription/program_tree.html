@@ -1,0 +1,13 @@
+{% for node in tree %}
+  <ul>
+    <li id="{{ node.id }}">
+        {{ node.text }}
+        {% if node.children %}
+          {% with tree=node.children template_name="tree_view_template.html" %}
+             {% include 'preparation_inscription/program_tree.html' %}
+          {% endwith %}
+        {% endif %}
+        <span class="node_block_text">{{ node.block }}</span>
+    </li>
+  </ul>
+{% endfor %}
