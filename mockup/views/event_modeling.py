@@ -36,6 +36,7 @@ from django.utils.translation import gettext_lazy as _
 
 from base.forms.utils.choice_field import add_blank
 from base.models.enums.active_status import ActiveStatusEnum
+from base.utils.htmx import HtmxMixin
 from education_group.forms.fields import MainEntitiesVersionChoiceField, UpperCaseCharField
 
 
@@ -76,10 +77,11 @@ class SearchForm(forms.Form):
         super().__init__(*args, **kwargs)
 
 
-class EventModelingView(LoginRequiredMixin, TemplateView):
+class EventModelingView(HtmxMixin, LoginRequiredMixin, TemplateView):
     name = 'EventModelingView'
     # TemplateView
     template_name = "mockup/event_modeling.html"
+    htmx_template_name = "mockup/blocks/consulter_contenu_groupement.html"
 
     def get_context_data(self, **kwargs):
         return {

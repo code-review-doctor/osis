@@ -1,10 +1,11 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView
 
+from base.utils.htmx import HtmxMixin
 from mockup.views.event_modeling import TypeAjustement
 
 
-class DeleteView(LoginRequiredMixin, TemplateView):
+class DeleteView(LoginRequiredMixin, TemplateView, HtmxMixin):
     name = 'delete_learning_units_view'
     # TemplateView
     template_name = "mockup/supprimer_unites_enseignements.html"
