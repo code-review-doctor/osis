@@ -43,7 +43,6 @@ class UniteEnseignementDTO(DTO):
     obligatoire: bool
     session_derogation: str
     credits_relatifs: int
-    chemin_acces: str  # Exemple : 'LDROI1001B|LDROI102C|LDROI1001
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)

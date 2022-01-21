@@ -23,21 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.urls import include, path
+from django.urls import path
 
 from preparation_inscription.views.formulaire_inscription_cours import FormulaireInscriptionCoursView
 
 
 urlpatterns = [
-    path('<int:year>/<acronym:acronym>/', include([
-        path('default_enrollment_form/', FormulaireInscriptionCoursView.as_view(), name='default_enrollment_form'),
-    ])),
-    path('<int:year>/<acronym:acronym>/<str:version_name>/', include([
-        path('default_enrollment_form/', FormulaireInscriptionCoursView.as_view(), name='default_enrollment_form'),
-        path(
-            '<str:transition_name>/default_enrollment_form/',
-            FormulaireInscriptionCoursView.as_view(),
-            name='default_enrollment_form'
-        ),
-    ])),
+    path('<int:year>/<acronym:acronym>/default_enrollment_form/',
+         FormulaireInscriptionCoursView.as_view(), name='default_enrollment_form'),
+    path('<int:year>/<acronym:acronym>/<str:version_name>/default_enrollment_form/',
+         FormulaireInscriptionCoursView.as_view(), name='default_enrollment_form'),
+    path('<int:year>/<acronym:acronym>/<str:version_name>/<str:transition_name>/default_enrollment_form/',
+         FormulaireInscriptionCoursView.as_view(), name='default_enrollment_form'),
 ]

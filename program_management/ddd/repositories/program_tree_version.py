@@ -424,8 +424,7 @@ def _build_contenu(node: 'Node', lien_parent: 'Link' = None) -> 'ContenuNoeudDTO
                     volume_annuel_pp=lien.child.volume_total_practical,
                     obligatoire=lien.is_mandatory if lien else False,
                     session_derogation='',
-                    credits_relatifs=lien.relative_credits,
-                    chemin_acces=""  # TODO :: to implement
+                    credits_relatifs=lien.relative_credits
                 )
             )
         else:

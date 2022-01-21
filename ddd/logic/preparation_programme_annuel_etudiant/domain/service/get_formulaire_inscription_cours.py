@@ -43,8 +43,8 @@ class GetFormulaireInscriptionCours(interface.DomainService):
             version=cmd.version_formation,
             transition_name=cmd.transition_formation
         )
-        unites_enseignement_contenues = formation.racine.unites_enseignement_contenues if formation.racine else []
-        groupements_contenus = formation.racine.groupements_contenus if formation.racine else []
+        unites_enseignement_contenues = formation.racine.unites_enseignement_contenues
+        groupements_contenus = formation.racine.groupements_contenus
 
         return FormulaireInscriptionCoursDTO(
             annee_formation=formation.annee,

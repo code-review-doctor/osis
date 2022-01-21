@@ -52,7 +52,14 @@ class FormulaireInscriptionCoursView(TemplateView):
     ):
         context = super().get_context_data(**kwargs)
         sigle = self.get_group_obj().abbreviated_title
-        context.update(contexte_commun_preparation_inscription(sigle, transition_name, version_name, year))
+        context.update(
+            contexte_commun_preparation_inscription(
+                sigle,
+                transition_name if transition_name else '',
+                version_name if version_name != STANDARD else '',
+                year
+            )
+        )
 
         return context
 
@@ -72,8 +79,8 @@ def _get_formation_inscription_cours(year: int, acronym: str, version_name: str,
     cmd = GetFormulaireInscriptionCoursCommand(
         annee_formation=year,
         sigle_formation=acronym,
-        version_formation=version_name if version_name != STANDARD else '',
-        transition_formation=transition_name if transition_name else '',
+        version_formation=version_name,
+        transition_formation=transition_name,
     )
     return message_bus_instance.invoke(cmd)
 
