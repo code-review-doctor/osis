@@ -25,6 +25,23 @@
  * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
+
+{% block style %}
+    <!-- move these styles into osis.css when the mockup is effectively used as implementation -->
+    <style>
+        .emphasized-code{
+            font-weight: bolder;
+            margin-left: 10px;
+        }
+        .code-col{
+            min-width: 120px;
+        }
+        .actions-col{
+            min-width: 50px;
+        }
+    </style>
+{% endblock style %}
+
 {% block breadcrumb %}
     <li><a href="#" id="lnk_preparation_PAE">{% trans 'Preparation PAE' %}</a></li>
     <li><a href="#" id="lnk_form_inscr_cours">{% trans "Formulaire d'inscriptions aux cours PAE" %}</a></li>
@@ -77,11 +94,11 @@
                 <h5>{% trans "MAT1ECGE - Formation pluridisciplinaires en sciences humaines" %}</h5>
             </div>
 
-            <div class="panel-body">
+            <div class="panel-body table-responsive">
                 <table id="table_search_list" class="table table-hover">
                     <thead>
                     <tr>
-                        <th id="code_ue">{% trans 'Code UE' %}</th>
+                        <th id="code_ue" class="code-col">{% trans 'Code UE' %}</th>
                         <th id="intitule">{% trans 'Intitule' %}</th>
                         <th id="volumes">{% trans 'Volumes PM/PP' %}</th>
                         <th id="bloc">{% trans 'Bloc' %}</th>
@@ -91,22 +108,23 @@
                         <th id="obligatoire">{% trans 'Obli.' %}</th>
                         <th id="commentaire_fr">{% trans 'Com. Fr.' %}</th>
                         <th id="commentaire_en">{% trans 'Com. Ang.' %}</th>
-                        <th id="action"></th>
+                        <th id="action" class="actions-col"></th>
                     </tr>
                     </thead>
                     <tbody>
                     {% for element in search_result %}
                         <tr>
                         {% if element.type_ajustement == 'SUPPRESSION' %}
-                            <td class="text-danger" headers="code_ue"><i class="fas fa-folder-minus"></i>
+                            <td class="text-danger" headers="code_ue"><span><i class="fas fa-folder-minus"></i>
                         {% elif element.type_ajustement == 'MODIFICATION' %}
-                            <td class="text-info" headers="code_ue"><i class="fas fa-folder"></i>
+                            <td class="text-info" headers="code_ue"><span><i class="fas fa-folder"></i>
                         {% elif element.type_ajustement == 'AJOUT' %}
-                            <td class="text-success" headers="code_ue"><i class="fas fa-folder-plus"></i>
+                            <td class="text-success" headers="code_ue"><span><i class="fas fa-folder-plus"></i>
                         {% endif %}
-                                <span style="font-weight: bolder;">
+                                <span class="emphasized-code">
                                     {{ element.code_ue }}
                                 </span>
+                            </span>
                             </td>
                             <td headers="intitule">
                                 {{ element.intitule }}
