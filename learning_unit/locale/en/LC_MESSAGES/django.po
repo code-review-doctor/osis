@@ -504,3 +504,6 @@ msgid ""
 "the report has not been done from %(proposal_year)s because the LU is in "
 "proposal"
 msgstr ""
+
+msgid "Error(s) in form: The modifications are not saved"
+msgstr ""

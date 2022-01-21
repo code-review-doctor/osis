@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ import operator
 from typing import Optional, List
 
 from django.db import models
-from django.db.models import F, QuerySet, Q, Subquery, OuterRef, Case, When, Value, Exists
+from django.db.models import F, QuerySet, Q, Subquery, OuterRef, Case, When, Exists
 
 from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.attribution_new import AttributionNew
@@ -95,9 +95,7 @@ def _prefetch_attributions(applicant_qs) -> List[AttributionFromRepositoryDTO]:
     subqs = AttributionChargeNew.objects.filter(attribution__id=OuterRef('id'))
 
     attributions_as_dict = AttributionNew.objects.filter(
-        tutor__person__global_id__in=applicant_qs.values_list('global_id', flat=True),
-        decision_making=''
-    ).exclude(
+        tutor__person__global_id__in=applicant_qs.values_list('global_id', flat=True), decision_making='').exclude(
         attributionchargenew__learning_component_year__learning_unit_year__subtype=learning_unit_year_subtypes.PARTIM
     ).annotate(
         course_id_code=F('learning_container_year__acronym'),
