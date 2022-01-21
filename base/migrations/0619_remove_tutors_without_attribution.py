@@ -21,7 +21,7 @@ def delete_tutors_without_attribution(apps, schema_editor):
     group = Group.objects.filter(name='tutors').first()
     for tutor in problematic_tutors:
         user = tutor.person.user
-        if user and group:
+        if user is not None and group is not None:
             print("Removing {} {} - {} from tutors group".format(
                 tutor.person.first_name,
                 tutor.person.last_name,
