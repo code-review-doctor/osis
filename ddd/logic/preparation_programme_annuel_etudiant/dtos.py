@@ -108,6 +108,7 @@ class FormationDTO(DTO):
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
 class ProgrammeInscriptionCoursDTO(DTO):
+    uuid: str
     intitule_complet_formation: str  # intitulé de la formation + version formation
     sous_programme: List['GroupementInscriptionCoursDTO']
 
