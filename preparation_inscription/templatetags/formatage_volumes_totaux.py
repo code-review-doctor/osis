@@ -25,11 +25,14 @@
 ##############################################################################
 from decimal import Decimal
 from django import template
+
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import UniteEnseignementCatalogueDTO
+
 register = template.Library()
 
 
 @register.filter
-def volumes_totaux_affichage(unite_catalogue_dto: 'UniteEnseignementCatalogueDTO') -> str:
+def formater_volumes_totaux(unite_catalogue_dto: 'UniteEnseignementCatalogueDTO') -> str:
     return "%(total_lecturing)gh + %(total_practical)gh" % {
         "total_lecturing": unite_catalogue_dto.volume_annuel_pm or Decimal(0.0),
         "total_practical": unite_catalogue_dto.volume_annuel_pp or Decimal(0.0)

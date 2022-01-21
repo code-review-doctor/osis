@@ -42,6 +42,7 @@ class UniteEnseignementDTO(DTO):
     volume_annuel_pp: int
     obligatoire: bool
     session_derogation: str
+    credits_relatifs: int
     chemin_acces: str  # Exemple : 'LDROI1001B|LDROI102C|LDROI1001
 
 
@@ -87,7 +88,7 @@ class UniteEnseignementCatalogueDTO(DTO):
     volume_annuel_pm: int
     volume_annuel_pp: int
     obligatoire: bool
-    credits_relatifs: Decimal
+    credits_relatifs: int
     session_derogation: str
 
 

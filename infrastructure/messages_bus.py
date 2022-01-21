@@ -170,7 +170,7 @@ from ddd.logic.learning_unit.use_case.write.create_learning_unit_service import 
 from ddd.logic.learning_unit.use_case.write.delete_effective_class_service import delete_effective_class
 from ddd.logic.learning_unit.use_case.write.update_effective_class_service import update_effective_class
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormulaireInscriptionCoursCommand, \
-    GetFormationDtoCommand
+    GetFormationCommand
 from ddd.logic.preparation_programme_annuel_etudiant.use_case.read.get_formulaire_inscription_cours_service import \
     get_formulaire_inscription_cours_service
 from ddd.logic.shared_kernel.academic_year.commands import SearchAcademicYearCommand
@@ -533,7 +533,7 @@ class MessageBusCommands(AbstractMessageBusCommands):
             cmd,
             CatalogueFormationsTranslator()
         ),
-        GetFormationDtoCommand: lambda cmd: get_programme_formation(cmd),
+        GetFormationCommand: lambda cmd: get_programme_formation(cmd),
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 
 

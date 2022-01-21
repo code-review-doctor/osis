@@ -42,19 +42,17 @@ class UniteEnseignementDTO(DTO):
     volume_annuel_pp: int
     obligatoire: bool
     session_derogation: str
-    credits_relatifs: Decimal
+    credits_relatifs: int
     chemin_acces: str  # Exemple : 'LDROI1001B|LDROI102C|LDROI1001
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
 class GroupementDTO(DTO):
-    # groupement provenant du catalogue (sans surcharge d'ajout, suppression ou modification)
     intitule: str
     obligatoire: bool
     remarque: str
     intitule_complet: str
     credits: Decimal
-    chemin_acces: str  # Exemple : 'LDROI1001B|LDROI102C|LDROI1001
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)

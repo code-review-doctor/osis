@@ -128,7 +128,7 @@ class DeplacerVersLeBasUEAjouteeDansProgrammeCommand(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
-class GetFormationDtoCommand(interface.CommandRequest):
+class GetFormationCommand(interface.CommandRequest):
     annee = attr.ib(type=int)
     code = attr.ib(type=str)
     version = attr.ib(type=str)

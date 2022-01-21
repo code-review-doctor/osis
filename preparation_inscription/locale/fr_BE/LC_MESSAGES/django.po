@@ -34,4 +34,4 @@ msgid "Year"
 msgstr "An"
 
 msgid "credits"
-msgstr "Crédits"
+msgstr "crédits"

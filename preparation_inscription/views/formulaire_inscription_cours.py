@@ -36,18 +36,20 @@ from infrastructure.messages_bus import message_bus_instance
 from program_management.forms.education_groups import STANDARD
 
 
-class FormulaireParDefaultView(TemplateView):
+class FormulaireInscriptionCoursView(TemplateView):
     permission_required = 'preparation_programme.view_formulaire_inscription_cours'
     raise_exception = True
 
     template_name = "onglets.html"
 
-    def get_context_data(self,
-                         year: int,
-                         acronym: str,
-                         version_name: str = '',
-                         transition_name: str = '',
-                         **kwargs):
+    def get_context_data(
+            self,
+            year: int,
+            acronym: str,
+            version_name: str = '',
+            transition_name: str = '',
+            **kwargs
+    ):
         context = super().get_context_data(**kwargs)
         sigle = self.get_group_obj().abbreviated_title
         context.update(contexte_commun_preparation_inscription(sigle, transition_name, version_name, year))
@@ -76,7 +78,7 @@ def _get_formation_inscription_cours(year: int, acronym: str, version_name: str,
     return message_bus_instance.invoke(cmd)
 
 
-def contexte_commun_preparation_inscription(sigle, transition_name, version_name, year):
+def contexte_commun_preparation_inscription(sigle, transition_name, version_name, year) -> dict:
     formulaire = _get_formation_inscription_cours(year, sigle, version_name, transition_name)
     return {
         'code': "{}{}".format(
@@ -84,7 +86,6 @@ def contexte_commun_preparation_inscription(sigle, transition_name, version_name
             formulaire.version_formation if formulaire.version_formation != STANDARD else ''
         ),
         'title': formulaire.intitule_complet_formation,
-        'academic_year': "{}-{}".format(year, str(year + 1)[-2:]),
         'formulaire_inscription_cours': formulaire,
         'year': year,
         }

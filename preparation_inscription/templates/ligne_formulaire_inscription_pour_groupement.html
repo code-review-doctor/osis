@@ -1,6 +1,6 @@
 {% load static %}
 {% load i18n %}
-{% load bootstrap3 credits_affichage %}
+{% load bootstrap3 formatage_credits %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -24,19 +24,13 @@
 * at the root of the source code of this program.  If not,
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
-{% if contenu.groupement_contenant %}
-    <tr>
-        <td>
-            <span style="padding-left: {% widthratio depth 1 10 %}px;">
-                <img src="{% if contenu.groupement_contenant.obligatoire %}{% static 'img/education_group_year/mandatory.png' %}{% else %}{% static 'img/education_group_year/optional.png' %}{% endif %}">
-                {{ contenu.groupement_contenant.intitule_complet }}
-                {% if contenu.groupement_contenant.credits %}
-                    ({{ contenu.groupement_contenant.credits }} {% trans 'credits' %})
-                {% endif %}
-            </span>
-        </td>
-        <td></td>
-        <td></td>
-        <td></td>
-    </tr>
-{% endif %}
+<tr>
+    <td>
+        <span style="padding-left: {% widthratio profondeur 1 10 %}px;">
+            <img src="{% if contenu.groupement_contenant.obligatoire %}{% static 'img/education_group_year/mandatory.png' %}{% else %}{% static 'img/education_group_year/optional.png' %}{% endif %}">
+            {{ contenu.groupement_contenant.intitule_complet }}
+            {{ contenu.groupement_contenant.credits|formater_credits_groupement }}
+        </span>
+    </td>
+    <td colspan="3"></td>
+</tr>

@@ -24,22 +24,36 @@
 #
 ##############################################################################
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormulaireInscriptionCoursCommand
-from ddd.logic.preparation_programme_annuel_etudiant.domain.service.get_formulaire_inscription_cours import \
-    GetFormulaireInscriptionCours
 from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import \
     ICatalogueFormationsTranslator
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormulaireInscriptionCoursDTO
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormulaireInscriptionCoursDTO, ContenuGroupementDTO
+from osis_common.ddd import interface
 
 
-def get_formulaire_inscription_cours_service(
+class GetFormulaireInscriptionCours(interface.DomainService):
+    @classmethod
+    def get_formulaire_inscription_cours(
+        cls,
         cmd: 'GetFormulaireInscriptionCoursCommand',
-        catalogue_formations_translator: 'ICatalogueFormationsTranslator',
-) -> 'FormulaireInscriptionCoursDTO':
-    # GIVEN
+        catalogue_formations_translator: 'ICatalogueFormationsTranslator'
+    ) -> 'FormulaireInscriptionCoursDTO':
+        formation = catalogue_formations_translator.get_formation(
+            sigle=cmd.sigle_formation,
+            annee=cmd.annee_formation,
+            version=cmd.version_formation,
+            transition_name=cmd.transition_formation
+        )
+        unites_enseignement_contenues = formation.racine.unites_enseignement_contenues if formation.racine else []
+        groupements_contenus = formation.racine.groupements_contenus if formation.racine else []
 
-    # WHEN
-
-    formulaire = GetFormulaireInscriptionCours.get_formulaire_inscription_cours(cmd, catalogue_formations_translator)
-
-    # THEN
-    return formulaire
+        return FormulaireInscriptionCoursDTO(
+            annee_formation=formation.annee,
+            sigle_formation=formation.sigle,
+            version_formation=formation.version,
+            intitule_complet_formation=formation.intitule_complet,
+            racine=ContenuGroupementDTO(
+                groupement_contenant=None,
+                unites_enseignement_contenues=unites_enseignement_contenues,
+                groupements_contenus=groupements_contenus
+            )
+        )

@@ -24,7 +24,7 @@
 ##############################################################################
 from typing import Optional
 
-from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormationDtoCommand
+from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormationCommand
 from program_management.ddd.command import GetProgramTreeVersionCommand
 from program_management.ddd.domain import program_tree_version, exception
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
@@ -46,7 +46,7 @@ def get_program_tree_version(cmd: GetProgramTreeVersionCommand) -> Optional['Pro
         return None
 
 
-def get_programme_formation(cmd: GetFormationDtoCommand) -> Optional['ProgrammeDeFormationDTO']:
+def get_programme_formation(cmd: GetFormationCommand) -> 'ProgrammeDeFormationDTO':
     identity = program_tree_version.ProgramTreeVersionIdentity(
         offer_acronym=cmd.code,
         year=cmd.annee,

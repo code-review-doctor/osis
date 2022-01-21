@@ -25,19 +25,21 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-{% with depth=depth|add:"1" %}
-    {% if is_learning_unit %}
+{% with profondeur=profondeur|add:"1" %}
+    {% if est_une_ue %}
         {% include 'ligne_formulaire_inscription_pour_ue.html' %}
     {% else %}
-        {% include 'ligne_formulaire_inscription_pour_groupement.html' %}
+        {% if contenu.groupement_contenant %}
+            {% include 'ligne_formulaire_inscription_pour_groupement.html' %}
+        {% endif %}
     {% endif %}
 
     {% for contenu_groupement_enfant in contenu.unites_enseignement_contenues %}
-        {% include 'ligne_formulaire_inscription.html' with contenu=contenu_groupement_enfant depth=depth|add:"1" is_learning_unit=True %}
+        {% include 'ligne_formulaire_inscription.html' with contenu=contenu_groupement_enfant profondeur=profondeur|add:"1" est_une_ue=True %}
     {% endfor %}
 
     {% for contenu_groupement_enfant in contenu.groupements_contenus %}
-        {% include 'ligne_formulaire_inscription.html' with contenu=contenu_groupement_enfant depth=depth is_learning_unit=False %}
+        {% include 'ligne_formulaire_inscription.html' with contenu=contenu_groupement_enfant profondeur=profondeur est_une_ue=False %}
     {% endfor %}
 
 {% endwith %}

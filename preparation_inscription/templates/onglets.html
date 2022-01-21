@@ -38,16 +38,6 @@
     <div class="panel panel-default">
         <div class="panel-body" id="tabs">
             <ul class="nav nav-tabs" role="tablist">
-{#                <li role="presentation" {% if request.path == url_search_ue_to_program or request.path == url_add_ue_to_program %} class="active"{% endif %}>#}
-{#                    <a data-toggle="tab" href="#tab_programme" role="tab">#}
-{#                        {% trans 'Program'%}#}
-{#                    </a>#}
-{#                </li>#}
-{#                <li role="presentation">#}
-{#                    <a data-toggle="tab" href="#tab_list_lus" role="tab">#}
-{#                        {% trans 'Learning units view list' %}#}
-{#                    </a>#}
-{#                </li>#}
                 <li role="presentation" {% if request.path != url_search_ue_to_program and request.path != url_add_ue_to_program %} class="active"{% endif %}>
                     <a data-toggle="tab" href="#tab_form_view" role="tab">
                         {% trans 'Form view'%}
@@ -56,9 +46,6 @@
             </ul>
             <br>
             <div class="tab-content">
-{#                <div id="tab_programme" class="tab-pane fade in {% if request.path == url_search_ue_to_program %} active{% endif %}">#}
-{#                    {% include 'programme.html' %}#}
-{#                </div>#}
                 <div id="tab_form_view" class="tab-pane fade in {% if request.path != url_search_ue_to_program %} active{% endif %}">
                     <table class="table table-hover">
                         <thead>
@@ -72,7 +59,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        {% include 'ligne_formulaire_inscription.html' with contenu=formulaire_inscription_cours.racine depth=0 %}
+                        {% include 'ligne_formulaire_inscription.html' with contenu=formulaire_inscription_cours.racine profondeur=0 %}
                         </tbody>
                     </table>
                 </div>

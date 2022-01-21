@@ -30,15 +30,13 @@ from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, C
 
 
 class CatalogueFormationsTranslatorInMemory(ICatalogueFormationsTranslator):
-    contenu = ContenuGroupementCatalogueDTO(
-        groupement_contenant=None,
-        groupements_contenus=[],
-        unites_enseignement_contenues=[]
-    )
-
     dtos = [
         FormationDTO(
-            racine=contenu,
+            racine=ContenuGroupementCatalogueDTO(
+                groupement_contenant=None,
+                groupements_contenus=[],
+                unites_enseignement_contenues=[]
+            ),
             annee=2021,
             sigle='ECGE1BA',
             version='STANDARD',

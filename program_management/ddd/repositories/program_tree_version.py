@@ -438,21 +438,11 @@ def _build_contenu(node: 'Node', lien_parent: 'Link' = None) -> 'ContenuNoeudDTO
             remarque=node.remark_fr,
             obligatoire=lien_parent.is_mandatory if lien_parent else False,
             credits=_get_credits(lien_parent),
-            intitule_complet=get_verbose_title_group(node),
-            chemin_acces=""  # TODO :: to implement
+            intitule_complet=get_verbose_title_group(node)
         ),
         groupements_contenus=groupements_contenus,
         unites_enseignement_contenues=ues_contenues
     )
-
-
-def get_groupement(
-        sigle_formation: str,
-        annee: int,
-        version_formation: str,
-        code_groupement: str
-) -> 'GroupementDTO':
-    raise NotImplementedError()
 
 
 def get_verbose_title_group(node: 'NodeGroupYear') -> str:
