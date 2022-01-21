@@ -7,7 +7,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('base', '0620_auto_20220117_1104'),
-        ('base', '0621_remove_tutors_without_attribution'),
+        ('base', '0619_remove_tutors_without_attribution'),
     ]
 
     operations = [
