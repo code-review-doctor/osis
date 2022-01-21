@@ -1,28 +1,28 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import TemplateView
-
-
-# class EventModelingView(LoginRequiredMixin, TemplateView):
-#     name = 'event-modeling-view'
-# 
-#     # TemplateView
-#     template_name = "mockup/event_modeling.html"
-# 
-#     def get_context_data(self, **kwargs):
-#         return {
-#             **super().get_context_data(**kwargs),
-#             'element': self.get_element(),
-#         }
-# 
-#     def get_element(self):
-#         return {
-#             'code_ue': '1',
-#             'intitule': '2',
-#             'volumes': '3',
-#             'bloc': '4',
-#             'quadri': '5',
-#             'credits': '6',
-#         }
+##############################################################################
+#
+#    OSIS stands for Open Student Information System. It's an application
+#    designed to manage the core business of higher education institutions,
+#    such as universities, faculties, institutes and professional schools.
+#    The core business involves the administration of students, teachers,
+#    courses, programs and so on.
+#
+#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    A copy of this license - GNU General Public License - is available
+#    at the root of the source code of this program.  If not,
+#    see http://www.gnu.org/licenses/.
+#
+##############################################################################
 
 
 from django.views.generic import TemplateView
@@ -169,3 +169,95 @@ class TypeAjustement(ChoiceEnum):
     SUPPRESSION = _('SUPPRESSION')
     MODIFICATION = _('MODIFICATION')
     AJOUT = _('AJOUT')
+
+
+from typing import List
+
+from django.views.generic import TemplateView
+from rules.contrib.views import LoginRequiredMixin
+
+
+class TreeHTMLView(LoginRequiredMixin, TemplateView):
+    name = 'tree-view'
+
+    # TemplateView
+    template_name = "mockup/blocks/tree_recursif.html"
+
+    def get_context_data(self, **kwargs):
+        if self.request.GET.get('id') != "#":
+            tree = self.get_node_of_tree(self.request.GET['id'])
+        else:
+            tree = self.get_tree()
+
+        return {
+            **super().get_context_data(**kwargs),
+            'tree': tree
+        }
+
+    def get_tree(self) -> List:
+        return [
+            {
+                'id': 'node_1',
+                'text': 'ECGE1BA',
+                'children': [
+                    {
+                        'id': 'node_11',
+                        'text': 'Contenu:',
+                        'children': [
+                            {
+                                'id': 'node_111',
+                                'text': 'Programme de base',
+                                'children': [
+                                    {
+                                        'id': 'node_1111',
+                                        'text': 'Formation pluridisciplinaire en sciences humaines',
+                                        'children': [
+                                            {
+                                                'id': '11111',
+                                                'text': 'LESPO1113 - Sociologie et anthropologie des mondes contemporains',
+                                                'children': []
+                                            },
+                                            {
+                                                'id': '11112',
+                                                'text': 'LESPO1321 - Economic, Political and Social Ethics',
+                                                'children': []
+                                            },
+                                            {
+                                                'id': '11113',
+                                                'text': 'LESPO1114 - Political Science',
+                                                'children': []
+                                            },
+                                            {
+                                                'id': '11114',
+                                                'text': 'LINGE1122 - Physique 1',
+                                                'children': []
+                                            },
+                                            {
+                                                'id': '11115',
+                                                'text': 'LINGE1125 - Séminaire de travail universitaire en gestion',
+                                                'children': []
+                                            },
+                                        ]
+                                    },
+                                ]
+                            },
+                        ]
+                    },
+                ]
+            },
+        ]
+
+    def get_node_of_tree(self, node_id: str) -> List:
+        return [
+            # {
+            #     'id': 'node_3',
+            #     'text': 'Node 3',
+            #     'children': [
+            #         {
+            #             'id': 'node_31',
+            #             'text': 'Node 31',
+            #             'children': []
+            #         },
+            #     ]
+            # }
+        ]
