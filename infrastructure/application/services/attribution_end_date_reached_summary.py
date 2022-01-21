@@ -123,7 +123,7 @@ def mail_already_sent(today, email_receiver: str) -> bool:
     mail_already_sent_today = MessageHistory.objects.filter(
         reference__in=[HTML_TEMPLATE_REF, TXT_TEMPLATE_REF],
         sent=today,
-        email_receiver=email_receiver
+        receiver_email=email_receiver
     ).exists()
     logger.info(
         "Mail already sent today, {}, to {}".format(
