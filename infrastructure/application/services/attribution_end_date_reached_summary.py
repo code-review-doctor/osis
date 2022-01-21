@@ -128,7 +128,3 @@ def mail_already_sent(today):
         )
     )
     return mail_already_sent_today
-
-
-
-
