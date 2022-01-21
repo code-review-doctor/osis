@@ -26,7 +26,8 @@
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormulaireInscriptionCoursCommand
 from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import \
     ICatalogueFormationsTranslator
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormulaireInscriptionCoursDTO, ContenuGroupementDTO
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormulaireInscriptionCoursDTO, ContenuGroupementDTO, \
+    GroupementDTO
 from osis_common.ddd import interface
 
 
@@ -45,14 +46,13 @@ class GetFormulaireInscriptionCours(interface.DomainService):
         )
         unites_enseignement_contenues = formation.racine.unites_enseignement_contenues
         groupements_contenus = formation.racine.groupements_contenus
-
         return FormulaireInscriptionCoursDTO(
             annee_formation=formation.annee,
             sigle_formation=formation.sigle,
             version_formation=formation.version,
             intitule_complet_formation=formation.intitule_complet,
             racine=ContenuGroupementDTO(
-                groupement_contenant=None,
+                groupement_contenant=formation.racine.groupement_contenant,
                 unites_enseignement_contenues=unites_enseignement_contenues,
                 groupements_contenus=groupements_contenus
             )
