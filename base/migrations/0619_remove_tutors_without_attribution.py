@@ -18,6 +18,11 @@ def delete_tutors_without_attribution(apps, schema_editor):
     )
     print("{} problematic tutors (without attributions)".format(len(problematic_tutors)))
     for tutor in problematic_tutors:
+        print("Removing {} {} - {} from tutors group".format(
+            tutor.person.first_name,
+            tutor.person.last_name,
+            tutor.person.global_id
+        ))
         tutor.delete()
 
 
