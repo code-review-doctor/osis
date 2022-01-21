@@ -32,7 +32,7 @@ class CatalogueFormationsTranslatorInMemory(ICatalogueFormationsTranslator):
 
     dtos = [
         FormationDTO(
-            programme_detaille=...,  # TODO :: to implement
+            racine=...,  # TODO :: to implement
             annee=2020,
             sigle='ECGE1BA',
             version='STANDARD',
