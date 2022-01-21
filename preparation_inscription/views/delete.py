@@ -93,7 +93,7 @@ class DeleteLearningUnitFormView(LoginRequiredMixin, HtmxMixin, TemplateView):
         # display_error_messages(self.request, messages)
         # display_success_messages(self.request, messages)
         # self.render_to_response(self.get_context_data(form=self.get_form(self.form_class)))
-        return redirect("detail-program")
+        return redirect("delete-learning-unit")
 
     def get_context_data(self, **kwargs):
         return {
@@ -102,5 +102,5 @@ class DeleteLearningUnitFormView(LoginRequiredMixin, HtmxMixin, TemplateView):
             'deletable_content': self.get_search_result(),
             'intitule_groupement': "MAT1ECGE - Formation pluridisciplinaires en sciences humaines",
             'intitule_programme': 'ECGE1BA - 2021-2022',
-            'cancel_url': reverse('detail-program')
+            'cancel_url': reverse('delete-learning-unit')
         }
