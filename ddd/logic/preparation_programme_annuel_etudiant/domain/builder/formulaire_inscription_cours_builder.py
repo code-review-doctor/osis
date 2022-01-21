@@ -31,4 +31,3 @@ class FormulaireInscriptionCoursBuilder(interface.RootEntityBuilder):
     @classmethod
     def build(cls, formation: 'FormationDTO') -> 'FormulaireInscriptionCoursDTO':
         raise NotImplementedError
-
