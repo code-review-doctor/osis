@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,5 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.urls import path
 
-urlpatterns = []
+from preparation_inscription.views.formulaire_inscription_cours import FormulaireInscriptionCoursView
+
+
+urlpatterns = [
+    path('<int:year>/<acronym:acronym>/default_enrollment_form/',
+         FormulaireInscriptionCoursView.as_view(), name='default_enrollment_form'),
+    path('<int:year>/<acronym:acronym>/<str:version_name>/default_enrollment_form/',
+         FormulaireInscriptionCoursView.as_view(), name='default_enrollment_form'),
+    path('<int:year>/<acronym:acronym>/<str:version_name>/<str:transition_name>/default_enrollment_form/',
+         FormulaireInscriptionCoursView.as_view(), name='default_enrollment_form'),
+]

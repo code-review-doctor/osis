@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -42,6 +42,7 @@ class UniteEnseignementDTO(DTO):
     volume_annuel_pp: int
     obligatoire: bool
     session_derogation: str
+    credits_relatifs: int
     chemin_acces: str  # Exemple : 'LDROI1001B|LDROI102C|LDROI1001
 
 
@@ -87,16 +88,18 @@ class UniteEnseignementCatalogueDTO(DTO):
     volume_annuel_pm: int
     volume_annuel_pp: int
     obligatoire: bool
+    credits_relatifs: int
     session_derogation: str
-    chemin_acces: str  # Exemple : 'LDROI1001B|LDROI102C|LDROI1001
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
 class GroupementCatalogueDTO(DTO):
     # groupement provenant du catalogue (sans surcharge d'ajout, suppression ou modification)
-    inclus_dans: 'GroupementCatalogueDTO'
     intitule: str
-    chemin_acces: str  # Exemple : 'LDROI1001B|LDROI102C|LDROI1001
+    obligatoire: bool
+    remarque: str
+    credits: Decimal
+    intitule_complet: str
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
