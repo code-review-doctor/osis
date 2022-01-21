@@ -26,7 +26,9 @@
 from django.urls import path
 
 from preparation_inscription.views.delete import DeleteLearningUnitFormView
+from preparation_inscription.views.detail import DetailView
 
 urlpatterns = [
+    path('view', DetailView.as_view(), name=DetailView.name),
     path('delete', DeleteLearningUnitFormView.as_view(), name=DeleteLearningUnitFormView.name),
 ]
