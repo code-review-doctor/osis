@@ -22,10 +22,13 @@ def delete_tutors_without_attribution(apps, schema_editor):
     for tutor in problematic_tutors:
         user = tutor.person.user
         if user and group:
-            print("Removing {} from tutors group".format(tutor.person))
+            print("Removing {} {} - {} from tutors group".format(
+                tutor.person.first_name,
+                tutor.person.last_name,
+                tutor.person.global_id)
+            )
             user.groups.remove(group)
-    print("Removing {} tutors".format(len(problematic_tutors)))
-    problematic_tutors.delete()
+        tutor.delete()
 
 
 class Migration(migrations.Migration):
