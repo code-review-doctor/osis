@@ -118,5 +118,17 @@ class AttributionsEndDateReachedSummary(IAttributionsEndDateReachedSummary):
 
 
 def mail_already_sent(today):
-    return MessageHistory.objects.filter(reference__in=[HTML_TEMPLATE_REF, TXT_TEMPLATE_REF], sent=today).exists()
+    mail_already_sent_today = MessageHistory.objects.filter(
+        reference__in=[HTML_TEMPLATE_REF, TXT_TEMPLATE_REF],
+        sent=today
+    ).exists()
+    logger.info(
+        "Mails already sent today {}{}".format(
+            today
+        )
+    )
+    return mail_already_sent_today
+
+
+
 
