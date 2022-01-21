@@ -246,7 +246,9 @@ class TestLearningUnitPostponementFormSave(LearningUnitPostponementFormContextMi
             self.learning_unit_year_partim,
             self.person
         )
-        Element.objects.filter(learning_unit_year__learning_unit=self.learn_unit_structure.learning_unit_partim).delete()
+        Element.objects.filter(
+            learning_unit_year__learning_unit=self.learn_unit_structure.learning_unit_partim
+        ).delete()
         LearningUnitYear.objects.filter(
             learning_unit=self.learn_unit_structure.learning_unit_partim,
             academic_year__year__gt=self.current_academic_year.year
