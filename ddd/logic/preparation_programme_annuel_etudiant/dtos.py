@@ -109,7 +109,7 @@ class FormationDTO(DTO):
 @attr.s(frozen=True, slots=True, auto_attribs=True)
 class ProgrammeInscriptionCoursDTO(DTO):
     intitule_complet_formation: str  # intitulé de la formation + version formation
-    sous_programme = List['GroupementInscriptionCoursDTO']
+    sous_programme: List['GroupementInscriptionCoursDTO']
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
@@ -120,7 +120,7 @@ class GroupementInscriptionCoursDTO(DTO):
     unites_enseignement_supprimees: List['UniteEnseignementSupprimeeDTO']
     unites_enseignement_modifiees: List['UniteEnseignementModifieeDTO']
     unites_enseignement: List['UniteEnseignementProgrammeDTO']
-    sous_programme = List['GroupementInscriptionCoursDTO']
+    sous_programme: List['GroupementInscriptionCoursDTO']
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
