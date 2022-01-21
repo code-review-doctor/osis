@@ -59,8 +59,8 @@ class DeleteLearningUnitFormView(LoginRequiredMixin, HtmxMixin, TemplateView):
     name = 'delete-learning-unit'
 
     # FormView
-    template_name = "preparation_inscription/delete.html"
-    htmx_template_name = "preparation_inscription/html_delete.html"
+    template_name = "preparation_inscription/delete_no_htmx.html"
+    # htmx_template_name = "preparation_inscription/html_delete.html"
 
     def get_search_form(self):
         return SearchLearningUnitForm(
@@ -99,7 +99,7 @@ class DeleteLearningUnitFormView(LoginRequiredMixin, HtmxMixin, TemplateView):
         return {
             **super().get_context_data(**kwargs),
             'search_form': self.get_search_form(),
-            'search_result': self.get_search_result(),
+            'deletable_content': self.get_search_result(),
             'intitule_groupement': "MAT1ECGE - Formation pluridisciplinaires en sciences humaines",
             'intitule_programme': 'ECGE1BA - 2021-2022',
             'cancel_url': reverse('detail-program')
