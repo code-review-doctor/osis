@@ -37,6 +37,7 @@ from ddd.logic.application.domain.service.attributions_end_date_reached_summary 
 from ddd.logic.application.repository.i_applicant_respository import IApplicantRepository
 from ddd.logic.effective_class_repartition.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
 from osis_common.messaging import message_config, send_message as message_service
+from osis_common.models.message_history import MessageHistory
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
@@ -53,7 +54,7 @@ class AttributionsEndDateReachedSummary(IAttributionsEndDateReachedSummary):
             applicant_repository: IApplicantRepository
     ):
         logger.info("In AttributionsEndDateReachedSummary method send ")
-        if application_calendar.start_date == datetime.date.today():
+        if application_calendar.start_date == datetime.date.today() and not mail_already_sent(datetime.date.today()):
             logger.info(
                 "application_calendar.start_date ({}) is today {}".format(
                     application_calendar.start_date,
@@ -114,3 +115,8 @@ class AttributionsEndDateReachedSummary(IAttributionsEndDateReachedSummary):
                     datetime.date.today()
                 )
             )
+
+
+def mail_already_sent(today):
+    return MessageHistory.objects.filter(reference__in=[HTML_TEMPLATE_REF, TXT_TEMPLATE_REF], sent=today).exists()
+
