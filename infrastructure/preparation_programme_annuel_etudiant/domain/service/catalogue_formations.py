@@ -112,7 +112,7 @@ def _convertir_contenu_noeud_dto_en_groupement_catalogue_dto(contenu_noeud: Cont
 
 
 def _convertir_unites_enseignement_contenues_en_unites_enseignement_catalogue_dto(
-        unites_enseignement_contenues: List['UniteEnseignementDTO']) -> UniteEnseignementCatalogueDTO:
+        unites_enseignement_contenues: List['UniteEnseignementDTO']) -> List['UniteEnseignementCatalogueDTO']:
     unites_enseignement_catalogue_dto = []
     for unite_enseignement_contenue in unites_enseignement_contenues:
         unites_enseignement_catalogue_dto.append(
