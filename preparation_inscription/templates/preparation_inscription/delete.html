@@ -1,0 +1,74 @@
+{% extends "layout.html" %}
+{% load static i18n bootstrap3 %}
+
+{% comment "License" %}
+ * OSIS stands for Open Student Information System. It's an application
+ * designed to manage the core business of higher education institutions,
+ * such as universities, faculties, institutes and professional schools.
+ * The core business involves the administration of students, teachers,
+ * courses, programs and so on.
+ *
+ * Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * A copy of this license - GNU General Public License - is available
+ * at the root of the source code of this program.  If not,
+ * see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+{% block breadcrumb %}
+    <li><a href="#" id="lnk_preparation_PAE">{% trans 'Preparation PAE' %}</a></li>
+    <li><a href="#" id="lnk_form_inscr_cours">{% trans "Formulaire d'inscriptions aux cours PAE" %}</a></li>
+    <li class="active">{{ intitule_programme }}</li>
+{% endblock %}
+{% block content %}
+    <div class="page-header">
+        <h2>{% trans 'Delete learning units' %}</h2>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="pull-right">
+                        <div class="dropdown">
+                            <button class="btn btn-default dropdown-toggle" type="button" id="btn-action-down" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                <span class="fa fa-cog" aria-hidden="true"></span> {% trans 'Actions' %}
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu pull-right" aria-labelledby="btn-action-down">
+                                <li><a href="#">{% trans "Revenir à l'état initial du programme" %}</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <h4>{% trans "Program" %}</h4>
+                </div>
+
+                <div class="panel-body">
+                    Contenu programme (arbre)
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h5>{{ intitule_groupement }}</h5>
+                </div>
+                {% include "preparation_inscription/htmx_delete.html" %}
+            </div>
+        </div>
+
+    </div>
+
+
+{% endblock %}
