@@ -169,6 +169,9 @@ from ddd.logic.learning_unit.use_case.write.create_effective_class_service impor
 from ddd.logic.learning_unit.use_case.write.create_learning_unit_service import create_learning_unit
 from ddd.logic.learning_unit.use_case.write.delete_effective_class_service import delete_effective_class
 from ddd.logic.learning_unit.use_case.write.update_effective_class_service import update_effective_class
+from ddd.logic.preparation_programme_annuel_etudiant.commands import AjouterUEAuProgrammeCommand
+from ddd.logic.preparation_programme_annuel_etudiant.use_case.write.ajouter_UE_au_programme_service import \
+    ajouter_UE_au_programme
 from ddd.logic.shared_kernel.academic_year.commands import SearchAcademicYearCommand
 from ddd.logic.shared_kernel.academic_year.use_case.read.search_academic_years_service import search_academic_years
 from ddd.logic.shared_kernel.campus.commands import GetCampusCommand, SearchUclouvainCampusesCommand
@@ -219,6 +222,8 @@ from infrastructure.learning_unit.domain.service.tutor_distributed_to_class impo
 from infrastructure.learning_unit.repository.effective_class import EffectiveClassRepository
 from infrastructure.learning_unit.repository.entity import UclEntityRepository
 from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
+from infrastructure.preparation_programme_annuel_etudiant.repository.in_memory.\
+    groupement_ajuste_inscription_cours import GroupementAjusteInscriptionCoursInMemoryRepository
 from infrastructure.shared_kernel.academic_year.repository.academic_year import AcademicYearRepository
 from infrastructure.shared_kernel.campus.repository.uclouvain_campus import UclouvainCampusRepository
 from infrastructure.shared_kernel.entite.repository.entiteucl import EntiteUCLRepository
@@ -519,6 +524,10 @@ class MessageBusCommands(AbstractMessageBusCommands):
             ApplicationCalendarRepository(),
             ApplicantRepository(),
             AttributionsEndDateReachedSummary()
+        ),
+        AjouterUEAuProgrammeCommand: lambda cmd: ajouter_UE_au_programme(
+            cmd,
+            GroupementAjusteInscriptionCoursInMemoryRepository(),
         ),
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 

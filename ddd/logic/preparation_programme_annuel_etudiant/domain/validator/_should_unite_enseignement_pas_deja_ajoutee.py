@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,28 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from unittest import mock
+from typing import TYPE_CHECKING
 
-from django.test import SimpleTestCase
+import attr
 
-from program_management.ddd.command import GetProgramTreeVersionCommand
+from base.ddd.utils.business_validator import BusinessValidator
+
+if TYPE_CHECKING:
+    from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
+    from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
+        GroupementAjusteInscriptionCours
+from ddd.logic.preparation_programme_annuel_etudiant.domain.validator.exceptions import \
+    UniteEnseignementDejaAjouteeException
 
 
-class CatalogueFormationsTranslatorTest(SimpleTestCase):
+@attr.s(frozen=True, slots=True, auto_attribs=True)
+class ShouldUniteEnseignementPasDejaAjoutee(BusinessValidator):
+    groupement_ajuste: 'GroupementAjusteInscriptionCours'
+    unite_enseignement: 'LearningUnitIdentity'
 
-    def setUp(self) -> None:
-        # mock appel service bus => retour GetProgramTreeVersionCommand : ProgramTreeVersionFactory()
-        self.patch_message_bus = mock.patch(
-            "infrastructure.messages_bus.invoke",
-            side_effect=self.__mock_message_bus_invoke
-        )
-        self.message_bus_mocked = self.patch_message_bus.start()
-        self.addCleanup(self.patch_message_bus.stop)
-
-    def __mock_message_bus_invoke(self, cmd):
-        if isinstance(cmd, GetProgramTreeVersionCommand):
-            # return ProgramTreeVersionFactory(entity_id__version_name="")
-            pass
-
-    def test_should_convertir_version_standard(self):
-        pass
+    def validate(self, *args, **kwargs):
+        if self.unite_enseignement in self.groupement_ajuste.get_identites_unites_enseignement_ajoutees():
+            raise UniteEnseignementDejaAjouteeException(self.unite_enseignement)
