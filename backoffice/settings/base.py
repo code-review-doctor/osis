@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -99,6 +99,8 @@ INSTALLED_APPS = (
     'osis_export',
     'osis_notification',
     'osis_async',
+    'mockup',
+    'django_htmx',
 )
 
 
@@ -127,6 +129,7 @@ MIDDLEWARE = (
     'base.middlewares.extra_http_responses_midleware.ExtraHttpResponsesMiddleware',
     'waffle.middleware.WaffleMiddleware',
     'base.middlewares.reversion_middleware.BaseRevisionMiddleware',
+    'django_htmx.middleware.HtmxMiddleware',
 )
 
 
