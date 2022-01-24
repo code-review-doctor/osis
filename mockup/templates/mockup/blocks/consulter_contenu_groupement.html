@@ -44,14 +44,14 @@
         <tr>
             {% if element.type_ajustement == 'SUPPRESSION' %}
                 <td class="text-danger" headers="code_ue"><span><i class="fas fa-folder-minus"></i>
-                            {% elif element.type_ajustement == 'MODIFICATION' %}
+            {% elif element.type_ajustement == 'MODIFICATION' %}
                 <td class="text-info" headers="code_ue"><span><i class="fas fa-folder"></i>
-                            {% elif element.type_ajustement == 'AJOUT' %}
+            {% elif element.type_ajustement == 'AJOUT' %}
                 <td class="text-success" headers="code_ue"><span><i class="fas fa-folder-plus"></i>
+            {% else %}
+                <td headers="code_ue"><span><i class="fas fa-folder-plus" style="visibility: hidden" ></i>
             {% endif %}
-            <span class="emphasized-code">
-                                        {{ element.code_ue }}
-                                    </span>
+                <span class="emphasized-code">{{ element.code_ue }}</span>
             </span>
             </td>
             <td headers="intitule">
@@ -108,7 +108,7 @@
                             <span class="fa fa-redo-alt" aria-hidden="true" data-toggle="modal" data-target="#annuler_modification_modal"></span>
                         </a>
 
-                    {% elif element.type_ajustement == 'AJOUT' %}
+                    {% else %}
 
                         <a href="#"
                            id="lnk_deplacer_bas"

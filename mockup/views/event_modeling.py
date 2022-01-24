@@ -139,6 +139,19 @@ class EventModelingView(HtmxMixin, LoginRequiredMixin, TemplateView):
                 'type_ajustement': TypeAjustement.MODIFICATION.name,
             },
             {
+                'code_ue': 'LECGE1115',
+                'intitule': 'Economie politique',
+                'volumes': '30',
+                'bloc': '1',
+                'quadri': 'Q2',
+                'credits': '3/3',
+                'session': 'Oui',
+                'obligatoire': 'Oui',
+                'commentaire_fr': '',
+                'commentaire_en': '',
+                'type_ajustement': None,
+            },
+            {
                 'code_ue': 'LINGE1122',
                 'intitule': 'Physique 1',
                 'volumes': '30',
@@ -244,16 +257,23 @@ class TreeHTMLView(LoginRequiredMixin, TemplateView):
                                                 'children': []
                                             },
                                             {
+                                                'id': '11115',
+                                                'text': 'LECGE1115 - Economie politique',
+                                                'obligatoire': True,
+                                                'type_ajustement': None,
+                                                'children': []
+                                            },
+                                            {
                                                 'id': '11114',
                                                 'text': 'LINGE1122 - Physique 1',
-                                                'obligatoire': False,
+                                                'obligatoire': True,
                                                 'type_ajustement': TypeAjustement.AJOUT.name,
                                                 'children': []
                                             },
                                             {
-                                                'id': '11115',
+                                                'id': '11116',
                                                 'text': 'LINGE1125 - Séminaire de travail universitaire en gestion',
-                                                'obligatoire': True,
+                                                'obligatoire': False,
                                                 'type_ajustement': TypeAjustement.AJOUT.name,
                                                 'children': []
                                             },
