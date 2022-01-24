@@ -73,7 +73,7 @@ class AttributionsEndDateReachedSummary(IAttributionsEndDateReachedSummary):
                 )
                 person = Person.objects.get(global_id=applicant.entity_id.global_id)
 
-                if not mail_already_sent(today=today_date, email_receiver=person.email):
+                if not mail_already_sent(today=today_date, receiver_email=person.email):
                     receivers = [message_config.create_receiver(person.id, person.email, person.language)]
                     table_ending_attributions = message_config.create_table(
                         'ending_attributions',
@@ -102,20 +102,18 @@ class AttributionsEndDateReachedSummary(IAttributionsEndDateReachedSummary):
                         None
                     )
                     message_service.send_messages(message_content)
+        else:
+            logger.info(
+                "[AttributionEndDateReachedSummary - {}] Application course start date not reached".format(today_date)
+            )
 
 
-def mail_already_sent(today, email_receiver: str) -> bool:
-    import pdb; pdb.set_trace()
+def mail_already_sent(today, receiver_email: str) -> bool:
     mail_already_sent_today = MessageHistory.objects.filter(
-        reference__in=[HTML_TEMPLATE_REF, TXT_TEMPLATE_REF],
+        subject="Charges d'enseignement arrivant à échéance",  # FIXME: fix reference on send method of message_service
         sent__date=today,
-        receiver_email=email_receiver
+        receiver_email=receiver_email
     ).exists()
     if mail_already_sent_today:
-        logger.info(
-            "Mail already sent today, {}, to {}".format(
-                today,
-                email_receiver
-            )
-        )
+        logger.info("Mail already sent today, {}, to {}".format(today, receiver_email))
     return mail_already_sent_today
