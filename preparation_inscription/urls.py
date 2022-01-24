@@ -25,8 +25,16 @@
 ##############################################################################
 from django.urls import path
 
-from preparation_inscription.views.delete import DeleteLearningUnitFormView
+from preparation_inscription.views.ajouter_unites_enseignement import AjouterUnitesEnseignementView
+from preparation_inscription.views.consulter_contenu_groupement import ConsulterContenuGroupementView
+from preparation_inscription.views.modification_contenu_groupement import ModifierProprietesContenuView
+from preparation_inscription.views.supprimer_unites_enseignement import SupprimerUnitesEnseignementView
+from preparation_inscription.views.tree_html import TreeHTMLView
 
 urlpatterns = [
-    path('delete', DeleteLearningUnitFormView.as_view(), name=DeleteLearningUnitFormView.name),
+    path('', ConsulterContenuGroupementView.as_view(), name=ConsulterContenuGroupementView.name),
+    path('delete', SupprimerUnitesEnseignementView.as_view(), name=SupprimerUnitesEnseignementView.name),
+    path('add', AjouterUnitesEnseignementView.as_view(), name=AjouterUnitesEnseignementView.name),
+    path('update', ModifierProprietesContenuView.as_view(), name=ModifierProprietesContenuView.name),
+    path('tree/', TreeHTMLView.as_view(), name=TreeHTMLView.name),
 ]

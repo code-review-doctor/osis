@@ -1,4 +1,3 @@
-##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -6,7 +5,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -15,7 +14,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,6 +22,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+
 from django import forms
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -34,11 +34,12 @@ from base.utils.htmx import HtmxMixin
 from ddd.logic.shared_kernel.academic_year.commands import SearchAcademicYearCommand
 from education_group.forms.fields import UpperCaseCharField
 from infrastructure.messages_bus import message_bus_instance
+from preparation_inscription.views.consulter_contenu_groupement import ConsulterContenuGroupementView
 
 
 class SearchLearningUnitForm(forms.Form):
     annee_academique = forms.ChoiceField(
-        label=_("Academic year").capitalize(),
+        label=_("Anac.").capitalize(),
         required=False
     )
     code = UpperCaseCharField(max_length=15, label=_("Code").capitalize(), required=False)
@@ -55,12 +56,12 @@ class SearchLearningUnitForm(forms.Form):
         self.fields['annee_academique'].choices = [(ac_year.year, str(ac_year)) for ac_year in all_academic_year]
 
 
-class DeleteLearningUnitFormView(LoginRequiredMixin, HtmxMixin, TemplateView):
-    name = 'delete-learning-unit'
+class AjouterUnitesEnseignementView(LoginRequiredMixin, HtmxMixin, TemplateView):
+    name = 'ajouter_unites_enseignement_view'
 
     # FormView
-    template_name = "preparation_inscription/delete.html"
-    htmx_template_name = "preparation_inscription/htmx_delete.html"
+    template_name = "preparation_inscription.html"
+    htmx_template_name = "ajouter_unites_enseignement.html"
 
     def get_search_form(self):
         return SearchLearningUnitForm(
@@ -73,12 +74,12 @@ class DeleteLearningUnitFormView(LoginRequiredMixin, HtmxMixin, TemplateView):
     def get_search_result(self):
         data = [
             {
-                'annee_academique': '2021',
+                'annee_academique': 2021,
                 'code': 'LSINF1452',
                 'intitule': 'Test en EPC',
             },
             {
-                'annee_academique': '2021',
+                'annee_academique': 2021,
                 'code': 'LECGE12547',
                 'intitule': 'Finance en Osis',
             },
@@ -93,14 +94,22 @@ class DeleteLearningUnitFormView(LoginRequiredMixin, HtmxMixin, TemplateView):
         # display_error_messages(self.request, messages)
         # display_success_messages(self.request, messages)
         # self.render_to_response(self.get_context_data(form=self.get_form(self.form_class)))
-        return redirect("delete-learning-unit")
+        return redirect("EventModelingView")
+
+    def get_intitule_groupement(self):
+        # TODO :: to implement
+        return "Intitulé groupement"
+
+    def get_intitule_programme(self):
+        # TODO :: to implement
+        return "Intitulé programme"
 
     def get_context_data(self, **kwargs):
         return {
             **super().get_context_data(**kwargs),
             'search_form': self.get_search_form(),
-            'deletable_content': self.get_search_result(),
-            'intitule_groupement': "MAT1ECGE - Formation pluridisciplinaires en sciences humaines",
-            'intitule_programme': 'ECGE1BA - 2021-2022',
-            'cancel_url': reverse('delete-learning-unit')
+            'search_result': self.get_search_result(),
+            'intitule_groupement': self.get_intitule_groupement(),
+            'intitule_programme': self.get_intitule_programme(),
+            'cancel_url': reverse(ConsulterContenuGroupementView.name)
         }

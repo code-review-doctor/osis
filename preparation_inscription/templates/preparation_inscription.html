@@ -25,15 +25,29 @@
  * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
+
+{% block style %}
+    <!-- move these styles into osis.css when the mockup is effectively used as implementation -->
+    <style>
+        .emphasized-code{
+            font-weight: bolder;
+            margin-left: 10px;
+        }
+        .code-col{
+            min-width: 120px;
+        }
+        .actions-col{
+            min-width: 50px;
+        }
+    </style>
+{% endblock style %}
+
 {% block breadcrumb %}
     <li><a href="#" id="lnk_preparation_PAE">{% trans 'Preparation PAE' %}</a></li>
     <li><a href="#" id="lnk_form_inscr_cours">{% trans "Formulaire d'inscriptions aux cours PAE" %}</a></li>
     <li class="active">{% trans 'ECGE1BA - 2021-2022' %}</li>
 {% endblock %}
 {% block content %}
-<div class="page-header">
-    <h2>{% trans 'Page header' %}</h2>
-</div>
 
 <div class="row">
     <div class="col-md-3">
@@ -50,19 +64,54 @@
                         </ul>
                     </div>
                 </div>
-                <h4>{% trans "Programme" %}</h4>
+                <h4 data-toggle="tooltip" title="Réorientation après la session de janvier">ECGE1BA - 2021-22 - Section RE</h4>
             </div>
 
             <div class="panel-body">
-                Contenu programme (arbre)
+                <div class="row">
+                    <div class="col-md-12">
+                        {% include "mockup/blocks/tree_panel.html" %}
+                    </div>
+                </div>
             </div>
         </div>
     </div>
     <div class="col-md-9">
+        <ul class="nav nav-tabs">
+          <li role="presentation" class="active"><a href="#">Contenu</a></li>
+          <li role="presentation"><a href="#">Formulaire</a></li>
+        </ul>
+
+        <br>
         <div class="panel panel-default">
-            {% include "preparation_inscription/htmx_delete.html" %}
+            <div class="panel-heading">
+                <div class="pull-right">
+                    <div class="dropdown">
+                        <button class="btn btn-default dropdown-toggle" type="button" id="btn-action-down" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                            <span class="fa fa-cog" aria-hidden="true"></span> {% trans 'Actions' %}
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu pull-right" aria-labelledby="btn-action-down">
+                            <li><a href="" hx-get="{% url 'ajouter_unites_enseignement_view' %}" hx-target="#content-of-main-panel" hx-trigger="click">{% trans "Ajouter des UE" %}</a></li>
+                            <li><a href="" hx-get="{% url 'supprimer_unites_enseignement_view' %}" hx-target="#content-of-main-panel" hx-trigger="click">{% trans "Supprimer des UE" %}</a></li>
+                            <li><a href="" hx-get="{% url 'modifier_proprietes_contenu_view' %}" hx-target="#content-of-main-panel" hx-trigger="click">{% trans "Modifier les propriétés" %}</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <h5>{% trans "MAT1ECGE - Formation pluridisciplinaires en sciences humaines" %}</h5>
+            </div>
+
+            <div class="panel-body table-responsive">
+                <div id="content-of-main-panel">
+
+                    {% include "consulter_contenu_groupement.html" %}
+
+                </div>
+            </div>
         </div>
     </div>
+
 </div>
+
 
 {% endblock %}
