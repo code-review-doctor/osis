@@ -28,47 +28,41 @@
 {% block breadcrumb %}
     <li><a href="#" id="lnk_preparation_PAE">{% trans 'Preparation PAE' %}</a></li>
     <li><a href="#" id="lnk_form_inscr_cours">{% trans "Formulaire d'inscriptions aux cours PAE" %}</a></li>
-    <li class="active">{{ intitule_programme }}</li>
+    <li class="active">{% trans 'ECGE1BA - 2021-2022' %}</li>
 {% endblock %}
 {% block content %}
-    <div class="page-header">
-        <h2>{% trans 'Delete learning units' %}</h2>
-    </div>
+<div class="page-header">
+    <h2>{% trans 'Page header' %}</h2>
+</div>
 
-    <div class="row">
-        <div class="col-md-3">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <div class="pull-right">
-                        <div class="dropdown">
-                            <button class="btn btn-default dropdown-toggle" type="button" id="btn-action-down" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                <span class="fa fa-cog" aria-hidden="true"></span> {% trans 'Actions' %}
-                                <span class="caret"></span>
-                            </button>
-                            <ul class="dropdown-menu pull-right" aria-labelledby="btn-action-down">
-                                <li><a href="#">{% trans "Revenir à l'état initial du programme" %}</a></li>
-                            </ul>
-                        </div>
+<div class="row">
+    <div class="col-md-3">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="pull-right">
+                    <div class="dropdown">
+                        <button class="btn btn-default dropdown-toggle" type="button" id="btn-action-down" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                            <span class="fa fa-cog" aria-hidden="true"></span> {% trans 'Actions' %}
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu pull-right" aria-labelledby="btn-action-down">
+                            <li><a href="#">{% trans "Revenir à l'état initial du programme" %}</a></li>
+                        </ul>
                     </div>
-                    <h4>{% trans "Program" %}</h4>
                 </div>
+                <h4>{% trans "Programme" %}</h4>
+            </div>
 
-                <div class="panel-body">
-                    Contenu programme (arbre)
-                </div>
+            <div class="panel-body">
+                Contenu programme (arbre)
             </div>
         </div>
-
-        <div class="col-md-9">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h5>{{ intitule_groupement }}</h5>
-                </div>
-                {% include "preparation_inscription/htmx_delete.html" %}
-            </div>
-        </div>
-
     </div>
-
+    <div class="col-md-9">
+        <div class="panel panel-default">
+            {% include "preparation_inscription/htmx_delete.html" %}
+        </div>
+    </div>
+</div>
 
 {% endblock %}

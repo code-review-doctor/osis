@@ -743,3 +743,14 @@ https://stackoverflow.com/questions/16897285/bootstrap-datepicker-is-displaying-
 .bootstrap-datetimepicker-widget {
     z-index: 1600;
 }
+
+.emphasized-code{
+    font-weight: bolder;
+    margin-left: 10px;
+}
+.code-col{
+    min-width: 120px;
+}
+.actions-col{
+    min-width: 50px;
+}

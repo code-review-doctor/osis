@@ -59,8 +59,8 @@ class DeleteLearningUnitFormView(LoginRequiredMixin, HtmxMixin, TemplateView):
     name = 'delete-learning-unit'
 
     # FormView
-    template_name = "preparation_inscription/delete_no_htmx.html"
-    # htmx_template_name = "preparation_inscription/html_delete.html"
+    template_name = "preparation_inscription/delete.html"
+    htmx_template_name = "preparation_inscription/htmx_delete.html"
 
     def get_search_form(self):
         return SearchLearningUnitForm(

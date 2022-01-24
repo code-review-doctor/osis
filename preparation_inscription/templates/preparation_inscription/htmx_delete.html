@@ -1,4 +1,3 @@
-{% extends "layout.html" %}
 {% load static i18n bootstrap3 %}
 
 {% comment "License" %}
@@ -25,78 +24,87 @@
  * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-<div class="panel-body">
-    <form method="GET" id="form_recherche_ues_a_supprimer">
-        {{ formulaire_recherche_ues.media }}
-        <div class="row">
-            <div class="col-md-3">
-                {% bootstrap_field search_form.annee_academique %}
-            </div>
-            <div class="col-md-3">
-                {% bootstrap_field search_form.code %}
-            </div>
-            <div class="col-md-2">
-                {% bootstrap_field search_form.intitule %}
-            </div>
-            <div class="col-md-1">
-                <br>
-                <button id="bt_search_list"
-                        class="btn btn-primary"
-                        role="button"
-                        style="margin-top: 4px"
-                        title="{% trans 'Search' %}"
-                >
-                    <span class="fa fa-search" aria-hidden="true"></span>
-                </button>
-            </div>
-        </div>
-    </form>
-    <br>
-    <form action="#" method="POST" id="form_supprimer_ues">
-        {% csrf_token %}
-        <div class="row">
-            <div class="col-md-1 col-md-offset-8">
-                <a class="btn btn-default" href="{{ cancel_url }}">{% trans 'Cancel' %}</a>
-            </div>
-            <div class="col-md-1">
-                <button type="submit" class="btn btn-primary">{% trans 'Delete selected learning units' %}</button>
-            </div>
-        </div>
-        <table id="table_rechercher_ues_a_supprimer" class="table table-hover">
-            <thead>
-            <tr>
-                <th id="select" class="col-md-1 text-center"></th>
-                <th id="annee_academique" class="col-md-1 text-center">{% trans 'Academic year' %}</th>
-                <th id="code" class="col-md-2">{% trans 'Code' %}</th>
-                <th id="intitule" class="col-md-1">{% trans 'Title' %}</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for element in search_result %}
-                <tr>
-                    <td headers="select" class="col-md-1">
-                        <input type="checkbox" name="selected_ue" value="{{ element.code }}">
-                    </td>
-                    <td headers="annee_academique" class="col-md-2">
-                        {{ element.annee_academique }}
-                    </td>
-                    <td headers="code" class="col-md-2">
-                        {{ element.code }}
-                    </td>
-                    <td headers="intitule" class="col-md-7">
-                        {{ element.intitule }}
-                    </td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-        <div class="row">
-            <div class="col-md-1 col-md-offset-8">
-                <a class="btn btn-default" href="{{ cancel_url }}">{% trans 'Cancel' %}</a>
-            </div>
-            <div class="col-md-1">
-                <button type="submit" class="btn btn-primary">{% trans 'Delete selected learning units' %}</button>
-            </div>
-        </div>
-    </form>
+<div class="panel-heading">
+    <h5>{% trans "Suppression d'unités d'enseignement sur " %} {{ intitule_groupement }}</h5>
 </div>
+<div class="panel-body">
+    <table id="table_search_list" class="table table-hover">
+        <thead>
+        <tr>
+            <th id="checkbox">
+                <input id="id_check_all" type="checkbox" name="check_all" title="{% trans 'Check All' %}"/>
+            </th>
+            <th id="code_ue" class="code-col">{% trans 'Code UE' %}</th>
+            <th id="intitule">{% trans 'Intitule' %}</th>
+            <th id="volumes">{% trans 'Volumes PM/PP' %}</th>
+            <th id="bloc">{% trans 'Bloc' %}</th>
+            <th id="quadri">{% trans 'Quadri' %}</th>
+            <th id="credits">{% trans 'Credits' %}</th>
+            <th id="session">{% trans 'Sess.' %}</th>
+            <th id="obligatoire">{% trans 'Obli.' %}</th>
+            <th id="commentaire_fr">{% trans 'Com. Fr.' %}</th>
+            <th id="commentaire_en">{% trans 'Com. Ang.' %}</th>
+        </tr>
+        </thead>
+        <tbody>
+            {% for element in deletable_content %}
+            <tr>
+            <td>
+                <input type="checkbox" name="to_delete" class="select-row-checkbox" />
+            </td>
+            {% if element.type_ajustement == 'MODIFICATION' %}
+                <td class="text-info" headers="code_ue"><span><i class="fas fa-folder"></i>
+            {% elif element.type_ajustement == 'AJOUT' %}
+                <td class="text-success" headers="code_ue"><span><i class="fas fa-folder-plus"></i>
+            {% else %}
+                <td headers="code_ue"><span>
+            {% endif %}
+                    <span class="emphasized-code">
+                        {{ element.code_ue }}
+                    </span>
+                </span>
+                </td>
+                <td headers="intitule">
+                    {{ element.intitule }}
+                </td>
+                <td headers="volumes">
+                    {{ element.volumes }}
+                </td>
+                <td headers="bloc">
+                    {{ element.bloc }}
+                </td>
+                <td headers="quadri">
+                    {{ element.quadri }}
+                </td>
+                <td headers="credits">
+                    {{ element.credits }}
+                </td>
+                <td headers="session">
+                    {{ element.session }}
+                </td>
+                <td headers="obligatoire">
+                    {{ element.obligatoire }}
+                </td>
+                <td headers="commentaire_fr">
+                    {{ element.commentaire_fr }}
+                </td>
+                <td headers="commentaire_en">
+                    {{ element.commentaire_en }}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+<div class="panel-footer text-right">
+    <a href="" type="button" class="btn btn-default">Annuler</a>
+    <a href="" type="button" class="btn btn-danger">Supprimer</a>
+</div>
+
+{% block script %}
+<script>
+    document.querySelector("#id_check_all").addEventListener('click', (e) => {
+        document.querySelectorAll('.select-row-checkbox').forEach(checkbox => checkbox.checked = e.target.checked);
+    });
+</script>
+{% endblock %}
