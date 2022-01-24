@@ -287,4 +287,9 @@
       <option name="HTML" value="true" />
     </context>
   </template>
+  <template name="ht-load" value="{% load i18n static bootstrap3 $END$%}" description="Crée un {% load i18n static bootstrap3 %}" toReformat="false" toShortenFQNames="true">
+    <context>
+      <option name="HTML" value="true" />
+    </context>
+  </template>
 </templateSet>
