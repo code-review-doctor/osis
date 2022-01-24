@@ -38,7 +38,7 @@ from infrastructure.messages_bus import message_bus_instance
 
 class SearchLearningUnitForm(forms.Form):
     annee_academique = forms.ChoiceField(
-        label=_("Academic year").capitalize(),
+        label=_("Anac.").capitalize(),
         required=False
     )
     code = UpperCaseCharField(max_length=15, label=_("Code").capitalize(), required=False)
@@ -73,12 +73,12 @@ class AddLearningUnitFormView(LoginRequiredMixin, HtmxMixin, TemplateView):
     def get_search_result(self):
         data = [
             {
-                'annee_academique': '2021',
+                'annee_academique': 2021,
                 'code': 'LSINF1452',
                 'intitule': 'Test en EPC',
             },
             {
-                'annee_academique': '2021',
+                'annee_academique': 2021,
                 'code': 'LECGE12547',
                 'intitule': 'Finance en Osis',
             },

@@ -1,4 +1,4 @@
-{% load static i18n bootstrap3 %}
+{% load static i18n bootstrap3 academic_year_display %}
 
 {% comment "License" %}
  * OSIS stands for Open Student Information System. It's an application
@@ -37,7 +37,7 @@
             <div class="col-md-3">
                 {% bootstrap_field search_form.code %}
             </div>
-            <div class="col-md-2">
+            <div class="col-md-5">
                 {% bootstrap_field search_form.intitule %}
             </div>
             <div class="col-md-1">
@@ -59,23 +59,15 @@
 
     <form action="#" method="POST" id="form_ajouter_ues">
         {% csrf_token %}
-        <div class="row">
-            <div class="col-md-1 col-md-offset-8">
-                <button class="btn btn-default" hx-get="{{ cancel_url }}" hx-trigger="click" hx-target="#content-of-main-panel" >{% trans 'Cancel' %}</button>
-            </div>
-            <div class="col-md-1">
-                <button type="submit" class="btn btn-primary">{% trans 'Add selected learning units' %}</button>
-            </div>
-        </div>
 
 
         <table id="table_rechercher_ues_a_ajouter" class="table table-hover">
             <thead>
             <tr>
                 <th id="select" class="col-md-1 text-center"></th>
-                <th id="annee_academique" class="col-md-1 text-center">{% trans 'Academic year' %}</th>
-                <th id="code" class="col-md-2">{% trans 'Code' %}</th>
-                <th id="intitule" class="col-md-1">{% trans 'Title' %}</th>
+                <th id="Anac." class="col-md-1">{% trans 'Anac.' %}</th>
+                <th id="Code" class="col-md-1">{% trans 'Code' %}</th>
+                <th id="Intitulé" class="col-md-2">{% trans 'Title' %}</th>
             </tr>
             </thead>
             <tbody>
@@ -84,13 +76,13 @@
                     <td headers="select" class="col-md-1">
                         <input type="checkbox" name="selected_ue" value="{{ element.code }}">
                     </td>
-                    <td headers="annee_academique" class="col-md-2">
-                        {{ element.annee_academique }}
+                    <td headers="Anac." class="col-md-2">
+                        {{ element.annee_academique|display_as_academic_year }}
                     </td>
-                    <td headers="code" class="col-md-2">
+                    <td headers="Code" class="col-md-2">
                         {{ element.code }}
                     </td>
-                    <td headers="intitule" class="col-md-7">
+                    <td headers="Intitulé" class="col-md-7">
                         {{ element.intitule }}
                     </td>
                 </tr>
@@ -98,15 +90,12 @@
             </tbody>
         </table>
 
-        <div class="row">
-            <div class="col-md-1 col-md-offset-8">
-                <button class="btn btn-default" hx-get="{{ cancel_url }}" hx-trigger="click" hx-target="#content-of-main-panel" >{% trans 'Cancel' %}</button>
-            </div>
-            <div class="col-md-1">
-                <button type="submit" class="btn btn-primary">{% trans 'Add selected learning units' %}</button>
-            </div>
-        </div>
-
     </form>
 
 </div>
+
+<div class="panel-footer text-right">
+    <a href="" hx-get="{% url 'EventModelingView' %}" hx-target="#content-of-main-panel" hx-trigger="click" type="button" class="btn btn-default">{% trans "Cancel" %}</a>
+    <a href="" hx-get="{% url 'EventModelingView' %}" hx-target="#content-of-main-panel" hx-trigger="click" type="button" class="btn btn-primary">{% trans "Add" %}</a>
+</div>
+
