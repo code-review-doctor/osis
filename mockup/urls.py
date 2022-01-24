@@ -25,11 +25,15 @@
 ##############################################################################
 from django.urls import path
 
+from mockup.views.ajouter_unites_enseignement import AddLearningUnitFormView
 from mockup.views.event_modeling import EventModelingView, TreeHTMLView
 from mockup.views.supprimer_unites_enseignement import DeleteView
+from mockup.views.modification_unites_enseignement import ModifierProprietesContenuView
 
 urlpatterns = [
     path('event_modeling/', EventModelingView.as_view(), name=EventModelingView.name),
     path('event_modeling/delete', DeleteView.as_view(), name=DeleteView.name),
+    path('event_modeling/add', AddLearningUnitFormView.as_view(), name=AddLearningUnitFormView.name),
+    path('event_modeling/update', ModifierProprietesContenuView.as_view(), name=ModifierProprietesContenuView.name),
     path('event_modeling/tree/', TreeHTMLView.as_view(), name=TreeHTMLView.name),
 ]

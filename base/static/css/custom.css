@@ -307,3 +307,7 @@ table.dataTable thead th.sorting:after {
     color: #337ab7 !important;
     opacity: 1 !important;
 }
+
+.strikethrough .jstree-anchor{
+    text-decoration: line-through !important;
+}

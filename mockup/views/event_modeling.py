@@ -97,65 +97,69 @@ class EventModelingView(HtmxMixin, LoginRequiredMixin, TemplateView):
         data = [
             {
                 'code_ue': 'LESPO1113',
-                'intitule': 'Sociologie...',
+                'intitule': 'Sociologie et anthropologie des mondes contemporains',
                 'volumes': '10',
                 'bloc': '1',
                 'quadri': 'Q1',
                 'credits': '5/5',
                 'session': 'Oui',
-                'obligatoire': '',
-                'commentaire_fr': '',
+                'obligatoire': 'Oui',
+                'commentaire_fr': """Lorem Ipsum est un générateur de faux textes aléatoires. Vous choisissez le nombre de paragraphes, de mots ou de listes. Vous obtenez alors un texte aléatoire que vous pourrez ensuite utiliser librement dans vos maquettes.
+                    Le texte généré est du pseudo latin et peut donner l'impression d'être du vrai texte.
+                    Faux-Texte est une réalisation du studio de création de sites internet indépendant Prélude Prod.
+                    Si vous aimez la photographie d'art et l'esprit zen, jetez un œil sur le site de ce photographe à Palaiseau, en Essonne (France).
+                """,
                 'commentaire_en': '',
                 'type_ajustement': TypeAjustement.SUPPRESSION.name,
             },
             {
                 'code_ue': 'LESPO1321',
-                'intitule': 'Economic...',
+                'intitule': 'Economic, Political and Social Ethics',
                 'volumes': '15+10',
                 'bloc': '1',
                 'quadri': 'Q1',
                 'credits': '4/5',
                 'session': 'Oui',
-                'obligatoire': '',
+                'obligatoire': 'Oui',
                 'commentaire_fr': '',
                 'commentaire_en': '',
                 'type_ajustement': TypeAjustement.SUPPRESSION.name,
             },
             {
                 'code_ue': 'LESPO1114',
-                'intitule': 'Political...',
+                'intitule': 'Political Science',
                 'volumes': '30',
                 'bloc': '2',
                 'quadri': 'Q1',
                 'credits': '5/5',
                 'session': 'Oui',
-                'obligatoire': '',
+                'obligatoire': 'Oui',
                 'commentaire_fr': '',
                 'commentaire_en': '',
                 'type_ajustement': TypeAjustement.MODIFICATION.name,
             },
             {
                 'code_ue': 'LINGE1122',
-                'intitule': 'Physique...',
+                'intitule': 'Physique 1',
                 'volumes': '30',
                 'bloc': '1',
                 'quadri': 'Q2',
                 'credits': '3/3',
                 'session': 'Oui',
-                'obligatoire': '',
+                'obligatoire': 'Oui',
                 'commentaire_fr': '',
                 'commentaire_en': '',
                 'type_ajustement': TypeAjustement.AJOUT.name,
             },
             {
                 'code_ue': 'LINGE1125',
-                'intitule': 'Séminaire...',
+                'intitule': 'Séminaire de travail universitaire en gestion',
                 'volumes': '25',
                 'bloc': '1',
                 'quadri': 'Q2',
                 'credits': '5/5',
                 'session': 'Oui',
-                'obligatoire': '',
+                'obligatoire': 'Non',
                 'commentaire_fr': '',
                 'commentaire_en': '',
                 'type_ajustement': TypeAjustement.AJOUT.name,
@@ -200,43 +204,57 @@ class TreeHTMLView(LoginRequiredMixin, TemplateView):
         return [
             {
                 'id': 'node_1',
-                'text': 'ECGE1BA',
+                'text': 'Bachelier en sciences économiques et de gestion',
+                'obligatoire': True,
                 'children': [
                     {
                         'id': 'node_11',
                         'text': 'Contenu:',
+                        'obligatoire': True,
                         'children': [
                             {
                                 'id': 'node_111',
                                 'text': 'Programme de base',
+                                'obligatoire': True,
                                 'children': [
                                     {
                                         'id': 'node_1111',
                                         'text': 'Formation pluridisciplinaire en sciences humaines',
+                                        'obligatoire': True,
                                         'children': [
                                             {
                                                 'id': '11111',
                                                 'text': 'LESPO1113 - Sociologie et anthropologie des mondes contemporains',
+                                                'obligatoire': True,
+                                                'type_ajustement': TypeAjustement.SUPPRESSION.name,
                                                 'children': []
                                             },
                                             {
                                                 'id': '11112',
                                                 'text': 'LESPO1321 - Economic, Political and Social Ethics',
+                                                'obligatoire': True,
+                                                'type_ajustement': TypeAjustement.SUPPRESSION.name,
                                                 'children': []
                                             },
                                             {
                                                 'id': '11113',
                                                 'text': 'LESPO1114 - Political Science',
+                                                'obligatoire': True,
+                                                'type_ajustement': TypeAjustement.MODIFICATION.name,
                                                 'children': []
                                             },
                                             {
                                                 'id': '11114',
                                                 'text': 'LINGE1122 - Physique 1',
+                                                'obligatoire': False,
+                                                'type_ajustement': TypeAjustement.AJOUT.name,
                                                 'children': []
                                             },
                                             {
                                                 'id': '11115',
                                                 'text': 'LINGE1125 - Séminaire de travail universitaire en gestion',
+                                                'obligatoire': True,
+                                                'type_ajustement': TypeAjustement.AJOUT.name,
                                                 'children': []
                                             },
                                         ]

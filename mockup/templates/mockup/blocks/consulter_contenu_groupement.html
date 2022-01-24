@@ -26,16 +26,16 @@
 <table id="table_search_list" class="table table-hover">
     <thead>
     <tr>
-        <th id="code_ue" class="code-col">{% trans 'Code UE' %}</th>
-        <th id="intitule">{% trans 'Intitule' %}</th>
-        <th id="volumes">{% trans 'Volumes PM/PP' %}</th>
+        <th id="code_ue" class="code-col">{% trans 'Code' %}</th>
+        <th id="intitule">{% trans 'Intitulé' %}</th>
+        <th id="volumes">{% trans 'Composants (PM/PP)' %}</th>
         <th id="bloc">{% trans 'Bloc' %}</th>
-        <th id="quadri">{% trans 'Quadri' %}</th>
-        <th id="credits">{% trans 'Credits' %}</th>
-        <th id="session">{% trans 'Sess.' %}</th>
-        <th id="obligatoire">{% trans 'Obli.' %}</th>
-        <th id="commentaire_fr">{% trans 'Com. Fr.' %}</th>
-        <th id="commentaire_en">{% trans 'Com. Ang.' %}</th>
+        <th id="quadri">{% trans 'Quadri.' %}</th>
+        <th id="credits">{% trans 'Crédits' %}</th>
+        <th id="session">{% trans 'Session' %}</th>
+        <th id="obligatoire">{% trans 'Obligatoire' %}</th>
+        <th id="commentaire_fr">{% trans 'Commentaire' %}</th>
+        <th id="commentaire_en">{% trans 'Commentaire en anglais' %}</th>
         <th id="action" class="actions-col"></th>
     </tr>
     </thead>
@@ -61,7 +61,11 @@
                 {{ element.volumes }}
             </td>
             <td headers="bloc">
-                {{ element.bloc }}
+                {% if element.type_ajustement == 'MODIFICATION' %}
+                    <b class="text-info" style="font-weight: bolder; text-shadow: 0px 0px 2px currentColor;">{{ element.bloc }}</b>
+                {% else %}
+                    {{ element.bloc }}
+                {% endif %}
             </td>
             <td headers="quadri">
                 {{ element.quadri }}
@@ -76,7 +80,7 @@
                 {{ element.obligatoire }}
             </td>
             <td headers="commentaire_fr">
-                {{ element.commentaire_fr }}
+                <div data-toggle="tooltip" title="{{ element.commentaire_fr }}">{{ element.commentaire_fr|truncatechars:10 }}</div>
             </td>
             <td headers="commentaire_en">
                 {{ element.commentaire_en }}
@@ -101,7 +105,7 @@
                            data-toggle="tooltip"
                            title="{% trans 'Supprimer unite enseignement' %}"
                         >
-                            <span class="fa fa-times" aria-hidden="true" data-toggle="modal" data-target="#annuler_modification_modal"></span>
+                            <span class="fa fa-redo-alt" aria-hidden="true" data-toggle="modal" data-target="#annuler_modification_modal"></span>
                         </a>
 
                     {% elif element.type_ajustement == 'AJOUT' %}
@@ -132,6 +136,7 @@
                 </div>
             </td>
         </tr>
+
     {% endfor %}
     </tbody>
 </table>
