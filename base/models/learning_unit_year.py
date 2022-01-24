@@ -24,7 +24,6 @@
 #
 ##############################################################################
 import uuid
-
 from decimal import Decimal
 from typing import List
 
@@ -550,9 +549,10 @@ class LearningUnitYear(models.Model):
         return None
 
     def find_gt_learning_units_year(self):
-        return LearningUnitYear.objects.filter(learning_unit=self.learning_unit,
-                                               academic_year__year__gt=self.academic_year.year) \
-            .order_by('academic_year__year')
+        return LearningUnitYear.objects.filter(
+            learning_unit=self.learning_unit,
+            academic_year__year__gt=self.academic_year.year
+        ).order_by('academic_year__year')
 
     def is_past(self):
         return self.academic_year.is_past

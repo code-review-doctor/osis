@@ -70,7 +70,7 @@ class LearningComponentYear(models.Model):
                                                    verbose_name=_("hourly volume partial q1"))
     hourly_volume_partial_q2 = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True,
                                                    verbose_name=_("hourly volume partial q2"))
-    volume_declared_vacant = models.DecimalField(max_digits=6, decimal_places=1, blank=True, null=True,
+    volume_declared_vacant = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True,
                                                  verbose_name=_("volume declared vacant"))
     repartition_volume_requirement_entity = RepartitionVolumeField()
     repartition_volume_additional_entity_1 = RepartitionVolumeField()

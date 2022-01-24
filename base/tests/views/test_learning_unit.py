@@ -634,8 +634,6 @@ class LearningUnitViewTestCase(TestCase):
         self.assertTrue(len(context['direct_parents']) == 3)
         self.assertIn('root_formations', context)
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTrue("tab_active" in response.context)
-        self.assertEqual(response.context["tab_active"], 'learning_unit_formations')
 
     def test_learning_unit_usage_with_complete_LU(self):
         learning_container_yr = LearningContainerYearFactory(academic_year=self.current_academic_year,
@@ -1100,17 +1098,6 @@ class TestLearningUnitComponents(TestCase):
             volumes = component['volumes']
             self.assertEqual(volumes[VOLUME_Q1], 30)
             self.assertEqual(volumes[VOLUME_Q2], 0)
-
-    def test_tab_active_url(self):
-        url = reverse("learning_unit_components", args=[self.learning_unit_year.id])
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTrue("tab_active" in response.context)
-        self.assertEqual(response.context["tab_active"], 'learning_unit_components')
-
-        url_tab_active = reverse(response.context["tab_active"], args=[self.learning_unit_year.id])
-        response = self.client.get(url_tab_active)
-        self.assertEqual(response.status_code, HttpResponse.status_code)
 
 
 class TestLearningAchievements(TestCase):
