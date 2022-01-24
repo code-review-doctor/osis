@@ -53,82 +53,67 @@ class AttributionsEndDateReachedSummary(IAttributionsEndDateReachedSummary):
             application_calendar: ApplicationCalendar,
             applicant_repository: IApplicantRepository
     ):
-        logger.info("In AttributionsEndDateReachedSummary method send ")
         today_date = datetime.date.today()
         if application_calendar.start_date == today_date:
-            logger.info(
-                "application_calendar.start_date ({}) is today {}".format(
-                    application_calendar.start_date,
-                    today_date
-                )
-            )
             applicants = applicant_repository.search()
-            logger.info("Number of applicants {}".format(len(applicants)))
-            for applicant in applicants:
+            applicants_with_renewable_functions = [
+                applicant for applicant in applicants
+                if applicant.get_attributions_about_to_expire_renewable_with_functions(
+                    AcademicYearIdentityBuilder.build_from_year(application_calendar.authorized_target_year.year)
+                )
+            ]
+            logger.info("[AttributionEndDateReachedSummary - {}] Number of applicants to remember {}".format(
+                application_calendar.start_date,
+                len(applicants_with_renewable_functions))
+            )
+
+            for applicant in applicants_with_renewable_functions:
                 attributions_about_to_expire = applicant.get_attributions_about_to_expire_renewable_with_functions(
                     AcademicYearIdentityBuilder.build_from_year(application_calendar.authorized_target_year.year)
                 )
+                person = Person.objects.get(global_id=applicant.entity_id.global_id)
 
-                if len(attributions_about_to_expire) > 0:
-                    logger.info("Number of attribution about to expired {} for {}".format(
-                        len(attributions_about_to_expire),
-                        applicant.entity_id.global_id)
+                if not mail_already_sent(today=today_date, receiver_email=person.email):
+                    receivers = [message_config.create_receiver(person.id, person.email, person.language)]
+                    table_ending_attributions = message_config.create_table(
+                        'ending_attributions',
+                        [pgettext_lazy("applications", "Code"), 'Title', 'Vol. 1', 'Vol. 2'],
+                        [
+                            (
+                                attributions_ending.course_id.code,
+                                attributions_ending.course_title,
+                                attributions_ending.lecturing_volume,
+                                attributions_ending.practical_volume,
+                            )
+                            for attributions_ending in attributions_about_to_expire
+                        ]
                     )
-                    person = Person.objects.get(global_id=applicant.entity_id.global_id)
-                    if not mail_already_sent(today=today_date, email_receiver=person.email):
-                        receivers = [message_config.create_receiver(person.id, person.email, person.language)]
-                        table_ending_attributions = message_config.create_table(
-                            'ending_attributions',
-                            [pgettext_lazy("applications", "Code"), 'Title', 'Vol. 1', 'Vol. 2'],
-                            [
-                                (
-                                    attributions_ending.course_id.code,
-                                    attributions_ending.course_title,
-                                    attributions_ending.lecturing_volume,
-                                    attributions_ending.practical_volume,
-                                )
-                                for attributions_ending in attributions_about_to_expire
-                            ]
-                        )
-                        template_base_data = {
-                            'first_name': person.first_name,
-                            'last_name': person.last_name,
-                            'end_date': application_calendar.end_date.strftime(DATE_FORMAT)
-                        }
-                        message_content = message_config.create_message_content(
-                            HTML_TEMPLATE_REF,
-                            TXT_TEMPLATE_REF,
-                            [table_ending_attributions],
-                            receivers,
-                            template_base_data,
-                            None
-                        )
-                        message_service.send_messages(message_content)
-                else:
-                    logger.info(
-                        "No attribution about to expired for {}".format(
-                            applicant.entity_id.global_id
-                        )
+                    template_base_data = {
+                        'first_name': person.first_name,
+                        'last_name': person.last_name,
+                        'end_date': application_calendar.end_date.strftime(DATE_FORMAT)
+                    }
+                    message_content = message_config.create_message_content(
+                        HTML_TEMPLATE_REF,
+                        TXT_TEMPLATE_REF,
+                        [table_ending_attributions],
+                        receivers,
+                        template_base_data,
+                        None
                     )
+                    message_service.send_messages(message_content)
         else:
             logger.info(
-                "application_calendar.start_date ({}) is NOT today {}".format(
-                    application_calendar.start_date,
-                    today_date
-                )
+                "[AttributionEndDateReachedSummary - {}] Application course start date not reached".format(today_date)
             )
 
 
-def mail_already_sent(today, email_receiver: str) -> bool:
+def mail_already_sent(today, receiver_email: str) -> bool:
     mail_already_sent_today = MessageHistory.objects.filter(
-        reference__in=[HTML_TEMPLATE_REF, TXT_TEMPLATE_REF],
-        sent=today,
-        receiver_email=email_receiver
+        subject="Charges d'enseignement arrivant à échéance",  # FIXME: fix reference on send method of message_service
+        sent__date=today,
+        receiver_email=receiver_email
     ).exists()
-    logger.info(
-        "Mail already sent today, {}, to {}".format(
-            today,
-            email_receiver
-        )
-    )
+    if mail_already_sent_today:
+        logger.info("Mail already sent today, {}, to {}".format(today, receiver_email))
     return mail_already_sent_today
