@@ -1,0 +1,24 @@
+{% load static %}
+{% for node in tree %}
+  <ul>
+    <li id="{{ node.id }}"
+        data-jstree='{"icon":"{% if node.obligatoire %}{% static "img/education_group_year/mandatory.png" %}{% else %}{% static "img/education_group_year/optional.png" %} {% endif%}"}'
+        class="
+        {% if node.type_ajustement == 'AJOUT' %}
+            text-success
+        {% elif node.type_ajustement == 'MODIFICATION' %}
+            text-info
+        {% elif node.type_ajustement == 'SUPPRESSION' %}
+            text-danger strikethrough
+        {% endif %}
+        "
+    >
+            {{ node.text }}
+        {% if node.children %}
+          {% with tree=node.children template_name="tree_view_template.html" %}
+             {% include 'mockup/blocks/tree_recursif.html' %}
+          {% endwith %}
+        {% endif %}
+    </li>
+  </ul>
+{% endfor %}

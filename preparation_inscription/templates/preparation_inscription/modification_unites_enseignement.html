@@ -1,0 +1,68 @@
+{% load i18n bootstrap3 %}
+<table id="table_search_list" class="table table-hover">
+    <thead>
+    <tr>
+        <th id="code_ue" class="code-col">{% trans 'Code' %}</th>
+        <th id="intitule">{% trans 'Intitulé' %}</th>
+        <th id="volumes">{% trans 'Composants (PM/PP)' %}</th>
+        <th id="bloc">{% trans 'Bloc' %}</th>
+        <th id="quadri">{% trans 'Quadri.' %}</th>
+        <th id="credits">{% trans 'Crédits' %}</th>
+        <th id="session">{% trans 'Session' %}</th>
+        <th id="obligatoire">{% trans 'Obligatoire' %}</th>
+        <th id="commentaire_fr">{% trans 'Commentaire' %}</th>
+        <th id="commentaire_en">{% trans 'Commentaire en anglais' %}</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for element in search_result %}
+        <tr>
+            {% if element.type_ajustement == 'SUPPRESSION' %}
+                <td class="text-danger" headers="code_ue"><span><i class="fas fa-folder-minus"></i>
+                            {% elif element.type_ajustement == 'MODIFICATION' %}
+                <td class="text-info" headers="code_ue"><span><i class="fas fa-folder"></i>
+                            {% elif element.type_ajustement == 'AJOUT' %}
+                <td class="text-success" headers="code_ue"><span><i class="fas fa-folder-plus"></i>
+            {% endif %}
+            <span class="emphasized-code">
+                                        {{ element.code_ue }}
+                                    </span>
+            </span>
+            </td>
+            <td headers="intitule">
+                {{ element.intitule }}
+            </td>
+            <td headers="volumes">
+                {{ element.volumes }}
+            </td>
+            <td headers="bloc">
+                <input  class="form-control" type="number" value="{{ element.bloc }}"/>
+            </td>
+            <td headers="quadri">
+                {{ element.quadri }}
+            </td>
+            <td headers="credits">
+                {{ element.credits }}
+            </td>
+            <td headers="session">
+                <input class="form-control" type="number" value="{{ element.session }}"/>
+            </td>
+            <td headers="obligatoire" class="text-center">
+                <input type="checkbox" value="{{ element.bloc }}"/>
+            </td>
+            <td headers="commentaire_fr">
+                <input  class="form-control" type="text" value="{{ element.commentaire_fr }}"/>
+            </td>
+            <td headers="commentaire_en">
+                <input  class="form-control" type="text" value="{{ element.commentaire_en }}"/>
+            </td>
+        </tr>
+
+    {% endfor %}
+    </tbody>
+</table>
+
+<div class="panel-footer text-right">
+    <a href="" hx-get="{% url 'consulter_contenu_groupement_view' %}" hx-target="#content-of-main-panel" hx-trigger="click" type="button" class="btn btn-default">Annuler</a>
+    <a href="" hx-get="{% url 'consulter_contenu_groupement_view' %}" hx-target="#content-of-main-panel" hx-trigger="click" type="button" class="btn btn-primary">Enregistrer</a>
+</div>
