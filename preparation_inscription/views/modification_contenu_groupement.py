@@ -52,8 +52,8 @@ class ModifierProprietesContenuView(LoginRequiredMixin, HtmxMixin, FormView):
     name = 'modifier_proprietes_contenu_view'
 
     # FormView
-    template_name = "preparation_inscription.html"
-    htmx_template_name = "modification_unites_enseignement.html"
+    template_name = "preparation_inscription/preparation_inscription.html"
+    htmx_template_name = "preparation_inscription/modification_unites_enseignement.html"
 
     form_class = ModifierProprietesContenuForm
 
