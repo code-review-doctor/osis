@@ -282,4 +282,9 @@
       <option name="HTML" value="true" />
     </context>
   </template>
+  <template name="ht-include" value="{% include &quot;$END$.html&quot; %}" description="Crée un {% include &quot;&quot; %}" toReformat="false" toShortenFQNames="true">
+    <context>
+      <option name="HTML" value="true" />
+    </context>
+  </template>
 </templateSet>
