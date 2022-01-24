@@ -23,5 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.urls import path
 
-urlpatterns = []
+from preparation_inscription.views.delete import DeleteLearningUnitFormView
+
+urlpatterns = [
+    path('delete', DeleteLearningUnitFormView.as_view(), name=DeleteLearningUnitFormView.name),
+]
