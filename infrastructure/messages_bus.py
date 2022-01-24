@@ -224,6 +224,8 @@ from infrastructure.learning_unit.repository.entity import UclEntityRepository
 from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
 from infrastructure.preparation_programme_annuel_etudiant.domain.service.catalogue_formations import \
     CatalogueFormationsTranslator
+from infrastructure.preparation_programme_annuel_etudiant.repository.groupement_ajuste_inscription_cours import \
+    GroupementAjusteInscriptionCoursRepository
 from infrastructure.shared_kernel.academic_year.repository.academic_year import AcademicYearRepository
 from infrastructure.shared_kernel.campus.repository.uclouvain_campus import UclouvainCampusRepository
 from infrastructure.shared_kernel.entite.repository.entiteucl import EntiteUCLRepository

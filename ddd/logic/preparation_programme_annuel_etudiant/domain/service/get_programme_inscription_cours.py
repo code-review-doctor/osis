@@ -57,7 +57,7 @@ class GetProgrammeInscriptionCours(interface.DomainService):
             transition_name=cmd.transition_formation
         )
         groupements_ajustes = groupement_ajuste_repository.get_dtos(program_tree_version_identity)
-        groupements = cls.__build_groupement_inscription_cours_dtos(formation.racine.groupements_contenus)
+        groupements = cls.__build_groupement_inscription_cours_dtos([formation.racine])
         return ProgrammeInscriptionCoursDTO(
             uuid='uuid-1234',
             code=program_tree_version_identity.offer_acronym,
@@ -77,7 +77,7 @@ class GetProgrammeInscriptionCours(interface.DomainService):
             GroupementInscriptionCoursDTO(
                 intitule_complet=groupement.groupement_contenant.intitule_complet,
                 obligatoire=groupement.groupement_contenant.obligatoire,
-                unites_enseignement=[
+                unites_enseignements=[
                     UniteEnseignementProgrammeDTO(
                         code=unite_enseignement.code,
                         intitule=unite_enseignement.intitule_complet,

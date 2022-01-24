@@ -127,7 +127,7 @@ class GroupementInscriptionCoursDTO(DTO):
     # unites_enseignement_ajoutees: List['UniteEnseignementAjouteeDTO']
     # unites_enseignement_supprimees: List['UniteEnseignementSupprimeeDTO']
     # unites_enseignement_modifiees: List['UniteEnseignementModifieeDTO']
-    unites_enseignement: List['UniteEnseignementProgrammeDTO']
+    unites_enseignements: List['UniteEnseignementProgrammeDTO']
     sous_programme: List['GroupementInscriptionCoursDTO']
 
 

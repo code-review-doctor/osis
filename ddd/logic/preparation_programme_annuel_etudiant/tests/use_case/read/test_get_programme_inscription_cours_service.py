@@ -27,6 +27,7 @@ from unittest import mock
 
 from django.test import SimpleTestCase
 
+from ddd.logic.preparation_programme_annuel_etudiant.commands import GetProgrammeInscriptionCoursCommand
 from infrastructure.messages_bus import message_bus_instance
 from infrastructure.preparation_programme_annuel_etudiant.domain.service.in_memory.catalogue_formations import \
     CatalogueFormationsTranslator
@@ -50,3 +51,29 @@ class GetProgrammeInscriptionCoursTest(SimpleTestCase):
         message_bus_patcher.start()
         self.addCleanup(message_bus_patcher.stop)
         self.message_bus = message_bus_instance
+
+    def test_should_visualiser_ECGE1BA_version_standard(self):
+        cmd = GetProgrammeInscriptionCoursCommand(
+            annee_formation=2021,
+            sigle_formation='ECGE1BA',
+            version_formation='',
+            transition_formation='',
+        )
+        programme = self.message_bus.invoke(cmd)
+        self.assertEqual(programme.code, 'ECGE1BA')
+        self.assertEqual(programme.annee, 2021)
+        self.assertEqual(programme.version, '')
+        self.assertEqual(programme.transition, '')
+        self.assertEqual(programme.intitule_complet_formation, 'Bachelier en sciences économiques et de gestion')
+        sous_programme = programme.sous_programme
+        self.assertEqual(len(sous_programme), 1)
+        groupement = sous_programme[0]
+        self.assertEqual(groupement.intitule_complet, 'Content:')
+        self.assertTrue(groupement.obligatoire)
+        unites_enseignements = groupement.unites_enseignements
+        self.assertEqual(len(unites_enseignements), 1)
+        unite_enseignement = unites_enseignements[0]
+        self.assertEqual(unite_enseignement.code, 'LESPO1113')
+        self.assertEqual(unite_enseignement.intitule, 'Sociologie et anthropologie des mondes contemporains')
+        self.assertTrue(unite_enseignement.obligatoire)
+        self.assertEqual(unite_enseignement.bloc, 1)
