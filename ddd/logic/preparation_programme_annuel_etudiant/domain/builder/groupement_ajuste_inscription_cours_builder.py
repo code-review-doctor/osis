@@ -23,28 +23,44 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import uuid
+from typing import Union
+
 from ddd.logic.preparation_programme_annuel_etudiant.commands import AjouterUEAuProgrammeCommand
-from ddd.logic.preparation_programme_annuel_etudiant.domain.builder.groupement_ajuste_inscription_cours_builder import \
-    GroupementAjusteInscriptionCoursBuilder
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
-    IdentiteGroupementAjusteInscriptionCours
+    IdentiteGroupementAjusteInscriptionCours, GroupementAjusteInscriptionCours
 from ddd.logic.preparation_programme_annuel_etudiant.repository.i_groupement_ajuste_inscription_cours import \
     IGroupementAjusteInscriptionCoursRepository
+from education_group.ddd.domain.group import GroupIdentity
+from osis_common.ddd import interface
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentityBuilder
 
 
-def ajouter_UE_au_programme(
-        cmd: 'AjouterUEAuProgrammeCommand',
-        repository: 'IGroupementAjusteInscriptionCoursRepository',
-) -> 'IdentiteGroupementAjusteInscriptionCours':
-    # GIVEN
-    groupement_ajuste = GroupementAjusteInscriptionCoursBuilder.build_from_command(cmd, repository)
-
-    # WHEN
-    groupement_ajuste.ajouter_unites_enseignements(
-        codes_unites_enseignement=cmd.unites_enseignements,
-    )
-
-    # THEN
-    repository.save(groupement_ajuste)
-
-    return groupement_ajuste.entity_id
+class GroupementAjusteInscriptionCoursBuilder(interface.RootEntityBuilder):
+    @classmethod
+    def build_from_command(
+            cls,
+            cmd: Union['AjouterUEAuProgrammeCommand'],
+            repository: 'IGroupementAjusteInscriptionCoursRepository'
+    ) -> 'GroupementAjusteInscriptionCours':
+        version_programme_id = ProgramTreeVersionIdentityBuilder().build(
+            offer_acronym=cmd.sigle_formation,
+            year=cmd.annee_formation,
+            version_name=cmd.version_formation,
+            transition_name=cmd.transition_formation,
+        )
+        groupement_id = GroupIdentity(
+            code=cmd.ajouter_dans,
+            year=cmd.annee_formation,
+        )
+        groupements_ajustes = repository.search(version_programme_id=version_programme_id, groupement_id=groupement_id)
+        if groupements_ajustes:
+            return groupements_ajustes[0]
+        return GroupementAjusteInscriptionCours(
+            entity_id=IdentiteGroupementAjusteInscriptionCours(uuid=uuid.uuid4()),
+            version_programme_id=version_programme_id,
+            groupement_id=groupement_id,
+            unites_enseignement_ajoutees=[],
+            unites_enseignement_supprimees=[],
+            unites_enseignement_modifiees=[],
+        )

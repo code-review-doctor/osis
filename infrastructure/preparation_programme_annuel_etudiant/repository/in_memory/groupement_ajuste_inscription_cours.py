@@ -25,18 +25,29 @@
 ##############################################################################
 from typing import Optional, List
 
+import uuid
+
+from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
     GroupementAjusteInscriptionCours
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
     IdentiteGroupementAjusteInscriptionCours
+from ddd.logic.preparation_programme_annuel_etudiant.domain.model.unite_enseignement_ajoutee import \
+    UniteEnseignementAjoutee, UniteEnseignementAjouteeIdentity
+from ddd.logic.preparation_programme_annuel_etudiant.repository.i_groupement_ajuste_inscription_cours import \
+    IGroupementAjusteInscriptionCoursRepository
+from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
+from education_group.ddd.domain.group import GroupIdentity
 from osis_common.ddd import interface
 from osis_common.ddd.interface import ApplicationService
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, STANDARD
 
 
-class IGroupementAjusteInscriptionCoursRepository(interface.AbstractRepository):
-    @classmethod
-    def get(cls, entity_id: 'IdentiteGroupementAjusteInscriptionCours') -> 'GroupementAjusteInscriptionCours':
-        pass
+class GroupementAjusteInscriptionCoursInMemoryRepository(
+    InMemoryGenericRepository,
+    IGroupementAjusteInscriptionCoursRepository
+):
 
     @classmethod
     def search(
@@ -46,12 +57,8 @@ class IGroupementAjusteInscriptionCoursRepository(interface.AbstractRepository):
             groupement_id: 'GroupIdentity' = None,
             **kwargs
     ) -> List['GroupementAjusteInscriptionCours']:
-        pass
-
-    @classmethod
-    def delete(cls, entity_id: 'IdentiteGroupementAjusteInscriptionCours', **kwargs: ApplicationService) -> None:
-        pass
-
-    @classmethod
-    def save(cls, entity: 'GroupementAjusteInscriptionCours') -> None:
-        pass
+        return [
+            ajustement for ajustement in cls.entities
+            if (not version_programme_id or ajustement.version_programme_id == version_programme_id)
+            and (not groupement_id or ajustement.groupement_id == groupement_id)
+        ]
