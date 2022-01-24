@@ -32,7 +32,7 @@ class CatalogueFormationsTranslatorInMemory(ICatalogueFormationsTranslator):
 
     dtos = [
         FormationDTO(
-            programme_detaille=...,  # TODO :: to implement
+            racine=...,  # TODO :: to implement
             annee=2020,
             sigle='ECGE1BA',
             version='STANDARD',
@@ -41,7 +41,7 @@ class CatalogueFormationsTranslatorInMemory(ICatalogueFormationsTranslator):
     ]
 
     @classmethod
-    def get_formation(cls, sigle: str, annee: int, version: str) -> 'FormationDTO':
+    def get_formation(cls, sigle: str, annee: int, version: str, transition_name: str) -> 'FormationDTO':
         return next(
             dto for dto in cls.dtos
             if dto.sigle == sigle and dto.annee == annee and dto.version == version

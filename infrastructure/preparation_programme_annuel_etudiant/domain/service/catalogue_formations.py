@@ -30,7 +30,7 @@ from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, C
 
 class CatalogueFormationsTranslator(ICatalogueFormationsTranslator):
     @classmethod
-    def get_formation(cls, sigle: str, annee: int, version: str) -> 'FormationDTO':
+    def get_formation(cls, sigle: str, annee: int, version: str, transition_name: str) -> 'FormationDTO':
         # reutiliser GetProgramTreeVersionCommand et convertir ProgramTreeVersion en FormationDTO
         raise NotImplementedError
 
