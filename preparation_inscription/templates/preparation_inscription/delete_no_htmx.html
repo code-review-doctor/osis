@@ -104,12 +104,14 @@
                         {% for element in deletable_content %}
                         <tr>
                         <td>
-                            <input type="checkbox" class="select-row-checkbox" />
+                            <input type="checkbox" name="to_delete" class="select-row-checkbox" />
                         </td>
                         {% if element.type_ajustement == 'MODIFICATION' %}
                             <td class="text-info" headers="code_ue"><span><i class="fas fa-folder"></i>
                         {% elif element.type_ajustement == 'AJOUT' %}
                             <td class="text-success" headers="code_ue"><span><i class="fas fa-folder-plus"></i>
+                        {% else %}
+                            <td headers="code_ue"><span>
                         {% endif %}
                                 <span class="emphasized-code">
                                     {{ element.code_ue }}
