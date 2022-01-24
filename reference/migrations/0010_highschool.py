@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('base', '0622_auto_20220124_0854'),
+        ('base', '0621_merge_20220120_1018'),
         ('reference', '0009_auto_20211025_1239'),
     ]
 
