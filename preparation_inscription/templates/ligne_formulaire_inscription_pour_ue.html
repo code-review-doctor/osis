@@ -31,6 +31,7 @@
             <img src="{% if contenu.obligatoire %}{% static 'img/education_group_year/mandatory.png' %}{% else %}{% static 'img/education_group_year/optional.png' %}{% endif %}">
             {{ contenu.code }} {{ contenu.intitule_complet }}
             [{{ contenu|formater_volumes_totaux }}]
+            {{ contenu.quadrimestre_texte }}
             {{ contenu|formater_credits_ue }}
         </span>
     </td>

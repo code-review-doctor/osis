@@ -121,6 +121,7 @@ def _convertir_unites_enseignement_contenues_en_unites_enseignement_catalogue_dt
                 code=unite_enseignement_contenue.code,
                 intitule_complet=unite_enseignement_contenue.intitule_complet,
                 quadrimestre=unite_enseignement_contenue.quadrimestre,
+                quadrimestre_texte=unite_enseignement_contenue.quadrimestre_texte,
                 credits_absolus=unite_enseignement_contenue.credits_absolus,
                 volume_annuel_pm=unite_enseignement_contenue.volume_annuel_pm,
                 volume_annuel_pp=unite_enseignement_contenue.volume_annuel_pp,
