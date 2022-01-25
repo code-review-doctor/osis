@@ -42,7 +42,7 @@ from ddd.logic.application.domain.model.vacant_course import VacantCourseIdentit
 from ddd.logic.application.domain.validator.exceptions import VacantCourseApplicationManagedInTeamException, \
     ApplicationAlreadyExistsException, VolumesAskedShouldBeLowerOrEqualToVolumeAvailable, \
     VacantCourseNotAllowedDeclarationType, VacantCourseNotFound, AttributionSubstituteException, \
-    AttributionAboutToExpireWithoutVolumeException
+    AttributionAboutToExpireWithoutVolumeException, AutomaticRenewalImpossibleVolumesVacantLowerThanVolumesToRenew
 from ddd.logic.application.dtos import AttributionAboutToExpireDTO
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
@@ -219,7 +219,7 @@ class TestGetAttributionsAboutToExpireService(TestCase):
         self.assertFalse(results[0].is_renewable)
         self.assertEqual(
             results[0].unavailable_renewal_reason,
-            VolumesAskedShouldBeLowerOrEqualToVolumeAvailable().message
+            AutomaticRenewalImpossibleVolumesVacantLowerThanVolumesToRenew().message
         )
 
     def test_assert_unavailable_renewal_reason_case_declaration_type_disallowed(self):

@@ -39,7 +39,8 @@ from ddd.logic.application.domain.service.apply_on_vacant_course import ApplyOnV
 from ddd.logic.application.domain.service.i_learning_unit_service import ILearningUnitService
 from ddd.logic.application.domain.validator.exceptions import AttributionAboutToExpireNotFound, \
     AttributionAboutToExpireFunctionException, VacantCourseNotFound, AttributionSubstituteException, \
-    AttributionAboutToExpireWithoutVolumeException
+    AttributionAboutToExpireWithoutVolumeException, VolumesAskedShouldBeLowerOrEqualToVolumeAvailable, \
+    AutomaticRenewalImpossibleVolumesVacantLowerThanVolumesToRenew
 from ddd.logic.application.dtos import AttributionAboutToExpireDTO, LearningUnitModificationProposalFromServiceDTO
 from ddd.logic.application.repository.i_vacant_course_repository import IVacantCourseRepository
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
@@ -243,6 +244,9 @@ def _get_unavailable_renewal_reason(
         )
     except MultipleBusinessExceptions as e:
         first_exception = next(iter(e.exceptions))
+
+        if isinstance(first_exception, VolumesAskedShouldBeLowerOrEqualToVolumeAvailable):
+            return AutomaticRenewalImpossibleVolumesVacantLowerThanVolumesToRenew().message
         return first_exception.message
 
 
