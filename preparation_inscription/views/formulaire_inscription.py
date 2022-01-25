@@ -23,14 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
 from django.views.generic import TemplateView
 
 from base.utils.htmx import HtmxMixin
-from preparation_inscription.views.consulter_contenu_groupement import TypeAjustement
 
 
 class FormulaireInscriptionView(HtmxMixin, LoginRequiredMixin, TemplateView):
@@ -42,82 +40,7 @@ class FormulaireInscriptionView(HtmxMixin, LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         return {
             **super().get_context_data(**kwargs),
-            'tree': self.get_tree()
         }
 
     def post(self, request, *args, **kwargs):
         return redirect("pae_formulaire_inscription_view")
-
-    def get_tree(self) -> List:
-        return [
-            {
-                'id': 'node_1',
-                'text': 'Bachelier en sciences économiques et de gestion',
-                'obligatoire': True,
-                'children': [
-                    {
-                        'id': 'node_11',
-                        'text': 'Contenu:',
-                        'obligatoire': True,
-                        'children': [
-                            {
-                                'id': 'node_111',
-                                'text': 'Programme de base',
-                                'obligatoire': True,
-                                'children': [
-                                    {
-                                        'id': 'node_1111',
-                                        'text': 'Formation pluridisciplinaire en sciences humaines',
-                                        'obligatoire': True,
-                                        'children': [
-                                            {
-                                                'id': '11111',
-                                                'text': 'LESPO1113 - Sociologie et anthropologie des mondes contemporains',
-                                                'obligatoire': True,
-                                                'type_ajustement': TypeAjustement.SUPPRESSION.name,
-                                                'children': []
-                                            },
-                                            {
-                                                'id': '11112',
-                                                'text': 'LESPO1321 - Economic, Political and Social Ethics',
-                                                'obligatoire': True,
-                                                'type_ajustement': TypeAjustement.SUPPRESSION.name,
-                                                'children': []
-                                            },
-                                            {
-                                                'id': '11113',
-                                                'text': 'LESPO1114 - Political Science',
-                                                'obligatoire': True,
-                                                'type_ajustement': TypeAjustement.MODIFICATION.name,
-                                                'children': []
-                                            },
-                                            {
-                                                'id': '11115',
-                                                'text': 'LECGE1115 - Economie politique',
-                                                'obligatoire': True,
-                                                'type_ajustement': None,
-                                                'children': []
-                                            },
-                                            {
-                                                'id': '11114',
-                                                'text': 'LINGE1122 - Physique 1',
-                                                'obligatoire': True,
-                                                'type_ajustement': TypeAjustement.AJOUT.name,
-                                                'children': []
-                                            },
-                                            {
-                                                'id': '11116',
-                                                'text': 'LINGE1125 - Séminaire de travail universitaire en gestion',
-                                                'obligatoire': False,
-                                                'type_ajustement': TypeAjustement.AJOUT.name,
-                                                'children': []
-                                            },
-                                        ]
-                                    },
-                                ]
-                            },
-                        ]
-                    },
-                ]
-            },
-        ]
