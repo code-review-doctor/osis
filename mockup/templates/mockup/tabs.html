@@ -51,6 +51,9 @@
 {% endblock style %}
 
 {% block content %}
-    <div id="tabs" hx-get="{% url 'EventModelingView' %}" hx-trigger="load after:100ms" hx-target="#tabs" hx-swap="innerHTML" >
+
+    <div id="tabs">
+        {% include "mockup/blocks/tab_contenu.html" %}
     </div>
+
 {% endblock %}
