@@ -22,6 +22,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
 
 from django import forms
 from django.shortcuts import redirect
@@ -30,7 +31,12 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from rules.contrib.views import LoginRequiredMixin
 
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.utils.htmx import HtmxMixin
+from base.views.common import display_error_messages, display_success_messages
+from ddd.logic.learning_unit.commands import LearningUnitSearchCommand
+from ddd.logic.learning_unit.dtos import LearningUnitSearchDTO
+from ddd.logic.preparation_programme_annuel_etudiant.commands import AjouterUEAuProgrammeCommand
 from ddd.logic.shared_kernel.academic_year.commands import SearchAcademicYearCommand
 from education_group.forms.fields import UpperCaseCharField
 from infrastructure.messages_bus import message_bus_instance
@@ -71,29 +77,36 @@ class AjouterUnitesEnseignementView(LoginRequiredMixin, HtmxMixin, TemplateView)
             }
         )
 
-    def get_search_result(self):
-        data = [
-            {
-                'annee_academique': 2021,
-                'code': 'LSINF1452',
-                'intitule': 'Test en EPC',
-            },
-            {
-                'annee_academique': 2021,
-                'code': 'LECGE12547',
-                'intitule': 'Finance en Osis',
-            },
-        ]  # TODO :: message_bus.invoke(Command)
-        return data
+    def get_search_result(self) -> List['LearningUnitSearchDTO']:
+        search_form = self.get_search_form()
+        if search_form.is_valid():
+
+            cmd = LearningUnitSearchCommand(
+                code_annee_values={(search_form.cleaned_data['code'], int(search_form.cleaned_data['annee_academique']))}
+            )
+            return message_bus_instance.invoke(cmd)
+
+        return []
 
     def post(self, request, *args, **kwargs):
         selected_ues = request.POST.getlist('selected_ue')
-        # TODO :: to implement
-        # cmd = Command(...)
-        # message__bus.invoke(cmd)
-        # display_error_messages(self.request, messages)
-        # display_success_messages(self.request, messages)
-        # self.render_to_response(self.get_context_data(form=self.get_form(self.form_class)))
+        cmd = AjouterUEAuProgrammeCommand(
+            annee_formation=2021,
+            sigle_formation='ECGE1BA',
+            version_formation='',
+            transition_formation='',
+            ajouter_dans='LECGE100R',
+            unites_enseignements=selected_ues
+        )
+        try:
+            message_bus_instance.invoke(cmd)
+            success_message = _('The learning units have been added')
+            display_success_messages(self.request, success_message)
+        except MultipleBusinessExceptions as exceptions:
+            messages = [exception.message for exception in exceptions.exceptions]
+            display_error_messages(self.request, messages)
+            return self.get(request, *args, **kwargs)
+
         return redirect("EventModelingView")
 
     def get_intitule_groupement(self):

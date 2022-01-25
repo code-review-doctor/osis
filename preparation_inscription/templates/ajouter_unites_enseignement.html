@@ -27,7 +27,7 @@
 
 <div class="panel-body">
 
-    <form method="GET" id="form_recherche_ues_a_ajouter">
+    <form hx-get="{% url 'ajouter_unites_enseignement_view' %}" hx-target="#content-of-main-panel" id="form_recherche_ues_a_ajouter">
 
         {{ formulaire_recherche_ues.media }}
         <div class="row">
@@ -42,7 +42,8 @@
             </div>
             <div class="col-md-1">
                 <br>
-                <button id="bt_search_list"
+                <button type="submit"
+                        id="bt_search_list"
                         class="btn btn-primary"
                         role="button"
                         style="margin-top: 4px"
@@ -57,7 +58,7 @@
 
     <br>
 
-    <form action="#" method="POST" id="form_ajouter_ues">
+    <form id="form_ajouter_ues">
         {% csrf_token %}
 
 
@@ -77,13 +78,13 @@
                         <input type="checkbox" name="selected_ue" value="{{ element.code }}">
                     </td>
                     <td headers="Anac." class="col-md-2">
-                        {{ element.annee_academique|display_as_academic_year }}
+                        {{ element.year|display_as_academic_year }}
                     </td>
                     <td headers="Code" class="col-md-2">
                         {{ element.code }}
                     </td>
                     <td headers="Intitulé" class="col-md-7">
-                        {{ element.intitule }}
+                        {{ element.full_title }}
                     </td>
                 </tr>
             {% endfor %}
@@ -96,6 +97,6 @@
 
 <div class="panel-footer text-right">
     <a href="" hx-get="{% url 'consulter_contenu_groupement_view' %}" hx-target="#content-of-main-panel" hx-trigger="click" type="button" class="btn btn-default">{% trans "Cancel" %}</a>
-    <a href="" hx-get="{% url 'consulter_contenu_groupement_view' %}" hx-target="#content-of-main-panel" hx-trigger="click" type="button" class="btn btn-primary">{% trans "Add" %}</a>
+    <a href="" hx-post="{% url 'ajouter_unites_enseignement_view' %}" hx-include="#form_ajouter_ues" hx-target="#content-of-main-panel" hx-trigger="click" type="button" class="btn btn-primary">{% trans "Add" %}</a>
 </div>
 
