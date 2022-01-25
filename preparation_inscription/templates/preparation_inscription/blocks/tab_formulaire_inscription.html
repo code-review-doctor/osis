@@ -24,7 +24,7 @@
             <td>
                 <span style="padding-left: 20px;">
                     <img src="/static/img/education_group_year/mandatory.png">
-                    Contenu :
+                    {{ tree.0.children.0.text }}
                 </span>
             </td>
             <td colspan="3"></td>
@@ -33,8 +33,7 @@
             <td>
                 <span style="padding-left: 30px;">
                     <img src="/static/img/education_group_year/mandatory.png">
-                    Programme de base
-                    (150 crédits)
+                     {{ tree.0.children.0.children.0.text }}
                 </span>
             </td>
             <td colspan="3"></td>
@@ -43,8 +42,7 @@
             <td>
                 <span style="padding-left: 40px;">
                     <img src="/static/img/education_group_year/mandatory.png">
-                    Formation pluridisciplinaire  en sciences humaines
-                    (18 crédits)
+                    {{ tree.0.children.0.children.0.children.0.text }}
                 </span>
             </td>
             <td colspan="3"></td>
@@ -53,9 +51,7 @@
             <td>
                 <span style="padding-left: 60px;">
                     <img src="/static/img/education_group_year/mandatory.png">
-                    LESPO1113 Sociologie et anthropologie des mondes contemporains
-                    [40h + 0h]
-                    (5 crédits)
+                    {{ tree.0.children.0.children.0.children.0.children.0.text }}
                 </span>
             </td>
             <td><label title="An 1">X</label></td>
@@ -66,27 +62,58 @@
             <td>
                 <span style="padding-left: 60px;">
                     <img src="/static/img/education_group_year/mandatory.png">
-                    LESPO1321 Economic, Political and Social Ethics
-                    [30h + 0h]
-                    (3 crédits)
+                    {{ tree.0.children.0.children.0.children.0.children.1.text }}
                 </span>
             </td>
+            <td><label title="An 1">X</label></td>
             <td></td>
             <td></td>
-            <td><label title="An 3">X</label></td>
         </tr>
         <tr>
             <td>
                 <span style="padding-left: 60px;">
                     <img src="/static/img/education_group_year/mandatory.png">
-                    LECGE1115 Economie politique
-                    [30h + 0h]
-                    (3 crédits)
+                    {{ tree.0.children.0.children.0.children.0.children.2.text }}
                 </span>
             </td>
             <td></td>
+            <td><label title="An 2">X</label></td>
             <td></td>
-            <td><label title="An 3">X</label></td>
+        </tr>
+        <tr>
+            <td>
+                <span style="padding-left: 60px;">
+                    <img src="/static/img/education_group_year/mandatory.png">
+                    {{ tree.0.children.0.children.0.children.0.children.3.text }}
+                </span>
+            </td>
+            <td><label title="An 1">X</label></td>
+            <td></td>
+            <td></td>
+        </tr>
+        </tbody>
+        <tr>
+            <td>
+                <span style="padding-left: 60px;">
+                    <img src="/static/img/education_group_year/mandatory.png">
+                    {{ tree.0.children.0.children.0.children.0.children.4.text }}
+                </span>
+            </td>
+            <td><label title="An 1">X</label></td>
+            <td></td>
+            <td></td>
+        </tr>
+        </tbody>
+        <tr>
+            <td>
+                <span style="padding-left: 60px;">
+                    <img src="/static/img/education_group_year/mandatory.png">
+                    {{ tree.0.children.0.children.0.children.0.children.5.text }}
+                </span>
+            </td>
+            <td><label title="An 1">X</label></td>
+            <td></td>
+            <td></td>
         </tr>
         </tbody>
     </table>
