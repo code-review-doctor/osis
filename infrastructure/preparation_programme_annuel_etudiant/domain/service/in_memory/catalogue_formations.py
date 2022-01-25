@@ -26,21 +26,61 @@
 from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import \
     ICatalogueFormationsTranslator
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, ContenuGroupementCatalogueDTO, \
-    GroupementDTO
+    GroupementDTO, GroupementCatalogueDTO, UniteEnseignementCatalogueDTO
+
+ANNEE = 2021
 
 
 class CatalogueFormationsTranslatorInMemory(ICatalogueFormationsTranslator):
+    groupement_ECGE1BA = GroupementCatalogueDTO(
+        intitule='ECGE1BA',
+        obligatoire=True,
+        remarque='Remarque',
+        credits=10,
+        intitule_complet='Bachelier en sciences économiques et de gestion ',
+    )
+
     dtos = [
         FormationDTO(
             racine=ContenuGroupementCatalogueDTO(
-                groupement_contenant=None,
-                groupements_contenus=[],
+                groupement_contenant=groupement_ECGE1BA,
+                groupements_contenus=[
+                    ContenuGroupementCatalogueDTO(
+                        groupement_contenant=groupement_ECGE1BA,
+                        groupements_contenus=[
+                            ContenuGroupementCatalogueDTO(
+                                groupement_contenant=GroupementCatalogueDTO(
+                                    intitule='Contenu :',
+                                    obligatoire=True,
+                                    remarque='Remarque',
+                                    credits=10,
+                                    intitule_complet='Contenu :',
+                                ),
+                                groupements_contenus=[],
+                                unites_enseignement_contenues=[
+                                    UniteEnseignementCatalogueDTO(
+                                        bloc=1,
+                                        code='LESPO1113',
+                                        intitule_complet='Sociologie et anthropologie des mondes contemporains',
+                                        quadrimestre='Q1 ou Q2',
+                                        credits_absolus=5,
+                                        volume_annuel_pm=40,
+                                        volume_annuel_pp=0,
+                                        obligatoire=False,
+                                        credits_relatifs=5,
+                                        session_derogation='',
+                                    )
+                                ]
+                            )],
+                        unites_enseignement_contenues=[]
+                    )
+                ],
                 unites_enseignement_contenues=[]
             ),
-            annee=2021,
+            annee=ANNEE,
             sigle='ECGE1BA',
             version='STANDARD',
-            intitule_complet='Bachelier ...',
+            intitule_complet='Bachelier en sciences économiques et de gestion',
         ),
     ]
 

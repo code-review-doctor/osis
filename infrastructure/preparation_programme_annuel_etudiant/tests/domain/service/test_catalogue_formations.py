@@ -28,23 +28,33 @@ from unittest import mock
 from django.test import SimpleTestCase
 
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormationCommand
+from infrastructure.preparation_programme_annuel_etudiant.domain.service.catalogue_formations import \
+    CatalogueFormationsTranslator
+from infrastructure.preparation_programme_annuel_etudiant.domain.service.in_memory.catalogue_formations import \
+    CatalogueFormationsTranslatorInMemory
 
 
 class CatalogueFormationsTranslatorTest(SimpleTestCase):
 
     def setUp(self) -> None:
-        # mock appel service bus => retour GetProgramTreeVersionCommand : ProgramTreeVersionFactory()
+        self.translator = CatalogueFormationsTranslator()
         self.patch_message_bus = mock.patch(
-            "infrastructure.messages_bus.invoke",
+            "infrastructure.utils.MessageBus.invoke",
             side_effect=self.__mock_message_bus_invoke
         )
         self.message_bus_mocked = self.patch_message_bus.start()
         self.addCleanup(self.patch_message_bus.stop)
+        self.ECGE1BA_dto = CatalogueFormationsTranslatorInMemory.dtos[0]
 
     def __mock_message_bus_invoke(self, cmd):
         if isinstance(cmd, GetFormationCommand):
-            # return ProgramTreeVersionFactory(entity_id__version_name="")
-            raise NotImplementedError
+            return self.ECGE1BA_dto
 
     def test_should_convertir_version_standard(self):
-        raise NotImplementedError
+        formation_dto = self.translator.get_formation(
+            sigle=self.ECGE1BA_dto.sigle,
+            annee=self.ECGE1BA_dto.annee,
+            version=self.ECGE1BA_dto.version,
+            transition_name=''
+        )
+        self.assertEqual(formation_dto, self.ECGE1BA_dto)
