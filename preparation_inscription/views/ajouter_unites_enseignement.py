@@ -82,7 +82,10 @@ class AjouterUnitesEnseignementView(LoginRequiredMixin, HtmxMixin, TemplateView)
         if search_form.is_valid():
 
             cmd = LearningUnitSearchCommand(
-                code_annee_values={(search_form.cleaned_data['code'], int(search_form.cleaned_data['annee_academique']))}
+                code_annee_values=None,
+                code=search_form.cleaned_data['code'],
+                annee_academique=int(search_form.cleaned_data['annee_academique']),
+                intitule=search_form.cleaned_data['intitule'],
             )
             return message_bus_instance.invoke(cmd)
 
