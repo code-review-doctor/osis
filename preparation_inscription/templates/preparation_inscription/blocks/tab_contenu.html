@@ -1,0 +1,13 @@
+{% load static i18n bootstrap3 %}
+
+<div class="tab-list">
+	<a hx-get="{% url 'consulter_contenu_groupement_view' %}" class="selected">{% trans "Form view" %}</a>
+	<a hx-get="{% url 'pae_formulaire_inscription_view' %}">{% trans "Form view" %}</a>
+</div>
+
+<div class="tab-content">
+        <div id="content-of-main-panel" class="panel panel-default">
+            {% include "preparation_inscription/consulter_contenu_groupement.html" %}
+        </div>
+    </div>
+</div>

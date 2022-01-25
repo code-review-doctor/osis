@@ -36,7 +36,7 @@ class ConsulterContenuGroupementView(HtmxMixin, LoginRequiredMixin, TemplateView
     name = 'consulter_contenu_groupement_view'
     # TemplateView
     template_name = "preparation_inscription/preparation_inscription.html"
-    htmx_template_name = "preparation_inscription/consulter_contenu_groupement.html"
+    htmx_template_name = "preparation_inscription/blocks/tab_contenu.html"
 
     def get_context_data(self, **kwargs):
         return {
