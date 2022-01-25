@@ -111,8 +111,8 @@
 </table>
 
 <div class="panel-footer text-right">
-    <a href="" hx-get="{% url 'EventModelingView' %}" hx-target="#content-of-main-panel" hx-trigger="click" type="button" class="btn btn-default">Annuler</a>
-    <a href="" hx-get="{% url 'EventModelingView' %}" hx-target="#content-of-main-panel" hx-trigger="click" type="button" class="btn btn-danger">Supprimer</a>
+    <a href="" hx-get="{% url 'EventModelingView' %}" type="button" class="btn btn-default">{% trans "Cancel" %}</a>
+    <a href="" hx-get="{% url 'EventModelingView' %}" type="button" class="btn btn-danger">Supprimer</a>
 </div>
 
 
