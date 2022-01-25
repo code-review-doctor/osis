@@ -9,8 +9,8 @@ class SupprimerUnitesEnseignementView(LoginRequiredMixin, HtmxMixin, TemplateVie
     name = 'supprimer_unites_enseignement_view'
 
     # TemplateView
-    template_name = "preparation_inscription.html"
-    htmx_template_name = "supprimer_unites_enseignements.html"
+    template_name = "preparation_inscription/preparation_inscription.html"
+    htmx_template_name = "preparation_inscription/supprimer_unites_enseignements.html"
 
     def get_context_data(self, **kwargs):
         return {

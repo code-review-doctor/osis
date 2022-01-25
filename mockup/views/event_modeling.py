@@ -23,8 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
-
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
@@ -81,7 +79,7 @@ class EventModelingView(HtmxMixin, LoginRequiredMixin, TemplateView):
     name = 'EventModelingView'
     # TemplateView
     template_name = "mockup/event_modeling.html"
-    htmx_template_name = "mockup/blocks/consulter_contenu_groupement.html"
+    htmx_template_name = "mockup/blocks/tab_contenu.html"
 
     def get_context_data(self, **kwargs):
         return {

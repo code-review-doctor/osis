@@ -1,0 +1,90 @@
+{% load static i18n bootstrap3 %}
+<div class="tab-list">
+	<a hx-get="{% url 'EventModelingView' %}">Contenu</a>
+	<a hx-get="{% url 'formulaire_inscription_view' %}" class="selected">Formulaire</a>
+</div>
+
+<div class="tab-content">
+    <table class="table table-hover">
+        <thead>
+        <tr style="border-bottom: solid;max-width: max-content">
+            <th>
+                <strong>Bachelier en sciences économiques et de gestion</strong>
+            </th>
+            <th>An 1</th>
+            <th>An 2</th>
+            <th>An 3</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>
+                <span style="padding-left: 20px;">
+                    <img src="/static/img/education_group_year/mandatory.png">
+                    Contenu :
+                </span>
+            </td>
+            <td colspan="3"></td>
+        </tr>
+        <tr>
+            <td>
+                <span style="padding-left: 30px;">
+                    <img src="/static/img/education_group_year/mandatory.png">
+                    Programme de base
+                    (150 crédits)
+                </span>
+            </td>
+            <td colspan="3"></td>
+        </tr>
+        <tr>
+            <td>
+                <span style="padding-left: 40px;">
+                    <img src="/static/img/education_group_year/mandatory.png">
+                    Formation pluridisciplinaire  en sciences humaines
+                    (18 crédits)
+                </span>
+            </td>
+            <td colspan="3"></td>
+        </tr>
+        <tr>
+            <td>
+                <span style="padding-left: 60px;">
+                    <img src="/static/img/education_group_year/mandatory.png">
+                    LESPO1113 Sociologie et anthropologie des mondes contemporains
+                    [40h + 0h]
+                    (5 crédits)
+                </span>
+            </td>
+            <td><label title="An 1">X</label></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>
+                <span style="padding-left: 60px;">
+                    <img src="/static/img/education_group_year/mandatory.png">
+                    LESPO1321 Economic, Political and Social Ethics
+                    [30h + 0h]
+                    (3 crédits)
+                </span>
+            </td>
+            <td></td>
+            <td></td>
+            <td><label title="An 3">X</label></td>
+        </tr>
+        <tr>
+            <td>
+                <span style="padding-left: 60px;">
+                    <img src="/static/img/education_group_year/mandatory.png">
+                    LECGE1115 Economie politique
+                    [30h + 0h]
+                    (3 crédits)
+                </span>
+            </td>
+            <td></td>
+            <td></td>
+            <td><label title="An 3">X</label></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
