@@ -38,7 +38,7 @@ class HighSchoolAdmin(osis_model_admin.OsisModelAdmin):
 
 class HighSchool(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
-    organization = models.ForeignKey('base.Organization', blank=True, on_delete=models.CASCADE)
+    organization = models.OneToOneField('base.Organization', blank=True, on_delete=models.CASCADE)
     phone = models.CharField(max_length=15, blank=True)
     fax = models.CharField(max_length=15, blank=True)
     email = models.EmailField(max_length=255, default='')
