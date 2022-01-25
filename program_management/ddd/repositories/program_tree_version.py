@@ -35,6 +35,7 @@ from django.db.models import Q
 from base.models.academic_year import AcademicYear
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import Categories
+from base.models.enums.quadrimesters import DerogationQuadrimester
 from education_group.ddd.domain.exception import TrainingNotFoundException
 from education_group.models.group import Group
 from education_group.models.group_year import GroupYear
@@ -395,15 +396,24 @@ def _get_common_queryset() -> QuerySet:
     )
 
 
+def _get_intitule_complet(noeud: 'Node') -> str:
+    intitule_complet = noeud.offer_title_fr
+    if noeud.version_name and noeud.version_title_fr:
+        intitule_complet = "{} [{}]".format(intitule_complet, noeud.version_title_fr)
+    if noeud.transition_name :
+        intitule_complet = "{} [{}]".format(intitule_complet, noeud.transition_name)
+    return intitule_complet
+
+
 def build_dto(tree: 'ProgramTree', identity: ProgramTreeVersionIdentity) -> 'ProgrammeDeFormationDTO':
     contenu = _build_contenu(tree.root_node,)
-
     return ProgrammeDeFormationDTO(
         racine=contenu,
         annee=identity.year,
         sigle=identity.offer_acronym,
         version=identity.version_name,
-        intitule_complet=tree.root_node.offer_title_fr
+        intitule_formation=tree.root_node.offer_title_fr,
+        intitule_version_programme=_get_intitule_complet(tree.root_node)
     )
 
 
@@ -419,6 +429,7 @@ def _build_contenu(node: 'Node', lien_parent: 'Link' = None) -> 'ContenuNoeudDTO
                     code=lien.child.code,
                     intitule_complet=lien.child.title,
                     quadrimestre=lien.child.quadrimester,
+                    quadrimestre_texte=lien.child.quadrimester.value if lien.child.quadrimester else "",
                     credits_absolus=lien.child.credits,
                     volume_annuel_pm=lien.child.volume_total_lecturing,
                     volume_annuel_pp=lien.child.volume_total_practical,

@@ -37,7 +37,7 @@ def formater_credits_ue(unite_enseignement: 'UniteEnseignementCatalogueDTO') -> 
     if unite_enseignement and (unite_enseignement.credits_absolus or unite_enseignement.credits_relatifs):
         credits_absolus = unite_enseignement.credits_absolus.normalize() if unite_enseignement.credits_absolus else None
         return "({} {})".format(
-            credits_absolus or unite_enseignement.credits_relatifs or 0,
+            unite_enseignement.credits_relatifs or credits_absolus or 0,
             _("credits")
         )
     return ""

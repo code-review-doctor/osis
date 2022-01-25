@@ -37,6 +37,7 @@ class UniteEnseignementDTO(DTO):
     code: str
     intitule_complet: str
     quadrimestre: str
+    quadrimestre_texte: str
     credits_absolus: Decimal
     volume_annuel_pm: int
     volume_annuel_pp: int
@@ -65,7 +66,8 @@ class FormulaireInscriptionCoursDTO(DTO):
     annee_formation: int
     sigle_formation: str
     version_formation: str
-    intitule_complet_formation: str  # intitulé de la formation + version formation
+    intitule_formation: str
+    intitule_version_programme: str
     racine: ContenuGroupementDTO
 
 
@@ -84,6 +86,7 @@ class UniteEnseignementCatalogueDTO(DTO):
     code: str
     intitule_complet: str
     quadrimestre: str
+    quadrimestre_texte: str
     credits_absolus: Decimal
     volume_annuel_pm: int
     volume_annuel_pp: int
@@ -115,4 +118,5 @@ class FormationDTO(DTO):
     annee: int
     sigle: str
     version: str
-    intitule_complet: str  # intitulé de la formation + version formation
+    intitule_formation: str
+    intitule_version_programme: str

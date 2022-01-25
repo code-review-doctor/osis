@@ -40,7 +40,8 @@ def build_formation_dto(program_management_formatation_dto: ProgrammeDeFormation
         annee=program_management_formatation_dto.annee,
         sigle=program_management_formatation_dto.sigle,
         version=program_management_formatation_dto.version,
-        intitule_complet=program_management_formatation_dto.intitule_complet
+        intitule_formation=program_management_formatation_dto.intitule_formation,
+        intitule_version_programme=program_management_formatation_dto.intitule_version_programme
     )
 
 
@@ -121,6 +122,7 @@ def _convertir_unites_enseignement_contenues_en_unites_enseignement_catalogue_dt
                 code=unite_enseignement_contenue.code,
                 intitule_complet=unite_enseignement_contenue.intitule_complet,
                 quadrimestre=unite_enseignement_contenue.quadrimestre,
+                quadrimestre_texte=unite_enseignement_contenue.quadrimestre_texte,
                 credits_absolus=unite_enseignement_contenue.credits_absolus,
                 volume_annuel_pm=unite_enseignement_contenue.volume_annuel_pm,
                 volume_annuel_pp=unite_enseignement_contenue.volume_annuel_pp,
