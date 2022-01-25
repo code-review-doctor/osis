@@ -311,3 +311,33 @@ table.dataTable thead th.sorting:after {
 .strikethrough .jstree-anchor{
     text-decoration: line-through !important;
 }
+
+.emphasized-code{
+    font-weight: bolder;
+    margin-left: 10px;
+}
+.code-col{
+    min-width: 120px;
+}
+.actions-col{
+    min-width: 50px;
+}
+
+.pae-panel #tabs > .tab-list {
+    border-bottom: solid 3px #eee;
+}
+
+.pae-panel #tabs > .tab-list a {
+    display: inline-block;
+    padding: 5px 10px;
+    cursor:pointer;
+}
+
+.pae-panel #tabs > .tab-list a.selected {
+    background-color: #eee;
+}
+
+.pae-panel #tabs > .tab-content {
+    padding:10px;
+    margin-bottom:100px;
+}
