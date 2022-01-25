@@ -14,12 +14,26 @@ class LearningUnitRepository(InMemoryGenericRepository, ILearningUnitRepository)
         raise NotImplementedError
 
     @classmethod
-    def search_learning_units_dto(cls, code_annee_values: Set[Tuple[str, int]] = None) -> List['LearningUnitSearchDTO']:
-        return [
-            cls._convert_learning_unit_to_search_dto(entity)
-            for entity in cls.entities
-            if (entity.code, entity.year) in code_annee_values
-        ]
+    def search_learning_units_dto(
+            cls,
+            code_annee_values: Set[Tuple[str, int]] = None,
+            code: str = None,
+            annee_academique: int = None,
+            intitule: str = None) -> List['LearningUnitSearchDTO']:
+        result = cls.entities
+        if code_annee_values:
+            result = [
+                cls._convert_learning_unit_to_search_dto(entity)
+                for entity in cls.entities
+                if (entity.code, entity.year) in code_annee_values
+            ]
+        if code:
+            result = [entity for entity in result if code in entity.code]
+        if annee_academique:
+            result = [entity for entity in result if entity.year == annee_academique]
+        if intitule:
+            result = [entity for entity in result if intitule in entity.complete_title_fr]
+        return result
 
     @classmethod
     def _convert_learning_unit_to_search_dto(cls, learning_unit: 'LearningUnit') -> 'LearningUnitSearchDTO':
