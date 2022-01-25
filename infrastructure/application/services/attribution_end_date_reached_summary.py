@@ -59,7 +59,7 @@ class AttributionsEndDateReachedSummary(IAttributionsEndDateReachedSummary):
             applicants_with_renewable_functions = [
                 applicant for applicant in applicants
                 if applicant.get_attributions_about_to_expire_renewable_with_functions(
-                    AcademicYearIdentityBuilder.build_from_year(application_calendar.authorized_target_year.year)
+                    AcademicYearIdentityBuilder.build_from_year(application_calendar.authorized_target_year.year - 1)
                 )
             ]
             logger.info("[AttributionEndDateReachedSummary - {}] Number of applicants to remember {}".format(
@@ -69,11 +69,11 @@ class AttributionsEndDateReachedSummary(IAttributionsEndDateReachedSummary):
 
             for applicant in applicants_with_renewable_functions:
                 attributions_about_to_expire = applicant.get_attributions_about_to_expire_renewable_with_functions(
-                    AcademicYearIdentityBuilder.build_from_year(application_calendar.authorized_target_year.year)
+                    AcademicYearIdentityBuilder.build_from_year(application_calendar.authorized_target_year.year - 1)
                 )
-                person = Person.objects.get(global_id=applicant.entity_id.global_id)
+                person = Person.objects.filter(global_id=applicant.entity_id.global_id).first()
 
-                if not mail_already_sent(today=today_date, receiver_email=person.email):
+                if person.email and not mail_already_sent(today=today_date, receiver_email=person.email):
                     receivers = [message_config.create_receiver(person.id, person.email, person.language)]
                     table_ending_attributions = message_config.create_table(
                         'ending_attributions',
