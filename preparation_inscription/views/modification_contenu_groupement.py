@@ -80,6 +80,8 @@ class ModifierProprietesContenuView(LoginRequiredMixin, HtmxMixin, FormView):
             **super().get_context_data(**kwargs),
             'search_result': self.get_contenu_groupement_modifiable(),
             'form': self.get_form(self.form_class),
+            'intitule_groupement': self.get_intitule_groupement(),
+            'intitule_programme': self.get_intitule_programme(),
         }
 
     def get_contenu_groupement_modifiable(self):
@@ -155,3 +157,11 @@ class ModifierProprietesContenuView(LoginRequiredMixin, HtmxMixin, FormView):
             },
         ]  # TODO :: message_bus.invoke(Command)
         return data
+
+    def get_intitule_groupement(self):
+        # TODO :: to implement
+        return "Intitulé groupement"
+
+    def get_intitule_programme(self):
+        # TODO :: to implement
+        return "Intitulé programme"

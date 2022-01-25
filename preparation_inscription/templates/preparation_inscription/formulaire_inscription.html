@@ -32,37 +32,9 @@
 {% endblock %}
 {% block content %}
 
-<div class="row">
-    <div class="col-md-3">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <div class="pull-right">
-                    <div class="dropdown">
-                        <button class="btn btn-default dropdown-toggle" type="button" id="btn-action-down" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                            <span class="fa fa-cog" aria-hidden="true"></span> {% trans 'Actions' %}
-                            <span class="caret"></span>
-                        </button>
-                        <ul class="dropdown-menu pull-right" aria-labelledby="btn-action-down">
-                            <li><a href="#">{% trans "Revenir à l'état initial du programme" %}</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <h4 data-toggle="tooltip" title="Réorientation après la session de janvier">ECGE1BA - 2021-22 - Section RE</h4>
-            </div>
 
-            <div class="panel-body">
-                <div class="row">
-                    <div class="col-md-12">
-                        {% include "preparation_inscription/blocks/tree_panel.html" %}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-9 pae-panel">
-        {% include 'preparation_inscription/tabs.html' %}
-    </div>
+<div id="content-of-main-panel">
+    {% include 'preparation_inscription/tabs.html' %}
 </div>
-
 
 {% endblock %}

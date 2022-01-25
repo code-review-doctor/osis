@@ -36,12 +36,14 @@ class ConsulterContenuGroupementView(HtmxMixin, LoginRequiredMixin, TemplateView
     name = 'consulter_contenu_groupement_view'
     # TemplateView
     template_name = "preparation_inscription/preparation_inscription.html"
-    htmx_template_name = "preparation_inscription/consulter_contenu_groupement.html"
+    htmx_template_name = "preparation_inscription/blocks/tab_contenu.html"
 
     def get_context_data(self, **kwargs):
         return {
             **super().get_context_data(**kwargs),
             'search_result': self.get_content(),
+            'intitule_groupement': self.get_intitule_groupement(),
+            'intitule_programme': self.get_intitule_programme(),
         }
 
     def get_content(self):
@@ -130,6 +132,14 @@ class ConsulterContenuGroupementView(HtmxMixin, LoginRequiredMixin, TemplateView
             },
         ]  # TODO :: message_bus.invoke(Command)
         return data
+
+    def get_intitule_groupement(self):
+        # TODO :: to implement
+        return "Intitulé groupement"
+
+    def get_intitule_programme(self):
+        # TODO :: to implement
+        return "Intitulé programme"
 
 
 from base.models.utils.utils import ChoiceEnum

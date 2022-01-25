@@ -24,24 +24,10 @@
  * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-
-{% block style %}
-    <!-- move these styles into osis.css when the mockup is effectively used as implementation -->
-    <style>
-        .emphasized-code{
-            font-weight: bolder;
-            margin-left: 10px;
-        }
-        .code-col{
-            min-width: 120px;
-        }
-        .actions-col{
-            min-width: 50px;
-        }
-    </style>
-{% endblock style %}
-
-
+<div class="panel-heading">
+    <h5>{{ intitule_groupement }}</h5>
+</div>
+<div class="panel-body">
 <table id="table_search_list" class="table table-hover">
     <thead>
     <tr>
@@ -109,10 +95,11 @@
     {% endfor %}
     </tbody>
 </table>
+</div>
 
 <div class="panel-footer text-right">
-    <a href="" hx-get="{% url 'consulter_contenu_groupement_view' %}" hx-target="#content-of-main-panel" hx-trigger="click" type="button" class="btn btn-default">Annuler</a>
-    <a href="" hx-get="{% url 'consulter_contenu_groupement_view' %}" hx-target="#content-of-main-panel" hx-trigger="click" type="button" class="btn btn-danger">Supprimer</a>
+    <a href="" hx-get="{% url 'consulter_contenu_groupement_view' %}" hx-target="#tabs" hx-trigger="click" type="button" class="btn btn-default">Annuler</a>
+    <a href="" hx-get="{% url 'consulter_contenu_groupement_view' %}" hx-target="#tabs" hx-trigger="click" type="button" class="btn btn-danger">Supprimer</a>
 </div>
 
 
