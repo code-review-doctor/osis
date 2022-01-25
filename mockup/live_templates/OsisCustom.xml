@@ -309,4 +309,11 @@
       <option name="Python" value="true" />
     </context>
   </template>
+  <template name="ht-for" value="{% for $element$ in $elements$ %}&#10;    {{ $element$ $END$}}&#10;{% endfor %}" description="Crée {% for %}{% endfor %}" toReformat="false" toShortenFQNames="true">
+    <variable name="element" expression="" defaultValue="&quot;element&quot;" alwaysStopAt="true" />
+    <variable name="elements" expression="" defaultValue="&quot;elements&quot;" alwaysStopAt="true" />
+    <context>
+      <option name="HTML" value="true" />
+    </context>
+  </template>
 </templateSet>
