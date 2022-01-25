@@ -25,20 +25,34 @@
 ##############################################################################
 from typing import Optional, List
 
+from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
-    GroupementAjusteInscriptionCours
-from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
-    IdentiteGroupementAjusteInscriptionCours
+    IdentiteGroupementAjusteInscriptionCours, GroupementAjusteInscriptionCours
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import GroupementAjusteFromRepositoryDTO
-from osis_common.ddd import interface
-from osis_common.ddd.interface import ApplicationService
+from ddd.logic.preparation_programme_annuel_etudiant.repository.i_groupement_ajuste_inscription_cours import \
+    IGroupementAjusteInscriptionCoursRepository
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 
 
-class IGroupementAjusteInscriptionCoursRepository(interface.AbstractRepository):
+class GroupementAjusteInscriptionCoursRepository(
+    InMemoryGenericRepository,
+    IGroupementAjusteInscriptionCoursRepository
+):
+    dtos = []
+
     @classmethod
-    def get(cls, entity_id: 'IdentiteGroupementAjusteInscriptionCours') -> 'GroupementAjusteInscriptionCours':
-        pass
+    def get_dtos(
+            cls,
+            program_tree_version_identity: ProgramTreeVersionIdentity
+    ) -> List['GroupementAjusteFromRepositoryDTO']:
+        return [
+            dto
+            for dto in cls.dtos
+            if dto.code_groupement == program_tree_version_identity.offer_acronym
+            and dto.annee == program_tree_version_identity.year
+            and dto.version_programme == program_tree_version_identity.version_name
+            and dto.nom_transition == program_tree_version_identity.transition_name
+        ]
 
     @classmethod
     def search(
@@ -46,19 +60,4 @@ class IGroupementAjusteInscriptionCoursRepository(interface.AbstractRepository):
             entity_ids: Optional[List['IdentiteGroupementAjusteInscriptionCours']] = None,
             **kwargs
     ) -> List['GroupementAjusteInscriptionCours']:
-        pass
-
-    @classmethod
-    def delete(cls, entity_id: 'IdentiteGroupementAjusteInscriptionCours', **kwargs: ApplicationService) -> None:
-        pass
-
-    @classmethod
-    def save(cls, entity: 'GroupementAjusteInscriptionCours') -> None:
-        pass
-
-    @classmethod
-    def get_dtos(
-            cls,
-            program_tree_version_identity: ProgramTreeVersionIdentity
-    ) -> List['GroupementAjusteFromRepositoryDTO']:
-        pass
+        raise NotImplementedError

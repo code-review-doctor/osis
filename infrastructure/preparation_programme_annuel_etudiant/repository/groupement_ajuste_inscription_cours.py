@@ -26,19 +26,25 @@
 from typing import Optional, List
 
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
-    GroupementAjusteInscriptionCours
-from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
-    IdentiteGroupementAjusteInscriptionCours
+    IdentiteGroupementAjusteInscriptionCours, GroupementAjusteInscriptionCours
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import GroupementAjusteFromRepositoryDTO
-from osis_common.ddd import interface
+from ddd.logic.preparation_programme_annuel_etudiant.repository.i_groupement_ajuste_inscription_cours import \
+    IGroupementAjusteInscriptionCoursRepository
 from osis_common.ddd.interface import ApplicationService
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 
 
-class IGroupementAjusteInscriptionCoursRepository(interface.AbstractRepository):
+class GroupementAjusteInscriptionCoursRepository(IGroupementAjusteInscriptionCoursRepository):
+    @classmethod
+    def get_dtos(
+            cls,
+            program_tree_version_identity: ProgramTreeVersionIdentity
+    ) -> List['GroupementAjusteFromRepositoryDTO']:
+        raise NotImplementedError
+
     @classmethod
     def get(cls, entity_id: 'IdentiteGroupementAjusteInscriptionCours') -> 'GroupementAjusteInscriptionCours':
-        pass
+        raise NotImplementedError
 
     @classmethod
     def search(
@@ -46,19 +52,12 @@ class IGroupementAjusteInscriptionCoursRepository(interface.AbstractRepository):
             entity_ids: Optional[List['IdentiteGroupementAjusteInscriptionCours']] = None,
             **kwargs
     ) -> List['GroupementAjusteInscriptionCours']:
-        pass
+        raise NotImplementedError
 
     @classmethod
     def delete(cls, entity_id: 'IdentiteGroupementAjusteInscriptionCours', **kwargs: ApplicationService) -> None:
-        pass
+        raise NotImplementedError
 
     @classmethod
     def save(cls, entity: 'GroupementAjusteInscriptionCours') -> None:
-        pass
-
-    @classmethod
-    def get_dtos(
-            cls,
-            program_tree_version_identity: ProgramTreeVersionIdentity
-    ) -> List['GroupementAjusteFromRepositoryDTO']:
-        pass
+        raise NotImplementedError
