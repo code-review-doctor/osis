@@ -23,7 +23,9 @@
  * at the root of the source code of this program.  If not,
  * see http://www.gnu.org/licenses/.
 {% endcomment %}
-
+<div class="panel-heading">
+    <h5>{{ intitule_groupement }}</h5>
+</div>
 
 <div class="panel-body">
 
@@ -95,7 +97,7 @@
 </div>
 
 <div class="panel-footer text-right">
-    <a href="" hx-get="{% url 'consulter_contenu_groupement_view' %}" hx-target="#content-of-main-panel" hx-trigger="click" type="button" class="btn btn-default">{% trans "Cancel" %}</a>
-    <a href="" hx-get="{% url 'consulter_contenu_groupement_view' %}" hx-target="#content-of-main-panel" hx-trigger="click" type="button" class="btn btn-primary">{% trans "Add" %}</a>
+    <a href="" hx-get="{% url 'consulter_contenu_groupement_view' %}" hx-target="#tabs" hx-trigger="click" type="button" class="btn btn-default">{% trans "Cancel" %}</a>
+    <a href="" hx-get="{% url 'consulter_contenu_groupement_view' %}" hx-target="#tabs" hx-trigger="click" type="button" class="btn btn-primary">{% trans "Add" %}</a>
 </div>
 
