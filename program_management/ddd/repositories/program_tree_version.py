@@ -412,7 +412,8 @@ def build_dto(tree: 'ProgramTree', identity: ProgramTreeVersionIdentity) -> 'Pro
         annee=identity.year,
         sigle=identity.offer_acronym,
         version=identity.version_name,
-        intitule_complet=_get_intitule_complet(tree.root_node)
+        intitule_formation=tree.root_node.offer_title_fr,
+        intitule_version_programme=_get_intitule_complet(tree.root_node)
     )
 
 

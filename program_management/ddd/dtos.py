@@ -68,4 +68,5 @@ class ProgrammeDeFormationDTO(DTO):
     annee: int
     sigle: str
     version: str
-    intitule_complet: str  # intitulé de la formation + version formation
+    intitule_formation: str
+    intitule_version_programme: str
