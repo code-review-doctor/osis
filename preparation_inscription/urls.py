@@ -27,13 +27,10 @@ from django.urls import path
 
 from preparation_inscription.views.ajouter_unites_enseignement import AjouterUnitesEnseignementView
 from preparation_inscription.views.consulter_contenu_groupement import ConsulterContenuGroupementView
-from preparation_inscription.views.formulaire_inscription import FormulaireInscriptionView
+from preparation_inscription.views.formulaire_inscription_cours import FormulaireInscriptionCoursView
 from preparation_inscription.views.modification_contenu_groupement import ModifierProprietesContenuView
 from preparation_inscription.views.supprimer_unites_enseignement import SupprimerUnitesEnseignementView
 from preparation_inscription.views.tree_html import TreeHTMLView
-
-from preparation_inscription.views.formulaire_inscription_cours import FormulaireInscriptionCoursView
-
 
 urlpatterns = [
     path('', ConsulterContenuGroupementView.as_view(), name=ConsulterContenuGroupementView.name),
@@ -41,12 +38,11 @@ urlpatterns = [
     path('add', AjouterUnitesEnseignementView.as_view(), name=AjouterUnitesEnseignementView.name),
     path('update', ModifierProprietesContenuView.as_view(), name=ModifierProprietesContenuView.name),
     path('tree/', TreeHTMLView.as_view(), name=TreeHTMLView.name),
-    path('formulaire_inscription/', FormulaireInscriptionView.as_view(), name=FormulaireInscriptionView.name),
 
     path('<int:year>/<acronym:acronym>/default_enrollment_form/',
-         FormulaireInscriptionCoursView.as_view(), name='default_enrollment_form'),
+         FormulaireInscriptionCoursView.as_view(), name=FormulaireInscriptionCoursView.name),
     path('<int:year>/<acronym:acronym>/<str:version_name>/default_enrollment_form/',
-         FormulaireInscriptionCoursView.as_view(), name='default_enrollment_form'),
+         FormulaireInscriptionCoursView.as_view(), name=FormulaireInscriptionCoursView.name),
     path('<int:year>/<acronym:acronym>/<str:version_name>/<str:transition_name>/default_enrollment_form/',
-         FormulaireInscriptionCoursView.as_view(), name='default_enrollment_form'),
+         FormulaireInscriptionCoursView.as_view(), name=FormulaireInscriptionCoursView.name),
 ]

@@ -26,7 +26,9 @@
 
 from django.http import Http404
 from django.views.generic import TemplateView
+from rules.contrib.views import LoginRequiredMixin
 
+from base.utils.htmx import HtmxMixin
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormulaireInscriptionCoursCommand
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormulaireInscriptionCoursDTO
 from education_group.ddd import command as command_education_group
@@ -36,11 +38,13 @@ from infrastructure.messages_bus import message_bus_instance
 from program_management.forms.education_groups import STANDARD
 
 
-class FormulaireInscriptionCoursView(TemplateView):
+class FormulaireInscriptionCoursView(HtmxMixin, LoginRequiredMixin, TemplateView):
+    name = "pae_formulaire_inscription_view"
     permission_required = 'preparation_programme.view_formulaire_inscription_cours'
     raise_exception = True
 
-    template_name = "onglets.html"
+    template_name = "preparation_inscription/blocks/tab_formulaire_inscription.html"
+    htmx_template_name = "preparation_inscription/blocks/tab_formulaire_inscription.html"
 
     def get_context_data(
             self,
