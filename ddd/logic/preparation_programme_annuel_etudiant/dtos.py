@@ -72,7 +72,6 @@ class FormulaireInscriptionCoursDTO(DTO):
 class UniteEnseignementCatalogueDTO(DTO):
     bloc: int
     code: str
-    annee: int
     intitule_complet: str
     quadrimestre: str
     credits_absolus: Decimal
@@ -87,7 +86,6 @@ class UniteEnseignementCatalogueDTO(DTO):
 class GroupementCatalogueDTO(DTO):
     # groupement provenant du catalogue (sans surcharge d'ajout, suppression ou modification)
     code: str
-    annee: int
     intitule: str
     obligatoire: bool
     remarque: str
@@ -127,7 +125,6 @@ class GroupementInscriptionCoursDTO(DTO):
     intitule_complet: str
     obligatoire: bool
     code: str
-    annee: int
     #  Comment because nominal case (program without adjustment) only for now
     # unites_enseignement_ajoutees: List['UniteEnseignementAjouteeDTO']
     # unites_enseignement_supprimees: List['UniteEnseignementSupprimeeDTO']
@@ -139,7 +136,6 @@ class GroupementInscriptionCoursDTO(DTO):
 @attr.s(frozen=True, slots=True, auto_attribs=True)
 class UniteEnseignementProgrammeDTO(DTO):
     code: str
-    annee: int
     intitule: str
     obligatoire: bool
     bloc: int
