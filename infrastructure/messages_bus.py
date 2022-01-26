@@ -540,6 +540,7 @@ class MessageBusCommands(AbstractMessageBusCommands):
         GetProgramTreeVersionCommand: lambda cmd: get_program_tree_version(cmd),
         GetFormulaireInscriptionCoursCommand: lambda cmd: get_formulaire_inscription_cours_service(
             cmd,
+            GroupementAjusteInscriptionCoursInMemoryRepository(),
             CatalogueFormationsTranslator()
         ),
         GetFormationCommand: lambda cmd: get_programme_formation(cmd),

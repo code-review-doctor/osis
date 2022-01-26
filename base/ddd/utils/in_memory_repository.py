@@ -34,7 +34,7 @@ class InMemoryGenericRepository(interface.AbstractRepository, metaclass=Singleto
     entities = list()  # type: List[RootEntity]
 
     def __new__(cls) -> Any:
-        cls.reset()
+        # cls.reset()
         return super().__new__(cls)
 
     @classmethod

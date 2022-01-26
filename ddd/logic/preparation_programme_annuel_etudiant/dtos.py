@@ -103,6 +103,7 @@ class GroupementCatalogueDTO(DTO):
     remarque: str
     credits: Decimal
     intitule_complet: str
+    chemin_acces: str
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
