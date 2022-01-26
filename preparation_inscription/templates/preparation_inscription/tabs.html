@@ -1,3 +1,4 @@
+{% load optional %}
 
 {% load static i18n bootstrap3 %}
 
@@ -26,6 +27,6 @@
 {% endcomment %}
 
 {% block content %}
-    <div id="tabs" hx-get="{% url 'consulter_contenu_groupement_view' %}" hx-trigger="load after:100ms" hx-target="#tabs" hx-swap="innerHTML" >
+    <div id="tabs" hx-get="{% url 'consulter_contenu_groupement_view' year acronym %}" hx-trigger="load after:100ms" hx-target="#tabs" hx-swap="innerHTML" >
     </div>
 {% endblock %}

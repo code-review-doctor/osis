@@ -44,3 +44,4 @@ class FormulaireInscriptionView(HtmxMixin, LoginRequiredMixin, TemplateView):
 
     def post(self, request, *args, **kwargs):
         return redirect("pae_formulaire_inscription_view")
+

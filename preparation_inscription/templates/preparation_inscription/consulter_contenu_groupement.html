@@ -1,3 +1,4 @@
+{% load optional %}
 {% load static i18n bootstrap3 %}
 
 {% comment "License" %}
@@ -31,9 +32,9 @@
                 <span class="caret"></span>
             </button>
             <ul class="dropdown-menu pull-right" aria-labelledby="btn-action-down">
-                <li><a href="" hx-get="{% url 'ajouter_unites_enseignement_view' %}" hx-target="#content-of-main-panel" hx-trigger="click">{% trans "Ajouter des UE" %}</a></li>
-                <li><a href="" hx-get="{% url 'supprimer_unites_enseignement_view' %}" hx-target="#content-of-main-panel" hx-trigger="click">{% trans "Supprimer des UE" %}</a></li>
-                <li><a href="" hx-get="{% url 'modifier_proprietes_contenu_view' %}" hx-target="#content-of-main-panel" hx-trigger="click">{% trans "Modifier les propriétés" %}</a></li>
+                <li><a href="" hx-get="{% url 'ajouter_unites_enseignement_view' year acronym %}" hx-target="#content-of-main-panel" hx-trigger="click">{% trans "Ajouter des UE" %}</a></li>
+                <li><a href="" hx-get="{% url 'supprimer_unites_enseignement_view' year acronym %}" hx-target="#content-of-main-panel" hx-trigger="click">{% trans "Supprimer des UE" %}</a></li>
+                <li><a href="" hx-get="{% url 'modifier_proprietes_contenu_view' year acronym %}" hx-target="#content-of-main-panel" hx-trigger="click">{% trans "Modifier les propriétés" %}</a></li>
             </ul>
         </div>
     </div>

@@ -26,6 +26,7 @@ class SupprimerUnitesEnseignementView(LoginRequiredMixin, HtmxMixin, TemplateVie
             'deletable_content': self.get_content(),
             'intitule_groupement': self.get_intitule_groupement(),
             'intitule_programme': self.get_intitule_programme(),
+            'consulter_contenu_groupement_url': self.get_consulter_contenu_groupement_url()
         }
 
     def get_deletable_content(self):
@@ -119,7 +120,7 @@ class SupprimerUnitesEnseignementView(LoginRequiredMixin, HtmxMixin, TemplateVie
             messages = [exception.message for exception in exceptions.exceptions]
             display_error_messages(self.request, messages)
             return self.get(request, *args, **kwargs)
-        return redirect(reverse('consulter_contenu_groupement_view'))
+        return redirect(self.get_consulter_contenu_groupement_url())
 
     def _get_command(self, to_delete):
         return RetirerUEDuProgrammeCommand(
@@ -132,3 +133,6 @@ class SupprimerUnitesEnseignementView(LoginRequiredMixin, HtmxMixin, TemplateVie
                 GetUniteEnseignementCommand(code=code) for code in to_delete
             ]
         )
+
+    def get_consulter_contenu_groupement_url(self):
+        return reverse('consulter_contenu_groupement_view', args=self.args, kwargs=self.kwargs)
