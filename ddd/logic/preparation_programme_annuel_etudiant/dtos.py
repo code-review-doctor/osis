@@ -50,6 +50,7 @@ class UniteEnseignementDTO(DTO):
 @attr.s(frozen=True, slots=True, auto_attribs=True)
 class GroupementDTO(DTO):
     intitule: str
+    intitule_complet: str
     obligatoire: bool
     chemin_acces: str  # Exemple : 'LDROI1001B|LDROI102C|LDROI1001
 
@@ -98,12 +99,12 @@ class UniteEnseignementCatalogueDTO(DTO):
 @attr.s(frozen=True, slots=True, auto_attribs=True)
 class GroupementCatalogueDTO(DTO):
     # groupement provenant du catalogue (sans surcharge d'ajout, suppression ou modification)
+    code: str
     intitule: str
     obligatoire: bool
     remarque: str
     credits: Decimal
     intitule_complet: str
-    chemin_acces: str
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)

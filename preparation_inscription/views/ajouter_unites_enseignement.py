@@ -66,7 +66,7 @@ class AjouterUnitesEnseignementView(LoginRequiredMixin, HtmxMixin, TemplateView)
     name = 'ajouter_unites_enseignement_view'
 
     # FormView
-    template_name = "preparation_inscription/preparation_inscription.html"
+    template_name = "preparation_inscription/ajouter_unites_enseignement.html"
     htmx_template_name = "preparation_inscription/ajouter_unites_enseignement.html"
 
     def get_search_form(self):
