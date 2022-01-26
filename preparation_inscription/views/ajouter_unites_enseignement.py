@@ -110,7 +110,7 @@ class AjouterUnitesEnseignementView(LoginRequiredMixin, HtmxMixin, TemplateView)
             display_error_messages(self.request, messages)
             return self.get(request, *args, **kwargs)
 
-        return redirect("EventModelingView")
+        return redirect("consulter_contenu_groupement_view")
 
     def get_intitule_groupement(self):
         # TODO :: to implement
