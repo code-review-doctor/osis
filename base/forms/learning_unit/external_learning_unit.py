@@ -328,7 +328,7 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
                     academic_year=self.start_year
                 ).first()
             learning_container = first_ue.learning_container_year.learning_container \
-                if first_ue else self.forms[LearningContainerModelForm].save(commit)
+                if first_ue else self.learning_container_form.save(commit)
             learning_unit = self.learning_unit_form.save(
                 start_year=self.start_year,
                 learning_container=learning_container,
