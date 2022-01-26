@@ -28,13 +28,13 @@ from typing import TYPE_CHECKING
 import attr
 
 from base.ddd.utils.business_validator import BusinessValidator
+from ddd.logic.preparation_programme_annuel_etudiant.domain.validator.exceptions import \
+    UniteEnseignementDejaAjouteeException
 
 if TYPE_CHECKING:
     from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
     from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
         GroupementAjusteInscriptionCours
-from ddd.logic.preparation_programme_annuel_etudiant.domain.validator.exceptions import \
-    UniteEnseignementDejaAjouteeException
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
