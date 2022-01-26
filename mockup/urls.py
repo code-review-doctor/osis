@@ -26,6 +26,7 @@
 from django.urls import path
 
 from mockup.views.ajouter_unites_enseignement import AddLearningUnitFormView
+from mockup.views.deplacer_unite_enseignement import DeplacerHautUniteEnseignementFormView
 from mockup.views.event_modeling import EventModelingView, TreeHTMLView
 from mockup.views.formulaire_inscription import FormulaireInscriptionView
 from mockup.views.supprimer_unites_enseignement import DeleteView
@@ -37,6 +38,7 @@ urlpatterns = [
     path('event_modeling/add', AddLearningUnitFormView.as_view(), name=AddLearningUnitFormView.name),
     path('event_modeling/update', ModifierProprietesContenuView.as_view(), name=ModifierProprietesContenuView.name),
     path('event_modeling/tree/', TreeHTMLView.as_view(), name=TreeHTMLView.name),
+    path('event_modeling/deplacer-ue/', DeplacerHautUniteEnseignementFormView.as_view(), name=DeplacerHautUniteEnseignementFormView.name),
     path(
         'event_modeling/formulaire_inscription',
         FormulaireInscriptionView.as_view(),

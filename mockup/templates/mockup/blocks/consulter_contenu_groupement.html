@@ -36,7 +36,7 @@
         <th id="obligatoire">{% trans 'Obligatoire' %}</th>
         <th id="commentaire_fr">{% trans 'Commentaire' %}</th>
         <th id="commentaire_en">{% trans 'Commentaire en anglais' %}</th>
-        <th id="action" class="actions-col"></th>
+        <th id="action" style="min-width: 115px"></th>
     </tr>
     </thead>
     <tbody>
@@ -90,48 +90,20 @@
 
                     {% if element.type_ajustement == 'SUPPRESSION' %}
 
-                        <a href="#"
-                           id="lnk_annuler_suppression"
-                           data-toggle="tooltip"
-                           title="{% trans 'Annuler suppression' %}"
-                        >
-                            <span class="fa fa-redo-alt" aria-hidden="true" data-toggle="modal" data-target="#annuler_suppression_modal"></span>
-                        </a>
+                        {% include "mockup/blocks/btn_annuler_suppression.html" %}
 
                     {% elif element.type_ajustement == 'MODIFICATION' %}
 
-                        <a href="#"
-                           id="lnk_supprimer_ue"
-                           data-toggle="tooltip"
-                           title="{% trans 'Supprimer unite enseignement' %}"
-                        >
-                            <span class="fa fa-redo-alt" aria-hidden="true" data-toggle="modal" data-target="#annuler_modification_modal"></span>
-                        </a>
+                        <div class="form-group" role="group">
+                            {% include "mockup/blocks/btn_deplacer_bas.html" %}
+                            {% include "mockup/blocks/btn_deplacer_haut.html" %}
+                            {% include "mockup/blocks/btn_annuler_modification.html" %}
+                        </div>
 
                     {% else %}
-
-                        <a href="#"
-                           id="lnk_deplacer_bas"
-                           data-toggle="tooltip"
-                           title="{% trans 'Déplacer vers le bas' %}"
-                        >
-                            <span class="fa fa-long-arrow-alt-down" aria-hidden="true"></span>
-                        </a>
-                        <a href="#"
-                           id="lnk_deplacer_haut"
-                           data-toggle="tooltip"
-                           title="{% trans 'Déplacer vers le haut' %}"
-                        >
-                            <span class="fa fa-long-arrow-alt-up" aria-hidden="true"></span>
-                        </a>
-                        <a href="#"
-                           id="lnk_annuler_ajout"
-                           data-toggle="tooltip"
-                           title="{% trans 'Annuler ajout' %}"
-                        >
-                            <span class="fa fa-times" aria-hidden="true" data-toggle="modal" data-target="#annuler_ajout_modal"></span>
-                        </a>
-
+                            {% include "mockup/blocks/btn_deplacer_bas.html" %}
+                            {% include "mockup/blocks/btn_deplacer_haut.html" %}
+                            {% include "mockup/blocks/btn_annuler_ajout.html" %}
                     {% endif %}
                 </div>
             </td>

@@ -1,0 +1,19 @@
+{% load i18n %}
+<form method="post" class="d-inline-block">
+    {% csrf_token %}
+        <button
+                type="button"
+                id="lnk_deplacer_bas"
+                class="btn btn-default btn-sm"
+                data-toggle="tooltip"
+                title="{% trans 'Déplacer vers le bas' %}"
+                hx-post="{% url "deplacer-ue" %}"
+                hx-target="#tabs"
+                hx-trigger="click"
+        >
+            <input type="hidden" name="code_ue" value="{{ element.code_ue }}"/>
+            <input type="hidden" name="groupement_contenant" value="A-definir"/>
+            <input type="hidden" name="sens_deplacement" value="BAS"/>
+            <span class="fa fa-long-arrow-alt-down text-primary" aria-hidden="true"></span>
+        </button>
+</form>
