@@ -77,6 +77,7 @@ class GetProgrammeInscriptionCours(interface.DomainService):
             GroupementInscriptionCoursDTO(
                 intitule_complet=groupement.groupement_contenant.intitule_complet,
                 obligatoire=groupement.groupement_contenant.obligatoire,
+                code=groupement.groupement_contenant.code,
                 unites_enseignements=[
                     UniteEnseignementProgrammeDTO(
                         code=unite_enseignement.code,

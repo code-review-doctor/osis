@@ -69,6 +69,7 @@ class GetProgrammeInscriptionCoursTest(SimpleTestCase):
         self.assertEqual(len(sous_programme), 1)
         groupement = sous_programme[0]
         self.assertEqual(groupement.intitule_complet, 'Content:')
+        self.assertEqual(groupement.code, 'LECGE100T')
         self.assertTrue(groupement.obligatoire)
         unites_enseignements = groupement.unites_enseignements
         self.assertEqual(len(unites_enseignements), 1)

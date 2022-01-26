@@ -1,7 +1,6 @@
 {% load static %}
 <ul>
     {% for unite_enseignement in sous_programme.unites_enseignements %}
-{#        TODO : code non suffisant pour id ?#}
         <li id="{{ unite_enseignement.code }}"
             data-jstree='{"icon":"{% if unite_enseignement.obligatoire %}{% static "img/education_group_year/mandatory.png" %}{% else %}{% static "img/education_group_year/optional.png" %}{% endif %}"}'
         >

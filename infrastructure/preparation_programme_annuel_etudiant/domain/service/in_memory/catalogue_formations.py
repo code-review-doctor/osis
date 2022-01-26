@@ -28,7 +28,7 @@ from decimal import Decimal
 from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import \
     ICatalogueFormationsTranslator
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, ContenuGroupementCatalogueDTO, \
-    GroupementCatalogueDTO, UniteEnseignementCatalogueDTO, GroupementDTO
+    GroupementCatalogueDTO, UniteEnseignementCatalogueDTO
 
 
 class CatalogueFormationsTranslator(ICatalogueFormationsTranslator):
@@ -41,6 +41,7 @@ class CatalogueFormationsTranslator(ICatalogueFormationsTranslator):
                     remarque='',
                     credits=Decimal(0),
                     intitule_complet='Content:',
+                    code='LECGE100T'
                 ),
                 unites_enseignement_contenues=[
                     UniteEnseignementCatalogueDTO(

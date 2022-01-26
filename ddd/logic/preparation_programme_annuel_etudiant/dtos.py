@@ -85,6 +85,7 @@ class UniteEnseignementCatalogueDTO(DTO):
 @attr.s(frozen=True, slots=True, auto_attribs=True)
 class GroupementCatalogueDTO(DTO):
     # groupement provenant du catalogue (sans surcharge d'ajout, suppression ou modification)
+    code: str
     intitule: str
     obligatoire: bool
     remarque: str
@@ -123,6 +124,7 @@ class ProgrammeInscriptionCoursDTO(DTO):
 class GroupementInscriptionCoursDTO(DTO):
     intitule_complet: str
     obligatoire: bool
+    code: str
     #  Comment because nominal case (program without adjustment) only for now
     # unites_enseignement_ajoutees: List['UniteEnseignementAjouteeDTO']
     # unites_enseignement_supprimees: List['UniteEnseignementSupprimeeDTO']
