@@ -1,0 +1,46 @@
+{% load static %}
+{% load i18n %}
+{% load bootstrap3 %}
+{% comment "License" %}
+* OSIS stands for Open Student Information System. It's an application
+* designed to manage the core business of higher education institutions,
+* such as universities, faculties, institutes and professional schools.
+* The core business involves the administration of students, teachers,
+* courses, programs and so on.
+*
+* Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* A copy of this license - GNU General Public License - is available
+* at the root of the source code of this program.  If not,
+* see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+{% with profondeur=profondeur|add:"1" %}
+    {% if est_une_ue %}
+        {% include 'ligne_formulaire_inscription_pour_ue.html' %}
+    {% else %}
+        {%  if not racine %}
+            {% include 'ligne_formulaire_inscription_pour_groupement.html' %}
+        {% endif %}
+    {% endif %}
+
+    {% for contenu_groupement_enfant in contenu.unites_enseignement_contenues %}
+        {% include 'ligne_formulaire_inscription.html' with contenu=contenu_groupement_enfant profondeur=profondeur|add:"1" est_une_ue=True racine=False%}
+    {% endfor %}
+
+    {% for contenu_groupement_enfant in contenu.groupements_contenus %}
+        {% include 'ligne_formulaire_inscription.html' with contenu=contenu_groupement_enfant profondeur=profondeur est_une_ue=False racine=False %}
+    {% endfor %}
+
+{% endwith %}
+
