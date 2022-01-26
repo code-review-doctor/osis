@@ -71,13 +71,3 @@ class CatalogueFormationsTranslator(ICatalogueFormationsTranslator):
             dto for dto in cls.dtos
             if dto.sigle == sigle and dto.annee == annee and dto.version == version
         )
-
-    @classmethod
-    def get_groupement(
-            cls,
-            sigle_formation: str,
-            annee: int,
-            version_formation: str,
-            code_groupement: str
-    ) -> 'GroupementDTO':
-        raise NotImplementedError()

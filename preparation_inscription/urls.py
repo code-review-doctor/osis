@@ -23,20 +23,24 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.urls import path
+from django.urls import path, include
 
 from preparation_inscription.views.ajouter_unites_enseignement import AjouterUnitesEnseignementView
 from preparation_inscription.views.consulter_contenu_groupement import ConsulterContenuGroupementView
+from preparation_inscription.views.detail import PreparationInscriptionMainView
 from preparation_inscription.views.formulaire_inscription import FormulaireInscriptionView
 from preparation_inscription.views.modification_contenu_groupement import ModifierProprietesContenuView
+from preparation_inscription.views.program_tree import ProgramTreeHTMLView
 from preparation_inscription.views.supprimer_unites_enseignement import SupprimerUnitesEnseignementView
-from preparation_inscription.views.tree_html import TreeHTMLView
 
 urlpatterns = [
     path('', ConsulterContenuGroupementView.as_view(), name=ConsulterContenuGroupementView.name),
     path('delete', SupprimerUnitesEnseignementView.as_view(), name=SupprimerUnitesEnseignementView.name),
     path('add', AjouterUnitesEnseignementView.as_view(), name=AjouterUnitesEnseignementView.name),
     path('update', ModifierProprietesContenuView.as_view(), name=ModifierProprietesContenuView.name),
-    path('tree/', TreeHTMLView.as_view(), name=TreeHTMLView.name),
     path('formulaire_inscription/', FormulaireInscriptionView.as_view(), name=FormulaireInscriptionView.name),
+    path('<int:year>/<acronym:acronym>/', include([
+        path('', PreparationInscriptionMainView.as_view(), name=PreparationInscriptionMainView.name),
+        path('tree', ProgramTreeHTMLView.as_view(), name=ProgramTreeHTMLView.name),
+    ])),
 ]

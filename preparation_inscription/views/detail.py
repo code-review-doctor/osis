@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,24 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import \
-    ICatalogueFormationsTranslator
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, ContenuGroupementDTO, GroupementDTO
+from django.urls import reverse
+from django.views.generic import TemplateView
+from rules.contrib.views import LoginRequiredMixin
 
 
-class CatalogueFormationsTranslator(ICatalogueFormationsTranslator):
-    @classmethod
-    def get_formation(cls, sigle: str, annee: int, version: str, transition_name: str) -> 'FormationDTO':
-        # reutiliser GetProgramTreeVersionCommand et convertir ProgramTreeVersion en FormationDTO
-        raise NotImplementedError
+class PreparationInscriptionMainView(LoginRequiredMixin, TemplateView):
+    name = 'preparation-inscription-main-view'
 
-    @classmethod
-    def get_contenu_groupement(
-            cls,
-            sigle_formation: str,
-            annee: int,
-            version_formation: str,
-            code_groupement: str
-    ) -> 'ContenuGroupementDTO':
-        # reutiliser get_formation pour récupérer le groupement et son contenu dans le FormationDTO
-        raise NotImplementedError
+    # TemplateView
+    template_name = "preparation_inscription/preparation_inscription.html"
+
+    def get_context_data(self, **kwargs):
+        return {
+            **super().get_context_data(**kwargs),
+            'tree_view_url': self.get_tree_view_url()
+        }
+
+    def get_tree_view_url(self) -> str:
+        return reverse('program-tree-view', kwargs={
+            'year': self.kwargs['year'],
+            'acronym': self.kwargs['acronym']
+        })

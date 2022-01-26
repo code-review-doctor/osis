@@ -34,14 +34,3 @@ class ICatalogueFormationsTranslator(interface.DomainService):
     @abc.abstractmethod
     def get_formation(cls, sigle: str, annee: int, version: str, transition_name: str) -> 'FormationDTO':
         raise NotImplementedError()
-
-    @classmethod
-    @abc.abstractmethod
-    def get_groupement(
-            cls,
-            sigle_formation: str,
-            annee: int,
-            version_formation: str,
-            code_groupement: str
-    ) -> 'GroupementDTO':
-        raise NotImplementedError()

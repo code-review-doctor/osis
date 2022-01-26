@@ -1,24 +1,25 @@
-{% load static %}
-{% for node in tree %}
-  <ul>
-    <li id="{{ node.id }}"
-        data-jstree='{"icon":"{% if node.obligatoire %}{% static "img/education_group_year/mandatory.png" %}{% else %}{% static "img/education_group_year/optional.png" %} {% endif%}"}'
-        class="
-        {% if node.type_ajustement == 'AJOUT' %}
-            text-success
-        {% elif node.type_ajustement == 'MODIFICATION' %}
-            text-info
-        {% elif node.type_ajustement == 'SUPPRESSION' %}
-            text-danger strikethrough
-        {% endif %}
-        "
-    >
-            {{ node.text }}
-        {% if node.children %}
-          {% with tree=node.children template_name="tree_view_template.html" %}
-             {% include 'preparation_inscription/blocks/tree_recursif.html' %}
-          {% endwith %}
-        {% endif %}
+{% load i18n static %}
+<ul>
+    <li id="{{ tree.code }}_{{ tree.annee }}">
+        {{ tree.code }}
+        <span class="node_block_text">{% trans 'Block' %}</span>
+        {% for sous_programme in tree.sous_programme %}
+            <ul>
+{#            TODO: id for li !#}
+            <li
+                    data-jstree='{"icon":"{% if sous_programme.obligatoire %}{% static "img/education_group_year/mandatory.png" %}{% else %}{% static "img/education_group_year/optional.png" %}{% endif %}"}'
+                >
+                    {{ sous_programme.intitule_complet }}
+                    {% if sous_programme.sous_programme %}
+                        {% with tree=sous_programme.sous_programme template_name="tree_view_template.html" %}
+                            {% include 'preparation_inscription/blocks/tree_recursif.html' %}
+                        {% endwith %}
+                    {% endif %}
+                    {% if sous_programme.unites_enseignements %}
+                        {% include 'preparation_inscription/blocks/tree_unites_enseignements.html' %}
+                    {% endif %}
+                </li>
+            </ul>
+        {% endfor %}
     </li>
-  </ul>
-{% endfor %}
+</ul>
