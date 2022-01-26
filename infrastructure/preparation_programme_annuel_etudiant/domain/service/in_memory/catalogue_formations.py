@@ -23,26 +23,61 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from decimal import Decimal
+
 from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import \
     ICatalogueFormationsTranslator
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, ContenuGroupementCatalogueDTO, \
+    GroupementCatalogueDTO, UniteEnseignementCatalogueDTO, GroupementDTO
 
 
-class CatalogueFormationsTranslatorInMemory(ICatalogueFormationsTranslator):
-
+class CatalogueFormationsTranslator(ICatalogueFormationsTranslator):
     dtos = [
         FormationDTO(
-            programme_detaille=...,  # TODO :: to implement
-            annee=2020,
+            racine=ContenuGroupementCatalogueDTO(
+                groupement_contenant=GroupementCatalogueDTO(
+                    intitule='Content:',
+                    obligatoire=True,
+                    remarque='',
+                    credits=Decimal(0),
+                    intitule_complet='Content:',
+                ),
+                unites_enseignement_contenues=[
+                    UniteEnseignementCatalogueDTO(
+                        bloc=1,
+                        code='LESPO1113',
+                        intitule_complet='Sociologie et anthropologie des mondes contemporains',
+                        quadrimestre='Q1',
+                        credits_absolus=Decimal(0),
+                        volume_annuel_pm=0,
+                        volume_annuel_pp=0,
+                        obligatoire=True,
+                        session_derogation='',
+                        chemin_acces=''
+                    )
+                ],
+                groupements_contenus=[],
+            ),
+            annee=2021,
             sigle='ECGE1BA',
-            version='STANDARD',
-            intitule_complet='Bachelier ...',
+            version='',
+            intitule_complet='Bachelier en sciences économiques et de gestion',
         ),
     ]
 
     @classmethod
-    def get_formation(cls, sigle: str, annee: int, version: str) -> 'FormationDTO':
+    def get_formation(cls, sigle: str, annee: int, version: str, transition_name: str) -> 'FormationDTO':
         return next(
             dto for dto in cls.dtos
             if dto.sigle == sigle and dto.annee == annee and dto.version == version
         )
+
+    @classmethod
+    def get_groupement(
+            cls,
+            sigle_formation: str,
+            annee: int,
+            version_formation: str,
+            code_groupement: str
+    ) -> 'GroupementDTO':
+        raise NotImplementedError()

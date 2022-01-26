@@ -1,0 +1,285 @@
+<templateSet group="OsisCustom">
+  <template name="dj-enum" value="from django.utils.translation import gettext_lazy as _&#10;from base.models.utils.utils import ChoiceEnum&#10;&#10;&#10;class $NAME$(ChoiceEnum):&#10;    $ENUM1$ = _(&quot;$ENUM1$&quot;)&#10;    $ENUM2$ = _(&quot;$ENUM2$&quot;)&#10;$END$" description="Crée une Enum(ChoiceEnum)" toReformat="false" toShortenFQNames="true">
+    <variable name="NAME" expression="" defaultValue="&quot;Enumeration&quot;" alwaysStopAt="true" />
+    <variable name="ENUM1" expression="" defaultValue="&quot;CHOIX1&quot;" alwaysStopAt="true" />
+    <variable name="ENUM2" expression="" defaultValue="&quot;CHOIX2&quot;" alwaysStopAt="true" />
+    <context>
+      <option name="Python" value="true" />
+    </context>
+  </template>
+  <template name="dj-form" value="from dal import autocomplete&#10;from django import forms&#10;from django.contrib.auth.models import User&#10;from django.core.validators import MaxValueValidator, MinValueValidator&#10;from django.utils.translation import gettext_lazy as _&#10;&#10;from base.forms.utils.choice_field import add_blank&#10;from base.models.enums.active_status import ActiveStatusEnum&#10;from education_group.forms.fields import MainEntitiesVersionChoiceField, UpperCaseCharField&#10;&#10;&#10;class $NAME$Form(forms.Form):&#10;    autocomplete = forms.ChoiceField(&#10;        required=False,&#10;        label=_('Label').capitalize(),&#10;        widget=autocomplete.ListSelect2(&#10;            url='$NAME2$-autocomplete',&#10;            attrs={'data-html': True, 'data-placeholder': _('Name')},&#10;        )&#10;    )&#10;    $champs1$ = UpperCaseCharField(max_length=15, label=_(&quot;$champs1$&quot;).capitalize())&#10;    $champs2$ = forms.ChoiceField(&#10;        initial=ActiveStatusEnum.ACTIVE.name,&#10;        choices=add_blank(list(ActiveStatusEnum.choices())),&#10;        label=_(&quot;$champs2$&quot;).capitalize(),&#10;    )&#10;    $champs3$ = forms.IntegerField(&#10;        label=_(&quot;$champs3$&quot;).capitalize(),&#10;        required=False,&#10;    )&#10;    $champs4$ = forms.BooleanField(label=_('$champs4$').capitalize())&#10;    management_entity = MainEntitiesVersionChoiceField(&#10;        queryset=None,&#10;        label=_('management_entity').capitalize(),&#10;        required=False&#10;    )&#10;    $champs5$ = forms.DecimalField(&#10;        max_digits=7,&#10;        decimal_places=4,&#10;        label=_('$champs5$').capitalize(),&#10;        validators=[MinValueValidator(1), MaxValueValidator(9999)],&#10;    )&#10;&#10;    def __init__(self, *args, user: User, **kwargs):&#10;        self.user = user&#10;        super().__init__(*args, **kwargs)&#10;" description="Crée un Form Django avec tous types de champs" toReformat="false" toShortenFQNames="true">
+    <variable name="NAME" expression="" defaultValue="" alwaysStopAt="true" />
+    <variable name="NAME2" expression="" defaultValue="" alwaysStopAt="true" />
+    <variable name="champs1" expression="" defaultValue="&quot;champs1&quot;" alwaysStopAt="true" />
+    <variable name="champs2" expression="" defaultValue="&quot;champs2&quot;" alwaysStopAt="true" />
+    <variable name="champs3" expression="" defaultValue="&quot;champs3&quot;" alwaysStopAt="true" />
+    <variable name="champs4" expression="" defaultValue="&quot;champs4&quot;" alwaysStopAt="true" />
+    <variable name="champs5" expression="" defaultValue="&quot;champs5&quot;" alwaysStopAt="true" />
+    <context>
+      <option name="Python" value="true" />
+    </context>
+  </template>
+  <template name="dj-modal-form" value="from django.contrib.auth.mixins import LoginRequiredMixin&#10;from base.views.common import display_success_messages, display_error_messages, display_warning_messages&#10;from django.urls import reverse&#10;from django.utils.translation import gettext_lazy as _&#10;&#10;&#10;class $VIEW$View(LoginRequiredMixin, FormView, HtmxMixin):&#10;    name = '$VIEW_NAME$'&#10;&#10;    # FormView&#10;    template_name = &quot;mockup/htmx_modal_form.html&quot;&#10;    &#10;    # HtmxMixin&#10;    htmx_template_name = &quot;mockup/htmx_modal_form.html&quot;&#10;&#10;    form_class = HtmxModalForm&#10;&#10;    def get_form_kwargs(self):&#10;        kwargs = super().get_form_kwargs()&#10;        kwargs['user'] = self.request.user&#10;        return kwargs&#10;&#10;    def form_valid(self, formset):&#10;        # TODO :: to implement&#10;        # cmd = Command(...)&#10;        # message__bus.invoke(cmd)&#10;        # display_error_messages(self.request, messages)&#10;        # display_success_messages(self.request, [&quot;test&quot;, &quot;success&quot;])&#10;        display_success_messages(self.request, [&quot;test&quot;, &quot;success&quot;])&#10;        return HttpResponseClientRedirect(self.get_success_url())&#10;&#10;    def form_invalid(self, form):&#10;        test = super().form_invalid(form)&#10;        display_error_messages(self.request, [_(&quot;Error message 1&quot;), _('Error message 2')])&#10;        display_warning_messages(self.request, [_(&quot;warning message&quot;)])&#10;        return test&#10;&#10;    def get_success_url(self):&#10;        # TODO :: to implement or to remove&#10;        return reverse($REVERSE$)&#10;&#10;    def get_context_data(self, **kwargs):&#10;        return {&#10;            **super().get_context_data(**kwargs),&#10;            'form': self.get_form(self.form_class),&#10;        }&#10;" description="Crée une Django view Form avec HTMX qui peut être validé dans une Modal" toReformat="false" toShortenFQNames="true">
+    <variable name="VIEW" expression="" defaultValue="&quot;HtmxModalForm&quot;" alwaysStopAt="true" />
+    <variable name="VIEW_NAME" expression="capitalizeAndUnderscore($VIEW$)" defaultValue="" alwaysStopAt="true" />
+    <variable name="REVERSE" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="Python" value="true" />
+    </context>
+  </template>
+  <template name="dj-path" value="path('$PATH$/', include([&#10;    path('$PATH2$', $NAME$.as_view(), name=$NAME$.name),&#10;]))," description="Crée un nouveau path() Django" toReformat="false" toShortenFQNames="true">
+    <variable name="PATH" expression="" defaultValue="" alwaysStopAt="true" />
+    <variable name="PATH2" expression="" defaultValue="" alwaysStopAt="true" />
+    <variable name="NAME" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="Python" value="true" />
+    </context>
+  </template>
+  <template name="dj-trans" value="from django.utils.translation import gettext_lazy as _" description="Génère l'import des traductions Django" toReformat="false" toShortenFQNames="true">
+    <context>
+      <option name="Python" value="true" />
+    </context>
+  </template>
+  <template name="dj-url" value="path('', $NAME$.as_view(), name=$NAME$.name)," description="[DEPRECATED - use dj-path] Crée une django url" toReformat="false" toShortenFQNames="true">
+    <variable name="NAME" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="Python" value="true" />
+    </context>
+  </template>
+  <template name="dj-v-autocomplete" value="from typing import List&#10;&#10;from django.contrib.auth.mixins import LoginRequiredMixin&#10;&#10;&#10;class Search$NAME$Autocomplete(LoginRequiredMixin, autocomplete.Select2ListView):&#10;    def get_list(self) -&gt; List[str]:&#10;        recherche = self.q&#10;        data = [&#10;            '1',&#10;            '2',&#10;            '3',&#10;            '4',&#10;            '5',&#10;            '6',&#10;        ]&#10;        return [elem for elem in data if str(recherche) in elem]&#10;" description="Crée une view auto-complete-light" toReformat="false" toShortenFQNames="true">
+    <variable name="NAME" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="Python" value="true" />
+    </context>
+  </template>
+  <template name="dj-v-detail" value="from django.views.generic import TemplateView&#10;from django.contrib.auth.mixins import LoginRequiredMixin&#10;&#10;&#10;class DetailView(LoginRequiredMixin, TemplateView):&#10;    name = 'detail-view'&#10;    &#10;    # TemplateView&#10;    template_name = &quot;mockup/detail.html&quot;&#10;    &#10;    def get_context_data(self, **kwargs):&#10;        return {&#10;            **super().get_context_data(**kwargs),&#10;            'element': self.get_element(),&#10;        }&#10;    &#10;    def get_element(self):&#10;        return {&#10;            'champs1': '1',&#10;            'champs2': '2',&#10;            'champs3': '3',&#10;            'champs4': '4',&#10;            'champs5': '5',&#10;            'champs6': '6',&#10;        }&#10;" description="Crée une TemplateView Django (vue détail)" toReformat="false" toShortenFQNames="true">
+    <context>
+      <option name="Python" value="true" />
+    </context>
+  </template>
+  <template name="dj-v-form" value="from django.urls import reverse&#10;from django.views.generic import FormView&#10;&#10;&#10;class $NAME$FormView(LoginRequiredMixin, FormView):&#10;    name = 'form-view'&#10;&#10;    # FormView&#10;    template_name = &quot;mockup/demo_form.html&quot;&#10;&#10;    form_class = $NAME$Form&#10;&#10;    def get_form_kwargs(self):&#10;        kwargs = super().get_form_kwargs()&#10;        kwargs['user'] = self.request.user&#10;        return kwargs&#10;&#10;    def form_valid(self, formset):&#10;        # TODO :: to implement&#10;        # cmd = Command(...)&#10;        # message__bus.invoke(cmd)&#10;        # display_error_messages(self.request, messages)&#10;        # display_success_messages(self.request, messages)&#10;        # self.render_to_response(self.get_context_data(form=self.get_form(self.form_class)))&#10;        return super().form_valid(formset)&#10;&#10;    def get_success_url(self):&#10;        # TODO :: to implement or to remove&#10;        return reverse('url-success')&#10;&#10;    def get_context_data(self, **kwargs):&#10;        return {&#10;            **super().get_context_data(**kwargs),&#10;            'form': self.get_form(self.form_class),&#10;        }&#10;" description="Crée une Django FormView" toReformat="false" toShortenFQNames="true">
+    <variable name="NAME" expression="" defaultValue="&quot;Demo&quot;" alwaysStopAt="true" />
+    <context>
+      <option name="Python" value="true" />
+    </context>
+  </template>
+  <template name="dj-v-search-list" value="from django.views.generic import TemplateView&#10;from django.contrib.auth.mixins import LoginRequiredMixin&#10;&#10;&#10;class SearchView(LoginRequiredMixin, TemplateView):&#10;    name = 'search_view'&#10;    # TemplateView&#10;    template_name = &quot;mockup/search_list.html&quot;&#10;&#10;    def get_context_data(self, **kwargs):&#10;        return {&#10;            **super().get_context_data(**kwargs),&#10;            'search_form': self.get_search_form(),&#10;            'search_result': self.get_search_result(),&#10;        }&#10;&#10;    def get_search_form(self):&#10;        return SearchForm(data=self.request.GET or None, user=self.request.user)&#10;&#10;    def get_search_result(self):&#10;        data = [&#10;            {&#10;                'champs1': '1',&#10;                'champs2': '2',&#10;                'champs3': '3',&#10;                'champs4': '4',&#10;                'champs5': '5',&#10;                'champs6': '6',&#10;            },&#10;            {&#10;                'champs1': '11',&#10;                'champs2': '12',&#10;                'champs3': '13',&#10;                'champs4': '14',&#10;                'champs5': '15',&#10;                'champs6': '16',&#10;            },$END$&#10;        ]  # TODO :: message_bus.invoke(Command)&#10;        return data&#10;" description="Crée une Django view pour rechercher / liste" toReformat="false" toShortenFQNames="true">
+    <context>
+      <option name="Python" value="true" />
+    </context>
+  </template>
+  <template name="ht-actions-down" value="&lt;div class=&quot;pull-right&quot;&gt;&#10;    &lt;div class=&quot;dropdown&quot;&gt;&#10;        &lt;button class=&quot;btn btn-default dropdown-toggle&quot; type=&quot;button&quot; id=&quot;btn-action-down&quot; data-toggle=&quot;dropdown&quot; aria-haspopup=&quot;true&quot; aria-expanded=&quot;true&quot;&gt;&#10;            &lt;span class=&quot;fa fa-cog&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt; {% trans 'Actions' %}&#10;            &lt;span class=&quot;caret&quot;&gt;&lt;/span&gt;&#10;        &lt;/button&gt;&#10;        &lt;ul class=&quot;dropdown-menu pull-right&quot; aria-labelledby=&quot;btn-action-down&quot;&gt;&#10;            &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Action&lt;/a&gt;&lt;/li&gt;&#10;            &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Another action&lt;/a&gt;&lt;/li&gt;&#10;            &lt;li class=&quot;dropdown-header&quot;&gt;Dropdown header&lt;/li&gt;&#10;            &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Something else here&lt;/a&gt;&lt;/li&gt;&#10;            &lt;li role=&quot;separator&quot; class=&quot;divider&quot;&gt;&lt;/li&gt;&#10;            &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Separated link&lt;/a&gt;&lt;/li&gt;&#10;        &lt;/ul&gt;&#10;    &lt;/div&gt;&#10;&lt;/div&gt;" description="Crée un menu 'actions' dropdown" toReformat="false" toShortenFQNames="true">
+    <context>
+      <option name="HTML" value="true" />
+    </context>
+  </template>
+  <template name="ht-actions-up" value="&lt;div class=&quot;pull-right&quot;&gt;&#10;    &lt;div class=&quot;dropdown dropup&quot;&gt;&#10;        &lt;button class=&quot;btn btn-default dropdown-toggle&quot; type=&quot;button&quot; id=&quot;btn-action-up&quot; data-toggle=&quot;dropdown&quot; aria-haspopup=&quot;true&quot; aria-expanded=&quot;true&quot;&gt;&#10;            &lt;span class=&quot;fa fa-cog&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt; {% trans 'Actions' %}&#10;            &lt;span class=&quot;caret&quot;&gt;&lt;/span&gt;&#10;        &lt;/button&gt;&#10;        &lt;ul class=&quot;dropdown-menu pull-right&quot; aria-labelledby=&quot;btn-action-up&quot;&gt;&#10;            &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Action&lt;/a&gt;&lt;/li&gt;&#10;            &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Another action&lt;/a&gt;&lt;/li&gt;&#10;            &lt;li class=&quot;dropdown-header&quot;&gt;Dropdown header&lt;/li&gt;&#10;            &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Something else here&lt;/a&gt;&lt;/li&gt;&#10;            &lt;li role=&quot;separator&quot; class=&quot;divider&quot;&gt;&lt;/li&gt;&#10;            &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Separated link&lt;/a&gt;&lt;/li&gt;&#10;        &lt;/ul&gt;&#10;    &lt;/div&gt;&#10;&lt;/div&gt;" description="Crée un menu 'actions' dropup" toReformat="false" toShortenFQNames="true">
+    <context>
+      <option name="HTML" value="true" />
+    </context>
+  </template>
+  <template name="ht-badge" value="&lt;span class=&quot;badge&quot;&gt;$VALUE$&lt;/span&gt;&#10;&lt;span class=&quot;badge primary-color&quot;&gt;$VALUE$&lt;/span&gt;&#10;&lt;span class=&quot;badge success-color&quot;&gt;$VALUE$&lt;/span&gt;&#10;&lt;span class=&quot;badge warning-color&quot;&gt;$VALUE$&lt;/span&gt;&#10;&lt;span class=&quot;badge danger-color&quot;&gt;$VALUE$&lt;/span&gt;&#10;&lt;span class=&quot;badge info-color&quot;&gt;$VALUE$&lt;/span&gt;" description="Crée tous les badges html possibles" toReformat="false" toShortenFQNames="true">
+    <variable name="VALUE" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="HTML" value="true" />
+    </context>
+  </template>
+  <template name="ht-bcrumb" value="&lt;li&gt;&#10;    &lt;a href=&quot;#&quot; id=&quot;lnk_$LINK1$&quot;&gt;{% trans '$LINK1$' %}&lt;/a&gt;&#10;&lt;/li&gt;&#10;&lt;li class=&quot;active&quot;&gt;{% trans '$LINK2$' %}&lt;/li&gt;" description="Crée un breadcrumb" toReformat="false" toShortenFQNames="true">
+    <variable name="LINK1" expression="" defaultValue="" alwaysStopAt="true" />
+    <variable name="LINK2" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="HTML" value="true" />
+    </context>
+  </template>
+  <template name="ht-btn" value="&lt;button type=&quot;button&quot; class=&quot;btn btn-default&quot;&gt;$NAME$&lt;/button&gt;&#10;&lt;button type=&quot;button&quot; class=&quot;btn btn-primary&quot;&gt;$NAME$&lt;/button&gt;&#10;&lt;button type=&quot;button&quot; class=&quot;btn btn-danger&quot;&gt;$NAME$&lt;/button&gt;&#10;&lt;button type=&quot;button&quot; class=&quot;btn btn-warning&quot;&gt;$NAME$&lt;/button&gt;&#10;&lt;button type=&quot;button&quot; class=&quot;btn btn-success&quot;&gt;$NAME$&lt;/button&gt;&#10;&lt;button type=&quot;button&quot; class=&quot;btn btn-info&quot;&gt;$NAME$&lt;/button&gt;" description="Crée tous les html-btn bootstrap" toReformat="false" toShortenFQNames="true">
+    <variable name="NAME" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="HTML" value="true" />
+    </context>
+  </template>
+  <template name="ht-check" value="&lt;div class=&quot;checkbox&quot;&gt;&#10;    &lt;label&gt;&#10;        &lt;input type=&quot;checkbox&quot; checked&gt; {% trans &quot;$LABEL$&quot; %}&#10;    &lt;/label&gt;&#10;&lt;/div&gt;" description="Crée un checkbox" toReformat="false" toShortenFQNames="true">
+    <variable name="LABEL" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="HTML" value="true" />
+    </context>
+  </template>
+  <template name="ht-col" value="        &lt;div class=&quot;col-md-$SIZE$&quot;&gt;&#10;            $CONTENT$&#10;        &lt;/div&gt;" description="Crée un div class=&quot;col-md-X&quot;" toReformat="false" toShortenFQNames="true">
+    <variable name="SIZE" expression="" defaultValue="" alwaysStopAt="true" />
+    <variable name="CONTENT" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="HTML" value="true" />
+    </context>
+  </template>
+  <template name="ht-collapse" value="&lt;button class=&quot;btn btn-default&quot; data-toggle=&quot;collapse&quot; data-target=&quot;#$BUTTON$&quot;&gt;$BUTTON$ &lt;span class=&quot;fa fa-arrow-down&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt;&lt;/button&gt;&#10;&lt;div id=&quot;$BUTTON$&quot; class=&quot;collapse&quot;&gt;&#10;    $END$&#10;&lt;/div&gt;" description="Crée un collapse" toReformat="false" toShortenFQNames="true">
+    <variable name="BUTTON" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="HTML" value="true" />
+    </context>
+  </template>
+  <template name="ht-detail" value="{% bootstrap_label _(&quot;$CHAMPS$&quot;) label_class='d-block'%}&#10;&lt;p&gt;{{ element.$CHAMPS$ }}&lt;/p&gt;" description="Crée un tag html pour consulter un champs" toReformat="false" toShortenFQNames="true">
+    <variable name="CHAMPS" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="HTML" value="true" />
+    </context>
+  </template>
+  <template name="ht-dropdown" value="&lt;div class=&quot;dropdown&quot;&gt;&#10;    &lt;button class=&quot;btn btn-default dropdown-toggle&quot; type=&quot;button&quot; id=&quot;$NAME$&quot; data-toggle=&quot;dropdown&quot; aria-haspopup=&quot;true&quot; aria-expanded=&quot;true&quot;&gt;&#10;        {% trans &quot;$NAME$&quot; %}&#10;        &lt;span class=&quot;caret&quot;&gt;&lt;/span&gt;&#10;    &lt;/button&gt;&#10;    &lt;ul class=&quot;dropdown-menu&quot; aria-labelledby=&quot;$NAME$&quot;&gt;&#10;        &lt;li&gt;&lt;a href=&quot;#&quot;&gt;$END$Action&lt;/a&gt;&lt;/li&gt;&#10;        &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Another action&lt;/a&gt;&lt;/li&gt;&#10;        &lt;li class=&quot;dropdown-header&quot;&gt;Dropdown header&lt;/li&gt;&#10;        &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Something else here&lt;/a&gt;&lt;/li&gt;&#10;        &lt;li role=&quot;separator&quot; class=&quot;divider&quot;&gt;&lt;/li&gt;&#10;        &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Separated link&lt;/a&gt;&lt;/li&gt;&#10;    &lt;/ul&gt;&#10;&lt;/div&gt;" description="Crée un bouton dropdown" toReformat="false" toShortenFQNames="true">
+    <variable name="NAME" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="HTML" value="true" />
+    </context>
+  </template>
+  <template name="ht-form-field" value="{% bootstrap_field search_form.$NAME$ %}" description="Crée un bootstrap-field html" toReformat="false" toShortenFQNames="true">
+    <variable name="NAME" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="HTML" value="true" />
+    </context>
+  </template>
+  <template name="ht-form-label" value="{% bootstrap_label search_form.$NAME$.label label_class=&quot;control-label&quot; %}       &#10;{% bootstrap_field search_form.$NAME$ show_label=False %}" description="Crée un bootstrap label html" toReformat="false" toShortenFQNames="true">
+    <variable name="NAME" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="HTML" value="true" />
+    </context>
+  </template>
+  <template name="ht-form-label-help" value="{% bootstrap_label search_form.$NAME$.label label_class=&quot;control-label&quot; %}&#10;&lt;span&#10;        class=&quot;glyphicon glyphicon-question-sign&quot;&#10;        data-toggle=&quot;tooltip&quot;&#10;        data-placement=&quot;top&quot;&#10;        data-html=&quot;true&quot;&#10;        title=&quot;&#10;            {% blocktrans trimmed %}&#10;            &lt;p&gt;Texte d'aide&lt;/p&gt;&#10;            {% endblocktrans %}&#10;        &quot;&#10;&gt;&lt;/span&gt;&#10;{% bootstrap_field search_form.$NAME$ show_label=False %}" description="Crée un bootstrap-label + badge &quot;?&quot;" toReformat="false" toShortenFQNames="true">
+    <variable name="NAME" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="HTML" value="true" />
+    </context>
+  </template>
+  <template name="ht-form-post" value="&lt;form method=&quot;POST&quot;&#10;      id=&quot;form_$URL$&quot;&#10;      action=&quot;{% url &quot;$URL$&quot; %}&quot;&#10;&gt;&#10;    {{ search_form.media }}&#10;    {{ crsf_token }}&#10;    &lt;div class=&quot;row&quot;&gt;&#10;        &lt;div class=&quot;col-md-3&quot;&gt;&#10;            {% bootstrap_field form.$FIELD1$ %}&#10;        &lt;/div&gt;&#10;        &lt;div class=&quot;col-md-3&quot;&gt;&#10;            {% bootstrap_field form.$FIELD2$ %}&#10;        &lt;/div&gt;&#10;        &lt;div class=&quot;col-md-2&quot;&gt;&#10;            {% bootstrap_field form.$FIELD3$ %}&#10;        &lt;/div&gt;&#10;        &lt;div class=&quot;col-md-2&quot;&gt;&#10;            &lt;br&gt;&#10;            {% bootstrap_field form.$FIELD4$ %}&#10;        &lt;/div&gt;&#10;        &lt;div class=&quot;col-md-2&quot;&gt;&#10;            {% bootstrap_field form.$FIELD5$ %}&#10;        &lt;/div&gt;&#10;    &lt;/div&gt;&#10;&lt;/form&gt;&#10;" description="Crée un form html POST" toReformat="false" toShortenFQNames="true">
+    <variable name="URL" expression="" defaultValue="" alwaysStopAt="true" />
+    <variable name="FIELD1" expression="" defaultValue="&quot;champs1&quot;" alwaysStopAt="true" />
+    <variable name="FIELD2" expression="" defaultValue="&quot;champs2&quot;" alwaysStopAt="true" />
+    <variable name="FIELD3" expression="" defaultValue="&quot;champs3&quot;" alwaysStopAt="true" />
+    <variable name="FIELD4" expression="" defaultValue="&quot;champs4&quot;" alwaysStopAt="true" />
+    <variable name="FIELD5" expression="" defaultValue="&quot;champs5&quot;" alwaysStopAt="true" />
+    <context>
+      <option name="HTML" value="true" />
+    </context>
+  </template>
+  <template name="ht-form-post-vertical" value=" &lt;form method=&quot;POST&quot;&#10;      id=&quot;form_$URL$&quot;&#10;      action=&quot;{% url &quot;$URL$&quot; %}&quot;&#10;&gt;&#10;    {{ search_form.media }}&#10;    {{ crsf_token }}&#10;    &lt;div class=&quot;form-group&quot;&gt;&#10;        {% bootstrap_field form.$FIELD1$ %}&#10;    &lt;/div&gt;&#10;    &lt;div class=&quot;form-group&quot;&gt;&#10;        {% bootstrap_field form.$FIELD2$ %}&#10;    &lt;/div&gt;&#10;    &lt;div class=&quot;form-group&quot;&gt;&#10;        {% bootstrap_field form.$FIELD3$ %}&#10;    &lt;/div&gt;&#10;    &lt;div class=&quot;form-group&quot;&gt;&#10;        {% bootstrap_field form.$FIELD4$ %}&#10;    &lt;/div&gt;&#10;    &lt;div class=&quot;form-group&quot;&gt;&#10;        {% bootstrap_field form.$FIELD5$ %}&#10;    &lt;/div&gt;&#10;&lt;/form&gt;" description="Crée un form html POST (vertical)" toReformat="false" toShortenFQNames="true">
+    <variable name="URL" expression="" defaultValue="" alwaysStopAt="true" />
+    <variable name="FIELD1" expression="" defaultValue="&quot;champs1&quot;" alwaysStopAt="true" />
+    <variable name="FIELD2" expression="" defaultValue="&quot;champs2&quot;" alwaysStopAt="true" />
+    <variable name="FIELD3" expression="" defaultValue="&quot;champs3&quot;" alwaysStopAt="true" />
+    <variable name="FIELD4" expression="" defaultValue="&quot;champs4&quot;" alwaysStopAt="true" />
+    <variable name="FIELD5" expression="" defaultValue="&quot;champs5&quot;" alwaysStopAt="true" />
+    <context>
+      <option name="HTML" value="true" />
+    </context>
+  </template>
+  <template name="ht-href" value="&lt;a href=&quot;{% url &quot;$URL$&quot; %}&quot;&#10;   id=&quot;lnk_$URL$&quot;&#10;   data-toggle=&quot;tooltip&quot;&#10;   title=&quot;{% trans '$TOOLTIP$' %}&quot;&#10;&gt;&#10;   $END$&#10;&lt;/a&gt;&#10;" description="Crée un &lt;a&gt; tag" toReformat="false" toShortenFQNames="true">
+    <variable name="URL" expression="" defaultValue="" alwaysStopAt="true" />
+    <variable name="TOOLTIP" expression="" defaultValue="&quot;Tooltip&quot;" alwaysStopAt="true" />
+    <context>
+      <option name="HTML" value="true" />
+    </context>
+  </template>
+  <template name="ht-href-btn" value="&lt;a href=&quot;{% url &quot;$URL$&quot; %}&quot;&#10;   type=&quot;button&quot;&#10;   class=&quot;btn btn-default&quot;&#10;   id=&quot;lnk_$URL$&quot;&#10;   data-toggle=&quot;tooltip&quot;&#10;   title=&quot;{% trans '$TOOLTIP$' %}&quot;&#10;&gt;&#10;        {{ element.$FIELD$ }}&#10;&lt;/a&gt;" description="Crée tag &lt;a&gt; sous forme de bouton" toReformat="false" toShortenFQNames="true">
+    <variable name="URL" expression="" defaultValue="" alwaysStopAt="true" />
+    <variable name="TOOLTIP" expression="" defaultValue="&quot;Tooltip&quot;" alwaysStopAt="true" />
+    <variable name="FIELD" expression="" defaultValue="&quot;champs1&quot;" alwaysStopAt="true" />
+    <context>
+      <option name="HTML" value="true" />
+    </context>
+  </template>
+  <template name="ht-icon" value="&lt;span class=&quot;fa fa-arrow-down&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt;" description="Crée un &lt;span&gt; avec une icone" toReformat="false" toShortenFQNames="true">
+    <context>
+      <option name="HTML" value="true" />
+    </context>
+  </template>
+  <template name="ht-if" value="{% if $condition1$ %}&#10;    $content$&#10;{% elif $condition2$ %}&#10;    $END$&#10;{% endif %}" description="Crée un template {%if %}" toReformat="false" toShortenFQNames="true">
+    <variable name="condition1" expression="" defaultValue="" alwaysStopAt="true" />
+    <variable name="content" expression="" defaultValue="" alwaysStopAt="true" />
+    <variable name="condition2" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="HTML" value="true" />
+    </context>
+  </template>
+  <template name="ht-modal" value="&lt;!-- DEPRECATED - should use htmx #TODO --&gt;&#10;&lt;!-- Button trigger modal --&gt;&#10;&lt;button type=&quot;button&quot; class=&quot;btn btn-primary&quot; data-toggle=&quot;modal&quot; data-target=&quot;#exampleModal&quot;&gt;&#10;    {% trans &quot;Launch modal&quot; %}&#10;&lt;/button&gt;&#10;&#10;&lt;!-- Modal --&gt;&#10;&lt;div class=&quot;modal fade&quot; id=&quot;exampleModal&quot; tabindex=&quot;-1&quot; role=&quot;dialog&quot; aria-labelledby=&quot;exampleModalLabel&quot; aria-hidden=&quot;true&quot;&gt;&#10;    &lt;div class=&quot;modal-dialog&quot; role=&quot;document&quot;&gt;&#10;        &lt;div class=&quot;modal-content&quot;&gt;&#10;            &lt;div class=&quot;modal-header&quot;&gt;&#10;                &lt;h5 class=&quot;modal-title&quot; id=&quot;exampleModalLabel&quot;&gt;{% trans &quot;Modal title&quot; %}&lt;/h5&gt;&#10;                &lt;button type=&quot;button&quot; class=&quot;close&quot; data-dismiss=&quot;modal&quot; aria-label=&quot;Close&quot;&gt;&#10;                    &lt;span aria-hidden=&quot;true&quot;&gt;&amp;times;&lt;/span&gt;&#10;                &lt;/button&gt;&#10;            &lt;/div&gt;&#10;            &lt;div class=&quot;modal-body&quot;&gt;&#10;                $END$...&#10;            &lt;/div&gt;&#10;            &lt;div class=&quot;modal-footer&quot;&gt;&#10;                &lt;button type=&quot;button&quot; class=&quot;btn btn-secondary&quot; data-dismiss=&quot;modal&quot;&gt; {% trans &quot;Cancel&quot; %}&lt;/button&gt;&#10;                &lt;button type=&quot;button&quot; class=&quot;btn btn-primary&quot;&gt;&lt;icon class=&quot;fa fa-save&quot;&gt; &lt;/icon&gt;&#10;                    {% trans 'Save' %}&lt;/button&gt;&#10;            &lt;/div&gt;&#10;        &lt;/div&gt;&#10;    &lt;/div&gt;&#10;&lt;/div&gt;" description="Crée une modal html" toReformat="false" toShortenFQNames="true">
+    <context>
+      <option name="HTML" value="true" />
+    </context>
+  </template>
+  <template name="ht-osis" value="{% extends &quot;layout.html&quot; %}&#10;{% load static i18n bootstrap3 %}&#10;&#10;{% comment &quot;License&quot; %}&#10; * OSIS stands for Open Student Information System. It's an application&#10; * designed to manage the core business of higher education institutions,&#10; * such as universities, faculties, institutes and professional schools.&#10; * The core business involves the administration of students, teachers,&#10; * courses, programs and so on.&#10; *&#10; * Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)&#10; *&#10; * This program is free software: you can redistribute it and/or modify&#10; * it under the terms of the GNU General Public License as published by&#10; * the Free Software Foundation, either version 3 of the License, or&#10; * (at your option) any later version.&#10; *&#10; * This program is distributed in the hope that it will be useful,&#10; * but WITHOUT ANY WARRANTY; without even the implied warranty of&#10; * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the&#10; * GNU General Public License for more details.&#10; *&#10; * A copy of this license - GNU General Public License - is available&#10; * at the root of the source code of this program.  If not,&#10; * see http://www.gnu.org/licenses/.&#10;{% endcomment %}&#10;&#10;{% block breadcrumb %}&#10;  &lt;li class=&quot;active&quot;&gt;{% trans 'breadcrumb' %}&lt;/li&gt;&#10;{% endblock %}&#10;{% block content %}&#10;&lt;div class=&quot;page-header&quot;&gt;&#10;    &lt;h2&gt;{% trans 'Page header' %}&lt;/h2&gt;&#10;&lt;/div&gt;&#10;&#10;&lt;div class=&quot;panel panel-default&quot;&gt;&#10;    &lt;div class=&quot;panel-heading&quot;&gt;&#10;        &lt;h4&gt;{% trans &quot;Panel heading&quot; %}&lt;/h4&gt;&#10;    &lt;/div&gt;&#10;&#10;    &lt;div class=&quot;panel-body&quot;&gt;&#10;    &#10;        $END$&#10;    &#10;    &lt;/div&gt;&#10;&lt;/div&gt;&#10;&#10;{% endblock %}&#10;" description="Hérite du template de base d'Osis" toReformat="false" toShortenFQNames="true">
+    <context>
+      <option name="HTML" value="true" />
+    </context>
+  </template>
+  <template name="ht-panel" value="&lt;div class=&quot;panel panel-default&quot;&gt;&#10;    &lt;div class=&quot;panel-heading&quot;&gt;&#10;        &lt;h4&gt;{% trans &quot;Panel heading&quot; %}&lt;/h4&gt;&#10;    &lt;/div&gt;&#10;&#10;    &lt;div class=&quot;panel-body&quot;&gt;&#10;        $END$&#10;    &lt;/div&gt;&#10;&lt;/div&gt;" description="Crée un bootstrap panel" toReformat="false" toShortenFQNames="true">
+    <context>
+      <option name="HTML" value="true" />
+    </context>
+  </template>
+  <template name="ht-row" value="&lt;div class=&quot;row&quot;&gt;&#10;    &lt;div class=&quot;col-md-3&quot;&gt;&#10;        $CONTENT1$&#10;    &lt;/div&gt;&#10;    &lt;div class=&quot;col-md-3&quot;&gt;&#10;        $CONTENT2$&#10;    &lt;/div&gt;&#10;    &lt;div class=&quot;col-md-3&quot;&gt;&#10;        $CONTENT3$&#10;    &lt;/div&gt;&#10;    &lt;div class=&quot;col-md-3&quot;&gt;&#10;        $CONTENT4$&#10;    &lt;/div&gt;&#10;&lt;/div&gt;" description="Crée un div avec class=row (inclus col-md-...)" toReformat="false" toShortenFQNames="true">
+    <variable name="CONTENT1" expression="" defaultValue="&quot;champs1&quot;" alwaysStopAt="true" />
+    <variable name="CONTENT2" expression="" defaultValue="&quot;champs2&quot;" alwaysStopAt="true" />
+    <variable name="CONTENT3" expression="" defaultValue="&quot;champs3&quot;" alwaysStopAt="true" />
+    <variable name="CONTENT4" expression="" defaultValue="&quot;champs4&quot;" alwaysStopAt="true" />
+    <context>
+      <option name="HTML" value="true" />
+    </context>
+  </template>
+  <template name="ht-search-form" value="&lt;form method=&quot;GET&quot;&#10;      id=&quot;form_list_search&quot;&#10;&gt;&#10;    {{ search_form.media }}&#10;    &lt;div class=&quot;row&quot;&gt;&#10;        &lt;div class=&quot;col-md-3&quot;&gt;&#10;            {% bootstrap_field search_form.$NAME$ %}&#10;        &lt;/div&gt;&#10;        &lt;div class=&quot;col-md-3&quot;&gt;&#10;            {% bootstrap_field search_form.$NAME2$ %}&#10;        &lt;/div&gt;&#10;        &lt;div class=&quot;col-md-2&quot;&gt;&#10;            {% bootstrap_field search_form.$NAME3$ %}&#10;        &lt;/div&gt;&#10;        &lt;div class=&quot;col-md-2&quot;&gt;&#10;            {% bootstrap_field search_form.$NAME5$ %}&#10;        &lt;/div&gt;&#10;        &lt;div class=&quot;col-md-1&quot;&gt;&#10;            &lt;br&gt;&#10;            {% bootstrap_field search_form.$NAME4$ %}&#10;        &lt;/div&gt;&#10;        &lt;div class=&quot;col-md-1&quot;&gt;&#10;            &lt;br&gt;&#10;            &lt;button id=&quot;bt_search_list&quot;&#10;                    class=&quot;btn btn-primary&quot;&#10;                    role=&quot;button&quot;&#10;                    style=&quot;margin-top: 4px&quot;&#10;                    title=&quot;{% trans 'Search' %}&quot;&#10;            &gt;&#10;                &lt;span class=&quot;fa fa-search&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt;&#10;            &lt;/button&gt;&#10;            &lt;button id=&quot;btn_clear_filter&quot;&#10;                    class=&quot;btn btn-default&quot;&#10;                    role=&quot;button&quot;&#10;                    style=&quot;margin-top: 4px&quot;&#10;                    onclick=&quot;&quot;&gt;&#10;                &lt;span class=&quot;glyphicon glyphicon-refresh&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt;&#10;            &lt;/button&gt;&#10;        &lt;/div&gt;&#10;    &lt;/div&gt;&#10;&lt;/form&gt;" description="Crée un form html de recherche" toReformat="false" toShortenFQNames="true">
+    <variable name="NAME" expression="" defaultValue="&quot;champs1&quot;" alwaysStopAt="true" />
+    <variable name="NAME2" expression="" defaultValue="&quot;champs2&quot;" alwaysStopAt="true" />
+    <variable name="NAME3" expression="" defaultValue="&quot;champs3&quot;" alwaysStopAt="true" />
+    <variable name="NAME5" expression="" defaultValue="&quot;champs5&quot;" alwaysStopAt="true" />
+    <variable name="NAME4" expression="" defaultValue="&quot;champs4&quot;" alwaysStopAt="true" />
+    <context>
+      <option name="HTML" value="true" />
+    </context>
+  </template>
+  <template name="ht-sep" value="&lt;br&gt;&#10;&lt;hr&gt;&#10;&lt;br&gt;" description="Crée une ligne de séparation (hr)" toReformat="false" toShortenFQNames="true">
+    <context>
+      <option name="HTML" value="true" />
+    </context>
+  </template>
+  <template name="ht-table" value="&#10;&lt;table id=&quot;table_search_list&quot; class=&quot;table table-hover&quot;&gt;&#10;    &lt;thead&gt;&#10;    &lt;tr&gt;&#10;        &lt;th id=&quot;$COL1$&quot; class=&quot;col-md-2 text-center&quot;&gt;{% trans '$COL1$' %}&lt;/th&gt;&#10;        &lt;th id=&quot;$COL2$&quot; class=&quot;col-md-2&quot;&gt;{% trans '$COL2$' %}&lt;/th&gt;&#10;        &lt;th id=&quot;$COL3$&quot; class=&quot;col-md-2&quot;&gt;{% trans '$COL3$' %}&lt;/th&gt;&#10;        &lt;th id=&quot;$COL4$&quot; class=&quot;col-md-2&quot;&gt;{% trans '$COL4$' %}&lt;/th&gt;&#10;        &lt;th id=&quot;$COL5$&quot; class=&quot;col-md-2&quot;&gt;{% trans '$COL5$' %}&lt;/th&gt;&#10;        &lt;th id=&quot;$COL6$&quot; class=&quot;col-md-2&quot;&gt;{% trans '$COL6$' %}&lt;/th&gt;&#10;    &lt;/tr&gt;&#10;    &lt;/thead&gt;&#10;    &lt;tbody&gt;&#10;    {% for element in search_result %}&#10;        &lt;tr&gt;&#10;            &lt;td class=&quot;text-center&quot; headers=&quot;$COL1$&quot;&gt;&#10;                {{ element.$COL1$ }}&#10;            &lt;/td&gt;&#10;            &lt;td headers=&quot;$COL2$&quot;&gt;&#10;                {{ element.$COL2$ }}&#10;            &lt;/td&gt;&#10;            &lt;td headers=&quot;$COL3$&quot;&gt;&#10;                {{ element.$COL3$ }}&#10;            &lt;/td&gt;&#10;            &lt;td headers=&quot;$COL4$&quot;&gt;&#10;                {{ element.$COL4$ }}&#10;            &lt;/td&gt;&#10;            &lt;td headers=&quot;$COL5$&quot;&gt;&#10;                {{ element.$COL5$ }}&#10;            &lt;/td&gt;&#10;            &lt;td headers=&quot;$COL6$&quot;&gt;&#10;                {{ element.$COL6$ }}&#10;            &lt;/td&gt;&#10;        &lt;/tr&gt;&#10;    {% endfor %}&#10;    &lt;/tbody&gt;&#10;&lt;/table&gt;&#10;&#10;" description="Crée un &lt;table&gt;" toReformat="false" toShortenFQNames="true">
+    <variable name="COL1" expression="" defaultValue="&quot;champs1&quot;" alwaysStopAt="true" />
+    <variable name="COL2" expression="" defaultValue="&quot;champs2&quot;" alwaysStopAt="true" />
+    <variable name="COL3" expression="" defaultValue="&quot;champs3&quot;" alwaysStopAt="true" />
+    <variable name="COL4" expression="" defaultValue="&quot;champs4&quot;" alwaysStopAt="true" />
+    <variable name="COL5" expression="" defaultValue="&quot;champs5&quot;" alwaysStopAt="true" />
+    <variable name="COL6" expression="" defaultValue="&quot;champs6&quot;" alwaysStopAt="true" />
+    <context>
+      <option name="HTML" value="true" />
+    </context>
+  </template>
+  <template name="ht-trans" value="{% trans &quot;$END$&quot; %}" description="Crée un bloc 'trans' html" toReformat="false" toShortenFQNames="true">
+    <context>
+      <option name="HTML" value="true" />
+    </context>
+  </template>
+  <template name="ht-url" value="{% url &quot;$END$&quot; %}" description="Crée un tag {% url &quot;&quot; %}" toReformat="false" toShortenFQNames="true">
+    <context>
+      <option name="HTML" value="true" />
+    </context>
+  </template>
+  <template name="licen" value="##############################################################################&#10;#&#10;#    OSIS stands for Open Student Information System. It's an application&#10;#    designed to manage the core business of higher education institutions,&#10;#    such as universities, faculties, institutes and professional schools.&#10;#    The core business involves the administration of students, teachers,&#10;#    courses, programs and so on.&#10;#&#10;#    Copyright (C) 2015-$end_year$ Université catholique de Louvain (http://www.uclouvain.be)&#10;#&#10;#    This program is free software: you can redistribute it and/or modify&#10;#    it under the terms of the GNU General Public License as published by&#10;#    the Free Software Foundation, either version 3 of the License, or&#10;#    (at your option) any later version.&#10;#&#10;#    This program is distributed in the hope that it will be useful,&#10;#    but WITHOUT ANY WARRANTY; without even the implied warranty of&#10;#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the&#10;#    GNU General Public License for more details.&#10;#&#10;#    A copy of this license - GNU General Public License - is available&#10;#    at the root of the source code of this program.  If not,&#10;#    see http://www.gnu.org/licenses/.&#10;#&#10;##############################################################################&#10;&#10;$END$" description="Ajoute la licence Osis" toReformat="false" toShortenFQNames="true">
+    <variable name="end_year" expression="date(&quot;YYYY&quot;)" defaultValue="" alwaysStopAt="false" />
+    <context>
+      <option name="Python" value="true" />
+    </context>
+  </template>
+  <template name="dj-tree" value="from typing import List&#10;&#10;from django.views.generic import TemplateView&#10;from rules.contrib.views import LoginRequiredMixin&#10;&#10;&#10;class TreeHTMLView(LoginRequiredMixin, TemplateView):&#10;    name = 'tree-view'&#10;&#10;    # TemplateView&#10;    template_name = &quot;mockup/tree.html&quot;&#10;&#10;    def get_context_data(self, **kwargs):&#10;        if self.request.GET.get('id') != &quot;#&quot;:&#10;            tree = self.get_node_of_tree(self.request.GET['id'])&#10;        else:&#10;            tree = self.get_tree()&#10;&#10;        return {&#10;            **super().get_context_data(**kwargs),&#10;            'tree': tree&#10;        }&#10;&#10;    def get_tree(self) -&gt; List:&#10;        return [&#10;            {&#10;                'id': 'node_1',&#10;                'text': 'Node 1',&#10;                'children': [&#10;                    {&#10;                        'id': 'node_11',&#10;                        'text': 'Node 11',&#10;                        'children': []&#10;                    },&#10;                    {&#10;                        'id': 'node_12',&#10;                        'text': 'Node 12',&#10;                        'children': []&#10;                    },&#10;                ]&#10;            },&#10;            {&#10;                'id': 'node_2',&#10;                'text': 'Node 2',&#10;                'children': []&#10;            },&#10;            {&#10;                'id': 'node_3',&#10;                'text': 'Node 3',&#10;                'children': [&#10;                    {&#10;                        'id': 'node_31',&#10;                        'text': 'Node 31',&#10;                        'children': []&#10;                    },&#10;                ]&#10;            },&#10;        ]&#10;&#10;    def get_node_of_tree(self, node_id: str) -&gt; List:&#10;        return [&#10;            {&#10;                'id': 'node_3',&#10;                'text': 'Node 3',&#10;                'children': [&#10;                    {&#10;                        'id': 'node_31',&#10;                        'text': 'Node 31',&#10;                        'children': []&#10;                    },&#10;                ]&#10;            }&#10;        ]&#10;" description="Crée une vue en arbre" toReformat="false" toShortenFQNames="true">
+    <context>
+      <option name="Python" value="true" />
+    </context>
+  </template>
+  <template name="ht-btn-refreshtreejs" value="&lt;button type=&quot;button&quot; class=&quot;btn btn-default&quot; onclick=&quot;$('#tree').trigger('refreshNode', '&lt;#NODE_ID&gt;')&quot;&gt;Refresh node&lt;/button&gt;" description="Crée un bouton rafraichissement arbre" toReformat="false" toShortenFQNames="true">
+    <context>
+      <option name="HTML" value="true" />
+    </context>
+  </template>
+  <template name="ht-tree" value="{% for node in tree %}&#10;  &lt;ul&gt;&#10;    &lt;li id=&quot;{{ node.id }}&quot;&gt;&#10;        {{ node.text }}&#10;        {% if node.children %}&#10;          {% with tree=node.children template_name=&quot;tree_view_template.html&quot; %}&#10;             {% include 'mockup/tree.html' %}&#10;          {% endwith %}&#10;        {% endif %}&#10;    &lt;/li&gt;&#10;  &lt;/ul&gt;&#10;{% endfor %}" description="Crée l'arborescence HTML" toReformat="false" toShortenFQNames="true">
+    <context>
+      <option name="HTML" value="true" />
+    </context>
+  </template>
+  <template name="ht-treejs" value="&lt;div id=&quot;js_tree_panel&quot;&gt;&#10;    &lt;input class=&quot;form-control&quot; id=&quot;tree_search&quot; type=&quot;text&quot; placeholder=&quot;Search&quot; aria-label=&quot;Search&quot;&gt;&#10;    &lt;div id=&quot;tree&quot;&gt;&lt;/div&gt;&#10;&#10;     &lt;script&gt;&#10;        $(document).ready(() =&gt; {&#10;            const $tree = $('#tree');&#10;            const $tree_search = $('#tree_search');&#10;            $tree.jstree({&#10;                'core': {&#10;                    &quot;animation&quot;: 0,&#10;                    &quot;check_callback&quot;: true,&#10;                    'data': {&#10;                        'url': &quot;{% url 'tree-view' %}&quot;,&#10;                        'data': function (node) {&#10;                            return {'id': node.id};&#10;                        }&#10;                    }&#10;                },&#10;                &quot;plugins&quot;: [&#10;                    &quot;contextmenu&quot;,&#10;                    &quot;state&quot;,&#10;                    &quot;search&quot;&#10;                ],&#10;                &quot;state&quot;: {&#10;                    &quot;key&quot;: `tree_state_` + $tree.attr('id'),&#10;                    &quot;opened&quot;: true,&#10;                    &quot;selected&quot;: false,&#10;                    &quot;ttl&quot;: 3600000&#10;                },&#10;                &quot;search&quot;: {&#10;                    &quot;case_insensitive&quot; : true,&#10;                    &quot;show_only_matches&quot;: true&#10;                },&#10;                &quot;contextmenu&quot;: {&#10;                    &quot;select_node&quot;: false,&#10;                    &quot;items&quot;: function ($node) {&#10;                        return {&#10;                            &quot;action_1&quot;: {&#10;                                &quot;label&quot;: gettext(&quot;Action 1&quot;),&#10;                                &quot;action&quot;: function (node) {&#10;                                    window.alert(&quot;Action 1&quot;);&#10;                                },&#10;                                &quot;_disabled&quot;: function (node) {&#10;                                    return false;&#10;                                }&#10;                            },&#10;                            &quot;action_2&quot;: {&#10;                                &quot;label&quot;: gettext(&quot;Action 2&quot;),&#10;                                &quot;action&quot;: function (node) {&#10;                                    window.alert(&quot;Action 2&quot;);&#10;                                },&#10;                                &quot;_disabled&quot;: function (node) {&#10;                                    return true;&#10;                                }&#10;                            },&#10;                            &quot;open_all&quot;: {&#10;                                &quot;separator_before&quot;: true,&#10;                                &quot;label&quot;: gettext(&quot;Open all&quot;),&#10;                                &quot;action&quot;: function (node) {&#10;                                    $tree.jstree('open_all');&#10;                                }&#10;                            },&#10;                            &quot;close_all&quot;: {&#10;                                &quot;label&quot;: gettext(&quot;Close all&quot;),&#10;                                &quot;action&quot;: function (node) {&#10;                                    $tree.jstree('close_all');&#10;                                }&#10;                            },&#10;                        }&#10;                    }&#10;                }&#10;            });&#10;&#10;            $tree_search.keyup((e) =&gt; {&#10;                $tree.jstree(true).search(e.target.value);&#10;            });&#10;&#10;            $tree.bind('refreshNode', function(e, node_id){&#10;                $tree.jstree(true).refresh_node(node_id);&#10;            });&#10;        });&#10;    &lt;/script&gt;&#10;&lt;/div&gt;" description="Déclaration javascript arbre" toReformat="false" toShortenFQNames="true">
+    <context>
+      <option name="HTML" value="true" />
+    </context>
+  </template>
+</templateSet>

@@ -25,12 +25,12 @@
 ##############################################################################
 from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import \
     ICatalogueFormationsTranslator
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, ContenuGroupementDTO
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, ContenuGroupementDTO, GroupementDTO
 
 
 class CatalogueFormationsTranslator(ICatalogueFormationsTranslator):
     @classmethod
-    def get_formation(cls, sigle: str, annee: int, version: str) -> 'FormationDTO':
+    def get_formation(cls, sigle: str, annee: int, version: str, transition_name: str) -> 'FormationDTO':
         # reutiliser GetProgramTreeVersionCommand et convertir ProgramTreeVersion en FormationDTO
         raise NotImplementedError
 
@@ -44,3 +44,13 @@ class CatalogueFormationsTranslator(ICatalogueFormationsTranslator):
     ) -> 'ContenuGroupementDTO':
         # reutiliser get_formation pour récupérer le groupement et son contenu dans le FormationDTO
         raise NotImplementedError
+
+    @classmethod
+    def get_groupement(
+            cls,
+            sigle_formation: str,
+            annee: int,
+            version_formation: str,
+            code_groupement: str
+    ) -> 'GroupementDTO':
+        raise NotImplementedError()

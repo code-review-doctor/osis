@@ -32,7 +32,7 @@ class ICatalogueFormationsTranslator(interface.DomainService):
 
     @classmethod
     @abc.abstractmethod
-    def get_formation(cls, sigle: str, annee: int, version: str) -> 'FormationDTO':
+    def get_formation(cls, sigle: str, annee: int, version: str, transition_name: str) -> 'FormationDTO':
         raise NotImplementedError()
 
     @classmethod
