@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,25 +23,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from decimal import Decimal
+import abc
 
-import attr
-
-from attribution.models.enums.function import Functions
-from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
-from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
+from ddd.logic.application.domain.model.application_calendar import ApplicationCalendar
+from ddd.logic.application.repository.i_applicant_respository import IApplicantRepository
 from osis_common.ddd import interface
 
 
-@attr.s(frozen=True, slots=True)
-class Attribution(interface.ValueObject):
-    course_id = attr.ib(type=LearningUnitIdentity)
-    course_title = attr.ib(type=str)
-    course_type = attr.ib(type=str)
-    course_is_in_suppression_proposal = attr.ib(type=bool)
-    function = attr.ib(type=Functions)
-    end_year = attr.ib(type=AcademicYearIdentity)
-    start_year = attr.ib(type=AcademicYearIdentity)
-    lecturing_volume = attr.ib(type=Decimal)
-    practical_volume = attr.ib(type=Decimal)
-    is_substitute = attr.ib(type=bool)
+class IAttributionsEndDateReachedSummary(interface.DomainService, abc.ABC):
+
+    @classmethod
+    @abc.abstractmethod
+    def send(
+            cls,
+            application_calendar: ApplicationCalendar,
+            applicant_repository: IApplicantRepository
+    ):
+        pass

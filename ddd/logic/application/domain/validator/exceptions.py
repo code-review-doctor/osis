@@ -114,3 +114,12 @@ class AttributionSubstituteException(BusinessException):
     def __init__(self, *args,  **kwargs):
         message = _("A substitute can not renew his function of substitute")
         super().__init__(message, **kwargs)
+
+
+class AutomaticRenewalImpossibleVolumesVacantLowerThanVolumesToRenew(BusinessException):
+    status_code = "APPLICATION-12"
+
+    def __init__(self, *args, **kwargs):
+        message = _('Automatic renewal is not possible because the volume declared vacant is lower than the volume '
+                    'to be renewed. Please go through "Add a new application".')
+        super().__init__(message, **kwargs)

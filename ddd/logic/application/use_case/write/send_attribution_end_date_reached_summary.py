@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,25 +23,22 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from decimal import Decimal
+from django.db import transaction
 
-import attr
-
-from attribution.models.enums.function import Functions
-from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
-from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
-from osis_common.ddd import interface
+from ddd.logic.application.domain.service.attributions_end_date_reached_summary import \
+    IAttributionsEndDateReachedSummary
+from ddd.logic.application.repository.i_applicant_respository import IApplicantRepository
+from ddd.logic.application.repository.i_application_calendar_repository import IApplicationCalendarRepository
 
 
-@attr.s(frozen=True, slots=True)
-class Attribution(interface.ValueObject):
-    course_id = attr.ib(type=LearningUnitIdentity)
-    course_title = attr.ib(type=str)
-    course_type = attr.ib(type=str)
-    course_is_in_suppression_proposal = attr.ib(type=bool)
-    function = attr.ib(type=Functions)
-    end_year = attr.ib(type=AcademicYearIdentity)
-    start_year = attr.ib(type=AcademicYearIdentity)
-    lecturing_volume = attr.ib(type=Decimal)
-    practical_volume = attr.ib(type=Decimal)
-    is_substitute = attr.ib(type=bool)
+@transaction.non_atomic_requests
+def send_emails_to_teachers_with_ending_attributions(
+        application_calendar_repository: IApplicationCalendarRepository,
+        applicant_repository: IApplicantRepository,
+        application_summary: IAttributionsEndDateReachedSummary,
+) -> None:
+    # GIVEN
+    application_calendar = application_calendar_repository.get_current_application_calendar()
+
+    # WHEN
+    application_summary.send(application_calendar, applicant_repository)

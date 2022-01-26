@@ -30,6 +30,7 @@ import uuid
 from django.test import TestCase
 
 from attribution.models.enums.function import Functions
+from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.vacant_declaration_type import VacantDeclarationType
 from ddd.logic.application.commands import GetAttributionsAboutToExpireCommand
 from ddd.logic.application.domain.builder.applicant_identity_builder import ApplicantIdentityBuilder
@@ -40,9 +41,9 @@ from ddd.logic.application.domain.model._attribution import Attribution
 from ddd.logic.application.domain.model._allocation_entity import AllocationEntity
 from ddd.logic.application.domain.model.vacant_course import VacantCourseIdentity, VacantCourse
 from ddd.logic.application.domain.validator.exceptions import VacantCourseApplicationManagedInTeamException, \
-    ApplicationAlreadyExistsException, VolumesAskedShouldBeLowerOrEqualToVolumeAvailable, \
-    VacantCourseNotAllowedDeclarationType, VacantCourseNotFound, AttributionSubstituteException, \
-    AttributionAboutToExpireWithoutVolumeException
+    ApplicationAlreadyExistsException, VacantCourseNotAllowedDeclarationType, VacantCourseNotFound, \
+    AttributionSubstituteException, AttributionAboutToExpireWithoutVolumeException, \
+    AutomaticRenewalImpossibleVolumesVacantLowerThanVolumesToRenew
 from ddd.logic.application.dtos import AttributionAboutToExpireDTO
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
@@ -71,6 +72,7 @@ class TestGetAttributionsAboutToExpireService(TestCase):
             ),
             course_title="Introduction au droit",
             course_is_in_suppression_proposal=False,
+            course_type=LearningContainerYearType.COURSE.name,
             function=Functions.CO_HOLDER,
             end_year=AcademicYearIdentityBuilder.build_from_year(year=2017),
             start_year=AcademicYearIdentityBuilder.build_from_year(year=2016),
@@ -138,6 +140,15 @@ class TestGetAttributionsAboutToExpireService(TestCase):
 
         self.assertListEqual(results, [])
 
+    def test_assert_attribution_about_to_expire_not_showed_when_not_course_type(self):
+        self.applicant.attributions = [
+            attr.evolve(self.attribution_about_to_expire, course_type=LearningContainerYearType.DISSERTATION.name)
+        ]
+
+        cmd = GetAttributionsAboutToExpireCommand(global_id=self.global_id)
+        results = self.message_bus.invoke(cmd)
+        self.assertEqual(len(results), 0)
+
     def test_assert_unavailable_renewal_reason_case_no_corresponding_vacant_course_next_year(self):
         self.applicant.attributions = [Attribution(
             course_id=LearningUnitIdentity(
@@ -145,6 +156,7 @@ class TestGetAttributionsAboutToExpireService(TestCase):
                 academic_year=AcademicYearIdentityBuilder.build_from_year(year=2017)
             ),
             course_title="Introduction à l'agro",
+            course_type=LearningContainerYearType.COURSE.name,
             function=Functions.CO_HOLDER,
             end_year=AcademicYearIdentityBuilder.build_from_year(year=2017),
             start_year=AcademicYearIdentityBuilder.build_from_year(year=2016),
@@ -219,7 +231,7 @@ class TestGetAttributionsAboutToExpireService(TestCase):
         self.assertFalse(results[0].is_renewable)
         self.assertEqual(
             results[0].unavailable_renewal_reason,
-            VolumesAskedShouldBeLowerOrEqualToVolumeAvailable().message
+            AutomaticRenewalImpossibleVolumesVacantLowerThanVolumesToRenew().message
         )
 
     def test_assert_unavailable_renewal_reason_case_declaration_type_disallowed(self):
