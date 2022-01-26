@@ -41,11 +41,14 @@ class CatalogueFormationsTranslator(ICatalogueFormationsTranslator):
                     remarque='',
                     credits=Decimal(0),
                     intitule_complet='Content:',
+                    code='LECGE100T',
+                    annee=2021
                 ),
                 unites_enseignement_contenues=[
                     UniteEnseignementCatalogueDTO(
                         bloc=1,
                         code='LESPO1113',
+                        annee=2021,
                         intitule_complet='Sociologie et anthropologie des mondes contemporains',
                         quadrimestre='Q1',
                         credits_absolus=Decimal(0),

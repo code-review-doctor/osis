@@ -69,11 +69,14 @@ class GetProgrammeInscriptionCoursTest(SimpleTestCase):
         self.assertEqual(len(sous_programme), 1)
         groupement = sous_programme[0]
         self.assertEqual(groupement.intitule_complet, 'Content:')
+        self.assertEqual(groupement.code, 'LECGE100T')
+        self.assertEqual(groupement.annee, 2021)
         self.assertTrue(groupement.obligatoire)
         unites_enseignements = groupement.unites_enseignements
         self.assertEqual(len(unites_enseignements), 1)
         unite_enseignement = unites_enseignements[0]
         self.assertEqual(unite_enseignement.code, 'LESPO1113')
+        self.assertEqual(unite_enseignement.annee, 2021)
         self.assertEqual(unite_enseignement.intitule, 'Sociologie et anthropologie des mondes contemporains')
         self.assertTrue(unite_enseignement.obligatoire)
         self.assertEqual(unite_enseignement.bloc, 1)

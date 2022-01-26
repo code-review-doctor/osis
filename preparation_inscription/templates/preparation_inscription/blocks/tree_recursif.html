@@ -5,8 +5,7 @@
         <span class="node_block_text">{% trans 'Block' %}</span>
         {% for sous_programme in tree.sous_programme %}
             <ul>
-{#            TODO: id for li !#}
-            <li
+            <li id="{{ sous_programe.code }}__{{ sous_programme.annee }}"
                     data-jstree='{"icon":"{% if sous_programme.obligatoire %}{% static "img/education_group_year/mandatory.png" %}{% else %}{% static "img/education_group_year/optional.png" %}{% endif %}"}'
                 >
                     {{ sous_programme.intitule_complet }}
