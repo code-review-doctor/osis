@@ -25,35 +25,7 @@
  * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-{% block style %}
-    <!-- move these styles into osis.css when the mockup is effectively used as implementation -->
-    <style>
-	#tabs > .tab-list {
-		border-bottom: solid 3px #eee;
-	}
-
-	#tabs > .tab-list a {
-		display: inline-block;
-		padding: 5px 10px;
-		cursor:pointer;
-	}
-
-	#tabs > .tab-list a.selected {
-		background-color: #eee;
-	}
-
-	#tabs > .tab-content {
-		padding:10px;
-		margin-bottom:100px;
-	}
-
-    </style>
-{% endblock style %}
-
 {% block content %}
-
-    <div id="tabs">
-        {% include "mockup/blocks/tab_contenu.html" %}
+    <div id="tabs" hx-get="{% url 'consulter_contenu_groupement_view' %}" hx-trigger="load after:100ms" hx-target="#tabs" hx-swap="innerHTML" >
     </div>
-
 {% endblock %}

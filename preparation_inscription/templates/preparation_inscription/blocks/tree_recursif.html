@@ -16,7 +16,7 @@
             {{ node.text }}
         {% if node.children %}
           {% with tree=node.children template_name="tree_view_template.html" %}
-             {% include 'mockup/blocks/tree_recursif.html' %}
+             {% include 'preparation_inscription/blocks/tree_recursif.html' %}
           {% endwith %}
         {% endif %}
     </li>

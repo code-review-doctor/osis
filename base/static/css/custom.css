@@ -311,3 +311,14 @@ table.dataTable thead th.sorting:after {
 .strikethrough .jstree-anchor{
     text-decoration: line-through !important;
 }
+
+.emphasized-code{
+    font-weight: bolder;
+    margin-left: 10px;
+}
+.code-col{
+    min-width: 120px;
+}
+.actions-col{
+    min-width: 50px;
+}

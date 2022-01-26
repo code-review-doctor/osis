@@ -15,7 +15,9 @@ class SupprimerUnitesEnseignementView(LoginRequiredMixin, HtmxMixin, TemplateVie
     def get_context_data(self, **kwargs):
         return {
             **super().get_context_data(**kwargs),
-            'deletable_content': self.get_content()
+            'deletable_content': self.get_content(),
+            'intitule_groupement': self.get_intitule_groupement(),
+            'intitule_programme': self.get_intitule_programme(),
         }
 
     def get_deletable_content(self):
@@ -89,3 +91,11 @@ class SupprimerUnitesEnseignementView(LoginRequiredMixin, HtmxMixin, TemplateVie
                 'type_ajustement': TypeAjustement.AJOUT.name,
             },
         ]
+
+    def get_intitule_groupement(self):
+        # TODO :: to implement
+        return "Intitulé groupement"
+
+    def get_intitule_programme(self):
+        # TODO :: to implement
+        return "Intitulé programme"
