@@ -52,8 +52,8 @@
 
 {% block content %}
 
-    <div id="tabs">
-        {% include "mockup/blocks/tab_contenu.html" %}
+    <div id="tabs" hx-get="{% url "deplacer-ue" %}" hx-trigger="load">
+
     </div>
 
 {% endblock %}
