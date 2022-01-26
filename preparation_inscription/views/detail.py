@@ -32,7 +32,7 @@ class PreparationInscriptionMainView(LoginRequiredMixin, TemplateView):
     name = 'preparation-inscription-main-view'
 
     # TemplateView
-    template_name = "preparation_inscription/main.html"
+    template_name = "preparation_inscription/preparation_inscription.html"
 
     def get_context_data(self, **kwargs):
         return {

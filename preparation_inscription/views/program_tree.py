@@ -23,17 +23,22 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from pprint import pprint
 from typing import List
 
 from django.views.generic import TemplateView
 from rules.contrib.views import LoginRequiredMixin
+
+from ddd.logic.preparation_programme_annuel_etudiant.commands import GetProgrammeInscriptionCoursCommand
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import ProgrammeInscriptionCoursDTO
+from infrastructure.messages_bus import message_bus_instance
 
 
 class ProgramTreeHTMLView(LoginRequiredMixin, TemplateView):
     name = 'program-tree-view'
 
     # TemplateView
-    template_name = "preparation_inscription/program_tree.html"
+    template_name = "preparation_inscription/blocks/tree_recursif.html"
 
     def get_context_data(self, **kwargs):
         if self.request.GET.get('id') != "#":
@@ -46,52 +51,15 @@ class ProgramTreeHTMLView(LoginRequiredMixin, TemplateView):
             'tree': tree
         }
 
-    def get_tree(self) -> List:
-        return [{
-            'id': 'root_node',
-            'text': 'ECGE1BA',
-            'block': 'Bloc',
-            'children': [
-                {
-                    'id': 'node_1',
-                    'text': 'Node 1',
-                    'block': '',
-                    'children': [
-                        {
-                            'id': 'node_11',
-                            'text': 'Node 11',
-                            'block': '2',
-                            'children': []
-                        },
-                        {
-                            'id': 'node_12',
-                            'text': 'Node 12',
-                            'block': '3',
-                            'children': []
-                        },
-                    ]
-                },
-                {
-                    'id': 'node_2',
-                    'text': 'Node 2',
-                    'block': '',
-                    'children': []
-                },
-                {
-                    'id': 'node_3',
-                    'text': 'Node 3',
-                    'block': '',
-                    'children': [
-                        {
-                            'id': 'node_31',
-                            'text': 'Node 31',
-                            'block': '2',
-                            'children': []
-                        },
-                    ]
-                },
-            ]
-        }]
+    def get_tree(self) -> 'ProgrammeInscriptionCoursDTO':
+        cmd = GetProgrammeInscriptionCoursCommand(
+            annee_formation=self.kwargs['year'],
+            sigle_formation=self.kwargs['acronym'],
+            version_formation='',
+            transition_formation='',
+        )
+        tree_dto = message_bus_instance.invoke(cmd)
+        return tree_dto
 
     def get_node_of_tree(self, node_id: str) -> List:
         return [

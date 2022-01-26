@@ -222,10 +222,10 @@ from infrastructure.learning_unit.domain.service.tutor_distributed_to_class impo
 from infrastructure.learning_unit.repository.effective_class import EffectiveClassRepository
 from infrastructure.learning_unit.repository.entity import UclEntityRepository
 from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
-from infrastructure.preparation_programme_annuel_etudiant.domain.service.catalogue_formations import \
+from infrastructure.preparation_programme_annuel_etudiant.domain.service.in_memory.catalogue_formations import \
     CatalogueFormationsTranslator
-from infrastructure.preparation_programme_annuel_etudiant.repository.groupement_ajuste_inscription_cours import \
-    GroupementAjusteInscriptionCoursRepository
+from infrastructure.preparation_programme_annuel_etudiant.repository.in_memory.groupement_ajuste_inscription_cours\
+    import GroupementAjusteInscriptionCoursRepository
 from infrastructure.shared_kernel.academic_year.repository.academic_year import AcademicYearRepository
 from infrastructure.shared_kernel.campus.repository.uclouvain_campus import UclouvainCampusRepository
 from infrastructure.shared_kernel.entite.repository.entiteucl import EntiteUCLRepository
