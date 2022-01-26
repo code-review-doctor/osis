@@ -23,23 +23,24 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.urls import path
 
-from mockup.views.ajouter_unites_enseignement import AddLearningUnitFormView
-from mockup.views.event_modeling import EventModelingView, TreeHTMLView
-from mockup.views.formulaire_inscription import FormulaireInscriptionView
-from mockup.views.supprimer_unites_enseignement import DeleteView
-from mockup.views.modification_unites_enseignement import ModifierProprietesContenuView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import redirect
+from django.views.generic import TemplateView
 
-urlpatterns = [
-    path('event_modeling/', EventModelingView.as_view(), name=EventModelingView.name),
-    path('event_modeling/delete', DeleteView.as_view(), name=DeleteView.name),
-    path('event_modeling/add', AddLearningUnitFormView.as_view(), name=AddLearningUnitFormView.name),
-    path('event_modeling/update', ModifierProprietesContenuView.as_view(), name=ModifierProprietesContenuView.name),
-    path('event_modeling/tree/', TreeHTMLView.as_view(), name=TreeHTMLView.name),
-    path(
-        'event_modeling/formulaire_inscription',
-        FormulaireInscriptionView.as_view(),
-        name=FormulaireInscriptionView.name
-    ),
-]
+from base.utils.htmx import HtmxMixin
+
+
+class FormulaireInscriptionView(HtmxMixin, LoginRequiredMixin, TemplateView):
+    name = 'pae_formulaire_inscription_view'
+    # TemplateView
+    template_name = "preparation_inscription/tabs.html"
+    htmx_template_name = "preparation_inscription/blocks/tab_formulaire_inscription.html"
+
+    def get_context_data(self, **kwargs):
+        return {
+            **super().get_context_data(**kwargs),
+        }
+
+    def post(self, request, *args, **kwargs):
+        return redirect("pae_formulaire_inscription_view")
