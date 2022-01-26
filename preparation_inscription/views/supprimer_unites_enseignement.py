@@ -1,7 +1,15 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import redirect
+from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.utils.htmx import HtmxMixin
+from base.views.common import display_success_messages, display_error_messages
+from ddd.logic.preparation_programme_annuel_etudiant.commands import RetirerUEDuProgrammeCommand, \
+    GetUniteEnseignementCommand
+from infrastructure.messages_bus import message_bus_instance
 from preparation_inscription.views.consulter_contenu_groupement import TypeAjustement
 
 
@@ -99,3 +107,28 @@ class SupprimerUnitesEnseignementView(LoginRequiredMixin, HtmxMixin, TemplateVie
     def get_intitule_programme(self):
         # TODO :: to implement
         return "Intitulé programme"
+
+    def post(self, request, *args, **kwargs):
+        to_delete = request.POST.getlist('to_delete')
+        cmd = self._get_command(to_delete)
+        try:
+            message_bus_instance.invoke(cmd)
+            success_message = _('The learning units {} have been deleted').format(to_delete.join(', '))
+            display_success_messages(self.request, success_message)
+        except MultipleBusinessExceptions as exceptions:
+            messages = [exception.message for exception in exceptions.exceptions]
+            display_error_messages(self.request, messages)
+            return self.get(request, *args, **kwargs)
+        return redirect(reverse('consulter_contenu_groupement_view'))
+
+    def _get_command(self, to_delete):
+        return RetirerUEDuProgrammeCommand(
+            sigle_formation='',
+            annee_formation=0,
+            version_formation='',
+            groupement_uuid='',
+            transition_formation='',
+            unites_enseignements=[
+                GetUniteEnseignementCommand(code=code) for code in to_delete
+            ]
+        )
