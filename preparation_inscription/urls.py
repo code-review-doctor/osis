@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.urls import path
+from django.urls import path, include
 
 from preparation_inscription.views.ajouter_unites_enseignement import AjouterUnitesEnseignementView
 from preparation_inscription.views.consulter_contenu_groupement import ConsulterContenuGroupementView
@@ -33,10 +33,12 @@ from preparation_inscription.views.supprimer_unites_enseignement import Supprime
 from preparation_inscription.views.tree_html import TreeHTMLView
 
 urlpatterns = [
-    path('', ConsulterContenuGroupementView.as_view(), name=ConsulterContenuGroupementView.name),
-    path('delete', SupprimerUnitesEnseignementView.as_view(), name=SupprimerUnitesEnseignementView.name),
-    path('add', AjouterUnitesEnseignementView.as_view(), name=AjouterUnitesEnseignementView.name),
-    path('update', ModifierProprietesContenuView.as_view(), name=ModifierProprietesContenuView.name),
-    path('tree/', TreeHTMLView.as_view(), name=TreeHTMLView.name),
-    path('formulaire_inscription/', FormulaireInscriptionView.as_view(), name=FormulaireInscriptionView.name),
+    path('<int:year>/<acronym:acronym>/', include([
+        path('', ConsulterContenuGroupementView.as_view(), name=ConsulterContenuGroupementView.name),
+        path('delete', SupprimerUnitesEnseignementView.as_view(), name=SupprimerUnitesEnseignementView.name),
+        path('add', AjouterUnitesEnseignementView.as_view(), name=AjouterUnitesEnseignementView.name),
+        path('update', ModifierProprietesContenuView.as_view(), name=ModifierProprietesContenuView.name),
+        path('tree/', TreeHTMLView.as_view(), name=TreeHTMLView.name),
+        path('formulaire_inscription/', FormulaireInscriptionView.as_view(), name=FormulaireInscriptionView.name),
+    ])),
 ]

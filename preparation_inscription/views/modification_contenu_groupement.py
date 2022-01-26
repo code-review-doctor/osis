@@ -77,7 +77,7 @@ class ModifierProprietesContenuView(LoginRequiredMixin, HtmxMixin, FormView):
 
     def get_context_data(self, **kwargs):
         return {
-            **super().get_context_data(**kwargs),
+            **super().get_context_data(**self.kwargs),
             'search_result': self.get_contenu_groupement_modifiable(),
             'form': self.get_form(self.form_class),
             'intitule_groupement': self.get_intitule_groupement(),

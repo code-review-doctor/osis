@@ -40,7 +40,6 @@ from ddd.logic.preparation_programme_annuel_etudiant.commands import AjouterUEAu
 from ddd.logic.shared_kernel.academic_year.commands import SearchAcademicYearCommand
 from education_group.forms.fields import UpperCaseCharField
 from infrastructure.messages_bus import message_bus_instance
-from preparation_inscription.views.consulter_contenu_groupement import ConsulterContenuGroupementView
 
 
 class SearchLearningUnitForm(forms.Form):
@@ -109,8 +108,7 @@ class AjouterUnitesEnseignementView(LoginRequiredMixin, HtmxMixin, TemplateView)
             messages = [exception.message for exception in exceptions.exceptions]
             display_error_messages(self.request, messages)
             return self.get(request, *args, **kwargs)
-
-        return redirect("consulter_contenu_groupement_view")
+        return redirect(self.get_consulter_contenu_groupement_url())
 
     def get_intitule_groupement(self):
         # TODO :: to implement
@@ -127,5 +125,8 @@ class AjouterUnitesEnseignementView(LoginRequiredMixin, HtmxMixin, TemplateView)
             'search_result': self.get_search_result(),
             'intitule_groupement': self.get_intitule_groupement(),
             'intitule_programme': self.get_intitule_programme(),
-            'cancel_url': reverse(ConsulterContenuGroupementView.name)
+            'cancel_url': self.get_consulter_contenu_groupement_url(),
         }
+
+    def get_consulter_contenu_groupement_url(self):
+        return reverse('consulter_contenu_groupement_view', args=self.args, kwargs=self.kwargs)
