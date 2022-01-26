@@ -31,7 +31,7 @@ class Migration(migrations.Migration):
                 ('zip_code', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='reference.ZipCode')),
             ],
             options={
-                'ordering': ('organization',),
+                'ordering': ('organization__name',),
             },
         ),
     ]

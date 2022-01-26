@@ -30,9 +30,9 @@ from osis_common.models import osis_model_admin
 
 
 class HighSchoolAdmin(osis_model_admin.OsisModelAdmin):
-    list_display = ('organization', 'zip_code', 'start_year', 'end_year')
+    list_display = ('organization', 'zip_code', 'start_year', 'end_year',)
     list_filter = ('zip_code', 'linguistic_regime',)
-    ordering = ('organization', 'zip_code', 'start_year', 'end_year')
+    ordering = ('organization__name', 'zip_code', 'start_year', 'end_year',)
     search_fields = ['organization', 'zip_code']
 
 
@@ -63,7 +63,7 @@ class HighSchool(models.Model):
         return str(self.organization)
 
     class Meta:
-        ordering = ('organization',)
+        ordering = ('organization__name',)
 
     @property
     def active(self):
