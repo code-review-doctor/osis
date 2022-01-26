@@ -23,40 +23,31 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import \
-    ICatalogueFormationsTranslator
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, ContenuGroupementCatalogueDTO, \
-    GroupementDTO
+from decimal import Decimal
+from django import template
+from django.utils.translation import gettext_lazy as _
+
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import UniteEnseignementCatalogueDTO
+
+register = template.Library()
 
 
-class CatalogueFormationsTranslatorInMemory(ICatalogueFormationsTranslator):
-    dtos = [
-        FormationDTO(
-            racine=ContenuGroupementCatalogueDTO(
-                groupement_contenant=None,
-                groupements_contenus=[],
-                unites_enseignement_contenues=[]
-            ),
-            annee=2021,
-            sigle='ECGE1BA',
-            version='STANDARD',
-            intitule_complet='Bachelier ...',
-        ),
-    ]
-
-    @classmethod
-    def get_formation(cls, sigle: str, annee: int, version: str, transition_name: str) -> 'FormationDTO':
-        return next(
-            dto for dto in cls.dtos
-            if dto.sigle == sigle and dto.annee == annee and dto.version == version
+@register.filter
+def formater_credits_ue(unite_enseignement: 'UniteEnseignementCatalogueDTO') -> str:
+    if unite_enseignement and (unite_enseignement.credits_absolus or unite_enseignement.credits_relatifs):
+        credits_absolus = unite_enseignement.credits_absolus.normalize() if unite_enseignement.credits_absolus else None
+        return "({} {})".format(
+            unite_enseignement.credits_relatifs or credits_absolus or 0,
+            _("credits")
         )
+    return ""
 
-    @classmethod
-    def get_groupement(
-            cls,
-            sigle_formation: str,
-            annee: int,
-            version_formation: str,
-            code_groupement: str
-    ) -> 'GroupementDTO':
-        raise NotImplementedError()
+
+@register.filter
+def formater_credits_groupement(credits: Decimal) -> str:
+    if credits:
+        return "({} {})".format(
+            credits or 0,
+            _("credits")
+        )
+    return ""

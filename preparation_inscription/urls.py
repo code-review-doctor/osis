@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -32,6 +32,9 @@ from preparation_inscription.views.modification_contenu_groupement import Modifi
 from preparation_inscription.views.supprimer_unites_enseignement import SupprimerUnitesEnseignementView
 from preparation_inscription.views.tree_html import TreeHTMLView
 
+from preparation_inscription.views.formulaire_inscription_cours import FormulaireInscriptionCoursView
+
+
 urlpatterns = [
     path('', ConsulterContenuGroupementView.as_view(), name=ConsulterContenuGroupementView.name),
     path('delete', SupprimerUnitesEnseignementView.as_view(), name=SupprimerUnitesEnseignementView.name),
@@ -39,4 +42,11 @@ urlpatterns = [
     path('update', ModifierProprietesContenuView.as_view(), name=ModifierProprietesContenuView.name),
     path('tree/', TreeHTMLView.as_view(), name=TreeHTMLView.name),
     path('formulaire_inscription/', FormulaireInscriptionView.as_view(), name=FormulaireInscriptionView.name),
+
+    path('<int:year>/<acronym:acronym>/default_enrollment_form/',
+         FormulaireInscriptionCoursView.as_view(), name='default_enrollment_form'),
+    path('<int:year>/<acronym:acronym>/<str:version_name>/default_enrollment_form/',
+         FormulaireInscriptionCoursView.as_view(), name='default_enrollment_form'),
+    path('<int:year>/<acronym:acronym>/<str:version_name>/<str:transition_name>/default_enrollment_form/',
+         FormulaireInscriptionCoursView.as_view(), name='default_enrollment_form'),
 ]

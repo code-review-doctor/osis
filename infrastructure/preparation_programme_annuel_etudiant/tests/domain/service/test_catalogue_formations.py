@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ from unittest import mock
 
 from django.test import SimpleTestCase
 
-from program_management.ddd.command import GetProgramTreeVersionCommand
+from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormationCommand
 
 
 class CatalogueFormationsTranslatorTest(SimpleTestCase):
@@ -42,7 +42,7 @@ class CatalogueFormationsTranslatorTest(SimpleTestCase):
         self.addCleanup(self.patch_message_bus.stop)
 
     def __mock_message_bus_invoke(self, cmd):
-        if isinstance(cmd, GetProgramTreeVersionCommand):
+        if isinstance(cmd, GetFormationCommand):
             # return ProgramTreeVersionFactory(entity_id__version_name="")
             pass
 

@@ -1,0 +1,36 @@
+{% load static %}
+{% load i18n %}
+{% load bootstrap3 formatage_credits %}
+{% comment "License" %}
+* OSIS stands for Open Student Information System. It's an application
+* designed to manage the core business of higher education institutions,
+* such as universities, faculties, institutes and professional schools.
+* The core business involves the administration of students, teachers,
+* courses, programs and so on.
+*
+* Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* A copy of this license - GNU General Public License - is available
+* at the root of the source code of this program.  If not,
+* see http://www.gnu.org/licenses/.
+{% endcomment %}
+<tr>
+    <td>
+        <span style="padding-left: {% widthratio profondeur 1 10 %}px;">
+            <img src="{% if contenu.groupement_contenant.obligatoire %}{% static 'img/education_group_year/mandatory.png' %}{% else %}{% static 'img/education_group_year/optional.png' %}{% endif %}">
+            {{ contenu.groupement_contenant.intitule_complet }}
+            {{ contenu.groupement_contenant.credits|formater_credits_groupement }}
+        </span>
+    </td>
+    <td colspan="3"></td>
+</tr>

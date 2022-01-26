@@ -146,3 +146,21 @@ msgstr "Les unitées d'enseignement ont été ajoutées"
 msgid "Title"
 msgstr "Intitule"
 
+msgid "Form view"
+msgstr "Vue formulaire"
+
+msgid "Program"
+msgstr "Parcours étudiant"
+
+msgid "Sections and programs"
+msgstr "Sections et programmes"
+
+msgid "Training configuration"
+msgstr "Configuration de la formation"
+
+msgctxt "student_path_year"
+msgid "Year"
+msgstr "An"
+
+msgid "credits"
+msgstr "crédits"

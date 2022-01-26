@@ -23,40 +23,50 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import \
-    ICatalogueFormationsTranslator
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, ContenuGroupementCatalogueDTO, \
-    GroupementDTO
+from decimal import Decimal
+from typing import List
+
+import attr
+
+from osis_common.ddd.interface import DTO
 
 
-class CatalogueFormationsTranslatorInMemory(ICatalogueFormationsTranslator):
-    dtos = [
-        FormationDTO(
-            racine=ContenuGroupementCatalogueDTO(
-                groupement_contenant=None,
-                groupements_contenus=[],
-                unites_enseignement_contenues=[]
-            ),
-            annee=2021,
-            sigle='ECGE1BA',
-            version='STANDARD',
-            intitule_complet='Bachelier ...',
-        ),
-    ]
+@attr.s(frozen=True, slots=True, auto_attribs=True)
+class UniteEnseignementDTO(DTO):
+    bloc: int
+    code: str
+    intitule_complet: str
+    quadrimestre: str
+    quadrimestre_texte: str
+    credits_absolus: Decimal
+    volume_annuel_pm: int
+    volume_annuel_pp: int
+    obligatoire: bool
+    session_derogation: str
+    credits_relatifs: int
 
-    @classmethod
-    def get_formation(cls, sigle: str, annee: int, version: str, transition_name: str) -> 'FormationDTO':
-        return next(
-            dto for dto in cls.dtos
-            if dto.sigle == sigle and dto.annee == annee and dto.version == version
-        )
 
-    @classmethod
-    def get_groupement(
-            cls,
-            sigle_formation: str,
-            annee: int,
-            version_formation: str,
-            code_groupement: str
-    ) -> 'GroupementDTO':
-        raise NotImplementedError()
+@attr.s(frozen=True, slots=True, auto_attribs=True)
+class GroupementDTO(DTO):
+    intitule: str
+    obligatoire: bool
+    remarque: str
+    intitule_complet: str
+    credits: Decimal
+
+
+@attr.s(frozen=True, slots=True, auto_attribs=True)
+class ContenuNoeudDTO(DTO):
+    groupement_contenant: GroupementDTO
+    unites_enseignement_contenues: List['UniteEnseignementDTO']
+    groupements_contenus: List['ContenuNoeudDTO']
+
+
+@attr.s(frozen=True, slots=True, auto_attribs=True)
+class ProgrammeDeFormationDTO(DTO):
+    racine: ContenuNoeudDTO
+    annee: int
+    sigle: str
+    version: str
+    intitule_formation: str
+    intitule_version_programme: str
