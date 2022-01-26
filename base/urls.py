@@ -61,6 +61,7 @@ from base.views.learning_units.pedagogy.read import learning_unit_pedagogy
 from base.views.learning_units.pedagogy.update import toggle_summary_locked
 from base.views.learning_units.proposal import create, update
 from base.views.learning_units.update import update_learning_unit, learning_unit_edition_end_date
+from base.views.messages import GetMessagesView
 from base.views.student.detail import StudentRead
 from base.views.student.list import StudentSearch
 from education_group import urls as education_group_urls
@@ -100,6 +101,7 @@ urlpatterns = [
         path('campus/', CampusAutocomplete.as_view(), name='campus-autocomplete'),
         path('employee/', EmployeeAutocomplete.as_view(), name='employee_autocomplete'),
     ])),
+    path('messages/', GetMessagesView.as_view(), name=GetMessagesView.name),
     url(r'^list-of-users/$', user_list.UserListView.as_view(), name='academic_actors_list'),
     url(r'^list-of-users/xls/$', user_list.create_xls, name='xls_user_list'),
 

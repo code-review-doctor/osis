@@ -69,14 +69,24 @@ class LearningUnitRepository(ILearningUnitRepository):
         ).exists()
 
     @classmethod
-    def search_learning_units_dto(cls, code_annee_values: Set[Tuple[str, int]] = None) -> List['LearningUnitSearchDTO']:
+    def search_learning_units_dto(
+            cls,
+            code_annee_values: Set[Tuple[str, int]] = None,
+            code: str = None,
+            annee_academique: int = None,
+            intitule: str = None
+    ) -> List['LearningUnitSearchDTO']:
         qs = _get_common_queryset()
         # FIXME :: reuse Django filter
-        if code_annee_values is not None:
+        if code_annee_values:
             qs = qs.filter(
                 academic_year__year__in={annee for _, annee in code_annee_values},
                 acronym__in={code for code, _ in code_annee_values}
             )
+        if code:
+            qs = qs.filter(acronym__icontains=code)
+        if annee_academique:
+            qs = qs.filter(academic_year__year=annee_academique)
 
         partims_prefetch = LearningUnitYearDatabase.objects.filter(
             subtype=learning_unit_year_subtypes.PARTIM,
@@ -132,6 +142,10 @@ class LearningUnitRepository(ILearningUnitRepository):
             "language",
             "academic_year"
         )
+
+        if intitule:
+            qs = qs.filter(full_title__contains=intitule)
+
         result = []
         for learning_unit_year_db_obj in qs:
             if code_annee_values is None or (

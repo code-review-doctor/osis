@@ -73,7 +73,7 @@ class TestSearchLearningUnits(SimpleTestCase):
 
         self.assertListEqual(result, [])
 
-    def test_should_retourner_resultats_si_criteres_corresponds(self):
+    def test_should_retourner_resultats_si_code_annee_criteres_corresponds(self):
         result = self.message_bus.invoke(self.cmd)
 
         self.assertCountEqual(
@@ -91,3 +91,30 @@ class TestSearchLearningUnits(SimpleTestCase):
             ]
         )
 
+    def test_should_retourner_resultats_si_code_correspond(self):
+        cmd = attr.evolve(
+            self.cmd,
+            code_annee_values=None,
+            code=self.course_with_partim.code,
+        )
+
+        result = self.message_bus.invoke(cmd)
+
+        self.assertCountEqual(
+            [dto.code for dto in result],
+            [self.course_with_partim.code]
+        )
+
+    def test_should_retourner_resultats_si_intitule_correspond(self):
+        cmd = attr.evolve(
+            self.cmd,
+            code_annee_values=None,
+            intitule=self.course_with_partim.complete_title_fr,
+        )
+
+        result = self.message_bus.invoke(cmd)
+
+        self.assertCountEqual(
+            [dto.code for dto in result],
+            [self.course_with_partim.code]
+        )

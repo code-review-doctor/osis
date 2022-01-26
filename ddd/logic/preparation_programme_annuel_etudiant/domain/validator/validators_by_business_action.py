@@ -23,37 +23,34 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from __future__ import annotations
+
 from typing import List
+from typing import TYPE_CHECKING
 
 import attr
 
 from base.ddd.utils.business_validator import TwoStepsMultipleBusinessExceptionListValidator, BusinessValidator
-from ddd.logic.encodage_des_notes.business_types import *
-from ddd.logic.encodage_des_notes.encodage.domain.validator._should_date_echeance_non_atteinte import \
-    ShouldDateEcheanceNonAtteinte
-from ddd.logic.encodage_des_notes.encodage.domain.validator._should_email_correspondre_noma import \
-    ShouldEmailCorrespondreNoma
-from ddd.logic.encodage_des_notes.encodage.domain.validator._should_note_etre_choix_valide import \
-    ShouldNoteEtreChoixValide
-from ddd.logic.encodage_des_notes.encodage.domain.validator._should_verifier_note_decimale import \
-    ShouldVerifierNoteDecimaleAutorisee
-from ddd.logic.preparation_programme_annuel_etudiant.domain.model.programme_inscription_cours import \
-    ProgrammeInscriptionCours
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
+
+if TYPE_CHECKING:
+    from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
+        GroupementAjusteInscriptionCours
+from ddd.logic.preparation_programme_annuel_etudiant.domain.validator.\
+    _should_unite_enseignement_pas_deja_ajoutee import ShouldUniteEnseignementPasDejaAjoutee
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
 class AjouterUniteEnseignementValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
 
-    programme_inscr_cours: 'ProgrammeInscriptionCours'
-    code_unite_enseignement: str
+    groupement_ajuste: GroupementAjusteInscriptionCours
+    unites_enseignement: List[LearningUnitIdentity]
 
     def get_data_contract_validators(self) -> List[BusinessValidator]:
         return []
 
     def get_invariants_validators(self) -> List[BusinessValidator]:
         return [
-            ShouldEmailCorrespondreNoma(self.note_etudiant, self.email),
-            ShouldDateEcheanceNonAtteinte(self.note_etudiant),
-            ShouldNoteEtreChoixValide(self.note),
-            ShouldVerifierNoteDecimaleAutorisee(self.note, self.note_etudiant),
+            ShouldUniteEnseignementPasDejaAjoutee(self.groupement_ajuste, ue)
+            for ue in self.unites_enseignement
         ]

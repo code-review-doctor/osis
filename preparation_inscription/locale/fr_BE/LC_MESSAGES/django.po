@@ -1,0 +1,148 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-01-26 07:08+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "AJOUT"
+msgstr ""
+
+msgid "Actions"
+msgstr "Actions"
+
+msgid "Add"
+msgstr "Ajouter"
+
+msgid "Ajouter des UE"
+msgstr ""
+
+msgid "Anac."
+msgstr ""
+
+msgid "Annuler ajout"
+msgstr ""
+
+msgid "Annuler l'ajout"
+msgstr ""
+
+msgid "Annuler l'ajout?"
+msgstr ""
+
+msgid "Annuler la modification"
+msgstr ""
+
+msgid "Annuler la modification ?"
+msgstr ""
+
+msgid "Annuler la suppression"
+msgstr ""
+
+msgid "Annuler la suppression ?"
+msgstr ""
+
+msgid "Annuler suppression"
+msgstr ""
+
+msgid "Bloc"
+msgstr ""
+
+msgid "Cancel"
+msgstr ""
+
+msgid "Cette action annulera l'ajout de l'UE X du groupement 'Y'"
+msgstr ""
+
+msgid "Cette action annulera la modification de l'UE X du groupement 'Y'"
+msgstr ""
+
+msgid "Cette action annulera la suppression de l'UE X du groupement 'Y'"
+msgstr ""
+
+msgid "Check All"
+msgstr ""
+
+msgid "Code"
+msgstr ""
+
+msgid "Commentaire"
+msgstr ""
+
+msgid "Commentaire en anglais"
+msgstr ""
+
+msgid "Composants (PM/PP)"
+msgstr ""
+
+msgid "Crédits"
+msgstr ""
+
+msgid "Déplacer vers le bas"
+msgstr ""
+
+msgid "Déplacer vers le haut"
+msgstr ""
+
+msgid "ECGE1BA - 2021-2022"
+msgstr ""
+
+msgid "Formulaire d'inscriptions aux cours PAE"
+msgstr ""
+
+msgid "Intitulé"
+msgstr ""
+
+msgid "MODIFICATION"
+msgstr ""
+
+msgid "Modifier les propriétés"
+msgstr ""
+
+msgid "Ne pas annuler"
+msgstr ""
+
+msgid "Obligatoire"
+msgstr ""
+
+msgid "Preparation PAE"
+msgstr ""
+
+msgid "Quadri."
+msgstr ""
+
+msgid "Revenir à l'état initial du programme"
+msgstr ""
+
+msgid "SUPPRESSION"
+msgstr ""
+
+msgid "Search"
+msgstr "Rechercher"
+
+msgid "Session"
+msgstr "Session"
+
+msgid "Supprimer des UE"
+msgstr ""
+
+msgid "Supprimer unite enseignement"
+msgstr ""
+
+msgid "The learning units have been added"
+msgstr "Les unitées d'enseignement ont été ajoutées"
+
+msgid "Title"
+msgstr "Intitule"
+
