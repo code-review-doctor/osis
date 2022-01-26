@@ -41,7 +41,8 @@ class ProgramTreeHTMLView(LoginRequiredMixin, TemplateView):
     template_name = "preparation_inscription/blocks/tree_recursif.html"
 
     def get_context_data(self, **kwargs):
-        if self.request.GET.get('id') != "#":
+        id = self.request.GET.get('id')
+        if id and id != "#":
             tree = self.get_node_of_tree(self.request.GET['id'])
         else:
             tree = self.get_tree()
