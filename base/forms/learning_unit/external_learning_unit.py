@@ -327,14 +327,16 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
                     acronym=self.data["acronym_0"] + self.data["acronym_1"],
                     academic_year=self.start_year
                 ).first()
+            learning_container = first_ue.learning_container_year.learning_container \
+                if first_ue else self.forms[LearningContainerModelForm].save(commit)
             learning_unit = self.learning_unit_form.save(
                 start_year=self.start_year,
-                learning_container=first_ue.learning_container_year.learning_container,
+                learning_container=learning_container,
                 commit=commit,
             )
             container_year = self.learning_container_year_form.save(
                 academic_year=self.academic_year,
-                learning_container=first_ue.learning_container_year.learning_container,
+                learning_container=learning_container,
                 acronym=self.learning_unit_year_form.instance.acronym,
                 commit=commit
             )
