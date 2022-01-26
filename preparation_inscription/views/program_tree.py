@@ -62,16 +62,4 @@ class ProgramTreeHTMLView(LoginRequiredMixin, TemplateView):
         return tree_dto
 
     def get_node_of_tree(self, node_id: str) -> List:
-        return [
-            {
-                'id': 'node_3',
-                'text': 'Node 3',
-                'children': [
-                    {
-                        'id': 'node_31',
-                        'text': 'Node 31',
-                        'children': []
-                    },
-                ]
-            }
-        ]
+        return []

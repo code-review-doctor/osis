@@ -44,13 +44,3 @@ class CatalogueFormationsTranslator(ICatalogueFormationsTranslator):
     ) -> 'ContenuGroupementDTO':
         # reutiliser get_formation pour récupérer le groupement et son contenu dans le FormationDTO
         raise NotImplementedError
-
-    @classmethod
-    def get_groupement(
-            cls,
-            sigle_formation: str,
-            annee: int,
-            version_formation: str,
-            code_groupement: str
-    ) -> 'GroupementDTO':
-        raise NotImplementedError()
