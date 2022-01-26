@@ -20,7 +20,7 @@ class LearningUnitRepository(InMemoryGenericRepository, ILearningUnitRepository)
             code: str = None,
             annee_academique: int = None,
             intitule: str = None) -> List['LearningUnitSearchDTO']:
-        if not code_annee_values or not code or annee_academique is None or not intitule:
+        if not code_annee_values and not code and annee_academique is None and not intitule:
             return []
         result = cls.entities
         if code_annee_values:
