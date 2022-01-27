@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@ class AjouterUEAuProgrammeCommand(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
-class GetProgrammeInscriptionCoursServiceCommand(interface.CommandRequest):
+class GetProgrammeInscriptionCoursCommand(interface.CommandRequest):
     annee_formation: int
     sigle_formation: str
     version_formation: str
@@ -128,3 +128,11 @@ class DeplacerVersLeBasUEAjouteeDansProgrammeCommand(interface.CommandRequest):
     transition_formation: str
     ajoutee_dans: str  # TODO :: code groupement ou uuid groupement ?
     unite_enseignement: GetUniteEnseignementCommand
+
+
+@attr.s(frozen=True, slots=True)
+class GetFormationCommand(interface.CommandRequest):
+    annee = attr.ib(type=int)
+    code = attr.ib(type=str)
+    version = attr.ib(type=str)
+    transition = attr.ib(type=str)

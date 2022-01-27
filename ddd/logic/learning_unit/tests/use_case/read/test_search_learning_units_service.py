@@ -86,7 +86,14 @@ class TestSearchLearningUnits(SimpleTestCase):
                     type=self.course_with_partim.type,
                     responsible_entity_code=self.course_with_partim.responsible_entity_identity.code,
                     responsible_entity_title='',
-                    partims=self.course_with_partim.get_partims_information()
+                    partims=self.course_with_partim.get_partims_information(),
+                    credits=self.course_with_partim.credits,
+                    quadrimester=self.course_with_partim.derogation_quadrimester,
+                    lecturing_volume_annual=self.course_with_partim.lecturing_part.volumes.volume_annual if
+                    self.course_with_partim.has_lecturing_volume() else 0,
+                    practical_volume_annual=self.course_with_partim.practical_part.volumes.volume_annual if
+                    self.course_with_partim.has_practical_volume() else 0,
+                    session_derogation=self.course_with_partim.derogation_session
                 )
             ]
         )

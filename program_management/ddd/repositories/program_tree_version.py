@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -25,15 +25,17 @@
 ##############################################################################
 import contextlib
 import warnings
+from _decimal import Decimal
 from typing import Optional, List
 
 from django.db import IntegrityError
-from django.db.models import F, Case, When, IntegerField, QuerySet, Max, OuterRef, Exists, Subquery
+from django.db.models import F, Case, When, IntegerField, QuerySet, Max, OuterRef, Subquery
 from django.db.models import Q
 
 from base.models.academic_year import AcademicYear
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import Categories
+from base.models.enums.quadrimesters import DerogationQuadrimester
 from education_group.ddd.domain.exception import TrainingNotFoundException
 from education_group.models.group import Group
 from education_group.models.group_year import GroupYear
@@ -47,6 +49,8 @@ from program_management.ddd.domain import program_tree_version
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, STANDARD, NOT_A_TRANSITION
 from program_management.ddd.repositories import program_tree as program_tree_repository
 from program_management.models.education_group_version import EducationGroupVersion
+from program_management.ddd.dtos import UniteEnseignementDTO, GroupementDTO, ContenuNoeudDTO, ProgrammeDeFormationDTO
+from program_management import formatter
 
 
 class ProgramTreeVersionRepository(interface.AbstractRepository):
@@ -255,6 +259,11 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
             results.append(_instanciate_tree_version(record_dict))
         return results
 
+    @classmethod
+    def get_dto(cls, identity: ProgramTreeVersionIdentity) -> Optional['ProgrammeDeFormationDTO']:
+        pgm_tree_version = cls.get(identity)
+        return build_dto(pgm_tree_version.get_tree(), identity)
+
 
 def _update_start_year_and_end_year(
         educ_group_version: EducationGroupVersion,
@@ -385,3 +394,83 @@ def _get_common_queryset() -> QuerySet:
         'end_year_of_existence',
         'start_year',
     )
+
+
+def _get_intitule_complet(noeud: 'Node') -> str:
+    intitule_complet = noeud.offer_title_fr
+    if noeud.version_name and noeud.version_title_fr:
+        intitule_complet = "{} [{}]".format(intitule_complet, noeud.version_title_fr)
+    if noeud.transition_name:
+        intitule_complet = "{} [{}]".format(intitule_complet, noeud.transition_name)
+    return intitule_complet
+
+
+def build_dto(tree: 'ProgramTree', identity: ProgramTreeVersionIdentity) -> 'ProgrammeDeFormationDTO':
+    contenu = _build_contenu(tree.root_node,)
+    return ProgrammeDeFormationDTO(
+        racine=contenu,
+        annee=identity.year,
+        sigle=identity.offer_acronym,
+        version=identity.version_name,
+        intitule_formation=tree.root_node.offer_title_fr,
+        intitule_version_programme=_get_intitule_complet(tree.root_node)
+    )
+
+
+def _build_contenu(node: 'Node', lien_parent: 'Link' = None) -> 'ContenuNoeudDTO':
+    groupements_contenus = []
+    ues_contenues = []
+
+    for lien in node.children:
+        if lien.child.is_learning_unit():
+            ues_contenues.append(
+                UniteEnseignementDTO(
+                    bloc=lien.block,
+                    code=lien.child.code,
+                    intitule_complet=lien.child.title,
+                    quadrimestre=lien.child.quadrimester,
+                    quadrimestre_texte=lien.child.quadrimester.value if lien.child.quadrimester else "",
+                    credits_absolus=lien.child.credits,
+                    volume_annuel_pm=lien.child.volume_total_lecturing,
+                    volume_annuel_pp=lien.child.volume_total_practical,
+                    obligatoire=lien.is_mandatory if lien else False,
+                    session_derogation='',
+                    credits_relatifs=lien.relative_credits
+                )
+            )
+        else:
+            groupement_contenu = _build_contenu(lien.child, lien_parent=lien)
+            groupements_contenus.append(groupement_contenu)
+
+    return ContenuNoeudDTO(
+        groupement_contenant=GroupementDTO(
+            code=node.code,
+            intitule=node.title,
+            remarque=node.remark_fr,
+            obligatoire=lien_parent.is_mandatory if lien_parent else False,
+            credits=_get_credits(lien_parent),
+            intitule_complet=get_verbose_title_group(node)
+        ),
+        groupements_contenus=groupements_contenus,
+        unites_enseignement_contenues=ues_contenues
+    )
+
+
+def get_verbose_title_group(node: 'NodeGroupYear') -> str:
+    if node.is_finality():
+        return format_complete_title_label(node, node.offer_partial_title_fr)
+    if node.is_option():
+        return format_complete_title_label(node, node.offer_title_fr)
+    else:
+        return node.group_title_fr
+
+
+def format_complete_title_label(node, title_fr) -> str:
+    version_complete_label = formatter.format_version_complete_name(node, "fr-be")
+    return "{}{}".format(title_fr, version_complete_label)
+
+
+def _get_credits(link: 'Link') -> Optional[Decimal]:
+    if link:
+        return link.relative_credits or link.child.credits or 0
+    return None

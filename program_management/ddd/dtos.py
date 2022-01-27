@@ -23,11 +23,51 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, FormulaireInscriptionCoursDTO
-from osis_common.ddd import interface
+from decimal import Decimal
+from typing import List
+
+import attr
+
+from osis_common.ddd.interface import DTO
 
 
-class FormulaireInscriptionCoursBuilder(interface.RootEntityBuilder):
-    @classmethod
-    def build(cls, formation: 'FormationDTO') -> 'FormulaireInscriptionCoursDTO':
-        raise NotImplementedError
+@attr.s(frozen=True, slots=True, auto_attribs=True)
+class UniteEnseignementDTO(DTO):
+    bloc: int
+    code: str
+    intitule_complet: str
+    quadrimestre: str
+    quadrimestre_texte: str
+    credits_absolus: Decimal
+    volume_annuel_pm: int
+    volume_annuel_pp: int
+    obligatoire: bool
+    session_derogation: str
+    credits_relatifs: int
+
+
+@attr.s(frozen=True, slots=True, auto_attribs=True)
+class GroupementDTO(DTO):
+    code: str
+    intitule: str
+    obligatoire: bool
+    remarque: str
+    intitule_complet: str
+    credits: Decimal
+
+
+@attr.s(frozen=True, slots=True, auto_attribs=True)
+class ContenuNoeudDTO(DTO):
+    groupement_contenant: GroupementDTO
+    unites_enseignement_contenues: List['UniteEnseignementDTO']
+    groupements_contenus: List['ContenuNoeudDTO']
+
+
+@attr.s(frozen=True, slots=True, auto_attribs=True)
+class ProgrammeDeFormationDTO(DTO):
+    racine: ContenuNoeudDTO
+    annee: int
+    sigle: str
+    version: str
+    intitule_formation: str
+    intitule_version_programme: str

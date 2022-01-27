@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,28 +23,44 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from pprint import pprint
+from typing import List
+
+from django.views.generic import TemplateView
+from rules.contrib.views import LoginRequiredMixin
 
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetProgrammeInscriptionCoursCommand
-from ddd.logic.preparation_programme_annuel_etudiant.domain.service.get_programme_inscription_cours import \
-    GetProgrammeInscriptionCours
-from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import \
-    ICatalogueFormationsTranslator
-from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_unites_enseignement import \
-    ICatalogueUnitesEnseignementTranslator
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import ProgrammeInscriptionCoursDTO
-from ddd.logic.preparation_programme_annuel_etudiant.repository.i_groupement_ajuste_inscription_cours import \
-    IGroupementAjusteInscriptionCoursRepository
+from infrastructure.messages_bus import message_bus_instance
 
 
-def get_programme_inscription_cours(
-        cmd: 'GetProgrammeInscriptionCoursCommand',
-        repository: 'IGroupementAjusteInscriptionCoursRepository',
-        translator: 'ICatalogueFormationsTranslator',
-        catalogue_unites_enseignement_translator: 'ICatalogueUnitesEnseignementTranslator'
-) -> 'ProgrammeInscriptionCoursDTO':
-    return GetProgrammeInscriptionCours.get_programme_inscription_cours(
-        cmd=cmd,
-        groupement_ajuste_repository=repository,
-        catalogue_formations_translator=translator,
-        catalogue_unites_enseignement_translator=catalogue_unites_enseignement_translator
-    )
+class ProgramTreeHTMLView(LoginRequiredMixin, TemplateView):
+    name = 'program-tree-view'
+
+    # TemplateView
+    template_name = "preparation_inscription/blocks/tree_recursif.html"
+
+    def get_context_data(self, **kwargs):
+        id = self.request.GET.get('id')
+        if id and id != "#":
+            tree = self.get_node_of_tree(self.request.GET['id'])
+        else:
+            tree = self.get_tree()
+
+        return {
+            **super().get_context_data(**kwargs),
+            'tree': tree
+        }
+
+    def get_tree(self) -> 'ProgrammeInscriptionCoursDTO':
+        cmd = GetProgrammeInscriptionCoursCommand(
+            annee_formation=self.kwargs['year'],
+            sigle_formation=self.kwargs['acronym'],
+            version_formation='',
+            transition_formation='',
+        )
+        tree_dto = message_bus_instance.invoke(cmd)
+        return tree_dto
+
+    def get_node_of_tree(self, node_id: str) -> List:
+        return []

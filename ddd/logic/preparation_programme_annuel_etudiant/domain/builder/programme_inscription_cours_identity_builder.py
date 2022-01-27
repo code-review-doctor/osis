@@ -26,7 +26,7 @@
 from typing import Union
 
 from ddd.logic.preparation_programme_annuel_etudiant.commands import AjouterUEAuProgrammeCommand, \
-    GetProgrammeInscriptionCoursServiceCommand, RetirerUEDuProgrammeCommand, ModifierUEDuGroupementCommand, \
+    GetProgrammeInscriptionCoursCommand, RetirerUEDuProgrammeCommand, ModifierUEDuGroupementCommand, \
     AnnulerActionSurUEDuProgrammeCommand, DeplacerVersLeBasUEAjouteeDansProgrammeCommand, \
     DeplacerVersLeHautUEAjouteeDansProgrammeCommand
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.programme_inscription_cours import \
@@ -39,7 +39,7 @@ class ProgrammeInscriptionCoursIdentityBuilder(interface.EntityIdentityBuilder):
     def build_from_command(
             cls,
             cmd: Union[
-                'GetProgrammeInscriptionCoursServiceCommand',
+                'GetProgrammeInscriptionCoursCommand',
                 'AjouterUEAuProgrammeCommand',
                 'RetirerUEDuProgrammeCommand',
                 'ModifierUEDuGroupementCommand',

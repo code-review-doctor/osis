@@ -23,24 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import redirect
+from django.urls import reverse
 from django.views.generic import TemplateView
+from rules.contrib.views import LoginRequiredMixin
 
-from base.utils.htmx import HtmxMixin
 
+class PreparationInscriptionMainView(LoginRequiredMixin, TemplateView):
+    name = 'preparation-inscription-main-view'
 
-class FormulaireInscriptionView(HtmxMixin, LoginRequiredMixin, TemplateView):
-    name = 'pae_formulaire_inscription_view'
     # TemplateView
-    template_name = "preparation_inscription/tabs.html"
-    htmx_template_name = "preparation_inscription/blocks/tab_formulaire_inscription.html"
+    template_name = "preparation_inscription/preparation_inscription.html"
 
     def get_context_data(self, **kwargs):
         return {
             **super().get_context_data(**kwargs),
+            'tree_view_url': self.get_tree_view_url()
         }
 
-    def post(self, request, *args, **kwargs):
-        return redirect("pae_formulaire_inscription_view")
+    def get_tree_view_url(self) -> str:
+        return reverse('program-tree-view', kwargs={
+            'year': self.kwargs['year'],
+            'acronym': self.kwargs['acronym']
+        })

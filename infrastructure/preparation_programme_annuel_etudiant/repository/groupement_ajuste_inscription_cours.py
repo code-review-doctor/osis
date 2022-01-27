@@ -25,46 +25,39 @@
 ##############################################################################
 from typing import Optional, List
 
-from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
     IdentiteGroupementAjusteInscriptionCours, GroupementAjusteInscriptionCours
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import GroupementAjusteFromRepositoryDTO
 from ddd.logic.preparation_programme_annuel_etudiant.repository.i_groupement_ajuste_inscription_cours import \
     IGroupementAjusteInscriptionCoursRepository
-from education_group.ddd.domain.group import GroupIdentity
+from osis_common.ddd.interface import ApplicationService
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 
 
-class GroupementAjusteInscriptionCoursInMemoryRepository(
-    InMemoryGenericRepository,
-    IGroupementAjusteInscriptionCoursRepository
-):
-    dtos = []
-
+class GroupementAjusteInscriptionCoursRepository(IGroupementAjusteInscriptionCoursRepository):
     @classmethod
     def get_dtos(
             cls,
             program_tree_version_identity: ProgramTreeVersionIdentity
     ) -> List['GroupementAjusteFromRepositoryDTO']:
-        return [
-            dto
-            for dto in cls.dtos
-            if dto.code_groupement == program_tree_version_identity.offer_acronym
-            and dto.annee == program_tree_version_identity.year
-            and dto.version_programme == program_tree_version_identity.version_name
-            and dto.nom_transition == program_tree_version_identity.transition_name
-        ]
+        raise NotImplementedError
+
+    @classmethod
+    def get(cls, entity_id: 'IdentiteGroupementAjusteInscriptionCours') -> 'GroupementAjusteInscriptionCours':
+        raise NotImplementedError
 
     @classmethod
     def search(
             cls,
             entity_ids: Optional[List['IdentiteGroupementAjusteInscriptionCours']] = None,
-            version_programme_id: 'ProgramTreeVersionIdentity' = None,
-            groupement_id: 'GroupIdentity' = None,
             **kwargs
     ) -> List['GroupementAjusteInscriptionCours']:
-        return [
-            ajustement for ajustement in cls.entities
-            if (not version_programme_id or ajustement.version_programme_id == version_programme_id)
-            and (not groupement_id or ajustement.groupement_id == groupement_id)
-        ]
+        raise NotImplementedError
+
+    @classmethod
+    def delete(cls, entity_id: 'IdentiteGroupementAjusteInscriptionCours', **kwargs: ApplicationService) -> None:
+        raise NotImplementedError
+
+    @classmethod
+    def save(cls, entity: 'GroupementAjusteInscriptionCours') -> None:
+        raise NotImplementedError

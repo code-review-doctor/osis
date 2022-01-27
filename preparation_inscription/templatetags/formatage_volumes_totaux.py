@@ -23,11 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, FormulaireInscriptionCoursDTO
-from osis_common.ddd import interface
+from decimal import Decimal
+from django import template
+
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import UniteEnseignementCatalogueDTO
+
+register = template.Library()
 
 
-class FormulaireInscriptionCoursBuilder(interface.RootEntityBuilder):
-    @classmethod
-    def build(cls, formation: 'FormationDTO') -> 'FormulaireInscriptionCoursDTO':
-        raise NotImplementedError
+@register.filter
+def formater_volumes_totaux(unite_catalogue_dto: 'UniteEnseignementCatalogueDTO') -> str:
+    return "%(total_lecturing)gh + %(total_practical)gh" % {
+        "total_lecturing": unite_catalogue_dto.volume_annuel_pm or Decimal(0.0),
+        "total_practical": unite_catalogue_dto.volume_annuel_pp or Decimal(0.0)
+    }

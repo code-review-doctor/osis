@@ -161,3 +161,22 @@ msgstr ""
 
 msgid "champs5"
 msgstr ""
+
+msgid "Form view"
+msgstr ""
+
+msgid "Program"
+msgstr ""
+
+msgid "Sections and programs"
+msgstr ""
+
+msgid "Training configuration"
+msgstr ""
+
+msgctxt "student_path_year"
+msgid "Year"
+msgstr ""
+
+msgid "credits"
+msgstr ""

@@ -131,7 +131,12 @@ class LearningUnitRepositoryTestCase(TestCase):
                                         partim_db.specific_title
                                     )
                                 )
-                            ]
+                            ],
+                            quadrimester=luy_db.quadrimester,
+                            credits=luy_db.credits,
+                            lecturing_volume_annual=None,
+                            practical_volume_annual=None,
+                            session_derogation=luy_db.session
                         )
                     ]
                 )

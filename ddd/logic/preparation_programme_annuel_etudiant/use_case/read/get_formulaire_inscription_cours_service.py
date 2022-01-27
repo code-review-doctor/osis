@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -24,25 +24,33 @@
 #
 ##############################################################################
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormulaireInscriptionCoursCommand
-from ddd.logic.preparation_programme_annuel_etudiant.domain.builder.formulaire_inscription_cours_builder import \
-    FormulaireInscriptionCoursBuilder
-from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import ICatalogueFormationsTranslator
+from ddd.logic.preparation_programme_annuel_etudiant.domain.service.get_formulaire_inscription_cours import \
+    GetFormulaireInscriptionCours
+from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations \
+    import ICatalogueFormationsTranslator
+from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_unites_enseignement import \
+    ICatalogueUnitesEnseignementTranslator
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormulaireInscriptionCoursDTO
+from ddd.logic.preparation_programme_annuel_etudiant.repository.i_groupement_ajuste_inscription_cours import \
+    IGroupementAjusteInscriptionCoursRepository
 
 
 def get_formulaire_inscription_cours_service(
         cmd: 'GetFormulaireInscriptionCoursCommand',
+        repo: 'IGroupementAjusteInscriptionCoursRepository',
         catalogue_formations_translator: 'ICatalogueFormationsTranslator',
+        catalogue_unites_enseignement_translator: 'ICatalogueUnitesEnseignementTranslator'
 ) -> 'FormulaireInscriptionCoursDTO':
     # GIVEN
-    formation = catalogue_formations_translator.get_formation(
-        sigle=cmd.sigle_formation,
-        annee=cmd.annee_formation,
-        version=cmd.version_formation,
-    )
 
     # WHEN
-    formulaire = FormulaireInscriptionCoursBuilder.build(formation)
+
+    formulaire = GetFormulaireInscriptionCours.get_formulaire_inscription_cours(
+        cmd,
+        repo,
+        catalogue_formations_translator,
+        catalogue_unites_enseignement_translator
+    )
 
     # THEN
     return formulaire
