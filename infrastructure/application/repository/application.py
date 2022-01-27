@@ -167,7 +167,7 @@ class ApplicationRepository(IApplicationRepository):
         application = cls.get(entity_id)
 
         TutorApplication.objects.filter(uuid=entity_id.uuid).delete()
-        transaction.on_commit(lambda: queue.notify_application_saved(application))
+        transaction.on_commit(lambda: queue.notify_application_deleted(application))
 
 
 def _application_base_qs():
