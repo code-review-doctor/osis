@@ -39,6 +39,7 @@ from base.models.campus import Campus
 from base.models.enums import learning_unit_year_subtypes, learning_component_year_type
 from base.models.enums.proposal_type import ProposalType
 from base.models.learning_component_year import LearningComponentYear
+from base.models.learning_container import LearningContainer
 from base.models.learning_unit_year import LearningUnitYear
 from education_group.calendar.education_group_extended_daily_management import \
     EducationGroupExtendedDailyManagementCalendar
@@ -308,41 +309,24 @@ class FullForm(LearningUnitBaseForm):
         }
 
     def save(self, commit=True):
-        if self.academic_year == self.start_year:
-            learning_container = self.forms[LearningContainerModelForm].save(commit)
-            learning_unit = self.learning_unit_form.save(
-                start_year=self.start_year,
-                learning_container=learning_container,
-                commit=commit,
-            )
+        learning_container = LearningContainer.objects.filter(
+            learningcontaineryear__learningunityear__acronym=self.learning_unit_year_form.instance.acronym,
+        ).first()
+        if not learning_container:
+            learning_container = self.learning_container_form.save(commit)
 
-            container_year = self.learning_container_year_form.save(
-                academic_year=self.academic_year,
-                learning_container=learning_container,
-                acronym=self.learning_unit_year_form.instance.acronym,
-                commit=commit
-            )
-        else:
-            if self.learning_unit_instance:
-                first_ue = LearningUnitYear.objects.filter(learning_unit=self.learning_unit_instance).first()
-            else:
-                first_ue = LearningUnitYear.objects.filter(
-                    acronym=self.data["acronym_0"] + self.data["acronym_1"],
-                    academic_year=self.start_year
-                ).first()
-            learning_container = first_ue.learning_container_year.learning_container \
-                if first_ue else self.learning_container_form.save(commit)
-            learning_unit = self.learning_unit_form.save(
-                start_year=self.start_year,
-                learning_container=learning_container,
-                commit=commit,
-            )
-            container_year = self.learning_container_year_form.save(
-                academic_year=self.academic_year,
-                learning_container=learning_container,
-                acronym=self.learning_unit_year_form.instance.acronym,
-                commit=commit
-            )
+        learning_unit = self.learning_unit_form.save(
+            start_year=self.start_year,
+            learning_container=learning_container,
+            commit=commit,
+        )
+
+        container_year = self.learning_container_year_form.save(
+            academic_year=self.academic_year,
+            learning_container=learning_container,
+            acronym=self.learning_unit_year_form.instance.acronym,
+            commit=commit
+        )
 
         # Save learning unit year (learning_component_year)
         learning_unit_yr = self.learning_unit_year_form.save(
