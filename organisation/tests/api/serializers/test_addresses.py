@@ -41,6 +41,7 @@ class AddressSerializerTestCase(TestCase):
             'city',
             'street',
             'street_number',
+            'location',
             'postal_code',
             'state',
             'country_iso_code',
