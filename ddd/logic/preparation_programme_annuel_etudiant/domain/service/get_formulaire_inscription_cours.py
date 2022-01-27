@@ -23,14 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from decimal import Decimal
+import itertools
 from typing import List
 
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormulaireInscriptionCoursCommand
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
     GroupementAjusteInscriptionCours
+from ddd.logic.preparation_programme_annuel_etudiant.domain.model.unite_enseignement_ajoutee import \
+    UniteEnseignementAjoutee
 from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import \
     ICatalogueFormationsTranslator
+from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_unites_enseignement import \
+    ICatalogueUnitesEnseignementTranslator
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormulaireInscriptionCoursDTO, ContenuGroupementDTO, \
     UniteEnseignementDTO, FormationDTO, ContenuGroupementCatalogueDTO, UniteEnseignementCatalogueDTO, \
     GroupementCatalogueDTO, GroupementDTO
@@ -46,7 +50,8 @@ class GetFormulaireInscriptionCours(interface.DomainService):
             cls,
             cmd: 'GetFormulaireInscriptionCoursCommand',
             repo: 'IGroupementAjusteInscriptionCoursRepository',
-            catalogue_formations_translator: 'ICatalogueFormationsTranslator'
+            catalogue_formations_translator: 'ICatalogueFormationsTranslator',
+            catalogue_unites_enseignement_translator: 'ICatalogueUnitesEnseignementTranslator'
     ) -> 'FormulaireInscriptionCoursDTO':
         formation = catalogue_formations_translator.get_formation(
             sigle=cmd.sigle_formation,
@@ -66,9 +71,36 @@ class GetFormulaireInscriptionCours(interface.DomainService):
             )
         )
 
+        unite_enseignements_ajoutes_dto = cls.rechercher_unites_enseignement_ajoutees_catalogue_dto(
+            groupements_ajustes,
+            catalogue_unites_enseignement_translator
+        )
+
         return cls._ajuster_formulaire_inscription(
             formulaire_inscription,
-            groupements_ajustes
+            groupements_ajustes,
+            unite_enseignements_ajoutes_dto
+        )
+
+    @classmethod
+    def rechercher_unites_enseignement_ajoutees_catalogue_dto(
+            cls,
+            groupements_ajustes: List['GroupementAjusteInscriptionCours'],
+            catalogue_unites_enseignement_translator: 'ICatalogueUnitesEnseignementTranslator'
+            ) -> List['UniteEnseignementCatalogueDTO']:
+        unites_enseignement_ajoutees = itertools.chain.from_iterable(
+            [
+                groupement.unites_enseignement_ajoutees
+                for groupement in groupements_ajustes
+            ]
+        )
+        entity_id_unites_enseignement = [
+            unite_enseignement.unite_enseignement_identity
+            for unite_enseignement in unites_enseignement_ajoutees
+        ]
+
+        return catalogue_unites_enseignement_translator.search(
+            entity_ids=entity_id_unites_enseignement
         )
 
     @classmethod
@@ -89,7 +121,7 @@ class GetFormulaireInscriptionCours(interface.DomainService):
     def convertir_contenu_contenu_groupement_catalogue_dto_en_contenu_groupement_dto(
             cls,
             contenu: 'ContenuGroupementCatalogueDTO'
-            ) -> 'ContenuGroupementDTO':
+    ) -> 'ContenuGroupementDTO':
         groupement_contenus = [
             cls.convertir_contenu_contenu_groupement_catalogue_dto_en_contenu_groupement_dto(groupement)
             for groupement in contenu.groupements_contenus
@@ -141,35 +173,50 @@ class GetFormulaireInscriptionCours(interface.DomainService):
     def _ajuster_formulaire_inscription(
             cls,
             formulaire_inscription: 'FormulaireInscriptionCoursDTO',
-            groupements_ajustes: List['GroupementAjusteInscriptionCours']
+            groupements_ajustes: List['GroupementAjusteInscriptionCours'],
+            unite_enseignement_ajoutes_dto: List['UniteEnseignementCatalogueDTO']
     ) -> FormulaireInscriptionCoursDTO:
 
         for groupement in groupements_ajustes:
             groupement_concernes = cls._rechercher_groupement(formulaire_inscription.racine, groupement)
 
-            # TODO CHERCHER INFOS UES
             for g in groupement_concernes:
                 g.unites_enseignement_contenues.extend(
                     [
-                        UniteEnseignementDTO(
-                            bloc=1,
-                            code=ue_ajoutes.code,
-                            intitule_complet="tchey",
-                            quadrimestre="Q1",
-                            quadrimestre_texte="Q1",
-                            credits_absolus=Decimal(21),
-                            credits_relatifs=21,
-                            volume_annuel_pm=10,
-                            volume_annuel_pp=10,
-                            chemin_acces=g.groupement_contenant.chemin_acces + "|" + ue_ajoutes.code,
-                            obligatoire=True,
-                            session_derogation="Nope",
+                        cls._create_unite_enseignement_dto_for_unite_enseignement_ajoutee(
+                            ue_ajoutee,
+                            unite_enseignement_ajoutes_dto
                         )
-                        for ue_ajoutes in groupement.unites_enseignement_ajoutees
+                        for ue_ajoutee in groupement.unites_enseignement_ajoutees
                     ]
                 )
 
         return formulaire_inscription
+
+    @classmethod
+    def _create_unite_enseignement_dto_for_unite_enseignement_ajoutee(
+            cls,
+            unite_enseignement_ajoutee: 'UniteEnseignementAjoutee',
+            unite_enseignement_ajoutes_dto: List['UniteEnseignementCatalogueDTO'],
+    ) -> 'UniteEnseignementDTO':
+        dto_correspondant = next(
+            dto for dto in unite_enseignement_ajoutes_dto
+            if dto.code == unite_enseignement_ajoutee.code
+        )
+        return UniteEnseignementDTO(
+            bloc=1,
+            code=unite_enseignement_ajoutee.code,
+            intitule_complet=dto_correspondant.intitule_complet,
+            quadrimestre=dto_correspondant.quadrimestre,
+            quadrimestre_texte=dto_correspondant.quadrimestre_texte,
+            credits_absolus=dto_correspondant.credits_absolus,
+            credits_relatifs=dto_correspondant.credits_relatifs,
+            volume_annuel_pm=dto_correspondant.volume_annuel_pm,
+            volume_annuel_pp=dto_correspondant.volume_annuel_pp,
+            chemin_acces=unite_enseignement_ajoutee.code,
+            obligatoire=dto_correspondant.obligatoire,
+            session_derogation=dto_correspondant.session_derogation,
+        )
 
     @classmethod
     def _rechercher_groupement(

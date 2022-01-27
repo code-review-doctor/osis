@@ -228,6 +228,8 @@ from infrastructure.learning_unit.repository.entity import UclEntityRepository
 from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
 from infrastructure.preparation_programme_annuel_etudiant.domain.service.catalogue_formations import \
     CatalogueFormationsTranslator
+from infrastructure.preparation_programme_annuel_etudiant.domain.service.catalogue_unites_enseignement import \
+    CatalogueUnitesEnseignementTranslator
 from infrastructure.preparation_programme_annuel_etudiant.repository.in_memory. \
     groupement_ajuste_inscription_cours import GroupementAjusteInscriptionCoursInMemoryRepository
 from infrastructure.shared_kernel.academic_year.repository.academic_year import AcademicYearRepository
@@ -541,7 +543,8 @@ class MessageBusCommands(AbstractMessageBusCommands):
         GetFormulaireInscriptionCoursCommand: lambda cmd: get_formulaire_inscription_cours_service(
             cmd,
             GroupementAjusteInscriptionCoursInMemoryRepository(),
-            CatalogueFormationsTranslator()
+            CatalogueFormationsTranslator(),
+            CatalogueUnitesEnseignementTranslator(),
         ),
         GetFormationCommand: lambda cmd: get_programme_formation(cmd),
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]

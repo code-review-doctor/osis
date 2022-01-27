@@ -106,6 +106,12 @@ class LearningUnitRepository(ILearningUnitRepository):
             ),
         )
 
+        components = LearningComponentYearDatabase.objects.filter(
+            learning_unit_year_id=OuterRef('pk'),
+            hourly_volume_total_annual__gt=0.0,
+        )
+        non_practical_component_filter = (Q(type=LECTURING) | Q(type__isnull=True, acronym=UNTYPED_COMPONENT_ACRONYM))
+
         qs = qs.annotate(
             code=F('acronym'),
             year=F('academic_year__year'),
@@ -132,6 +138,14 @@ class LearningUnitRepository(ILearningUnitRepository):
                 EntityVersionDatabase.objects.filter(
                     entity__id=OuterRef('learning_container_year__requirement_entity_id')
                 ).order_by('-start_date').values('title')[:1]
+            ),
+            lecturing_volume_annual=Subquery(
+                components.filter(
+                    non_practical_component_filter
+                ).values('hourly_volume_total_annual')
+            ),
+            practical_volume_annual=Subquery(
+                components.filter(type=PRACTICAL_EXERCISES).values('hourly_volume_total_annual')
             ),
         ).select_related(
             "learning_container_year"
@@ -166,7 +180,12 @@ class LearningUnitRepository(ILearningUnitRepository):
                             )
                             for partim
                             in learning_unit_year_db_obj.learning_container_year.partims
-                        ]
+                        ],
+                        quadrimester=learning_unit_year_db_obj.quadrimester,
+                        credits=learning_unit_year_db_obj.credits,
+                        session_derogation=learning_unit_year_db_obj.session,
+                        lecturing_volume_annual=learning_unit_year_db_obj.lecturing_volume_annual,
+                        practical_volume_annual=learning_unit_year_db_obj.practical_volume_annual
                     )
                 )
         return result
