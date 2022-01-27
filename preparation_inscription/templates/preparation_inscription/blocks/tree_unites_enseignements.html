@@ -1,11 +1,7 @@
 {% load static %}
-<ul>
-    {% for unite_enseignement in sous_programme.unites_enseignements %}
-        <li id="{{ unite_enseignement.code }}"
-            data-jstree='{"icon":"{% if unite_enseignement.obligatoire %}{% static "img/education_group_year/mandatory.png" %}{% else %}{% static "img/education_group_year/optional.png" %}{% endif %}"}'
-        >
-            {{ unite_enseignement.code }} - {{ unite_enseignement.intitule }}
-            <span class="node_block_text" style="background-color:white;">{{ unite_enseignement.bloc }}</span>
-        </li>
-    {% endfor %}
-</ul>
+<li id="{{ unite_enseignement.code }}"
+    data-jstree='{"icon":"{% if unite_enseignement.obligatoire %}{% static "img/education_group_year/mandatory.png" %}{% else %}{% static "img/education_group_year/optional.png" %}{% endif %}"}'
+>
+    {{ unite_enseignement.code }} - {{ unite_enseignement.intitule }}
+    <span class="node_block_text" style="background-color:white;">{{ unite_enseignement.bloc }}</span>
+</li>
