@@ -50,3 +50,6 @@ admin.site.register(language.Language,
 
 admin.site.register(zipcode.ZipCode,
                     zipcode.ZipCodeAdmin)
+
+admin.site.register(high_school.HighSchool,
+                    high_school.HighSchoolAdmin)
