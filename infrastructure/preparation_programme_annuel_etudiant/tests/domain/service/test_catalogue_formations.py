@@ -33,6 +33,7 @@ from ddd.logic.preparation_programme_annuel_etudiant.dtos import UniteEnseigneme
     ContenuGroupementCatalogueDTO, GroupementCatalogueDTO
 from infrastructure.preparation_programme_annuel_etudiant.domain.service.catalogue_formations import \
     CatalogueFormationsTranslator
+from program_management.ddd.domain.program_tree_version import STANDARD
 from program_management.ddd.dtos import ProgrammeDeFormationDTO, ContenuNoeudDTO, GroupementDTO, UniteEnseignementDTO
 
 ANNEE = 2021
@@ -170,7 +171,7 @@ def _build_ProgrammeDeFormationDTO():
         ),
         annee=ANNEE,
         sigle='ECGE1BA',
-        version='',
+        version=STANDARD,
         intitule_complet='Bachelier en sciences économiques et de gestion',
 
     )

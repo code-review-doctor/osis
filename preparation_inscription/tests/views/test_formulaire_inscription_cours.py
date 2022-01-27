@@ -33,6 +33,7 @@ from base.tests.factories.program_manager import ProgramManagerFactory
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormulaireInscriptionCoursDTO, ContenuGroupementDTO, \
     GroupementDTO
 from education_group.tests.ddd.factories.domain.group import GroupFactory
+from program_management.ddd.domain.program_tree_version import STANDARD
 
 ACRONYM = 'LCOMI200M'
 
@@ -62,7 +63,7 @@ class TestFormulaireInscriptionCoursView(TestCase):
             return_value=FormulaireInscriptionCoursDTO(
                 annee_formation=YEAR,
                 sigle_formation=ACRONYM,
-                version_formation='',
+                version_formation=STANDARD,
                 intitule_complet_formation='Bachelier en sciences économiques et de gestion',
                 racine=ContenuGroupementDTO(
                     groupement_contenant=GroupementDTO(
@@ -90,10 +91,3 @@ class TestFormulaireInscriptionCoursView(TestCase):
     def test_assert_template_used(self):
         response = self.client.get(self.url)
         self.assertTemplateUsed(response, "onglets.html")
-
-    def test_assert_context_have_keys(self):
-        response = self.client.get(self.url)
-        self.assertIn('code', response.context)
-        self.assertIn('title', response.context)
-        self.assertIn('formulaire_inscription_cours', response.context)
-        self.assertIn('year', response.context)

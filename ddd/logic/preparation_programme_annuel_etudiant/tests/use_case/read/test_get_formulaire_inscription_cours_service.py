@@ -35,6 +35,7 @@ from infrastructure.messages_bus import message_bus_instance
 from infrastructure.preparation_programme_annuel_etudiant.domain.service.in_memory.catalogue_formations import \
     CatalogueFormationsTranslatorInMemory
 from program_management.ddd.dtos import UniteEnseignementDTO, ContenuNoeudDTO
+from program_management.ddd.domain.program_tree_version import STANDARD, NOT_A_TRANSITION
 
 
 class GetFormulaireInscriptionCoursTest(SimpleTestCase):
@@ -53,13 +54,13 @@ class GetFormulaireInscriptionCoursTest(SimpleTestCase):
         self.addCleanup(message_bus_patcher.stop)
         self.message_bus = message_bus_instance
 
-    def test_should_convertir_version_standard(self):
+    def test_should_afficher_programme_inscription_cas_nominal_version_stabdard(self):
         obj_FormationDTO_de_depart = CatalogueFormationsTranslatorInMemory.dtos[0]
         cmd = GetFormulaireInscriptionCoursCommand(
             annee_formation=2021,
             sigle_formation='ECGE1BA',
-            version_formation='',
-            transition_formation=''
+            version_formation=STANDARD,
+            transition_formation=NOT_A_TRANSITION
         )
 
         resultat_conversion_en_FormulaireInscriptionCoursDTO = self.message_bus.invoke(cmd)
