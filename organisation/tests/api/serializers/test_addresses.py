@@ -26,24 +26,21 @@
 
 from django.test import TestCase
 
-from base.tests.factories.entity_version_address import EntityVersionAddressFactory
+from base.tests.factories.entity import EntityFactory
 from organisation.api.serializers.addresses import AddressSerializer
 
 
 class AddressSerializerTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.address = EntityVersionAddressFactory()
+        cls.address = EntityFactory()
         cls.serializer = AddressSerializer(cls.address)
 
     def test_contains_expected_fields(self):
         expected_fields = [
             'city',
-            'street',
-            'street_number',
+            'location',
             'postal_code',
-            'state',
             'country_iso_code',
-            'is_main',
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
