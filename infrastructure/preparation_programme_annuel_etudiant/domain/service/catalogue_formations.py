@@ -41,8 +41,7 @@ def build_formation_dto(program_management_formation_dto: ProgrammeDeFormationDT
         annee=program_management_formation_dto.annee,
         sigle=program_management_formation_dto.sigle,
         version=program_management_formation_dto.version,
-        intitule_complet=program_management_formation_dto.intitule_formation + " " +
-        program_management_formation_dto.intitule_version_programme,
+        intitule_complet=program_management_formation_dto.intitule_version_programme,
     )
 
 
