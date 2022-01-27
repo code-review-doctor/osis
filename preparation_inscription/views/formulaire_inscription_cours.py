@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
 from django.http import Http404
 from django.views.generic import TemplateView
 
@@ -34,10 +33,11 @@ from education_group.ddd.domain.exception import GroupNotFoundException
 from education_group.ddd.service.read import get_group_service
 from infrastructure.messages_bus import message_bus_instance
 from program_management.forms.education_groups import STANDARD
+from osis_role.contrib.views import PermissionRequiredMixin
 
 
-class FormulaireInscriptionCoursView(TemplateView):
-    permission_required = 'preparation_programme.view_formulaire_inscription_cours'
+class FormulaireInscriptionCoursView(PermissionRequiredMixin, TemplateView):
+    permission_required = 'preparation_inscription.view_formulaire_inscription_cours'
     raise_exception = True
 
     template_name = "onglets.html"
