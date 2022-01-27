@@ -30,7 +30,8 @@ from django.urls import reverse
 
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormulaireInscriptionCoursDTO
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormulaireInscriptionCoursDTO, ContenuGroupementDTO, \
+    GroupementDTO
 from education_group.tests.ddd.factories.domain.group import GroupFactory
 
 ACRONYM = 'LCOMI200M'
@@ -38,7 +39,7 @@ ACRONYM = 'LCOMI200M'
 YEAR = 2021
 
 
-class TestFormulaireInscriptionCourssView(TestCase):
+class TestFormulaireInscriptionCoursView(TestCase):
 
     @classmethod
     def setUpTestData(cls):
@@ -62,8 +63,16 @@ class TestFormulaireInscriptionCourssView(TestCase):
                 annee_formation=YEAR,
                 sigle_formation=ACRONYM,
                 version_formation='',
-                intitule_complet_formation='',
-                racine=None
+                intitule_complet_formation='Bachelier en sciences économiques et de gestion',
+                racine=ContenuGroupementDTO(
+                    groupement_contenant=GroupementDTO(
+                        intitule='intitule',
+                        obligatoire=True,
+                        chemin_acces=''
+                    ),
+                    unites_enseignement_contenues=[],
+                    groupements_contenus=[]
+                )
             )
         )
         self.fetch_from_cache_patcher.start()
