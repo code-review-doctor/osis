@@ -6,6 +6,7 @@ import uuid
 from django.test import TestCase
 
 from attribution.models.enums.function import Functions
+from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.vacant_declaration_type import VacantDeclarationType
 from ddd.logic.application.commands import GetChargeSummaryCommand
 from ddd.logic.application.domain.builder.applicant_identity_builder import ApplicantIdentityBuilder
@@ -46,6 +47,7 @@ class GetChargeSummary(TestCase):
                     ),
                     course_title='Introduction au droit',
                     course_is_in_suppression_proposal=False,
+                    course_type=LearningContainerYearType.COURSE.name,
                     function=Functions.CO_HOLDER,
                     end_year=AcademicYearIdentityBuilder.build_from_year(year=2030),
                     start_year=AcademicYearIdentityBuilder.build_from_year(year=2016),
