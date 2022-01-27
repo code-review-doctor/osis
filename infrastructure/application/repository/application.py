@@ -28,7 +28,7 @@ import operator
 from decimal import Decimal
 from typing import List, Optional
 
-from django.db import models
+from django.db import models, transaction
 from django.db.models import F, Q, OuterRef, fields, Case, When, Subquery
 
 from attribution.models.tutor_application import TutorApplication
@@ -160,14 +160,14 @@ class ApplicationRepository(IApplicationRepository):
                 "course_summary": application.course_summary
             }
         )
-        queue.notify_application_saved(application)
+        transaction.on_commit(lambda: queue.notify_application_saved(application))
 
     @classmethod
     def delete(cls, entity_id: ApplicationIdentity, **kwargs: ApplicationService) -> None:
         application = cls.get(entity_id)
 
         TutorApplication.objects.filter(uuid=entity_id.uuid).delete()
-        queue.notify_application_deleted(application)
+        transaction.on_commit(lambda: queue.notify_application_saved(application))
 
 
 def _application_base_qs():
