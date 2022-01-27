@@ -39,8 +39,8 @@ class FormulaireInscriptionCoursView(HtmxMixin, LoginRequiredMixin, TemplateView
     permission_required = 'preparation_programme.view_formulaire_inscription_cours'
     raise_exception = True
 
-    template_name = "preparation_inscription/blocks/tab_formulaire_inscription.html"
-    htmx_template_name = "preparation_inscription/blocks/tab_formulaire_inscription.html"
+    template_name = "preparation_inscription/blocks/formulaire_inscription.html"
+    htmx_template_name = "preparation_inscription/blocks/formulaire_inscription.html"
 
     def get_context_data(
             self,
