@@ -26,8 +26,8 @@
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormulaireInscriptionCoursCommand
 from ddd.logic.preparation_programme_annuel_etudiant.domain.service.get_formulaire_inscription_cours import \
     GetFormulaireInscriptionCours
-from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import \
-    ICatalogueFormationsTranslator
+from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations \
+    import ICatalogueFormationsTranslator
 from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_unites_enseignement import \
     ICatalogueUnitesEnseignementTranslator
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormulaireInscriptionCoursDTO

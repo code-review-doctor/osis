@@ -34,19 +34,18 @@ from preparation_inscription.views.program_tree import ProgramTreeHTMLView
 from preparation_inscription.views.supprimer_unites_enseignement import SupprimerUnitesEnseignementView
 
 urlpatterns = [
-    path('', ConsulterContenuGroupementView.as_view(), name=ConsulterContenuGroupementView.name),
-    path('delete', SupprimerUnitesEnseignementView.as_view(), name=SupprimerUnitesEnseignementView.name),
-    path('add', AjouterUnitesEnseignementView.as_view(), name=AjouterUnitesEnseignementView.name),
-    path('update', ModifierProprietesContenuView.as_view(), name=ModifierProprietesContenuView.name),
 
-    path('<int:year>/<acronym:acronym>/default_enrollment_form/',
-         FormulaireInscriptionCoursView.as_view(), name=FormulaireInscriptionCoursView.name),
-    path('<int:year>/<acronym:acronym>/<str:version_name>/default_enrollment_form/',
-         FormulaireInscriptionCoursView.as_view(), name=FormulaireInscriptionCoursView.name),
-    path('<int:year>/<acronym:acronym>/<str:version_name>/<str:transition_name>/default_enrollment_form/',
-         FormulaireInscriptionCoursView.as_view(), name=FormulaireInscriptionCoursView.name),
     path('<int:year>/<acronym:acronym>/', include([
         path('', PreparationInscriptionMainView.as_view(), name=PreparationInscriptionMainView.name),
-        path('tree', ProgramTreeHTMLView.as_view(), name=ProgramTreeHTMLView.name),
+        path('detail', ConsulterContenuGroupementView.as_view(), name=ConsulterContenuGroupementView.name),
+        path('delete', SupprimerUnitesEnseignementView.as_view(), name=SupprimerUnitesEnseignementView.name),
+        path('add', AjouterUnitesEnseignementView.as_view(), name=AjouterUnitesEnseignementView.name),
+        path('update', ModifierProprietesContenuView.as_view(), name=ModifierProprietesContenuView.name),
+        path('tree/', ProgramTreeHTMLView.as_view(), name=ProgramTreeHTMLView.name),
+        path(
+            'formulaire_inscription/',
+            FormulaireInscriptionCoursView.as_view(),
+            name=FormulaireInscriptionCoursView.name
+        ),
     ])),
 ]

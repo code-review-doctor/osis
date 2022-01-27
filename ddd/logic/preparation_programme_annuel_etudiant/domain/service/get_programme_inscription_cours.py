@@ -79,7 +79,7 @@ class GetProgrammeInscriptionCours(interface.DomainService):
         )
         return ProgrammeInscriptionCoursDTO(
             uuid='uuid-1234',
-            code=cmd.sigle_formation,
+            code=formation.racine.groupement_contenant.code,
             annee=cmd.annee_formation,
             version=cmd.version_formation,
             transition=cmd.transition_formation,
