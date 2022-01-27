@@ -23,13 +23,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import itertools
 from typing import List
 
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetProgrammeInscriptionCoursCommand
+from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
+    GroupementAjusteInscriptionCours
+from ddd.logic.preparation_programme_annuel_etudiant.domain.model.unite_enseignement_ajoutee import \
+    UniteEnseignementAjoutee
 from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import \
     ICatalogueFormationsTranslator
+from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_unites_enseignement import \
+    ICatalogueUnitesEnseignementTranslator
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import ProgrammeInscriptionCoursDTO, \
-    GroupementInscriptionCoursDTO, UniteEnseignementProgrammeDTO, ContenuGroupementCatalogueDTO
+    GroupementInscriptionCoursDTO, UniteEnseignementProgrammeDTO, ContenuGroupementCatalogueDTO, \
+    UniteEnseignementAjouteeDTO, UniteEnseignementCatalogueDTO
 from ddd.logic.preparation_programme_annuel_etudiant.repository.i_groupement_ajuste_inscription_cours import \
     IGroupementAjusteInscriptionCoursRepository
 from osis_common.ddd import interface
@@ -42,7 +50,8 @@ class GetProgrammeInscriptionCours(interface.DomainService):
             cls,
             cmd: 'GetProgrammeInscriptionCoursCommand',
             groupement_ajuste_repository: 'IGroupementAjusteInscriptionCoursRepository',
-            catalogue_formations_translator: 'ICatalogueFormationsTranslator'
+            catalogue_formations_translator: 'ICatalogueFormationsTranslator',
+            catalogue_unites_enseignement_translator: 'ICatalogueUnitesEnseignementTranslator'
     ):
         formation = catalogue_formations_translator.get_formation(
             sigle=cmd.sigle_formation,
@@ -50,42 +59,131 @@ class GetProgrammeInscriptionCours(interface.DomainService):
             version=cmd.version_formation,
             transition_name=cmd.transition_formation
         )
-        program_tree_version_identity = ProgramTreeVersionIdentityBuilder().build(
-            year=cmd.annee_formation,
-            offer_acronym=cmd.sigle_formation,
-            version_name=cmd.version_formation,
-            transition_name=cmd.transition_formation
+
+        groupements_ajustes = groupement_ajuste_repository.search(
+            version_programme_id=ProgramTreeVersionIdentityBuilder().build(
+                year=cmd.annee_formation,
+                offer_acronym=cmd.sigle_formation,
+                version_name=cmd.version_formation,
+                transition_name=cmd.transition_formation
+            )
         )
-        groupements_ajustes = groupement_ajuste_repository.get_dtos(program_tree_version_identity)
-        groupements = cls.__build_groupement_inscription_cours_dtos([formation.racine])
+        unite_enseignements_ajoutes_dto = cls.rechercher_unites_enseignement_ajoutees_catalogue_dto(
+            groupements_ajustes,
+            catalogue_unites_enseignement_translator
+        )
+        groupements = cls.__build_groupement_inscription_cours_dtos(
+            [formation.racine],
+            groupements_ajustes,
+            unite_enseignements_ajoutes_dto
+        )
         return ProgrammeInscriptionCoursDTO(
             uuid='uuid-1234',
-            code=program_tree_version_identity.offer_acronym,
-            annee=program_tree_version_identity.year,
-            version=program_tree_version_identity.version_name,
-            transition=program_tree_version_identity.transition_name,
+            code=cmd.sigle_formation,
+            annee=cmd.annee_formation,
+            version=cmd.version_formation,
+            transition=cmd.transition_formation,
             intitule_complet_formation=formation.intitule_complet,
             sous_programme=groupements,
         )
 
     @classmethod
+    def rechercher_unites_enseignement_ajoutees_catalogue_dto(
+            cls,
+            groupements_ajustes: List['GroupementAjusteInscriptionCours'],
+            catalogue_unites_enseignement_translator: 'ICatalogueUnitesEnseignementTranslator'
+    ) -> List['UniteEnseignementCatalogueDTO']:
+        unites_enseignement_ajoutees = itertools.chain.from_iterable(
+            [
+                groupement.unites_enseignement_ajoutees
+                for groupement in groupements_ajustes
+            ]
+        )
+        entity_id_unites_enseignement = [
+            unite_enseignement.unite_enseignement_identity
+            for unite_enseignement in unites_enseignement_ajoutees
+        ]
+
+        return catalogue_unites_enseignement_translator.search(
+            entity_ids=entity_id_unites_enseignement
+        )
+
+    @classmethod
     def __build_groupement_inscription_cours_dtos(
             cls,
-            groupements_contenus: List[ContenuGroupementCatalogueDTO]
+            groupements_contenus: List[ContenuGroupementCatalogueDTO],
+            groupements_ajustes: List['GroupementAjusteInscriptionCours'],
+            unite_enseignement_ajoutes_dto: List['UniteEnseignementCatalogueDTO']
     ) -> List[GroupementInscriptionCoursDTO]:
         return [
             GroupementInscriptionCoursDTO(
                 intitule_complet=groupement.groupement_contenant.intitule_complet,
                 obligatoire=groupement.groupement_contenant.obligatoire,
                 code=groupement.groupement_contenant.code,
-                unites_enseignements=[
-                    UniteEnseignementProgrammeDTO(
-                        code=unite_enseignement.code,
-                        intitule=unite_enseignement.intitule_complet,
-                        obligatoire=unite_enseignement.obligatoire,
-                        bloc=unite_enseignement.bloc,
-                    ) for unite_enseignement in groupement.unites_enseignement_contenues
-                ],
-                sous_programme=cls.__build_groupement_inscription_cours_dtos(groupement.groupements_contenus),
+                unites_enseignements=cls.__build_unite_enseignement_programme_dtos(groupement),
+                unites_enseignement_ajoutees=cls.__build_unite_enseignement_ajoute_dtos(
+                    groupement,
+                    groupements_ajustes,
+                    unite_enseignement_ajoutes_dto
+                ),
+                sous_programme=cls.__build_groupement_inscription_cours_dtos(
+                    groupement.groupements_contenus,
+                    groupements_ajustes,
+                    unite_enseignement_ajoutes_dto
+                ),
             ) for groupement in groupements_contenus
         ]
+
+    @classmethod
+    def __build_unite_enseignement_programme_dtos(
+            cls,
+            groupement: 'ContenuGroupementCatalogueDTO',
+            ) -> List['UniteEnseignementProgrammeDTO']:
+        return [
+            UniteEnseignementProgrammeDTO(
+                code=unite_enseignement.code,
+                intitule=unite_enseignement.intitule_complet,
+                obligatoire=unite_enseignement.obligatoire,
+                bloc=unite_enseignement.bloc,
+            ) for unite_enseignement in groupement.unites_enseignement_contenues
+        ]
+
+    @classmethod
+    def __build_unite_enseignement_ajoute_dtos(
+            cls,
+            groupement: 'ContenuGroupementCatalogueDTO',
+            groupements_ajustes: List['GroupementAjusteInscriptionCours'],
+            unite_enseignement_ajoutes_dto: List['UniteEnseignementCatalogueDTO']
+    ) -> List['UniteEnseignementAjouteeDTO']:
+        groupement_ajuste_correspondant = next(
+            (
+                groupement_ajuste
+                for groupement_ajuste in groupements_ajustes
+                if groupement_ajuste.groupement_id.code == groupement.groupement_contenant.code
+            ),
+            None
+        )
+        unites_enseignemnts_ajoutes = groupement_ajuste_correspondant.unites_enseignement_ajoutees if \
+            groupement_ajuste_correspondant else []
+
+        return [
+            cls.__build_unite_enseignement_ajoute_dto(unite_enseignement, unite_enseignement_ajoutes_dto)
+            for unite_enseignement in unites_enseignemnts_ajoutes
+        ]
+
+    @classmethod
+    def __build_unite_enseignement_ajoute_dto(
+            cls,
+            unite_enseignement_ajoute: 'UniteEnseignementAjoutee',
+            unite_enseignement_dtos: List['UniteEnseignementCatalogueDTO']
+    ) -> 'UniteEnseignementAjouteeDTO':
+        unite_enseignement_dto_correspondant = next(
+            dto for dto in unite_enseignement_dtos if dto.code == unite_enseignement_ajoute.code
+        )
+        return UniteEnseignementAjouteeDTO(
+            code=unite_enseignement_ajoute.code,
+            intitule=unite_enseignement_dto_correspondant.intitule_complet,
+            obligatoire=unite_enseignement_dto_correspondant.obligatoire,
+            bloc=1,
+            a_la_suite_de="",
+        )

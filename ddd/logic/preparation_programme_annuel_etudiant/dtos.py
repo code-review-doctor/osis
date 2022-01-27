@@ -130,8 +130,8 @@ class GroupementInscriptionCoursDTO(DTO):
     intitule_complet: str
     obligatoire: bool
     code: str
+    unites_enseignement_ajoutees: List['UniteEnseignementAjouteeDTO']
     #  Comment because nominal case (program without adjustment) only for now
-    # unites_enseignement_ajoutees: List['UniteEnseignementAjouteeDTO']
     # unites_enseignement_supprimees: List['UniteEnseignementSupprimeeDTO']
     # unites_enseignement_modifiees: List['UniteEnseignementModifieeDTO']
     unites_enseignements: List['UniteEnseignementProgrammeDTO']
@@ -173,7 +173,7 @@ class GroupementAjusteFromRepositoryDTO(DTO):
     version_programme: str
     nom_transition: str
     code_groupement: str
+    unites_enseignement_ajoutees: List['UniteEnseignementAjouteeDTO']
     #  Comment because nominal case (program without adjustment) only for now
-    # unites_enseignement_ajoutees: List['UniteEnseignementAjouteeDTO']
     # unites_enseignement_supprimees: List['UniteEnseignementSupprimeeDTO']
     # unites_enseignement_modifiees: List['UniteEnseignementModifieeDTO']

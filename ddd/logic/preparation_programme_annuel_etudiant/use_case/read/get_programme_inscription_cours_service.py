@@ -29,6 +29,8 @@ from ddd.logic.preparation_programme_annuel_etudiant.domain.service.get_programm
     GetProgrammeInscriptionCours
 from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import \
     ICatalogueFormationsTranslator
+from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_unites_enseignement import \
+    ICatalogueUnitesEnseignementTranslator
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import ProgrammeInscriptionCoursDTO
 from ddd.logic.preparation_programme_annuel_etudiant.repository.i_groupement_ajuste_inscription_cours import \
     IGroupementAjusteInscriptionCoursRepository
@@ -37,10 +39,12 @@ from ddd.logic.preparation_programme_annuel_etudiant.repository.i_groupement_aju
 def get_programme_inscription_cours(
         cmd: 'GetProgrammeInscriptionCoursCommand',
         repository: 'IGroupementAjusteInscriptionCoursRepository',
-        translator: 'ICatalogueFormationsTranslator'
+        translator: 'ICatalogueFormationsTranslator',
+        catalogue_unites_enseignement_translator: 'ICatalogueUnitesEnseignementTranslator'
 ) -> 'ProgrammeInscriptionCoursDTO':
     return GetProgrammeInscriptionCours.get_programme_inscription_cours(
         cmd=cmd,
         groupement_ajuste_repository=repository,
-        catalogue_formations_translator=translator
+        catalogue_formations_translator=translator,
+        catalogue_unites_enseignement_translator=catalogue_unites_enseignement_translator
     )

@@ -554,6 +554,7 @@ class MessageBusCommands(AbstractMessageBusCommands):
             cmd,
             GroupementAjusteInscriptionCoursInMemoryRepository(),
             CatalogueFormationsTranslator(),
+            CatalogueUnitesEnseignementTranslator(),
         )
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 
