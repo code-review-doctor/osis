@@ -112,8 +112,8 @@ class GetFormulaireInscriptionCours(interface.DomainService):
             annee_formation=formation.annee,
             sigle_formation=formation.sigle,
             version_formation=formation.version,
-            intitule_formation=formation.intitule_formation,
-            intitule_version_programme=formation.intitule_version_programme,
+            intitule_formation=formation.intitule_complet,
+            intitule_version_programme=formation.intitule_complet,
             racine=cls.convertir_contenu_contenu_groupement_catalogue_dto_en_contenu_groupement_dto(formation.racine)
         )
 

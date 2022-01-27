@@ -172,8 +172,11 @@ from ddd.logic.learning_unit.use_case.write.update_effective_class_service impor
 from ddd.logic.preparation_programme_annuel_etudiant.commands import AjouterUEAuProgrammeCommand
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormulaireInscriptionCoursCommand, \
     GetFormationCommand
+from ddd.logic.preparation_programme_annuel_etudiant.commands import GetProgrammeInscriptionCoursCommand
 from ddd.logic.preparation_programme_annuel_etudiant.use_case.read.get_formulaire_inscription_cours_service import \
     get_formulaire_inscription_cours_service
+from ddd.logic.preparation_programme_annuel_etudiant.use_case.read.get_programme_inscription_cours_service import \
+    get_programme_inscription_cours
 from ddd.logic.preparation_programme_annuel_etudiant.use_case.write.ajouter_UE_au_programme_service import \
     ajouter_UE_au_programme
 from ddd.logic.shared_kernel.academic_year.commands import SearchAcademicYearCommand
@@ -230,8 +233,8 @@ from infrastructure.preparation_programme_annuel_etudiant.domain.service.catalog
     CatalogueFormationsTranslator
 from infrastructure.preparation_programme_annuel_etudiant.domain.service.catalogue_unites_enseignement import \
     CatalogueUnitesEnseignementTranslator
-from infrastructure.preparation_programme_annuel_etudiant.repository.in_memory. \
-    groupement_ajuste_inscription_cours import GroupementAjusteInscriptionCoursInMemoryRepository
+from infrastructure.preparation_programme_annuel_etudiant.repository.in_memory.groupement_ajuste_inscription_cours \
+    import GroupementAjusteInscriptionCoursInMemoryRepository
 from infrastructure.shared_kernel.academic_year.repository.academic_year import AcademicYearRepository
 from infrastructure.shared_kernel.campus.repository.uclouvain_campus import UclouvainCampusRepository
 from infrastructure.shared_kernel.entite.repository.entiteucl import EntiteUCLRepository
@@ -547,6 +550,11 @@ class MessageBusCommands(AbstractMessageBusCommands):
             CatalogueUnitesEnseignementTranslator(),
         ),
         GetFormationCommand: lambda cmd: get_programme_formation(cmd),
+        GetProgrammeInscriptionCoursCommand: lambda cmd: get_programme_inscription_cours(
+            cmd,
+            GroupementAjusteInscriptionCoursInMemoryRepository(),
+            CatalogueFormationsTranslator(),
+        )
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 
 

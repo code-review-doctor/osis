@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from unittest import mock
 
 from django.test import SimpleTestCase
 
@@ -34,12 +33,13 @@ class CatalogueFormationsTranslatorTest(SimpleTestCase):
 
     def setUp(self) -> None:
         # mock appel service bus => retour GetProgramTreeVersionCommand : ProgramTreeVersionFactory()
-        self.patch_message_bus = mock.patch(
-            "infrastructure.messages_bus.invoke",
-            side_effect=self.__mock_message_bus_invoke
-        )
-        self.message_bus_mocked = self.patch_message_bus.start()
-        self.addCleanup(self.patch_message_bus.stop)
+        # self.patch_message_bus = mock.patch(
+        #     "infrastructure.messages_bus.invoke",
+        #     side_effect=self.__mock_message_bus_invoke
+        # )
+        # self.message_bus_mocked = self.patch_message_bus.start()
+        # self.addCleanup(self.patch_message_bus.stop)
+        pass
 
     def __mock_message_bus_invoke(self, cmd):
         if isinstance(cmd, GetFormationCommand):

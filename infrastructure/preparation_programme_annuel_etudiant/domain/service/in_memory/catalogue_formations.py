@@ -23,24 +23,47 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from decimal import Decimal
+
 from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import \
     ICatalogueFormationsTranslator
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, ContenuGroupementCatalogueDTO, \
-    GroupementDTO
+    GroupementDTO, GroupementCatalogueDTO, UniteEnseignementCatalogueDTO
 
 
-class CatalogueFormationsTranslatorInMemory(ICatalogueFormationsTranslator):
+class CatalogueFormationsInMemoryTranslator(ICatalogueFormationsTranslator):
     dtos = [
         FormationDTO(
             racine=ContenuGroupementCatalogueDTO(
-                groupement_contenant=None,
+                groupement_contenant=GroupementCatalogueDTO(
+                    intitule='Content:',
+                    obligatoire=True,
+                    remarque='',
+                    credits=Decimal(0),
+                    intitule_complet='Content:',
+                    code='LECGE100T'
+                ),
+                unites_enseignement_contenues=[
+                    UniteEnseignementCatalogueDTO(
+                        bloc=1,
+                        code='LESPO1113',
+                        intitule_complet='Sociologie et anthropologie des mondes contemporains',
+                        quadrimestre='Q1',
+                        quadrimestre_texte='Q1',
+                        credits_absolus=Decimal(0),
+                        credits_relatifs=0,
+                        volume_annuel_pm=0,
+                        volume_annuel_pp=0,
+                        obligatoire=True,
+                        session_derogation='',
+                    )
+                ],
                 groupements_contenus=[],
-                unites_enseignement_contenues=[]
             ),
             annee=2021,
             sigle='ECGE1BA',
-            version='STANDARD',
-            intitule_complet='Bachelier ...',
+            version='',
+            intitule_complet='Bachelier en sciences économiques et de gestion',
         ),
     ]
 

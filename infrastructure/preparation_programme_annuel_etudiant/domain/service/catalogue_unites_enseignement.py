@@ -38,6 +38,8 @@ from ddd.logic.preparation_programme_annuel_etudiant.dtos import UniteEnseigneme
 class CatalogueUnitesEnseignementTranslator(ICatalogueUnitesEnseignementTranslator):
     @classmethod
     def search(cls, entity_ids: List['LearningUnitIdentity']) -> List['UniteEnseignementCatalogueDTO']:
+        if not entity_ids:
+            return []
         from infrastructure.messages_bus import message_bus_instance
         unites_enseignement_dto = message_bus_instance.invoke(
             LearningUnitSearchCommand(

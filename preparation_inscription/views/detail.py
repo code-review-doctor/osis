@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,24 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
-from ddd.logic.preparation_programme_annuel_etudiant.commands import GetProgrammeInscriptionCoursCommand
-from ddd.logic.preparation_programme_annuel_etudiant.domain.service.get_programme_inscription_cours import \
-    GetProgrammeInscriptionCours
-from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import \
-    ICatalogueFormationsTranslator
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import ProgrammeInscriptionCoursDTO
-from ddd.logic.preparation_programme_annuel_etudiant.repository.i_groupement_ajuste_inscription_cours import \
-    IGroupementAjusteInscriptionCoursRepository
+from django.urls import reverse
+from django.views.generic import TemplateView
+from rules.contrib.views import LoginRequiredMixin
 
 
-def get_programme_inscription_cours(
-        cmd: 'GetProgrammeInscriptionCoursCommand',
-        repository: 'IGroupementAjusteInscriptionCoursRepository',
-        translator: 'ICatalogueFormationsTranslator'
-) -> 'ProgrammeInscriptionCoursDTO':
-    return GetProgrammeInscriptionCours.get_programme_inscription_cours(
-        cmd=cmd,
-        groupement_ajuste_repository=repository,
-        catalogue_formations_translator=translator
-    )
+class PreparationInscriptionMainView(LoginRequiredMixin, TemplateView):
+    name = 'preparation-inscription-main-view'
+
+    # TemplateView
+    template_name = "preparation_inscription/preparation_inscription.html"
+
+    def get_context_data(self, **kwargs):
+        return {
+            **super().get_context_data(**kwargs),
+            'tree_view_url': self.get_tree_view_url()
+        }
+
+    def get_tree_view_url(self) -> str:
+        return reverse('program-tree-view', kwargs={
+            'year': self.kwargs['year'],
+            'acronym': self.kwargs['acronym']
+        })
