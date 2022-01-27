@@ -66,11 +66,13 @@ class AddressesListViewTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         self.assertCountEqual(
-            list(response.data.keys()),
-            [
+            list(response.data.keys()), [
                 'city',
                 'location',
+                'street',
+                'street_number',
                 'postal_code',
+                'state',
                 'country_iso_code',
-            ]
-        )
+                'is_main',
+            ])

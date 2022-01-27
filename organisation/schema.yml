@@ -284,12 +284,22 @@ components:
         location:
           type: string
           example: "Rue du compas 1"
+        street:
+          type: string
+          example: "Rue du compas"
+        street_number:
+          type: string
+          example: "1"
         postal_code:
           type: string
           example: "1348"
+        state:
+          type: string
         country_iso_code:
           type: string
           example: "BE"
+        is_main:
+          type: boolean
     EntiteTypeEnum:
       type: string
       enum:

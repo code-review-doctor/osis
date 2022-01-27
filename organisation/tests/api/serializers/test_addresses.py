@@ -39,8 +39,11 @@ class AddressSerializerTestCase(TestCase):
     def test_contains_expected_fields(self):
         expected_fields = [
             'city',
-            'location',
+            'street',
+            'street_number',
             'postal_code',
+            'state',
             'country_iso_code',
+            'is_main',
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
