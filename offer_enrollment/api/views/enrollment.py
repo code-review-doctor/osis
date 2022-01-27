@@ -103,11 +103,11 @@ class OfferEnrollmentsListView(LanguageContextSerializerMixin, generics.ListAPIV
         """
         qs = qs.filter(
             enrollment_state__in=list(offer_enrollment_state.VALID_ENROLLMENT_STATES)
-        ).annotate(
-            max_year=Max('education_group_year__academic_year__year')
-        ).filter(
-            education_group_year__academic_year__year=F('max_year')
         )
+        max_year = qs.aggregate(
+            max_year=Max('education_group_year__academic_year__year')
+        ).get('max_year')
+        qs = qs.filter(education_group_year__academic_year__year=max_year)
         nomas = qs.values('student__registration_id').distinct()
         if len(nomas) > 1:
             raise DoubleNOMAException
