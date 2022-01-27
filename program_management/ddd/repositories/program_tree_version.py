@@ -400,7 +400,7 @@ def _get_intitule_complet(noeud: 'Node') -> str:
     intitule_complet = noeud.offer_title_fr
     if noeud.version_name and noeud.version_title_fr:
         intitule_complet = "{} [{}]".format(intitule_complet, noeud.version_title_fr)
-    if noeud.transition_name :
+    if noeud.transition_name:
         intitule_complet = "{} [{}]".format(intitule_complet, noeud.transition_name)
     return intitule_complet
 

@@ -30,23 +30,23 @@ from django.test import SimpleTestCase
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetProgrammeInscriptionCoursCommand
 from infrastructure.messages_bus import message_bus_instance
 from infrastructure.preparation_programme_annuel_etudiant.domain.service.in_memory.catalogue_formations import \
-    CatalogueFormationsTranslator
+    CatalogueFormationsInMemoryTranslator
 from infrastructure.preparation_programme_annuel_etudiant.repository.in_memory.groupement_ajuste_inscription_cours \
-    import GroupementAjusteInscriptionCoursRepository
+    import GroupementAjusteInscriptionCoursInMemoryRepository
 
 
 class GetProgrammeInscriptionCoursTest(SimpleTestCase):
 
     def setUp(self) -> None:
-        self.catalogue_formation_translator = CatalogueFormationsTranslator()
-        self.groupement_ajustes_repository = GroupementAjusteInscriptionCoursRepository()
+        self.catalogue_formation_translator = CatalogueFormationsInMemoryTranslator()
+        self.groupement_ajustes_repository = GroupementAjusteInscriptionCoursInMemoryRepository()
         self._mock_message_bus()
 
     def _mock_message_bus(self):
         message_bus_patcher = mock.patch.multiple(
             'infrastructure.messages_bus',
             CatalogueFormationsTranslator=lambda: self.catalogue_formation_translator,
-            GroupementAjusteInscriptionCoursRepository=lambda: self.groupement_ajustes_repository
+            GroupementAjusteInscriptionCoursInMemoryRepository=lambda: self.groupement_ajustes_repository
         )
         message_bus_patcher.start()
         self.addCleanup(message_bus_patcher.stop)
@@ -60,7 +60,7 @@ class GetProgrammeInscriptionCoursTest(SimpleTestCase):
             transition_formation='',
         )
         programme = self.message_bus.invoke(cmd)
-        self.assertEqual(programme.code, 'ECGE1BA')
+        self.assertEqual(programme.code, 'LECGE100T')
         self.assertEqual(programme.annee, 2021)
         self.assertEqual(programme.version, '')
         self.assertEqual(programme.transition, '')

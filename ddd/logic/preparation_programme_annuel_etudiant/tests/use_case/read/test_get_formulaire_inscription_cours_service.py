@@ -4,13 +4,13 @@ from django.test import SimpleTestCase
 
 from infrastructure.messages_bus import message_bus_instance
 from infrastructure.preparation_programme_annuel_etudiant.domain.service.in_memory.catalogue_formations import \
-    CatalogueFormationsTranslator
+    CatalogueFormationsInMemoryTranslator
 
 
 class GetFormulaireInscriptionCoursTest(SimpleTestCase):
 
     def setUp(self) -> None:
-        self.catalogue_formation_translator = CatalogueFormationsTranslator()
+        self.catalogue_formation_translator = CatalogueFormationsInMemoryTranslator()
         self._mock_message_bus()
 
     def _mock_message_bus(self):

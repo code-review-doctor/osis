@@ -46,7 +46,14 @@ class LearningUnitRepository(InMemoryGenericRepository, ILearningUnitRepository)
             type=learning_unit.type,
             responsible_entity_code=learning_unit.responsible_entity_identity.code,
             responsible_entity_title="",
-            partims=learning_unit.get_partims_information()
+            partims=learning_unit.get_partims_information(),
+            quadrimester=learning_unit.derogation_quadrimester,
+            credits=learning_unit.credits,
+            lecturing_volume_annual=learning_unit.lecturing_part.volumes.volume_annual if
+            learning_unit.has_lecturing_volume() else 0,
+            practical_volume_annual=learning_unit.practical_part.volumes.volume_annual if
+            learning_unit.has_practical_volume() else 0,
+            session_derogation=learning_unit.derogation_session,
         )
 
     # TODO: To implement when Proposals are in DDD
