@@ -23,39 +23,118 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
 from unittest import mock
 
 from django.test import SimpleTestCase
 
-from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormationCommand
-from infrastructure.preparation_programme_annuel_etudiant.domain.service.catalogue_formations import \
-    CatalogueFormationsTranslator
+from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormulaireInscriptionCoursCommand
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import ContenuGroupementDTO, \
+    GroupementCatalogueDTO, UniteEnseignementCatalogueDTO, ContenuGroupementCatalogueDTO
+from infrastructure.messages_bus import message_bus_instance
 from infrastructure.preparation_programme_annuel_etudiant.domain.service.in_memory.catalogue_formations import \
     CatalogueFormationsTranslatorInMemory
+from program_management.ddd.dtos import UniteEnseignementDTO, ContenuNoeudDTO
 
 
 class GetFormulaireInscriptionCoursTest(SimpleTestCase):
-    # TODO :: identique à class CatalogueFormationsTranslatorTest(SimpleTestCase):
-    def setUp(self) -> None:
-        self.translator = CatalogueFormationsTranslator()
-        self.patch_message_bus = mock.patch(
-            "infrastructure.utils.MessageBus.invoke",
-            side_effect=self.__mock_message_bus_invoke
-        )
-        self.message_bus_mocked = self.patch_message_bus.start()
-        self.addCleanup(self.patch_message_bus.stop)
-        self.ECGE1BA_dto = CatalogueFormationsTranslatorInMemory.dtos[0]
 
-    def __mock_message_bus_invoke(self, cmd):
-        if isinstance(cmd, GetFormationCommand):
-            return self.ECGE1BA_dto
+    def setUp(self) -> None:
+        self.catalogue_formations_translator = CatalogueFormationsTranslatorInMemory()
+
+        self.__mock_service_bus()
+
+    def __mock_service_bus(self):
+        message_bus_patcher = mock.patch.multiple(
+            'infrastructure.messages_bus',
+            CatalogueFormationsTranslator=lambda: self.catalogue_formations_translator,
+        )
+        message_bus_patcher.start()
+        self.addCleanup(message_bus_patcher.stop)
+        self.message_bus = message_bus_instance
 
     def test_should_convertir_version_standard(self):
-        formation_dto = self.translator.get_formation(
-            sigle=self.ECGE1BA_dto.sigle,
-            annee=self.ECGE1BA_dto.annee,
-            version=self.ECGE1BA_dto.version,
-            transition_name=''
+        obj_FormationDTO_de_depart = CatalogueFormationsTranslatorInMemory.dtos[0]
+        cmd = GetFormulaireInscriptionCoursCommand(
+            annee_formation=2021,
+            sigle_formation='ECGE1BA',
+            version_formation='',
+            transition_formation=''
         )
-        self.assertEqual(formation_dto, self.ECGE1BA_dto)
 
+        resultat_conversion_en_FormulaireInscriptionCoursDTO = self.message_bus.invoke(cmd)
+
+        self.assertEqual(
+            resultat_conversion_en_FormulaireInscriptionCoursDTO.annee_formation,
+            obj_FormationDTO_de_depart.annee
+        )
+        self.assertEqual(
+            resultat_conversion_en_FormulaireInscriptionCoursDTO.sigle_formation,
+            obj_FormationDTO_de_depart.sigle
+        )
+        self.assertEqual(
+            resultat_conversion_en_FormulaireInscriptionCoursDTO.version_formation,
+            obj_FormationDTO_de_depart.version
+        )
+        self.assertEqual(
+            resultat_conversion_en_FormulaireInscriptionCoursDTO.intitule_complet_formation,
+            obj_FormationDTO_de_depart.intitule_complet
+        )
+
+        self._assert_equal_contenu_conversion(
+            resultat_conversion_en_FormulaireInscriptionCoursDTO.racine.groupement_contenant,
+            obj_FormationDTO_de_depart.racine.groupement_contenant
+        )
+
+        self._assert_equal_groupements_contenus(
+            resultat_conversion_en_FormulaireInscriptionCoursDTO.racine.groupements_contenus,
+            obj_FormationDTO_de_depart.racine.groupements_contenus,
+        )
+
+    def _assert_equal_groupements_contenus(
+            self,
+            formation_groupements_contenus: List['ContenuGroupementCatalogueDTO'],
+            prgm_racine_groupements_contenus: List['ContenuNoeudDTO'],
+    ):
+        for idx, pgm_contenu in enumerate(formation_groupements_contenus):
+            self._assert_equal_contenu_conversion(
+                pgm_contenu.groupement_contenant,
+                prgm_racine_groupements_contenus[idx].groupement_contenant
+            )
+            self._assert_equal_groupements_contenus(
+                pgm_contenu.groupements_contenus,
+                prgm_racine_groupements_contenus[idx].groupements_contenus
+            )
+            for idx_unite, unite_contenue in enumerate(pgm_contenu.unites_enseignement_contenues):
+                self._assert_equal_unite_conversion(
+                    unite_contenue,
+                    prgm_racine_groupements_contenus[idx].unites_enseignement_contenues[idx_unite]
+                )
+
+    def _assert_equal_contenu_conversion(
+            self,
+            formation_contenu: 'ContenuGroupementDTO',
+            pgm_contenu: 'GroupementCatalogueDTO'
+    ):
+
+        self.assertEqual(pgm_contenu.intitule, formation_contenu.intitule)
+        self.assertEqual(pgm_contenu.intitule_complet, formation_contenu.intitule_complet)
+        self.assertEqual(pgm_contenu.obligatoire, formation_contenu.obligatoire)
+        self.assertEqual(pgm_contenu.remarque, formation_contenu.remarque)
+        self.assertEqual(pgm_contenu.credits, formation_contenu.credits)
+
+    def _assert_equal_unite_conversion(
+            self,
+            unite_contenue: UniteEnseignementCatalogueDTO,
+            unite_contenu_dans_programme: UniteEnseignementDTO
+    ):
+        self.assertEqual(unite_contenue.bloc, unite_contenu_dans_programme.bloc)
+        self.assertEqual(unite_contenue.code, unite_contenu_dans_programme.code)
+        self.assertEqual(unite_contenue.intitule_complet, unite_contenu_dans_programme.intitule_complet)
+        self.assertEqual(unite_contenue.quadrimestre, unite_contenu_dans_programme.quadrimestre)
+        self.assertEqual(unite_contenue.credits_absolus, unite_contenu_dans_programme.credits_absolus)
+        self.assertEqual(unite_contenue.volume_annuel_pm, unite_contenu_dans_programme.volume_annuel_pm)
+        self.assertEqual(unite_contenue.volume_annuel_pp, unite_contenu_dans_programme.volume_annuel_pp)
+        self.assertEqual(unite_contenue.obligatoire, unite_contenu_dans_programme.obligatoire)
+        self.assertEqual(unite_contenue.credits_relatifs, unite_contenu_dans_programme.credits_relatifs)
+        self.assertEqual(unite_contenue.session_derogation, unite_contenu_dans_programme.session_derogation)

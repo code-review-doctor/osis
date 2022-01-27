@@ -79,7 +79,7 @@ class CatalogueFormationsTranslatorInMemory(ICatalogueFormationsTranslator):
             ),
             annee=ANNEE,
             sigle='ECGE1BA',
-            version='STANDARD',
+            version='',
             intitule_complet='Bachelier en sciences économiques et de gestion',
         ),
     ]
