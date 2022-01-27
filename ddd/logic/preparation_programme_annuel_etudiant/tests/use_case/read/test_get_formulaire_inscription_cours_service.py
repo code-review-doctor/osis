@@ -54,7 +54,7 @@ class GetFormulaireInscriptionCoursTest(SimpleTestCase):
         self.addCleanup(message_bus_patcher.stop)
         self.message_bus = message_bus_instance
 
-    def test_should_afficher_programme_inscription_cas_nominal_version_stabdard(self):
+    def test_should_afficher_programme_inscription_cas_nominal_version_standard(self):
         obj_FormationDTO_de_depart = CatalogueFormationsTranslatorInMemory.dtos[0]
         cmd = GetFormulaireInscriptionCoursCommand(
             annee_formation=2021,

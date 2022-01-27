@@ -33,7 +33,7 @@ from ddd.logic.preparation_programme_annuel_etudiant.dtos import UniteEnseigneme
     ContenuGroupementCatalogueDTO, GroupementCatalogueDTO
 from infrastructure.preparation_programme_annuel_etudiant.domain.service.catalogue_formations import \
     CatalogueFormationsTranslator
-from program_management.ddd.domain.program_tree_version import STANDARD
+from program_management.ddd.domain.program_tree_version import STANDARD, NOT_A_TRANSITION
 from program_management.ddd.dtos import ProgrammeDeFormationDTO, ContenuNoeudDTO, GroupementDTO, UniteEnseignementDTO
 
 ANNEE = 2021
@@ -58,7 +58,7 @@ class CatalogueFormationsTranslatorTest(SimpleTestCase):
             sigle=program_to_translate.sigle,
             annee=program_to_translate.annee,
             version=program_to_translate.version,
-            transition_name=''
+            transition_name=NOT_A_TRANSITION
         )
 
         self.assertEqual(program_to_translate.annee, formation_dto.annee)
