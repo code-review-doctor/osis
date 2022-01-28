@@ -65,6 +65,7 @@ class CatalogueFormationsInMemoryTranslator(ICatalogueFormationsTranslator):
             code='LECGE100B',
             version='',
             intitule_complet='Bachelier en sciences économiques et de gestion',
+            transition=''
         ),
     ]
 

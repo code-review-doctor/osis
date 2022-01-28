@@ -54,10 +54,8 @@ class GetProgrammeInscriptionCoursTest(SimpleTestCase):
 
     def test_should_visualiser_ECGE1BA_version_standard(self):
         cmd = GetProgrammeInscriptionCoursCommand(
-            annee_formation=2021,
-            sigle_formation='ECGE1BA',
-            version_formation='',
-            transition_formation='',
+            annee=2021,
+            code_programme='LECGE100B',
         )
         programme = self.message_bus.invoke(cmd)
         self.assertEqual(programme.code, 'LECGE100T')

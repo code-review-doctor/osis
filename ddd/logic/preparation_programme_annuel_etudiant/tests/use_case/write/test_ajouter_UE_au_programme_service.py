@@ -42,7 +42,7 @@ class TestAjouterUeAuProgramme(SimpleTestCase):
 
     def setUp(self) -> None:
         self.annee = 2021
-        self.sigle_formation = 'ECGE1BA'
+        self.code_programme = 'LECGE100T'
         self.version_formation = STANDARD
         self.transition_formation = ''
         self.repository = GroupementAjusteInscriptionCoursInMemoryRepository()
@@ -60,10 +60,8 @@ class TestAjouterUeAuProgramme(SimpleTestCase):
     def test_should_ajouter_UE_cas_nominal(self):
         groupement_ajuste_id = self.message_bus.invoke(
             AjouterUEAuProgrammeCommand(
-                annee_formation=self.annee,
-                sigle_formation=self.sigle_formation,
-                version_formation=self.version_formation,
-                transition_formation=self.transition_formation,
+                annee=self.annee,
+                code_programme=self.code_programme,
                 ajouter_dans='LECGE100T',
                 unites_enseignements=['LINGE1125', 'LINGE1122'],
             )
@@ -75,10 +73,8 @@ class TestAjouterUeAuProgramme(SimpleTestCase):
 
     def test_should_empecher_ajouter_UE_deja_ajoutee(self):
         cmd = AjouterUEAuProgrammeCommand(
-            annee_formation=self.annee,
-            sigle_formation=self.sigle_formation,
-            version_formation=self.version_formation,
-            transition_formation=self.transition_formation,
+            annee=self.annee,
+            code_programme=self.code_programme,
             ajouter_dans='LECGE100T',
             unites_enseignements=['LINGE1125', 'LINGE1122'],
         )
