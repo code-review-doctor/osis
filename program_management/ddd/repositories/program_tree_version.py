@@ -286,15 +286,12 @@ def _update_start_year_and_end_year(
 
 
 def _instanciate_tree_version(record_dict: dict) -> 'ProgramTreeVersion':
-    print(record_dict)
     identity = program_tree_version.ProgramTreeVersionIdentity(
         offer_acronym=record_dict['offer_acronym'],
         year=record_dict['offer_year'],
         version_name=record_dict['version_name'],
         transition_name=record_dict['transition_name'],
     )
-    print('$$$')
-    print(record_dict['version_title_fr'])
     return program_tree_version.ProgramTreeVersion(
         entity_identity=identity,
         entity_id=identity,
