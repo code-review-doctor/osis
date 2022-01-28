@@ -78,8 +78,12 @@ class GetFormulaireInscriptionCoursTest(SimpleTestCase):
             obj_FormationDTO_de_depart.version
         )
         self.assertEqual(
-            resultat_conversion_en_FormulaireInscriptionCoursDTO.intitule_complet_formation,
-            obj_FormationDTO_de_depart.intitule_complet
+            resultat_conversion_en_FormulaireInscriptionCoursDTO.intitule_formation,
+            obj_FormationDTO_de_depart.intitule_formation
+        )
+        self.assertEqual(
+            resultat_conversion_en_FormulaireInscriptionCoursDTO.intitule_version_programme,
+            obj_FormationDTO_de_depart.intitule_version_programme
         )
 
         self._assert_equal_contenu_conversion(
@@ -133,6 +137,7 @@ class GetFormulaireInscriptionCoursTest(SimpleTestCase):
         self.assertEqual(unite_contenue.code, unite_contenu_dans_programme.code)
         self.assertEqual(unite_contenue.intitule_complet, unite_contenu_dans_programme.intitule_complet)
         self.assertEqual(unite_contenue.quadrimestre, unite_contenu_dans_programme.quadrimestre)
+        self.assertEqual(unite_contenue.quadrimestre_texte, unite_contenu_dans_programme.quadrimestre_texte)
         self.assertEqual(unite_contenue.credits_absolus, unite_contenu_dans_programme.credits_absolus)
         self.assertEqual(unite_contenue.volume_annuel_pm, unite_contenu_dans_programme.volume_annuel_pm)
         self.assertEqual(unite_contenue.volume_annuel_pp, unite_contenu_dans_programme.volume_annuel_pp)

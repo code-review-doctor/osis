@@ -32,6 +32,59 @@ from program_management.ddd.domain.program_tree_version import STANDARD
 ANNEE = 2021
 
 
+def _cas_nominal_formation_version_standard():
+    groupement_ECGE1BA = GroupementCatalogueDTO(
+        intitule='ECGE1BA',
+        obligatoire=True,
+        remarque='Remarque',
+        credits=10,
+        intitule_complet='Bachelier en sciences économiques et de gestion ',
+    )
+    return FormationDTO(
+        racine=ContenuGroupementCatalogueDTO(
+            groupement_contenant=groupement_ECGE1BA,
+            groupements_contenus=[
+                ContenuGroupementCatalogueDTO(
+                    groupement_contenant=groupement_ECGE1BA,
+                    groupements_contenus=[
+                        ContenuGroupementCatalogueDTO(
+                            groupement_contenant=GroupementCatalogueDTO(
+                                intitule='Contenu :',
+                                obligatoire=True,
+                                remarque='Remarque',
+                                credits=10,
+                                intitule_complet='Contenu :',
+                            ),
+                            groupements_contenus=[],
+                            unites_enseignement_contenues=[
+                                UniteEnseignementCatalogueDTO(
+                                    bloc=1,
+                                    code='LESPO1113',
+                                    intitule_complet='Sociologie et anthropologie des mondes contemporains',
+                                    quadrimestre='Q1or2',
+                                    credits_absolus=5,
+                                    volume_annuel_pm=40,
+                                    volume_annuel_pp=0,
+                                    obligatoire=False,
+                                    credits_relatifs=5,
+                                    session_derogation='',
+                                    quadrimestre_texte='Q1 ou Q2'
+                                )
+                            ]
+                        )],
+                    unites_enseignement_contenues=[]
+                )
+            ],
+            unites_enseignement_contenues=[]
+        ),
+        annee=ANNEE,
+        sigle='ECGE1BA',
+        version=STANDARD,
+        intitule_formation='Bachelier en sciences économiques et de gestion',
+        intitule_version_programme='Bachelier en sciences économiques et de gestion',
+    )
+
+
 class CatalogueFormationsTranslatorInMemory(ICatalogueFormationsTranslator):
     groupement_ECGE1BA = GroupementCatalogueDTO(
         intitule='ECGE1BA',
@@ -42,47 +95,7 @@ class CatalogueFormationsTranslatorInMemory(ICatalogueFormationsTranslator):
     )
 
     dtos = [
-        FormationDTO(
-            racine=ContenuGroupementCatalogueDTO(
-                groupement_contenant=groupement_ECGE1BA,
-                groupements_contenus=[
-                    ContenuGroupementCatalogueDTO(
-                        groupement_contenant=groupement_ECGE1BA,
-                        groupements_contenus=[
-                            ContenuGroupementCatalogueDTO(
-                                groupement_contenant=GroupementCatalogueDTO(
-                                    intitule='Contenu :',
-                                    obligatoire=True,
-                                    remarque='Remarque',
-                                    credits=10,
-                                    intitule_complet='Contenu :',
-                                ),
-                                groupements_contenus=[],
-                                unites_enseignement_contenues=[
-                                    UniteEnseignementCatalogueDTO(
-                                        bloc=1,
-                                        code='LESPO1113',
-                                        intitule_complet='Sociologie et anthropologie des mondes contemporains',
-                                        quadrimestre='Q1 ou Q2',
-                                        credits_absolus=5,
-                                        volume_annuel_pm=40,
-                                        volume_annuel_pp=0,
-                                        obligatoire=False,
-                                        credits_relatifs=5,
-                                        session_derogation='',
-                                    )
-                                ]
-                            )],
-                        unites_enseignement_contenues=[]
-                    )
-                ],
-                unites_enseignement_contenues=[]
-            ),
-            annee=ANNEE,
-            sigle='ECGE1BA',
-            version=STANDARD,
-            intitule_complet='Bachelier en sciences économiques et de gestion',
-        ),
+        _cas_nominal_formation_version_standard(),
     ]
 
     @classmethod
