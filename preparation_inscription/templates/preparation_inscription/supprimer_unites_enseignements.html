@@ -92,22 +92,24 @@
                 {{ element.commentaire_en }}
             </td>
         </tr>
-    {% endfor %}
+        {% endfor %}
     </tbody>
 </table>
 </div>
 
 <div class="panel-footer text-right">
-    <a href="" hx-get="{% url 'consulter_contenu_groupement_view' year acronym %}" hx-target="#content-of-main-panel" hx-trigger="click" type="button" class="btn btn-default">Annuler</a>
-    <a href="" hx-get="{% url 'consulter_contenu_groupement_view' year acronym %}" hx-target="#content-of-main-panel" hx-trigger="click" type="button" class="btn btn-danger">Supprimer</a>
+    <a href="" hx-get="{% url 'consulter_contenu_groupement_view' annee code_programme %}"
+       hx-target="#content-of-main-panel" hx-trigger="click" type="button" class="btn btn-default">Annuler</a>
+    <a href="" hx-get="{% url 'consulter_contenu_groupement_view' annee code_programme %}"
+       hx-target="#content-of-main-panel" hx-trigger="click" type="button" class="btn btn-danger">Supprimer</a>
 </div>
 
 
 
 {% block script %}
-<script>
-    document.querySelector("#id_check_all").addEventListener('click', (e) => {
-        document.querySelectorAll('.select-row-checkbox').forEach(checkbox => checkbox.checked = e.target.checked);
-    });
-</script>
+    <script>
+        document.querySelector("#id_check_all").addEventListener('click', (e) => {
+            document.querySelectorAll('.select-row-checkbox').forEach(checkbox => checkbox.checked = e.target.checked);
+        });
+    </script>
 {% endblock %}

@@ -62,16 +62,17 @@ class CatalogueFormationsInMemoryTranslator(ICatalogueFormationsTranslator):
             ),
             annee=2021,
             sigle='ECGE1BA',
+            code='LECGE100B',
             version='',
             intitule_complet='Bachelier en sciences économiques et de gestion',
         ),
     ]
 
     @classmethod
-    def get_formation(cls, sigle: str, annee: int, version: str, transition_name: str) -> 'FormationDTO':
+    def get_formation(cls, code_programme: str, annee: int) -> 'FormationDTO':
         return next(
             dto for dto in cls.dtos
-            if dto.sigle == sigle and dto.annee == annee and dto.version == version
+            if dto.code == code_programme and dto.annee == annee
         )
 
     @classmethod

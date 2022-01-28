@@ -40,8 +40,8 @@ from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormulaireInscr
     GroupementCatalogueDTO, GroupementDTO
 from ddd.logic.preparation_programme_annuel_etudiant.repository.i_groupement_ajuste_inscription_cours import \
     IGroupementAjusteInscriptionCoursRepository
+from education_group.ddd.domain.group import GroupIdentity
 from osis_common.ddd import interface
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentityBuilder
 
 
 class GetFormulaireInscriptionCours(interface.DomainService):
@@ -54,20 +54,16 @@ class GetFormulaireInscriptionCours(interface.DomainService):
             catalogue_unites_enseignement_translator: 'ICatalogueUnitesEnseignementTranslator'
     ) -> 'FormulaireInscriptionCoursDTO':
         formation = catalogue_formations_translator.get_formation(
-            sigle=cmd.sigle_formation,
-            annee=cmd.annee_formation,
-            version=cmd.version_formation,
-            transition_name=cmd.transition_formation
+            code_programme=cmd.code_programme,
+            annee=cmd.annee,
         )
 
         formulaire_inscription = cls.convertir_formation_catalogue_en_formulaire_inscription(formation)
 
         groupements_ajustes = repo.search(
-            version_programme_id=ProgramTreeVersionIdentityBuilder().build(
-                year=cmd.annee_formation,
-                offer_acronym=cmd.sigle_formation,
-                version_name=cmd.version_formation,
-                transition_name=cmd.transition_formation
+            groupement_id=GroupIdentity(
+                year=cmd.annee,
+                code=cmd.code_programme,
             )
         )
 

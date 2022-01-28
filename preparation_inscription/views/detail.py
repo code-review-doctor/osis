@@ -37,11 +37,13 @@ class PreparationInscriptionMainView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         return {
             **super().get_context_data(**kwargs),
-            'tree_view_url': self.get_tree_view_url()
+            'tree_view_url': self.get_tree_view_url(),
+            'annee': self.kwargs['annee'],
+            'code_programme': self.kwargs['code_programme']
         }
 
     def get_tree_view_url(self) -> str:
         return reverse('program-tree-view', kwargs={
-            'year': self.kwargs['year'],
-            'acronym': self.kwargs['acronym']
+            'annee': self.kwargs['annee'],
+            'code_programme': self.kwargs['code_programme']
         })

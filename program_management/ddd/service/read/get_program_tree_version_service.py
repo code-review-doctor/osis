@@ -46,15 +46,11 @@ def get_program_tree_version(cmd: GetProgramTreeVersionCommand) -> Optional['Pro
         return None
 
 
-def get_programme_formation(cmd: GetFormationCommand) -> 'ProgrammeDeFormationDTO':
-    identity = program_tree_version.ProgramTreeVersionIdentity(
-        offer_acronym=cmd.code,
-        year=cmd.annee,
-        version_name=cmd.version,
-        transition_name=cmd.transition
-    )
-
+def get_programme_formation(cmd: GetFormationCommand) -> Optional['ProgrammeDeFormationDTO']:
     try:
-        return program_tree_version_repository.ProgramTreeVersionRepository().get_dto(identity)
+        return program_tree_version_repository.ProgramTreeVersionRepository().get_dto_from_year_and_code(
+            year=cmd.annee,
+            code=cmd.code
+        )
     except exception.ProgramTreeVersionNotFoundException:
         return None

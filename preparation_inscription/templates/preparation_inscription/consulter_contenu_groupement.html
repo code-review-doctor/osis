@@ -21,29 +21,34 @@
  *
  * A copy of this license - GNU General Public License - is available
  * at the root of the source code of this program.  If not,
- * see http://www.gnu.org/licenses/.
+    * see http://www.gnu.org/licenses/.
 {% endcomment %}
 <div class="panel-heading">
     <div class="pull-right">
         <div class="dropdown">
-            <button class="btn btn-default dropdown-toggle" type="button" id="btn-action-down" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+            <button class="btn btn-default dropdown-toggle" type="button" id="btn-action-down" data-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="true">
                 <span class="fa fa-cog" aria-hidden="true"></span> {% trans 'Actions' %}
                 <span class="caret"></span>
             </button>
             <ul class="dropdown-menu pull-right" aria-labelledby="btn-action-down">
-                <li><a href="" hx-get="{% url 'ajouter_unites_enseignement_view' year acronym %}" hx-target="#content-of-main-panel" hx-trigger="click">{% trans "Ajouter des UE" %}</a></li>
-                <li><a href="" hx-get="{% url 'supprimer_unites_enseignement_view' year acronym %}" hx-target="#content-of-main-panel" hx-trigger="click">{% trans "Supprimer des UE" %}</a></li>
-                <li><a href="" hx-get="{% url 'modifier_proprietes_contenu_view' year acronym %}" hx-target="#content-of-main-panel" hx-trigger="click">{% trans "Modifier les propriétés" %}</a></li>
+                <li><a href="" hx-get="{% url 'ajouter_unites_enseignement_view' annee code_programme %}"
+                       hx-target="#content-of-main-panel" hx-trigger="click">{% trans "Ajouter des UE" %}</a></li>
+                <li><a href="" hx-get="{% url 'supprimer_unites_enseignement_view' annee code_programme %}"
+                       hx-target="#content-of-main-panel" hx-trigger="click">{% trans "Supprimer des UE" %}</a></li>
+                <li><a href="" hx-get="{% url 'modifier_proprietes_contenu_view' annee code_programme %}"
+                       hx-target="#content-of-main-panel" hx-trigger="click">{% trans "Modifier les propriétés" %}</a>
+                </li>
             </ul>
         </div>
     </div>
     <h5>{{ intitule_groupement }}</h5>
 </div>
 <div class="panel-body">
-<table id="table_search_list" class="table table-hover">
-    <thead>
-    <tr>
-        <th id="code_ue" class="code-col">{% trans 'Code' %}</th>
+    <table id="table_search_list" class="table table-hover">
+        <thead>
+        <tr>
+            <th id="code_ue" class="code-col">{% trans 'Code' %}</th>
         <th id="intitule">{% trans 'Intitulé' %}</th>
         <th id="volumes">{% trans 'Composants (PM/PP)' %}</th>
         <th id="bloc">{% trans 'Bloc' %}</th>

@@ -110,7 +110,9 @@ class FormationDTO(DTO):
     racine: ContenuGroupementCatalogueDTO
     annee: int
     sigle: str
+    code: str
     version: str
+    transition: str
     intitule_complet: str  # intitulé de la formation + version formation
 
 

@@ -40,8 +40,8 @@ from ddd.logic.preparation_programme_annuel_etudiant.dtos import ProgrammeInscri
     UniteEnseignementAjouteeDTO, UniteEnseignementCatalogueDTO
 from ddd.logic.preparation_programme_annuel_etudiant.repository.i_groupement_ajuste_inscription_cours import \
     IGroupementAjusteInscriptionCoursRepository
+from education_group.ddd.domain.group import GroupIdentity
 from osis_common.ddd import interface
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentityBuilder
 
 
 class GetProgrammeInscriptionCours(interface.DomainService):
@@ -54,18 +54,14 @@ class GetProgrammeInscriptionCours(interface.DomainService):
             catalogue_unites_enseignement_translator: 'ICatalogueUnitesEnseignementTranslator'
     ):
         formation = catalogue_formations_translator.get_formation(
-            sigle=cmd.sigle_formation,
-            annee=cmd.annee_formation,
-            version=cmd.version_formation,
-            transition_name=cmd.transition_formation
+            code_programme=cmd.code_programme,
+            annee=cmd.annee,
         )
 
         groupements_ajustes = groupement_ajuste_repository.search(
-            version_programme_id=ProgramTreeVersionIdentityBuilder().build(
-                year=cmd.annee_formation,
-                offer_acronym=cmd.sigle_formation,
-                version_name=cmd.version_formation,
-                transition_name=cmd.transition_formation
+            version_programme_id=GroupIdentity(
+                year=cmd.annee,
+                code=cmd.code_programme,
             )
         )
         unite_enseignements_ajoutes_dto = cls.rechercher_unites_enseignement_ajoutees_catalogue_dto(
@@ -80,9 +76,9 @@ class GetProgrammeInscriptionCours(interface.DomainService):
         return ProgrammeInscriptionCoursDTO(
             uuid='uuid-1234',
             code=formation.racine.groupement_contenant.code,
-            annee=cmd.annee_formation,
-            version=cmd.version_formation,
-            transition=cmd.transition_formation,
+            annee=cmd.annee,
+            version=formation.version,
+            transition=formation.transition,
             intitule_complet_formation=formation.intitule_complet,
             sous_programme=groupements,
         )
