@@ -62,5 +62,5 @@ class ProgramTreeHTMLView(LoginRequiredMixin, TemplateView):
         tree_dto = message_bus_instance.invoke(cmd)
         return tree_dto
 
-    def get_node_of_tree(self, node_id: str) -> List:
-        return []
+    def get_node_of_tree(self, node_id: str) -> 'ProgrammeInscriptionCoursDTO':
+        return self.get_tree()  # TODO :: à implémenter - charger uniquement le node modifié (et pas tout l'arbre)

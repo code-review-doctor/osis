@@ -162,3 +162,9 @@
 {% include 'preparation_inscription/modal_confirmer_annuler_suppression.html' %}
 {% include 'preparation_inscription/modal_confirmer_annuler_modification.html' %}
 {% include 'preparation_inscription/modal_confirmer_annuler_ajout.html' %}
+
+{% if rafraichir_groupement_contenant %}
+    <script>
+        $('#tree').trigger('refreshNode', '{{ code_groupement_racine }}');
+    </script>
+{% endif %}
