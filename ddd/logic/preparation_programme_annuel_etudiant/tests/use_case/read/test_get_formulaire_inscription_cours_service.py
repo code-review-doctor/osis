@@ -33,7 +33,7 @@ from ddd.logic.preparation_programme_annuel_etudiant.dtos import ContenuGroupeme
     GroupementCatalogueDTO, UniteEnseignementCatalogueDTO, ContenuGroupementCatalogueDTO
 from infrastructure.messages_bus import message_bus_instance
 from infrastructure.preparation_programme_annuel_etudiant.domain.service.in_memory.catalogue_formations import \
-    CatalogueFormationsTranslatorInMemory
+    CatalogueFormationsTranslatorInMemory, ANNEE
 from program_management.ddd.dtos import UniteEnseignementDTO, ContenuNoeudDTO
 from program_management.ddd.domain.program_tree_version import STANDARD, NOT_A_TRANSITION
 
@@ -57,14 +57,27 @@ class GetFormulaireInscriptionCoursTest(SimpleTestCase):
     def test_should_afficher_programme_inscription_cas_nominal_version_standard(self):
         obj_FormationDTO_de_depart = CatalogueFormationsTranslatorInMemory.dtos[0]
         cmd = GetFormulaireInscriptionCoursCommand(
-            annee_formation=2021,
+            annee_formation=ANNEE,
             sigle_formation='ECGE1BA',
             version_formation=STANDARD,
             transition_formation=NOT_A_TRANSITION
         )
 
-        resultat_conversion_en_FormulaireInscriptionCoursDTO = self.message_bus.invoke(cmd)
+        self._assert_equal_tous_les_attributs_ok_apres_conversion(cmd, obj_FormationDTO_de_depart)
 
+    def test_should_afficher_programme_inscription_cas_formation_version_particuliere(self):
+        obj_FormationDTO_de_depart = CatalogueFormationsTranslatorInMemory.dtos[1]
+        cmd = GetFormulaireInscriptionCoursCommand(
+            annee_formation=ANNEE,
+            sigle_formation='CORP2MS/CS',
+            version_formation='DDSHERBROOKE',
+            transition_formation=NOT_A_TRANSITION
+        )
+
+        self._assert_equal_tous_les_attributs_ok_apres_conversion(cmd, obj_FormationDTO_de_depart)
+
+    def _assert_equal_tous_les_attributs_ok_apres_conversion(self, cmd, obj_FormationDTO_de_depart):
+        resultat_conversion_en_FormulaireInscriptionCoursDTO = self.message_bus.invoke(cmd)
         self.assertEqual(
             resultat_conversion_en_FormulaireInscriptionCoursDTO.annee_formation,
             obj_FormationDTO_de_depart.annee
@@ -78,15 +91,13 @@ class GetFormulaireInscriptionCoursTest(SimpleTestCase):
             obj_FormationDTO_de_depart.version
         )
         self.assertEqual(
-            resultat_conversion_en_FormulaireInscriptionCoursDTO.intitule_complet_formation,
-            obj_FormationDTO_de_depart.intitule_complet
+            resultat_conversion_en_FormulaireInscriptionCoursDTO.intitule_formation,
+            obj_FormationDTO_de_depart.intitule_formation
         )
-
         self._assert_equal_contenu_conversion(
             resultat_conversion_en_FormulaireInscriptionCoursDTO.racine.groupement_contenant,
             obj_FormationDTO_de_depart.racine.groupement_contenant
         )
-
         self._assert_equal_groupements_contenus(
             resultat_conversion_en_FormulaireInscriptionCoursDTO.racine.groupements_contenus,
             obj_FormationDTO_de_depart.racine.groupements_contenus,
@@ -133,6 +144,7 @@ class GetFormulaireInscriptionCoursTest(SimpleTestCase):
         self.assertEqual(unite_contenue.code, unite_contenu_dans_programme.code)
         self.assertEqual(unite_contenue.intitule_complet, unite_contenu_dans_programme.intitule_complet)
         self.assertEqual(unite_contenue.quadrimestre, unite_contenu_dans_programme.quadrimestre)
+        self.assertEqual(unite_contenue.quadrimestre_texte, unite_contenu_dans_programme.quadrimestre_texte)
         self.assertEqual(unite_contenue.credits_absolus, unite_contenu_dans_programme.credits_absolus)
         self.assertEqual(unite_contenue.volume_annuel_pm, unite_contenu_dans_programme.volume_annuel_pm)
         self.assertEqual(unite_contenue.volume_annuel_pp, unite_contenu_dans_programme.volume_annuel_pp)

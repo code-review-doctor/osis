@@ -64,7 +64,7 @@ class CatalogueFormationsTranslatorTest(SimpleTestCase):
         self.assertEqual(program_to_translate.annee, formation_dto.annee)
         self.assertEqual(program_to_translate.sigle, formation_dto.sigle)
         self.assertEqual(program_to_translate.version, formation_dto.version)
-        self.assertEqual(program_to_translate.intitule_complet, formation_dto.intitule_complet)
+        self.assertEqual(program_to_translate.intitule_formation, formation_dto.intitule_formation)
 
         self._assert_equal_contenu_conversion(
             formation_dto.racine.groupement_contenant,
@@ -154,7 +154,8 @@ def _build_ProgrammeDeFormationDTO():
                                     bloc=1,
                                     code='LESPO1113pp',
                                     intitule_complet='Sociologie et anthropologie des mondes contemporains',
-                                    quadrimestre='Q1 ou Q2',
+                                    quadrimestre='Q1or2',
+                                    quadrimestre_texte='Q1 ou Q2',
                                     credits_absolus=Decimal(5),
                                     volume_annuel_pm=40,
                                     volume_annuel_pp=0,
@@ -172,6 +173,5 @@ def _build_ProgrammeDeFormationDTO():
         annee=ANNEE,
         sigle='ECGE1BA',
         version=STANDARD,
-        intitule_complet='Bachelier en sciences économiques et de gestion',
-
+        intitule_formation='Bachelier en sciences économiques et de gestion',
     )

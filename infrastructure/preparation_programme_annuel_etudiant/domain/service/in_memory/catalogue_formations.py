@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from decimal import Decimal
+
 from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import \
     ICatalogueFormationsTranslator
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, ContenuGroupementCatalogueDTO, \
@@ -32,57 +34,116 @@ from program_management.ddd.domain.program_tree_version import STANDARD
 ANNEE = 2021
 
 
-class CatalogueFormationsTranslatorInMemory(ICatalogueFormationsTranslator):
-    groupement_ECGE1BA = GroupementCatalogueDTO(
-        intitule='ECGE1BA',
+def _cas_nominal_formation_version_standard():
+    SIGLE = 'ECGE1BA'
+    groupement = GroupementCatalogueDTO(
+        intitule=SIGLE,
         obligatoire=True,
         remarque='Remarque',
-        credits=10,
-        intitule_complet='Bachelier en sciences économiques et de gestion ',
+        credits=Decimal(10),
+        intitule_complet='Bachelier en sciences économiques et de gestion',
+    )
+    return FormationDTO(
+        racine=ContenuGroupementCatalogueDTO(
+            groupement_contenant=groupement,
+            groupements_contenus=[
+                ContenuGroupementCatalogueDTO(
+                    groupement_contenant=groupement,
+                    groupements_contenus=[
+                        ContenuGroupementCatalogueDTO(
+                            groupement_contenant=GroupementCatalogueDTO(
+                                intitule='Contenu :',
+                                obligatoire=True,
+                                remarque='Remarque',
+                                credits=Decimal(10),
+                                intitule_complet='Contenu :',
+                            ),
+                            groupements_contenus=[],
+                            unites_enseignement_contenues=[
+                                UniteEnseignementCatalogueDTO(
+                                    bloc=1,
+                                    code='LESPO1113',
+                                    intitule_complet='Sociologie et anthropologie des mondes contemporains',
+                                    quadrimestre='Q1or2',
+                                    credits_absolus=Decimal(5),
+                                    volume_annuel_pm=40,
+                                    volume_annuel_pp=0,
+                                    obligatoire=False,
+                                    credits_relatifs=None,
+                                    session_derogation='',
+                                    quadrimestre_texte='Q1 ou Q2'
+                                )
+                            ]
+                        )],
+                    unites_enseignement_contenues=[]
+                )
+            ],
+            unites_enseignement_contenues=[]
+        ),
+        annee=ANNEE,
+        sigle=SIGLE,
+        version=STANDARD,
+        intitule_formation='Bachelier en sciences économiques et de gestion'
     )
 
-    dtos = [
-        FormationDTO(
-            racine=ContenuGroupementCatalogueDTO(
-                groupement_contenant=groupement_ECGE1BA,
-                groupements_contenus=[
-                    ContenuGroupementCatalogueDTO(
-                        groupement_contenant=groupement_ECGE1BA,
-                        groupements_contenus=[
-                            ContenuGroupementCatalogueDTO(
-                                groupement_contenant=GroupementCatalogueDTO(
-                                    intitule='Contenu :',
-                                    obligatoire=True,
-                                    remarque='Remarque',
-                                    credits=10,
-                                    intitule_complet='Contenu :',
-                                ),
-                                groupements_contenus=[],
-                                unites_enseignement_contenues=[
-                                    UniteEnseignementCatalogueDTO(
-                                        bloc=1,
-                                        code='LESPO1113',
-                                        intitule_complet='Sociologie et anthropologie des mondes contemporains',
-                                        quadrimestre='Q1 ou Q2',
-                                        credits_absolus=5,
-                                        volume_annuel_pm=40,
-                                        volume_annuel_pp=0,
-                                        obligatoire=False,
-                                        credits_relatifs=5,
-                                        session_derogation='',
-                                    )
-                                ]
-                            )],
-                        unites_enseignement_contenues=[]
-                    )
-                ],
-                unites_enseignement_contenues=[]
-            ),
-            annee=ANNEE,
-            sigle='ECGE1BA',
-            version=STANDARD,
-            intitule_complet='Bachelier en sciences économiques et de gestion',
+
+def _cas_formation_version_particuliere():
+    SIGLE = 'CORP2MS/CS'
+    groupement = GroupementCatalogueDTO(
+        intitule=SIGLE,
+        obligatoire=True,
+        remarque='Remarque',
+        credits=Decimal(10),
+        intitule_complet='Master [120] en communication[ Double diplôme UCLouvain - uSherbrooke ]',
+    )
+    return FormationDTO(
+        racine=ContenuGroupementCatalogueDTO(
+            groupement_contenant=groupement,
+            groupements_contenus=[
+                ContenuGroupementCatalogueDTO(
+                    groupement_contenant=groupement,
+                    groupements_contenus=[
+                        ContenuGroupementCatalogueDTO(
+                            groupement_contenant=GroupementCatalogueDTO(
+                                intitule='Tronc commun',
+                                obligatoire=True,
+                                remarque='Remarque',
+                                credits=Decimal(10),
+                                intitule_complet='Tronc commun',
+                            ),
+                            groupements_contenus=[],
+                            unites_enseignement_contenues=[
+                                UniteEnseignementCatalogueDTO(
+                                    bloc=2,
+                                    code='LCOMU2904B',
+                                    intitule_complet="Séminaire d'accompagnement au mémoire : méthodologie",
+                                    quadrimestre='Q2',
+                                    credits_absolus=Decimal(20),
+                                    volume_annuel_pm=0,
+                                    volume_annuel_pp=0,
+                                    obligatoire=False,
+                                    credits_relatifs=None,
+                                    session_derogation='',
+                                    quadrimestre_texte='Q2'
+                                )
+                            ]
+                        )],
+                    unites_enseignement_contenues=[]
+                )
+            ],
+            unites_enseignement_contenues=[]
         ),
+        annee=ANNEE,
+        sigle=SIGLE,
+        version='DDSHERBROOKE',
+        intitule_formation='Master [120] en communication[ Double diplôme UCLouvain - uSherbrooke ]',
+    )
+
+
+class CatalogueFormationsTranslatorInMemory(ICatalogueFormationsTranslator):
+    dtos = [
+        _cas_nominal_formation_version_standard(),
+        _cas_formation_version_particuliere()
     ]
 
     @classmethod
