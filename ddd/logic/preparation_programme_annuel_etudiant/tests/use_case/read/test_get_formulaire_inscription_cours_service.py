@@ -81,10 +81,6 @@ class GetFormulaireInscriptionCoursTest(SimpleTestCase):
             resultat_conversion_en_FormulaireInscriptionCoursDTO.intitule_formation,
             obj_FormationDTO_de_depart.intitule_formation
         )
-        self.assertEqual(
-            resultat_conversion_en_FormulaireInscriptionCoursDTO.intitule_version_programme,
-            obj_FormationDTO_de_depart.intitule_version_programme
-        )
 
         self._assert_equal_contenu_conversion(
             resultat_conversion_en_FormulaireInscriptionCoursDTO.racine.groupement_contenant,

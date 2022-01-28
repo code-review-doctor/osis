@@ -92,7 +92,7 @@ def contexte_commun_preparation_inscription(sigle, transition_name, version_name
             formulaire.sigle_formation,
             formulaire.version_formation if formulaire.version_formation != STANDARD else ''
         ),
-        'title': formulaire.intitule_version_programme,
+        'title': formulaire.intitule_formation,
         'formulaire_inscription_cours': formulaire,
         'year': year,
         }

@@ -67,7 +67,6 @@ class FormulaireInscriptionCoursDTO(DTO):
     sigle_formation: str
     version_formation: str
     intitule_formation: str
-    intitule_version_programme: str
     racine: ContenuGroupementDTO
 
 
@@ -119,4 +118,3 @@ class FormationDTO(DTO):
     sigle: str
     version: str
     intitule_formation: str
-    intitule_version_programme: str

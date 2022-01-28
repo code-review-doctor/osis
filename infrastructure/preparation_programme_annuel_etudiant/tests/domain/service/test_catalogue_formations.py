@@ -65,7 +65,6 @@ class CatalogueFormationsTranslatorTest(SimpleTestCase):
         self.assertEqual(program_to_translate.sigle, formation_dto.sigle)
         self.assertEqual(program_to_translate.version, formation_dto.version)
         self.assertEqual(program_to_translate.intitule_formation, formation_dto.intitule_formation)
-        self.assertEqual(program_to_translate.intitule_version_programme, formation_dto.intitule_version_programme)
 
         self._assert_equal_contenu_conversion(
             formation_dto.racine.groupement_contenant,
@@ -175,5 +174,4 @@ def _build_ProgrammeDeFormationDTO():
         sigle='ECGE1BA',
         version=STANDARD,
         intitule_formation='Bachelier en sciences économiques et de gestion',
-        intitule_version_programme='Bachelier en sciences économiques et de gestion',
     )

@@ -286,12 +286,15 @@ def _update_start_year_and_end_year(
 
 
 def _instanciate_tree_version(record_dict: dict) -> 'ProgramTreeVersion':
+    print(record_dict)
     identity = program_tree_version.ProgramTreeVersionIdentity(
         offer_acronym=record_dict['offer_acronym'],
         year=record_dict['offer_year'],
         version_name=record_dict['version_name'],
         transition_name=record_dict['transition_name'],
     )
+    print('$$$')
+    print(record_dict['version_title_fr'])
     return program_tree_version.ProgramTreeVersion(
         entity_identity=identity,
         entity_id=identity,
@@ -396,16 +399,8 @@ def _get_common_queryset() -> QuerySet:
     )
 
 
-def _get_intitule_complet(noeud: 'Node', pgm_tree_version: 'ProgramTreeVersion') -> str:
-    intitule = noeud.offer_title_fr
-    if not pgm_tree_version.is_standard or \
-            pgm_tree_version.is_specific_transition or \
-            pgm_tree_version.is_specific_transition:
-        return "{} [{}]".format(intitule, noeud.version_title_fr)
-    return intitule
-
-
-def build_dto(pgm_tree_version: 'ProgramTreeVersion', identity: ProgramTreeVersionIdentity) -> 'ProgrammeDeFormationDTO':
+def build_dto(pgm_tree_version: 'ProgramTreeVersion', identity: ProgramTreeVersionIdentity) \
+        -> 'ProgrammeDeFormationDTO':
     tree = pgm_tree_version.get_tree()
     contenu = _build_contenu(tree.root_node,)
     return ProgrammeDeFormationDTO(
@@ -413,8 +408,9 @@ def build_dto(pgm_tree_version: 'ProgramTreeVersion', identity: ProgramTreeVersi
         annee=identity.year,
         sigle=identity.offer_acronym,
         version=identity.version_name,
-        intitule_formation=tree.root_node.offer_title_fr,
-        intitule_version_programme=_get_intitule_complet(tree.root_node, pgm_tree_version)
+        intitule_formation="{}{}".format(
+            tree.root_node.offer_title_fr,
+            "{}".format("[ {} ]".format(pgm_tree_version.title_fr) if pgm_tree_version.title_fr else ''))
     )
 
 
