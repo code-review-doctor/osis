@@ -123,7 +123,7 @@ class DeplacerVersLeBasUEAjouteeDansProgrammeCommand(interface.CommandRequest):
     unite_enseignement: GetUniteEnseignementCommand
 
 
-@attr.s(frozen=True, slots=True)
+@attr.s(frozen=True, slots=True, auto_attribs=True)
 class GetFormationCommand(interface.CommandRequest):
-    annee = attr.ib(type=int)
-    code = attr.ib(type=str)
+    annee: int
+    code: str
