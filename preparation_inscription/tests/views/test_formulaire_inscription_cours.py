@@ -64,7 +64,7 @@ class TestFormulaireInscriptionCoursView(TestCase):
                 annee_formation=YEAR,
                 sigle_formation=ACRONYM,
                 version_formation=STANDARD,
-                intitule_complet_formation='Bachelier en sciences économiques et de gestion',
+                intitule_formation='Bachelier en sciences économiques et de gestion',
                 racine=ContenuGroupementDTO(
                     groupement_contenant=GroupementDTO(
                         intitule='intitule',

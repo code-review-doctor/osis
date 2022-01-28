@@ -135,8 +135,8 @@ def _cas_formation_version_particuliere():
         ),
         annee=ANNEE,
         sigle=SIGLE,
-        version=STANDARD,
-        intitule_formation='Bachelier en sciences économiques et de gestion',
+        version='DDSHERBROOKE',
+        intitule_formation='Master [120] en communication[ Double diplôme UCLouvain - uSherbrooke ]',
     )
 
 
@@ -151,6 +151,7 @@ class CatalogueFormationsTranslatorInMemory(ICatalogueFormationsTranslator):
 
     dtos = [
         _cas_nominal_formation_version_standard(),
+        _cas_formation_version_particuliere()
     ]
 
     @classmethod
