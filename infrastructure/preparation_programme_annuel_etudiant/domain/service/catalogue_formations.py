@@ -28,10 +28,9 @@ from typing import List, Optional
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormationCommand
 from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import \
     ICatalogueFormationsTranslator
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, GroupementDTO
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import GroupementCatalogueDTO, \
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, GroupementCatalogueDTO, \
     ContenuGroupementCatalogueDTO, UniteEnseignementDTO, UniteEnseignementCatalogueDTO
-from program_management.ddd.dtos import ProgrammeDeFormationDTO, ContenuNoeudDTO
+from program_management.ddd.dtos import ProgrammeDeFormationDTO, ContenuNoeudDTO, GroupementDTO
 
 
 def build_formation_dto(program_management_formation_dto: ProgrammeDeFormationDTO) -> FormationDTO:
@@ -41,7 +40,7 @@ def build_formation_dto(program_management_formation_dto: ProgrammeDeFormationDT
         annee=program_management_formation_dto.annee,
         sigle=program_management_formation_dto.sigle,
         version=program_management_formation_dto.version,
-        intitule_complet=program_management_formation_dto.intitule_version_programme,
+        intitule_formation=program_management_formation_dto.intitule_formation,
     )
 
 

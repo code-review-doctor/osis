@@ -29,42 +29,125 @@ from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_
     ICatalogueFormationsTranslator
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, ContenuGroupementCatalogueDTO, \
     GroupementDTO, GroupementCatalogueDTO, UniteEnseignementCatalogueDTO
+from program_management.ddd.domain.program_tree_version import STANDARD
+
+ANNEE = 2021
 
 
-class CatalogueFormationsInMemoryTranslator(ICatalogueFormationsTranslator):
-    dtos = [
-        FormationDTO(
-            racine=ContenuGroupementCatalogueDTO(
-                groupement_contenant=GroupementCatalogueDTO(
-                    intitule='Content:',
-                    obligatoire=True,
-                    remarque='',
-                    credits=Decimal(0),
-                    intitule_complet='Content:',
-                    code='LECGE100T'
-                ),
-                unites_enseignement_contenues=[
-                    UniteEnseignementCatalogueDTO(
-                        bloc=1,
-                        code='LESPO1113',
-                        intitule_complet='Sociologie et anthropologie des mondes contemporains',
-                        quadrimestre='Q1',
-                        quadrimestre_texte='Q1',
-                        credits_absolus=Decimal(0),
-                        credits_relatifs=0,
-                        volume_annuel_pm=0,
-                        volume_annuel_pp=0,
-                        obligatoire=True,
-                        session_derogation='',
-                    )
-                ],
-                groupements_contenus=[],
-            ),
-            annee=2021,
-            sigle='ECGE1BA',
-            version='',
-            intitule_complet='Bachelier en sciences économiques et de gestion',
+def _cas_nominal_formation_version_standard():
+    SIGLE = 'ECGE1BA'
+    groupement = GroupementCatalogueDTO(
+        intitule=SIGLE,
+        obligatoire=True,
+        remarque='Remarque',
+        credits=Decimal(10),
+        intitule_complet='Bachelier en sciences économiques et de gestion',
+        code='LECGE100B'
+    )
+    return FormationDTO(
+        racine=ContenuGroupementCatalogueDTO(
+            groupement_contenant=groupement,
+            groupements_contenus=[
+                ContenuGroupementCatalogueDTO(
+                    groupement_contenant=groupement,
+                    groupements_contenus=[
+                        ContenuGroupementCatalogueDTO(
+                            groupement_contenant=GroupementCatalogueDTO(
+                                intitule='Contenu :',
+                                obligatoire=True,
+                                remarque='Remarque',
+                                credits=Decimal(10),
+                                intitule_complet='Contenu :',
+                                code='LECGE100T',
+                            ),
+                            groupements_contenus=[],
+                            unites_enseignement_contenues=[
+                                UniteEnseignementCatalogueDTO(
+                                    bloc=1,
+                                    code='LESPO1113',
+                                    intitule_complet='Sociologie et anthropologie des mondes contemporains',
+                                    quadrimestre='Q1or2',
+                                    credits_absolus=Decimal(5),
+                                    volume_annuel_pm=40,
+                                    volume_annuel_pp=0,
+                                    obligatoire=False,
+                                    credits_relatifs=None,
+                                    session_derogation='',
+                                    quadrimestre_texte='Q1 ou Q2'
+                                )
+                            ]
+                        )],
+                    unites_enseignement_contenues=[]
+                )
+            ],
+            unites_enseignement_contenues=[]
         ),
+        annee=ANNEE,
+        sigle=SIGLE,
+        version=STANDARD,
+        intitule_formation='Bachelier en sciences économiques et de gestion'
+    )
+
+
+def _cas_formation_version_particuliere():
+    SIGLE = 'CORP2MS/CS'
+    groupement = GroupementCatalogueDTO(
+        intitule=SIGLE,
+        obligatoire=True,
+        remarque='Remarque',
+        credits=Decimal(10),
+        intitule_complet='Master [120] en communication[ Double diplôme UCLouvain - uSherbrooke ]',
+        code='LCORP201S'
+    )
+    return FormationDTO(
+        racine=ContenuGroupementCatalogueDTO(
+            groupement_contenant=groupement,
+            groupements_contenus=[
+                ContenuGroupementCatalogueDTO(
+                    groupement_contenant=groupement,
+                    groupements_contenus=[
+                        ContenuGroupementCatalogueDTO(
+                            groupement_contenant=GroupementCatalogueDTO(
+                                intitule='Tronc commun',
+                                obligatoire=True,
+                                remarque='Remarque',
+                                credits=Decimal(10),
+                                intitule_complet='Tronc commun',
+                                code='LCORP114T'
+                            ),
+                            groupements_contenus=[],
+                            unites_enseignement_contenues=[
+                                UniteEnseignementCatalogueDTO(
+                                    bloc=2,
+                                    code='LCOMU2904B',
+                                    intitule_complet="Séminaire d'accompagnement au mémoire : méthodologie",
+                                    quadrimestre='Q2',
+                                    credits_absolus=Decimal(20),
+                                    volume_annuel_pm=0,
+                                    volume_annuel_pp=0,
+                                    obligatoire=False,
+                                    credits_relatifs=None,
+                                    session_derogation='',
+                                    quadrimestre_texte='Q2'
+                                )
+                            ]
+                        )],
+                    unites_enseignement_contenues=[]
+                )
+            ],
+            unites_enseignement_contenues=[]
+        ),
+        annee=ANNEE,
+        sigle=SIGLE,
+        version='DDSHERBROOKE',
+        intitule_formation='Master [120] en communication[ Double diplôme UCLouvain - uSherbrooke ]',
+    )
+
+
+class CatalogueFormationsTranslatorInMemory(ICatalogueFormationsTranslator):
+    dtos = [
+        _cas_nominal_formation_version_standard(),
+        _cas_formation_version_particuliere()
     ]
 
     @classmethod
