@@ -42,12 +42,6 @@ class GroupementAjusteInscriptionCoursBuilder(interface.RootEntityBuilder):
             cmd: Union['AjouterUEAuProgrammeCommand'],
             repository: 'IGroupementAjusteInscriptionCoursRepository'
     ) -> 'GroupementAjusteInscriptionCours':
-        # version_programme_id = ProgramTreeVersionIdentityBuilder().build(
-        #     offer_acronym=cmd.sigle_formation,
-        #     year=cmd.annee,
-        #     version_name=cmd.version_formation,
-        #     transition_name=cmd.transition_formation,
-        # )
         groupement_id = GroupIdentity(
             code=cmd.ajouter_dans,
             year=cmd.annee,
@@ -57,7 +51,6 @@ class GroupementAjusteInscriptionCoursBuilder(interface.RootEntityBuilder):
             return groupements_ajustes[0]
         return GroupementAjusteInscriptionCours(
             entity_id=IdentiteGroupementAjusteInscriptionCours(uuid=uuid.uuid4()),
-            version_programme_id=None,  # FIXME
             groupement_id=groupement_id,
             unites_enseignement_ajoutees=[],
             unites_enseignement_supprimees=[],
