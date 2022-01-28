@@ -11,7 +11,7 @@ servers:
   - url: https://osis.uclouvain.be/api/v1/organisation/
     description: 'Production server'
 info:
-  version: '1.2'
+  version: '1.3'
   title: 'Organisations Service'
   description: |-
     A set of API endpoints that allow you to get information about organizations
@@ -138,7 +138,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedAddresses'
+                $ref: '#/components/schemas/Address'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -275,21 +275,15 @@ components:
           type: string
           format: uri
           nullable: true
-    PaginatedAddresses:
-      allOf:
-        - $ref: '#/components/schemas/Paging'
-        - type: object
-          properties:
-            results:
-              type: array
-              items:
-                $ref: '#/components/schemas/Address'
     Address:
       type: object
       properties:
         city:
           type: string
           example: "Louvain-la-Neuve"
+        location:
+          type: string
+          example: "Rue du compas 1"
         street:
           type: string
           example: "Rue du compas"

@@ -28,9 +28,10 @@ from rest_framework import serializers
 
 class AddressSerializer(serializers.Serializer):
     city = serializers.CharField()
-    street = serializers.CharField()
-    street_number = serializers.CharField()
+    street = serializers.CharField(default='')
+    street_number = serializers.CharField(default='')
+    location = serializers.CharField()
     postal_code = serializers.CharField()
-    state = serializers.CharField()
+    state = serializers.CharField(default='')
     country_iso_code = serializers.CharField(source='country.iso_code')
-    is_main = serializers.BooleanField()
+    is_main = serializers.BooleanField(default=True)

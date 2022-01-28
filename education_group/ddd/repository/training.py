@@ -30,6 +30,7 @@ from typing import Optional, List
 
 from django.db import IntegrityError
 from django.db.models import Subquery, OuterRef, Prefetch, QuerySet, Q, Max, TextField
+from django.utils.timezone import now
 
 from base.models import entity_version
 from base.models.academic_year import AcademicYear as AcademicYearModelDb
@@ -151,23 +152,20 @@ class TrainingRepository(interface.AbstractRepository):
             qs = qs.filter(academic_year__year=annee)
         if type:
             qs = qs.filter(education_group_type__name=type)
-        if sigle_entite_gestion and not inclure_entites_gestion_subordonnees:
-            qs = qs.annotate(
-                management_entity_acronym=Subquery(
-                    EntityVersion.objects.filter(
-                        entity_id=OuterRef('management_entity'),
-                    ).values('management_entity_acronym')[:1],
-                ),
-            ).filter(management_entity_acronym=sigle_entite_gestion)
-        elif sigle_entite_gestion and inclure_entites_gestion_subordonnees:
-            qs = qs.annotate(
-                management_path_as_string=CTESubquery(
-                    EntityVersion.objects.with_acronym_path(
-                        entity_id=OuterRef('management_entity'),
-                    ).values('path_as_string')[:1],
-                    output_field=TextField(),
-                ),
-            ).filter(management_path_as_string__contains=sigle_entite_gestion)
+        if sigle_entite_gestion:
+            if not inclure_entites_gestion_subordonnees:
+                qs = qs.filter(
+                    management_entity_id=Subquery(
+                        EntityVersion.objects.filter(
+                            acronym=sigle_entite_gestion,
+                        ).current(now()).values('entity_id')[:1],
+                    ),
+                )
+            else:
+                cte = EntityVersion.objects.with_parents(acronym=sigle_entite_gestion)
+                qs = qs.filter(
+                    management_entity_id__in=cte.queryset().with_cte(cte).values('entity_id'),
+                )
         return [_convert_education_group_year_to_dto(education_group_year_db) for education_group_year_db in qs]
 
     @classmethod
@@ -472,8 +470,7 @@ def _get_training_base_queryset() -> QuerySet:
     return EducationGroupYearModelDb.objects.select_related(
         'education_group_type',
         'hops',
-        'management_entity',
-        'administration_entity',
+        'academic_year',
         'enrollment_campus__organization',
         'isced_domain',
         'education_group__start_year',

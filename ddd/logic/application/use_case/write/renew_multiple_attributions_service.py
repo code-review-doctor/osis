@@ -50,7 +50,9 @@ def renew_multiple_attributions(
     # GIVEN
     application_calendar = application_calendar_repository.get_current_application_calendar()
     applicant = applicant_repository.get(entity_id=ApplicantIdentityBuilder.build_from_global_id(cmd.global_id))
-    all_existing_applications = application_repository.search(global_id=cmd.global_id)
+    all_existing_applications = application_repository.search(
+        applicant_id=ApplicantIdentityBuilder.build_from_global_id(cmd.global_id)
+    )
 
     # WHEN
     applications_renewed = []
