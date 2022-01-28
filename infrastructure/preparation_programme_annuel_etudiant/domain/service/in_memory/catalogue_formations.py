@@ -141,14 +141,6 @@ def _cas_formation_version_particuliere():
 
 
 class CatalogueFormationsTranslatorInMemory(ICatalogueFormationsTranslator):
-    groupement_ECGE1BA = GroupementCatalogueDTO(
-        intitule='ECGE1BA',
-        obligatoire=True,
-        remarque='Remarque',
-        credits=10,
-        intitule_complet='Bachelier en sciences économiques et de gestion ',
-    )
-
     dtos = [
         _cas_nominal_formation_version_standard(),
         _cas_formation_version_particuliere()

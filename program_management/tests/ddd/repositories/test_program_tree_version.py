@@ -257,7 +257,13 @@ class TestProgramTreeVersionRepositoryGetDtoMethod(TestCase):
         self.assertEqual(programme_de_formation_dto.sigle, education_group_version_model_obj.offer.acronym)
         self.assertEqual(programme_de_formation_dto.annee, education_group_version_model_obj.offer.academic_year.year)
         self.assertEqual(programme_de_formation_dto.version, education_group_version_model_obj.version_name)
-        self.assertEqual(programme_de_formation_dto.intitule_complet, education_group_version_model_obj.offer.title)
+        self.assertEqual(programme_de_formation_dto.intitule_formation,
+                         "{}{}".format(
+                             education_group_version_model_obj.offer.title,
+                             "{}".format(
+                                "[ {} ]".format(education_group_version_model_obj.title_fr) if education_group_version_model_obj.title_fr else '')
+                         )
+                         )
 
         self.assertIsInstance(programme_de_formation_dto.racine, ContenuNoeudDTO)
         self.assertEqual(programme_de_formation_dto.racine.groupement_contenant.intitule, root_group.acronym)
