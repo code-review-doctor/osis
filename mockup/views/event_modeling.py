@@ -23,15 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.template import RequestContext
-from django.views.generic import TemplateView
-from django.contrib.auth.mixins import LoginRequiredMixin
-
 from dal import autocomplete
 from django import forms
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.utils.translation import gettext_lazy as _
+from django.views.generic import TemplateView
 
 from base.forms.utils.choice_field import add_blank
 from base.models.enums.active_status import ActiveStatusEnum
@@ -154,7 +152,7 @@ data = [
         'code_ue': 'LECGE1115',
         'intitule': 'Economie politique',
         'volumes': '30',
-        'bloc': '1',
+        'bloc': '2',
         'quadri': 'Q2',
         'credits': '3/3',
         'session': 'Oui',
@@ -221,6 +219,7 @@ class TreeHTMLView(LoginRequiredMixin, TemplateView):
                 'id': 'node_1',
                 'text': 'Bachelier en sciences économiques et de gestion',
                 'obligatoire': True,
+                'block': 'Bloc',
                 'children': [
                     {
                         'id': 'node_11',
@@ -242,42 +241,48 @@ class TreeHTMLView(LoginRequiredMixin, TemplateView):
                                                 'text': 'LESPO1113 - Sociologie et anthropologie des mondes contemporains',
                                                 'obligatoire': True,
                                                 'type_ajustement': TypeAjustement.SUPPRESSION.name,
-                                                'children': []
+                                                'children': [],
+                                                'block': 1,
                                             },
                                             {
                                                 'id': '11112',
                                                 'text': 'LESPO1321 - Economic, Political and Social Ethics',
                                                 'obligatoire': True,
                                                 'type_ajustement': TypeAjustement.SUPPRESSION.name,
-                                                'children': []
+                                                'children': [],
+                                                'block': 1,
                                             },
                                             {
                                                 'id': '11113',
                                                 'text': 'LESPO1114 - Political Science',
                                                 'obligatoire': True,
                                                 'type_ajustement': TypeAjustement.MODIFICATION.name,
-                                                'children': []
+                                                'children': [],
+                                                'block': 1,
                                             },
                                             {
                                                 'id': '11115',
                                                 'text': 'LECGE1115 - Economie politique',
                                                 'obligatoire': True,
                                                 'type_ajustement': None,
-                                                'children': []
+                                                'children': [],
+                                                'block': 2,
                                             },
                                             {
                                                 'id': '11114',
                                                 'text': 'LINGE1122 - Physique 1',
                                                 'obligatoire': True,
                                                 'type_ajustement': TypeAjustement.AJOUT.name,
-                                                'children': []
+                                                'children': [],
+                                                'block': 1,
                                             },
                                             {
                                                 'id': '11116',
                                                 'text': 'LINGE1125 - Séminaire de travail universitaire en gestion',
                                                 'obligatoire': False,
                                                 'type_ajustement': TypeAjustement.AJOUT.name,
-                                                'children': []
+                                                'children': [],
+                                                'block': 1,
                                             },
                                         ]
                                     },
