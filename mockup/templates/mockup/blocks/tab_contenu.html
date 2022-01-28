@@ -1,7 +1,9 @@
 {% load static i18n bootstrap3 %}
 <ul class="nav nav-tabs">
-    <li role="presentation" class="active"><a href="" hx-get="{% url 'EventModelingView' %}" hx-target="#tabs" hx-trigger="click" hx-swap="innerHTML">Contenu</a></li>
-    <li role="presentation" class=""><a href="" hx-get="{% url 'formulaire_inscription_view' %}" hx-target="#tabs" hx-trigger="click" hx-swap="innerHTML">Formulaire</a></li>
+    <li role="presentation" class="active"><a href="" hx-get="{% url 'EventModelingView' %}" hx-target="#tabs"
+                                              hx-trigger="click" hx-swap="innerHTML">Contenu</a></li>
+    <li role="presentation" class=""><a href="" hx-get="{% url 'formulaire_inscription_view' %}" hx-target="#tabs"
+                                        hx-trigger="click" hx-swap="innerHTML">Vue formulaire</a></li>
 </ul>
 
 <br>
@@ -10,7 +12,8 @@
     <div class="panel-heading">
         <div class="pull-right">
             <div class="dropdown">
-                <button class="btn btn-default dropdown-toggle" type="button" id="btn-action-down" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                <button class="btn btn-default dropdown-toggle" type="button" id="btn-action-down"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                     <span class="fa fa-cog" aria-hidden="true"></span> {% trans 'Actions' %}
                     <span class="caret"></span>
                 </button>

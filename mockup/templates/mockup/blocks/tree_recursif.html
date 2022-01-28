@@ -1,9 +1,10 @@
-{% load static %}
+{% load static i18n %}
 {% for node in tree %}
-  <ul>
-    <li id="{{ node.id }}"
-        data-jstree='{"icon":"{% if node.obligatoire %}{% static "img/education_group_year/mandatory.png" %}{% else %}{% static "img/education_group_year/optional.png" %} {% endif%}"}'
-        class="
+    <ul>
+        <li id="{{ node.id }}"
+            data-jstree='{"icon":"
+                    {% if node.obligatoire %}{% static "img/education_group_year/mandatory.png" %}{% else %}{% static "img/education_group_year/optional.png" %} {% endif %}"}'
+            class="
         {% if node.type_ajustement == 'AJOUT' %}
             text-success
         {% elif node.type_ajustement == 'MODIFICATION' %}
@@ -12,13 +13,14 @@
             text-danger strikethrough
         {% endif %}
         "
-    >
+        >
             {{ node.text }}
-        {% if node.children %}
-          {% with tree=node.children template_name="tree_view_template.html" %}
-             {% include 'mockup/blocks/tree_recursif.html' %}
-          {% endwith %}
-        {% endif %}
-    </li>
-  </ul>
+            {% if node.children %}
+                {% with tree=node.children template_name="tree_view_template.html" %}
+                    {% include 'mockup/blocks/tree_recursif.html' %}
+                {% endwith %}
+            {% endif %}
+            <span class="node_block_text" style="background-color:white;">{{ node.block }}</span>
+        </li>
+    </ul>
 {% endfor %}

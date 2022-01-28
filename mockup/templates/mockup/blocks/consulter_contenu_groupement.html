@@ -95,12 +95,10 @@
                     {% elif element.type_ajustement == 'MODIFICATION' %}
 
                         <div class="form-group" role="group">
-                            {% include "mockup/blocks/btn_deplacer_bas.html" %}
-                            {% include "mockup/blocks/btn_deplacer_haut.html" %}
                             {% include "mockup/blocks/btn_annuler_modification.html" %}
                         </div>
 
-                    {% else %}
+                    {% elif element.type_ajustement == 'AJOUT' %}
                             {% include "mockup/blocks/btn_deplacer_bas.html" %}
                             {% include "mockup/blocks/btn_deplacer_haut.html" %}
                             {% include "mockup/blocks/btn_annuler_ajout.html" %}
