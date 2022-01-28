@@ -31,8 +31,8 @@ from admission.contrib.models import DoctorateAdmission
 from base.models.academic_year import AcademicYear
 from base.models.person import Person
 from osis_document.contrib.fields import FileField
-from osis_profile.models.enums.curriculum import ExperienceTypes, StudySystems, Result, Grade, CreditType,\
-    ActivityTypes, ForeignStudyCycleType
+from osis_profile.models.enums.curriculum import ExperienceType, StudySystem, Result, Grade, CreditType,\
+    ActivityType, ForeignStudyCycleType
 from osis_profile.models.enums.education import BelgianCommunitiesOfEducation
 from reference.models.language import Language
 
@@ -82,7 +82,7 @@ class Experience(models.Model):
     )
     type = models.CharField(
         _("Type"),
-        choices=ExperienceTypes.choices(),
+        choices=ExperienceType.choices(),
         max_length=50,
     )
     country = models.ForeignKey(
@@ -118,8 +118,8 @@ class Experience(models.Model):
         max_length=20,
         null=True,
     )
-    program_name = models.CharField(
-        _("Program name"),
+    education_name = models.CharField(
+        _("Education name"),
         blank=True,
         max_length=255,
         null=True,
@@ -128,6 +128,7 @@ class Experience(models.Model):
         _("Result"),
         blank=True,
         choices=Result.choices(),
+        default="",
         max_length=50,
         null=True,
     )
@@ -140,11 +141,12 @@ class Experience(models.Model):
         _('Obtained grade'),
         blank=True,
         choices=Grade.choices(),
+        default="",
         max_length=50,
         null=True,
     )
-    diploma_ranked = models.CharField(
-        _('Diploma ranked'),
+    rank_in_diploma = models.CharField(
+        _('Rank in diploma'),
         blank=True,
         max_length=255,
         null=True,
@@ -158,6 +160,7 @@ class Experience(models.Model):
         _('Credit type'),
         blank=True,
         choices=CreditType.choices(),
+        default="",
         max_length=50,
         null=True,
     )
@@ -178,16 +181,19 @@ class Experience(models.Model):
         verbose_name=_('Acquired credit number'),
     )
     transcript = FileField(
+        blank=True,
         mimetypes=['application/pdf'],
         null=True,
         verbose_name=_('Transcript'),
     )
     graduate_degree = FileField(
+        blank=True,
         mimetypes=['application/pdf'],
         null=True,
         verbose_name=_('Graduate degree'),
     )
     access_certificate_after_60_master = FileField(
+        blank=True,
         mimetypes=['application/pdf'],
         null=True,
         verbose_name=_('Access certificate after a 60 master'),
@@ -206,6 +212,7 @@ class Experience(models.Model):
         verbose_name=_('Dissertation score'),
     )
     dissertation_summary = FileField(
+        blank=True,
         mimetypes=['application/pdf'],
         null=True,
         verbose_name=_('Dissertation summary'),
@@ -215,6 +222,7 @@ class Experience(models.Model):
         _("Education community"),
         blank=True,
         choices=BelgianCommunitiesOfEducation.choices(),
+        default="",
         max_length=50,
         null=True,
     )
@@ -229,21 +237,17 @@ class Experience(models.Model):
     study_system = models.CharField(
         _("Study system"),
         blank=True,
-        choices=StudySystems.choices(),
+        choices=StudySystem.choices(),
+        default="",
         null=True,
         max_length=50,
-    )
-    curriculum = FileField(
-        mimetypes=['application/pdf'],
-        null=True,
-        verbose_name=_('Curriculum'),
-        help_text=_('Must be detailed, dated and signed'),
     )
     # Foreign higher education
     study_cycle_type = models.CharField(
         _("Study cycle type"),
         blank=True,
         choices=ForeignStudyCycleType.choices(),
+        default="",
         max_length=50,
         null=True,
     )
@@ -256,20 +260,23 @@ class Experience(models.Model):
         verbose_name=_("Linguistic regime"),
     )
     transcript_translation = FileField(
+        blank=True,
         mimetypes=['application/pdf'],
         null=True,
         verbose_name=_('Transcript translation'),
     )
     graduate_degree_translation = FileField(
+        blank=True,
         mimetypes=['application/pdf'],
         null=True,
         verbose_name=_('Graduate degree translation'),
     )
-    # Other occupation
+    # Other activity
     activity_type = models.CharField(
         _('Activity type'),
         blank=True,
-        choices=ActivityTypes.choices(),
+        choices=ActivityType.choices(),
+        default="",
         max_length=50,
         null=True,
     )
@@ -280,12 +287,13 @@ class Experience(models.Model):
         null=True,
     )
     activity_certificate = FileField(
+        blank=True,
         mimetypes=['application/pdf'],
         null=True,
         verbose_name=_('Activity certificate'),
     )
     activity_position = models.CharField(
-        _('Position'),
+        _('Activity position'),
         blank=True,
         max_length=255,
         null=True,

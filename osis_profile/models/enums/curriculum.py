@@ -29,13 +29,12 @@ from django.utils.translation import gettext_lazy as _
 from base.models.utils.utils import ChoiceEnum
 
 
-class ExperienceTypes(ChoiceEnum):
-    BELGIAN_UNIVERSITY_HIGHER_EDUCATION = _("Belgian university higher education")
-    FOREIGN_UNIVERSITY_HIGHER_EDUCATION = _("Foreign university higher education")
-    OTHER = _("Other")
+class ExperienceType(ChoiceEnum):
+    HIGHER_EDUCATION = _("Higher education")
+    OTHER_ACTIVITY = _("Other activity")
 
 
-class StudySystems(ChoiceEnum):
+class StudySystem(ChoiceEnum):
     CONTINUING_EDUCATION = _("Continuing education")
     FULL_TIME_EDUCATION = _("Full-time education")
 
@@ -69,7 +68,7 @@ class ForeignStudyCycleType(ChoiceEnum):
     OTHER_HIGHER_EDUCATION = _('Other higher education')
 
 
-class ActivityTypes(ChoiceEnum):
+class ActivityType(ChoiceEnum):
     ILLNESS = _('Illness')
     INTERNSHIP = _('Internship')
     OTHER = _('Other')
