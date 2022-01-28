@@ -25,22 +25,23 @@
 ##############################################################################
 from django.http import Http404
 from django.views.generic import TemplateView
+from rules.contrib.views import LoginRequiredMixin
 
+from base.utils.htmx import HtmxMixin
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormulaireInscriptionCoursCommand
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormulaireInscriptionCoursDTO
-from education_group.ddd import command as command_education_group
-from education_group.ddd.domain.exception import GroupNotFoundException
-from education_group.ddd.service.read import get_group_service
 from infrastructure.messages_bus import message_bus_instance
 from program_management.forms.education_groups import STANDARD
 from osis_role.contrib.views import PermissionRequiredMixin
 
 
-class FormulaireInscriptionCoursView(PermissionRequiredMixin, TemplateView):
+class FormulaireInscriptionCoursView(HtmxMixin, LoginRequiredMixin, TemplateView):
+    name = "pae_formulaire_inscription_view"
     permission_required = 'preparation_inscription.view_formulaire_inscription_cours'
     raise_exception = True
 
-    template_name = "onglets.html"
+    template_name = "preparation_inscription/blocks/formulaire_inscription.html"
+    htmx_template_name = "preparation_inscription/blocks/formulaire_inscription.html"
 
     def get_context_data(
             self,
@@ -51,10 +52,9 @@ class FormulaireInscriptionCoursView(PermissionRequiredMixin, TemplateView):
             **kwargs
     ):
         context = super().get_context_data(**kwargs)
-        sigle = self.get_group_obj().abbreviated_title
         context.update(
             contexte_commun_preparation_inscription(
-                sigle,
+                self.kwargs['acronym'],
                 transition_name if transition_name else '',
                 version_name if version_name != STANDARD else '',
                 year
@@ -62,16 +62,6 @@ class FormulaireInscriptionCoursView(PermissionRequiredMixin, TemplateView):
         )
 
         return context
-
-    def get_group_obj(self) -> 'Group':
-        try:
-            get_cmd = command_education_group.GetGroupCommand(
-                code=self.kwargs["acronym"],
-                year=self.kwargs["year"]
-            )
-            return get_group_service.get_group(get_cmd)
-        except GroupNotFoundException:
-            raise Http404
 
 
 def _get_formation_inscription_cours(year: int, acronym: str, version_name: str, transition_name: str) \
@@ -92,6 +82,7 @@ def contexte_commun_preparation_inscription(sigle, transition_name, version_name
             formulaire.sigle_formation,
             formulaire.version_formation if formulaire.version_formation != STANDARD else ''
         ),
+        'acronym': sigle,
         'title': formulaire.intitule_formation,
         'formulaire_inscription_cours': formulaire,
         'year': year,

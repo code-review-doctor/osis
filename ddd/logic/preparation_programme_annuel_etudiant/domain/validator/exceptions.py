@@ -25,12 +25,13 @@
 ##############################################################################
 from django.utils.translation import gettext_lazy as _
 
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 from osis_common.ddd.interface import BusinessException
 
 
-class PasGestionnaireParcoursExceptionException(BusinessException):
-    def __init__(self, **kwargs):
-        message = _("You're not a program manager (no assigned formations found)")
+class UniteEnseignementDejaAjouteeException(BusinessException):
+    def __init__(self, unite_enseignement: 'LearningUnitIdentity', **kwargs):
+        message = _("Learning unit {} already added in this ajusted group.").format(unite_enseignement)
         super().__init__(message, **kwargs)
 
 

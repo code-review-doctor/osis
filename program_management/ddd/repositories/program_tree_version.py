@@ -438,6 +438,7 @@ def _build_contenu(node: 'Node', lien_parent: 'Link' = None) -> 'ContenuNoeudDTO
 
     return ContenuNoeudDTO(
         groupement_contenant=GroupementDTO(
+            code=node.code,
             intitule=node.title,
             remarque=node.remark_fr,
             obligatoire=lien_parent.is_mandatory if lien_parent else False,

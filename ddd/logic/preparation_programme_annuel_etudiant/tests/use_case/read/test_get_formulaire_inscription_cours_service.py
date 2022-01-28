@@ -132,8 +132,6 @@ class GetFormulaireInscriptionCoursTest(SimpleTestCase):
         self.assertEqual(pgm_contenu.intitule, formation_contenu.intitule)
         self.assertEqual(pgm_contenu.intitule_complet, formation_contenu.intitule_complet)
         self.assertEqual(pgm_contenu.obligatoire, formation_contenu.obligatoire)
-        self.assertEqual(pgm_contenu.remarque, formation_contenu.remarque)
-        self.assertEqual(pgm_contenu.credits, formation_contenu.credits)
 
     def _assert_equal_unite_conversion(
             self,

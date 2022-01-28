@@ -26,7 +26,10 @@
 from typing import List
 
 import attr
+import uuid
 
+from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
+    CodeUniteEnseignement
 from osis_common.ddd import interface
 
 
@@ -49,12 +52,12 @@ class AjouterUEAuProgrammeCommand(interface.CommandRequest):
     sigle_formation: str
     version_formation: str
     transition_formation: str
-    groupement_uuid: str  # TODO :: code groupement ou uuid groupement ?
-    unites_enseignements: List[GetUniteEnseignementCommand]
+    ajouter_dans: str  # code groupement
+    unites_enseignements: List[CodeUniteEnseignement]
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
-class GetProgrammeInscriptionCoursServiceCommand(interface.CommandRequest):
+class GetProgrammeInscriptionCoursCommand(interface.CommandRequest):
     annee_formation: int
     sigle_formation: str
     version_formation: str

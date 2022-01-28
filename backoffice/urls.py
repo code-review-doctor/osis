@@ -93,6 +93,11 @@ if 'osis_async' in settings.INSTALLED_APPS:
 if 'preparation_inscription' in settings.INSTALLED_APPS:
     urlpatterns += (url(r'^preparation_inscription/', include('preparation_inscription.urls')),)
 
+if 'mockup' in settings.INSTALLED_APPS:
+    urlpatterns += (
+        url(r'^mockup/', include('mockup.urls')),
+    )
+
 handler404 = 'base.views.common.page_not_found'
 handler403 = 'base.views.common.access_denied'
 handler405 = 'base.views.common.method_not_allowed'

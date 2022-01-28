@@ -44,4 +44,8 @@ class UniteEnseignementAjouteeIdentity(interface.EntityIdentity):
 class UniteEnseignementAjoutee(interface.Entity):
     entity_id: 'UniteEnseignementAjouteeIdentity'
     unite_enseignement_identity: 'LearningUnitIdentity'
-    a_la_suite_de: Union['LearningUnitIdentity', 'GroupIdentity']
+    a_la_suite_de: Union['LearningUnitIdentity', 'GroupIdentity'] = None
+
+    @property
+    def code(self):
+        return self.unite_enseignement_identity.code

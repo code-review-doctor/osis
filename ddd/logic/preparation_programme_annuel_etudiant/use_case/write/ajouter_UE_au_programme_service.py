@@ -24,8 +24,8 @@
 #
 ##############################################################################
 from ddd.logic.preparation_programme_annuel_etudiant.commands import AjouterUEAuProgrammeCommand
-from ddd.logic.preparation_programme_annuel_etudiant.domain.builder.groupement_ajuste_inscription_cours_identity_builder import \
-    GroupementAjusteInscriptionCoursIdentityBuilder
+from ddd.logic.preparation_programme_annuel_etudiant.domain.builder.groupement_ajuste_inscription_cours_builder import \
+    GroupementAjusteInscriptionCoursBuilder
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
     IdentiteGroupementAjusteInscriptionCours
 from ddd.logic.preparation_programme_annuel_etudiant.repository.i_groupement_ajuste_inscription_cours import \
@@ -37,17 +37,14 @@ def ajouter_UE_au_programme(
         repository: 'IGroupementAjusteInscriptionCoursRepository',
 ) -> 'IdentiteGroupementAjusteInscriptionCours':
     # GIVEN
-    identite_groupement_ajuste = GroupementAjusteInscriptionCoursIdentityBuilder.build_from_command(cmd)
-    groupement_ajuste = repository.get(
-        entity_id=identite_groupement_ajuste
-    )
+    groupement_ajuste = GroupementAjusteInscriptionCoursBuilder.build_from_command(cmd, repository)
 
     # WHEN
-    for cmd_ue in cmd.unites_enseignements:
-        groupement_ajuste.ajouter_unite_enseignement(
-            unite_enseignement=cmd_ue.code,
-        )
+    groupement_ajuste.ajouter_unites_enseignements(
+        codes_unites_enseignement=cmd.unites_enseignements,
+    )
 
     # THEN
     repository.save(groupement_ajuste)
+
     return groupement_ajuste.entity_id

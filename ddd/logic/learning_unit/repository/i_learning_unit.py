@@ -39,7 +39,13 @@ class ILearningUnitRepository(interface.AbstractRepository):
 
     @classmethod
     @abc.abstractmethod
-    def search_learning_units_dto(cls, code_annee_values: Set[Tuple[str, int]] = None) -> List['LearningUnitSearchDTO']:
+    def search_learning_units_dto(
+            cls,
+            code_annee_values: Set[Tuple[str, int]] = None,
+            code: str = None,
+            annee_academique: int = None,
+            intitule: str = None
+    ) -> List['LearningUnitSearchDTO']:
         pass
 
     @classmethod

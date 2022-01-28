@@ -105,8 +105,6 @@ class CatalogueFormationsTranslatorTest(SimpleTestCase):
         self.assertEqual(pgm_contenu.intitule, formation_contenu.intitule)
         self.assertEqual(pgm_contenu.intitule_complet, formation_contenu.intitule_complet)
         self.assertEqual(pgm_contenu.obligatoire, formation_contenu.obligatoire)
-        self.assertEqual(pgm_contenu.remarque, formation_contenu.remarque)
-        self.assertEqual(pgm_contenu.credits, formation_contenu.credits)
 
     def _assert_equal_unite_conversion(
             self,
@@ -132,6 +130,7 @@ def _build_ProgrammeDeFormationDTO():
         remarque='Remarque',
         credits=Decimal(10),
         intitule_complet='Bachelier en sciences économiques et de gestion ',
+        code='LECGE100B'
     )
     return ProgrammeDeFormationDTO(
         racine=ContenuNoeudDTO(
@@ -147,6 +146,7 @@ def _build_ProgrammeDeFormationDTO():
                                 remarque='Remarque',
                                 credits=Decimal(10),
                                 intitule_complet='Contenu :',
+                                code='LECGE100T'
                             ),
                             groupements_contenus=[],
                             unites_enseignement_contenues=[

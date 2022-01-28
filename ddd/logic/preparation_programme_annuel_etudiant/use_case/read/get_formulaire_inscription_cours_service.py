@@ -26,20 +26,31 @@
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormulaireInscriptionCoursCommand
 from ddd.logic.preparation_programme_annuel_etudiant.domain.service.get_formulaire_inscription_cours import \
     GetFormulaireInscriptionCours
-from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import \
-    ICatalogueFormationsTranslator
+from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations \
+    import ICatalogueFormationsTranslator
+from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_unites_enseignement import \
+    ICatalogueUnitesEnseignementTranslator
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormulaireInscriptionCoursDTO
+from ddd.logic.preparation_programme_annuel_etudiant.repository.i_groupement_ajuste_inscription_cours import \
+    IGroupementAjusteInscriptionCoursRepository
 
 
 def get_formulaire_inscription_cours_service(
         cmd: 'GetFormulaireInscriptionCoursCommand',
+        repo: 'IGroupementAjusteInscriptionCoursRepository',
         catalogue_formations_translator: 'ICatalogueFormationsTranslator',
+        catalogue_unites_enseignement_translator: 'ICatalogueUnitesEnseignementTranslator'
 ) -> 'FormulaireInscriptionCoursDTO':
     # GIVEN
 
     # WHEN
 
-    formulaire = GetFormulaireInscriptionCours.get_formulaire_inscription_cours(cmd, catalogue_formations_translator)
+    formulaire = GetFormulaireInscriptionCours.get_formulaire_inscription_cours(
+        cmd,
+        repo,
+        catalogue_formations_translator,
+        catalogue_unites_enseignement_translator
+    )
 
     # THEN
     return formulaire

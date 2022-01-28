@@ -42,6 +42,7 @@ def _cas_nominal_formation_version_standard():
         remarque='Remarque',
         credits=Decimal(10),
         intitule_complet='Bachelier en sciences économiques et de gestion',
+        code='LECGE100B'
     )
     return FormationDTO(
         racine=ContenuGroupementCatalogueDTO(
@@ -57,6 +58,7 @@ def _cas_nominal_formation_version_standard():
                                 remarque='Remarque',
                                 credits=Decimal(10),
                                 intitule_complet='Contenu :',
+                                code='LECGE100T',
                             ),
                             groupements_contenus=[],
                             unites_enseignement_contenues=[
@@ -95,6 +97,7 @@ def _cas_formation_version_particuliere():
         remarque='Remarque',
         credits=Decimal(10),
         intitule_complet='Master [120] en communication[ Double diplôme UCLouvain - uSherbrooke ]',
+        code='LCORP201S'
     )
     return FormationDTO(
         racine=ContenuGroupementCatalogueDTO(
@@ -110,6 +113,7 @@ def _cas_formation_version_particuliere():
                                 remarque='Remarque',
                                 credits=Decimal(10),
                                 intitule_complet='Tronc commun',
+                                code='LCORP114T'
                             ),
                             groupements_contenus=[],
                             unites_enseignement_contenues=[

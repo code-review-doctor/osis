@@ -7,7 +7,6 @@ from django.db.models import Exists, OuterRef
 def delete_tutors_without_attribution(apps, schema_editor):
     Tutor = apps.get_model('base', 'Tutor')
     AttributionNew = apps.get_model('attribution', 'AttributionNew')
-    Group = apps.get_model('auth', 'Group')
     problematic_tutors = Tutor.objects.annotate(
         has_attribution=Exists(
             queryset=AttributionNew.objects.filter(
@@ -18,14 +17,13 @@ def delete_tutors_without_attribution(apps, schema_editor):
         has_attribution=False
     )
     print("{} problematic tutors (without attributions)".format(len(problematic_tutors)))
-    group = Group.objects.filter(name='tutors').first()
     for tutor in problematic_tutors:
-        user = tutor.person.user
-        if user and group:
-            print("Removing {} from tutors group".format(tutor.person))
-            user.groups.remove(group)
-    print("Removing {} tutors".format(len(problematic_tutors)))
-    problematic_tutors.delete()
+        print("Removing {} {} - {} from tutors group".format(
+            tutor.person.first_name,
+            tutor.person.last_name,
+            tutor.person.global_id
+        ))
+        tutor.delete()
 
 
 class Migration(migrations.Migration):
