@@ -2,8 +2,7 @@
 {% for node in tree %}
     <ul>
         <li id="{{ node.id }}"
-            data-jstree='{"icon":"
-                    {% if node.obligatoire %}{% static "img/education_group_year/mandatory.png" %}{% else %}{% static "img/education_group_year/optional.png" %} {% endif %}"}'
+            data-jstree='{"icon":"{% if node.obligatoire %}{% static "img/education_group_year/mandatory.png" %}{% else %}{% static "img/education_group_year/optional.png" %} {% endif %}"}'
             class="
         {% if node.type_ajustement == 'AJOUT' %}
             text-success
