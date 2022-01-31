@@ -31,6 +31,7 @@ from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, C
     GroupementDTO, GroupementCatalogueDTO, UniteEnseignementCatalogueDTO
 from program_management.ddd.domain.program_tree_version import STANDARD
 
+
 ANNEE = 2021
 
 
@@ -79,7 +80,7 @@ def _cas_nominal_formation_version_standard():
         annee=ANNEE,
         sigle=SIGLE,
         version=STANDARD,
-        intitule_formation='Bachelier en sciences économiques et de gestion',
+        intitule_formation='Bachelier en sciences économiques et de gestion'
     )
 
 
@@ -94,7 +95,7 @@ def _cas_formation_version_particuliere():
                 remarque='Remarque',
                 credits=Decimal(10),
                 intitule_complet='Master [120] en communication[ Double diplôme UCLouvain - uSherbrooke ]',
-                code='LCORP201S'
+                code='LCORP203S'
             ),
             groupements_contenus=[
                 ContenuGroupementCatalogueDTO(
@@ -130,13 +131,13 @@ def _cas_formation_version_particuliere():
         sigle=SIGLE,
         version='DDSHERBROOKE',
         intitule_formation='Master [120] en communication[ Double diplôme UCLouvain - uSherbrooke ]',
-
     )
 
 
 def _cas_formation_version_transition():
     SIGLE = 'DATI2MS/G'
-    INTITULE = "Master [120] en science des données, orientation technologies de l'information, à finalité spécialisée[ Version 2020 ]"
+    INTITULE = "Master [120] en science des données, orientation technologies de l'information, à finalité " \
+               "spécialisée[ Version 2020 ]"
     return FormationDTO(
         racine=ContenuGroupementCatalogueDTO(
             groupement_contenant=GroupementCatalogueDTO(
@@ -184,16 +185,388 @@ def _cas_formation_version_transition():
     )
 
 
+def _cas_formation_version_particuliere_transition():
+    SIGLE = 'CORP2MS/CS'
+    VERSION = 'Version 2020'
+    INTITULE = "{}[ {} ]".format(
+        "Master [120] en communication , à finalité spécialisée: communication stratégique des organisations",
+        VERSION)
+    return FormationDTO(
+        racine=ContenuGroupementCatalogueDTO(
+            groupement_contenant=GroupementCatalogueDTO(
+                intitule=SIGLE,
+                obligatoire=True,
+                remarque='Remarque',
+                credits=Decimal(10),
+                intitule_complet=INTITULE,
+                code='LCORP201S'
+            ),
+            groupements_contenus=[
+                ContenuGroupementCatalogueDTO(
+                    groupement_contenant=GroupementCatalogueDTO(
+                        intitule='Contenu:',
+                        obligatoire=True,
+                        remarque='Remarque',
+                        credits=Decimal(10),
+                        intitule_complet='Contenu:',
+                        code='TCORP102T'
+                    ),
+                    groupements_contenus=[],
+                    unites_enseignement_contenues=[
+                        UniteEnseignementCatalogueDTO(
+                            bloc=2,
+                            code='LCOMU9870',
+                            intitule_complet="Séminaire d'intégration en communication stratégique (Sherbrooke)",
+                            quadrimestre=None,
+                            quadrimestre_texte=None,
+                            credits_absolus=Decimal(5),
+                            credits_relatifs=None,
+                            volume_annuel_pm=0,
+                            volume_annuel_pp=0,
+                            obligatoire=False,
+                            session_derogation='',
+                        )
+                    ]
+                ),
+            ],
+            unites_enseignement_contenues=[]
+        ),
+        annee=ANNEE,
+        sigle=SIGLE,
+        version=VERSION,
+        intitule_formation=INTITULE,
+    )
+
+
+def _cas_formation_version_standard_annee_moins_1():
+    SIGLE = 'ECGE1BA'
+    INTITULE = 'Bachelier en sciences économiques et de gestion'
+
+    return FormationDTO(
+        racine=ContenuGroupementCatalogueDTO(
+            groupement_contenant=GroupementCatalogueDTO(
+                intitule=SIGLE,
+                obligatoire=True,
+                remarque='Remarque',
+                credits=Decimal(10),
+                intitule_complet=INTITULE,
+                code='LECGE100B'
+            ),
+            groupements_contenus=[
+                ContenuGroupementCatalogueDTO(
+                    groupement_contenant=GroupementCatalogueDTO(
+                        intitule='Content:',
+                        obligatoire=True,
+                        remarque='Remarque',
+                        credits=Decimal(10),
+                        intitule_complet='Content:',
+                        code='LECGE100T',
+                    ),
+                    groupements_contenus=[],
+                    unites_enseignement_contenues=[
+                        UniteEnseignementCatalogueDTO(
+                            bloc=1,
+                            code='LESPO1113',
+                            intitule_complet='Sociologie et anthropologie des mondes contemporains',
+                            quadrimestre='Q1or2',
+                            quadrimestre_texte='Q1 ou Q2',
+                            credits_absolus=Decimal(5),
+                            credits_relatifs=None,
+                            volume_annuel_pm=40,
+                            volume_annuel_pp=0,
+                            obligatoire=True,
+                            session_derogation='',
+                        )
+                    ]),
+            ],
+            unites_enseignement_contenues=[]
+        ),
+        annee=ANNEE-1,
+        sigle=SIGLE,
+        version=STANDARD,
+        intitule_formation=INTITULE
+    )
+
+
+def _cas_mini_formation_version_standard():
+    SIGLE = 'MINADROI'
+    INTITULE = "Mineure en droit (accès)"
+
+    return FormationDTO(
+        racine=ContenuGroupementCatalogueDTO(
+            groupement_contenant=GroupementCatalogueDTO(
+                intitule=SIGLE,
+                obligatoire=True,
+                remarque='Remarque',
+                credits=Decimal(10),
+                intitule_complet=INTITULE,
+                code='LADRT100I'
+            ),
+            groupements_contenus=[
+                ContenuGroupementCatalogueDTO(
+                    groupement_contenant=GroupementCatalogueDTO(
+                        intitule='Contenu:',
+                        obligatoire=True,
+                        remarque='Remarque',
+                        credits=Decimal(10),
+                        intitule_complet='Contenu:',
+                        code='LADRT100T',
+                    ),
+                    groupements_contenus=[],
+                    unites_enseignement_contenues=[
+                        UniteEnseignementCatalogueDTO(
+                            bloc=3,
+                            code='LDROI1225',
+                            intitule_complet='Droit de la procédure pénale',
+                            quadrimestre='Q2',
+                            quadrimestre_texte='Q2',
+                            credits_absolus=Decimal(4),
+                            credits_relatifs=None,
+                            volume_annuel_pm=45,
+                            volume_annuel_pp=10,
+                            obligatoire=True,
+                            session_derogation='',
+                        )
+                    ]),
+            ],
+            unites_enseignement_contenues=[]
+        ),
+        annee=ANNEE,
+        sigle=SIGLE,
+        version=STANDARD,
+        intitule_formation=INTITULE
+    )
+
+
+def _cas_mini_formation_version_particuliere():
+    SIGLE = 'MINADROI'
+    VERSION = "Pour les bacheliers en sciences économiques et de gestion"
+    INTITULE = "{}[{}]".format("Mineure en droit (accès)", VERSION)
+
+    return FormationDTO(
+        racine=ContenuGroupementCatalogueDTO(
+            groupement_contenant=GroupementCatalogueDTO(
+                intitule=SIGLE,
+                obligatoire=True,
+                remarque='Remarque',
+                credits=Decimal(10),
+                intitule_complet=INTITULE,
+                code='LADRT100S'
+            ),
+            groupements_contenus=[
+                ContenuGroupementCatalogueDTO(
+                    groupement_contenant=GroupementCatalogueDTO(
+                        intitule='Contenu:',
+                        obligatoire=True,
+                        remarque='Remarque',
+                        credits=Decimal(10),
+                        intitule_complet='Contenu:',
+                        code='LADRT101T',
+                    ),
+                    groupements_contenus=[],
+                    unites_enseignement_contenues=[
+                        UniteEnseignementCatalogueDTO(
+                            bloc=2,
+                            code='LDROI1222',
+                            intitule_complet="Droit constitutionnel",
+                            quadrimestre='Q1and2',
+                            quadrimestre_texte='Q1 et Q2',
+                            credits_absolus=Decimal(8),
+                            credits_relatifs=None,
+                            volume_annuel_pm=90,
+                            volume_annuel_pp=14,
+                            obligatoire=True,
+                            session_derogation='',
+                        )
+                    ]),
+            ],
+            unites_enseignement_contenues=[]
+        ),
+        annee=ANNEE,
+        sigle=SIGLE,
+        version=VERSION,
+        intitule_formation=INTITULE
+    )
+
+
+def _cas_mini_formation_version_transition():
+    SIGLE = 'MINADROI'
+    VERSION = "Version 2020 "
+    INTITULE = "{}[{}]".format("Mineure en droit (accès)", VERSION)
+
+    return FormationDTO(
+        racine=ContenuGroupementCatalogueDTO(
+            groupement_contenant=GroupementCatalogueDTO(
+                intitule=SIGLE,
+                obligatoire=True,
+                remarque='Remarque',
+                credits=Decimal(10),
+                intitule_complet=INTITULE,
+                code='LADRT111S'
+            ),
+            groupements_contenus=[
+                ContenuGroupementCatalogueDTO(
+                    groupement_contenant=GroupementCatalogueDTO(
+                        intitule='Contenu:',
+                        obligatoire=True,
+                        remarque='Remarque',
+                        credits=Decimal(10),
+                        intitule_complet='Contenu:',
+                        code='TADRT100T',
+                    ),
+                    groupements_contenus=[],
+                    unites_enseignement_contenues=[
+                        UniteEnseignementCatalogueDTO(
+                            bloc=2,
+                            code='LDROI1223',
+                            intitule_complet="Droit des obligations",
+                            quadrimestre='Q3',
+                            quadrimestre_texte='Q3',
+                            credits_absolus=Decimal(11.5),
+                            credits_relatifs=None,
+                            volume_annuel_pm=0,
+                            volume_annuel_pp=50,
+                            obligatoire=True,
+                            session_derogation='',
+                        )
+                    ]),
+            ],
+            unites_enseignement_contenues=[]
+        ),
+        annee=ANNEE,
+        sigle=SIGLE,
+        version=VERSION,
+        intitule_formation=INTITULE
+    )
+
+
+def _cas_mini_formation_version_particuliere_transition():
+    SIGLE = 'MINADROI'
+    VERSION = "Version 2020 "
+    INTITULE = "{}[{}]".format("Mineure en droit (accès)", VERSION)
+
+    return FormationDTO(
+        racine=ContenuGroupementCatalogueDTO(
+            groupement_contenant=GroupementCatalogueDTO(
+                intitule=SIGLE,
+                obligatoire=True,
+                remarque='Remarque',
+                credits=Decimal(10),
+                intitule_complet=INTITULE,
+                code='LADRT101S'
+            ),
+            groupements_contenus=[
+                ContenuGroupementCatalogueDTO(
+                    groupement_contenant=GroupementCatalogueDTO(
+                        intitule='Contenu:',
+                        obligatoire=True,
+                        remarque='Remarque',
+                        credits=Decimal(10),
+                        intitule_complet='Contenu:',
+                        code='TADRT101T',
+                    ),
+                    groupements_contenus=[],
+                    unites_enseignement_contenues=[
+                        UniteEnseignementCatalogueDTO(
+                            bloc=2,
+                            code='LDROI1225',
+                            intitule_complet="Droit de la procédure pénale",
+                            quadrimestre='Q2',
+                            quadrimestre_texte='Q2',
+                            credits_absolus=Decimal(4),
+                            credits_relatifs=None,
+                            volume_annuel_pm=45,
+                            volume_annuel_pp=10,
+                            obligatoire=True,
+                            session_derogation='',
+                        )
+                    ]),
+            ],
+            unites_enseignement_contenues=[]
+        ),
+        annee=ANNEE,
+        sigle=SIGLE,
+        version=VERSION,
+        intitule_formation=INTITULE
+    )
+
+
+def _cas_mini_formation_version_standard_annee_moins_1():
+    SIGLE = 'MINADROI'
+    VERSION = STANDARD
+    INTITULE = "Mineure en droit (accès)"
+
+    return FormationDTO(
+        racine=ContenuGroupementCatalogueDTO(
+            groupement_contenant=GroupementCatalogueDTO(
+                intitule=SIGLE,
+                obligatoire=True,
+                remarque='Remarque',
+                credits=Decimal(10),
+                intitule_complet=INTITULE,
+                code='LADRT121S'
+            ),
+            groupements_contenus=[
+                ContenuGroupementCatalogueDTO(
+                    groupement_contenant=GroupementCatalogueDTO(
+                        intitule='Contenu:',
+                        obligatoire=True,
+                        remarque='Remarque',
+                        credits=Decimal(10),
+                        intitule_complet='Contenu:',
+                        code='LADRT100T',
+                    ),
+                    groupements_contenus=[],
+                    unites_enseignement_contenues=[
+                        UniteEnseignementCatalogueDTO(
+                            bloc=3,
+                            code='LDROI1225',
+                            intitule_complet="Droit de la procédure pénale",
+                            quadrimestre='Q2',
+                            quadrimestre_texte='Q2',
+                            credits_absolus=Decimal(4),
+                            credits_relatifs=None,
+                            volume_annuel_pm=45,
+                            volume_annuel_pp=10,
+                            obligatoire=True,
+                            session_derogation='',
+                        )
+                    ]),
+            ],
+            unites_enseignement_contenues=[]
+        ),
+        annee=ANNEE-1,
+        sigle=SIGLE,
+        version=VERSION,
+        intitule_formation=INTITULE
+    )
+
+
 CAS_NOMINAL_FORMATION_STANDARD = _cas_nominal_formation_version_standard()
 CAS_FORMATION_VERSION_PARTICULIERE = _cas_formation_version_particuliere()
 CAS_FORMATION_VERSION_TRANSITION = _cas_formation_version_transition()
+CAS_FORMATION_VERSION_PARTICULIERE_TRANSITION = _cas_formation_version_particuliere_transition()
+CAS_FORMATION_STANDARD_ANNEE_MOINS_1 = _cas_formation_version_standard_annee_moins_1()
+CAS_MINI_FORMATION_VERSION_STANDARD = _cas_mini_formation_version_standard()
+CAS_MINI_FORMATION_VERSION_PARTICULIERE = _cas_mini_formation_version_particuliere()
+CAS_MINI_FORMATION_VERSION_TRANSITION = _cas_mini_formation_version_transition()
+CAS_MINI_FORMATION_VERSION_PARTICULIERE_TRANSITION = _cas_mini_formation_version_particuliere_transition()
+CAS_MINI_FORMATION_VERSION_STANDARD_ANNEE_MOINS_1 = _cas_mini_formation_version_standard_annee_moins_1()
 
 
 class CatalogueFormationsTranslatorInMemory(ICatalogueFormationsTranslator):
+
     dtos = [
         CAS_NOMINAL_FORMATION_STANDARD,
         CAS_FORMATION_VERSION_PARTICULIERE,
-        CAS_FORMATION_VERSION_TRANSITION
+        CAS_FORMATION_VERSION_TRANSITION,
+        CAS_FORMATION_VERSION_PARTICULIERE_TRANSITION,
+        CAS_FORMATION_STANDARD_ANNEE_MOINS_1,
+        CAS_MINI_FORMATION_VERSION_STANDARD,
+        CAS_MINI_FORMATION_VERSION_PARTICULIERE,
+        CAS_MINI_FORMATION_VERSION_TRANSITION,
+        CAS_MINI_FORMATION_VERSION_PARTICULIERE_TRANSITION,
+        CAS_MINI_FORMATION_VERSION_STANDARD_ANNEE_MOINS_1,
     ]
 
     @classmethod
