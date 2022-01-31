@@ -35,7 +35,7 @@ from program_management.forms.education_groups import STANDARD
 from osis_role.contrib.views import PermissionRequiredMixin
 
 
-class FormulaireInscriptionCoursView(HtmxMixin, LoginRequiredMixin, TemplateView):
+class FormulaireInscriptionCoursView(PermissionRequiredMixin, HtmxMixin, LoginRequiredMixin, TemplateView):
     name = "pae_formulaire_inscription_view"
     permission_required = 'preparation_inscription.view_formulaire_inscription_cours'
     raise_exception = True

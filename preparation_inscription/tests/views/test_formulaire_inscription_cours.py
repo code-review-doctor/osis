@@ -44,19 +44,12 @@ class TestFormulaireInscriptionCoursView(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.url = reverse('default_enrollment_form', kwargs={'year': YEAR, 'acronym': ACRONYM})
+        cls.url = reverse('pae_formulaire_inscription_view', kwargs={'year': YEAR, 'acronym': ACRONYM})
 
     def setUp(self) -> None:
         pgm_manager = ProgramManagerFactory()
         self.person = pgm_manager.person
         self.client.force_login(self.person.user)
-        #
-        fetch_tree_patcher = mock.patch(
-            'preparation_inscription.views.formulaire_inscription_cours.FormulaireInscriptionCoursView.get_group_obj',
-            return_value=GroupFactory()
-        )
-        fetch_tree_patcher.start()
-        self.addCleanup(fetch_tree_patcher.stop)
 
         self.fetch_from_cache_patcher = mock.patch(
             'preparation_inscription.views.formulaire_inscription_cours._get_formation_inscription_cours',
@@ -69,7 +62,8 @@ class TestFormulaireInscriptionCoursView(TestCase):
                     groupement_contenant=GroupementDTO(
                         intitule='intitule',
                         obligatoire=True,
-                        chemin_acces=''
+                        chemin_acces='',
+                        intitule_complet='intitule',
                     ),
                     unites_enseignement_contenues=[],
                     groupements_contenus=[]
@@ -90,4 +84,4 @@ class TestFormulaireInscriptionCoursView(TestCase):
 
     def test_assert_template_used(self):
         response = self.client.get(self.url)
-        self.assertTemplateUsed(response, "onglets.html")
+        self.assertTemplateUsed(response, "preparation_inscription/blocks/formulaire_inscription.html")
