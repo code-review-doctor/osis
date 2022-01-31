@@ -36,49 +36,43 @@ ANNEE = 2021
 
 def _cas_nominal_formation_version_standard():
     SIGLE = 'ECGE1BA'
-    groupement = GroupementCatalogueDTO(
-        intitule=SIGLE,
-        obligatoire=True,
-        remarque='Remarque',
-        credits=Decimal(10),
-        intitule_complet='Bachelier en sciences économiques et de gestion',
-        code='LECGE100B'
-    )
+
     return FormationDTO(
         racine=ContenuGroupementCatalogueDTO(
-            groupement_contenant=groupement,
+            groupement_contenant=GroupementCatalogueDTO(
+                intitule=SIGLE,
+                obligatoire=True,
+                remarque='Remarque',
+                credits=Decimal(10),
+                intitule_complet='Bachelier en sciences économiques et de gestion',
+                code='LECGE100B'
+            ),
             groupements_contenus=[
                 ContenuGroupementCatalogueDTO(
-                    groupement_contenant=groupement,
-                    groupements_contenus=[
-                        ContenuGroupementCatalogueDTO(
-                            groupement_contenant=GroupementCatalogueDTO(
-                                intitule='Contenu :',
-                                obligatoire=True,
-                                remarque='Remarque',
-                                credits=Decimal(10),
-                                intitule_complet='Contenu :',
-                                code='LECGE100T',
-                            ),
-                            groupements_contenus=[],
-                            unites_enseignement_contenues=[
-                                UniteEnseignementCatalogueDTO(
-                                    bloc=1,
-                                    code='LESPO1113',
-                                    intitule_complet='Sociologie et anthropologie des mondes contemporains',
-                                    quadrimestre='Q1or2',
-                                    credits_absolus=Decimal(5),
-                                    volume_annuel_pm=40,
-                                    volume_annuel_pp=0,
-                                    obligatoire=False,
-                                    credits_relatifs=None,
-                                    session_derogation='',
-                                    quadrimestre_texte='Q1 ou Q2'
-                                )
-                            ]
-                        )],
-                    unites_enseignement_contenues=[]
-                )
+                    groupement_contenant=GroupementCatalogueDTO(
+                        intitule='Contenu :',
+                        obligatoire=True,
+                        remarque='Remarque',
+                        credits=Decimal(10),
+                        intitule_complet='Contenu :',
+                        code='LECGE100T',
+                    ),
+                    groupements_contenus=[],
+                    unites_enseignement_contenues=[
+                        UniteEnseignementCatalogueDTO(
+                            bloc=1,
+                            code='LESPO1113',
+                            intitule_complet='Sociologie et anthropologie des mondes contemporains',
+                            quadrimestre='Q1or2',
+                            credits_absolus=Decimal(5),
+                            volume_annuel_pm=40,
+                            volume_annuel_pp=0,
+                            obligatoire=True,
+                            credits_relatifs=None,
+                            session_derogation='',
+                            quadrimestre_texte='Q1 ou Q2'
+                        )
+                    ]),
             ],
             unites_enseignement_contenues=[]
         ),
@@ -91,49 +85,44 @@ def _cas_nominal_formation_version_standard():
 
 def _cas_formation_version_particuliere():
     SIGLE = 'CORP2MS/CS'
-    groupement = GroupementCatalogueDTO(
-        intitule=SIGLE,
-        obligatoire=True,
-        remarque='Remarque',
-        credits=Decimal(10),
-        intitule_complet='Master [120] en communication[ Double diplôme UCLouvain - uSherbrooke ]',
-        code='LCORP201S'
-    )
+
     return FormationDTO(
         racine=ContenuGroupementCatalogueDTO(
-            groupement_contenant=groupement,
+            groupement_contenant=GroupementCatalogueDTO(
+                intitule=SIGLE,
+                obligatoire=True,
+                remarque='Remarque',
+                credits=Decimal(10),
+                intitule_complet='Master [120] en communication[ Double diplôme UCLouvain - uSherbrooke ]',
+                code='LCORP201S'
+            ),
             groupements_contenus=[
                 ContenuGroupementCatalogueDTO(
-                    groupement_contenant=groupement,
-                    groupements_contenus=[
-                        ContenuGroupementCatalogueDTO(
-                            groupement_contenant=GroupementCatalogueDTO(
-                                intitule='Tronc commun',
-                                obligatoire=True,
-                                remarque='Remarque',
-                                credits=Decimal(10),
-                                intitule_complet='Tronc commun',
-                                code='LCORP114T'
-                            ),
-                            groupements_contenus=[],
-                            unites_enseignement_contenues=[
-                                UniteEnseignementCatalogueDTO(
-                                    bloc=2,
-                                    code='LCOMU2904B',
-                                    intitule_complet="Séminaire d'accompagnement au mémoire : méthodologie",
-                                    quadrimestre='Q2',
-                                    credits_absolus=Decimal(20),
-                                    volume_annuel_pm=0,
-                                    volume_annuel_pp=0,
-                                    obligatoire=False,
-                                    credits_relatifs=None,
-                                    session_derogation='',
-                                    quadrimestre_texte='Q2'
-                                )
-                            ]
-                        )],
-                    unites_enseignement_contenues=[]
-                )
+                    groupement_contenant=GroupementCatalogueDTO(
+                            intitule='Tronc commun',
+                            obligatoire=True,
+                            remarque='Remarque',
+                            credits=Decimal(10),
+                            intitule_complet='Tronc commun',
+                            code='LCORP114T'
+                    ),
+                    groupements_contenus=[],
+                    unites_enseignement_contenues=[
+                        UniteEnseignementCatalogueDTO(
+                            bloc=2,
+                            code='LCOMU2904B',
+                            intitule_complet="Séminaire d'accompagnement au mémoire : méthodologie",
+                            quadrimestre='Q2',
+                            credits_absolus=Decimal(20),
+                            volume_annuel_pm=0,
+                            volume_annuel_pp=0,
+                            obligatoire=False,
+                            credits_relatifs=None,
+                            session_derogation='',
+                            quadrimestre_texte='Q2'
+                        )
+                    ]
+                ),
             ],
             unites_enseignement_contenues=[]
         ),
@@ -144,10 +133,15 @@ def _cas_formation_version_particuliere():
     )
 
 
+CAS_NOMINAL_FORMATION_STANDARD = _cas_nominal_formation_version_standard()
+CAS_FORMATION_VERSION_PARTICULIERE = _cas_formation_version_particuliere()
+
+
 class CatalogueFormationsTranslatorInMemory(ICatalogueFormationsTranslator):
+
     dtos = [
-        _cas_nominal_formation_version_standard(),
-        _cas_formation_version_particuliere()
+        CAS_NOMINAL_FORMATION_STANDARD,
+        CAS_FORMATION_VERSION_PARTICULIERE,
     ]
 
     @classmethod
