@@ -99,12 +99,12 @@ def _cas_formation_version_particuliere():
             groupements_contenus=[
                 ContenuGroupementCatalogueDTO(
                     groupement_contenant=GroupementCatalogueDTO(
-                            intitule='Tronc commun',
-                            obligatoire=True,
-                            remarque='Remarque',
-                            credits=Decimal(10),
-                            intitule_complet='Tronc commun',
-                            code='LCORP114T'
+                        intitule='Tronc commun',
+                        obligatoire=True,
+                        remarque='Remarque',
+                        credits=Decimal(10),
+                        intitule_complet='Tronc commun',
+                        code='LCORP114T'
                     ),
                     groupements_contenus=[],
                     unites_enseignement_contenues=[
