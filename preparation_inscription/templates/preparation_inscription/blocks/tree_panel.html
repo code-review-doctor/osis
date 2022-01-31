@@ -11,6 +11,7 @@
     }
 
     .node_block_text {
+        display: inline-block;
         position: absolute;
         right: 0;
         width: 40px;
@@ -54,7 +55,7 @@
     <div id="tree"></div>
 
     <script>
-        document.getElementById('tree').addEventListener('scroll', (e) => {
+        document.querySelector('#tree').addEventListener('scroll', (e) => {
             const currentScrollLeft = e.target.scrollLeft;
             const currentScrollTop = e.target.scrollTop;
 
