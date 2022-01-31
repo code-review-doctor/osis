@@ -29,16 +29,21 @@ from typing import List, Union
 
 import attr
 
+from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.unite_enseignement_ajoutee import \
     UniteEnseignementAjoutee, UniteEnseignementAjouteeIdentity
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.unite_enseignement_modifiee import \
     UniteEnseignementModifiee
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.unite_enseignement_supprimee import \
     UniteEnseignementSupprimee
+from ddd.logic.preparation_programme_annuel_etudiant.domain.validator.validators_by_business_action import \
+    AjouterUniteEnseignementValidatorList
 from education_group.ddd.domain.group import GroupIdentity
 from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
 from osis_common.ddd import interface
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
+
+CodeUniteEnseignement = str
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
@@ -49,8 +54,7 @@ class IdentiteGroupementAjusteInscriptionCours(interface.EntityIdentity):
 @attr.s(slots=True, auto_attribs=True)
 class GroupementAjusteInscriptionCours(interface.RootEntity):
     entity_id: IdentiteGroupementAjusteInscriptionCours
-    version_programme_id: 'ProgramTreeVersionIdentity'
-    groupement_id: GroupIdentity
+    groupement_id: 'GroupIdentity'
     unites_enseignement_ajoutees: List['UniteEnseignementAjoutee']
     unites_enseignement_supprimees: List['UniteEnseignementSupprimee']
     unites_enseignement_modifiees: List['UniteEnseignementModifiee']
@@ -59,9 +63,28 @@ class GroupementAjusteInscriptionCours(interface.RootEntity):
     def annee(self):
         return self.groupement_id.year
 
-    # comment vérifier qu'une unité d'enseignement n'est pas déjà existante dans le programme
-    def ajouter_unite_enseignement(self, unite_enseignement: 'LearningUnitYearIdentity'):
-        raise NotImplementedError
+    def get_identites_unites_enseignement_ajoutees(self) -> List['LearningUnitIdentity']:
+        return [ue.unite_enseignement_identity for ue in self.unites_enseignement_ajoutees]
+
+    def ajouter_unites_enseignements(
+            self,
+            codes_unites_enseignement: List['CodeUniteEnseignement']
+    ) -> None:
+        unites_enseignement = [
+            LearningUnitIdentityBuilder.build_from_code_and_year(code=code, year=self.annee)
+            for code in codes_unites_enseignement
+        ]
+        AjouterUniteEnseignementValidatorList(
+            groupement_ajuste=self,
+            unites_enseignement=unites_enseignement,
+        ).validate()
+        for ue in unites_enseignement:
+            self.unites_enseignement_ajoutees.append(
+                UniteEnseignementAjoutee(
+                    entity_id=UniteEnseignementAjouteeIdentity(uuid.uuid4()),
+                    unite_enseignement_identity=ue,
+                )
+            )
 
     def retirer_unite_enseignement(self, unite_enseignement: 'LearningUnitYearIdentity'):
         raise NotImplementedError

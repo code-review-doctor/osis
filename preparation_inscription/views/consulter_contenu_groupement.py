@@ -32,15 +32,21 @@ from django.views.generic import TemplateView
 from base.utils.htmx import HtmxMixin
 
 
+RAFRAICHIR_GROUPEMENT_CONTENANT = 'rafraichir_groupement_contenant'
+
+
 class ConsulterContenuGroupementView(HtmxMixin, LoginRequiredMixin, TemplateView):
     name = 'consulter_contenu_groupement_view'
     # TemplateView
     template_name = "preparation_inscription/preparation_inscription.html"
-    htmx_template_name = "preparation_inscription/blocks/tab_contenu.html"
+    htmx_template_name = "preparation_inscription/consulter_contenu_groupement.html"
 
     def get_context_data(self, **kwargs):
         return {
             **super().get_context_data(**kwargs),
+            # TODO code_groupement_racine :: à implémenter quand la story "afficher contenu" est développée
+            'code_groupement_racine': 'LECGE100T',
+            RAFRAICHIR_GROUPEMENT_CONTENANT: self.request.GET.get(RAFRAICHIR_GROUPEMENT_CONTENANT),
             'search_result': self.get_content(),
             'intitule_groupement': self.get_intitule_groupement(),
             'intitule_programme': self.get_intitule_programme(),

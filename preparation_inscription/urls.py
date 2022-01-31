@@ -27,20 +27,24 @@ from django.urls import path, include
 
 from preparation_inscription.views.ajouter_unites_enseignement import AjouterUnitesEnseignementView
 from preparation_inscription.views.consulter_contenu_groupement import ConsulterContenuGroupementView
-from preparation_inscription.views.formulaire_inscription import FormulaireInscriptionView
+from preparation_inscription.views.detail import PreparationInscriptionMainView
 from preparation_inscription.views.formulaire_inscription_cours import FormulaireInscriptionCoursView
 from preparation_inscription.views.modification_contenu_groupement import ModifierProprietesContenuView
+from preparation_inscription.views.program_tree import ProgramTreeHTMLView
 from preparation_inscription.views.supprimer_unites_enseignement import SupprimerUnitesEnseignementView
-from preparation_inscription.views.tree_html import TreeHTMLView
 
 urlpatterns = [
-    path('<int:year>/<acronym:acronym>/', include([
-        path('', ConsulterContenuGroupementView.as_view(), name=ConsulterContenuGroupementView.name),
+    path('<int:annee>/<str:code_programme>/', include([
+        path('', PreparationInscriptionMainView.as_view(), name=PreparationInscriptionMainView.name),
+        path('detail', ConsulterContenuGroupementView.as_view(), name=ConsulterContenuGroupementView.name),
         path('delete', SupprimerUnitesEnseignementView.as_view(), name=SupprimerUnitesEnseignementView.name),
         path('add', AjouterUnitesEnseignementView.as_view(), name=AjouterUnitesEnseignementView.name),
         path('update', ModifierProprietesContenuView.as_view(), name=ModifierProprietesContenuView.name),
-        path('tree/', TreeHTMLView.as_view(), name=TreeHTMLView.name),
-        path('formulaire_inscription/', FormulaireInscriptionView.as_view(), name=FormulaireInscriptionView.name),
-        path('default_enrollment_form/', FormulaireInscriptionCoursView.as_view(), name='default_enrollment_form')
+        path('tree/', ProgramTreeHTMLView.as_view(), name=ProgramTreeHTMLView.name),
+        path(
+            'formulaire_inscription/',
+            FormulaireInscriptionCoursView.as_view(),
+            name=FormulaireInscriptionCoursView.name
+        ),
     ])),
 ]

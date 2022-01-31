@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-28 10:34+0200\n"
+"POT-Creation-Date: 2022-01-27 16:13+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -30,8 +30,8 @@ msgstr "Un suppléant ne peut pas reconduire sa fonction de suppléant"
 msgid ""
 "Application on this vacant course is not reserved for interns/open for extern"
 msgstr ""
-"La candidature sur ce cours vacant est réservée pour les internes/"
-"ouverte pour les externes"
+"La candidature sur ce cours vacant est réservée pour les internes/ouverte "
+"pour les externes"
 
 msgid "Can't create a learning unit lower than 2019-20"
 msgstr "On ne peut pas créer une UE avec une année inférieure à 2019-20"
@@ -98,6 +98,9 @@ msgstr "Le sous-type de stage est obligatoire"
 msgid "Large print"
 msgstr "Copie adaptée"
 
+msgid "Learning unit {} already added in this ajusted group."
+msgstr "L'UE {} a déjà été ajoutée dans ce groupement ajusté."
+
 msgid "Learning unit {} already exists next year"
 msgstr "L'UE {} existe déjà sur l'année suivante"
 
@@ -106,9 +109,6 @@ msgstr "L'UE est utilisée dans les formations suivantes : {}"
 
 msgid "Lecturing charge or practical charge must be filled"
 msgstr "Le vol.1 postulé ou le vol.2 postulé doit être rempli"
-
-msgid "No student to encode by excel"
-msgstr "Aucun étudiant à encoder par Excel "
 
 msgid "No vacant corresponding activity"
 msgstr "Pas de cours vacant correspondant"
@@ -238,12 +238,6 @@ msgstr ""
 
 msgid "The teaching place is required."
 msgstr "Le lieu d'enseignement est obligatoire"
-
-msgid "There is no enrollment for this course"
-msgstr "Aucune inscription pour ce cours"
-
-msgid "There is no enrollment to the exam"
-msgstr "Aucune inscription à l'examen de ce cours"
 
 msgid ""
 "This course is team-managed. The application to this activity is based on a "

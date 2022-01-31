@@ -48,6 +48,7 @@ class UniteEnseignementDTO(DTO):
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
 class GroupementDTO(DTO):
+    code: str
     intitule: str
     obligatoire: bool
     remarque: str
@@ -68,5 +69,5 @@ class ProgrammeDeFormationDTO(DTO):
     annee: int
     sigle: str
     version: str
+    code: str
     intitule_formation: str
-    intitule_version_programme: str

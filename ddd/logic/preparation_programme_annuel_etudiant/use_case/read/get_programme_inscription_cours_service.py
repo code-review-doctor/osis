@@ -24,17 +24,27 @@
 #
 ##############################################################################
 
-from ddd.logic.preparation_programme_annuel_etudiant.commands import GetProgrammeInscriptionCoursServiceCommand
-from ddd.logic.preparation_programme_annuel_etudiant.domain.builder.programme_inscription_cours_identity_builder import \
-    ProgrammeInscriptionCoursIdentityBuilder
+from ddd.logic.preparation_programme_annuel_etudiant.commands import GetProgrammeInscriptionCoursCommand
+from ddd.logic.preparation_programme_annuel_etudiant.domain.service.get_programme_inscription_cours import \
+    GetProgrammeInscriptionCours
+from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import \
+    ICatalogueFormationsTranslator
+from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_unites_enseignement import \
+    ICatalogueUnitesEnseignementTranslator
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import ProgrammeInscriptionCoursDTO
-from ddd.logic.preparation_programme_annuel_etudiant.repository.i_programme_inscription_cours import \
-    IProgrammeInscriptionCoursRepository
+from ddd.logic.preparation_programme_annuel_etudiant.repository.i_groupement_ajuste_inscription_cours import \
+    IGroupementAjusteInscriptionCoursRepository
 
 
 def get_programme_inscription_cours(
-        cmd: 'GetProgrammeInscriptionCoursServiceCommand',
-        repository: 'IProgrammeInscriptionCoursRepository',
+        cmd: 'GetProgrammeInscriptionCoursCommand',
+        repository: 'IGroupementAjusteInscriptionCoursRepository',
+        translator: 'ICatalogueFormationsTranslator',
+        catalogue_unites_enseignement_translator: 'ICatalogueUnitesEnseignementTranslator'
 ) -> 'ProgrammeInscriptionCoursDTO':
-    programme_inscription_cours_identity = ProgrammeInscriptionCoursIdentityBuilder.build_from_command(cmd)
-    return repository.get_dto(entity_id=programme_inscription_cours_identity)
+    return GetProgrammeInscriptionCours.get_programme_inscription_cours(
+        cmd=cmd,
+        groupement_ajuste_repository=repository,
+        catalogue_formations_translator=translator,
+        catalogue_unites_enseignement_translator=catalogue_unites_enseignement_translator
+    )

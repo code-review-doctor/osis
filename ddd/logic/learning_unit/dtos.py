@@ -111,6 +111,11 @@ class LearningUnitSearchDTO(DTO):
     type = attr.ib(type=str)
     responsible_entity_code = attr.ib(type=str)
     responsible_entity_title = attr.ib(type=str)
+    quadrimester = attr.ib(type=str)
+    credits = attr.ib(type=int)
+    lecturing_volume_annual = attr.ib(type=int)
+    practical_volume_annual = attr.ib(type=int)
+    session_derogation = attr.ib(type=str)
     partims = attr.ib(type=List[LearningUnitPartimDTO], default=attr.Factory(list))
 
 

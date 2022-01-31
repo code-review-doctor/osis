@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,76 +23,60 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
 from django.http import Http404
 from django.views.generic import TemplateView
+from rules.contrib.views import LoginRequiredMixin
 
+from base.utils.htmx import HtmxMixin
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormulaireInscriptionCoursCommand
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormulaireInscriptionCoursDTO
-from education_group.ddd import command as command_education_group
-from education_group.ddd.domain.exception import GroupNotFoundException
-from education_group.ddd.service.read import get_group_service
 from infrastructure.messages_bus import message_bus_instance
 from program_management.forms.education_groups import STANDARD
+from osis_role.contrib.views import PermissionRequiredMixin
 
 
-class FormulaireInscriptionCoursView(TemplateView):
-    permission_required = 'preparation_programme.view_formulaire_inscription_cours'
+class FormulaireInscriptionCoursView(PermissionRequiredMixin, HtmxMixin, LoginRequiredMixin, TemplateView):
+    name = "pae_formulaire_inscription_view"
+    permission_required = 'preparation_inscription.view_formulaire_inscription_cours'
     raise_exception = True
 
-    template_name = "onglets.html"
+    template_name = "preparation_inscription/blocks/formulaire_inscription.html"
+    htmx_template_name = "preparation_inscription/blocks/formulaire_inscription.html"
 
     def get_context_data(
             self,
-            year: int,
-            acronym: str,
-            version_name: str = '',
-            transition_name: str = '',
+            annee: int,
+            code_programme: str,
             **kwargs
     ):
         context = super().get_context_data(**kwargs)
-        sigle = self.get_group_obj().abbreviated_title
         context.update(
             contexte_commun_preparation_inscription(
-                sigle,
-                transition_name if transition_name else '',
-                version_name if version_name != STANDARD else '',
-                year
+                self.kwargs['code_programme'],
+                annee
             )
         )
 
         return context
 
-    def get_group_obj(self) -> 'Group':
-        try:
-            get_cmd = command_education_group.GetGroupCommand(
-                code=self.kwargs["acronym"],
-                year=self.kwargs["year"]
-            )
-            return get_group_service.get_group(get_cmd)
-        except GroupNotFoundException:
-            raise Http404
 
-
-def _get_formation_inscription_cours(year: int, acronym: str, version_name: str, transition_name: str) \
-        -> FormulaireInscriptionCoursDTO:
+def _get_formation_inscription_cours(annee: int, code_programme: str) -> FormulaireInscriptionCoursDTO:
     cmd = GetFormulaireInscriptionCoursCommand(
-        annee_formation=year,
-        sigle_formation=acronym,
-        version_formation=version_name,
-        transition_formation=transition_name,
+        annee=annee,
+        code_programme=code_programme,
     )
     return message_bus_instance.invoke(cmd)
 
 
-def contexte_commun_preparation_inscription(sigle, transition_name, version_name, year) -> dict:
-    formulaire = _get_formation_inscription_cours(year, sigle, version_name, transition_name)
+def contexte_commun_preparation_inscription(code_programme: str, annee: int) -> dict:
+    formulaire = _get_formation_inscription_cours(annee, code_programme)
     return {
         'code': "{}{}".format(
             formulaire.sigle_formation,
             formulaire.version_formation if formulaire.version_formation != STANDARD else ''
         ),
-        'title': formulaire.intitule_version_programme,
+        'acronym': code_programme,
+        'title': formulaire.intitule_formation,
         'formulaire_inscription_cours': formulaire,
-        'year': year,
-        }
+        'year': annee,
+    }

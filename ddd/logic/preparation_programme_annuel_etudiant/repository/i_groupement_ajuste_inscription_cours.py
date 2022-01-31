@@ -29,8 +29,10 @@ from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_aju
     GroupementAjusteInscriptionCours
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
     IdentiteGroupementAjusteInscriptionCours
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import GroupementAjusteFromRepositoryDTO
 from osis_common.ddd import interface
 from osis_common.ddd.interface import ApplicationService
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 
 
 class IGroupementAjusteInscriptionCoursRepository(interface.AbstractRepository):
@@ -42,6 +44,7 @@ class IGroupementAjusteInscriptionCoursRepository(interface.AbstractRepository):
     def search(
             cls,
             entity_ids: Optional[List['IdentiteGroupementAjusteInscriptionCours']] = None,
+            groupement_id: 'GroupIdentity' = None,
             **kwargs
     ) -> List['GroupementAjusteInscriptionCours']:
         pass
@@ -52,4 +55,11 @@ class IGroupementAjusteInscriptionCoursRepository(interface.AbstractRepository):
 
     @classmethod
     def save(cls, entity: 'GroupementAjusteInscriptionCours') -> None:
+        pass
+
+    @classmethod
+    def get_dtos(
+            cls,
+            program_tree_version_identity: ProgramTreeVersionIdentity
+    ) -> List['GroupementAjusteFromRepositoryDTO']:
         pass

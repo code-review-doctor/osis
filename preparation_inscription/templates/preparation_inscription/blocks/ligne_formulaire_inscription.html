@@ -27,19 +27,19 @@
 
 {% with profondeur=profondeur|add:"1" %}
     {% if est_une_ue %}
-        {% include 'ligne_formulaire_inscription_pour_ue.html' %}
+        {% include 'preparation_inscription/blocks/ligne_formulaire_inscription_pour_ue.html' %}
     {% else %}
         {%  if not racine %}
-            {% include 'ligne_formulaire_inscription_pour_groupement.html' %}
+            {% include 'preparation_inscription/blocks/ligne_formulaire_inscription_pour_groupement.html' %}
         {% endif %}
     {% endif %}
 
     {% for contenu_groupement_enfant in contenu.unites_enseignement_contenues %}
-        {% include 'ligne_formulaire_inscription.html' with contenu=contenu_groupement_enfant profondeur=profondeur|add:"1" est_une_ue=True racine=False%}
+        {% include 'preparation_inscription/blocks/ligne_formulaire_inscription.html' with contenu=contenu_groupement_enfant profondeur=profondeur|add:"1" est_une_ue=True racine=False%}
     {% endfor %}
 
     {% for contenu_groupement_enfant in contenu.groupements_contenus %}
-        {% include 'ligne_formulaire_inscription.html' with contenu=contenu_groupement_enfant profondeur=profondeur est_une_ue=False racine=False %}
+        {% include 'preparation_inscription/blocks/ligne_formulaire_inscription.html' with contenu=contenu_groupement_enfant profondeur=profondeur est_une_ue=False racine=False %}
     {% endfor %}
 
 {% endwith %}

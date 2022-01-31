@@ -27,15 +27,15 @@ from typing import List
 
 import attr
 
+from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
+    CodeUniteEnseignement
 from osis_common.ddd import interface
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
 class GetFormulaireInscriptionCoursCommand(interface.CommandRequest):
-    annee_formation: int
-    sigle_formation: str
-    version_formation: str
-    transition_formation: str
+    annee: int
+    code_programme: str
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
@@ -45,20 +45,16 @@ class GetUniteEnseignementCommand(interface.CommandRequest):
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
 class AjouterUEAuProgrammeCommand(interface.CommandRequest):
-    annee_formation: int
-    sigle_formation: str
-    version_formation: str
-    transition_formation: str
-    groupement_uuid: str  # TODO :: code groupement ou uuid groupement ?
-    unites_enseignements: List[GetUniteEnseignementCommand]
+    annee: int
+    code_programme: str
+    ajouter_dans: str  # code groupement
+    unites_enseignements: List[CodeUniteEnseignement]
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
-class GetProgrammeInscriptionCoursServiceCommand(interface.CommandRequest):
-    annee_formation: int
-    sigle_formation: str
-    version_formation: str
-    transition_formation: str
+class GetProgrammeInscriptionCoursCommand(interface.CommandRequest):
+    annee: int
+    code_programme: str
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
@@ -127,9 +123,7 @@ class DeplacerVersLeBasUEAjouteeDansProgrammeCommand(interface.CommandRequest):
     unite_enseignement: GetUniteEnseignementCommand
 
 
-@attr.s(frozen=True, slots=True)
+@attr.s(frozen=True, slots=True, auto_attribs=True)
 class GetFormationCommand(interface.CommandRequest):
-    annee = attr.ib(type=int)
-    code = attr.ib(type=str)
-    version = attr.ib(type=str)
-    transition = attr.ib(type=str)
+    annee: int
+    code: str

@@ -26,6 +26,8 @@ class SupprimerUnitesEnseignementView(LoginRequiredMixin, HtmxMixin, TemplateVie
             'deletable_content': self.get_content(),
             'intitule_groupement': self.get_intitule_groupement(),
             'intitule_programme': self.get_intitule_programme(),
+            'annee': self.kwargs['annee'],
+            'code_programme': self.kwargs['code_programme'],
             'consulter_contenu_groupement_url': self.get_consulter_contenu_groupement_url()
         }
 

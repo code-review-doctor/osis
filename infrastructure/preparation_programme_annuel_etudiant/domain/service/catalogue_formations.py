@@ -33,28 +33,25 @@ from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, G
 from program_management.ddd.dtos import ProgrammeDeFormationDTO, ContenuNoeudDTO, GroupementDTO
 
 
-def build_formation_dto(program_management_formatation_dto: ProgrammeDeFormationDTO) -> FormationDTO:
-    racine = build_contenu(program_management_formatation_dto.racine)
+def build_formation_dto(program_management_formation_dto: ProgrammeDeFormationDTO) -> FormationDTO:
+    racine = build_contenu(program_management_formation_dto.racine)
     return FormationDTO(
         racine=racine,
-        annee=program_management_formatation_dto.annee,
-        sigle=program_management_formatation_dto.sigle,
-        version=program_management_formatation_dto.version,
-        intitule_formation=program_management_formatation_dto.intitule_formation,
-        intitule_version_programme=program_management_formatation_dto.intitule_version_programme
+        annee=program_management_formation_dto.annee,
+        sigle=program_management_formation_dto.sigle,
+        version=program_management_formation_dto.version,
+        intitule_formation=program_management_formation_dto.intitule_formation,
     )
 
 
 class CatalogueFormationsTranslator(ICatalogueFormationsTranslator):
     @classmethod
-    def get_formation(cls, sigle: str, annee: int, version: str, transition_name: str) -> Optional['FormationDTO']:
+    def get_formation(cls, code_programme: str, annee: int, ) -> Optional['FormationDTO']:
         from infrastructure.messages_bus import message_bus_instance
         program_management_formation_dto = message_bus_instance.invoke(
             GetFormationCommand(
                 annee=annee,
-                code=sigle,
-                version=version,
-                transition=transition_name
+                code=code_programme,
             )
         )
         if program_management_formation_dto:
@@ -82,7 +79,7 @@ def build_contenu(contenu_noeud: ContenuNoeudDTO) -> ContenuGroupementCatalogueD
     return construire_contenu_groupement_catalogue_dto(
         contenu_noeud,
         groupements_contenus,
-        contenu_noeud.unites_enseignement_contenues
+        contenu_noeud.unites_enseignement_contenues,
     )
 
 
@@ -104,11 +101,12 @@ def construire_contenu_groupement_catalogue_dto(
 
 def _convertir_contenu_noeud_dto_en_groupement_catalogue_dto(contenu_noeud: ContenuNoeudDTO) -> GroupementCatalogueDTO:
     return GroupementCatalogueDTO(
+        code=contenu_noeud.groupement_contenant.code,
         intitule=contenu_noeud.groupement_contenant.intitule,
         obligatoire=contenu_noeud.groupement_contenant.obligatoire,
         remarque=contenu_noeud.groupement_contenant.remarque,
         credits=contenu_noeud.groupement_contenant.credits,
-        intitule_complet=contenu_noeud.groupement_contenant.intitule_complet
+        intitule_complet=contenu_noeud.groupement_contenant.intitule_complet,
     )
 
 
