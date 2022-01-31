@@ -191,7 +191,8 @@ class ForeignHighSchoolDiploma(HighSchoolDiploma):
         _("Is this diploma subject to an equivalence decision by the services of the French community of Belgium?"),
         choices=Equivalence.choices(),
         max_length=25,
-        null=True,
+        default="",
+        blank=True,
     )
     high_school_transcript_translation = FileField(
         verbose_name=_("A certified translation of your official transcript of marks for your final year of "

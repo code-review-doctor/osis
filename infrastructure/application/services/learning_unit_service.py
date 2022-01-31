@@ -143,7 +143,8 @@ class LearningUnitTranslator(ILearningUnitService):
         qs = LearningUnitYear.objects.filter(
             proposallearningunit__type__in=[
                 ProposalType.MODIFICATION.name,
-                ProposalType.TRANSFORMATION_AND_MODIFICATION.name
+                ProposalType.TRANSFORMATION_AND_MODIFICATION.name,
+                ProposalType.TRANSFORMATION.name
             ]
         ).filter(
             learning_container_year__academic_year__year=year

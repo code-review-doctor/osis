@@ -90,7 +90,7 @@ class RoleModel(models.Model, metaclass=RoleModelMeta):
             pass
 
     def _remove_user_from_group(self, person):
-        if not self.belong_to(person):
+        if not self.belong_to(person) and person.user:
             group, _ = Group.objects.get_or_create(name=self.group_name)
             person.user.groups.remove(group)
 
