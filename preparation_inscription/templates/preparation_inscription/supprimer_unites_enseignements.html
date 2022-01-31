@@ -24,13 +24,15 @@
  * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-<form hx-post="{% url 'supprimer_unites_enseignement_view' year acronym %}">
+
+<form class="panel-default" hx-post="{% url 'supprimer_unites_enseignement_view' annee code_programme %}">
 
 {% csrf_token %}
 
 <div class="panel-heading">
     <h5>{{ intitule_groupement }}</h5>
 </div>
+
 <div class="panel-body">
 <table id="table_search_list" class="table table-hover">
     <thead>
