@@ -59,12 +59,10 @@ class GroupementAjusteInscriptionCoursInMemoryRepository(
     def search(
             cls,
             entity_ids: Optional[List['IdentiteGroupementAjusteInscriptionCours']] = None,
-            version_programme_id: 'ProgramTreeVersionIdentity' = None,
             groupement_id: 'GroupIdentity' = None,
             **kwargs
     ) -> List['GroupementAjusteInscriptionCours']:
         return [
             ajustement for ajustement in cls.entities
-            if (not version_programme_id or ajustement.version_programme_id == version_programme_id)
-            and (not groupement_id or ajustement.groupement_id == groupement_id)
+            if not groupement_id or ajustement.groupement_id == groupement_id
         ]

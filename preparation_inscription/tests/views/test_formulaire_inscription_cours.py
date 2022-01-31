@@ -44,7 +44,7 @@ class TestFormulaireInscriptionCoursView(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.url = reverse('pae_formulaire_inscription_view', kwargs={'year': YEAR, 'acronym': ACRONYM})
+        cls.url = reverse('pae_formulaire_inscription_view', kwargs={'annee': YEAR, 'code_programme': ACRONYM})
 
     def setUp(self) -> None:
         pgm_manager = ProgramManagerFactory()

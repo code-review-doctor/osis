@@ -23,8 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from pprint import pprint
-from typing import List
 
 from django.views.generic import TemplateView
 from rules.contrib.views import LoginRequiredMixin
@@ -54,10 +52,8 @@ class ProgramTreeHTMLView(LoginRequiredMixin, TemplateView):
 
     def get_tree(self) -> 'ProgrammeInscriptionCoursDTO':
         cmd = GetProgrammeInscriptionCoursCommand(
-            annee_formation=self.kwargs['year'],
-            sigle_formation=self.kwargs['acronym'],
-            version_formation='',
-            transition_formation='',
+            annee=self.kwargs['annee'],
+            code_programme=self.kwargs['code_programme'],
         )
         tree_dto = message_bus_instance.invoke(cmd)
         return tree_dto

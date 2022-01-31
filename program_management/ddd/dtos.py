@@ -69,4 +69,5 @@ class ProgrammeDeFormationDTO(DTO):
     annee: int
     sigle: str
     version: str
+    code: str
     intitule_formation: str

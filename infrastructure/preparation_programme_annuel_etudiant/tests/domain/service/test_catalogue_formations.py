@@ -55,10 +55,8 @@ class CatalogueFormationsTranslatorTest(SimpleTestCase):
         program_to_translate = self.message_bus_mocked.return_value
 
         formation_dto = self.translator.get_formation(
-            sigle=program_to_translate.sigle,
+            code_programme=program_to_translate.code,
             annee=program_to_translate.annee,
-            version=program_to_translate.version,
-            transition_name=NOT_A_TRANSITION
         )
 
         self.assertEqual(program_to_translate.annee, formation_dto.annee)
@@ -172,6 +170,7 @@ def _build_ProgrammeDeFormationDTO():
         ),
         annee=ANNEE,
         sigle='ECGE1BA',
+        code='LECGE100B',
         version=STANDARD,
         intitule_formation='Bachelier en sciences économiques et de gestion',
     )

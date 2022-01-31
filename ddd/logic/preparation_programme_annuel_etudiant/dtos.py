@@ -79,10 +79,10 @@ class UniteEnseignementCatalogueDTO(DTO):
     quadrimestre: str
     quadrimestre_texte: str
     credits_absolus: Decimal
+    credits_relatifs: int
     volume_annuel_pm: int
     volume_annuel_pp: int
     obligatoire: bool
-    credits_relatifs: int
     session_derogation: str
 
 
@@ -119,7 +119,6 @@ class ProgrammeInscriptionCoursDTO(DTO):
     code: str
     annee: int
     version: str
-    transition: str
     intitule_complet_formation: str  # intitulé de la formation + version formation
     sous_programme: List['GroupementInscriptionCoursDTO']
 

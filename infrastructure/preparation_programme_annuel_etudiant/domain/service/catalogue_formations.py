@@ -46,14 +46,12 @@ def build_formation_dto(program_management_formation_dto: ProgrammeDeFormationDT
 
 class CatalogueFormationsTranslator(ICatalogueFormationsTranslator):
     @classmethod
-    def get_formation(cls, sigle: str, annee: int, version: str, transition_name: str) -> Optional['FormationDTO']:
+    def get_formation(cls, code_programme: str, annee: int, ) -> Optional['FormationDTO']:
         from infrastructure.messages_bus import message_bus_instance
         program_management_formation_dto = message_bus_instance.invoke(
             GetFormationCommand(
                 annee=annee,
-                code=sigle,
-                version=version,
-                transition=transition_name
+                code=code_programme,
             )
         )
         if program_management_formation_dto:

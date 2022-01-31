@@ -35,7 +35,7 @@ from preparation_inscription.views.supprimer_unites_enseignement import Supprime
 
 urlpatterns = [
 
-    path('<int:year>/<acronym:acronym>/', include([
+    path('<int:annee>/<str:code_programme>/', include([
         path('', PreparationInscriptionMainView.as_view(), name=PreparationInscriptionMainView.name),
         path('detail', ConsulterContenuGroupementView.as_view(), name=ConsulterContenuGroupementView.name),
         path('delete', SupprimerUnitesEnseignementView.as_view(), name=SupprimerUnitesEnseignementView.name),

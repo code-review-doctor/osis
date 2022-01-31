@@ -57,10 +57,8 @@ class GetFormulaireInscriptionCoursTest(SimpleTestCase):
     def test_should_afficher_programme_inscription_cas_nominal_version_standard(self):
         obj_FormationDTO_de_depart = CatalogueFormationsTranslatorInMemory.dtos[0]
         cmd = GetFormulaireInscriptionCoursCommand(
-            annee_formation=ANNEE,
-            sigle_formation='ECGE1BA',
-            version_formation=STANDARD,
-            transition_formation=NOT_A_TRANSITION
+            annee=ANNEE,
+            code_programme='LECGE100B',
         )
 
         self._assert_equal_tous_les_attributs_ok_apres_conversion(cmd, obj_FormationDTO_de_depart)
@@ -68,10 +66,8 @@ class GetFormulaireInscriptionCoursTest(SimpleTestCase):
     def test_should_afficher_programme_inscription_cas_formation_version_particuliere(self):
         obj_FormationDTO_de_depart = CatalogueFormationsTranslatorInMemory.dtos[1]
         cmd = GetFormulaireInscriptionCoursCommand(
-            annee_formation=ANNEE,
-            sigle_formation='CORP2MS/CS',
-            version_formation='DDSHERBROOKE',
-            transition_formation=NOT_A_TRANSITION
+            annee=ANNEE,
+            code_programme='LCORP201S',
         )
 
         self._assert_equal_tous_les_attributs_ok_apres_conversion(cmd, obj_FormationDTO_de_depart)

@@ -57,30 +57,24 @@ class GetProgrammeInscriptionCoursTest(SimpleTestCase):
 
     def test_should_visualiser_ECGE1BA_version_standard(self):
         cmd = GetProgrammeInscriptionCoursCommand(
-            annee_formation=2021,
-            sigle_formation='ECGE1BA',
-            version_formation='',
-            transition_formation='',
+            annee=2021,
+            code_programme='LECGE100B',
         )
         programme = self.message_bus.invoke(cmd)
         self.assertEqualFormation(programme, CAS_NOMINAL_FORMATION_STANDARD)
 
     def test_should_visualiser_cas_formation_version_particuliere(self):
         cmd = GetProgrammeInscriptionCoursCommand(
-            annee_formation=2021,
-            sigle_formation='CORP2MS/CS',
-            version_formation='DDSHERBROOKE',
-            transition_formation='',
+            annee=2021,
+            code_programme='LCORP201S',
         )
         programme = self.message_bus.invoke(cmd)
         self.assertEqualFormation(programme, CAS_FORMATION_VERSION_PARTICULIERE)
 
     def test_should_visualiser_cas_formation_version_transition(self):
         cmd = GetProgrammeInscriptionCoursCommand(
-            annee_formation=2021,
-            sigle_formation='DATI2MS/G',
-            version_formation='Version 2020',
-            transition_formation='',
+            annee=2021,
+            code_programme='LDATI200S',
         )
         programme = self.message_bus.invoke(cmd)
         self.assertEqualFormation(programme, CAS_FORMATION_VERSION_TRANSITION)
@@ -89,7 +83,6 @@ class GetProgrammeInscriptionCoursTest(SimpleTestCase):
         self.assertEqual(programme.code, formation.racine.groupement_contenant.code)
         self.assertEqual(programme.annee, formation.annee)
         self.assertEqual(programme.version, formation.version)
-
         self.assertEqual(programme.intitule_complet_formation, formation.intitule_formation)
         sous_programme = programme.sous_programme
         self.assertEqual(len(sous_programme), 1)

@@ -79,7 +79,7 @@ def _cas_nominal_formation_version_standard():
         annee=ANNEE,
         sigle=SIGLE,
         version=STANDARD,
-        intitule_formation='Bachelier en sciences économiques et de gestion'
+        intitule_formation='Bachelier en sciences économiques et de gestion',
     )
 
 
@@ -130,6 +130,7 @@ def _cas_formation_version_particuliere():
         sigle=SIGLE,
         version='DDSHERBROOKE',
         intitule_formation='Master [120] en communication[ Double diplôme UCLouvain - uSherbrooke ]',
+
     )
 
 
@@ -189,7 +190,6 @@ CAS_FORMATION_VERSION_TRANSITION = _cas_formation_version_transition()
 
 
 class CatalogueFormationsTranslatorInMemory(ICatalogueFormationsTranslator):
-
     dtos = [
         CAS_NOMINAL_FORMATION_STANDARD,
         CAS_FORMATION_VERSION_PARTICULIERE,
@@ -197,10 +197,10 @@ class CatalogueFormationsTranslatorInMemory(ICatalogueFormationsTranslator):
     ]
 
     @classmethod
-    def get_formation(cls, sigle: str, annee: int, version: str, transition_name: str) -> 'FormationDTO':
+    def get_formation(cls, code_programme: str, annee: int) -> 'FormationDTO':
         return next(
             dto for dto in cls.dtos
-            if dto.sigle == sigle and dto.annee == annee and dto.version == version
+            if dto.racine.groupement_contenant.code == code_programme and dto.annee == annee
         )
 
     @classmethod

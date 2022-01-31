@@ -35,22 +35,22 @@ from django.db.models import Q
 from base.models.academic_year import AcademicYear
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import Categories
-from base.models.enums.quadrimesters import DerogationQuadrimester
 from education_group.ddd.domain.exception import TrainingNotFoundException
 from education_group.models.group import Group
 from education_group.models.group_year import GroupYear
 from osis_common.ddd import interface
 from osis_common.ddd.interface import RootEntity
+from program_management import formatter
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception
 from program_management.ddd.domain import program_tree
 from program_management.ddd.domain import program_tree_version
+from program_management.ddd.domain.exception import ProgramTreeVersionNotFoundException
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, STANDARD, NOT_A_TRANSITION
+from program_management.ddd.dtos import UniteEnseignementDTO, GroupementDTO, ContenuNoeudDTO, ProgrammeDeFormationDTO
 from program_management.ddd.repositories import program_tree as program_tree_repository
 from program_management.models.education_group_version import EducationGroupVersion
-from program_management.ddd.dtos import UniteEnseignementDTO, GroupementDTO, ContenuNoeudDTO, ProgrammeDeFormationDTO
-from program_management import formatter
 
 
 class ProgramTreeVersionRepository(interface.AbstractRepository):
@@ -192,9 +192,9 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
 
     @classmethod
     def delete(
-           cls,
-           entity_id: 'ProgramTreeVersionIdentity',
-           delete_program_tree_service: interface.ApplicationService = None
+            cls,
+            entity_id: 'ProgramTreeVersionIdentity',
+            delete_program_tree_service: interface.ApplicationService = None
     ) -> None:
         program_tree_version = cls.get(entity_id)
 
@@ -263,6 +263,13 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
     def get_dto(cls, identity: ProgramTreeVersionIdentity) -> Optional['ProgrammeDeFormationDTO']:
         pgm_tree_version = cls.get(identity)
         return build_dto(pgm_tree_version, identity)
+
+    @classmethod
+    def get_dto_from_year_and_code(cls, code: str, year: int) -> Optional['ProgrammeDeFormationDTO']:
+        pgm_tree_version = cls.search(code=code, year=year)
+        if pgm_tree_version:
+            return build_dto(pgm_tree_version[0], pgm_tree_version[0].entity_identity)
+        raise ProgramTreeVersionNotFoundException
 
 
 def _update_start_year_and_end_year(
@@ -399,7 +406,7 @@ def _get_common_queryset() -> QuerySet:
 def build_dto(pgm_tree_version: 'ProgramTreeVersion', identity: ProgramTreeVersionIdentity) \
         -> 'ProgrammeDeFormationDTO':
     tree = pgm_tree_version.get_tree()
-    contenu = _build_contenu(tree.root_node,)
+    contenu = _build_contenu(tree.root_node, )
     return ProgrammeDeFormationDTO(
         racine=contenu,
         annee=identity.year,
@@ -407,7 +414,9 @@ def build_dto(pgm_tree_version: 'ProgramTreeVersion', identity: ProgramTreeVersi
         version=identity.version_name,
         intitule_formation="{}{}".format(
             tree.root_node.offer_title_fr,
-            "{}".format("[ {} ]".format(pgm_tree_version.title_fr) if pgm_tree_version.title_fr else ''))
+            "{}".format("[ {} ]".format(pgm_tree_version.title_fr) if pgm_tree_version.title_fr else '')
+        ),
+        code=tree.entity_id.code,
     )
 
 

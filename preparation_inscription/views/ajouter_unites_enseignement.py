@@ -94,10 +94,8 @@ class AjouterUnitesEnseignementView(LoginRequiredMixin, HtmxMixin, TemplateView)
     def post(self, request, *args, **kwargs):
         selected_ues = request.POST.getlist('selected_ue')
         cmd = AjouterUEAuProgrammeCommand(
-            annee_formation=self.kwargs['year'],
-            sigle_formation=self.kwargs['acronym'],
-            version_formation='',
-            transition_formation='',
+            annee=self.kwargs['annee'],
+            code_programme=self.kwargs['code_programme'],
             ajouter_dans='LECGE100R',
             unites_enseignements=selected_ues
         )
@@ -127,6 +125,8 @@ class AjouterUnitesEnseignementView(LoginRequiredMixin, HtmxMixin, TemplateView)
             'intitule_groupement': self.get_intitule_groupement(),
             'intitule_programme': self.get_intitule_programme(),
             'cancel_url': self.get_consulter_contenu_groupement_url(),
+            'annee': self.kwargs['annee'],
+            'code_programme': self.kwargs['code_programme']
         }
 
     def get_consulter_contenu_groupement_url(self):
