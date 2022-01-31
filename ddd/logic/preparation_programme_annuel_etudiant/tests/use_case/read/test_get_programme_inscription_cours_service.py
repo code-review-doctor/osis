@@ -23,12 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
 from unittest import mock
 
 from django.test import SimpleTestCase
 
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetProgrammeInscriptionCoursCommand
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, ProgrammeInscriptionCoursDTO
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, ProgrammeInscriptionCoursDTO, \
+    GroupementInscriptionCoursDTO
 from infrastructure.messages_bus import message_bus_instance
 from infrastructure.preparation_programme_annuel_etudiant.domain.service.in_memory.catalogue_formations import \
     CatalogueFormationsTranslatorInMemory
@@ -65,7 +67,7 @@ class GetProgrammeInscriptionCoursTest(SimpleTestCase):
             code_programme='LECGE100B',
         )
         programme = self.message_bus.invoke(cmd)
-        self.assertEqualFormation(programme, CAS_NOMINAL_FORMATION_STANDARD)
+        self._assertEqual_formation(programme, CAS_NOMINAL_FORMATION_STANDARD)
 
     def test_should_visualiser_cas_formation_version_particuliere(self):
         cmd = GetProgrammeInscriptionCoursCommand(
@@ -73,7 +75,7 @@ class GetProgrammeInscriptionCoursTest(SimpleTestCase):
             code_programme='LCORP203S',
         )
         programme = self.message_bus.invoke(cmd)
-        self.assertEqualFormation(programme, CAS_FORMATION_VERSION_PARTICULIERE)
+        self._assertEqual_formation(programme, CAS_FORMATION_VERSION_PARTICULIERE)
 
     def test_should_visualiser_cas_formation_version_transition(self):
         cmd = GetProgrammeInscriptionCoursCommand(
@@ -81,7 +83,7 @@ class GetProgrammeInscriptionCoursTest(SimpleTestCase):
             code_programme='LDATI200S',
         )
         programme = self.message_bus.invoke(cmd)
-        self.assertEqualFormation(programme, CAS_FORMATION_VERSION_TRANSITION)
+        self._assertEqual_formation(programme, CAS_FORMATION_VERSION_TRANSITION)
 
     def test_should_visualiser_cas_formation_version_particuliere_transition(self):
         cmd = GetProgrammeInscriptionCoursCommand(
@@ -89,7 +91,7 @@ class GetProgrammeInscriptionCoursTest(SimpleTestCase):
             code_programme='LCORP201S'
         )
         programme = self.message_bus.invoke(cmd)
-        self.assertEqualFormation(programme, CAS_FORMATION_VERSION_PARTICULIERE_TRANSITION)
+        self._assertEqual_formation(programme, CAS_FORMATION_VERSION_PARTICULIERE_TRANSITION)
 
     def test_should_visualiser_formation_version_standard_annee_moins_1(self):
         cmd = GetProgrammeInscriptionCoursCommand(
@@ -97,7 +99,7 @@ class GetProgrammeInscriptionCoursTest(SimpleTestCase):
             code_programme='LECGE100B',
         )
         programme = self.message_bus.invoke(cmd)
-        self.assertEqualFormation(programme, CAS_FORMATION_STANDARD_ANNEE_MOINS_1)
+        self._assertEqual_formation(programme, CAS_FORMATION_STANDARD_ANNEE_MOINS_1)
 
     def test_should_visualiser_mini_formation_version_standard(self):
         cmd = GetProgrammeInscriptionCoursCommand(
@@ -105,7 +107,7 @@ class GetProgrammeInscriptionCoursTest(SimpleTestCase):
             code_programme="LADRT100I"
         )
         programme = self.message_bus.invoke(cmd)
-        self.assertEqualFormation(programme, CAS_MINI_FORMATION_VERSION_STANDARD)
+        self._assertEqual_formation(programme, CAS_MINI_FORMATION_VERSION_STANDARD)
 
     def test_should_visualiser_mini_formation_version_particuliere(self):
         cmd = GetProgrammeInscriptionCoursCommand(
@@ -113,7 +115,7 @@ class GetProgrammeInscriptionCoursTest(SimpleTestCase):
             code_programme='LADRT100S',
         )
         programme = self.message_bus.invoke(cmd)
-        self.assertEqualFormation(programme, CAS_MINI_FORMATION_VERSION_PARTICULIERE)
+        self._assertEqual_formation(programme, CAS_MINI_FORMATION_VERSION_PARTICULIERE)
 
     def test_should_visualiser_mini_formation_version_transition(self):
         cmd = GetProgrammeInscriptionCoursCommand(
@@ -121,7 +123,7 @@ class GetProgrammeInscriptionCoursTest(SimpleTestCase):
             code_programme='LADRT111S',
         )
         programme = self.message_bus.invoke(cmd)
-        self.assertEqualFormation(programme, CAS_MINI_FORMATION_VERSION_TRANSITION)
+        self._assertEqual_formation(programme, CAS_MINI_FORMATION_VERSION_TRANSITION)
 
     def test_should_visualiser_mini_formation_version_particuliere_transition(self):
         cmd = GetProgrammeInscriptionCoursCommand(
@@ -129,7 +131,7 @@ class GetProgrammeInscriptionCoursTest(SimpleTestCase):
             code_programme='LADRT101S',
         )
         programme = self.message_bus.invoke(cmd)
-        self.assertEqualFormation(programme, CAS_MINI_FORMATION_VERSION_PARTICULIERE_TRANSITION)
+        self._assertEqual_formation(programme, CAS_MINI_FORMATION_VERSION_PARTICULIERE_TRANSITION)
 
     def test_should_visualiser_mini_formation_version_standard_annee_moins_1(self):
         cmd = GetProgrammeInscriptionCoursCommand(
@@ -137,21 +139,21 @@ class GetProgrammeInscriptionCoursTest(SimpleTestCase):
             code_programme='LADRT121S',
         )
         programme = self.message_bus.invoke(cmd)
-        self.assertEqualFormation(programme, CAS_MINI_FORMATION_VERSION_STANDARD_ANNEE_MOINS_1)
+        self._assertEqual_formation(programme, CAS_MINI_FORMATION_VERSION_STANDARD_ANNEE_MOINS_1)
 
-    def assertEqualFormation(self, programme: 'ProgrammeInscriptionCoursDTO', formation: 'FormationDTO'):
+    def _assertEqual_formation(self, programme: 'ProgrammeInscriptionCoursDTO', formation: 'FormationDTO'):
         self.assertEqual(programme.code, formation.racine.groupement_contenant.code)
         self.assertEqual(programme.annee, formation.annee)
         self.assertEqual(programme.version, formation.version)
         self.assertEqual(programme.intitule_complet_formation, formation.intitule_formation)
-        sous_programme = programme.sous_programme
-        self.assertEqual(len(sous_programme), 1)
+        self._assert_contenu(programme.sous_programme, formation.racine.groupements_contenus)
 
+    def _assert_contenu(self,
+                        sous_programme: List['GroupementInscriptionCoursDTO'],
+                        sous_programme_formation: List['ContenuGroupementCatalogueDTO']):
         for idx_grp, groupement in enumerate(sous_programme):
-            groupement_formation = formation.racine.groupements_contenus[idx_grp]
-            self.assertEqual(groupement.intitule_complet, groupement_formation.groupement_contenant.intitule_complet)
-            self.assertEqual(groupement.code, groupement_formation.groupement_contenant.code)
-            self.assertEqual(groupement.obligatoire, groupement_formation.groupement_contenant.obligatoire)
+            groupement_formation = sous_programme_formation[idx_grp]
+            self._assert_equal_groupement(groupement, groupement_formation)
             for idx_ue, unite_enseignement in enumerate(groupement.unites_enseignements):
                 unites_enseignements_formation = groupement_formation.unites_enseignement_contenues
                 unite_enseignement_formation = unites_enseignements_formation[idx_ue]
@@ -159,3 +161,13 @@ class GetProgrammeInscriptionCoursTest(SimpleTestCase):
                 self.assertEqual(unite_enseignement.intitule, unite_enseignement_formation.intitule_complet)
                 self.assertEqual(unite_enseignement.obligatoire, unite_enseignement_formation.obligatoire)
                 self.assertEqual(unite_enseignement.bloc, unite_enseignement_formation.bloc)
+
+            self._assert_contenu(groupement.sous_programme, groupement_formation.groupements_contenus)
+
+    def _assert_equal_groupement(self,
+                                 groupement: 'GroupementInscriptionCoursDTO',
+                                 groupement_formation: 'ContenuGroupementCatalogueDTO'):
+        self.assertEqual(groupement.intitule_complet, groupement_formation.groupement_contenant.intitule_complet)
+        self.assertEqual(groupement.code, groupement_formation.groupement_contenant.code)
+        self.assertEqual(groupement.obligatoire, groupement_formation.groupement_contenant.obligatoire)
+

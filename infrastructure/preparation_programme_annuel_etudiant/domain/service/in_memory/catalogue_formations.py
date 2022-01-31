@@ -37,7 +37,20 @@ ANNEE = 2021
 
 def _cas_nominal_formation_version_standard():
     SIGLE = 'ECGE1BA'
+    ContenuGroupementCatalogueDTO(
+        groupement_contenant=GroupementCatalogueDTO(
+            intitule='Contenu :',
+            obligatoire=True,
+            remarque='Remarque',
+            credits=Decimal(10),
+            intitule_complet='Contenu :',
+            code='LECGE100T',
+        ),
+        groupements_contenus=[
 
+        ],
+        unites_enseignement_contenues=[
+        ]),
     return FormationDTO(
         racine=ContenuGroupementCatalogueDTO(
             groupement_contenant=GroupementCatalogueDTO(
@@ -58,21 +71,89 @@ def _cas_nominal_formation_version_standard():
                         intitule_complet='Contenu :',
                         code='LECGE100T',
                     ),
-                    groupements_contenus=[],
+                    groupements_contenus=[
+                        ContenuGroupementCatalogueDTO(
+                            groupement_contenant=GroupementCatalogueDTO(
+                                intitule='Programme de base',
+                                obligatoire=True,
+                                remarque='Remarque',
+                                credits=Decimal(10),
+                                intitule_complet='Programme de base',
+                                code='LECGE900R',
+                            ),
+                            groupements_contenus=[
+                            ],
+                            unites_enseignement_contenues=[
+                                UniteEnseignementCatalogueDTO(
+                                    bloc=1,
+                                    code='LESPO1113',
+                                    intitule_complet='Sociologie et anthropologie des mondes contemporains',
+                                    quadrimestre='Q1or2',
+                                    quadrimestre_texte='Q1 ou Q2',
+                                    credits_absolus=Decimal(5),
+                                    credits_relatifs=None,
+                                    volume_annuel_pm=40,
+                                    volume_annuel_pp=0,
+                                    obligatoire=True,
+                                    session_derogation='',
+                                )
+                            ]),
+                        ContenuGroupementCatalogueDTO(
+                            groupement_contenant=GroupementCatalogueDTO(
+                                intitule='Formation pluridisciplinaire en sciences humaines',
+                                obligatoire=True,
+                                remarque='Remarque',
+                                credits=Decimal(10),
+                                intitule_complet='Formation pluridisciplinaire en sciences humaines',
+                                code='LECGE100R',
+                            ),
+                            groupements_contenus=[
+                            ],
+                            unites_enseignement_contenues=[
+                                UniteEnseignementCatalogueDTO(
+                                    bloc=3,
+                                    code='LESPO1321',
+                                    intitule_complet='Economic, Political and Social Ethics',
+                                    quadrimestre='Q2',
+                                    quadrimestre_texte='Q2',
+                                    credits_absolus=Decimal(3),
+                                    credits_relatifs=None,
+                                    volume_annuel_pm=30,
+                                    volume_annuel_pp=0,
+                                    obligatoire=True,
+                                    session_derogation='',
+                                )
+                            ]),
+                        ContenuGroupementCatalogueDTO(
+                            groupement_contenant=GroupementCatalogueDTO(
+                                intitule='Cours au choix',
+                                obligatoire=True,
+                                remarque='Remarque',
+                                credits=Decimal(10),
+                                intitule_complet='Cours au choix',
+                                code='LECGE860R',
+                            ),
+                            groupements_contenus=[
+                            ],
+                            unites_enseignement_contenues=[
+                                UniteEnseignementCatalogueDTO(
+                                    bloc=1,
+                                    code='LCOPS1124',
+                                    intitule_complet='Philosophie',
+                                    quadrimestre='Q2',
+                                    quadrimestre_texte='Q2',
+                                    credits_absolus=Decimal(5),
+                                    credits_relatifs=None,
+                                    volume_annuel_pm=30,
+                                    volume_annuel_pp=0,
+                                    obligatoire=True,
+                                    session_derogation='',
+                                )
+                            ]),
+
+                    ],
                     unites_enseignement_contenues=[
-                        UniteEnseignementCatalogueDTO(
-                            bloc=1,
-                            code='LESPO1113',
-                            intitule_complet='Sociologie et anthropologie des mondes contemporains',
-                            quadrimestre='Q1or2',
-                            credits_absolus=Decimal(5),
-                            volume_annuel_pm=40,
-                            volume_annuel_pp=0,
-                            obligatoire=True,
-                            credits_relatifs=None,
-                            session_derogation='',
-                            quadrimestre_texte='Q1 ou Q2'
-                        )
+
                     ]),
             ],
             unites_enseignement_contenues=[]
