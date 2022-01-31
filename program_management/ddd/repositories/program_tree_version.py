@@ -46,6 +46,7 @@ from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception
 from program_management.ddd.domain import program_tree
 from program_management.ddd.domain import program_tree_version
+from program_management.ddd.domain.exception import ProgramTreeVersionNotFoundException
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, STANDARD, NOT_A_TRANSITION
 from program_management.ddd.dtos import UniteEnseignementDTO, GroupementDTO, ContenuNoeudDTO, ProgrammeDeFormationDTO
 from program_management.ddd.repositories import program_tree as program_tree_repository
@@ -268,6 +269,7 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
         pgm_tree_version = cls.search(code=code, year=year)
         if pgm_tree_version:
             return build_dto(pgm_tree_version[0], pgm_tree_version[0].entity_identity)
+        raise ProgramTreeVersionNotFoundException
 
 
 def _update_start_year_and_end_year(
