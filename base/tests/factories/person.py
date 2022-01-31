@@ -34,7 +34,7 @@ from django.contrib.auth.models import Group, Permission
 
 from base import models as mdl
 from base.models.enums.groups import CENTRAL_MANAGER_GROUP, SIC_GROUP, UE_FACULTY_MANAGER_GROUP, \
-    ADMINISTRATIVE_MANAGER_GROUP
+    CATALOG_VIEWER_GROUP
 from base.tests.factories.user import UserFactory
 
 
@@ -63,7 +63,7 @@ class PersonFactory(factory.DjangoModelFactory):
     changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1))
     email = factory.LazyAttribute(lambda person: person.user.email if person.user else '')
     phone = factory.Faker('phone_number')
-    language = factory.Iterator(settings.LANGUAGES, getter=operator.itemgetter(0))
+    language = settings.LANGUAGE_CODE
     gender = factory.Iterator(mdl.person.Person.GENDER_CHOICES, getter=operator.itemgetter(0))
     user = factory.SubFactory(UserFactory)
     global_id = factory.LazyFunction(generate_global_id)
@@ -115,9 +115,9 @@ class SICFactory(PersonWithPermissionsFactory):
         super().__init__(*permissions, groups=(SIC_GROUP, ), **kwargs)
 
 
-class AdministrativeManagerFactory(PersonWithPermissionsFactory):
+class CatalogViewerFactory(PersonWithPermissionsFactory):
     def __init__(self, *permissions, **kwargs):
-        super().__init__(*permissions, groups=(ADMINISTRATIVE_MANAGER_GROUP, ), **kwargs)
+        super().__init__(*permissions, groups=(CATALOG_VIEWER_GROUP,), **kwargs)
 
 
 def add_person_to_groups(person, groups):

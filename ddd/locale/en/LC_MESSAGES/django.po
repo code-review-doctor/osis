@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-13 12:17+0200\n"
+"POT-Creation-Date: 2022-01-25 11:11+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -25,32 +25,17 @@ msgstr ""
 msgid "'{value}' is not a valid derogation session."
 msgstr ""
 
-msgid "A justification is needed when creating a pre-admission."
-msgstr ""
-
 msgid "A substitute can not renew his function of substitute"
-msgstr ""
-
-msgid "ADMISSION"
-msgstr "Admission"
-
-msgid "APPROVED"
-msgstr "Approved"
-
-msgid "Already a member of CA."
-msgstr ""
-
-msgid "Already a promoter."
 msgstr ""
 
 msgid ""
 "Application on this vacant course is not reserved for interns/open for extern"
 msgstr ""
 
-msgid "CANCELLED"
-msgstr "Cancelled"
-
-msgid "CDE Bureau should be filled in only if the doctorate's entity is CDE"
+msgid ""
+"Automatic renewal is not possible because the volume declared vacant is "
+"lower than the volume to be renewed. Please go through \"Add a new "
+"application\"."
 msgstr ""
 
 msgid "Can't create a learning unit lower than 2019-20"
@@ -90,31 +75,23 @@ msgstr ""
 msgid "Decimal scores not authorized"
 msgstr ""
 
+msgid "Details other educational facilities"
+msgstr ""
+
 msgid "Distributed volume should be filled in and be greater than 0"
 msgstr ""
 
-msgid "ECONOMY"
-msgstr "Economy"
-
-msgid "English"
+#, python-format
+msgid "Extra time (33% generally)"
 msgstr ""
 
 msgid "Following fields are required : {}"
 msgstr ""
 
-msgid "French"
-msgstr ""
-
-msgid "INVITED"
-msgstr "Invited"
-
-msgid "IN_PROGRESS"
-msgstr "In progress"
-
-msgid "Institution should be set when PhD has been set to yes or partial"
-msgstr ""
-
 msgid "Internship subtype is a mandatory field"
+msgstr ""
+
+msgid "Large print"
 msgstr ""
 
 msgid "Learning unit {} already exists next year"
@@ -126,59 +103,14 @@ msgstr ""
 msgid "Lecturing charge or practical charge must be filled"
 msgstr ""
 
-msgid "MANAGEMENT"
-msgstr "Management"
-
-msgid "Member of supervision group already invited."
-msgstr ""
-
-msgid "Member of supervision group not found."
-msgstr ""
-
-msgid "Member of supervision group not invited."
-msgstr ""
-
-msgid "Membre CA not found."
-msgstr ""
-
-msgid "NO"
-msgstr "No"
-
-msgid "NOT_INVITED"
-msgstr "Not invited"
-
-msgid "No PhD found."
-msgstr ""
-
 msgid "No vacant corresponding activity"
 msgstr ""
 
-msgid "PARTIAL"
-msgstr "Partial"
-
-msgid "PRE_ADMISSION"
-msgstr "Pre-admission"
-
-msgid "Promoter not found."
+msgid "Other educational facilities"
 msgstr ""
-
-msgid "Proposition not found."
-msgstr ""
-
-msgid "REFUSED"
-msgstr "Refused"
 
 msgid "Registration ID does not match email"
 msgstr ""
-
-msgid "SEARCH_SCHOLARSHIP"
-msgstr "Search scholarship"
-
-msgid "SELF_FUNDING"
-msgstr "Self-funding"
-
-msgid "SUBMITTED"
-msgstr "Submitted"
 
 msgid "Score already submitted"
 msgstr ""
@@ -186,13 +118,13 @@ msgstr ""
 msgid "Selected entity {} is not an authorized responsible entity"
 msgstr ""
 
+msgid "Specific room of examination"
+msgstr ""
+
 msgid "Student not registered for exam"
 msgstr ""
 
 msgid "Subdivision should be one character A-Z or 0-9"
-msgstr ""
-
-msgid "Supervision group not found."
 msgstr ""
 
 #, python-format
@@ -229,6 +161,9 @@ msgstr ""
 msgid ""
 "The %(effective_class_complete_acronym)s volumes are inconsistent(the "
 "%(quadrimester)s volume has to be completed)"
+msgstr ""
+
+msgid "The address cannot be the same between bachelor and first year bachelor"
 msgstr ""
 
 #, python-format
@@ -286,9 +221,6 @@ msgstr ""
 msgid "UCL Person not found."
 msgstr ""
 
-msgid "Undecided"
-msgstr ""
-
 #, python-format
 msgid ""
 "Volume of %(assigned_volume)s is not a valid volume. It should be greater or "
@@ -307,15 +239,6 @@ msgstr ""
 
 msgid "Volumes of {} are inconsistent"
 msgstr ""
-
-msgid "WORK_CONTRACT"
-msgstr "Work contract"
-
-msgid "Work contract should be set when financing type is set to work contract"
-msgstr ""
-
-msgid "YES"
-msgstr "Yes"
 
 msgid ""
 "You cannot create a class on this learning unit because it is in proposal "
@@ -350,9 +273,6 @@ msgid "You're not a program manager of {}"
 msgstr ""
 
 msgid "You're not attributed to the learning unit {}"
-msgstr ""
-
-msgid "You've reached the maximum authorized propositions."
 msgstr ""
 
 msgid "at least one class volume is greater than the volume of the LU"

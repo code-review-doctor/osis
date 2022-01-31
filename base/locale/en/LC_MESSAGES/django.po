@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-11 09:22+0200\n"
+"POT-Creation-Date: 2022-01-17 11:07+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -150,9 +150,6 @@ msgid "Absence justified"
 msgstr ""
 
 msgid "Absence unjustified"
-msgstr ""
-
-msgid "Absent"
 msgstr ""
 
 msgid "Ac yr."
@@ -354,9 +351,6 @@ msgstr ""
 msgid "Are you certain that you want to delete the learning unit ?"
 msgstr ""
 
-msgid "Are you sure you want to delete the teaching material?"
-msgstr ""
-
 msgid "Are you sure?"
 msgstr ""
 
@@ -483,6 +477,12 @@ msgid "Cancel the proposal"
 msgstr ""
 
 msgid "Cancel the proposal?"
+msgstr ""
+
+msgid "Catalog viewer"
+msgstr ""
+
+msgid "Catalog viewers"
 msgstr ""
 
 msgid "Catalogue"
@@ -778,6 +778,9 @@ msgstr ""
 msgid "Dissertations"
 msgstr ""
 
+msgid "Divorced"
+msgstr ""
+
 msgid "Do not assign"
 msgstr ""
 
@@ -1060,9 +1063,6 @@ msgstr ""
 msgid "Finality 180 list choice"
 msgstr ""
 
-msgid "First name"
-msgstr ""
-
 msgid "Firstname"
 msgstr ""
 
@@ -1329,9 +1329,6 @@ msgstr ""
 msgid "Last modifications"
 msgstr ""
 
-msgid "Last name"
-msgstr ""
-
 msgid "Last update description fiche (force majeure) by"
 msgstr ""
 
@@ -1425,6 +1422,9 @@ msgid "Lecturing planned classes"
 msgstr ""
 
 msgid "Lecturing vol."
+msgstr ""
+
+msgid "Legal cohabitant"
 msgstr ""
 
 msgid "Legend"
@@ -1581,6 +1581,9 @@ msgid "Mark selected messages as read"
 msgstr ""
 
 msgid "Marks presentation"
+msgstr ""
+
+msgid "Married"
 msgstr ""
 
 msgid "Master MA 120"
@@ -1921,6 +1924,12 @@ msgid "Pay attention"
 msgstr ""
 
 msgid "Pay attention! This learning unit is used in more than one formation"
+msgstr ""
+
+msgid "Payment notice 1 warning"
+msgstr ""
+
+msgid "Payment notice 2 warning"
 msgstr ""
 
 msgid "Pending"
@@ -2303,9 +2312,6 @@ msgstr ""
 msgid "Search for an organization"
 msgstr ""
 
-msgid "Search of annual programs"
-msgstr ""
-
 msgid "Search type"
 msgstr ""
 
@@ -2356,6 +2362,9 @@ msgid "Signatory"
 msgstr ""
 
 msgid "Signatory qualification"
+msgstr ""
+
+msgid "Single"
 msgstr ""
 
 msgid "Society minor"
@@ -3020,6 +3029,9 @@ msgctxt "section title"
 msgid "Welcome"
 msgstr ""
 
+msgid "Widowed"
+msgstr ""
+
 msgid "Yes"
 msgstr ""
 
@@ -3271,9 +3283,6 @@ msgid "role (english)"
 msgstr ""
 
 msgid "role (french)"
-msgstr ""
-
-msgid "score(s) saved"
 msgstr ""
 
 msgid "search"

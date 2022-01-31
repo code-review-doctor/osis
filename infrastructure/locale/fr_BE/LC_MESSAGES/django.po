@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-28 14:09+0200\n"
+"POT-Creation-Date: 2022-01-17 16:11+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -36,10 +36,7 @@ msgctxt "applications"
 msgid "Code"
 msgstr "Code"
 
-msgid "First name"
-msgstr "Prénom"
-
-msgid "Last name"
+msgid "Name"
 msgstr "Nom"
 
 msgctxt "Submission email table header"
@@ -64,3 +61,6 @@ msgstr "Les notes suivantes %(scores_with_noma)s ont été encodées"
 #, python-format
 msgid "The following scores %(scores_with_noma)s has been submitted"
 msgstr "Les notes suivantes %(scores_with_noma)s ont été soumises"
+
+msgid "Title"
+msgstr "Titre"

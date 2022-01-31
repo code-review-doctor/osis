@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -96,6 +96,11 @@ INSTALLED_APPS = (
     'osis_document',
     'osis_history',
     'osis_signature',
+    'osis_export',
+    'osis_notification',
+    'osis_async',
+    'mockup',
+    'django_htmx',
 )
 
 
@@ -124,6 +129,7 @@ MIDDLEWARE = (
     'base.middlewares.extra_http_responses_midleware.ExtraHttpResponsesMiddleware',
     'waffle.middleware.WaffleMiddleware',
     'base.middlewares.reversion_middleware.BaseRevisionMiddleware',
+    'django_htmx.middleware.HtmxMiddleware',
 )
 
 
@@ -150,6 +156,7 @@ APPS_TO_TEST = (
     'program_management',
     'ddd',
     'infrastructure',
+    'preparation_inscription',
 )
 TEST_RUNNER = os.environ.get('TEST_RUNNER', 'osis_common.tests.runner.InstalledAppsTestRunner')
 SKIP_QUEUES_TESTS = os.environ.get('SKIP_QUEUES_TESTS', 'False').lower() == 'true'
@@ -224,7 +231,7 @@ MEDIA_URL = os.environ.get('MEDIA_URL',  '/media/')
 CONTENT_TYPES = ['application/csv', 'application/doc', 'application/pdf', 'application/xls', 'application/xml',
                  'application/zip', 'image/jpeg', 'image/gif', 'image/png', 'text/html', 'text/plain']
 MAX_UPLOAD_SIZE = int(os.environ.get('MAX_UPLOAD_SIZE', 5242880))
-OSIS_DOCUMENT_BASE_URL = os.environ.get('OSIS_DOCUMENT_BASE_URL', '/osis_document/')
+OSIS_DOCUMENT_BASE_URL = os.environ.get('OSIS_DOCUMENT_BASE_URL', '')
 
 # Logging settings
 # Logging framework is defined in env settings (ex: dev.py)
@@ -540,3 +547,12 @@ INTERNSHIP_SCORE_ENCODING_URL = os.environ.get("INTERNSHIP_SCORE_ENCODING_URL", 
 CONTINUING_EDUCATION_STUDENT_PORTAL_URL = os.environ.get("CONTINUING_EDUCATION_STUDENT_PORTAL_URL", "")
 
 SCHEDULE_APP_URL = os.environ.get("SCHEDULE_APP_URL", "")
+APPLICATION_COURSES_PUBLICATION_DATE = os.environ.get("APPLICATION_COURSES_PUBLICATION_DATE", "")
+
+REGISTRATION_ADMINISTRATION_URL = os.environ.get('REGISTRATION_SERVICE_URL', '')
+
+OSIS_EXPORT_ASYNCHRONOUS_MANAGER_CLS = os.environ.get(
+    "OSIS_EXPORT_ASYNCHRONOUS_MANAGER_CLS", "backoffice.settings.osis_export.async_manager.AsyncTaskManager"
+)
+
+OSIS_DOCUMENT_API_SHARED_SECRET = os.environ.get("OSIS_DOCUMENT_API_SHARED_SECRET", "")

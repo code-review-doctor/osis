@@ -39,8 +39,9 @@ from ddd.logic.application.domain.service.apply_on_vacant_course import ApplyOnV
 from ddd.logic.application.domain.service.i_learning_unit_service import ILearningUnitService
 from ddd.logic.application.domain.validator.exceptions import AttributionAboutToExpireNotFound, \
     AttributionAboutToExpireFunctionException, VacantCourseNotFound, AttributionSubstituteException, \
-    AttributionAboutToExpireWithoutVolumeException
-from ddd.logic.application.dtos import AttributionAboutToExpireDTO
+    AttributionAboutToExpireWithoutVolumeException, VolumesAskedShouldBeLowerOrEqualToVolumeAvailable, \
+    AutomaticRenewalImpossibleVolumesVacantLowerThanVolumesToRenew
+from ddd.logic.application.dtos import AttributionAboutToExpireDTO, LearningUnitModificationProposalFromServiceDTO
 from ddd.logic.application.repository.i_vacant_course_repository import IVacantCourseRepository
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
@@ -81,8 +82,15 @@ class AttributionAboutToExpireRenew(interface.DomainService):
             AcademicYearIdentityBuilder.build_from_year(application_calendar.authorized_target_year.year - 1)
         )
         attributions_filtered = _filter_attribution_by_renewable_functions(attributions_about_to_expire)
-        if not attributions_about_to_expire:
+        attributions_filtered = _filter_only_courses(attributions_filtered)
+        if not attributions_filtered:
             return []
+
+        # Lookup if some courses have proposal modification
+        learning_unit_in_modification_proposals = learning_unit_service.search_learning_unit_modification_proposal_dto(
+            codes=[attribution.course_id.code for attribution in attributions_filtered],
+            year=application_calendar.authorized_target_year.year
+        )
 
         # Lookup vacant course on next year for current attribution
         vacant_course_ids = [
@@ -92,6 +100,14 @@ class AttributionAboutToExpireRenew(interface.DomainService):
                 ),
                 code=attribution.course_id.code
             ) for attribution in attributions_filtered
+        ] + [
+            VacantCourseIdentity(
+                academic_year=AcademicYearIdentityBuilder.build_from_year(
+                    year=application_calendar.authorized_target_year.year
+                ),
+                code=modification_proposal.code
+            )
+            for modification_proposal in learning_unit_in_modification_proposals
         ]
         vacant_courses = vacant_course_repository.search(vacant_course_ids)
 
@@ -106,14 +122,19 @@ class AttributionAboutToExpireRenew(interface.DomainService):
             unavailable_renewal_reason = _get_unavailable_renewal_reason(
                 attribution_about_to_expire,
                 vacant_courses,
+                learning_unit_in_modification_proposals,
                 all_existing_applications
             )
-            vacant_course_next_year = _get_vacant_course_by_code(
-                attribution_about_to_expire.course_id.code, vacant_courses
+
+            course_code = next(
+                (modification_proposal.code for modification_proposal in learning_unit_in_modification_proposals if
+                 modification_proposal.old_code == attribution_about_to_expire.course_id.code),
+                attribution_about_to_expire.course_id.code
             )
+            vacant_course_next_year = _get_vacant_course_by_code(course_code, vacant_courses)
             vacant_course_next_year_volume = next((
                 vc_volume for vc_volume in vacant_courses_volumes
-                if vc_volume.code == attribution_about_to_expire.course_id.code
+                if vc_volume.code == course_code
             ), None)
 
             attribution_dto = AttributionAboutToExpireDTO(
@@ -124,7 +145,7 @@ class AttributionAboutToExpireRenew(interface.DomainService):
                 function=attribution_about_to_expire.function,
                 end_year=attribution_about_to_expire.end_year.year,
                 start_year=attribution_about_to_expire.start_year.year,
-                title=getattr(vacant_course_next_year, 'title', None) or attribution_about_to_expire.course_title,
+                title=attribution_about_to_expire.course_title,
                 total_lecturing_volume_course=getattr(vacant_course_next_year_volume, 'lecturing_volume_total', None),
                 total_practical_volume_course=getattr(vacant_course_next_year_volume, 'practical_volume_total', None),
                 lecturing_volume_available=getattr(vacant_course_next_year, 'lecturing_volume_available', None),
@@ -143,7 +164,8 @@ class AttributionAboutToExpireRenew(interface.DomainService):
             application_calendar: ApplicationCalendar,
             applicant: Applicant,
             all_existing_applications: List[Application],
-            vacant_course_repository: IVacantCourseRepository
+            vacant_course_repository: IVacantCourseRepository,
+            learning_unit_service: ILearningUnitService,
     ) -> Application:
         attributions_about_to_expire = applicant.get_attributions_about_to_expire(
             AcademicYearIdentityBuilder.build_from_year(application_calendar.authorized_target_year.year - 1)
@@ -153,6 +175,13 @@ class AttributionAboutToExpireRenew(interface.DomainService):
         if not attributions_filtered:
             raise MultipleBusinessExceptions(exceptions={AttributionAboutToExpireFunctionException()})
         attribution_about_to_expire = attributions_filtered[0]
+
+        learning_unit_in_modification_proposals = learning_unit_service.search_learning_unit_modification_proposal_dto(
+            codes=[attribution.course_id.code for attribution in attributions_filtered],
+            year=application_calendar.authorized_target_year.year
+        )
+        if learning_unit_in_modification_proposals:
+            learning_unit_code = learning_unit_in_modification_proposals[0].code
 
         vacant_course = vacant_course_repository.get(
             VacantCourseIdentity(
@@ -192,14 +221,28 @@ def _filter_attribution_by_renewable_functions(attributions_about_to_expire: Lis
     ]
 
 
+def _filter_only_courses(attributions_about_to_expire: List[Attribution]):
+    from base.models.enums.learning_container_year_types import LearningContainerYearType
+
+    return [
+        attribution_about_to_expire for attribution_about_to_expire in attributions_about_to_expire
+        if attribution_about_to_expire.course_type == LearningContainerYearType.COURSE.name
+    ]
+
+
 def _get_unavailable_renewal_reason(
         attribution_about_to_expire: Attribution,
         vacant_courses_next_year: List[VacantCourse],
+        learning_unit_in_modification_proposals: List[LearningUnitModificationProposalFromServiceDTO],
         all_existing_applications: List[Application]
 ) -> str:
-    vacant_course_next_year = _get_vacant_course_by_code(
-        attribution_about_to_expire.course_id.code, vacant_courses_next_year
+    course_code = next(
+        (modification_proposal.code for modification_proposal in learning_unit_in_modification_proposals if
+         modification_proposal.old_code == attribution_about_to_expire.course_id.code),
+        attribution_about_to_expire.course_id.code
     )
+
+    vacant_course_next_year = _get_vacant_course_by_code(course_code, vacant_courses_next_year)
     if vacant_course_next_year is None:
         return VacantCourseNotFound().message
 
@@ -211,6 +254,9 @@ def _get_unavailable_renewal_reason(
         )
     except MultipleBusinessExceptions as e:
         first_exception = next(iter(e.exceptions))
+
+        if isinstance(first_exception, VolumesAskedShouldBeLowerOrEqualToVolumeAvailable):
+            return AutomaticRenewalImpossibleVolumesVacantLowerThanVolumesToRenew().message
         return first_exception.message
 
 

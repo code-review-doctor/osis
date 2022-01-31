@@ -31,7 +31,9 @@ from django.test import TestCase
 from attribution.models.enums.function import Functions
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from base.models.enums import learning_component_year_type
+from base.models.enums.proposal_type import ProposalType
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearFullFactory
+from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.tutor import TutorFactory
 from ddd.logic.application.domain.model.applicant import ApplicantIdentity, Applicant
 from ddd.logic.application.domain.model._attribution import Attribution
@@ -81,6 +83,8 @@ class ApplicantRepositoryGet(TestCase):
         expected_attribution = Attribution(
             course_id=LearningUnitIdentity(code="LDROI1200", academic_year=AcademicYearIdentity(year=2018)),
             course_title=self.ldroi1200.learning_container_year.common_title + " - " + self.ldroi1200.specific_title,
+            course_is_in_suppression_proposal=False,
+            course_type=self.ldroi1200.learning_container_year.container_type,
             function=Functions[self.attribution_practical_ldroi1200.attribution.function],
             end_year=AcademicYearIdentity(year=self.attribution_practical_ldroi1200.attribution.end_year),
             start_year=AcademicYearIdentity(year=self.attribution_practical_ldroi1200.attribution.start_year),
@@ -89,6 +93,14 @@ class ApplicantRepositoryGet(TestCase):
             is_substitute=False
         )
         self.assertEqual(applicant.attributions[0], expected_attribution)
+
+    def test_assert_course_is_in_suppression_proposal_correctly_computed(self):
+        ProposalLearningUnitFactory(learning_unit_year=self.ldroi1200, type=ProposalType.SUPPRESSION.name)
+        applicant_id = ApplicantIdentity(global_id=self.global_id)
+        applicant = self.repository.get(applicant_id)
+
+        self.assertEqual(len(applicant.attributions), 1)
+        self.assertTrue(applicant.attributions[0].course_is_in_suppression_proposal)
 
 
 class ApplicantRepositorySearch(TestCase):

@@ -47,6 +47,7 @@ from base.models.enums.learning_unit_year_subtypes import FULL
 from base.models.enums.proposal_type import ProposalType
 from base.models.external_learning_unit_year import ExternalLearningUnitYear
 from base.models.learning_component_year import LearningComponentYear
+from base.models.learning_container import LearningContainer
 from base.models.learning_unit import LearningUnit
 from education_group.calendar.education_group_extended_daily_management import \
     EducationGroupExtendedDailyManagementCalendar
@@ -307,7 +308,12 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
     def save(self, commit=True):
         academic_year = self.academic_year
 
-        learning_container = self.learning_container_form.save(commit)
+        learning_container = LearningContainer.objects.filter(
+            learningcontaineryear__learningunityear__acronym=self.learning_unit_year_form.instance.acronym,
+        ).first()
+        if not learning_container:
+            learning_container = self.learning_container_form.save(commit)
+
         learning_unit = self.learning_unit_form.save(
             start_year=self.start_year,
             learning_container=learning_container,

@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import json
+import urllib
 from collections import OrderedDict
 from typing import Dict, Union, List
 
@@ -53,6 +54,7 @@ from base.models.enums import education_group_categories
 from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import TrainingType
 from base.models.person import Person
+from base.views.autocomplete import EmployeeAutocomplete
 from base.views.mixins import AjaxTemplateMixin
 from ddd.logic.encodage_des_notes.encodage.dtos import GestionnaireCohortesDTO, ProprietesGestionnaireCohorteDTO
 from education_group.models.enums.cohort_name import CohortName
@@ -64,7 +66,7 @@ EXCLUDE_OFFER_TYPE_SEARCH = TrainingType.finality_types()
 
 
 class ProgramManagerListView(TemplateView):
-    template_name = "assessments/programmanager_list.html"
+    template_name = "assessments/program_manager_administration/list.html"
 
     @property
     def nom_cohortes_selected(self) -> List['str']:
@@ -145,7 +147,8 @@ class ProgramManagerMixin(PermissionRequiredMixin, AjaxTemplateMixin):
     def get_success_url(self):
         url = reverse_lazy('program_manager_list') + "?"
         for nom_cohorte in self.nom_cohortes_selected:
-            url += "nom_cohortes_selected={}&".format(nom_cohorte)
+            urlencoded_nom_cohorte = urllib.parse.quote_plus(nom_cohorte)
+            url += "nom_cohortes_selected={}&".format(urlencoded_nom_cohorte)
         return url
 
     def get_queryset(self):
@@ -169,7 +172,7 @@ class ProgramManagerMixin(PermissionRequiredMixin, AjaxTemplateMixin):
 
 
 class ProgramManagerDeleteView(ProgramManagerMixin, DeleteView):
-    template_name = 'admin/programmanager_confirm_delete_inner.html'
+    template_name = 'assessments/program_manager_administration/confirm_delete_inner.html'
 
     def get_object(self, queryset=None):
         obj = self.get_queryset().get(
@@ -195,7 +198,7 @@ class ProgramManagerDeleteView(ProgramManagerMixin, DeleteView):
 
 
 class ProgramManagerPersonDeleteView(ProgramManagerMixin, DeleteView):
-    template_name = 'admin/programmanager_confirm_delete_inner.html'
+    template_name = 'assessments/program_manager_administration/confirm_delete_inner.html'
 
     def delete(self, request, *args, **kwargs):
         for obj in self.get_object():
@@ -249,15 +252,9 @@ class MainProgramManagerPersonUpdateView(MainProgramManagerUpdateCommonView):
         )
 
 
-class PersonAutocomplete(autocomplete.Select2QuerySetView):
+class PersonAutocomplete(EmployeeAutocomplete):
     def get_result_label(self, item):
         return "{} {}, {}".format(item.last_name, item.first_name, item.email)
-
-    def get_queryset(self):
-        qs = Person.objects.all()
-        if self.q:
-            qs = qs.filter(Q(last_name__icontains=self.q) | Q(first_name__icontains=self.q))
-        return qs.order_by('last_name', 'first_name')
 
 
 class ProgramManagerForm(forms.ModelForm):
@@ -269,7 +266,7 @@ class ProgramManagerForm(forms.ModelForm):
 
 class ProgramManagerCreateView(ProgramManagerMixin, FormView):
     form_class = ProgramManagerForm
-    template_name = 'admin/manager_add_inner.html'
+    template_name = 'assessments/program_manager_administration/create_inner.html'
 
     def get_context_data(self, **kwargs):
         return {
@@ -317,7 +314,7 @@ class ProgramManagerCreateView(ProgramManagerMixin, FormView):
 @permission_required('base.view_programmanager', raise_exception=True)
 def pgm_manager_administration(request):
     administrator_entities = get_administrator_entities(request.user)
-    return render(request, "assessments/pgm_manager.html", {
+    return render(request, "assessments/program_manager_administration/search.html", {
         'administrator_entities_string': _get_administrator_entities_acronym_list(administrator_entities),
         'entities_managed_root': administrator_entities,
         'offer_types': __search_offer_types(),
@@ -329,6 +326,8 @@ def pgm_manager_administration(request):
 def __search_offer_types():
     return EducationGroupType.objects.filter(
         category=Categories.TRAINING.name
+    ).exclude(
+        name__in=TrainingType.root_master_2m_types()
     )
 
 
@@ -367,7 +366,7 @@ def pgm_manager_search(request):
         'managers': _get_entity_program_managers(administrator_entities),
         'offer_type': pgm_offer_type
     }
-    return render(request, "assessments/pgm_manager.html", data)
+    return render(request, "assessments/program_manager_administration/search.html", data)
 
 
 def get_entity_root(entity_id: int):
@@ -443,7 +442,8 @@ def _get_trainings(academic_yr, entity_list, manager_person, education_group_typ
         management_entity__in={ev.entity_id for ev in entity_list},
         education_group_type__category=education_group_categories.TRAINING,
     ).exclude(
-        Q(acronym__contains='common-') | Q(acronym__icontains="11BA")
+        Q(acronym__contains='common-') | Q(acronym__icontains="11BA") |
+        Q(education_group_type__name__in=TrainingType.root_master_2m_types())
     ).select_related('management_entity', 'education_group_type')
 
     if education_group_type:

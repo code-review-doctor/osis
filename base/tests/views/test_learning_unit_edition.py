@@ -521,11 +521,6 @@ class TestLearningUnitVolumesManagement(TestCase):
             learning_component_year = generated_container_year.learning_component_cm_full
             self.check_postponement(learning_component_year)
 
-    def test_should_set_tab_active_as_components_url_name_when_creating_context(self):
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertEqual(response.context["tab_active"], 'learning_unit_components')
-
     def check_postponement(self, learning_component_year):
         learning_component_year.refresh_from_db()
         self.assertEqual(learning_component_year.planned_classes, 1)

@@ -11,7 +11,7 @@ servers:
  - url: https://osis.uclouvain.be/api/v1/attribution/
    description: 'Production server'
 info:
-  version: '1.17'
+  version: '1.20'
   title: 'Attribution Service'
   description: |-
     A set of API endpoints that allow you to get information about attribution
@@ -533,6 +533,8 @@ components:
           example: 2018
           description: 'End year of attribution'
           nullable: true
+        course_is_in_suppression_proposal:
+          type: boolean
         function:
           $ref: '#/components/schemas/AttributionFunctionEnum'
         function_text:
@@ -541,21 +543,27 @@ components:
         lecturing_volume:
           type: string
           example: '10.0'
+          nullable: true
         practical_volume:
           type: string
           example: '10.00'
+          nullable: true
         lecturing_volume_available:
           type: string
           example: '15.00'
+          nullable: true
         practical_volume_available:
           type: string
           example: '10.50'
+          nullable: true
         total_lecturing_volume_course:
           type: string
           example: '30.00'
+          nullable: true
         total_practical_volume_course:
           type: string
           example: '30.00'
+          nullable: true
         tutors:
           type: array
           items:
@@ -588,15 +596,19 @@ components:
         lecturing_volume_total:
           type: string
           example: '20.0'
+          nullable: true
         practical_volume_total:
           type: string
           example: '50.0'
+          nullable: true
         lecturing_volume_available:
           type: string
           example: '10.0'
+          nullable: true
         practical_volume_available:
           type: string
           example: '40.0'
+          nullable: true
         title:
           type: string
           example: "Introduction au droit"
@@ -639,9 +651,11 @@ components:
         lecturing_volume:
           type: string
           example: '10.0'
+          nullable: true
         practical_volume:
           type: string
           example: '15.0'
+          nullable: true
         function:
           $ref: '#/components/schemas/AttributionFunctionEnum'
         function_text:
@@ -705,9 +719,11 @@ components:
         lecturing_volume:
           type: string
           example: '10.0'
+          nullable: true
         practical_volume:
           type: string
           example: '15.0'
+          nullable: true
         remark:
           type: string
           example: "Remarque "

@@ -28,8 +28,8 @@ import attr
 from django.test import SimpleTestCase
 
 from ddd.logic.encodage_des_notes.encodage.domain.model._note import NoteManquante
-from ddd.logic.encodage_des_notes.soumission.test.factory.note_etudiant import NoteChiffreEtudiantFactory, \
-    NoteJustificationEtudiantFactory, NoteManquanteEtudiantFactory, NoteJustificationSoumiseEtudiantFactory, \
+from ddd.logic.encodage_des_notes.soumission.test.factory.note_etudiant import NoteManquanteEtudiantFactory, \
+    NoteJustificationSoumiseEtudiantFactory, \
     NoteDejaSoumise
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.attribution_enseignant import \
     AttributionEnseignantTranslatorInMemory
@@ -64,7 +64,8 @@ class TestNotifierEncodageNotes(SimpleTestCase):
 
     def _mock_get_person_id_in_db(self):
         patcher_get_person_id = mock.patch(
-            'infrastructure.encodage_de_notes.soumission.domain.service.notifier_soumission_notes.NotifierSoumissionNotes._get_receiver_id'
+            'infrastructure.encodage_de_notes.soumission.domain.service.notifier_soumission_notes'
+            '.NotifierSoumissionNotes._get_receiver_id'
         )
         mock_get_person_id = patcher_get_person_id.start()
         mock_get_person_id.return_value = 123
@@ -95,6 +96,16 @@ class TestNotifierEncodageNotes(SimpleTestCase):
             NoteDejaSoumise(
                 entity_id__code_unite_enseignement="LDROI1001",
                 entity_id__noma="99999999",
+                nom_cohorte="ECGE1BA"
+            ),
+            NoteDejaSoumise(
+                entity_id__code_unite_enseignement="LDROI1001",
+                entity_id__noma="8523645",
+                nom_cohorte="ECGE1BA"
+            ),
+            NoteDejaSoumise(
+                entity_id__code_unite_enseignement="LDROI1001",
+                entity_id__noma="45896321",
                 nom_cohorte="ECGE1BA"
             ),
         ]
@@ -211,3 +222,24 @@ class TestNotifierEncodageNotes(SimpleTestCase):
         args = mock_send_mail.call_args[0][0]
         self.assertEqual("LDROI1001", args['template_base_data']['learning_unit_name'])
         self.assertEqual("LDROI1001", args['subject_data']['learning_unit_name'])
+
+    def test_should_sort_students_by_removing_accents_and_special_characters(self, mock_send_mail):
+        notes_encodees = [
+            self.notes_ldroi1001[4].entity_id,
+            self.notes_ldroi1001[5].entity_id,
+            self.notes_ldroi1001[6].entity_id,
+        ]
+
+        NotifierSoumissionNotes().notifier(
+            notes_encodees,
+            self.note_etudiant_repo,
+            self.attribution_translator,
+            self.signaletique_personne_repo,
+            self.signaletique_etudiant_repo,
+            self.inscr_exam_translator,
+        )
+
+        tables_rows = mock_send_mail.call_args[0][0]['tables'][0]['data']
+        expected_nom_order = ["Arogan, Adrien", "Déjean, Morge", "De Pierre, Adrién"]
+        actual_order = [row[3] for row in tables_rows]
+        self.assertListEqual(expected_nom_order, actual_order)

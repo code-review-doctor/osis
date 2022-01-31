@@ -47,7 +47,7 @@ from osis_role.contrib import predicates as osis_role_predicates
 
 
 class ProgramManagerAdmin(VersionAdmin, EducationGroupRoleModelAdmin):
-    list_display = ('person', 'education_group_most_recent_acronym', 'changed',)
+    list_display = ('person', 'education_group_most_recent_acronym', 'cohort', 'changed',)
     raw_id_fields = ('person', 'education_group')
     search_fields = ('education_group__educationgroupyear__acronym', 'person__first_name', 'person__last_name')
 
@@ -133,6 +133,7 @@ def find_by_person(a_person):
     )
 
 
+# TODO :: to remove ?
 def is_program_manager(user, learning_unit_year=None, education_group=None):
     """
     Args:

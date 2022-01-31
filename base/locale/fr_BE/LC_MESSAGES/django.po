@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-11 09:22+0200\n"
+"POT-Creation-Date: 2022-01-17 11:07+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -162,9 +162,6 @@ msgstr "Absence justifiée"
 
 msgid "Absence unjustified"
 msgstr "Absence injustifiée"
-
-msgid "Absent"
-msgstr "Absent"
 
 msgid "Ac yr."
 msgstr "Anac."
@@ -371,9 +368,6 @@ msgstr ""
 "Etes-vous certain de vouloir supprimer définitivement cette unité "
 "d'enseignement ?"
 
-msgid "Are you sure you want to delete the teaching material?"
-msgstr "Êtes-vous sûr·e de vouloir supprimer le support de cours ?"
-
 msgid "Are you sure?"
 msgstr "Êtes-vous sûr·e ?"
 
@@ -503,6 +497,12 @@ msgstr "Annuler la proposition"
 
 msgid "Cancel the proposal?"
 msgstr "Annuler la proposition ?"
+
+msgid "Catalog viewer"
+msgstr "Lecteur du catalogue"
+
+msgid "Catalog viewers"
+msgstr "Lecteurs du catalogue"
 
 msgid "Catalogue"
 msgstr "Catalogue"
@@ -799,6 +799,9 @@ msgstr "Remise du mémoire"
 msgid "Dissertations"
 msgstr "Mémoires"
 
+msgid "Divorced"
+msgstr "Divorcé.e"
+
 msgid "Do not assign"
 msgstr "Ne pas attribuer"
 
@@ -1088,9 +1091,6 @@ msgstr "Liste au choix de Finalités (120)"
 msgid "Finality 180 list choice"
 msgstr "Liste au choix de Finalités (180)"
 
-msgid "First name"
-msgstr "Prénom"
-
 msgid "Firstname"
 msgstr "Prénom"
 
@@ -1371,9 +1371,6 @@ msgstr "Cours de langue"
 msgid "Last modifications"
 msgstr "Dernières modifications"
 
-msgid "Last name"
-msgstr "Nom"
-
 msgid "Last update description fiche (force majeure) by"
 msgstr "Dernière modification fiche descriptive (force majeure) par"
 
@@ -1471,6 +1468,9 @@ msgstr "Classes prévues PM"
 
 msgid "Lecturing vol."
 msgstr "Vol. PM"
+
+msgid "Legal cohabitant"
+msgstr "Cohabitant.e légal.e"
 
 msgid "Legend"
 msgstr "Légende"
@@ -1634,6 +1634,9 @@ msgstr "Marquer les messages sélectionnés comme lus"
 
 msgid "Marks presentation"
 msgstr "Remise des notes"
+
+msgid "Married"
+msgstr "Marié.e"
 
 msgid "Master MA 120"
 msgstr "Master en 120 crédits à finalité approfondie"
@@ -1977,6 +1980,12 @@ msgstr "Attention"
 msgid "Pay attention! This learning unit is used in more than one formation"
 msgstr ""
 "Attention cette unité d'enseignement fait partie de plusieurs formations :"
+
+msgid "Payment notice 1 warning"
+msgstr "Avertissement avis d'échéance de paiement 1"
+
+msgid "Payment notice 2 warning"
+msgstr "Avertissement avis d'échéance de paiement 2"
 
 msgid "Pending"
 msgstr "En attente"
@@ -2360,7 +2369,7 @@ msgid "Scores exam submission"
 msgstr "Encodage de notes"
 
 msgid "Scores must be between 0 and 20"
-msgstr "Les scores doivent être compris entre 0 et 20"
+msgstr "Les notes doivent être comprises entre 0 et 20"
 
 msgid "Scores responsibles"
 msgstr "Responsables de notes"
@@ -2373,9 +2382,6 @@ msgstr "Rechercher une entité"
 
 msgid "Search for an organization"
 msgstr "Recherche d'organisations"
-
-msgid "Search of annual programs"
-msgstr "Recherche des programmes annualisés"
 
 msgid "Search type"
 msgstr "Type de recherche"
@@ -2428,6 +2434,9 @@ msgstr "Signataire"
 
 msgid "Signatory qualification"
 msgstr "Qualification du signataire"
+
+msgid "Single"
+msgstr "Célibataire"
 
 msgid "Society minor"
 msgstr "Mineure de société"
@@ -2639,7 +2648,9 @@ msgstr ""
 msgid ""
 "The effective class %(acronym)s has %(count)d enrollments for the year "
 "%(year)s"
-msgstr "La classe %(acronym)s fait l'objet de %(count)d inscription(s) pour l'année %(year)s"
+msgstr ""
+"La classe %(acronym)s fait l'objet de %(count)d inscription(s) pour l'année "
+"%(year)s"
 
 #, python-format
 msgid ""
@@ -3166,6 +3177,9 @@ msgctxt "section title"
 msgid "Welcome"
 msgstr "Accueil"
 
+msgid "Widowed"
+msgstr "Veuf.ve"
+
 msgid "Yes"
 msgstr "Oui"
 
@@ -3440,9 +3454,6 @@ msgstr "rôle (anglais)"
 
 msgid "role (french)"
 msgstr "rôle (français)"
-
-msgid "score(s) saved"
-msgstr "note(s) enregistrée(s)"
 
 msgid "search"
 msgstr "recherche"

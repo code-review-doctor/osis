@@ -23,10 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Set
+from typing import Set, List
 
 from ddd.logic.encodage_des_notes.shared_kernel.domain.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import EnseignantDTO
 from ddd.logic.encodage_des_notes.soumission.dtos import AttributionEnseignantDTO
 
 
@@ -74,3 +75,26 @@ class AttributionEnseignantTranslatorInMemory(IAttributionEnseignantTranslator):
                 cls.attributions_dtos,
             )
         )
+
+    @classmethod
+    def search_enseignants_par_nom_prenom_annee(cls, annee: int, nom_prenom: str) -> List['EnseignantDTO']:
+        attributions = cls.search_attributions_enseignant_par_nom_prenom_annee(annee, nom_prenom)
+        enseignants = {EnseignantDTO(nom=attrib.nom, prenom=attrib.prenom) for attrib in attributions}
+        return list(
+            sorted(
+                enseignants,
+                key=lambda ens: ens.nom + ens.prenom
+            )
+        )
+
+    @classmethod
+    def search_attributions_enseignant_par_nom_prenom_annee(
+            cls,
+            annee: int,
+            nom_prenom: str,
+    ) -> Set['AttributionEnseignantDTO']:
+        return {
+            attrib for attrib in cls.attributions_dtos
+            if attrib.annee == annee
+            and any((mot in attrib.nom or mot in attrib.prenom) for mot in nom_prenom.split(' '))
+        }

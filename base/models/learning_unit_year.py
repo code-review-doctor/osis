@@ -23,13 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import uuid
 from decimal import Decimal
 from typing import List
 
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
 from django.db import models
-from django.db.models import Q, When, CharField, Value, Case, Subquery, OuterRef, F, fields
+from django.db.models import Q, When, CharField, Value, Case, Subquery, OuterRef, F, fields, Exists
 from django.db.models.functions import Concat
 from django.db.models.signals import post_delete
 from django.dispatch.dispatcher import receiver
@@ -58,8 +59,7 @@ from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit import LEARNING_UNIT_ACRONYM_REGEX_MODEL
 from base.models.prerequisite_item import PrerequisiteItem
 from education_group import publisher
-from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin, SerializableModelManager, \
-    SerializableQuerySet
+from osis_common.models.osis_model_admin import OsisModelAdmin
 
 CREDITS_FOR_DECIMAL_SCORES = 15
 
@@ -120,7 +120,7 @@ def academic_year_validator(value):
         )
 
 
-class LearningUnitYearAdmin(VersionAdmin, SerializableModelAdmin):
+class LearningUnitYearAdmin(VersionAdmin, OsisModelAdmin):
     list_display = (
         'external_id',
         'acronym',
@@ -143,7 +143,7 @@ class LearningUnitYearAdmin(VersionAdmin, SerializableModelAdmin):
     ]
 
 
-class LearningUnitYearQuerySet(SerializableQuerySet):
+class LearningUnitYearQuerySet(models.QuerySet):
     def annotate_volume_total(self):
         return self.annotate_volume_total_class_method(self)
 
@@ -152,6 +152,9 @@ class LearningUnitYearQuerySet(SerializableQuerySet):
 
     def annotate_full_title(self):
         return self.annotate_full_title_class_method(self)
+
+    def annotate_has_classes(self):
+        return self.annotate_has_classes_class_method(self)
 
     @classmethod
     def annotate_full_title_class_method(cls, queryset):
@@ -285,8 +288,17 @@ class LearningUnitYearQuerySet(SerializableQuerySet):
             ),
         )
 
+    @classmethod
+    def annotate_has_classes_class_method(cls, queryset):
+        from learning_unit.models.learning_class_year import LearningClassYear
+        return queryset.annotate(
+            has_classes=Exists(
+                LearningClassYear.objects.filter(learning_component_year__learning_unit_year=OuterRef('id'))
+            )
+        )
 
-class BaseLearningUnitYearManager(SerializableModelManager):
+
+class BaseLearningUnitYearManager(models.Manager):
     def get_queryset(self):
         return LearningUnitYearQuerySet(self.model, using=self._db)
 
@@ -298,7 +310,11 @@ class LearningUnitYearWithContainerManager(models.Manager):
             .filter(learning_container_year__isnull=False)
 
 
-class LearningUnitYear(SerializableModel):
+class LearningUnitYear(models.Model):
+    uuid = models.UUIDField(
+        default=uuid.uuid4, editable=False, unique=True, db_index=True
+    )
+
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     academic_year = models.ForeignKey(AcademicYear, verbose_name=_('Academic year'),
                                       validators=[academic_year_validator], on_delete=models.PROTECT)
@@ -533,9 +549,10 @@ class LearningUnitYear(SerializableModel):
         return None
 
     def find_gt_learning_units_year(self):
-        return LearningUnitYear.objects.filter(learning_unit=self.learning_unit,
-                                               academic_year__year__gt=self.academic_year.year) \
-            .order_by('academic_year__year')
+        return LearningUnitYear.objects.filter(
+            learning_unit=self.learning_unit,
+            academic_year__year__gt=self.academic_year.year
+        ).order_by('academic_year__year')
 
     def is_past(self):
         return self.academic_year.is_past

@@ -1,6 +1,7 @@
 {% extends "layout.html" %}
 {% load static %}
 {% load i18n %}
+{% load dictionnary %}
 
 {% comment "License" %}
  * OSIS stands for Open Student Information System. It's an application
@@ -9,7 +10,7 @@
  * The core business involves the administration of students, teachers,
  * courses, programs and so on.
  *
- * Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+ * Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,9 +45,9 @@
             <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th>{% trans 'Tutor' %}</th>
-                        <th>{% trans 'Status' %}</th>
-                        <th>{% trans 'Scores responsible' %}</th>
+                        <th class="col-md-4">{% trans 'Tutor' %}</th>
+                        <th class="col-md-4">{% trans 'Status' %}</th>
+                        <th class="col-md-4">{% trans 'Scores responsible' %}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -62,6 +63,58 @@
                     {% endfor%}
                 </tbody>
             </table>
+
+            {% if repartitions_classes %}
+            <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                <div class="panel panel-default">
+                    <div class="panel-heading" role="tab" id="headingOne">
+                        <h4 class="panel-title">
+                            <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne" style="text-decoration: none;">
+                                <span class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>
+                                <strong>{% blocktrans %}Tutors' classes of the course {{code}} ({{ annee_academique }}){% endblocktrans%}</strong>
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+                        <div class="panel-body">
+                            {% for class in repartitions_classes %}
+                            <table class="table table-hover">
+                                <caption><strong>{{class}}</strong></caption>
+                                <thead>
+                                <tr>
+                                    <th class="col-md-4">{% trans 'Tutor' %}</th>
+                                    <th class="col-md-4">{% trans 'Status' %}</th>
+                                    <th class="col-md-4">{% trans 'Scores responsible' %}</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% with attr_classes=repartitions_classes|get_item:class%}
+                                {% for attr in attr_classes %}
+                                <tr>
+                                    <td>{{ attr.enseignant }}</td>
+                                    <td>{{ attr.statut }}</td>
+                                    <td>
+                                        <label>
+                                            <input id="txt_attribution_class_{{code}}{{class}}"  name="matricule_fgs_{{attr.code}}" value="{{ attr.matricule_fgs }}"
+                                                   type="radio" {% if attr.responsable_de_notes %} checked {% endif %} >
+                                        </label>
+                                    </td>
+                                </tr>
+                                {% endfor%}
+                                {% endwith %}
+                                </tbody>
+                            </table>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+            {% endif %}
+
             <div class="panel-body">
                 <button type="submit" class="btn btn-primary" role="button" title="{% trans 'Add' %}">{% trans 'Save' %}</button>
                 <a class="btn btn-default" href="{% url 'scores_responsibles_search' %}" title="{% trans 'Cancel' %}">{% trans 'Cancel' %}</a>
@@ -69,4 +122,14 @@
         </form>
     </div>
 </div>
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#accordion').on('shown.bs.collapse hidden.bs.collapse', function (e) {
+            $(e.target).prev('.panel-heading').find("span.glyphicon").toggleClass('glyphicon-collapse-up glyphicon-collapse-down',0, "easeOutSine" );
+        });
+    });
+</script>
 {% endblock %}

@@ -32,14 +32,16 @@ from typing import List, Optional
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.db.models import F, QuerySet, OuterRef, Subquery, Q, Value, Case, When
-from django.db.models.expressions import RawSQL
+from django.db.models.expressions import RawSQL, Exists
 from django.db.models.functions import Cast
 from django_cte import With
 
 from base.models.entity_version import EntityVersion
 from base.models.enums import learning_container_year_types
+from base.models.enums.proposal_type import ProposalType
 from base.models.enums.vacant_declaration_type import VacantDeclarationType
 from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
+from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.models.utils.func import ArrayConcat
 from ddd.logic.application.domain.builder.vacant_course_builder import VacantCourseBuilder
 from ddd.logic.application.domain.model.vacant_course import VacantCourseIdentity, VacantCourse
@@ -52,7 +54,7 @@ class VacantCourseRepository(IVacantCourseRepository):
     @classmethod
     def search(cls, entity_ids: Optional[List[VacantCourseIdentity]] = None, **kwargs) -> List[VacantCourse]:
         qs = _vacant_course_base_qs()
-        if entity_ids is not None:
+        if entity_ids:
             filter_clause = functools.reduce(
                 operator.or_,
                 ((Q(code=entity_id.code) & Q(year=entity_id.year)) for entity_id in entity_ids)
@@ -140,7 +142,13 @@ def _vacant_course_base_qs() -> QuerySet:
             is_in_team=F('learning_container_year__team'),
             vacant_declaration_type=F('learning_container_year__type_declaration_vacant'),
             allocation_entity=F('entity_allocation'),
-        ).values(
+            course_is_in_suppression_proposal=Exists(
+                ProposalLearningUnit.objects.filter(
+                    learning_unit_year_id=OuterRef('pk'),
+                    type=ProposalType.SUPPRESSION.name
+                )
+            )
+        ).exclude(course_is_in_suppression_proposal=True).values(
             "code",
             "year",
             "title",
@@ -183,7 +191,6 @@ def _annotate_allocation_entity_parents(qs: QuerySet) -> QuerySet:
                         )
                     ),
                     parent_id=cte.col.entity_id,
-                    start_date__gte=cte.col.start_date,
                     end_date_queryable__lte=cte.col.end_date_queryable
                 ).values(
                     'parent_id',

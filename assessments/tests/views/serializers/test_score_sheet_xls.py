@@ -94,10 +94,10 @@ class ScoreSheetXLSSerializerTest(SimpleTestCase):
         cls.donnees_administrative = DonneesAdministrativesFeuilleDeNotesDTO(
             sigle_formation='DROI2M',
             code_unite_enseignement='LDROI1200',
-            date_deliberation=DateDTO.build_from_date(datetime.date.today() + datetime.timedelta(days=10)),
             contact_feuille_de_notes=AdresseFeuilleDeNotesDTO(
                 nom_cohorte='DROI2M',
-                entite="",
+                annee_academique=2021,
+                type_entite="",
                 destinataire='Durant Thomas',
                 rue_numero='Chemin de lasne',
                 code_postal=1200,
@@ -135,7 +135,7 @@ class ScoreSheetXLSSerializerTest(SimpleTestCase):
         self.assertTrue("note" in sheet_serialized['rows'][0])
         self.assertTrue("nom_cohorte" in sheet_serialized['rows'][0])
         self.assertTrue("email" in sheet_serialized['rows'][0])
-        self.assertTrue("date_remise_de_notes" in sheet_serialized['rows'][0])
+        self.assertTrue("echeance_enseignant" in sheet_serialized['rows'][0])
         self.assertTrue("est_soumise" in sheet_serialized['rows'][0])
         self.assertTrue("inscrit_tardivement" in sheet_serialized['rows'][0])
         self.assertTrue("desinscrit_tardivement" in sheet_serialized['rows'][0])
@@ -232,10 +232,10 @@ class TutorScoreSheetXLSSerilizeTest(SimpleTestCase):
                     intitule_complet_unite_enseignement='Introduction au droit',
                     est_soumise=False,
                     date_remise_de_notes=DateDTO.build_from_date(
-                        datetime.date.today() - datetime.timedelta(days=1)
+                        datetime.date.today() + datetime.timedelta(days=5)
                     ),
                     echeance_enseignant=DateDTO.build_from_date(
-                        datetime.date.today() + datetime.timedelta(days=5)
+                        datetime.date.today() - datetime.timedelta(days=1)
                     ),
                     nom_cohorte='DROI2M',
                     noma='999999999',
@@ -295,10 +295,10 @@ class TutorScoreSheetXLSSerilizeTest(SimpleTestCase):
                     intitule_complet_unite_enseignement='Introduction au droit',
                     est_soumise=True,
                     date_remise_de_notes=DateDTO.build_from_date(
-                        datetime.date.today() - datetime.timedelta(days=5)
+                        datetime.date.today() + datetime.timedelta(days=5)
                     ),
                     echeance_enseignant=DateDTO.build_from_date(
-                        datetime.date.today() + datetime.timedelta(days=5)
+                        datetime.date.today() - datetime.timedelta(days=5)
                     ),
                     nom_cohorte='DROI2M',
                     noma='999999996',
@@ -316,10 +316,10 @@ class TutorScoreSheetXLSSerilizeTest(SimpleTestCase):
         cls.donnees_administrative = DonneesAdministrativesFeuilleDeNotesDTO(
             sigle_formation='DROI2M',
             code_unite_enseignement='LDROI1200',
-            date_deliberation=DateDTO.build_from_date(datetime.date.today() + datetime.timedelta(days=10)),
             contact_feuille_de_notes=AdresseFeuilleDeNotesDTO(
                 nom_cohorte='DROI2M',
-                entite="",
+                annee_academique=2021,
+                type_entite="",
                 destinataire='Durant Thomas',
                 rue_numero='Chemin de lasne',
                 code_postal=1200,

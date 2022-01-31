@@ -23,17 +23,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
+import logging
 from typing import List
 
+from django.conf import settings
+from django.template.defaultfilters import date
 from django.utils import translation
-from django.utils.translation import pgettext_lazy
+from django.utils.translation import pgettext_lazy, gettext_lazy as _
 
 from base.models.person import Person
 from ddd.logic.application.domain.model.applicant import Applicant
-from ddd.logic.application.domain.model.application_calendar import ApplicationCalendar
 from ddd.logic.application.domain.service.applications_summary import IApplicationsSummary
 from ddd.logic.application.dtos import ApplicationByApplicantDTO
 from osis_common.messaging import message_config, send_message as message_service
+
+
+logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
 class ApplicationsMailSummary(IApplicationsSummary):
@@ -42,7 +48,6 @@ class ApplicationsMailSummary(IApplicationsSummary):
     def send(
             cls,
             applicant: Applicant,
-            application_calendar: ApplicationCalendar,
             applications: List[ApplicationByApplicantDTO]
     ):
         html_template_ref = 'applications_confirmation_html'
@@ -55,18 +60,28 @@ class ApplicationsMailSummary(IApplicationsSummary):
 
         table_applications = message_config.create_table(
             'applications',
-            [pgettext_lazy("applications", "Code"), 'Vol. 1', 'Vol. 2'],
+            [pgettext_lazy("applications", "Code"), _("Title"), 'Vol. 1', 'Vol. 2'],
             [
-                (application.code, application.lecturing_volume, application.practical_volume,)
+                (application.code, application.course_title,
+                 application.lecturing_volume, application.practical_volume,)
                 for application in applications
             ]
         )
         template_base_data = {
             'first_name': applicant.first_name,
             'last_name': applicant.last_name,
-            'application_courses_targeted_year': application_calendar.authorized_target_year
+            'application_courses_publication_date': cls.__get_application_courses_publication_date()
         }
         message_content = message_config.create_message_content(
             html_template_ref, txt_template_ref, [table_applications], receivers, template_base_data, None
         )
         message_service.send_messages(message_content)
+
+    @classmethod
+    def __get_application_courses_publication_date(cls) -> str:
+        try:
+            date_obj = datetime.datetime.strptime(settings.APPLICATION_COURSES_PUBLICATION_DATE, "%d/%m/%Y").date()
+            return date(date_obj, 'd F Y')
+        except Exception:
+            logger.warning('Invalid APPLICATION_COURSES_PUBLICATION_DATE configuration')
+            return ''

@@ -2,27 +2,27 @@
 {% load i18n academic_year_display bootstrap3 index %}
 
 {% comment "License" %}
- * OSIS stands for Open Student Information System. It's an application
- * designed to manage the core business of higher education institutions,
- * such as universities, faculties, institutes and professional schools.
- * The core business involves the administration of students, teachers,
- * courses, programs and so on.
- *
- * Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * A copy of this license - GNU General Public License - is available
- * at the root of the source code of this program.  If not,
- * see http://www.gnu.org/licenses/.
+    * OSIS stands for Open Student Information System. It's an application
+    * designed to manage the core business of higher education institutions,
+    * such as universities, faculties, institutes and professional schools.
+    * The core business involves the administration of students, teachers,
+    * courses, programs and so on.
+    *
+    * Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+    *
+    * This program is free software: you can redistribute it and/or modify
+    * it under the terms of the GNU General Public License as published by
+    * the Free Software Foundation, either version 3 of the License, or
+    * (at your option) any later version.
+    *
+    * This program is distributed in the hope that it will be useful,
+    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    * GNU General Public License for more details.
+    *
+    * A copy of this license - GNU General Public License - is available
+    * at the root of the source code of this program.  If not,
+    * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
 {% block breadcrumb %}
@@ -44,132 +44,162 @@
         <div class="panel-body">
             <ul class="nav nav-tabs nav-justified" id="tabs">
                 <li>
-                    <a href="{{ score_encoding_progress_overview_url }}" id="lnk_scores_encoding">{% trans 'By learning unit' %}</a>
+                    <a href="{{ score_encoding_progress_overview_url }}"
+                       id="lnk_scores_encoding">{% trans 'By learning unit' %}</a>
                 </li>
                 <li class="active">
-                    <a data-toggle="tab" role="tab" href="#" id="lnk_score_search">{% trans 'By specific criteria' %}</a>
+                    <a data-toggle="tab" role="tab" href="#"
+                       id="lnk_score_search">{% trans 'By specific criteria' %}</a>
                 </li>
             </ul>
 
             <div class="tab-content">
                 <div id="tab_score_search" class="tab-pane fade in active">
+                    {{ search_form.media }}
                     <form id="score_search_form" method="GET" action="{{ request.path }}" style="margin-top: 20px;">
-                         <div class="row">
+                        <div class="row">
                             <div class="col-md-2">
-                                 {% bootstrap_field search_form.noma %}
+                                {% bootstrap_field search_form.noma %}
                             </div>
                             <div class="col-md-2">
-                                 {% bootstrap_field search_form.nom %}
+                                {% bootstrap_field search_form.nom %}
                             </div>
                             <div class="col-md-2">
-                                 {% bootstrap_field search_form.prenom %}
+                                {% bootstrap_field search_form.prenom %}
                             </div>
                             <div class="col-md-3">
-                                 {% bootstrap_field search_form.etat %}
+                                {% bootstrap_field search_form.etat %}
                             </div>
                             <div class="col-md-2">
-                                 {% bootstrap_field search_form.nom_cohorte %}
+                                {% bootstrap_field search_form.noms_cohortes %}
                             </div>
                             <div class="col-md-1">
                                 <button id="bt_submit_score_search" class="btn btn-primary" type="submit" role="button"
-                                    style="margin-top:22px">
+                                        style="margin-top:22px">
                                     <span class="fa fa-search" aria-hidden="true"></span>
                                 </button>
                             </div>
-                         </div>
+                        </div>
                         {% bootstrap_form_errors search_form error_types='non_field_errors' %}
                     </form>
 
                     {% if search_form.is_valid %}
                         {% if notes_etudiant_filtered %}
-                            <form id="score_submit_form" class="form-inline" method="POST" action="{{ request.path }}?{{ request.GET.urlencode }}">
-                            {% csrf_token %}
-                            <div class="row">
-                                <div class="col-md-12">
-                                   {% include 'assessments/common/legend.html' %}
+                            {% if too_many_results_message %}
+                                <div class="alert alert-warning" style="margin:5px">{{ too_many_results_message }}</div>
+                            {% endif %}
+                            <form id="score_submit_form" class="form-inline" method="POST"
+                                  action="{{ request.path }}?{{ request.GET.urlencode }}">
+                                {% csrf_token %}
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        {% include 'assessments/common/legend.html' %}
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <button id="lnk_submit_up" class="btn btn-primary" type="submit">
-                                        <em class="fas fa-save"></em> {% trans 'Save' %}
-                                    </button>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <button id="lnk_submit_up" class="btn btn-primary" type="submit"
+                                                data-toggle="tooltip" title="{% trans 'Save scores' %}">
+                                            <em class="fas fa-save"></em> {% trans 'Save' %}
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <table class="table table-hover">
-                                <thead>
+                                <table class="table table-hover">
+                                    <thead>
                                     <tr>
-                                        <th id="status" class="col-md-1">{% trans 'Status' %}</th>
-                                        <th id="program" class="col-md-1">{% trans 'Program' context 'encoding' %}</th>
-                                        <th id="learning_unit" class="col-md-3">{% trans 'Learning unit' %}</th>
-                                        <th id="registration_number" class="col-md-1">{% trans 'Reg. No.' %}</th>
-                                        <th id="lastname" class="col-md-2">{% trans 'Lastname' %}</th>
-                                        <th id="firstname" class="col-md-2">{% trans 'Firstname' %}</th>
-                                        <th id="score" class="col-md-2">
+                                        <th id="status" style="width: 5%">{% trans 'Status' %}</th>
+                                        <th id="program"
+                                            style="width: 10%">{% trans 'Program' context 'encoding' %}</th>
+                                        <th id="learning_unit" style="width: 20%">{% trans 'Learning unit' %}</th>
+                                        <th id="peps_data" style="width: 15%">
+                                            {% trans 'Type' %}
+                                            <span class="badge warning-color">
+                                                PEPS
+                                            </span>
+                                        </th>
+                                        <th id="registration_number" style="width: 10%">{% trans 'Reg. No.' %}</th>
+                                        <th id="name" style="width: 20%">{% trans 'Name' %}</th>
+                                        <th id="score" style="width: 10%" style="width: 70px;">
                                             {% trans 'Score' %}
                                             <span
-                                                class="glyphicon glyphicon-question-sign"
-                                                data-toggle="tooltip"
-                                                data-placement="top"
-                                                data-html="true"
-                                                title="{% trans "Score legend" %}:
-                                                <ul>
-                                                    <li> {% trans "number between 0-20 (0=Score of presence)" %}
-                                                    <li>S : {% trans "Absence unjustified" %}</li>
-                                                    <li>M : {% trans "Absence justified" %}</li>
-                                                    <li>T : {% trans "Cheating" %}</li>
-                                                </ul>">
+                                                    class="glyphicon glyphicon-question-sign"
+                                                    data-toggle="tooltip"
+                                                    data-placement="top"
+                                                    data-html="true"
+                                                    title="{% trans "Score legend for program manager" %}:
+                                                    <ul>
+                                                        <li> {% trans "number between 0-20 (0=Score of presence)" %}
+                                                        <li>S : {% trans "Absence unjustified" %}</li>
+                                                        <li>M : {% trans "Absence justified" %}</li>
+                                                        <li>T : {% trans "Cheating" %}</li>
+                                                    </ul>
+                                                    {% trans "Score legend for tutor" %}:
+                                                    <ul>
+                                                        <li> {% trans "number between 0-20 (0=Score of presence)" %}</li>
+                                                        <li>A : {% trans "Absence" %}</li>
+                                                        <li>T : {% trans "Cheating" %}</li>
+                                                    </ul>">
                                             </span>
                                         </th>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                     {% for note_etudiant in notes_etudiant_filtered %}
-                                         <tr class="result" style="{% include 'assessments/common/row-background-color.html' %}">
-                                             <td style="text-align:center;" id="enrollment_status_{{ forloop.counter }}" headers="status">
+                                    </thead>
+                                    <tbody>
+                                    {% for note_etudiant in notes_etudiant_filtered %}
+                                        <tr class="result"
+                                            style="{% include 'assessments/common/row-background-color.html' with date_echeance_atteinte=note_etudiant.date_echeance_atteinte %}">
+                                            <td style="text-align:center;" id="enrollment_status_{{ forloop.counter }}"
+                                                headers="status">
                                                 {% if note_etudiant.date_echeance_atteinte %}
-                                                    <span class="glyphicon glyphicon-lock" aria-hidden="true" style="color: #8B008B;" title="{% trans 'Deadline reached' %}"></span>
+                                                    <span class="glyphicon glyphicon-lock" aria-hidden="true"
+                                                          style="color: #8B008B;"
+                                                          data-toggle="tooltip"
+                                                          title="{% trans 'Deadline reached' %}"></span>
                                                 {% endif %}
                                                 {% if note_etudiant.est_soumise %}
-                                                    <span class="glyphicon glyphicon-send" aria-hidden="true" style="color: green;" title="{% trans 'Score submitted' %}"></span>
+                                                    <span class="glyphicon glyphicon-send" aria-hidden="true"
+                                                          style="color: green;" data-toggle="tooltip"
+                                                          title="{% trans 'Score submitted' %}"></span>
                                                 {% endif %}
                                             </td>
                                             <td headers="program">{{ note_etudiant.nom_cohorte }}</td>
-                                            <td headers="learning_unit" data-container="body" data-toggle="tooltip" title="{{ note_etudiant.intitule_complet_unite_enseignement }}">
-                                                {{ note_etudiant.code_unite_enseignement |add:" - " |add:note_etudiant.intitule_complet_unite_enseignement| truncatechars:30}}
+                                            <td headers="learning_unit" data-container="body" data-toggle="tooltip"
+                                                title="{{ note_etudiant.intitule_complet_unite_enseignement }}">
+                                                {{ note_etudiant.code_unite_enseignement |add:" - " |add:note_etudiant.intitule_complet_unite_enseignement| truncatechars:45}}
                                             </td>
+                                            {% include 'assessments/common/peps_column.html' %}
                                             <td headers="registration_number">{{ note_etudiant.noma }}</td>
-                                            <td headers="lastname">{{ note_etudiant.nom }}</td>
-                                            <td headers="firstname">{{ note_etudiant.prenom }}</td>
+                                            <td headers="name">{{ note_etudiant.nom }}, {{ note_etudiant.prenom }}</td>
                                             <td id="enrollment_note_{{ forloop.counter0 }}" headers="score">
-                                                {% if not note_etudiant.date_echeance_atteinte and not note_etudiant.desinscrit_tardivement %}
+                                                {% if not note_etudiant.date_echeance_gestionnaire_atteinte and not note_etudiant.desinscrit_tardivement %}
                                                     {% with score_encoding_form=form|index:forloop.counter0 %}
                                                         {% bootstrap_field score_encoding_form.note show_label=False %}
                                                         {% bootstrap_field score_encoding_form.noma %}
                                                         {% bootstrap_field score_encoding_form.code_unite_enseignement %}
-                                                        <input type="hidden" name="note_decimale_est_autorisee" value="{% if note_etudiant.note_decimale_est_autorisee %}true{% else %}false{% endif %}">
+                                                        <input type="hidden" name="note_decimale_est_autorisee"
+                                                               value="{% if note_etudiant.note_decimale_est_autorisee %}true{% else %}false{% endif %}">
                                                     {% endwith %}
                                                 {% else %}
                                                     {{ note_etudiant.note|default:"-" }}
                                                 {% endif %}
                                             </td>
-                                         </tr>
-                                        {% endfor %}
-                                        {{ form.management_form }}
-                                </tbody>
-                            </table>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <button id="lnk_submit_down" class="btn btn-primary" type="submit">
-                                        <em class="fas fa-save"></em> {% trans 'Save' %}
-                                    </button>
+                                        </tr>
+                                    {% endfor %}
+                                    {{ form.management_form }}
+                                    </tbody>
+                                </table>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <button id="lnk_submit_down" class="btn btn-primary" type="submit"
+                                                data-toggle="tooltip" title="{% trans 'Save scores' %}">
+                                            <em class="fas fa-save"></em> {% trans 'Save' %}
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                         </form>
+                            </form>
                         {% else %}
-                             <div class="alert alert-info" style="margin:5px">{% trans 'No result!' %}</div>
+                            <div class="alert alert-info" style="margin:5px">{% trans 'No result!' %}</div>
                         {% endif %}
                     {% endif %}
                 </div>
@@ -181,29 +211,29 @@
 
 {% block script %}
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             const SCORE_INPUTS = $("input[id^='id_form'][class='form-control']");
             const SUBMIT_LINKS = $("#lnk_submit_up, #lnk_submit_down");
 
-            const is_valid_score = function(score, is_decimal) {
-                score = score.replace(',','.');
-
-                const regex = (is_decimal) ? /^\d+(\.\d{0,2})?$/ : /^\d+$/;
-                if(!regex.test(score)){
+            const is_valid_score = function (score, is_decimal) {
+                score = score.replace(',', '.');
+                const regex = (is_decimal) ? /^\d+(\.\d{0,1})?$/ : /^\d+$/;
+                if (!regex.test(score)) {
                     return false;
                 }
-                score = parseFloat(score).toFixed(2)
+                score = parseFloat(score).toFixed(1)
                 return !(score > 20 || score < 0);
             }
 
             const is_valid_justification = function (justification) {
+                justification = justification.toUpperCase();
                 const justificationAvailables = ['M', 'S', 'T'];
                 return justificationAvailables.indexOf(justification) > -1;
             }
 
-            const validate_form = function() {
+            const validate_form = function () {
                 let has_error = false;
-                SCORE_INPUTS.each(function(){
+                SCORE_INPUTS.each(function () {
                     const value_encoded = $(this).val();
                     const is_decimal = (
                         $(this).parents("td").find("input[name=note_decimale_est_autorisee]").val() === 'true'
@@ -225,6 +255,22 @@
             }
             SCORE_INPUTS.change(validate_form);
         });
-        $(document).on('keypress', function(e) { disable_enter(e); });
+        $(document).on('keypress', function (e) {
+            disable_enter(e);
+        });
+        // Focus on next input when keypress 'enter'
+        const focusables = $(":focusable");
+        focusables.keypress(function (e) {
+            if (keycode_is_enter(e)) {
+                const current = focusables.index(this),
+                    next = focusables.eq(current + 1).length ? focusables.eq(current + 1) : focusables.eq(0);
+                next.focus();
+            }
+        });
+
+        setTimeout(function () {
+            $('.select2-selection__clear').attr('title', '');
+            $('.select2-selection__choice').attr('title', '');
+        }, 1);
     </script>
 {% endblock %}

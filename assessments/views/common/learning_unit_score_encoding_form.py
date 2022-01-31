@@ -23,6 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import contextlib
+import datetime
+from typing import Optional
+
 from django.forms import formset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
@@ -39,6 +43,13 @@ from osis_role.contrib.views import PermissionRequiredMixin
 class LearningUnitScoreEncodingBaseFormView(PermissionRequiredMixin, FormView):
     # PermissionRequiredMixin
     permission_required = "assessments.can_access_scoreencoding"
+
+    @cached_property
+    def echeance_enseignant_filter(self) -> Optional[datetime.date]:
+        with contextlib.suppress(TypeError, ValueError):
+            echeance_enseignant_queryparams = self.request.GET.get('echeance_enseignant')
+            return datetime.datetime.strptime(echeance_enseignant_queryparams, "%d/%m/%Y").date()
+        return None
 
     @cached_property
     def person(self):
@@ -83,7 +94,7 @@ class LearningUnitScoreEncodingBaseFormView(PermissionRequiredMixin, FormView):
 
     def _get_initial_note_etudiant(self, note_etudiant):
         try:
-            note_format = "2" if self.feuille_de_notes.note_decimale_est_autorisee else "0"
+            note_format = "1" if self.feuille_de_notes.note_decimale_est_autorisee else "0"
             note_formated = floatformat(float(note_etudiant.note), note_format)
         except ValueError:
             note_formated = note_etudiant.note

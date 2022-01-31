@@ -28,7 +28,9 @@ from datetime import date
 from typing import List, Optional, Iterable
 
 import attr
+from django.utils.translation import ugettext as _
 
+from base.models.enums import peps_type
 from osis_common.ddd import interface
 
 
@@ -78,6 +80,26 @@ class EtudiantPepsDTO(interface.DTO):
     accompagnateur = attr.ib(type=str)
     sous_type_peps = attr.ib(type=str, default='')
 
+    @property
+    def get_type_peps_display(self) -> str:
+        return get_type_peps_display(self.type_peps, self.sous_type_peps)
+
+    @property
+    def get_arrangements_display(self) -> List[str]:
+        arrangements = []
+        if self.tiers_temps:
+            arrangements.append(_('Extra time (33% generally)'))
+        if self.copie_adaptee:
+            arrangements.append(_('Large print'))
+        if self.local_specifique:
+            arrangements.append(_('Specific room of examination'))
+        if self.autre_amenagement:
+            arrangements.append(_('Other educational facilities'))
+            if self.details_autre_amenagement:
+                arrangements.append("{} : {}".format(_('Details other educational facilities'),
+                                                     self.details_autre_amenagement))
+        return arrangements
+
 
 @attr.s(frozen=True, slots=True)
 class NoteEtudiantDTO(interface.DTO):
@@ -98,8 +120,15 @@ class NoteEtudiantDTO(interface.DTO):
     desinscrit_tardivement = attr.ib(type=bool)  # inscription examen
 
     @property
-    def date_echeance_atteinte(self) -> bool:
-        date_dto = self.date_remise_de_notes
+    def date_echeance_gestionnaire_atteinte(self) -> bool:
+        return self._is_date_echeance_atteinte(self.date_remise_de_notes)
+
+    @property
+    def date_echeance_enseignant_atteinte(self) -> bool:
+        return self._is_date_echeance_atteinte(self.echeance_enseignant)
+
+    @staticmethod
+    def _is_date_echeance_atteinte(date_dto):
         date_de_remise = datetime.date(day=date_dto.jour, month=date_dto.mois, year=date_dto.annee)
         aujourdhui = datetime.date.today()
         return aujourdhui > date_de_remise
@@ -124,6 +153,7 @@ class RechercheNoteEtudiantDTO(interface.DTO):
     inscrit_tardivement = attr.ib(type=bool)  # inscription examen
     desinscrit_tardivement = attr.ib(type=bool)  # inscription examen
     note_decimale_est_autorisee = attr.ib(type=bool)
+    peps = attr.ib(type=Optional[EtudiantPepsDTO])  # signaletique
 
     @property
     def date_echeance_atteinte(self) -> bool:
@@ -240,3 +270,19 @@ class ProgressionGeneraleEncodageNotesDTO(interface.DTO):
     annee_academique = attr.ib(type=int)
     numero_session = attr.ib(type=int)
     progression_generale = attr.ib(type=List[ProgressionEncodageNotesUniteEnseignementDTO])
+
+
+def get_type_peps_display(type_peps: str, sous_type_peps: str) -> str:
+    if type_peps == peps_type.PepsTypes.SPORT.name:
+        return "{} - {}".format(
+            str(peps_type.PepsTypes[type_peps].value) or "-",
+            str(peps_type.SportSubtypes[sous_type_peps].value) or "-",
+        )
+    if type_peps == peps_type.PepsTypes.DISABILITY.name:
+        return "{} - {}".format(
+            str(peps_type.PepsTypes[type_peps].value) or "-",
+            str(peps_type.HtmSubtypes[sous_type_peps].value) or "-",
+        )
+    if type_peps == peps_type.PepsTypes.NOT_DEFINED.name:
+        return"-"
+    return str(peps_type.PepsTypes[type_peps].value) or "-"

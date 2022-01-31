@@ -112,7 +112,8 @@ class AttributionListView(generics.ListAPIView):
             ),
             practical_charge=Case(
                 When(
-                    Q(learning_component_year__type=learning_component_year_type.LECTURING),
+                    Q(learning_component_year__type=learning_component_year_type.LECTURING) |
+                    Q(learning_component_year__acronym='NT'),
                     then=Subquery(
                         AttributionChargeNew.objects.filter(
                             attribution_id=OuterRef('attribution_id'),
@@ -201,7 +202,7 @@ class AttributionListView(generics.ListAPIView):
                 tutor_personal_id_number=self.attributions_charge_new[0].tutor_personal_id
             )
         )  # type: Tutor
-        classes_peps = self._get_classes_peps(tutor_classes)
+        classes_peps = self._get_classes_peps(tutor_classes, year=self.kwargs['year'])
         for attrib in self.attributions_charge_new:
             if tutor_classes:
                 learning_unit_year = attrib.learning_component_year.learning_unit_year
@@ -214,7 +215,7 @@ class AttributionListView(generics.ListAPIView):
                 attrib.effective_class_repartition = []
 
     @staticmethod
-    def _get_classes_peps(tutor_classes: 'Tutor') -> List[ClassPepsTuple]:
+    def _get_classes_peps(tutor_classes: 'Tutor', year: int) -> List[ClassPepsTuple]:
         class_codes = [
             "{}{}".format(
                 class_repartition.effective_class.learning_unit_identity.code,
@@ -224,7 +225,7 @@ class AttributionListView(generics.ListAPIView):
         classes_peps = LearningClassYear.objects.annotate(
             full_code=Concat('learning_component_year__learning_unit_year__acronym', 'acronym')
         ).filter(
-            full_code__in=class_codes
+            full_code__in=class_codes,
         ).annotate(
             has_peps=Exists(
                 Student.objects.filter(

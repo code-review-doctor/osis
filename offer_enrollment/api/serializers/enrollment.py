@@ -31,6 +31,7 @@ class EnrollmentSerializer(serializers.Serializer):
     acronym = serializers.CharField()
     year = serializers.IntegerField()
     title = serializers.SerializerMethodField()
+    student_registration_id = serializers.CharField()
 
     def get_title(self, enrollment):
         language = self.context['language']

@@ -23,13 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+
+from django.conf import settings
 from django.urls import reverse
+from django.utils.translation import ugettext_lazy as _
 from rest_framework import status
 from rest_framework.test import APITestCase
 
 from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
+from base.tests.factories.student import StudentFactory
 from education_group.tests.factories.first_year_bachelor import FirstYearBachelorFactory
-from offer_enrollment.api.views.enrollment import MyOfferEnrollmentsListView, MyOfferYearEnrollmentsListView
+from offer_enrollment.api.views.enrollment import MyOfferEnrollmentsListView, OfferEnrollmentsListView
 
 
 class MyOfferEnrollmentsListViewTestCase(APITestCase):
@@ -62,7 +66,7 @@ class MyOfferEnrollmentsListViewTestCase(APITestCase):
         results = response.json()['results']
         self.assertEqual(len(results), 1)
 
-        self.assertCountEqual(list(results[0].keys()), ["acronym", "year", "title"])
+        self.assertCountEqual(list(results[0].keys()), ["acronym", "year", "title", "student_registration_id"])
 
     def test_get_results_assert_acronym_11ba_is_correct(self):
         cohort = FirstYearBachelorFactory()
@@ -80,14 +84,14 @@ class MyOfferEnrollmentsListViewTestCase(APITestCase):
         self.assertEqual(results[0]['acronym'], cohort.education_group_year.acronym.replace('1', '11'))
 
 
-class MyOfferYearEnrollmentsListViewTestCase(APITestCase):
+class OfferEnrollmentsListViewTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
         cls.offer_enrollment = OfferEnrollmentFactory()
         cls.student = cls.offer_enrollment.student
         cls.url = reverse(
-            'offer_enrollment_api_v1:' + MyOfferYearEnrollmentsListView.name,
-            kwargs={'year': cls.offer_enrollment.education_group_year.academic_year.year}
+            'offer_enrollment_api_v1:' + OfferEnrollmentsListView.name,
+            kwargs={'global_id': cls.student.person.global_id}
         )
 
     def setUp(self):
@@ -113,7 +117,22 @@ class MyOfferYearEnrollmentsListViewTestCase(APITestCase):
         results = response.json()['results']
         self.assertEqual(len(results), 1)
 
-        self.assertCountEqual(list(results[0].keys()), ["acronym", "year", "title"])
+        self.assertCountEqual(list(results[0].keys()), ["acronym", "year", "title", "student_registration_id"])
+
+    def test_raise_exception_if_double_noma_for_last_valid_offer_enrollments_year(self):
+        other_student = StudentFactory(person=self.student.person)
+        OfferEnrollmentFactory(
+            education_group_year__academic_year=self.offer_enrollment.education_group_year.academic_year,
+            student=other_student
+        )
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        expected_message = _(
+            "A problem was detected with your registration : 2 registration id's are linked to your user.</br> Please "
+            "contact <a href=\"{registration_department_url}\" "
+            "target=\"_blank\">the Registration department</a>. Thank you."
+        ).format(registration_department_url=settings.REGISTRATION_ADMINISTRATION_URL)
+        self.assertEqual(response.json()['non_field_errors'][0]['detail'], expected_message)
 
     def test_get_results_assert_acronym_11ba_is_correct(self):
         cohort = FirstYearBachelorFactory(
@@ -123,8 +142,12 @@ class MyOfferYearEnrollmentsListViewTestCase(APITestCase):
             cohort_year=cohort,
             education_group_year=cohort.education_group_year
         )
+        url = reverse(
+            'offer_enrollment_api_v1:' + OfferEnrollmentsListView.name,
+            kwargs={'global_id': offer_enrollment_11ba.student.person.global_id}
+        )
         self.client.force_authenticate(user=offer_enrollment_11ba.student.person.user)
-        response = self.client.get(self.url)
+        response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         results = response.json()['results']
@@ -132,13 +155,10 @@ class MyOfferYearEnrollmentsListViewTestCase(APITestCase):
 
         self.assertCountEqual(list(results[0]['acronym']), cohort.education_group_year.acronym.replace('1', '11'))
 
-    def test_get_no_result_for_other_year(self):
+    def test_get_404_for_bad_global_id(self):
         url = reverse(
-            'offer_enrollment_api_v1:' + MyOfferYearEnrollmentsListView.name,
-            kwargs={'year': self.offer_enrollment.education_group_year.academic_year.year + 1}
+            'offer_enrollment_api_v1:' + OfferEnrollmentsListView.name,
+            kwargs={'global_id': self.student.person.global_id + '2'}
         )
         response = self.client.get(url)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-        results = response.json()['results']
-        self.assertEqual(len(results), 0)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

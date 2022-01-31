@@ -127,12 +127,20 @@ table.volumes thead {
     background-color: #5cb85c;
 }
 
+.badge.primary-color {
+    background-color:#337ab7
+}
+
 .badge.warning-color {
     background-color: #f0ad4e;
 }
 
 .badge.danger-color {
     background-color: #d9534f;
+}
+
+.badge.info-color {
+    background-color:#269abc;
 }
 
 .no_label {
@@ -284,4 +292,18 @@ input[type="text"].ui-autocomplete-input:disabled ~ .results_on_deck .ui-icon {
 .trigger_modal{
     cursor: pointer;
     text-decoration: none;
+}
+/* dataTables CSS modification */
+table.dataTable thead .sorting:after,
+table.dataTable thead .sorting_asc:after,
+table.dataTable thead .sorting_desc:after,
+table.dataTable thead .sorting_asc_disabled:after,
+table.dataTable thead .sorting_desc_disabled:after {
+    color: #337ab7 !important;
+    opacity: 1 !important;
+}
+
+table.dataTable thead th.sorting:after {
+    color: #337ab7 !important;
+    opacity: 1 !important;
 }

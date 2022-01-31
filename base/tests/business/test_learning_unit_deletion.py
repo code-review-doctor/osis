@@ -32,8 +32,8 @@ from django.utils.translation import gettext_lazy as _
 
 from assistant.models.tutoring_learning_unit_year import TutoringLearningUnitYear
 from assistant.tests.factories.assistant_mandate import AssistantMandateFactory
-from attribution.tests.factories.attribution import AttributionNewFactory
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
+from attribution.tests.factories.attribution_new import AttributionNewFactory
 from attribution.tests.factories.tutor_application import TutorApplicationFactory
 from base.business.learning_unit import CMS_LABEL_SPECIFICATIONS, CMS_LABEL_PEDAGOGY, CMS_LABEL_SUMMARY
 from base.business.learning_units.simple import deletion
@@ -52,7 +52,7 @@ from base.tests.factories.learning_container_year import LearningContainerYearFa
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.person import AdministrativeManagerFactory
+from base.tests.factories.person import CatalogViewerFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from cms.models.translated_text import TranslatedText
 from cms.tests.factories.text_label import LearningUnitYearTextLabelFactory
@@ -344,14 +344,12 @@ class LearningUnitYearDeletion(TestCase):
         manager = FacultyManagerFactory(entity=entity_version.entity)
 
         # Creation UE
-        learning_unit = LearningUnitFactory()
         l_containeryear = LearningContainerYearFactory(
             academic_year=self.academic_year,
             container_type=learning_container_year_types.COURSE,
             requirement_entity=entity_version.entity
         )
         learning_unit_year = LearningUnitYearFactory(
-            learning_unit=learning_unit,
             academic_year=self.academic_year,
             learning_container_year=l_containeryear,
             subtype=learning_unit_year_subtypes.FULL
@@ -361,8 +359,11 @@ class LearningUnitYearDeletion(TestCase):
         self.assertFalse(manager.person.user.has_perm('base.can_delete_learningunit', learning_unit_year))
 
         # Can remove PARTIM COURSE
-        learning_unit_year.subtype = learning_unit_year_subtypes.PARTIM
-        learning_unit_year.save()
+        learning_unit_year = LearningUnitYearFactory(
+            academic_year=self.academic_year,
+            learning_container_year=l_containeryear,
+            subtype=learning_unit_year_subtypes.PARTIM
+        )
         self.assertTrue(manager.person.user.has_perm('base.can_delete_learningunit', learning_unit_year))
 
         # invalidate cache
@@ -375,18 +376,18 @@ class LearningUnitYearDeletion(TestCase):
 
         self.assertTrue(manager.person.user.has_perm('base.can_delete_learningunit', learning_unit_year))
 
-    def test_cannot_delete_learning_unit_year_with_administrative_manager_role(self):
-        manager = AdministrativeManagerFactory()
-        entity_version = EntityVersionFactory(entity_type=entity_type.FACULTY, acronym="SST",
-                                              start_date=datetime.date(year=1990, month=1, day=1),
-                                              end_date=None)
+    def test_cannot_delete_learning_unit_year_with_catalog_viewer_role(self):
+        catalog_viewer = CatalogViewerFactory()
+        EntityVersionFactory(entity_type=entity_type.FACULTY, acronym="SST",
+                             start_date=datetime.date(year=1990, month=1, day=1),
+                             end_date=None)
         # Cannot remove FULL COURSE
-        self.assertFalse(manager.user.has_perm('base.can_delete_learningunit', self.luy1))
+        self.assertFalse(catalog_viewer.user.has_perm('base.can_delete_learningunit', self.luy1))
 
         # Cannot remove PARTIM COURSE
         self.luy1.subtype = learning_unit_year_subtypes.PARTIM
         self.luy1.save()
-        self.assertFalse(manager.user.has_perm('base.can_delete_learningunit', self.luy1))
+        self.assertFalse(catalog_viewer.user.has_perm('base.can_delete_learningunit', self.luy1))
         self.luy1.subtype = learning_unit_year_subtypes.FULL
         self.luy1.save()
 

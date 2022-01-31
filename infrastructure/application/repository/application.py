@@ -28,15 +28,15 @@ import operator
 from decimal import Decimal
 from typing import List, Optional
 
-from django.db import models
+from django.db import models, transaction
 from django.db.models import F, Q, OuterRef, fields, Case, When, Subquery
 
 from attribution.models.tutor_application import TutorApplication
-from base.auth.roles.tutor import Tutor
 from base.models.enums import learning_component_year_type, learning_unit_year_subtypes
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit_year import LearningUnitYear
+from base.models.person import Person
 from ddd.logic.application.domain.builder.application_builder import ApplicationBuilder
 from ddd.logic.application.domain.model.applicant import ApplicantIdentity
 from ddd.logic.application.domain.model.application import ApplicationIdentity, Application
@@ -64,7 +64,7 @@ class ApplicationRepository(IApplicationRepository):
             )
             qs = qs.filter(filter_clause)
         if applicant_id is not None:
-            qs = qs.filter(tutor__person__global_id=applicant_id.global_id)
+            qs = qs.filter(person__global_id=applicant_id.global_id)
         results = []
         for row_as_dict in qs:
             dto_from_database = ApplicationFromRepositoryDTO(**row_as_dict)
@@ -90,7 +90,7 @@ class ApplicationRepository(IApplicationRepository):
         ).values('volume_declared_vacant_casted')
 
         main_qs = TutorApplication.objects.filter(
-            tutor__person__global_id=applicant_id.global_id,
+            person__global_id=applicant_id.global_id,
             learning_container_year__academic_year__year=academic_year_id.year
         ).annotate(
             code=F('learning_container_year__acronym'),
@@ -143,7 +143,7 @@ class ApplicationRepository(IApplicationRepository):
 
     @classmethod
     def save(cls, application: Application) -> None:
-        tutor_id = Tutor.objects.get(person__global_id=application.applicant_id.global_id).pk
+        person_id = Person.objects.get(global_id=application.applicant_id.global_id).pk
         learning_container_year_id = LearningContainerYear.objects.get(
             acronym=application.vacant_course_id.code,
             academic_year__year=application.vacant_course_id.year
@@ -152,7 +152,7 @@ class ApplicationRepository(IApplicationRepository):
         obj, created = TutorApplication.objects.update_or_create(
             uuid=application.entity_id.uuid,
             defaults={
-                "tutor_id": tutor_id,
+                "person_id": person_id,
                 "learning_container_year_id": learning_container_year_id,
                 "volume_lecturing": application.lecturing_volume,
                 "volume_pratical_exercice": application.practical_volume,
@@ -160,19 +160,19 @@ class ApplicationRepository(IApplicationRepository):
                 "course_summary": application.course_summary
             }
         )
-        queue.notify_application_saved(application)
+        transaction.on_commit(lambda: queue.notify_application_saved(application))
 
     @classmethod
     def delete(cls, entity_id: ApplicationIdentity, **kwargs: ApplicationService) -> None:
         application = cls.get(entity_id)
 
         TutorApplication.objects.filter(uuid=entity_id.uuid).delete()
-        queue.notify_application_deleted(application)
+        transaction.on_commit(lambda: queue.notify_application_deleted(application))
 
 
 def _application_base_qs():
     return TutorApplication.objects.annotate(
-        applicant_global_id=F('tutor__person__global_id'),
+        applicant_global_id=F('person__global_id'),
         vacant_course_code=F('learning_container_year__acronym'),
         vacant_course_year=F('learning_container_year__academic_year__year'),
         lecturing_volume=F('volume_lecturing'),

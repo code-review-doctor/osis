@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@ from ddd.logic.application.commands import (
     SearchVacantCoursesCommand,
     SendApplicationsSummaryCommand,
     UpdateApplicationCommand,
+    SendAttributionEndDateReachedSummaryCommand,
 )
 from ddd.logic.application.use_case.read.get_attributions_about_to_expire_service import \
     get_attributions_about_to_expire
@@ -46,6 +47,8 @@ from ddd.logic.application.use_case.write.apply_on_vacant_course_service import 
 from ddd.logic.application.use_case.write.delete_application_service import delete_application
 from ddd.logic.application.use_case.write.renew_multiple_attributions_service import renew_multiple_attributions
 from ddd.logic.application.use_case.write.send_applications_summary import send_applications_summary
+from ddd.logic.application.use_case.write.send_attribution_end_date_reached_summary import \
+    send_emails_to_teachers_with_ending_attributions
 from ddd.logic.application.use_case.write.update_application_service import update_application
 from ddd.logic.effective_class_repartition.commands import (
     DistributeClassToTutorCommand,
@@ -56,7 +59,7 @@ from ddd.logic.effective_class_repartition.commands import (
     SearchAttributionsToLearningUnitCommand,
     SearchClassesEnseignantCommand,
     SearchTutorsDistributedToClassCommand,
-    UnassignTutorClassCommand,
+    UnassignTutorClassCommand, SearchClassesParNomEnseignantCommand,
 )
 from ddd.logic.effective_class_repartition.use_case.read.get_attribution_service import get_attribution
 from ddd.logic.effective_class_repartition.use_case.read.get_tutor_repartition_classes_service import \
@@ -67,6 +70,8 @@ from ddd.logic.effective_class_repartition.use_case.read.search_attributions_to_
     search_attributions_to_learning_unit
 from ddd.logic.effective_class_repartition.use_case.read.search_classes_enseignant_service import \
     search_classes_enseignant
+from ddd.logic.effective_class_repartition.use_case.read.search_classes_par_nom_enseignant_service import \
+    search_classes_par_nom_prenom
 from ddd.logic.effective_class_repartition.use_case.read.search_effective_classes_distributed_service import \
     search_tutors_distributed_to_class
 from ddd.logic.effective_class_repartition.use_case.write.distribute_class_to_tutor_service import \
@@ -80,7 +85,7 @@ from ddd.logic.encodage_des_notes.encodage.commands import (
     GetFeuilleDeNotesGestionnaireCommand,
     GetPeriodeEncodageCommand,
     GetProgressionGeneraleGestionnaireCommand,
-    RechercherNotesCommand,
+    RechercherNotesCommand, SearchEnseignantsCommand,
 )
 from ddd.logic.encodage_des_notes.encodage.use_case.read.get_cohortes_gestionnaire import get_cohortes_gestionnaire
 from ddd.logic.encodage_des_notes.encodage.use_case.read.get_feuille_de_notes_service import \
@@ -88,6 +93,7 @@ from ddd.logic.encodage_des_notes.encodage.use_case.read.get_feuille_de_notes_se
 from ddd.logic.encodage_des_notes.encodage.use_case.read.get_periode_encodage_service import get_periode_encodage
 from ddd.logic.encodage_des_notes.encodage.use_case.read.get_progression_generale_encodage_service import \
     get_progression_generale_gestionnaire
+from ddd.logic.encodage_des_notes.encodage.use_case.read.rechercher_enseignants import rechercher_enseignants
 from ddd.logic.encodage_des_notes.encodage.use_case.read.rechercher_notes_service import rechercher_notes
 from ddd.logic.encodage_des_notes.encodage.use_case.write.encoder_notes_service import encoder_notes
 from ddd.logic.encodage_des_notes.shared_kernel.commands import GetEncoderNotesRapportCommand
@@ -95,7 +101,7 @@ from ddd.logic.encodage_des_notes.shared_kernel.use_case.read.get_encoder_notes_
     get_encoder_notes_rapport
 from ddd.logic.encodage_des_notes.soumission.commands import (
     AssignerResponsableDeNotesCommand,
-    EcraserAdresseFeuilleDeNotesPremiereAnneeDeBachelier,
+    SupprimerAdresseFeuilleDeNotesPremiereAnneeDeBachelier,
     EncoderAdresseEntiteCommeAdresseFeuilleDeNotes,
     EncoderAdresseFeuilleDeNotesSpecifique,
     EncoderNotesEtudiantCommand,
@@ -105,7 +111,7 @@ from ddd.logic.encodage_des_notes.soumission.commands import (
     GetProgressionGeneraleCommand,
     GetResponsableDeNotesCommand,
     SearchAdressesFeuilleDeNotesCommand,
-    SoumettreNotesCommand,
+    SoumettreNotesCommand, SearchResponsableDeNotesCommand,
 )
 from ddd.logic.encodage_des_notes.soumission.use_case.read.get_addresse_feuille_de_notes_service import \
     get_adresse_feuille_de_notes
@@ -119,11 +125,13 @@ from ddd.logic.encodage_des_notes.soumission.use_case.read.get_responsable_de_no
 from ddd.logic.encodage_des_notes.soumission.use_case.read.search_donnees_administratives_feuille_de_notes_service \
     import \
     search_donnees_administratives_feuille_de_notes
+from ddd.logic.encodage_des_notes.soumission.use_case.read.search_responsable_de_notes_service import \
+    search_responsables_de_notes
 from ddd.logic.encodage_des_notes.soumission.use_case.write.assigner_responsable_de_notes_service import \
     assigner_responsable_de_notes
 from ddd.logic.encodage_des_notes.soumission.use_case.write \
-    .ecraser_adresse_feuille_de_note_premiere_annee_de_bachelier_par_adresse_du_bachelier_service import \
-    ecraser_adresse_feuille_de_note_premiere_annee_de_bachelier_par_adresse_du_bachelier
+    .supprimer_adresse_feuille_de_note_premiere_annee_de_bachelier import \
+    supprimer_adresse_feuille_de_note_premiere_annee_de_bachelier
 from ddd.logic.encodage_des_notes.soumission.use_case.write \
     .encoder_adresse_entite_comme_adresse_feuille_de_notes_service import \
     encoder_adresse_entite_comme_adresse_feuille_de_notes
@@ -175,6 +183,7 @@ from infrastructure.application.repository.application import ApplicationReposit
 from infrastructure.application.repository.application_calendar import ApplicationCalendarRepository
 from infrastructure.application.repository.vacant_course import VacantCourseRepository
 from infrastructure.application.services.applications_summary import ApplicationsMailSummary
+from infrastructure.application.services.attribution_end_date_reached_summary import AttributionsEndDateReachedSummary
 from infrastructure.application.services.learning_unit_service import LearningUnitTranslator
 from infrastructure.effective_class_repartition.domain.service.tutor_attribution import \
     TutorAttributionToLearningUnitTranslator
@@ -195,7 +204,6 @@ from infrastructure.encodage_de_notes.shared_kernel.service.periode_encodage_not
 from infrastructure.encodage_de_notes.shared_kernel.service.signaletique_etudiant import \
     SignaletiqueEtudiantTranslator
 from infrastructure.encodage_de_notes.shared_kernel.service.unite_enseignement import UniteEnseignementTranslator
-from infrastructure.encodage_de_notes.soumission.domain.service.deliberation import DeliberationTranslator
 from infrastructure.encodage_de_notes.soumission.domain.service.entites_cohorte import EntitesCohorteTranslator
 from infrastructure.encodage_de_notes.soumission.domain.service.historiser_notes import HistoriserNotesService
 from infrastructure.encodage_de_notes.soumission.domain.service.notifier_soumission_notes import NotifierSoumissionNotes
@@ -296,7 +304,7 @@ class MessageBusCommands(AbstractMessageBusCommands):
         ),
         RenewMultipleAttributionsCommand: lambda cmd: renew_multiple_attributions(
             cmd, ApplicationRepository(), ApplicationCalendarRepository(),
-            ApplicantRepository(), VacantCourseRepository()
+            ApplicantRepository(), VacantCourseRepository(), LearningUnitTranslator()
         ),
         DeleteApplicationCommand: lambda cmd: delete_application(cmd, ApplicationRepository()),
         SearchApplicationByApplicantCommand: lambda cmd: search_applications_by_applicant(
@@ -402,8 +410,9 @@ class MessageBusCommands(AbstractMessageBusCommands):
             cmd,
             PeriodeEncodageNotesTranslator(),
             InscriptionExamenTranslator(),
-            DeliberationTranslator(),
             AdresseFeuilleDeNotesRepository(),
+            EntiteUCLRepository(),
+            EntitesCohorteTranslator(),
         ),
         EncoderNotesCommand: lambda cmd: encoder_notes(
             cmd,
@@ -442,6 +451,7 @@ class MessageBusCommands(AbstractMessageBusCommands):
             UniteEnseignementTranslator(),
             CohortesDuGestionnaireTranslator(),
             InscriptionExamenTranslator(),
+            AttributionEnseignantTranslator(),
         ),
         GetPeriodeEncodageCommand: lambda cmd: get_periode_encodage(
             cmd,
@@ -452,25 +462,32 @@ class MessageBusCommands(AbstractMessageBusCommands):
                 cmd,
                 AdresseFeuilleDeNotesRepository(),
                 EntiteUCLRepository(),
-                EntitesCohorteTranslator()
+                EntitesCohorteTranslator(),
+                PeriodeEncodageNotesTranslator(),
         ),
         EncoderAdresseFeuilleDeNotesSpecifique: lambda cmd: encoder_adresse_feuille_de_notes_specifique(
             cmd,
             AdresseFeuilleDeNotesRepository(),
+            PeriodeEncodageNotesTranslator(),
         ),
-        EcraserAdresseFeuilleDeNotesPremiereAnneeDeBachelier: lambda cmd:
-            ecraser_adresse_feuille_de_note_premiere_annee_de_bachelier_par_adresse_du_bachelier(
+        SupprimerAdresseFeuilleDeNotesPremiereAnneeDeBachelier: lambda cmd: \
+            supprimer_adresse_feuille_de_note_premiere_annee_de_bachelier(
                 cmd,
                 AdresseFeuilleDeNotesRepository(),
+                PeriodeEncodageNotesTranslator(),
         ),
         GetAdresseFeuilleDeNotesServiceCommand: lambda cmd: get_adresse_feuille_de_notes(
             cmd,
             AdresseFeuilleDeNotesRepository(),
+            PeriodeEncodageNotesTranslator(),
+            EntiteUCLRepository(),
+            EntitesCohorteTranslator(),
         ),
         GetChoixEntitesAdresseFeuilleDeNotesCommand: lambda cmd: get_choix_entites_adresse_feuille_de_notes(
             cmd,
             EntiteUCLRepository(),
-            EntitesCohorteTranslator()
+            EntitesCohorteTranslator(),
+            PeriodeEncodageNotesTranslator(),
         ),
         GetResponsableDeNotesCommand: lambda cmd: get_responsable_de_notes(
             cmd,
@@ -483,6 +500,25 @@ class MessageBusCommands(AbstractMessageBusCommands):
         GetEncoderNotesRapportCommand: lambda cmd: get_encoder_notes_rapport(
             cmd,
             EncoderNotesRapportRepository()
+        ),
+        SearchResponsableDeNotesCommand: lambda cmd: search_responsables_de_notes(
+            cmd,
+            ResponsableDeNotesRepository()
+        ),
+        SearchEnseignantsCommand: lambda cmd: rechercher_enseignants(
+            cmd,
+            AttributionEnseignantTranslator(),
+            PeriodeEncodageNotesTranslator(),
+        ),
+        SearchClassesParNomEnseignantCommand: lambda cmd: search_classes_par_nom_prenom(
+            cmd,
+            TutorAttributionToLearningUnitTranslator(),
+            TutorRepository(),
+        ),
+        SendAttributionEndDateReachedSummaryCommand: lambda cmd: send_emails_to_teachers_with_ending_attributions(
+            ApplicationCalendarRepository(),
+            ApplicantRepository(),
+            AttributionsEndDateReachedSummary()
         ),
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 

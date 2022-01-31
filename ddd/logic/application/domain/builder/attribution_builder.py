@@ -43,6 +43,8 @@ class AttributionBuilder(RootEntityBuilder):
                 academic_year=AcademicYearIdentityBuilder.build_from_year(year=dto.course_id_year)
             ),
             course_title=dto.course_title or '',
+            course_type=dto.course_type,
+            course_is_in_suppression_proposal=dto.course_is_in_suppression_proposal,
             end_year=AcademicYearIdentityBuilder.build_from_year(year=dto.end_year),
             start_year=AcademicYearIdentityBuilder.build_from_year(year=dto.start_year),
             function=Functions[dto.function] if dto.function else None,

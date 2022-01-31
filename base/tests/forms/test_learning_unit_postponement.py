@@ -51,6 +51,7 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from learning_unit.tests.factories.faculty_manager import FacultyManagerFactory
+from program_management.models.element import Element
 
 FULL_ACRONYM = 'LAGRO1000'
 SUBDIVISION_ACRONYM = 'C'
@@ -158,6 +159,7 @@ class TestLearningUnitPostponementFormInit(LearningUnitPostponementFormContextMi
         self.assertEqual(len(form._forms_to_delete), 4)
 
     def test_forms_property_no_learning_unit_year_in_future(self):
+        Element.objects.filter(learning_unit_year__learning_unit=self.learn_unit_structure.learning_unit_full).delete()
         LearningUnitYear.objects.filter(
             learning_unit=self.learn_unit_structure.learning_unit_full,
             academic_year__year__gt=self.current_academic_year.year
@@ -228,6 +230,7 @@ class TestLearningUnitPostponementFormSave(LearningUnitPostponementFormContextMi
 
     def setUp(self):
         super().setUp()
+        Element.objects.filter(learning_unit_year__learning_unit=self.learn_unit_structure.learning_unit_full).delete()
         LearningUnitYear.objects.filter(
             learning_unit=self.learn_unit_structure.learning_unit_full,
             academic_year__year__gt=self.current_academic_year.year
@@ -243,6 +246,9 @@ class TestLearningUnitPostponementFormSave(LearningUnitPostponementFormContextMi
             self.learning_unit_year_partim,
             self.person
         )
+        Element.objects.filter(
+            learning_unit_year__learning_unit=self.learn_unit_structure.learning_unit_partim
+        ).delete()
         LearningUnitYear.objects.filter(
             learning_unit=self.learn_unit_structure.learning_unit_partim,
             academic_year__year__gt=self.current_academic_year.year
@@ -324,6 +330,7 @@ class TestLearningUnitPostponementFormSave(LearningUnitPostponementFormContextMi
            3 Update because LUY exist until current_academic_year + 2
            4 Create because LUY doesn't exist after current_academic_year + 2
         """
+        Element.objects.filter(learning_unit_year__learning_unit=self.learn_unit_structure.learning_unit_full).delete()
         LearningUnitYear.objects.filter(
             learning_unit=self.learn_unit_structure.learning_unit_full,
             academic_year__year__gt=self.current_academic_year.year + 2

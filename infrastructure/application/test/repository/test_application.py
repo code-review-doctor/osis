@@ -66,10 +66,10 @@ class ApplicationRepositorySearch(TestCase):
         cls.applicant_id = ApplicantIdentity(global_id=global_id)
         cls.tutor_application_dbs = [
             TutorApplicationFactory(
-                tutor__person__global_id=global_id, learning_container_year__academic_year__year=2018
+                person__global_id=global_id, learning_container_year__academic_year__year=2018
             ),
             TutorApplicationFactory(
-                tutor__person__global_id=global_id, learning_container_year__academic_year__year=2016
+                person__global_id=global_id, learning_container_year__academic_year__year=2016
             ),
             TutorApplicationFactory(learning_container_year__academic_year__year=2015),
         ]

@@ -235,7 +235,9 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
     def search_last_occurence(cls, from_year: int) -> List['ProgramTreeVersion']:
         subquery_max_existing_year_for_offer = EducationGroupVersion.objects.filter(
             offer__academic_year__year__gte=from_year,
-            offer__education_group=OuterRef("offer__education_group")
+            offer__education_group=OuterRef("offer__education_group"),
+            version_name=OuterRef('version_name'),
+            transition_name=OuterRef('transition_name')
         ).values(
             "offer__education_group"
         ).annotate(

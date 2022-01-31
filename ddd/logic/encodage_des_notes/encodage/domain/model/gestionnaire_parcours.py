@@ -27,6 +27,7 @@ from typing import Set
 
 import attr
 
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import PasGestionnaireParcoursCohorteException
 from osis_common.ddd import interface
 
@@ -45,4 +46,9 @@ class GestionnaireParcours(interface.RootEntity):
 
     def verifier_gere_cohorte(self, nom_cohorte) -> None:
         if nom_cohorte not in self.cohortes_gerees:
-            raise PasGestionnaireParcoursCohorteException(nom_cohorte)
+            raise MultipleBusinessExceptions(exceptions=[PasGestionnaireParcoursCohorteException(nom_cohorte)])
+
+    def verifier_gere_cohortes(self, noms_cohortes: Set[str]) -> None:
+        cohortes_non_gerees = noms_cohortes - self.cohortes_gerees
+        if cohortes_non_gerees:
+            raise MultipleBusinessExceptions(exceptions=[PasGestionnaireParcoursCohorteException(cohortes_non_gerees)])

@@ -24,16 +24,17 @@
 #
 ##############################################################################
 from django.utils.functional import cached_property
+from django.utils.translation import gettext_lazy as _
 from rest_framework import exceptions
 from rest_framework.exceptions import ValidationError
 from rest_framework.views import APIView
 
+from assessments.export.score_sheet_pdf import print_notes
 from assessments.views.serializers.score_sheet import ScoreSheetPDFSerializer
 from base.auth.roles.tutor import Tutor
 from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand, \
     SearchAdressesFeuilleDeNotesCommand
 from infrastructure.messages_bus import message_bus_instance
-from osis_common.document import paper_sheet
 from osis_role.contrib.helper import EntityRoleHelper
 
 
@@ -54,15 +55,10 @@ class ScoreSheetsPDFExportAPIView(APIView):
             raise ValidationError(detail="codes queryparam missing")
 
         score_sheet_serialized = ScoreSheetPDFSerializer(
-            instance=[
-                {
-                    'feuille_de_notes': self.get_feuille_de_notes(code),
-                    'donnees_administratives': self.get_donnees_administratives(code)
-                } for code in codes_unites_enseignement
-            ],
+            instance=self._get_documents(codes_unites_enseignement),
             context={'person': self.person}
         )
-        return paper_sheet.print_notes(score_sheet_serialized.data)
+        return print_notes(score_sheet_serialized.data)
 
     def get_donnees_administratives(self, code_unite_enseignement: str):
         cmd = SearchAdressesFeuilleDeNotesCommand(
@@ -78,3 +74,21 @@ class ScoreSheetsPDFExportAPIView(APIView):
             )
             return message_bus_instance.invoke(cmd)
         raise exceptions.PermissionDenied()
+
+    def _get_documents(self, codes_unites_enseignement):
+        documents = []
+        validation_errors = []
+        for code in codes_unites_enseignement:
+            feuille_de_notes = self.get_feuille_de_notes(code)
+            if feuille_de_notes:
+                documents.append(
+                    {
+                        'feuille_de_notes': feuille_de_notes,
+                        'donnees_administratives': self.get_donnees_administratives(code),
+                    }
+                )
+            else:
+                validation_errors.append(_('There is no enrollment to the exam for this learning unit'))
+        if validation_errors:
+            raise ValidationError(detail=", ".join([str(error) for error in validation_errors]))
+        return documents

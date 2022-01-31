@@ -23,9 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from functools import partial
+
 from rest_framework import serializers
 
 from reference.models.language import Language
+
+
+RelatedLanguageField = partial(
+    serializers.SlugRelatedField,
+    slug_field='code',
+    queryset=Language.objects.all(),
+    allow_null=True,
+)
 
 
 class LanguageSerializer(serializers.ModelSerializer):
@@ -34,4 +44,5 @@ class LanguageSerializer(serializers.ModelSerializer):
         fields = (
             'code',
             'name',
+            'name_en'
         )

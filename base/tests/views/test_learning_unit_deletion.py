@@ -26,7 +26,7 @@
 import datetime
 
 from django.contrib import messages
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, Permission
 from django.contrib.messages.api import get_messages
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.core.exceptions import PermissionDenied
@@ -35,9 +35,9 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from waffle.testutils import override_flag
 
-from attribution.tests.factories.attribution import AttributionNewFactory
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from attribution.tests.factories.attribution_class import AttributionClassFactory
+from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.models.enums import entity_type
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.academic_calendar_type import AcademicCalendarTypes
@@ -64,6 +64,8 @@ class LearningUnitDelete(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.user = UserFactory(username="jeandp")
+        delete_learning_unit_proposal_permission = Permission.objects.get(codename="can_delete_learningunit")
+        cls.user.user_permissions.add(delete_learning_unit_proposal_permission)
         cls.entity_version = EntityVersionFactory(entity_type=entity_type.FACULTY, acronym="SST",
                                                   start_date=datetime.date(year=1990, month=1, day=1),
                                                   end_date=None)
@@ -139,13 +141,14 @@ class LearningUnitDelete(TestCase):
         self.assertEqual(response.url, reverse('learning_units'))
 
     def test_delete_all_learning_units_year_case_error_start_date(self):
+        user = UserFactory(username="duke")
         learning_unit_years = self.learning_unit_year_list
         request_factory = RequestFactory()
         learning_unit_years[1].learning_unit.start_year = AcademicYearFactory(year=2014)
         learning_unit_years[1].learning_unit.save()
 
         request = request_factory.post(reverse(delete_all_learning_units_year, args=[learning_unit_years[1].id]))
-        request.user = self.user
+        request.user = user
         setattr(request, 'session', 'session')
         setattr(request, '_messages', FallbackStorage(request))
 

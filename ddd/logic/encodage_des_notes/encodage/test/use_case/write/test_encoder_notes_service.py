@@ -111,6 +111,15 @@ class EncoderNoteTest(SimpleTestCase):
         self.addCleanup(message_bus_patcher.stop)
         self.message_bus = message_bus_instance
 
+    def test_command_should_upper_case_note_field(self):
+        cmd = EncoderNoteCommand(
+            noma=self.note.noma,
+            email=self.note.email,
+            code_unite_enseignement=self.note.code_unite_enseignement,
+            note="a",
+        )
+        self.assertEqual(cmd.note, "A")
+
     def test_should_empecher_si_periode_fermee_depuis_hier(self):
         hier = datetime.date.today() - datetime.timedelta(days=1)
         date_dans_le_passe = DateDTO(jour=hier.day, mois=hier.month, annee=hier.year)
@@ -179,7 +188,7 @@ class EncoderNoteTest(SimpleTestCase):
         )
         self.cohortes_gestionnaire_trans.search = lambda *args, **kwargs: {cohorte_gestionnaire}
 
-        with self.assertRaises(PasGestionnaireParcoursCohorteException):
+        with self.assertRaises(MultipleBusinessExceptions):
             self.message_bus.invoke(self.cmd)
 
     def test_should_empecher_si_date_de_remise_est_hier(self):
@@ -471,14 +480,10 @@ class EncoderNoteTest(SimpleTestCase):
         self.assertIsInstance(exception, EncoderNotesEnLotLigneBusinessExceptions)
         self.assertEqual(exception.message, NoteIncorrecteException(note_incorrecte=cmd.notes_encodees[3].note).message)
 
-    @mock.patch("infrastructure.messages_bus.NoteEtudiantGestionnaireRepository")
-    def test_should_sauvegarder_note_meme_si_autre_note_en_erreur(self, mock_note_repo):
+    def test_should_sauvegarder_note_meme_si_autre_note_en_erreur(self):
         note = NoteManquanteEtudiantFactory()
         self.repository.save(note)
-        appels_save = []
-        fake_repo = NoteEtudiantInMemoryRepository()
-        fake_repo.save = lambda *args, **kwargs: appels_save.append(1)
-        mock_note_repo.return_value = fake_repo
+        note_valide_qui_doit_etre_persistee = "7"
         cmd = EncoderNotesCommand(
             matricule_fgs_gestionnaire=self.matricule_gestionnaire,
             notes_encodees=[
@@ -492,7 +497,7 @@ class EncoderNoteTest(SimpleTestCase):
                     noma=self.note.noma,
                     email=self.note.email,
                     code_unite_enseignement=self.note.code_unite_enseignement,
-                    note="7",
+                    note=note_valide_qui_doit_etre_persistee,
                 ),
             ],
         )
@@ -504,8 +509,8 @@ class EncoderNoteTest(SimpleTestCase):
         self.assertEqual(exception.message, NoteIncorrecteException(note_incorrecte=cmd.notes_encodees[0].note).message)
 
         self.assertEqual(
-            len(appels_save),
-            1,
+            float(note_valide_qui_doit_etre_persistee),
+            self.repository.get(self.note.entity_id).note.value,
             "Meme en cas d'erreur sur certaines notes, les notes valides doivent être persistées. "
             "Dans notre cas de test ici, 1 note valide == 1 appel à repository.save()",
         )

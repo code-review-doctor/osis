@@ -42,7 +42,7 @@ from osis_common.decorators.download import set_download_cookie
 
 PAGE_SIZE = A4
 MARGIN_SIZE = 15 * mm
-COLS_WIDTH = [30*mm, 40*mm, 40*mm, 35*mm, 30*mm]
+COLS_WIDTH = [30*mm, 80*mm, 35*mm, 30*mm]
 STUDENTS_PER_PAGE = 20
 DATE_FORMAT = "%d/%m/%Y"
 
@@ -77,7 +77,6 @@ def get_data_schema():
                  Required("decimal_scores"): bool,
                  Required("programs"): [
                     {
-                      Required("deliberation_date"): str,
                       Required("acronym"): str,
                       Required("address"): {},
                       Required("enrollments"): [{
@@ -188,7 +187,9 @@ def _data_to_pdf_content(json_data):
         for program in learn_unit_year['programs']:
             nb_students = len(program['enrollments'])
             for enrollments_by_pdf_page in chunks(program['enrollments'], STUDENTS_PER_PAGE):
-                content.extend(_build_page_content(enrollments_by_pdf_page, learn_unit_year, nb_students, program, styles))
+                content.extend(
+                    _build_page_content(enrollments_by_pdf_page, learn_unit_year, nb_students, program, styles)
+                )
     return content
 
 
@@ -212,14 +213,15 @@ def _build_page_content(enrollments_by_pdf_page, learn_unit_year, nb_students, p
 def _build_exam_enrollments_table(enrollments_by_pdf_page, styles):
     students_table = _students_table_header()
     for enrollment in enrollments_by_pdf_page:
-        student_last_name = enrollment["last_name"] if enrollment["last_name"] else ""
-        student_first_name = enrollment["first_name"] if enrollment["first_name"] else ""
+        student_name = "{}, {}".format(
+            enrollment["last_name"] if enrollment["last_name"] else "",
+            enrollment["first_name"] if enrollment["first_name"] else ""
+        )
 
         # 1. Append the examEnrollment to the table 'students_table'
         students_table.append([
             enrollment["registration_id"],
-            Paragraph(student_last_name, styles['Normal']),
-            Paragraph(student_first_name, styles['Normal']),
+            Paragraph(student_name, styles['Normal']),
             enrollment["score"],
             enrollment["deadline"]
         ])
@@ -241,8 +243,7 @@ def _build_exam_enrollments_table(enrollments_by_pdf_page, styles):
 
 def _students_table_header():
     data = [['''%s''' % _('Reg. No.'),
-             '''%s''' % _('Lastname'),
-             '''%s''' % _('Firstname'),
+             '''%s''' % _('Name'),
              '''%s''' % _('Score'),
              '''%s''' % _('Submit data')
              ]]
@@ -341,7 +342,6 @@ def _build_program_block_content(learning_unit_year, nb_students, program, style
     text_left_style.alignment = TA_LEFT
     text_left_style.fontSize = 10
     return [
-        Paragraph(_get_deliberation_date_text(program), styles["Normal"]),
         Paragraph(_get_academic_year_text(learning_unit_year), text_left_style),
         Paragraph(_get_learning_unit_year_text(learning_unit_year), styles["Normal"]),
         Paragraph(_get_program_text(nb_students, program), styles["Normal"]),
@@ -358,10 +358,6 @@ def _get_program_text(nb_students, program):
 
 def _get_learning_unit_year_text(learning_unit_year):
     return "<strong>{} : {}</strong>".format(learning_unit_year['acronym'], learning_unit_year['title'])
-
-
-def _get_deliberation_date_text(program):
-    return '%s : %s' % (_('Deliberation date'), program['deliberation_date'] or '')
 
 
 def _get_academic_year_text(learning_unit_year):

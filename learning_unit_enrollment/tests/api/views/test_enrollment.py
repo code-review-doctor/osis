@@ -27,9 +27,12 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from base.models.enums import offer_enrollment_state
+from base.models.enums import offer_enrollment_state, learning_container_year_types, learning_unit_year_subtypes
 from base.models.enums.learning_component_year_type import LECTURING
+from base.tests.factories.academic_year import create_current_academic_year
+from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearPartimFactory, LearningUnitYearFactory
 from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
 from base.tests.factories.user import UserFactory
 from education_group.tests.factories.first_year_bachelor import FirstYearBachelorFactory
@@ -118,6 +121,71 @@ class LearningUnitEnrollmentsListViewTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         results = response.json()['results']
         self.assertEqual(len(results), 0)
+
+    def test_should_get_results_for_partim_only(self):
+
+        learning_unit_year_full, learning_unit_year_partim1 = self._create_ue_with_partims()
+
+        LearningUnitEnrollmentFactory(learning_unit_year=learning_unit_year_partim1)
+
+        LearningUnitEnrollmentFactory(learning_unit_year=learning_unit_year_full)
+
+        url = reverse('learning_unit_enrollment_api_v1:' + LearningUnitEnrollmentsListView.name, args=[
+            learning_unit_year_partim1.acronym,
+            learning_unit_year_partim1.academic_year.year
+        ])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        results = response.json()['results']
+        self.assertEqual(len(results), 1)
+
+        self.assertEqual(
+            results[0]['learning_unit_acronym'],
+            "{}".format(learning_unit_year_partim1.acronym)
+        )
+
+    def test_should_get_results_for_partim_and_ue(self):
+        learning_unit_year_full, learning_unit_year_partim1 = self._create_ue_with_partims()
+
+        LearningUnitEnrollmentFactory(learning_unit_year=learning_unit_year_partim1)
+
+        LearningUnitEnrollmentFactory(learning_unit_year=learning_unit_year_full)
+
+        url = reverse('learning_unit_enrollment_api_v1:' + LearningUnitEnrollmentsListView.name, args=[
+            learning_unit_year_full.acronym,
+            learning_unit_year_full.academic_year.year
+        ])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        results = response.json()['results']
+
+        results_acronyms = [item['learning_unit_acronym'] for item in results]
+        expected_acronyms = [learning_unit_year_full.acronym, learning_unit_year_partim1.acronym]
+
+        self.assertCountEqual(results_acronyms, expected_acronyms)
+
+    def _create_ue_with_partims(self):
+        current_academic_year = create_current_academic_year()
+        learning_container_year = LearningContainerYearFactory(
+            academic_year=current_academic_year,
+            container_type=learning_container_year_types.COURSE,
+            acronym="LBRT2101",
+        )
+        learning_unit_year_full = LearningUnitYearFactory(
+            learning_container_year=learning_container_year,
+            acronym="LBRT2101",
+            academic_year=current_academic_year,
+            subtype=learning_unit_year_subtypes.FULL,
+        )
+        learning_unit_year_partim1 = LearningUnitYearPartimFactory(
+            learning_container_year=learning_container_year,
+            acronym="LBRT2101A",
+            academic_year=current_academic_year,
+
+        )
+        return learning_unit_year_full, learning_unit_year_partim1
 
 
 class MyLearningUnitEnrollmentsListViewTestCase(APITestCase):

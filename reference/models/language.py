@@ -24,10 +24,10 @@
 #
 ##############################################################################
 from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
+from osis_common.utils.models import get_object_or_none
 
 # FIXME Should use language codes enumeration of base
 EN_CODE_LANGUAGE = 'EN'
@@ -53,6 +53,7 @@ class Language(SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     name = models.CharField(max_length=80, unique=True)
+    name_en = models.CharField(max_length=80, blank=True)
     recognized = models.BooleanField(default=False)
 
     def __str__(self):
@@ -60,10 +61,7 @@ class Language(SerializableModel):
 
 
 def find_by_id(language_id):
-    try:
-        return Language.objects.get(pk=language_id)
-    except ObjectDoesNotExist:
-        return None
+    return get_object_or_none(Language, pk=language_id)
 
 
 def find_language_in_settings(language_code):
