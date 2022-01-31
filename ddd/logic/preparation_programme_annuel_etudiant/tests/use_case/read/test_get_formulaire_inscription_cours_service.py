@@ -67,7 +67,7 @@ class GetFormulaireInscriptionCoursTest(SimpleTestCase):
         obj_FormationDTO_de_depart = CatalogueFormationsTranslatorInMemory.dtos[1]
         cmd = GetFormulaireInscriptionCoursCommand(
             annee=ANNEE,
-            code_programme='LCORP201S',
+            code_programme='LCORP203S',
         )
 
         self._assert_equal_tous_les_attributs_ok_apres_conversion(cmd, obj_FormationDTO_de_depart)
