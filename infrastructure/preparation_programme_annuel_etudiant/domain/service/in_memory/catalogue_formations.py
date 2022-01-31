@@ -29,51 +29,178 @@ from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_
     ICatalogueFormationsTranslator
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, ContenuGroupementCatalogueDTO, \
     GroupementDTO, GroupementCatalogueDTO, UniteEnseignementCatalogueDTO
+from program_management.ddd.domain.program_tree_version import STANDARD
+
+ANNEE = 2021
 
 
-class CatalogueFormationsInMemoryTranslator(ICatalogueFormationsTranslator):
-    dtos = [
-        FormationDTO(
-            racine=ContenuGroupementCatalogueDTO(
-                groupement_contenant=GroupementCatalogueDTO(
-                    intitule='Content:',
-                    obligatoire=True,
-                    remarque='',
-                    credits=Decimal(0),
-                    intitule_complet='Content:',
-                    code='LECGE100T'
-                ),
-                unites_enseignement_contenues=[
-                    UniteEnseignementCatalogueDTO(
-                        bloc=1,
-                        code='LESPO1113',
-                        intitule_complet='Sociologie et anthropologie des mondes contemporains',
-                        quadrimestre='Q1',
-                        quadrimestre_texte='Q1',
-                        credits_absolus=Decimal(0),
-                        credits_relatifs=0,
-                        volume_annuel_pm=0,
-                        volume_annuel_pp=0,
-                        obligatoire=True,
-                        session_derogation='',
-                    )
-                ],
-                groupements_contenus=[],
+def _cas_nominal_formation_version_standard():
+    SIGLE = 'ECGE1BA'
+
+    return FormationDTO(
+        racine=ContenuGroupementCatalogueDTO(
+            groupement_contenant=GroupementCatalogueDTO(
+                intitule=SIGLE,
+                obligatoire=True,
+                remarque='Remarque',
+                credits=Decimal(10),
+                intitule_complet='Bachelier en sciences économiques et de gestion',
+                code='LECGE100B'
             ),
-            annee=2021,
-            sigle='ECGE1BA',
-            code='LECGE100B',
-            version='',
-            intitule_complet='Bachelier en sciences économiques et de gestion',
-            transition=''
+            groupements_contenus=[
+                ContenuGroupementCatalogueDTO(
+                    groupement_contenant=GroupementCatalogueDTO(
+                        intitule='Contenu :',
+                        obligatoire=True,
+                        remarque='Remarque',
+                        credits=Decimal(10),
+                        intitule_complet='Contenu :',
+                        code='LECGE100T',
+                    ),
+                    groupements_contenus=[],
+                    unites_enseignement_contenues=[
+                        UniteEnseignementCatalogueDTO(
+                            bloc=1,
+                            code='LESPO1113',
+                            intitule_complet='Sociologie et anthropologie des mondes contemporains',
+                            quadrimestre='Q1or2',
+                            credits_absolus=Decimal(5),
+                            volume_annuel_pm=40,
+                            volume_annuel_pp=0,
+                            obligatoire=True,
+                            credits_relatifs=None,
+                            session_derogation='',
+                            quadrimestre_texte='Q1 ou Q2'
+                        )
+                    ]),
+            ],
+            unites_enseignement_contenues=[]
         ),
+        annee=ANNEE,
+        sigle=SIGLE,
+        version=STANDARD,
+        intitule_formation='Bachelier en sciences économiques et de gestion',
+    )
+
+
+def _cas_formation_version_particuliere():
+    SIGLE = 'CORP2MS/CS'
+
+    return FormationDTO(
+        racine=ContenuGroupementCatalogueDTO(
+            groupement_contenant=GroupementCatalogueDTO(
+                intitule=SIGLE,
+                obligatoire=True,
+                remarque='Remarque',
+                credits=Decimal(10),
+                intitule_complet='Master [120] en communication[ Double diplôme UCLouvain - uSherbrooke ]',
+                code='LCORP201S'
+            ),
+            groupements_contenus=[
+                ContenuGroupementCatalogueDTO(
+                    groupement_contenant=GroupementCatalogueDTO(
+                        intitule='Tronc commun',
+                        obligatoire=True,
+                        remarque='Remarque',
+                        credits=Decimal(10),
+                        intitule_complet='Tronc commun',
+                        code='LCORP114T'
+                    ),
+                    groupements_contenus=[],
+                    unites_enseignement_contenues=[
+                        UniteEnseignementCatalogueDTO(
+                            bloc=2,
+                            code='LCOMU2904B',
+                            intitule_complet="Séminaire d'accompagnement au mémoire : méthodologie",
+                            quadrimestre='Q2',
+                            credits_absolus=Decimal(20),
+                            volume_annuel_pm=0,
+                            volume_annuel_pp=0,
+                            obligatoire=False,
+                            credits_relatifs=None,
+                            session_derogation='',
+                            quadrimestre_texte='Q2'
+                        )
+                    ]
+                ),
+            ],
+            unites_enseignement_contenues=[]
+        ),
+        annee=ANNEE,
+        sigle=SIGLE,
+        version='DDSHERBROOKE',
+        intitule_formation='Master [120] en communication[ Double diplôme UCLouvain - uSherbrooke ]',
+
+    )
+
+
+def _cas_formation_version_transition():
+    SIGLE = 'DATI2MS/G'
+    INTITULE = "Master [120] en science des données, orientation technologies de l'information, à finalité spécialisée[ Version 2020 ]"
+    return FormationDTO(
+        racine=ContenuGroupementCatalogueDTO(
+            groupement_contenant=GroupementCatalogueDTO(
+                intitule=SIGLE,
+                obligatoire=True,
+                remarque='Remarque',
+                credits=Decimal(10),
+                intitule_complet=INTITULE,
+                code='LDATI200S'
+            ),
+            groupements_contenus=[
+                ContenuGroupementCatalogueDTO(
+                    groupement_contenant=GroupementCatalogueDTO(
+                        intitule='Contenu:',
+                        obligatoire=True,
+                        remarque='Remarque',
+                        credits=Decimal(10),
+                        intitule_complet='Contenu:',
+                        code='TDATI101T'
+                    ),
+                    groupements_contenus=[],
+                    unites_enseignement_contenues=[
+                        UniteEnseignementCatalogueDTO(
+                            bloc=2,
+                            code='LINFO2369',
+                            intitule_complet="Artificial intelligence and machine learning seminar",
+                            quadrimestre='Q1',
+                            credits_absolus=Decimal(3),
+                            volume_annuel_pm=30,
+                            volume_annuel_pp=0,
+                            obligatoire=False,
+                            credits_relatifs=None,
+                            session_derogation='',
+                            quadrimestre_texte='Q1'
+                        )
+                    ]
+                ),
+            ],
+            unites_enseignement_contenues=[]
+        ),
+        annee=ANNEE,
+        sigle=SIGLE,
+        version='Version 2020',
+        intitule_formation=INTITULE,
+    )
+
+
+CAS_NOMINAL_FORMATION_STANDARD = _cas_nominal_formation_version_standard()
+CAS_FORMATION_VERSION_PARTICULIERE = _cas_formation_version_particuliere()
+CAS_FORMATION_VERSION_TRANSITION = _cas_formation_version_transition()
+
+
+class CatalogueFormationsTranslatorInMemory(ICatalogueFormationsTranslator):
+    dtos = [
+        CAS_NOMINAL_FORMATION_STANDARD,
+        CAS_FORMATION_VERSION_PARTICULIERE,
+        CAS_FORMATION_VERSION_TRANSITION
     ]
 
     @classmethod
     def get_formation(cls, code_programme: str, annee: int) -> 'FormationDTO':
         return next(
             dto for dto in cls.dtos
-            if dto.code == code_programme and dto.annee == annee
+            if dto.racine.groupement_contenant.code == code_programme and dto.annee == annee
         )
 
     @classmethod

@@ -191,9 +191,9 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
 
     @classmethod
     def delete(
-           cls,
-           entity_id: 'ProgramTreeVersionIdentity',
-           delete_program_tree_service: interface.ApplicationService = None
+            cls,
+            entity_id: 'ProgramTreeVersionIdentity',
+            delete_program_tree_service: interface.ApplicationService = None
     ) -> None:
         program_tree_version = cls.get(entity_id)
 
@@ -261,13 +261,13 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
     @classmethod
     def get_dto(cls, identity: ProgramTreeVersionIdentity) -> Optional['ProgrammeDeFormationDTO']:
         pgm_tree_version = cls.get(identity)
-        return build_dto(pgm_tree_version.get_tree(), identity)
+        return build_dto(pgm_tree_version, identity)
 
     @classmethod
     def get_dto_from_year_and_code(cls, code: str, year: int) -> Optional['ProgrammeDeFormationDTO']:
         pgm_tree_version = cls.search(code=code, year=year)
         if pgm_tree_version:
-            return build_dto(pgm_tree_version[0].get_tree(), pgm_tree_version[0].entity_identity)
+            return build_dto(pgm_tree_version[0], pgm_tree_version[0].entity_identity)
 
 
 def _update_start_year_and_end_year(
@@ -401,26 +401,20 @@ def _get_common_queryset() -> QuerySet:
     )
 
 
-def _get_intitule_complet(noeud: 'Node') -> str:
-    intitule_complet = noeud.offer_title_fr
-    if noeud.version_name and noeud.version_title_fr:
-        intitule_complet = "{} [{}]".format(intitule_complet, noeud.version_title_fr)
-    if noeud.transition_name:
-        intitule_complet = "{} [{}]".format(intitule_complet, noeud.transition_name)
-    return intitule_complet
-
-
-def build_dto(tree: 'ProgramTree', identity: ProgramTreeVersionIdentity) -> 'ProgrammeDeFormationDTO':
-    contenu = _build_contenu(tree.root_node,)
+def build_dto(pgm_tree_version: 'ProgramTreeVersion', identity: ProgramTreeVersionIdentity) \
+        -> 'ProgrammeDeFormationDTO':
+    tree = pgm_tree_version.get_tree()
+    contenu = _build_contenu(tree.root_node, )
     return ProgrammeDeFormationDTO(
         racine=contenu,
         annee=identity.year,
         sigle=identity.offer_acronym,
         version=identity.version_name,
-        intitule_formation=tree.root_node.offer_title_fr,
-        intitule_version_programme=_get_intitule_complet(tree.root_node),
+        intitule_formation="{}{}".format(
+            tree.root_node.offer_title_fr,
+            "{}".format("[ {} ]".format(pgm_tree_version.title_fr) if pgm_tree_version.title_fr else '')
+        ),
         code=tree.entity_id.code,
-        transition=identity.transition_name
     )
 
 

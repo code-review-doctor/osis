@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
+from django.http import Http404
 from django.views.generic import TemplateView
 from rules.contrib.views import LoginRequiredMixin
 
@@ -32,11 +32,12 @@ from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormulai
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormulaireInscriptionCoursDTO
 from infrastructure.messages_bus import message_bus_instance
 from program_management.forms.education_groups import STANDARD
+from osis_role.contrib.views import PermissionRequiredMixin
 
 
-class FormulaireInscriptionCoursView(HtmxMixin, LoginRequiredMixin, TemplateView):
+class FormulaireInscriptionCoursView(PermissionRequiredMixin, HtmxMixin, LoginRequiredMixin, TemplateView):
     name = "pae_formulaire_inscription_view"
-    permission_required = 'preparation_programme.view_formulaire_inscription_cours'
+    permission_required = 'preparation_inscription.view_formulaire_inscription_cours'
     raise_exception = True
 
     template_name = "preparation_inscription/blocks/formulaire_inscription.html"
@@ -75,7 +76,7 @@ def contexte_commun_preparation_inscription(code_programme: str, annee: int) -> 
             formulaire.version_formation if formulaire.version_formation != STANDARD else ''
         ),
         'acronym': code_programme,
-        'title': formulaire.intitule_version_programme,
+        'title': formulaire.intitule_formation,
         'formulaire_inscription_cours': formulaire,
         'year': annee,
     }
