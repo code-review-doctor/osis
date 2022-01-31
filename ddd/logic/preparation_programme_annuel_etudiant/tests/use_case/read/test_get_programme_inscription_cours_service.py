@@ -35,7 +35,7 @@ from infrastructure.preparation_programme_annuel_etudiant.domain.service.in_memo
 from infrastructure.preparation_programme_annuel_etudiant.repository.in_memory.groupement_ajuste_inscription_cours \
     import GroupementAjusteInscriptionCoursInMemoryRepository
 from infrastructure.preparation_programme_annuel_etudiant.domain.service.in_memory.catalogue_formations import \
-    CAS_NOMINAL_FORMATION_STANDARD, CAS_FORMATION_VERSION_PARTICULIERE
+    CAS_NOMINAL_FORMATION_STANDARD, CAS_FORMATION_VERSION_PARTICULIERE, CAS_FORMATION_VERSION_TRANSITION
 
 
 class GetProgrammeInscriptionCoursTest(SimpleTestCase):
@@ -74,6 +74,16 @@ class GetProgrammeInscriptionCoursTest(SimpleTestCase):
         )
         programme = self.message_bus.invoke(cmd)
         self.assertEqualFormation(programme, CAS_FORMATION_VERSION_PARTICULIERE)
+
+    def test_should_visualiser_cas_formation_version_transition(self):
+        cmd = GetProgrammeInscriptionCoursCommand(
+            annee_formation=2021,
+            sigle_formation='DATI2MS/G',
+            version_formation='Version 2020',
+            transition_formation='',
+        )
+        programme = self.message_bus.invoke(cmd)
+        self.assertEqualFormation(programme, CAS_FORMATION_VERSION_TRANSITION)
 
     def assertEqualFormation(self, programme: 'ProgrammeInscriptionCoursDTO', formation: 'FormationDTO'):
         self.assertEqual(programme.code, formation.racine.groupement_contenant.code)

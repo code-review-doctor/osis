@@ -133,8 +133,59 @@ def _cas_formation_version_particuliere():
     )
 
 
+def _cas_formation_version_transition():
+    SIGLE = 'DATI2MS/G'
+    INTITULE = "Master [120] en science des données, orientation technologies de l'information, à finalité spécialisée[ Version 2020 ]"
+    return FormationDTO(
+        racine=ContenuGroupementCatalogueDTO(
+            groupement_contenant=GroupementCatalogueDTO(
+                intitule=SIGLE,
+                obligatoire=True,
+                remarque='Remarque',
+                credits=Decimal(10),
+                intitule_complet=INTITULE,
+                code='LDATI200S'
+            ),
+            groupements_contenus=[
+                ContenuGroupementCatalogueDTO(
+                    groupement_contenant=GroupementCatalogueDTO(
+                        intitule='Contenu:',
+                        obligatoire=True,
+                        remarque='Remarque',
+                        credits=Decimal(10),
+                        intitule_complet='Contenu:',
+                        code='TDATI101T'
+                    ),
+                    groupements_contenus=[],
+                    unites_enseignement_contenues=[
+                        UniteEnseignementCatalogueDTO(
+                            bloc=2,
+                            code='LINFO2369',
+                            intitule_complet="Artificial intelligence and machine learning seminar",
+                            quadrimestre='Q1',
+                            credits_absolus=Decimal(3),
+                            volume_annuel_pm=30,
+                            volume_annuel_pp=0,
+                            obligatoire=False,
+                            credits_relatifs=None,
+                            session_derogation='',
+                            quadrimestre_texte='Q1'
+                        )
+                    ]
+                ),
+            ],
+            unites_enseignement_contenues=[]
+        ),
+        annee=ANNEE,
+        sigle=SIGLE,
+        version='Version 2020',
+        intitule_formation=INTITULE,
+    )
+
+
 CAS_NOMINAL_FORMATION_STANDARD = _cas_nominal_formation_version_standard()
 CAS_FORMATION_VERSION_PARTICULIERE = _cas_formation_version_particuliere()
+CAS_FORMATION_VERSION_TRANSITION = _cas_formation_version_transition()
 
 
 class CatalogueFormationsTranslatorInMemory(ICatalogueFormationsTranslator):
@@ -142,6 +193,7 @@ class CatalogueFormationsTranslatorInMemory(ICatalogueFormationsTranslator):
     dtos = [
         CAS_NOMINAL_FORMATION_STANDARD,
         CAS_FORMATION_VERSION_PARTICULIERE,
+        CAS_FORMATION_VERSION_TRANSITION
     ]
 
     @classmethod
