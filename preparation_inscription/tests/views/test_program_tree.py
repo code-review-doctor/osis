@@ -26,10 +26,13 @@
 from django.http.response import HttpResponseForbidden
 from django.test import TestCase
 from django.urls import reverse
+from mock import mock
 
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import ProgrammeInscriptionCoursDTO
 from preparation_inscription.views.program_tree import ProgramTreeHTMLView
+from program_management.ddd.domain.program_tree_version import STANDARD
 
 
 class TestProgramTreeView(TestCase):
@@ -44,6 +47,22 @@ class TestProgramTreeView(TestCase):
     def setUp(self) -> None:
         pgm_manager = ProgramManagerFactory()
         self.client.force_login(pgm_manager.person.user)
+        self.__mock_service_bus()
+
+    def __mock_service_bus(self):
+        message_bus_patcher = mock.patch(
+            'infrastructure.messages_bus.get_programme_inscription_cours',
+            return_value=ProgrammeInscriptionCoursDTO(
+                uuid='aa0d2466-e013-4038-9c0d-6a8c726c4f88',
+                code='LCORP201S',
+                annee=2022,
+                version=STANDARD,
+                intitule_complet_formation='Master [120] en communication',
+                sous_programme=[]
+            )
+        )
+        message_bus_patcher.start()
+        self.addCleanup(message_bus_patcher.stop)
 
     def test_user_has_not_permission(self):
         person_without_permission = PersonFactory()
