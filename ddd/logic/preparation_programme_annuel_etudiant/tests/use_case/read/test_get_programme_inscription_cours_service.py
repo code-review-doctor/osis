@@ -30,8 +30,10 @@ from django.test import SimpleTestCase
 
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetProgrammeInscriptionCoursCommand
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, ProgrammeInscriptionCoursDTO, \
-    GroupementInscriptionCoursDTO
+    GroupementInscriptionCoursDTO, ContenuGroupementCatalogueDTO
 from infrastructure.messages_bus import message_bus_instance
+from infrastructure.preparation_programme_annuel_etudiant.domain.service.in_memory.catalogue_formations import \
+    CAS_NOMINAL_FORMATION_STANDARD, CAS_FORMATION_VERSION_PARTICULIERE, CAS_FORMATION_VERSION_TRANSITION
 from infrastructure.preparation_programme_annuel_etudiant.domain.service.in_memory.catalogue_formations import \
     CatalogueFormationsTranslatorInMemory
 from infrastructure.preparation_programme_annuel_etudiant.repository.in_memory.groupement_ajuste_inscription_cours \
@@ -146,7 +148,7 @@ class GetProgrammeInscriptionCoursTest(SimpleTestCase):
         self.assertEqual(programme.annee, formation.annee)
         self.assertEqual(programme.version, formation.version)
         self.assertEqual(programme.intitule_complet_formation, formation.intitule_formation)
-        self._assert_contenu(programme.sous_programme, formation.racine.groupements_contenus)
+        self._assert_contenu(programme.sous_programme, [formation.racine])
 
     def _assert_contenu(self,
                         sous_programme: List['GroupementInscriptionCoursDTO'],

@@ -69,7 +69,7 @@ class GetProgrammeInscriptionCours(interface.DomainService):
             catalogue_unites_enseignement_translator
         )
         groupements = cls.__build_groupement_inscription_cours_dtos(
-            formation.racine.groupements_contenus,
+            [formation.racine],
             groupements_ajustes,
             unite_enseignements_ajoutes_dto
         )
