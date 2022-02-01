@@ -2,8 +2,8 @@
 <li id="{{ tree.code }}"
     data-jstree='{"icon":"{% if tree.obligatoire %}{% static "img/education_group_year/mandatory.png" %}{% else %}{% static "img/education_group_year/optional.png" %}{% endif %}"}'
 >
-     {{ tree.intitule_complet }}
-     <div class="node_block_text" style="background-color:white;"></div>
+    {{ tree.intitule_complet }}
+     <div class="node_block_text"></div>
     {% if tree.sous_programme or tree.unites_enseignements %}
         <ul>
             {% for sous_programme in tree.sous_programme %}

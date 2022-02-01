@@ -23,9 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Optional
+
 from django.urls import reverse
+from django.utils.functional import cached_property
 from django.views.generic import TemplateView
 from rules.contrib.views import PermissionRequiredMixin
+
+from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormationCommand
+from education_group.templatetags.academic_year_display import display_as_academic_year
+from infrastructure.messages_bus import message_bus_instance
+from program_management.ddd.dtos import ProgrammeDeFormationDTO
 
 
 class PreparationInscriptionMainView(PermissionRequiredMixin, TemplateView):
@@ -42,6 +50,8 @@ class PreparationInscriptionMainView(PermissionRequiredMixin, TemplateView):
         return {
             **super().get_context_data(**kwargs),
             'tree_view_url': self.get_tree_view_url(),
+            'tree_panel_header': self.get_tree_panel_header(),
+            'tree_panel_title': self.get_tree_panel_title(),
             'annee': self.kwargs['annee'],
             'code_programme': self.kwargs['code_programme']
         }
@@ -51,3 +61,21 @@ class PreparationInscriptionMainView(PermissionRequiredMixin, TemplateView):
             'annee': self.kwargs['annee'],
             'code_programme': self.kwargs['code_programme']
         })
+
+    def get_tree_panel_header(self) -> str:
+        return "{sigle}{version} (RE) - {annee}".format(
+            sigle=self.formation.sigle,
+            version=" [{}]".format(self.formation.version) if self.formation.version else '',
+            annee=display_as_academic_year(self.formation.annee),
+        )
+
+    def get_tree_panel_title(self) -> str:
+        return self.formation.intitule_formation
+
+    @cached_property
+    def formation(self) -> Optional['ProgrammeDeFormationDTO']:
+        cmd = GetFormationCommand(
+            annee=self.kwargs['annee'],
+            code=self.kwargs['code_programme']
+        )
+        return message_bus_instance.invoke(cmd)
