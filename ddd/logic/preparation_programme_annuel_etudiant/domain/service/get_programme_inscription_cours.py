@@ -40,7 +40,6 @@ from ddd.logic.preparation_programme_annuel_etudiant.dtos import ProgrammeInscri
     UniteEnseignementAjouteeDTO, UniteEnseignementCatalogueDTO
 from ddd.logic.preparation_programme_annuel_etudiant.repository.i_groupement_ajuste_inscription_cours import \
     IGroupementAjusteInscriptionCoursRepository
-from education_group.ddd.domain.group import GroupIdentity
 from osis_common.ddd import interface
 
 

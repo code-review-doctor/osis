@@ -32,7 +32,7 @@
                 <span class="caret"></span>
             </button>
             <ul class="dropdown-menu pull-right" aria-labelledby="btn-action-down">
-                <li><a href="" hx-get="{% url 'ajouter_unites_enseignement_view' annee code_programme %}"
+                <li><a href="" hx-get="{% url 'ajouter_unites_enseignement_view' annee code_programme code_programme %}"
                        hx-target="#content-of-main-panel" hx-trigger="click">{% trans "Ajouter des UE" %}</a></li>
                 <li><a href="" hx-get="{% url 'supprimer_unites_enseignement_view' annee code_programme %}"
                        hx-target="#content-of-main-panel" hx-trigger="click">{% trans "Supprimer des UE" %}</a></li>
