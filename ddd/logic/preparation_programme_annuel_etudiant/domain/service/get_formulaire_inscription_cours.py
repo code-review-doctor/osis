@@ -60,12 +60,7 @@ class GetFormulaireInscriptionCours(interface.DomainService):
 
         formulaire_inscription = cls.convertir_formation_catalogue_en_formulaire_inscription(formation)
 
-        groupements_ajustes = repo.search(
-            groupement_id=GroupIdentity(
-                year=cmd.annee,
-                code=cmd.code_programme,
-            )
-        )
+        groupements_ajustes = repo.search(code_programme=cmd.code_programme)
 
         unite_enseignements_ajoutes_dto = cls.rechercher_unites_enseignement_ajoutees_catalogue_dto(
             groupements_ajustes,
