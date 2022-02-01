@@ -25,11 +25,15 @@
 ##############################################################################
 from django.urls import reverse
 from django.views.generic import TemplateView
-from rules.contrib.views import LoginRequiredMixin
+from rules.contrib.views import PermissionRequiredMixin
 
 
-class PreparationInscriptionMainView(LoginRequiredMixin, TemplateView):
+class PreparationInscriptionMainView(PermissionRequiredMixin, TemplateView):
     name = 'preparation-inscription-main-view'
+
+    # PermissionRequiredMixin
+    permission_required = "preparation_inscription.view_preparation_inscription_cours"
+    raise_exception = True
 
     # TemplateView
     template_name = "preparation_inscription/preparation_inscription.html"
