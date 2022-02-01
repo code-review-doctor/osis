@@ -29,6 +29,7 @@ from preparation_inscription.views.ajouter_unites_enseignement import AjouterUni
 from preparation_inscription.views.consulter_contenu_groupement import ConsulterContenuGroupementView
 from preparation_inscription.views.detail import PreparationInscriptionMainView
 from preparation_inscription.views.formulaire_inscription_cours import FormulaireInscriptionCoursView
+from preparation_inscription.views.liste_unites_enseignement import ListeUnitesEnseignementView
 from preparation_inscription.views.modification_contenu_groupement import ModifierProprietesContenuView
 from preparation_inscription.views.program_tree import ProgramTreeHTMLView
 from preparation_inscription.views.supprimer_unites_enseignement import SupprimerUnitesEnseignementView
@@ -47,5 +48,6 @@ urlpatterns = [
             FormulaireInscriptionCoursView.as_view(),
             name=FormulaireInscriptionCoursView.name
         ),
+        path('liste_unites_enseignement/', ListeUnitesEnseignementView.as_view(), name=ListeUnitesEnseignementView.name)
     ])),
 ]

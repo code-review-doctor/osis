@@ -314,7 +314,6 @@ table.dataTable thead th.sorting:after {
 
 .emphasized-code{
     font-weight: bolder;
-    margin-left: 10px;
 }
 .code-col{
     min-width: 120px;
