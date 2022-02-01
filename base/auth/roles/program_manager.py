@@ -33,7 +33,6 @@ from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
 from base.auth.predicates import is_linked_to_offer, is_scores_responsible_period_opened
-from base.models.academic_year import current_academic_year
 from base.models.education_group import EducationGroup
 from base.models.entity import Entity
 from base.models.entity_version import find_parent_of_type_into_entity_structure, EntityVersion
@@ -126,6 +125,7 @@ class ProgramManager(EducationGroupRoleModel):
             'learning_unit.view_learningclassyear': rules.always_allow,
             'preparation_inscription.view_formulaire_inscription_cours': rules.always_allow,
             'preparation_programme.can_add_unites_enseignement_au_programme': is_linked_to_offer,
+            'preparation_inscription.can_delete_unites_enseignement_du_programme': is_linked_to_offer,
         })
 
 

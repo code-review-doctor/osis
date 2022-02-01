@@ -9,14 +9,15 @@ from base.utils.htmx import HtmxMixin
 from base.views.common import display_success_messages, display_error_messages
 from ddd.logic.preparation_programme_annuel_etudiant.commands import RetirerUEDuProgrammeCommand, \
     GetUniteEnseignementCommand
+from education_group.models.group_year import GroupYear
 from infrastructure.messages_bus import message_bus_instance
+from osis_role.contrib.views import PermissionRequiredMixin
 from preparation_inscription.views.consulter_contenu_groupement import TypeAjustement
 
 
-class SupprimerUnitesEnseignementView(LoginRequiredMixin, HtmxMixin, TemplateView):
+class SupprimerUnitesEnseignementView(PermissionRequiredMixin, LoginRequiredMixin, HtmxMixin, TemplateView):
     name = 'supprimer_unites_enseignement_view'
-
-    # TemplateView
+    permission_required = 'preparation_inscription.can_delete_unites_enseignement_du_programme'
     template_name = "preparation_inscription/supprimer_unites_enseignement.html"
     htmx_template_name = "preparation_inscription/supprimer_unites_enseignement.html"
 
@@ -138,3 +139,9 @@ class SupprimerUnitesEnseignementView(LoginRequiredMixin, HtmxMixin, TemplateVie
 
     def get_consulter_contenu_groupement_url(self):
         return reverse('consulter_contenu_groupement_view', args=self.args, kwargs=self.kwargs)
+
+    def get_permission_object(self):
+        return GroupYear.objects.get(
+            partial_acronym=self.kwargs['code_programme'],
+            academic_year__year=self.kwargs['annee']
+        )

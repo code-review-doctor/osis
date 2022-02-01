@@ -26,23 +26,35 @@
 import mock
 from django.contrib import messages
 from django.contrib.messages import get_messages
+from django.http import HttpResponseForbidden
 from django.test import TestCase
 from django.urls import reverse
 
-from base.tests.factories.person import PersonFactory
+from base.tests.factories.program_manager import ProgramManagerFactory
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 
 
 class TestSupprimerUnitesEnseignement(TestCase):
 
-    code = 'LCOMI200M'
-    year = 2021
-
     @classmethod
     def setUpTestData(cls):
-        cls.url = reverse('supprimer_unites_enseignement_view', kwargs={'annee': cls.year, 'code_programme': cls.code})
+        cls.education_group_year = EducationGroupVersionFactory().offer
+        cls.url = reverse('supprimer_unites_enseignement_view', kwargs={
+            'annee': cls.education_group_year.academic_year.year,
+            'code_programme': cls.education_group_year.partial_acronym
+        })
 
     def setUp(self) -> None:
-        self.client.force_login(PersonFactory().user)
+        self.client.force_login(ProgramManagerFactory(
+            education_group=self.education_group_year.education_group
+        ).person.user)
+
+    def test_assert_access_denied(self):
+        lambda_prgm_manager = ProgramManagerFactory()
+        self.client.force_login(lambda_prgm_manager.person.user)
+        response = self.client.get(self.url)
+        self.assertTemplateUsed(response, "access_denied.html")
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
     def test_assert_template_used(self):
         response = self.client.get(self.url)
