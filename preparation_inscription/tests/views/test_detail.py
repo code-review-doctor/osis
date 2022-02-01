@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import mock
 from django.http.response import HttpResponseForbidden
 from django.test import TestCase
 from django.urls import reverse
@@ -30,6 +31,8 @@ from django.urls import reverse
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
 from preparation_inscription.views.detail import PreparationInscriptionMainView
+from program_management.ddd.domain.program_tree_version import STANDARD
+from program_management.ddd.dtos import ProgrammeDeFormationDTO
 
 
 class TestPreparationInscriptionMainView(TestCase):
@@ -44,6 +47,22 @@ class TestPreparationInscriptionMainView(TestCase):
     def setUp(self) -> None:
         pgm_manager = ProgramManagerFactory()
         self.client.force_login(pgm_manager.person.user)
+        self.__mock_service_bus()
+
+    def __mock_service_bus(self):
+        message_bus_patcher = mock.patch(
+            'infrastructure.messages_bus.get_programme_formation',
+            return_value=ProgrammeDeFormationDTO(
+                racine=None,
+                code='LCORP201S',
+                sigle='ECGE1BA',
+                annee=2022,
+                version=STANDARD,
+                intitule_formation='Master [120] en communication',
+            )
+        )
+        message_bus_patcher.start()
+        self.addCleanup(message_bus_patcher.stop)
 
     def test_user_has_not_permission(self):
         person_without_permission = PersonFactory()
