@@ -11,10 +11,19 @@
     }
 
     .node_block_text {
+        display: inline-block;
         position: absolute;
         right: 0;
         width: 40px;
         text-align: center;
+        border-left: 1px solid #ccc;
+        height: 26px;
+        box-shadow: -5px 0px 0px 0px white;
+    }
+
+    .node_block_text.header {
+        z-index: 2;
+        height: 27px;
     }
 
     #tree a {
@@ -32,8 +41,13 @@
     }
 
     #tree {
+        position: relative;
         overflow-x: scroll;
         height: 60vh;
+    }
+
+    #tree a.jstree-anchor {
+        padding-right: 45px;
     }
 </style>
 <div id="js_tree_panel">
@@ -41,6 +55,18 @@
     <div id="tree"></div>
 
     <script>
+        document.querySelector('#tree').addEventListener('scroll', (e) => {
+            const currentScrollLeft = e.target.scrollLeft;
+            const currentScrollTop = e.target.scrollTop;
+
+            document.querySelectorAll('.node_block_text').forEach((el) => {
+                if (el.classList.contains('header')){
+                    el.style.top = currentScrollTop + "px";
+                }
+                el.style.right = -currentScrollLeft + "px";
+            });
+        });
+
         $(document).ready(() => {
             const $tree = $('#tree');
             const $tree_search = $('#tree_search');
