@@ -126,11 +126,11 @@ class SupprimerUnitesEnseignementView(LoginRequiredMixin, HtmxMixin, TemplateVie
 
     def _get_command(self, to_delete):
         return RetirerUEDuProgrammeCommand(
-            sigle_formation='',
-            annee_formation=0,
+            sigle_formation=self.kwargs['code_programme'],
+            annee_formation=self.kwargs['annee'],
             version_formation='',
-            groupement_uuid='',
             transition_formation='',
+            groupement_uuid='',
             unites_enseignements=[
                 GetUniteEnseignementCommand(code=code) for code in to_delete
             ]
