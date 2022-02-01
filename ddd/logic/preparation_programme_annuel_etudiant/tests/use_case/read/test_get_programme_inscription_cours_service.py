@@ -31,11 +31,11 @@ from ddd.logic.preparation_programme_annuel_etudiant.commands import GetProgramm
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, ProgrammeInscriptionCoursDTO
 from infrastructure.messages_bus import message_bus_instance
 from infrastructure.preparation_programme_annuel_etudiant.domain.service.in_memory.catalogue_formations import \
+    CAS_NOMINAL_FORMATION_STANDARD, CAS_FORMATION_VERSION_PARTICULIERE, CAS_FORMATION_VERSION_TRANSITION
+from infrastructure.preparation_programme_annuel_etudiant.domain.service.in_memory.catalogue_formations import \
     CatalogueFormationsTranslatorInMemory
 from infrastructure.preparation_programme_annuel_etudiant.repository.in_memory.groupement_ajuste_inscription_cours \
     import GroupementAjusteInscriptionCoursInMemoryRepository
-from infrastructure.preparation_programme_annuel_etudiant.domain.service.in_memory.catalogue_formations import \
-    CAS_NOMINAL_FORMATION_STANDARD, CAS_FORMATION_VERSION_PARTICULIERE, CAS_FORMATION_VERSION_TRANSITION
 
 
 class GetProgrammeInscriptionCoursTest(SimpleTestCase):
@@ -87,12 +87,13 @@ class GetProgrammeInscriptionCoursTest(SimpleTestCase):
         sous_programme = programme.sous_programme
         self.assertEqual(len(sous_programme), 1)
         groupement = sous_programme[0]
-        groupement_formation = formation.racine.groupements_contenus[0]
+        groupement_formation = formation.racine
         self.assertEqual(groupement.intitule_complet, groupement_formation.groupement_contenant.intitule_complet)
         self.assertEqual(groupement.code, groupement_formation.groupement_contenant.code)
         self.assertEqual(groupement.obligatoire, groupement_formation.groupement_contenant.obligatoire)
-        unites_enseignements = groupement.unites_enseignements
-        unites_enseignements_formation = groupement_formation.unites_enseignement_contenues
+        sous_groupe = groupement_formation.groupements_contenus[0]
+        unites_enseignements = groupement.sous_programme[0].unites_enseignements
+        unites_enseignements_formation = sous_groupe.unites_enseignement_contenues
         self.assertEqual(len(unites_enseignements), 1)
         unite_enseignement = unites_enseignements[0]
         unite_enseignement_formation = unites_enseignements_formation[0]
