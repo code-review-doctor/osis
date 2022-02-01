@@ -17,8 +17,8 @@ class SupprimerUnitesEnseignementView(LoginRequiredMixin, HtmxMixin, TemplateVie
     name = 'supprimer_unites_enseignement_view'
 
     # TemplateView
-    template_name = "preparation_inscription/preparation_inscription.html"
-    htmx_template_name = "preparation_inscription/supprimer_unites_enseignements.html"
+    template_name = "preparation_inscription/supprimer_unites_enseignement.html"
+    htmx_template_name = "preparation_inscription/supprimer_unites_enseignement.html"
 
     def get_context_data(self, **kwargs):
         return {
@@ -116,7 +116,7 @@ class SupprimerUnitesEnseignementView(LoginRequiredMixin, HtmxMixin, TemplateVie
         cmd = self._get_command(to_delete)
         try:
             message_bus_instance.invoke(cmd)
-            success_message = _('The learning units {} have been deleted').format(to_delete.join(', '))
+            success_message = _('The learning units {} have been deleted').format(', '.join(to_delete))
             display_success_messages(self.request, success_message)
         except MultipleBusinessExceptions as exceptions:
             messages = [exception.message for exception in exceptions.exceptions]
