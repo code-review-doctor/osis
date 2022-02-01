@@ -25,9 +25,9 @@
 # ##############################################################################
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 
-from admission.contrib.models import DoctorateAdmission
 from base.models.academic_year import AcademicYear
 from base.models.person import Person
 from osis_document.contrib.fields import FileField
@@ -35,6 +35,14 @@ from osis_profile.models.enums.curriculum import ExperienceType, StudySystem, Re
     ActivityType, ForeignStudyCycleType
 from osis_profile.models.enums.education import BelgianCommunitiesOfEducation
 from reference.models.language import Language
+
+
+def curriculum_directory_path(curriculum_experience: 'Experience', filename: str):
+    """Return the file upload directory path."""
+    return '{}/curriculum/{}'.format(
+        curriculum_experience.curriculum_year.person.uuid,
+        filename,
+    )
 
 
 class CurriculumYear(models.Model):
@@ -55,30 +63,12 @@ class CurriculumYear(models.Model):
         ordering = ["-academic_year__year"]
 
 
-class ExperienceManager(models.Manager):
-    def get_queryset(self):
-        """An experience is 'valuated' after an admission has been accepted."""
-        return super().get_queryset().annotate(
-            is_valuated=models.ExpressionWrapper(
-                models.Q(valuated_from__isnull=False),
-                output_field=models.BooleanField(),
-            )
-        )
-
-
 class Experience(models.Model):
     # Common
     curriculum_year = models.ForeignKey(
         CurriculumYear,
         on_delete=models.CASCADE,
         related_name="experiences",
-    )
-    valuated_from = models.ForeignKey(
-        DoctorateAdmission,
-        blank=True,
-        null=True,
-        on_delete=models.PROTECT,
-        verbose_name=_("Experience valuated from this accepted admission."),
     )
     type = models.CharField(
         _("Type"),
@@ -184,18 +174,21 @@ class Experience(models.Model):
         blank=True,
         mimetypes=['application/pdf'],
         null=True,
+        upload_to=curriculum_directory_path,
         verbose_name=_('Transcript'),
     )
     graduate_degree = FileField(
         blank=True,
         mimetypes=['application/pdf'],
         null=True,
+        upload_to=curriculum_directory_path,
         verbose_name=_('Graduate degree'),
     )
     access_certificate_after_60_master = FileField(
         blank=True,
         mimetypes=['application/pdf'],
         null=True,
+        upload_to=curriculum_directory_path,
         verbose_name=_('Access certificate after a 60 master'),
     )
     dissertation_title = models.CharField(
@@ -215,6 +208,7 @@ class Experience(models.Model):
         blank=True,
         mimetypes=['application/pdf'],
         null=True,
+        upload_to=curriculum_directory_path,
         verbose_name=_('Dissertation summary'),
     )
     # Belgian higher education
@@ -263,6 +257,7 @@ class Experience(models.Model):
         blank=True,
         mimetypes=['application/pdf'],
         null=True,
+        upload_to=curriculum_directory_path,
         verbose_name=_('Transcript translation'),
     )
     graduate_degree_translation = FileField(
@@ -290,6 +285,7 @@ class Experience(models.Model):
         blank=True,
         mimetypes=['application/pdf'],
         null=True,
+        upload_to=curriculum_directory_path,
         verbose_name=_('Activity certificate'),
     )
     activity_position = models.CharField(
@@ -298,4 +294,17 @@ class Experience(models.Model):
         max_length=255,
         null=True,
     )
-    objects = ExperienceManager()
+
+    def save(self, *args, **kwargs):
+        previous_curriculum_year = Experience.objects.get(pk=self.pk).curriculum_year if self.pk else None
+        super().save(*args, **kwargs)
+        if previous_curriculum_year and previous_curriculum_year.experiences.count() == 0:
+            # Remove the empty curriculum year
+            previous_curriculum_year.delete()
+
+
+@receiver(models.signals.post_delete, sender=Experience)
+def delete_empty_curriculum_year(sender, instance, **kwargs):
+    if instance.curriculum_year and instance.curriculum_year.experiences.count() == 0:
+        # Remove the curriculum year as the experience to delete was its last experience
+        instance.curriculum_year.delete()

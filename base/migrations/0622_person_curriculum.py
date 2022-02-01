@@ -14,6 +14,13 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='person',
             name='curriculum',
-            field=osis_document.contrib.fields.FileField(base_field=models.UUIDField(), blank=True, default=list, null=True, size=None, verbose_name='Curriculum'),
+            field=osis_document.contrib.fields.FileField(
+                base_field=models.UUIDField(),
+                blank=True,
+                default=list,
+                null=True,
+                size=None,
+                verbose_name='Curriculum',
+            ),
         ),
     ]
