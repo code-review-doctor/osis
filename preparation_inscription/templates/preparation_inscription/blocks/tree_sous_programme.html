@@ -1,18 +1,18 @@
 {% load i18n static %}
-<li id="{{ sous_programme.code }}"
-    data-jstree='{"icon":"{% if sous_programme.obligatoire %}{% static "img/education_group_year/mandatory.png" %}{% else %}{% static "img/education_group_year/optional.png" %}{% endif %}"}'
+<li id="{{ tree.code }}"
+    data-jstree='{"icon":"{% if tree.obligatoire %}{% static "img/education_group_year/mandatory.png" %}{% else %}{% static "img/education_group_year/optional.png" %}{% endif %}"}'
 >
-     {{ sous_programme.intitule_complet }}
+     {{ tree.intitule_complet }}
      <div class="node_block_text" style="background-color:white;"></div>
-    {% if sous_programme.sous_programme or sous_programme.unites_enseignements %}
+    {% if tree.sous_programme or tree.unites_enseignements %}
         <ul>
-            {% for sous_programme in sous_programme.sous_programme %}
+            {% for sous_programme in tree.sous_programme %}
                 {% include 'preparation_inscription/blocks/tree_sous_programme.html' with tree=sous_programme %}
             {% endfor %}
-            {% for unite_enseignement in sous_programme.unites_enseignements %}
+            {% for unite_enseignement in tree.unites_enseignements %}
                 {% include 'preparation_inscription/blocks/tree_unites_enseignements.html' with unite_enseignement=unite_enseignement %}
             {% endfor %}
-            {% for unite_enseignement in sous_programme.unites_enseignement_ajoutees %}
+            {% for unite_enseignement in tree.unites_enseignement_ajoutees %}
                 {% include 'preparation_inscription/blocks/tree_unites_enseignements_ajoutees.html' with unite_enseignement=unite_enseignement %}
             {% endfor %}
         </ul>
