@@ -7,7 +7,7 @@
         {% if tree.sous_programme.0.sous_programme %}
             <ul>
                 {% for sous_programme in tree.sous_programme.0.sous_programme %}
-                    {% include 'preparation_inscription/blocks/tree_sous_programme.html' with sous_programme=sous_programme %}
+                    {% include 'preparation_inscription/blocks/tree_sous_programme.html' with tree=sous_programme %}
                 {% endfor %}
                 {% for unite_enseignement in tree.sous_programme.0.unites_enseignements %}
                     {% include 'preparation_inscription/blocks/tree_unites_enseignements.html' with unite_enseignement=unite_enseignement %}
