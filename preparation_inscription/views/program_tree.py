@@ -25,15 +25,19 @@
 ##############################################################################
 
 from django.views.generic import TemplateView
-from rules.contrib.views import LoginRequiredMixin
+from rules.contrib.views import PermissionRequiredMixin
 
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetProgrammeInscriptionCoursCommand
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import ProgrammeInscriptionCoursDTO
 from infrastructure.messages_bus import message_bus_instance
 
 
-class ProgramTreeHTMLView(LoginRequiredMixin, TemplateView):
+class ProgramTreeHTMLView(PermissionRequiredMixin, TemplateView):
     name = 'program-tree-view'
+
+    # PermissionRequiredMixin
+    permission_required = "preparation_inscription.view_preparation_inscription_cours"
+    raise_exception = True
 
     # TemplateView
     template_name = "preparation_inscription/blocks/tree_recursif.html"
