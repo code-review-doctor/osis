@@ -3,7 +3,7 @@
 <ul>
     <li id="{{ tree.code }}">
         {{ tree.code }} - {{ tree.intitule_complet_formation }}
-        <span class="node_block_text" style="background-color:white;">{% trans 'Block' %}</span>
+        <div class="node_block_text header" style="background-color:white;">{% trans 'Block' %}</div>
         {% if tree.sous_programme.0.sous_programme %}
             <ul>
                 {% for sous_programme in tree.sous_programme.0.sous_programme %}
