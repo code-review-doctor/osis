@@ -421,9 +421,6 @@ def build_dto(pgm_tree_version: 'ProgramTreeVersion', identity: ProgramTreeVersi
 
 
 def _build_contenu(node: 'Node', lien_parent: 'Link' = None) -> 'ContenuNoeudDTO':
-    groupements_contenus = []
-    ues_contenues = []
-
     contenu_ordonne = []
     for lien in node.children:
         if lien.child.is_learning_unit():
@@ -454,8 +451,6 @@ def _build_contenu(node: 'Node', lien_parent: 'Link' = None) -> 'ContenuNoeudDTO
         credits=_get_credits(lien_parent),
         intitule_complet=get_verbose_title_group(node),
         contenu_ordonne=contenu_ordonne,
-        # groupements_contenus=groupements_contenus,
-        # unites_enseignement_contenues=ues_contenues
     )
 
 
