@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-26 07:08+0100\n"
+"POT-Creation-Date: 2022-02-01 14:28+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -59,6 +59,9 @@ msgstr ""
 msgid "Bloc"
 msgstr ""
 
+msgid "Block"
+msgstr ""
+
 msgid "Cancel"
 msgstr ""
 
@@ -72,7 +75,7 @@ msgid "Cette action annulera la suppression de l'UE X du groupement 'Y'"
 msgstr ""
 
 msgid "Check All"
-msgstr ""
+msgstr "Cocher tout"
 
 msgid "Code"
 msgstr ""
@@ -141,26 +144,32 @@ msgid "Supprimer unite enseignement"
 msgstr ""
 
 msgid "The learning units have been added"
-msgstr "Les unitées d'enseignement ont été ajoutées"
+msgstr "Les unités d'enseignement ont été ajoutées"
+
+msgid "The learning units {} have been deleted"
+msgstr "Les unités d'enseignement {} ont été supprimées"
 
 msgid "Title"
 msgstr "Intitule"
 
-msgid "Form view"
-msgstr "Vue formulaire"
-
-msgid "Program"
-msgstr "Parcours étudiant"
-
-msgid "Sections and programs"
-msgstr "Sections et programmes"
-
-msgid "Training configuration"
-msgstr "Configuration de la formation"
-
 msgctxt "student_path_year"
 msgid "Year"
 msgstr "An"
+
+msgid "champs1"
+msgstr ""
+
+msgid "champs2"
+msgstr ""
+
+msgid "champs3"
+msgstr ""
+
+msgid "champs4"
+msgstr ""
+
+msgid "champs5"
+msgstr ""
 
 msgid "credits"
 msgstr "crédits"

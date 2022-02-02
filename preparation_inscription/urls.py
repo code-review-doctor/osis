@@ -34,7 +34,6 @@ from preparation_inscription.views.program_tree import ProgramTreeHTMLView
 from preparation_inscription.views.supprimer_unites_enseignement import SupprimerUnitesEnseignementView
 
 urlpatterns = [
-
     path('<int:annee>/<str:code_programme>/', include([
         path('', PreparationInscriptionMainView.as_view(), name=PreparationInscriptionMainView.name),
         path('detail', ConsulterContenuGroupementView.as_view(), name=ConsulterContenuGroupementView.name),

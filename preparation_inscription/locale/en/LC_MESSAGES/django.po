@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-26 07:08+0100\n"
+"POT-Creation-Date: 2022-02-01 14:28+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "AJOUT"
-msgstr ""
+msgstr "ADD"
 
 msgid "Actions"
 msgstr ""
@@ -28,49 +28,52 @@ msgid "Add"
 msgstr ""
 
 msgid "Ajouter des UE"
-msgstr ""
+msgstr "Add learning units"
 
 msgid "Anac."
-msgstr ""
+msgstr "Anac."
 
 msgid "Annuler ajout"
-msgstr ""
+msgstr "Cancel add"
 
 msgid "Annuler l'ajout"
-msgstr ""
+msgstr "Cancel add"
 
 msgid "Annuler l'ajout?"
-msgstr ""
+msgstr "Cancel add ?"
 
 msgid "Annuler la modification"
-msgstr ""
+msgstr "Cancel edition"
 
 msgid "Annuler la modification ?"
-msgstr ""
+msgstr "Cancel edition ?"
 
 msgid "Annuler la suppression"
-msgstr ""
+msgstr "Cancel deletion"
 
 msgid "Annuler la suppression ?"
-msgstr ""
+msgstr "Cancel deletion ?"
 
 msgid "Annuler suppression"
-msgstr ""
+msgstr "Cancel deletion"
 
 msgid "Bloc"
+msgstr "Block"
+
+msgid "Block"
 msgstr ""
 
 msgid "Cancel"
 msgstr ""
 
 msgid "Cette action annulera l'ajout de l'UE X du groupement 'Y'"
-msgstr ""
+msgstr "This action will cancel learning unit X addition on group 'Y'"
 
 msgid "Cette action annulera la modification de l'UE X du groupement 'Y'"
-msgstr ""
+msgstr "This action will cancel learning unit X modification in group 'Y'"
 
 msgid "Cette action annulera la suppression de l'UE X du groupement 'Y'"
-msgstr ""
+msgstr "This action will cancel learning unit X deletion from group 'Y'"
 
 msgid "Check All"
 msgstr ""
@@ -79,55 +82,55 @@ msgid "Code"
 msgstr ""
 
 msgid "Commentaire"
-msgstr ""
+msgstr "Comment"
 
 msgid "Commentaire en anglais"
-msgstr ""
+msgstr "English comment"
 
 msgid "Composants (PM/PP)"
-msgstr ""
+msgstr "Components (PM/PP)"
 
 msgid "Crédits"
-msgstr ""
+msgstr "Credits"
 
 msgid "Déplacer vers le bas"
-msgstr ""
+msgstr "Move downwards"
 
 msgid "Déplacer vers le haut"
-msgstr ""
+msgstr "Move upwards"
 
 msgid "ECGE1BA - 2021-2022"
 msgstr ""
 
 msgid "Formulaire d'inscriptions aux cours PAE"
-msgstr ""
+msgstr "Registration to PAE Form"
 
 msgid "Intitulé"
-msgstr ""
+msgstr "Title"
 
 msgid "MODIFICATION"
-msgstr ""
+msgstr "EDITION"
 
 msgid "Modifier les propriétés"
-msgstr ""
+msgstr "Edit properties"
 
 msgid "Ne pas annuler"
-msgstr ""
+msgstr "Do not cancel"
 
 msgid "Obligatoire"
-msgstr ""
+msgstr "Mandatory"
 
 msgid "Preparation PAE"
-msgstr ""
+msgstr "PAE preparation"
 
 msgid "Quadri."
-msgstr ""
+msgstr "Quadri."
 
 msgid "Revenir à l'état initial du programme"
-msgstr ""
+msgstr "Reset program to inital state"
 
 msgid "SUPPRESSION"
-msgstr ""
+msgstr "DELETION"
 
 msgid "Search"
 msgstr ""
@@ -136,47 +139,38 @@ msgid "Session"
 msgstr ""
 
 msgid "Supprimer des UE"
-msgstr ""
+msgstr "Delete learning units"
 
 msgid "Supprimer unite enseignement"
-msgstr ""
+msgstr "Delete learning unit"
 
 msgid "The learning units have been added"
 msgstr ""
 
+msgid "The learning units {} have been deleted"
+msgstr ""
+
 msgid "Title"
-msgstr ""
-
-msgid "champs1"
-msgstr ""
-
-msgid "champs2"
-msgstr ""
-
-msgid "champs3"
-msgstr ""
-
-msgid "champs4"
-msgstr ""
-
-msgid "champs5"
-msgstr ""
-
-msgid "Form view"
-msgstr ""
-
-msgid "Program"
-msgstr ""
-
-msgid "Sections and programs"
-msgstr ""
-
-msgid "Training configuration"
 msgstr ""
 
 msgctxt "student_path_year"
 msgid "Year"
 msgstr ""
 
+msgid "champs1"
+msgstr "field1"
+
+msgid "champs2"
+msgstr "field2"
+
+msgid "champs3"
+msgstr "field3"
+
+msgid "champs4"
+msgstr "field4"
+
+msgid "champs5"
+msgstr "field5"
+
 msgid "credits"
-msgstr ""
+msgstr "credits"
