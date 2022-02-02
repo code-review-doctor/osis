@@ -224,3 +224,29 @@ class LearningUnitTranslatorSearchModificationProposal(TestCase):
             proposal.initial_data['learning_unit_year']['specific_title']
         )
         self.assertEqual(results[0].old_title, expected_title)
+
+    def test_assert_search_transformation_proposal_return_list_dto(self):
+        proposal = ProposalLearningUnitFactory(
+            learning_unit_year=self.ldroi1200,
+            type=ProposalType.TRANSFORMATION.name,
+            initial_data={
+                'learning_container_year': {'common_title': 'Introduction aux droits ancien titre'},
+                'learning_unit_year': {'specific_title': 'null', 'acronym': 'LDROI1120'}
+            }
+        )
+
+        results = self.service.search_learning_unit_modification_proposal_dto(
+            codes=['LDROI1120'],
+            year=2018
+        )
+        self.assertEqual(len(results), 1)
+
+        self.assertEqual(
+            results[0],
+            LearningUnitModificationProposalFromServiceDTO(
+                code='LDROI1200',
+                year=2018,
+                old_code=proposal.initial_data['learning_unit_year']['acronym'],
+                old_title=proposal.initial_data['learning_container_year']['common_title'],
+            )
+        )

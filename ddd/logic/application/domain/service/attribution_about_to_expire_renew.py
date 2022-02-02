@@ -39,7 +39,8 @@ from ddd.logic.application.domain.service.apply_on_vacant_course import ApplyOnV
 from ddd.logic.application.domain.service.i_learning_unit_service import ILearningUnitService
 from ddd.logic.application.domain.validator.exceptions import AttributionAboutToExpireNotFound, \
     AttributionAboutToExpireFunctionException, VacantCourseNotFound, AttributionSubstituteException, \
-    AttributionAboutToExpireWithoutVolumeException
+    AttributionAboutToExpireWithoutVolumeException, VolumesAskedShouldBeLowerOrEqualToVolumeAvailable, \
+    AutomaticRenewalImpossibleVolumesVacantLowerThanVolumesToRenew
 from ddd.logic.application.dtos import AttributionAboutToExpireDTO, LearningUnitModificationProposalFromServiceDTO
 from ddd.logic.application.repository.i_vacant_course_repository import IVacantCourseRepository
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
@@ -81,7 +82,8 @@ class AttributionAboutToExpireRenew(interface.DomainService):
             AcademicYearIdentityBuilder.build_from_year(application_calendar.authorized_target_year.year - 1)
         )
         attributions_filtered = _filter_attribution_by_renewable_functions(attributions_about_to_expire)
-        if not attributions_about_to_expire:
+        attributions_filtered = _filter_only_courses(attributions_filtered)
+        if not attributions_filtered:
             return []
 
         # Lookup if some courses have proposal modification
@@ -219,6 +221,15 @@ def _filter_attribution_by_renewable_functions(attributions_about_to_expire: Lis
     ]
 
 
+def _filter_only_courses(attributions_about_to_expire: List[Attribution]):
+    from base.models.enums.learning_container_year_types import LearningContainerYearType
+
+    return [
+        attribution_about_to_expire for attribution_about_to_expire in attributions_about_to_expire
+        if attribution_about_to_expire.course_type == LearningContainerYearType.COURSE.name
+    ]
+
+
 def _get_unavailable_renewal_reason(
         attribution_about_to_expire: Attribution,
         vacant_courses_next_year: List[VacantCourse],
@@ -243,6 +254,9 @@ def _get_unavailable_renewal_reason(
         )
     except MultipleBusinessExceptions as e:
         first_exception = next(iter(e.exceptions))
+
+        if isinstance(first_exception, VolumesAskedShouldBeLowerOrEqualToVolumeAvailable):
+            return AutomaticRenewalImpossibleVolumesVacantLowerThanVolumesToRenew().message
         return first_exception.message
 
 

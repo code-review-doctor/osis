@@ -27,7 +27,6 @@ from typing import List
 
 import attr
 
-from attribution.models.enums.function import Functions
 from ddd.logic.application.domain.model._attribution import Attribution
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 from osis_common.ddd import interface
@@ -50,12 +49,4 @@ class Applicant(interface.RootEntity):
             attribution for attribution in self.attributions
             if attribution.end_year == academic_year_identity and
             attribution.course_id.academic_year == academic_year_identity
-        ]
-
-    def get_attributions_about_to_expire_renewable_with_functions(self, academic_year_identity: AcademicYearIdentity):
-        return [
-            attribution_about_to_expire for attribution_about_to_expire in self.get_attributions_about_to_expire(
-                academic_year_identity
-            )
-            if attribution_about_to_expire.function in (Functions.CO_HOLDER, Functions.HOLDER)
         ]

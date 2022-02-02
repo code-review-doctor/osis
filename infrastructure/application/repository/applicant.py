@@ -107,6 +107,7 @@ def _prefetch_attributions(applicant_qs) -> List[AttributionFromRepositoryDTO]:
             ).annotate_full_title().values('full_title')[:1],
             output_field=models.CharField()
         ),
+        course_type=F('learning_container_year__container_type'),
         course_is_in_suppression_proposal=Exists(
             ProposalLearningUnit.objects.filter(
                 learning_unit_year__learning_container_year_id=OuterRef('learning_container_year_id'),
@@ -136,6 +137,7 @@ def _prefetch_attributions(applicant_qs) -> List[AttributionFromRepositoryDTO]:
         'course_id_year',
         'course_is_in_suppression_proposal',
         'course_title',
+        'course_type',
         'function',
         'end_year',
         'start_year',
