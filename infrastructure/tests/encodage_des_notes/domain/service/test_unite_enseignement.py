@@ -46,7 +46,12 @@ class UniteEnseignementTest(TestCase):
             full_title="A title",
             type="A type",
             responsible_entity_code="OSIS",
-            responsible_entity_title="OSIS Entity"
+            responsible_entity_title="OSIS Entity",
+            quadrimester='Q1',
+            credits=20,
+            lecturing_volume_annual=10,
+            practical_volume_annual=10,
+            session_derogation="",
         )
         cls.classe_dto = EffectiveClassInMemoryRepository.dtos[0]
 

@@ -1,0 +1,122 @@
+<style>
+    .side-container {
+        width: 300px;
+        height: calc(100% - 125px);
+        top: 75px;
+        left: 50px;
+    }
+
+    .main-content {
+        margin-left: 350px;
+    }
+
+    .node_block_text {
+        position: absolute;
+        right: 0;
+        width: 40px;
+        text-align: center;
+    }
+
+    #tree a {
+        white-space: nowrap !important;
+        height: auto;
+        padding: 1px 2px;
+    }
+
+    #tree li > ins {
+        vertical-align: top;
+    }
+
+    #tree .jstree-hovered, #demo4 .jstree-clicked {
+        border: 0;
+    }
+
+    #tree {
+        overflow-x: scroll;
+        height: 60vh;
+    }
+</style>
+<div id="js_tree_panel">
+    <input class="form-control" id="tree_search" type="text" placeholder="Search" aria-label="Search">
+    <div id="tree"></div>
+
+    <script>
+        $(document).ready(() => {
+            const $tree = $('#tree');
+            const $tree_search = $('#tree_search');
+            $tree.jstree({
+                'core': {
+                    "animation": 0,
+                    "check_callback": true,
+                    'data': {
+                        'url': "{{ tree_view_url }}",
+                        'data': function (node) {
+                            return {'id': node.id};
+                        }
+                    }
+                },
+                "plugins": [
+                    "contextmenu",
+                    "state",
+                    "search"
+                ],
+                "state": {
+                    "key": `tree_state_` + $tree.attr('id'),
+                    "opened": true,
+                    "selected": false,
+                    "ttl": 3600000
+                },
+                "search": {
+                    "case_insensitive": true,
+                    "show_only_matches": true
+                },
+                "contextmenu": {
+                    "select_node": false,
+                    "items": function ($node) {
+                        return {
+                            "action_1": {
+                                "label": gettext("Action 1"),
+                                "action": function (node) {
+                                    window.alert("Action 1");
+                                },
+                                "_disabled": function (node) {
+                                    return false;
+                                }
+                            },
+                            "action_2": {
+                                "label": gettext("Action 2"),
+                                "action": function (node) {
+                                    window.alert("Action 2");
+                                },
+                                "_disabled": function (node) {
+                                    return true;
+                                }
+                            },
+                            "open_all": {
+                                "separator_before": true,
+                                "label": gettext("Open all"),
+                                "action": function (node) {
+                                    $tree.jstree('open_all');
+                                }
+                            },
+                            "close_all": {
+                                "label": gettext("Close all"),
+                                "action": function (node) {
+                                    $tree.jstree('close_all');
+                                }
+                            },
+                        }
+                    }
+                }
+            });
+
+            $tree_search.keyup((e) => {
+                $tree.jstree(true).search(e.target.value);
+            });
+
+            $tree.bind('refreshNode', function (e, node_id) {
+                $tree.jstree(true).refresh_node(node_id);
+            });
+        });
+    </script>
+</div>

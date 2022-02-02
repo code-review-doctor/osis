@@ -106,7 +106,10 @@ class CreateCommand(interface.CommandRequest):
 
 @attr.s(frozen=True, slots=True)
 class LearningUnitSearchCommand(interface.CommandRequest):
-    code_annee_values = attr.ib(type=Set[Tuple[str, int]])
+    code_annee_values = attr.ib(type=Set[Tuple[str, int]], default=None)
+    annee_academique = attr.ib(type=int, default=None)
+    code = attr.ib(type=str, default="")
+    intitule = attr.ib(type=str, default="")
 
 
 @attr.s(frozen=True, slots=True)
