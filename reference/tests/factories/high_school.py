@@ -1,6 +1,6 @@
 ##############################################################################
 #
-#    OSIS stands for Open Student Information System. It's an application
+# OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
 #    such as universities, faculties, institutes and professional schools.
 #    The core business involves the administration of students, teachers,
@@ -15,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,25 +23,28 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from functools import partial
+import factory
+from factory import fuzzy
 
-from rest_framework import serializers
-
-from reference.models.language import Language
-
-RelatedLanguageField = partial(
-    serializers.SlugRelatedField,
-    slug_field='code',
-    queryset=Language.objects.all(),
-    allow_null=True,
-)
+from base.tests.factories.organization import OrganizationFactory
+from reference.tests.factories.city import ZipCodeFactory
+from reference.tests.factories.language import LanguageFactory
 
 
-class LanguageSerializer(serializers.ModelSerializer):
+class HighSchoolFactory(factory.DjangoModelFactory):
     class Meta:
-        model = Language
-        fields = (
-            'code',
-            'name',
-            'name_en'
-        )
+        model = 'reference.HighSchool'
+
+    external_id = factory.Faker('text', max_nb_chars=100)
+    # uuid
+    organization = factory.SubFactory(OrganizationFactory)
+    phone = factory.Sequence(lambda n: 'Phone - %d' % n)
+    fax = factory.Sequence(lambda n: 'Fax - %d' % n)
+    email = factory.Sequence(lambda n: 'high_school{0}@example.com'.format(n))
+    start_year = fuzzy.FuzzyInteger(1999, 2099)
+    end_year = None
+    linguistic_regime = factory.SubFactory(LanguageFactory)
+    zip_code = factory.SubFactory(ZipCodeFactory)
+    street = factory.Sequence(lambda n: 'Street {0}'.format(n))
+    street_number = factory.Sequence(lambda n: '%d' % n)
+    type = ''
