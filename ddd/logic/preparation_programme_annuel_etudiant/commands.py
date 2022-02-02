@@ -58,12 +58,10 @@ class GetProgrammeInscriptionCoursCommand(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
-class RetirerUEDuProgrammeCommand(interface.CommandRequest):
-    annee_formation: int
-    sigle_formation: str
-    version_formation: str
-    transition_formation: str
-    groupement_uuid: str  # TODO :: code groupement ou uuid groupement ?
+class SupprimerUEDuProgrammeCommand(interface.CommandRequest):
+    annee: int
+    code_programme: str
+    retirer_de: str  # code groupement
     unites_enseignements: List[GetUniteEnseignementCommand]
 
 

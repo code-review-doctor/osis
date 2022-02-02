@@ -1,13 +1,13 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext as _
 from django.views.generic import TemplateView
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.utils.htmx import HtmxMixin
 from base.views.common import display_success_messages, display_error_messages
-from ddd.logic.preparation_programme_annuel_etudiant.commands import RetirerUEDuProgrammeCommand, \
+from ddd.logic.preparation_programme_annuel_etudiant.commands import SupprimerUEDuProgrammeCommand, \
     GetUniteEnseignementCommand
 from education_group.models.group_year import GroupYear
 from infrastructure.messages_bus import message_bus_instance
@@ -126,15 +126,11 @@ class SupprimerUnitesEnseignementView(PermissionRequiredMixin, LoginRequiredMixi
         return redirect(self.get_consulter_contenu_groupement_url())
 
     def _get_command(self, to_delete):
-        return RetirerUEDuProgrammeCommand(
-            sigle_formation=self.kwargs['code_programme'],
-            annee_formation=self.kwargs['annee'],
-            version_formation='',
-            transition_formation='',
-            groupement_uuid='',
-            unites_enseignements=[
-                GetUniteEnseignementCommand(code=code) for code in to_delete
-            ]
+        return SupprimerUEDuProgrammeCommand(
+            code_programme=self.kwargs['code_programme'],
+            annee=self.kwargs['annee'],
+            retirer_de='LECGE900R',
+            unites_enseignements=[GetUniteEnseignementCommand(code=code) for code in to_delete]
         )
 
     def get_consulter_contenu_groupement_url(self):

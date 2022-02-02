@@ -31,7 +31,11 @@ from osis_common.ddd.interface import BusinessException
 
 class UniteEnseignementDejaAjouteeException(BusinessException):
     def __init__(self, unite_enseignement: 'LearningUnitIdentity', **kwargs):
-        message = _("Learning unit {} already added in this ajusted group.").format(unite_enseignement)
+        message = _("Learning unit {} already added in this adjusted group.").format(unite_enseignement)
         super().__init__(message, **kwargs)
 
 
+class UniteEnseignementDejaSupprimeeException(BusinessException):
+    def __init__(self, unite_enseignement: 'LearningUnitIdentity', **kwargs):
+        message = _("Learning unit {} already deleted from this adjusted group.").format(unite_enseignement)
+        super().__init__(message, **kwargs)

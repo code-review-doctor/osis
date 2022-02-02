@@ -26,7 +26,8 @@
 import uuid
 from typing import Union
 
-from ddd.logic.preparation_programme_annuel_etudiant.commands import AjouterUEAuProgrammeCommand
+from ddd.logic.preparation_programme_annuel_etudiant.commands import AjouterUEAuProgrammeCommand, \
+    SupprimerUEDuProgrammeCommand
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
     IdentiteGroupementAjusteInscriptionCours, GroupementAjusteInscriptionCours
 from ddd.logic.preparation_programme_annuel_etudiant.repository.i_groupement_ajuste_inscription_cours import \
@@ -37,22 +38,47 @@ from osis_common.ddd import interface
 
 class GroupementAjusteInscriptionCoursBuilder(interface.RootEntityBuilder):
     @classmethod
-    def build_from_command(
+    def build_from_add_command(
             cls,
             cmd: Union['AjouterUEAuProgrammeCommand'],
             repository: 'IGroupementAjusteInscriptionCoursRepository'
     ) -> 'GroupementAjusteInscriptionCours':
-        groupement_id = GroupIdentity(
-            code=cmd.ajouter_dans,
-            year=cmd.annee,
+        return cls._build_from_group_identity(
+            group_identity=GroupIdentity(
+                code=cmd.ajouter_dans,
+                year=cmd.annee,
+            ),
+            repository=repository
         )
-        groupements_ajustes = repository.search(groupement_id=groupement_id)
+
+    @classmethod
+    def build_from_delete_command(
+            cls,
+            cmd: Union['SupprimerUEDuProgrammeCommand'],
+            repository: 'IGroupementAjusteInscriptionCoursRepository'
+    ) -> 'GroupementAjusteInscriptionCours':
+        return cls._build_from_group_identity(
+            group_identity=GroupIdentity(
+                code=cmd.retirer_de,
+                year=cmd.annee,
+            ),
+            repository=repository
+        )
+
+    @classmethod
+    def _build_from_group_identity(
+            cls,
+            group_identity: 'GroupIdentity',
+            repository: 'IGroupementAjusteInscriptionCoursRepository'
+    ):
+        groupements_ajustes = repository.search(groupement_id=group_identity)
         if groupements_ajustes:
             return groupements_ajustes[0]
         return GroupementAjusteInscriptionCours(
             entity_id=IdentiteGroupementAjusteInscriptionCours(uuid=uuid.uuid4()),
-            groupement_id=groupement_id,
+            groupement_id=group_identity,
             unites_enseignement_ajoutees=[],
             unites_enseignement_supprimees=[],
             unites_enseignement_modifiees=[],
         )
+

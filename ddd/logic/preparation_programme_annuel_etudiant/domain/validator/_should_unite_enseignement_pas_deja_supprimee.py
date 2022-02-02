@@ -23,27 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import TYPE_CHECKING
 
-from ddd.logic.preparation_programme_annuel_etudiant.commands import SupprimerUEDuProgrammeCommand
-from ddd.logic.preparation_programme_annuel_etudiant.domain.builder.groupement_ajuste_inscription_cours_builder import \
-    GroupementAjusteInscriptionCoursBuilder
-from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
-    IdentiteGroupementAjusteInscriptionCours
-from ddd.logic.preparation_programme_annuel_etudiant.repository.i_groupement_ajuste_inscription_cours import \
-    IGroupementAjusteInscriptionCoursRepository
+import attr
+
+from base.ddd.utils.business_validator import BusinessValidator
+from ddd.logic.preparation_programme_annuel_etudiant.domain.validator.exceptions import \
+    UniteEnseignementDejaSupprimeeException
+
+if TYPE_CHECKING:
+    from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
+    from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
+        GroupementAjusteInscriptionCours
 
 
-def supprimer_UE_du_programme(
-        cmd: 'SupprimerUEDuProgrammeCommand',
-        repository: 'IGroupementAjusteInscriptionCoursRepository',
-) -> 'IdentiteGroupementAjusteInscriptionCours':
-    # GIVEN
-    groupement_ajuste = GroupementAjusteInscriptionCoursBuilder.build_from_delete_command(cmd, repository)
+@attr.s(frozen=True, slots=True, auto_attribs=True)
+class ShouldUniteEnseignementPasDejaSupprimee(BusinessValidator):
+    groupement_ajuste: 'GroupementAjusteInscriptionCours'
+    unite_enseignement: 'LearningUnitIdentity'
 
-    # WHEN
-    for cmd_ue in cmd.unites_enseignements:
-        groupement_ajuste.supprimer_unite_enseignement(code_unite_enseignement=cmd_ue.code)
-
-    # THEN
-    repository.save(groupement_ajuste)
-    return groupement_ajuste.entity_id
+    def validate(self, *args, **kwargs):
+        if self.unite_enseignement in self.groupement_ajuste.get_identites_unites_enseignement_supprimees():
+            raise UniteEnseignementDejaSupprimeeException(self.unite_enseignement)
