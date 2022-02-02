@@ -23,30 +23,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List, Optional
+from typing import List, Union
 
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormationCommand
 from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import \
     ICatalogueFormationsTranslator
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, GroupementCatalogueDTO, \
-    ContenuGroupementCatalogueDTO, UniteEnseignementDTO, UniteEnseignementCatalogueDTO
-from program_management.ddd.dtos import ProgrammeDeFormationDTO, ContenuNoeudDTO, GroupementDTO
-
-
-def build_formation_dto(program_management_formation_dto: ProgrammeDeFormationDTO) -> FormationDTO:
-    racine = build_contenu(program_management_formation_dto.racine)
-    return FormationDTO(
-        racine=racine,
-        annee=program_management_formation_dto.annee,
-        sigle=program_management_formation_dto.sigle,
-        version=program_management_formation_dto.version,
-        intitule_formation=program_management_formation_dto.intitule_formation,
-    )
+from ddd.logic.preparation_programme_annuel_etudiant.domain.validator.exceptions import FormationIntrouvableException
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, \
+    ContenuGroupementCatalogueDTO, UniteEnseignementDTO, UniteEnseignementCatalogueDTO, GroupementCatalogueDTO
+from program_management.ddd.dtos import ProgrammeDeFormationDTO, ContenuNoeudDTO, ElementType
 
 
 class CatalogueFormationsTranslator(ICatalogueFormationsTranslator):
     @classmethod
-    def get_formation(cls, code_programme: str, annee: int, ) -> Optional['FormationDTO']:
+    def get_formation(cls, code_programme: str, annee: int) -> 'FormationDTO':
         from infrastructure.messages_bus import message_bus_instance
         program_management_formation_dto = message_bus_instance.invoke(
             GetFormationCommand(
@@ -55,78 +45,53 @@ class CatalogueFormationsTranslator(ICatalogueFormationsTranslator):
             )
         )
         if program_management_formation_dto:
-            return build_formation_dto(program_management_formation_dto)
-        return None
-
-    @classmethod
-    def get_groupement(
-            cls,
-            sigle_formation: str,
-            annee: int,
-            version_formation: str,
-            code_groupement: str
-    ) -> 'GroupementDTO':
-        raise NotImplementedError()
+            return _build_formation_dto(program_management_formation_dto)
+        raise FormationIntrouvableException(code_programme=code_programme, annee=annee)
 
 
-def build_contenu(contenu_noeud: ContenuNoeudDTO) -> ContenuGroupementCatalogueDTO:
-    groupements_contenus = []
-
-    for groupement_contenu in contenu_noeud.groupements_contenus:
-        contenu_groupement_catalog = build_contenu(groupement_contenu)
-        groupements_contenus.append(contenu_groupement_catalog)
-
-    return construire_contenu_groupement_catalogue_dto(
-        contenu_noeud,
-        groupements_contenus,
-        contenu_noeud.unites_enseignement_contenues,
+def _build_formation_dto(program_management_formation_dto: ProgrammeDeFormationDTO) -> FormationDTO:
+    return FormationDTO(
+        racine=__build_groupement_contenu(program_management_formation_dto.racine),
+        annee=program_management_formation_dto.annee,
+        sigle=program_management_formation_dto.sigle,
+        version=program_management_formation_dto.version,
+        intitule_formation=program_management_formation_dto.intitule_formation,
     )
 
 
-def construire_contenu_groupement_catalogue_dto(
-        contenu_noeud: ContenuNoeudDTO,
-        groupements_contenus: List[ContenuGroupementCatalogueDTO],
-        unites_enseignement_contenues: List[UniteEnseignementDTO]) -> ContenuGroupementCatalogueDTO:
-
-    groupement_catalogue_dto = _convertir_contenu_noeud_dto_en_groupement_catalogue_dto(contenu_noeud)
-    unites_enseignement_contenues_dto = _convertir_unites_enseignement_contenues_en_unites_enseignement_catalogue_dto(
-        unites_enseignement_contenues
-    )
+def __build_groupement_contenu(contenu_noeud: ContenuNoeudDTO) -> ContenuGroupementCatalogueDTO:
     return ContenuGroupementCatalogueDTO(
-        groupement_contenant=groupement_catalogue_dto,
-        groupements_contenus=groupements_contenus,
-        unites_enseignement_contenues=unites_enseignement_contenues_dto
+        groupement_contenant=GroupementCatalogueDTO(
+            code=contenu_noeud.code,
+            intitule=contenu_noeud.intitule,
+            obligatoire=contenu_noeud.obligatoire,
+            remarque=contenu_noeud.remarque,
+            credits=contenu_noeud.credits,
+            intitule_complet=contenu_noeud.intitule_complet,
+        ),
+        contenu_ordonne_catalogue=__build_contenu_ordonne_catalogue(contenu_noeud.contenu_ordonne)
     )
 
 
-def _convertir_contenu_noeud_dto_en_groupement_catalogue_dto(contenu_noeud: ContenuNoeudDTO) -> GroupementCatalogueDTO:
-    return GroupementCatalogueDTO(
-        code=contenu_noeud.groupement_contenant.code,
-        intitule=contenu_noeud.groupement_contenant.intitule,
-        obligatoire=contenu_noeud.groupement_contenant.obligatoire,
-        remarque=contenu_noeud.groupement_contenant.remarque,
-        credits=contenu_noeud.groupement_contenant.credits,
-        intitule_complet=contenu_noeud.groupement_contenant.intitule_complet,
-    )
-
-
-def _convertir_unites_enseignement_contenues_en_unites_enseignement_catalogue_dto(
-        unites_enseignement_contenues: List['UniteEnseignementDTO']) -> List['UniteEnseignementCatalogueDTO']:
-    unites_enseignement_catalogue_dto = []
-    for unite_enseignement_contenue in unites_enseignement_contenues:
-        unites_enseignement_catalogue_dto.append(
-            UniteEnseignementCatalogueDTO(
-                bloc=unite_enseignement_contenue.bloc,
-                code=unite_enseignement_contenue.code,
-                intitule_complet=unite_enseignement_contenue.intitule_complet,
-                quadrimestre=unite_enseignement_contenue.quadrimestre,
-                quadrimestre_texte=unite_enseignement_contenue.quadrimestre_texte,
-                credits_absolus=unite_enseignement_contenue.credits_absolus,
-                volume_annuel_pm=unite_enseignement_contenue.volume_annuel_pm,
-                volume_annuel_pp=unite_enseignement_contenue.volume_annuel_pp,
-                obligatoire=unite_enseignement_contenue.obligatoire,
-                credits_relatifs=unite_enseignement_contenue.credits_relatifs,
-                session_derogation=unite_enseignement_contenue.session_derogation,
+def __build_contenu_ordonne_catalogue(contenu_ordonne: List[Union['UniteEnseignementDTO', 'ContenuNoeudDTO']]):
+    contenu_ordonne_catalogue = []
+    for element in contenu_ordonne:
+        if element.type == ElementType.UNITE_ENSEIGNEMENT.name:
+            contenu_ordonne_catalogue.append(
+                UniteEnseignementCatalogueDTO(
+                    bloc=element.bloc,
+                    code=element.code,
+                    intitule_complet=element.intitule_complet,
+                    quadrimestre=element.quadrimestre,
+                    quadrimestre_texte=element.quadrimestre_texte,
+                    credits_absolus=element.credits_absolus,
+                    volume_annuel_pm=element.volume_annuel_pm,
+                    volume_annuel_pp=element.volume_annuel_pp,
+                    obligatoire=element.obligatoire,
+                    credits_relatifs=element.credits_relatifs,
+                    session_derogation=element.session_derogation,
+                )
             )
-        )
-    return unites_enseignement_catalogue_dto
+        elif element.type == ElementType.GROUPEMENT.name:
+            contenu_ordonne_catalogue.append(__build_groupement_contenu(element))
+    return contenu_ordonne_catalogue

@@ -48,7 +48,7 @@ from program_management.ddd.domain import program_tree
 from program_management.ddd.domain import program_tree_version
 from program_management.ddd.domain.exception import ProgramTreeVersionNotFoundException
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, STANDARD, NOT_A_TRANSITION
-from program_management.ddd.dtos import UniteEnseignementDTO, GroupementDTO, ContenuNoeudDTO, ProgrammeDeFormationDTO
+from program_management.ddd.dtos import UniteEnseignementDTO, ContenuNoeudDTO, ProgrammeDeFormationDTO
 from program_management.ddd.repositories import program_tree as program_tree_repository
 from program_management.models.education_group_version import EducationGroupVersion
 
@@ -424,9 +424,10 @@ def _build_contenu(node: 'Node', lien_parent: 'Link' = None) -> 'ContenuNoeudDTO
     groupements_contenus = []
     ues_contenues = []
 
+    contenu_ordonne = []
     for lien in node.children:
         if lien.child.is_learning_unit():
-            ues_contenues.append(
+            contenu_ordonne.append(
                 UniteEnseignementDTO(
                     bloc=lien.block,
                     code=lien.child.code,
@@ -438,24 +439,23 @@ def _build_contenu(node: 'Node', lien_parent: 'Link' = None) -> 'ContenuNoeudDTO
                     volume_annuel_pp=lien.child.volume_total_practical,
                     obligatoire=lien.is_mandatory if lien else False,
                     session_derogation='',
-                    credits_relatifs=lien.relative_credits
+                    credits_relatifs=lien.relative_credits,
                 )
             )
         else:
             groupement_contenu = _build_contenu(lien.child, lien_parent=lien)
-            groupements_contenus.append(groupement_contenu)
+            contenu_ordonne.append(groupement_contenu)
 
     return ContenuNoeudDTO(
-        groupement_contenant=GroupementDTO(
-            code=node.code,
-            intitule=node.title,
-            remarque=node.remark_fr,
-            obligatoire=lien_parent.is_mandatory if lien_parent else False,
-            credits=_get_credits(lien_parent),
-            intitule_complet=get_verbose_title_group(node)
-        ),
-        groupements_contenus=groupements_contenus,
-        unites_enseignement_contenues=ues_contenues
+        code=node.code,
+        intitule=node.title,
+        remarque=node.remark_fr,
+        obligatoire=lien_parent.is_mandatory if lien_parent else False,
+        credits=_get_credits(lien_parent),
+        intitule_complet=get_verbose_title_group(node),
+        contenu_ordonne=contenu_ordonne,
+        # groupements_contenus=groupements_contenus,
+        # unites_enseignement_contenues=ues_contenues
     )
 
 

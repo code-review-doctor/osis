@@ -37,20 +37,7 @@ ANNEE = 2021
 
 def _cas_nominal_formation_version_standard():
     SIGLE = 'ECGE1BA'
-    ContenuGroupementCatalogueDTO(
-        groupement_contenant=GroupementCatalogueDTO(
-            intitule='Contenu :',
-            obligatoire=True,
-            remarque='Remarque',
-            credits=Decimal(10),
-            intitule_complet='Contenu :',
-            code='LECGE100T',
-        ),
-        groupements_contenus=[
 
-        ],
-        unites_enseignement_contenues=[
-        ]),
     return FormationDTO(
         racine=ContenuGroupementCatalogueDTO(
             groupement_contenant=GroupementCatalogueDTO(
@@ -61,7 +48,7 @@ def _cas_nominal_formation_version_standard():
                 intitule_complet='Bachelier en sciences économiques et de gestion',
                 code='LECGE100B'
             ),
-            groupements_contenus=[
+            contenu_ordonne_catalogue=[
                 ContenuGroupementCatalogueDTO(
                     groupement_contenant=GroupementCatalogueDTO(
                         intitule='Contenu :',
@@ -71,7 +58,7 @@ def _cas_nominal_formation_version_standard():
                         intitule_complet='Contenu :',
                         code='LECGE100T',
                     ),
-                    groupements_contenus=[
+                    contenu_ordonne_catalogue=[
                         ContenuGroupementCatalogueDTO(
                             groupement_contenant=GroupementCatalogueDTO(
                                 intitule='Programme de base',
@@ -81,9 +68,7 @@ def _cas_nominal_formation_version_standard():
                                 intitule_complet='Programme de base',
                                 code='LECGE900R',
                             ),
-                            groupements_contenus=[
-                            ],
-                            unites_enseignement_contenues=[
+                            contenu_ordonne_catalogue=[
                                 UniteEnseignementCatalogueDTO(
                                     bloc=1,
                                     code='LESPO1113',
@@ -107,9 +92,7 @@ def _cas_nominal_formation_version_standard():
                                 intitule_complet='Formation pluridisciplinaire en sciences humaines',
                                 code='LECGE100R',
                             ),
-                            groupements_contenus=[
-                            ],
-                            unites_enseignement_contenues=[
+                            contenu_ordonne_catalogue=[
                                 UniteEnseignementCatalogueDTO(
                                     bloc=3,
                                     code='LESPO1321',
@@ -133,9 +116,7 @@ def _cas_nominal_formation_version_standard():
                                 intitule_complet='Cours au choix',
                                 code='LECGE860R',
                             ),
-                            groupements_contenus=[
-                            ],
-                            unites_enseignement_contenues=[
+                            contenu_ordonne_catalogue=[
                                 UniteEnseignementCatalogueDTO(
                                     bloc=1,
                                     code='LCOPS1124',
@@ -150,13 +131,8 @@ def _cas_nominal_formation_version_standard():
                                     session_derogation='',
                                 )
                             ]),
-
-                    ],
-                    unites_enseignement_contenues=[
-
-                    ]),
+                    ])
             ],
-            unites_enseignement_contenues=[]
         ),
         annee=ANNEE,
         sigle=SIGLE,
@@ -178,7 +154,7 @@ def _cas_formation_version_particuliere():
                 intitule_complet='Master [120] en communication[ Double diplôme UCLouvain - uSherbrooke ]',
                 code='LCORP203S'
             ),
-            groupements_contenus=[
+            contenu_ordonne_catalogue=[
                 ContenuGroupementCatalogueDTO(
                     groupement_contenant=GroupementCatalogueDTO(
                         intitule='Tronc commun',
@@ -188,8 +164,7 @@ def _cas_formation_version_particuliere():
                         intitule_complet='Tronc commun',
                         code='LCORP114T'
                     ),
-                    groupements_contenus=[],
-                    unites_enseignement_contenues=[
+                    contenu_ordonne_catalogue=[
                         UniteEnseignementCatalogueDTO(
                             bloc=2,
                             code='LCOMU2904B',
@@ -206,7 +181,6 @@ def _cas_formation_version_particuliere():
                     ]
                 ),
             ],
-            unites_enseignement_contenues=[]
         ),
         annee=ANNEE,
         sigle=SIGLE,
@@ -229,7 +203,7 @@ def _cas_formation_version_transition():
                 intitule_complet=INTITULE,
                 code='LDATI200S'
             ),
-            groupements_contenus=[
+            contenu_ordonne_catalogue=[
                 ContenuGroupementCatalogueDTO(
                     groupement_contenant=GroupementCatalogueDTO(
                         intitule='Contenu:',
@@ -239,8 +213,7 @@ def _cas_formation_version_transition():
                         intitule_complet='Contenu:',
                         code='TDATI101T'
                     ),
-                    groupements_contenus=[],
-                    unites_enseignement_contenues=[
+                    contenu_ordonne_catalogue=[
                         UniteEnseignementCatalogueDTO(
                             bloc=2,
                             code='LINFO2369',
@@ -257,7 +230,6 @@ def _cas_formation_version_transition():
                     ]
                 ),
             ],
-            unites_enseignement_contenues=[]
         ),
         annee=ANNEE,
         sigle=SIGLE,
@@ -282,7 +254,7 @@ def _cas_formation_version_particuliere_transition():
                 intitule_complet=INTITULE,
                 code='LCORP201S'
             ),
-            groupements_contenus=[
+            contenu_ordonne_catalogue=[
                 ContenuGroupementCatalogueDTO(
                     groupement_contenant=GroupementCatalogueDTO(
                         intitule='Contenu:',
@@ -292,8 +264,7 @@ def _cas_formation_version_particuliere_transition():
                         intitule_complet='Contenu:',
                         code='TCORP102T'
                     ),
-                    groupements_contenus=[],
-                    unites_enseignement_contenues=[
+                    contenu_ordonne_catalogue=[
                         UniteEnseignementCatalogueDTO(
                             bloc=2,
                             code='LCOMU9870',
@@ -310,7 +281,6 @@ def _cas_formation_version_particuliere_transition():
                     ]
                 ),
             ],
-            unites_enseignement_contenues=[]
         ),
         annee=ANNEE,
         sigle=SIGLE,
@@ -333,7 +303,7 @@ def _cas_formation_version_standard_annee_moins_1():
                 intitule_complet=INTITULE,
                 code='LECGE100B'
             ),
-            groupements_contenus=[
+            contenu_ordonne_catalogue=[
                 ContenuGroupementCatalogueDTO(
                     groupement_contenant=GroupementCatalogueDTO(
                         intitule='Content:',
@@ -343,8 +313,7 @@ def _cas_formation_version_standard_annee_moins_1():
                         intitule_complet='Content:',
                         code='LECGE100T',
                     ),
-                    groupements_contenus=[],
-                    unites_enseignement_contenues=[
+                    contenu_ordonne_catalogue=[
                         UniteEnseignementCatalogueDTO(
                             bloc=1,
                             code='LESPO1113',
@@ -360,7 +329,6 @@ def _cas_formation_version_standard_annee_moins_1():
                         )
                     ]),
             ],
-            unites_enseignement_contenues=[]
         ),
         annee=ANNEE-1,
         sigle=SIGLE,
@@ -383,7 +351,7 @@ def _cas_mini_formation_version_standard():
                 intitule_complet=INTITULE,
                 code='LADRT100I'
             ),
-            groupements_contenus=[
+            contenu_ordonne_catalogue=[
                 ContenuGroupementCatalogueDTO(
                     groupement_contenant=GroupementCatalogueDTO(
                         intitule='Contenu:',
@@ -393,8 +361,7 @@ def _cas_mini_formation_version_standard():
                         intitule_complet='Contenu:',
                         code='LADRT100T',
                     ),
-                    groupements_contenus=[],
-                    unites_enseignement_contenues=[
+                    contenu_ordonne_catalogue=[
                         UniteEnseignementCatalogueDTO(
                             bloc=3,
                             code='LDROI1225',
@@ -410,7 +377,6 @@ def _cas_mini_formation_version_standard():
                         )
                     ]),
             ],
-            unites_enseignement_contenues=[]
         ),
         annee=ANNEE,
         sigle=SIGLE,
@@ -434,7 +400,7 @@ def _cas_mini_formation_version_particuliere():
                 intitule_complet=INTITULE,
                 code='LADRT100S'
             ),
-            groupements_contenus=[
+            contenu_ordonne_catalogue=[
                 ContenuGroupementCatalogueDTO(
                     groupement_contenant=GroupementCatalogueDTO(
                         intitule='Contenu:',
@@ -444,8 +410,7 @@ def _cas_mini_formation_version_particuliere():
                         intitule_complet='Contenu:',
                         code='LADRT101T',
                     ),
-                    groupements_contenus=[],
-                    unites_enseignement_contenues=[
+                    contenu_ordonne_catalogue=[
                         UniteEnseignementCatalogueDTO(
                             bloc=2,
                             code='LDROI1222',
@@ -461,7 +426,6 @@ def _cas_mini_formation_version_particuliere():
                         )
                     ]),
             ],
-            unites_enseignement_contenues=[]
         ),
         annee=ANNEE,
         sigle=SIGLE,
@@ -485,7 +449,7 @@ def _cas_mini_formation_version_transition():
                 intitule_complet=INTITULE,
                 code='LADRT111S'
             ),
-            groupements_contenus=[
+            contenu_ordonne_catalogue=[
                 ContenuGroupementCatalogueDTO(
                     groupement_contenant=GroupementCatalogueDTO(
                         intitule='Contenu:',
@@ -495,8 +459,7 @@ def _cas_mini_formation_version_transition():
                         intitule_complet='Contenu:',
                         code='TADRT100T',
                     ),
-                    groupements_contenus=[],
-                    unites_enseignement_contenues=[
+                    contenu_ordonne_catalogue=[
                         UniteEnseignementCatalogueDTO(
                             bloc=2,
                             code='LDROI1223',
@@ -512,7 +475,6 @@ def _cas_mini_formation_version_transition():
                         )
                     ]),
             ],
-            unites_enseignement_contenues=[]
         ),
         annee=ANNEE,
         sigle=SIGLE,
@@ -536,7 +498,7 @@ def _cas_mini_formation_version_particuliere_transition():
                 intitule_complet=INTITULE,
                 code='LADRT101S'
             ),
-            groupements_contenus=[
+            contenu_ordonne_catalogue=[
                 ContenuGroupementCatalogueDTO(
                     groupement_contenant=GroupementCatalogueDTO(
                         intitule='Contenu:',
@@ -546,8 +508,7 @@ def _cas_mini_formation_version_particuliere_transition():
                         intitule_complet='Contenu:',
                         code='TADRT101T',
                     ),
-                    groupements_contenus=[],
-                    unites_enseignement_contenues=[
+                    contenu_ordonne_catalogue=[
                         UniteEnseignementCatalogueDTO(
                             bloc=2,
                             code='LDROI1225',
@@ -563,7 +524,6 @@ def _cas_mini_formation_version_particuliere_transition():
                         )
                     ]),
             ],
-            unites_enseignement_contenues=[]
         ),
         annee=ANNEE,
         sigle=SIGLE,
@@ -587,7 +547,7 @@ def _cas_mini_formation_version_standard_annee_moins_1():
                 intitule_complet=INTITULE,
                 code='LADRT121S'
             ),
-            groupements_contenus=[
+            contenu_ordonne_catalogue=[
                 ContenuGroupementCatalogueDTO(
                     groupement_contenant=GroupementCatalogueDTO(
                         intitule='Contenu:',
@@ -597,8 +557,7 @@ def _cas_mini_formation_version_standard_annee_moins_1():
                         intitule_complet='Contenu:',
                         code='LADRT100T',
                     ),
-                    groupements_contenus=[],
-                    unites_enseignement_contenues=[
+                    contenu_ordonne_catalogue=[
                         UniteEnseignementCatalogueDTO(
                             bloc=3,
                             code='LDROI1225',
@@ -614,7 +573,6 @@ def _cas_mini_formation_version_standard_annee_moins_1():
                         )
                     ]),
             ],
-            unites_enseignement_contenues=[]
         ),
         annee=ANNEE-1,
         sigle=SIGLE,
