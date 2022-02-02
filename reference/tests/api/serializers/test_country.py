@@ -44,6 +44,7 @@ class CountryListSerializerTestCase(TestCase):
             'iso_code',
             'name',
             'name_en',
-            'nationality'
+            'nationality',
+            'dialing_code'
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
