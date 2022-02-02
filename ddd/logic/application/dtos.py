@@ -38,6 +38,7 @@ class AttributionFromRepositoryDTO(DTO):
     course_id_year = attr.ib(type=int)
     course_is_in_suppression_proposal = attr.ib(type=bool)
     course_title = attr.ib(type=int)
+    course_type = attr.ib(type=str)
     applicant_id_global_id = attr.ib(type=str)
     function = attr.ib(type=str)
     end_year = attr.ib(type=int)

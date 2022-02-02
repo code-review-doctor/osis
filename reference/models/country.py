@@ -43,7 +43,7 @@ class Country(SerializableModel):
     name_en = models.CharField(max_length=80)
     nationality = models.CharField(max_length=80, blank=True, null=True)
     european_union = models.BooleanField(default=False)
-    dialing_code = models.CharField(max_length=3, blank=True, null=True)
+    dialing_code = models.CharField(max_length=6, blank=True, null=True)
     cref_code = models.CharField(max_length=3, blank=True, null=True)
     currency = models.ForeignKey('Currency', blank=True, null=True, on_delete=models.CASCADE)
     continent = models.ForeignKey('Continent', blank=True, null=True, on_delete=models.CASCADE)

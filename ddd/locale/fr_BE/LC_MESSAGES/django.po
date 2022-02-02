@@ -33,6 +33,13 @@ msgstr ""
 "La candidature sur ce cours vacant est réservée pour les internes/ouverte "
 "pour les externes"
 
+msgid ""
+"Automatic renewal is not possible because the volume declared vacant is "
+"lower than the volume to be renewed. Please go through \"Add a new "
+"application\"."
+msgstr "La reconduction automatique n'est pas possible car le volume déclaré vacant est inférieur au volume "
+"à reconduire. Veuillez passer par 'Ajouter une nouvelle candidature'."
+
 msgid "Can't create a learning unit lower than 2019-20"
 msgstr "On ne peut pas créer une UE avec une année inférieure à 2019-20"
 
@@ -86,6 +93,7 @@ msgstr "Détails autre aménagement"
 msgid "Distributed volume should be filled in and be greater than 0"
 msgstr "Le volume attribué doit être supérieur à 0"
 
+# python-format
 msgid "Extra time (33% generally)"
 msgstr "Tiers-Temps"
 
