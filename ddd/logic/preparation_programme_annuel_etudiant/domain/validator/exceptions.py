@@ -39,3 +39,9 @@ class UniteEnseignementDejaSupprimeeException(BusinessException):
     def __init__(self, unite_enseignement: 'LearningUnitIdentity', **kwargs):
         message = _("Learning unit {} already deleted from this adjusted group.").format(unite_enseignement)
         super().__init__(message, **kwargs)
+
+
+class FormationIntrouvableException(BusinessException):
+    def __init__(self, code_programme: str, annee: int, **kwargs):
+        message = _("Training {} - {} not found").format(code_programme, str(annee))
+        super().__init__(message, **kwargs)

@@ -34,13 +34,12 @@
         {% endif %}
     {% endif %}
 
-    {% for contenu_groupement_enfant in contenu.unites_enseignement_contenues %}
-        {% include 'preparation_inscription/blocks/ligne_formulaire_inscription.html' with contenu=contenu_groupement_enfant profondeur=profondeur|add:"1" est_une_ue=True racine=False%}
+    {% for element in contenu.contenu %}
+        {% if element.type == "UNITE_ENSEIGNEMENT" %}
+             {% include 'preparation_inscription/blocks/ligne_formulaire_inscription.html' with contenu=element profondeur=profondeur|add:"1" est_une_ue=True racine=False %}
+        {% else %}
+            {% include 'preparation_inscription/blocks/ligne_formulaire_inscription.html' with contenu=element profondeur=profondeur est_une_ue=False racine=False %}
+        {% endif %}
     {% endfor %}
-
-    {% for contenu_groupement_enfant in contenu.groupements_contenus %}
-        {% include 'preparation_inscription/blocks/ligne_formulaire_inscription.html' with contenu=contenu_groupement_enfant profondeur=profondeur est_une_ue=False racine=False %}
-    {% endfor %}
-
 {% endwith %}
 

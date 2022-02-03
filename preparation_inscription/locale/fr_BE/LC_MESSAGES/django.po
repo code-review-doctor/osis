@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-03 14:20+0100\n"
+"POT-Creation-Date: 2022-02-03 14:50+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,6 +20,9 @@ msgstr ""
 msgid "ADDITION"
 msgstr "AJOUT"
 
+msgid "AJOUT"
+msgstr ""
+
 msgid "Actions"
 msgstr "Actions"
 
@@ -29,8 +32,14 @@ msgstr "Ajouter"
 msgid "Add learning units"
 msgstr "Ajouter des UE"
 
+msgid "Ajout"
+msgstr ""
+
 msgid "Anac."
 msgstr "Anac."
+
+msgid "Bloc"
+msgstr "Bloc"
 
 msgid "Block"
 msgstr "Bloc"
@@ -65,10 +74,22 @@ msgstr "Code"
 msgid "Comment"
 msgstr "Commentaire"
 
+msgid "Commentaire"
+msgstr "Commentaire"
+
+msgid "Commentaire en anglais"
+msgstr ""
+
 msgid "Components (PM/PP)"
 msgstr "Composants (PM/PP)"
 
+msgid "Composants (PM/PP)"
+msgstr "Composants (PM/PP)"
+
 msgid "Credits"
+msgstr "Crédits"
+
+msgid "Crédits"
 msgstr "Crédits"
 
 msgid "DELETION"
@@ -92,14 +113,26 @@ msgstr "Modifier les propriétés"
 msgid "English comment"
 msgstr "Commentaire en anglais"
 
+msgid "Intitulé"
+msgstr ""
+
+msgid "MODIFICATION"
+msgstr "MODIFICATION"
+
 msgid "Mandatory"
 msgstr "Obligatoire"
+
+msgid "Modification"
+msgstr ""
 
 msgid "Move downwards"
 msgstr "Déplacer vers le bas"
 
 msgid "Move upwards"
 msgstr "Déplacer vers le haut"
+
+msgid "Obligatoire"
+msgstr ""
 
 msgid "PAE preparation"
 msgstr "Préparation PAE"
@@ -113,11 +146,20 @@ msgstr "Quadri."
 msgid "Reset to initial program state"
 msgstr "Revenir à l'état initial du programme"
 
+msgid "SUPPRESSION"
+msgstr ""
+
+msgid "Save"
+msgstr ""
+
 msgid "Search"
 msgstr "Rechercher"
 
 msgid "Session"
 msgstr "Session"
+
+msgid "Suppression"
+msgstr "Suppression"
 
 msgid "The learning units have been added"
 msgstr "Les unités d'enseignement ont été ajoutées"
@@ -136,6 +178,24 @@ msgstr "Cette action annulera la modification de l'UE X du groupement Y"
 
 msgid "Title"
 msgstr "Intitule"
+
+msgid "Tri par bloc"
+msgstr ""
+
+msgid "Tri par code"
+msgstr ""
+
+msgid "Tri par ordre du programme"
+msgstr ""
+
+msgid "Tri par quadrimestre"
+msgstr ""
+
+msgid "Tri principal"
+msgstr ""
+
+msgid "Tri secondaire"
+msgstr ""
 
 msgctxt "student_path_year"
 msgid "Year"

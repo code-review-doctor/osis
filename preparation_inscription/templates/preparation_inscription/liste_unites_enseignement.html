@@ -1,0 +1,180 @@
+{% load static i18n bootstrap3 %}
+
+{% comment "License" %}
+ * OSIS stands for Open Student Information System. It's an application
+ * designed to manage the core business of higher education institutions,
+ * such as universities, faculties, institutes and professional schools.
+ * The core business involves the administration of students, teachers,
+ * courses, programs and so on.
+ *
+ * Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * A copy of this license - GNU General Public License - is available
+ * at the root of the source code of this program.  If not,
+    * see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+<div class="panel-heading">
+        <div class="pull-right">
+        <div class="dropdown">
+            <button class="btn btn-default dropdown-toggle" type="button" id="btn-action-down" data-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="true">
+                <span class="fa fa-cog" aria-hidden="true"></span> {% trans 'Actions' %}
+                <span class="caret"></span>
+            </button>
+        </div>
+    </div>
+    <h5>&nbsp;</h5>
+</div>
+
+<div class="panel-body">
+    <form method="POST" id="form_tri_preferences">
+        {{ form.media }}
+        {{ crsf_token }}
+        <div class="row">
+            <div class="col-md-5">
+                {% bootstrap_field form.tri_principal layout='horizontal'%}
+            </div>
+            <div class="col-md-5">
+                {% bootstrap_field form.tri_secondaire layout='horizontal'%}
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i>
+                    {% trans 'Save' %}
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <hr/>
+
+    <table id="table_search_list" class="table table-hover">
+        <thead>
+        <tr>
+        <th id="type_ajustement">
+            <div class="btn-group">
+              <a type="button" style="cursor: pointer;" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <i class="fas fa-filter text-primary"></i>
+              </a>
+              <ul class="dropdown-menu">
+                <li>
+                    <a>
+                        <input type="checkbox" checked>
+                        <i class="fas fa-folder-plus text-success"></i>
+                        {% trans 'Ajout' %}
+                    </a>
+                </li>
+                <li>
+                    <a>
+                        <input type="checkbox" checked>
+                        <i class="fas fa-folder-minus text-danger"></i>
+                        {% trans 'Suppression' %}
+                    </a>
+                </li>
+                <li>
+                    <a>
+                        <input type="checkbox" checked>
+                        <i class="fas fa-folder text-info"></i>
+                        {% trans 'Modification' %}
+                    </a>
+                </li>
+              </ul>
+            </div>
+        </th>
+        <th id="code_ue" class="code-col">
+            {% trans 'Code' %}
+            <i class="glyphicon glyphicon-sort text-primary" style="margin-left: 3px;"></i>
+        </th>
+        <th id="intitule">{% trans 'Intitulé' %}
+            <i class="glyphicon glyphicon-sort text-primary" style="margin-left: 3px;"></i></th>
+        <th id="volumes">{% trans 'Composants (PM/PP)' %}
+            <i class="glyphicon glyphicon-sort text-primary" style="margin-left: 3px;"></i></th>
+        <th id="bloc">
+            {% trans 'Bloc' %}
+            <i class="glyphicon glyphicon-sort text-primary" style="margin-left: 3px;"></i></th>
+        <th id="quadri">{% trans 'Quadri.' %}
+            <i class="glyphicon glyphicon-sort text-primary" style="margin-left: 3px;"></i></th>
+        <th id="credits">{% trans 'Crédits' %}
+            <i class="glyphicon glyphicon-sort text-primary" style="margin-left: 3px;"></i></th>
+        <th id="session">{% trans 'Session' %}
+            <i class="glyphicon glyphicon-sort text-primary" style="margin-left: 3px;"></i></th>
+        <th id="obligatoire">{% trans 'Obligatoire' %}
+            <i class="glyphicon glyphicon-sort text-primary" style="margin-left: 3px;"></i></th>
+        <th id="commentaire_fr">{% trans 'Commentaire' %}
+            <i class="glyphicon glyphicon-sort text-primary" style="margin-left: 3px;"></i></th>
+        <th id="commentaire_en">{% trans 'Commentaire en anglais' %}
+            <i class="glyphicon glyphicon-sort text-primary" style="margin-left: 3px;"></i></th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for element in search_result %}
+        <tr>
+            <td>
+                {% if element.type_ajustement == 'SUPPRESSION' %}
+                    <i class="fas fa-folder-minus text-danger"></i>
+                {% elif element.type_ajustement == 'MODIFICATION' %}
+                    <i class="fas fa-folder text-info"></i>
+                {% elif element.type_ajustement == 'AJOUT' %}
+                    <i class="fas fa-folder-plus text-success"></i>
+                {% endif %}
+            </td>
+
+            <td>
+                <span class="emphasized-code
+                {% if element.type_ajustement == 'SUPPRESSION' %}
+                    text-danger
+                {% elif element.type_ajustement == 'MODIFICATION' %}
+                    text-info
+                {% elif element.type_ajustement == 'AJOUT' %}
+                    text-success
+                {% endif %}
+                ">{{ element.code_ue }}</span>
+            </td>
+            <td headers="intitule">
+                {{ element.intitule }}
+            </td>
+            <td headers="volumes">
+                {{ element.volumes }}
+            </td>
+            <td headers="bloc">
+                {% if element.type_ajustement == 'MODIFICATION' %}
+                    <b class="text-info" style="font-weight: bolder; text-shadow: 0px 0px 2px currentColor;">{{ element.bloc }}</b>
+                {% else %}
+                    {{ element.bloc }}
+                {% endif %}
+            </td>
+            <td headers="quadri">
+                {{ element.quadri }}
+            </td>
+            <td headers="credits">
+                {{ element.credits }}
+            </td>
+            <td headers="session">
+                {{ element.session }}
+            </td>
+            <td headers="obligatoire">
+                {{ element.obligatoire }}
+            </td>
+            <td headers="commentaire_fr">
+                <div data-toggle="tooltip" title="{{ element.commentaire_fr }}">{{ element.commentaire_fr|truncatechars:10 }}</div>
+            </td>
+            <td headers="commentaire_en">
+                {{ element.commentaire_en }}
+            </td>
+        </tr>
+
+    {% endfor %}
+    </tbody>
+</table>
+</div>

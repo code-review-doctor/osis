@@ -23,32 +23,53 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from django import forms
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import TemplateView
+from django.views.generic import FormView
 
+from base.forms.utils.choice_field import add_blank
+from base.models.utils.utils import ChoiceEnum
 from base.utils.htmx import HtmxMixin
 
-RAFRAICHIR_GROUPEMENT_CONTENANT = 'rafraichir_groupement_contenant'
+
+class TypeAjustement(ChoiceEnum):
+    SUPPRESSION = _('SUPPRESSION')
+    MODIFICATION = _('MODIFICATION')
+    AJOUT = _('AJOUT')
 
 
-class ConsulterContenuGroupementView(HtmxMixin, PermissionRequiredMixin, TemplateView):
-    name = 'consulter_contenu_groupement_view'
+class PreferenceTri(ChoiceEnum):
+    TRI_ORDRE_PROGRAMME = _("Tri par ordre du programme")
+    TRI_PAR_CODE = _("Tri par code")
+    TRI_PAR_BLOC = _("Tri par bloc")
+    TRI_PAR_QUADRIMESTRE = _("Tri par quadrimestre")
 
-    # PermissionRequiredMixin
-    permission_required = "preparation_inscription.view_preparation_inscription_cours"
-    raise_exception = True
 
+class PreferenceTriForm(forms.Form):
+    tri_principal = forms.ChoiceField(
+        initial=PreferenceTri.TRI_ORDRE_PROGRAMME.name,
+        choices=list(PreferenceTri.choices()),
+        label=_("Tri principal").capitalize(),
+    )
+    tri_secondaire = forms.ChoiceField(
+        choices=add_blank(list(PreferenceTri.choices())),
+        label=_("Tri secondaire").capitalize(),
+        required=False
+    )
+
+
+class ListeUnitesEnseignementView(HtmxMixin, LoginRequiredMixin, FormView):
+    name = 'liste_unites_enseignement_view'
     # TemplateView
-    template_name = "preparation_inscription/preparation_inscription.html"
-    htmx_template_name = "preparation_inscription/consulter_contenu_groupement.html"
+    template_name = "preparation_inscription/liste_unites_enseignement.html"
+    htmx_template_name = "preparation_inscription/liste_unites_enseignement.html"
+    form_class = PreferenceTriForm
 
     def get_context_data(self, **kwargs):
         return {
             **super().get_context_data(**kwargs),
             # TODO code_groupement_racine :: à implémenter quand la story "afficher contenu" est développée
-            'code_groupement_racine': 'LECGE100T',
-            RAFRAICHIR_GROUPEMENT_CONTENANT: self.request.GET.get(RAFRAICHIR_GROUPEMENT_CONTENANT),
             'search_result': self.get_content(),
             'intitule_groupement': self.get_intitule_groupement(),
             'intitule_programme': self.get_intitule_programme(),
@@ -149,11 +170,3 @@ class ConsulterContenuGroupementView(HtmxMixin, PermissionRequiredMixin, Templat
         # TODO :: to implement
         return "Intitulé programme"
 
-
-from base.models.utils.utils import ChoiceEnum
-
-
-class TypeAjustement(ChoiceEnum):
-    SUPPRESSION = _('DELETION')
-    MODIFICATION = _('EDITION')
-    AJOUT = _('ADDITION')

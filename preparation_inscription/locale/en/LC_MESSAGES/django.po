@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-03 14:20+0100\n"
+"POT-Creation-Date: 2022-02-03 14:50+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,6 +20,9 @@ msgstr ""
 msgid "ADDITION"
 msgstr ""
 
+msgid "AJOUT"
+msgstr ""
+
 msgid "Actions"
 msgstr ""
 
@@ -29,8 +32,14 @@ msgstr ""
 msgid "Add learning units"
 msgstr ""
 
+msgid "Ajout"
+msgstr ""
+
 msgid "Anac."
 msgstr "Anac."
+
+msgid "Bloc"
+msgstr ""
 
 msgid "Block"
 msgstr ""
@@ -65,10 +74,22 @@ msgstr ""
 msgid "Comment"
 msgstr ""
 
+msgid "Commentaire"
+msgstr ""
+
+msgid "Commentaire en anglais"
+msgstr ""
+
 msgid "Components (PM/PP)"
 msgstr ""
 
+msgid "Composants (PM/PP)"
+msgstr ""
+
 msgid "Credits"
+msgstr ""
+
+msgid "Crédits"
 msgstr ""
 
 msgid "DELETION"
@@ -92,13 +113,25 @@ msgstr ""
 msgid "English comment"
 msgstr ""
 
+msgid "Intitulé"
+msgstr ""
+
+msgid "MODIFICATION"
+msgstr ""
+
 msgid "Mandatory"
+msgstr ""
+
+msgid "Modification"
 msgstr ""
 
 msgid "Move downwards"
 msgstr ""
 
 msgid "Move upwards"
+msgstr ""
+
+msgid "Obligatoire"
 msgstr ""
 
 msgid "PAE preparation"
@@ -113,10 +146,19 @@ msgstr ""
 msgid "Reset to initial program state"
 msgstr ""
 
+msgid "SUPPRESSION"
+msgstr ""
+
+msgid "Save"
+msgstr ""
+
 msgid "Search"
 msgstr ""
 
 msgid "Session"
+msgstr ""
+
+msgid "Suppression"
 msgstr ""
 
 msgid "The learning units have been added"
@@ -135,6 +177,24 @@ msgid "This action will cancel edition of UE X from group Y"
 msgstr ""
 
 msgid "Title"
+msgstr ""
+
+msgid "Tri par bloc"
+msgstr ""
+
+msgid "Tri par code"
+msgstr ""
+
+msgid "Tri par ordre du programme"
+msgstr ""
+
+msgid "Tri par quadrimestre"
+msgstr ""
+
+msgid "Tri principal"
+msgstr ""
+
+msgid "Tri secondaire"
 msgstr ""
 
 msgctxt "student_path_year"
