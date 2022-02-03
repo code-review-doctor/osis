@@ -49,5 +49,6 @@ class CountrySerializer(serializers.HyperlinkedModelSerializer):
             'iso_code',
             'name',
             'name_en',
-            'nationality'
+            'nationality',
+            'dialing_code'
         )

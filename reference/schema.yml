@@ -29,12 +29,17 @@ paths:
         - in: query
           name: iso_code
           schema:
-            description: Search by ISO 3166-1 2-letter country code
+            description: Filter by ISO 3166-1 2-letter country code
             type: string
         - in: query
           name: name
           schema:
-            description: Search by country name. It can be partial/full name
+            description: Filter by country name.
+            type: string
+        - in: query
+          name: dialing_code
+          schema:
+            description: Filter by dialing code
             type: string
         - $ref: '#/components/parameters/Accept-Language'
         - $ref: '#/components/parameters/X-User-FirstName'
@@ -503,6 +508,10 @@ components:
         nationality:
           type: string
           description: The nationality of the country
+          nullable: true
+        dialing_code:
+          type: string
+          description: The dialing code of the country
           nullable: true
     HighSchool:
       type: object
