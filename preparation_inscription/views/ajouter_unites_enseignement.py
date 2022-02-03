@@ -124,7 +124,8 @@ class AjouterUnitesEnseignementView(LoginRequiredMixin, HtmxMixin, TemplateView)
             'intitule_programme': self.get_intitule_programme(),
             'cancel_url': self.get_consulter_contenu_groupement_url(),
             'annee': self.kwargs['annee'],
-            'code_programme': self.kwargs['code_programme']
+            'code_programme': self.kwargs['code_programme'],
+            'code_groupement': self.kwargs['code_groupement']
         }
 
     def get_consulter_contenu_groupement_url(self):
@@ -133,5 +134,6 @@ class AjouterUnitesEnseignementView(LoginRequiredMixin, HtmxMixin, TemplateView)
             kwargs={
                 "annee": self.kwargs['annee'],
                 "code_programme": self.kwargs['code_programme'],
+                "code_groupement": self.kwargs['code_groupement']
             }
         ) + "?{}=1".format(RAFRAICHIR_GROUPEMENT_CONTENANT)
