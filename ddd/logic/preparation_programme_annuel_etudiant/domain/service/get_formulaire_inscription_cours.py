@@ -24,7 +24,7 @@
 #
 ##############################################################################
 import itertools
-from typing import List
+from typing import List, Union
 
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormulaireInscriptionCoursCommand
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
@@ -36,8 +36,7 @@ from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_
 from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_unites_enseignement import \
     ICatalogueUnitesEnseignementTranslator
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormulaireInscriptionCoursDTO, ContenuGroupementDTO, \
-    UniteEnseignementDTO, FormationDTO, ContenuGroupementCatalogueDTO, UniteEnseignementCatalogueDTO, \
-    GroupementCatalogueDTO, GroupementDTO
+    UniteEnseignementDTO, ContenuGroupementCatalogueDTO, UniteEnseignementCatalogueDTO, GroupementDTO
 from ddd.logic.preparation_programme_annuel_etudiant.repository.i_groupement_ajuste_inscription_cours import \
     IGroupementAjusteInscriptionCoursRepository
 from education_group.ddd.domain.group import GroupIdentity
@@ -58,16 +57,21 @@ class GetFormulaireInscriptionCours(interface.DomainService):
             annee=cmd.annee,
         )
 
-        formulaire_inscription = cls.convertir_formation_catalogue_en_formulaire_inscription(formation)
+        formulaire_inscription = FormulaireInscriptionCoursDTO(
+            annee_formation=formation.annee,
+            sigle_formation=formation.sigle,
+            version_formation=formation.version,
+            intitule_formation=formation.intitule_formation,
+            racine=cls.__build_contenu_formulaire_inscription_cours_dto([formation.racine])[0]
+        )
 
         groupements_ajustes = repo.search(code_programme=cmd.code_programme)
-
         unite_enseignements_ajoutes_dto = cls.rechercher_unites_enseignement_ajoutees_catalogue_dto(
             groupements_ajustes,
             catalogue_unites_enseignement_translator
         )
 
-        return cls._ajuster_formulaire_inscription(
+        return cls.__ajuster_formulaire_inscription(
             formulaire_inscription,
             groupements_ajustes,
             unite_enseignements_ajoutes_dto
@@ -95,72 +99,45 @@ class GetFormulaireInscriptionCours(interface.DomainService):
         )
 
     @classmethod
-    def convertir_formation_catalogue_en_formulaire_inscription(
+    def __build_contenu_formulaire_inscription_cours_dto(
             cls,
-            formation: 'FormationDTO'
-    ) -> 'FormulaireInscriptionCoursDTO':
-        return FormulaireInscriptionCoursDTO(
-            annee_formation=formation.annee,
-            sigle_formation=formation.sigle,
-            version_formation=formation.version,
-            intitule_formation=formation.intitule_formation,
-            racine=cls.convertir_contenu_contenu_groupement_catalogue_dto_en_contenu_groupement_dto(formation.racine)
-        )
+            contenu_ordonne_catalogue: List[Union['UniteEnseignementCatalogueDTO', 'ContenuGroupementCatalogueDTO']],
+    ) -> List[Union['UniteEnseignementDTO', 'ContenuGroupementDTO']]:
+        contenu = []
+        for element in contenu_ordonne_catalogue:
+            if isinstance(element, UniteEnseignementCatalogueDTO):
+                contenu.append(
+                    UniteEnseignementDTO(
+                        bloc=element.bloc,
+                        code=element.code,
+                        intitule_complet=element.intitule_complet,
+                        quadrimestre=element.quadrimestre,
+                        quadrimestre_texte=element.quadrimestre_texte,
+                        credits_absolus=element.credits_absolus,
+                        credits_relatifs=element.credits_relatifs,
+                        obligatoire=element.obligatoire,
+                        volume_annuel_pp=element.volume_annuel_pp,
+                        volume_annuel_pm=element.volume_annuel_pm,
+                        session_derogation=element.session_derogation,
+                        chemin_acces=element.code
+                    )
+                )
+            elif isinstance(element, ContenuGroupementCatalogueDTO):
+                contenu.append(
+                    ContenuGroupementDTO(
+                        groupement_contenant=GroupementDTO(
+                            intitule=element.groupement_contenant.intitule,
+                            intitule_complet=element.groupement_contenant.intitule_complet,
+                            obligatoire=element.groupement_contenant.obligatoire,
+                            chemin_acces=element.groupement_contenant.code
+                        ),
+                        contenu=cls.__build_contenu_formulaire_inscription_cours_dto(element.contenu_ordonne_catalogue)
+                    )
+                )
+        return contenu
 
     @classmethod
-    def convertir_contenu_contenu_groupement_catalogue_dto_en_contenu_groupement_dto(
-            cls,
-            contenu: 'ContenuGroupementCatalogueDTO'
-    ) -> 'ContenuGroupementDTO':
-        groupement_contenus = [
-            cls.convertir_contenu_contenu_groupement_catalogue_dto_en_contenu_groupement_dto(groupement)
-            for groupement in contenu.groupements_contenus
-        ]
-        unites_enseignement_contenues = [
-            cls.convertir_unite_enseignement_catalogue_dto_en_unite_enseignement_dto(unite_enseignement)
-            for unite_enseignement in contenu.unites_enseignement_contenues
-        ]
-        groupement_contenant = cls.convertir_groupement_catalogue_dto_en_groupement_dto(contenu.groupement_contenant)
-        return ContenuGroupementDTO(
-            groupement_contenant=groupement_contenant,
-            unites_enseignement_contenues=unites_enseignement_contenues,
-            groupements_contenus=groupement_contenus
-        )
-
-    @classmethod
-    def convertir_unite_enseignement_catalogue_dto_en_unite_enseignement_dto(
-            cls,
-            unite_enseignement: 'UniteEnseignementCatalogueDTO',
-    ) -> 'UniteEnseignementDTO':
-        return UniteEnseignementDTO(
-            bloc=unite_enseignement.bloc,
-            code=unite_enseignement.code,
-            intitule_complet=unite_enseignement.intitule_complet,
-            quadrimestre=unite_enseignement.quadrimestre,
-            quadrimestre_texte=unite_enseignement.quadrimestre_texte,
-            credits_absolus=unite_enseignement.credits_absolus,
-            credits_relatifs=unite_enseignement.credits_relatifs,
-            obligatoire=unite_enseignement.obligatoire,
-            volume_annuel_pp=unite_enseignement.volume_annuel_pp,
-            volume_annuel_pm=unite_enseignement.volume_annuel_pm,
-            session_derogation=unite_enseignement.session_derogation,
-            chemin_acces=unite_enseignement.code
-        )
-
-    @classmethod
-    def convertir_groupement_catalogue_dto_en_groupement_dto(
-            cls,
-            groupement: 'GroupementCatalogueDTO'
-    ) -> 'GroupementDTO':
-        return GroupementDTO(
-            intitule=groupement.intitule,
-            intitule_complet=groupement.intitule_complet,
-            obligatoire=groupement.obligatoire,
-            chemin_acces=groupement.code
-        )
-
-    @classmethod
-    def _ajuster_formulaire_inscription(
+    def __ajuster_formulaire_inscription(
             cls,
             formulaire_inscription: 'FormulaireInscriptionCoursDTO',
             groupements_ajustes: List['GroupementAjusteInscriptionCours'],
@@ -168,12 +145,12 @@ class GetFormulaireInscriptionCours(interface.DomainService):
     ) -> FormulaireInscriptionCoursDTO:
 
         for groupement in groupements_ajustes:
-            groupement_concernes = cls._rechercher_groupement(formulaire_inscription.racine, groupement)
+            groupement_concernes = cls.__rechercher_groupement(formulaire_inscription.racine, groupement)
 
             for g in groupement_concernes:
-                g.unites_enseignement_contenues.extend(
+                g.contenu.extend(
                     [
-                        cls._create_unite_enseignement_dto_for_unite_enseignement_ajoutee(
+                        cls.__create_unite_enseignement_dto_for_unite_enseignement_ajoutee(
                             ue_ajoutee,
                             unite_enseignement_ajoutes_dto
                         )
@@ -184,7 +161,23 @@ class GetFormulaireInscriptionCours(interface.DomainService):
         return formulaire_inscription
 
     @classmethod
-    def _create_unite_enseignement_dto_for_unite_enseignement_ajoutee(
+    def __rechercher_groupement(
+            cls,
+            contenu_groupement: 'ContenuGroupementDTO',
+            groupement_a_rechercher: 'GroupementAjusteInscriptionCours'
+    ) -> List['ContenuGroupementDTO']:
+        if groupement_a_rechercher.groupement_id.code in contenu_groupement.groupement_contenant.chemin_acces:
+            return [contenu_groupement]
+
+        groupement_trouves = []
+        for groupement_contenu in filter(lambda el: isinstance(el, ContenuGroupementDTO), contenu_groupement.contenu):
+            groupement_trouve = cls.__rechercher_groupement(groupement_contenu, groupement_a_rechercher)
+            if groupement_trouve:
+                groupement_trouves.extend(groupement_trouve)
+        return groupement_trouves
+
+    @classmethod
+    def __create_unite_enseignement_dto_for_unite_enseignement_ajoutee(
             cls,
             unite_enseignement_ajoutee: 'UniteEnseignementAjoutee',
             unite_enseignement_ajoutes_dto: List['UniteEnseignementCatalogueDTO'],
@@ -207,20 +200,3 @@ class GetFormulaireInscriptionCours(interface.DomainService):
             obligatoire=dto_correspondant.obligatoire,
             session_derogation=dto_correspondant.session_derogation,
         )
-
-    @classmethod
-    def _rechercher_groupement(
-            cls,
-            contenu_groupement: 'ContenuGroupementDTO',
-            groupement_a_rechercher: 'GroupementAjusteInscriptionCours'
-    ) -> List['ContenuGroupementDTO']:
-        if groupement_a_rechercher.groupement_id.code in contenu_groupement.groupement_contenant.chemin_acces:
-            return [contenu_groupement]
-
-        groupement_trouves = []
-        for groupement_contenu in contenu_groupement.groupements_contenus:
-            groupement_trouve = cls._rechercher_groupement(groupement_contenu, groupement_a_rechercher)
-            if groupement_trouve:
-                groupement_trouves.extend(groupement_trouve)
-
-        return groupement_trouves

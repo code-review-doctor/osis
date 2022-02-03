@@ -23,14 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+from typing import List, Union
 from unittest import mock
 
 from django.test import SimpleTestCase
 
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetProgrammeInscriptionCoursCommand
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, ProgrammeInscriptionCoursDTO, \
-    GroupementInscriptionCoursDTO
+    GroupementInscriptionCoursDTO, ContenuGroupementCatalogueDTO, UniteEnseignementProgrammeDTO, \
+    UniteEnseignementCatalogueDTO
 from infrastructure.messages_bus import message_bus_instance
 from infrastructure.preparation_programme_annuel_etudiant.domain.service.in_memory.catalogue_formations import \
     CatalogueFormationsTranslatorInMemory
@@ -146,28 +147,37 @@ class GetProgrammeInscriptionCoursTest(SimpleTestCase):
         self.assertEqual(programme.annee, formation.annee)
         self.assertEqual(programme.version, formation.version)
         self.assertEqual(programme.intitule_complet_formation, formation.intitule_formation)
-        self._assert_contenu(programme.sous_programme, formation.racine.groupements_contenus)
+        self._assert_contenu([programme.racine], [formation.racine])
 
-    def _assert_contenu(self,
-                        sous_programme: List['GroupementInscriptionCoursDTO'],
-                        sous_programme_formation: List['ContenuGroupementCatalogueDTO']):
-        for idx_grp, groupement in enumerate(sous_programme):
-            groupement_formation = sous_programme_formation[idx_grp]
-            self._assert_equal_groupement(groupement, groupement_formation)
-            for idx_ue, unite_enseignement in enumerate(groupement.unites_enseignements):
-                unites_enseignements_formation = groupement_formation.unites_enseignement_contenues
-                unite_enseignement_formation = unites_enseignements_formation[idx_ue]
-                self.assertEqual(unite_enseignement.code, unite_enseignement_formation.code)
-                self.assertEqual(unite_enseignement.intitule, unite_enseignement_formation.intitule_complet)
-                self.assertEqual(unite_enseignement.obligatoire, unite_enseignement_formation.obligatoire)
-                self.assertEqual(unite_enseignement.bloc, unite_enseignement_formation.bloc)
+    def _assert_contenu(
+            self,
+            contenu: List[Union['UniteEnseignementProgrammeDTO', 'GroupementInscriptionCoursDTO']],
+            contenu_formation: List[Union['UniteEnseignementCatalogueDTO', 'ContenuGroupementCatalogueDTO']]
+    ):
+        for idx_grp, element in enumerate(contenu):
+            element_formation = contenu_formation[idx_grp]
 
-            self._assert_contenu(groupement.sous_programme, groupement_formation.groupements_contenus)
+            if isinstance(element, GroupementInscriptionCoursDTO):
+                self._assert_equal_groupement(element, element_formation)
+                self._assert_contenu(element.contenu, element_formation.contenu_ordonne_catalogue)
+            elif isinstance(element, UniteEnseignementProgrammeDTO):
+                self._assert_equal_unite_enseignement(element, element_formation)
 
-    def _assert_equal_groupement(self,
-                                 groupement: 'GroupementInscriptionCoursDTO',
-                                 groupement_formation: 'ContenuGroupementCatalogueDTO'):
+    def _assert_equal_unite_enseignement(
+            self,
+            unite_enseignement: UniteEnseignementProgrammeDTO,
+            unite_enseignement_formation: UniteEnseignementCatalogueDTO
+    ):
+        self.assertEqual(unite_enseignement.code, unite_enseignement_formation.code)
+        self.assertEqual(unite_enseignement.intitule, unite_enseignement_formation.intitule_complet)
+        self.assertEqual(unite_enseignement.obligatoire, unite_enseignement_formation.obligatoire)
+        self.assertEqual(unite_enseignement.bloc, unite_enseignement_formation.bloc)
+
+    def _assert_equal_groupement(
+            self,
+            groupement: 'GroupementInscriptionCoursDTO',
+            groupement_formation: 'ContenuGroupementCatalogueDTO'
+    ):
         self.assertEqual(groupement.intitule_complet, groupement_formation.groupement_contenant.intitule_complet)
         self.assertEqual(groupement.code, groupement_formation.groupement_contenant.code)
         self.assertEqual(groupement.obligatoire, groupement_formation.groupement_contenant.obligatoire)
-

@@ -23,19 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+from typing import List, Union
 from unittest import mock
 
 from django.test import SimpleTestCase
 
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormulaireInscriptionCoursCommand
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import ContenuGroupementDTO, \
-    GroupementCatalogueDTO, UniteEnseignementCatalogueDTO, ContenuGroupementCatalogueDTO
+    GroupementCatalogueDTO, UniteEnseignementCatalogueDTO, ContenuGroupementCatalogueDTO, UniteEnseignementDTO, \
+    GroupementDTO
 from infrastructure.messages_bus import message_bus_instance
 from infrastructure.preparation_programme_annuel_etudiant.domain.service.in_memory.catalogue_formations import \
     CatalogueFormationsTranslatorInMemory, ANNEE
-from program_management.ddd.dtos import UniteEnseignementDTO, ContenuNoeudDTO
-from program_management.ddd.domain.program_tree_version import STANDARD, NOT_A_TRANSITION
 
 
 class GetFormulaireInscriptionCoursTest(SimpleTestCase):
@@ -90,58 +89,52 @@ class GetFormulaireInscriptionCoursTest(SimpleTestCase):
             resultat_conversion_en_FormulaireInscriptionCoursDTO.intitule_formation,
             obj_FormationDTO_de_depart.intitule_formation
         )
-        self._assert_equal_contenu_conversion(
+        self.__assert_equal_groupement(
             resultat_conversion_en_FormulaireInscriptionCoursDTO.racine.groupement_contenant,
             obj_FormationDTO_de_depart.racine.groupement_contenant
         )
-        self._assert_equal_groupements_contenus(
-            resultat_conversion_en_FormulaireInscriptionCoursDTO.racine.groupements_contenus,
-            obj_FormationDTO_de_depart.racine.groupements_contenus,
+        self.__assert_equal_contenus(
+            resultat_conversion_en_FormulaireInscriptionCoursDTO.racine.contenu,
+            obj_FormationDTO_de_depart.racine.contenu_ordonne_catalogue,
         )
 
-    def _assert_equal_groupements_contenus(
+    def __assert_equal_contenus(
             self,
-            formation_groupements_contenus: List['ContenuGroupementCatalogueDTO'],
-            prgm_racine_groupements_contenus: List['ContenuNoeudDTO'],
+            contenu_groupement: List[Union['UniteEnseignementDTO', 'ContenuGroupementDTO']],
+            contenu_groupement_catalogue: List[Union['UniteEnseignementCatalogueDTO', 'ContenuGroupementCatalogueDTO']],
     ):
-        for idx, pgm_contenu in enumerate(formation_groupements_contenus):
-            self._assert_equal_contenu_conversion(
-                pgm_contenu.groupement_contenant,
-                prgm_racine_groupements_contenus[idx].groupement_contenant
-            )
-            self._assert_equal_groupements_contenus(
-                pgm_contenu.groupements_contenus,
-                prgm_racine_groupements_contenus[idx].groupements_contenus
-            )
-            for idx_unite, unite_contenue in enumerate(pgm_contenu.unites_enseignement_contenues):
-                self._assert_equal_unite_conversion(
-                    unite_contenue,
-                    prgm_racine_groupements_contenus[idx].unites_enseignement_contenues[idx_unite]
-                )
+        for idx, element in enumerate(contenu_groupement):
+            element_catalogue = contenu_groupement_catalogue[idx]
 
-    def _assert_equal_contenu_conversion(
+            if isinstance(element, ContenuGroupementDTO):
+                self.__assert_equal_groupement(element.groupement_contenant, element_catalogue.groupement_contenant)
+                self.__assert_equal_contenus(element.contenu, element_catalogue.contenu_ordonne_catalogue)
+            elif isinstance(element, UniteEnseignementDTO):
+                self.__assert_equal_unite_conversion(element, element_catalogue)
+
+    def __assert_equal_groupement(
             self,
-            formation_contenu: 'ContenuGroupementDTO',
-            pgm_contenu: 'GroupementCatalogueDTO'
+            groupement: 'GroupementDTO',
+            groupement_catalogue_dto: 'GroupementCatalogueDTO'
     ):
 
-        self.assertEqual(pgm_contenu.intitule, formation_contenu.intitule)
-        self.assertEqual(pgm_contenu.intitule_complet, formation_contenu.intitule_complet)
-        self.assertEqual(pgm_contenu.obligatoire, formation_contenu.obligatoire)
+        self.assertEqual(groupement.intitule, groupement_catalogue_dto.intitule)
+        self.assertEqual(groupement.intitule_complet, groupement_catalogue_dto.intitule_complet)
+        self.assertEqual(groupement.obligatoire, groupement_catalogue_dto.obligatoire)
 
-    def _assert_equal_unite_conversion(
+    def __assert_equal_unite_conversion(
             self,
-            unite_contenue: UniteEnseignementCatalogueDTO,
-            unite_contenu_dans_programme: UniteEnseignementDTO
+            unite_enseignement: UniteEnseignementDTO,
+            unite_enseignement_catalogue_dto: UniteEnseignementCatalogueDTO
     ):
-        self.assertEqual(unite_contenue.bloc, unite_contenu_dans_programme.bloc)
-        self.assertEqual(unite_contenue.code, unite_contenu_dans_programme.code)
-        self.assertEqual(unite_contenue.intitule_complet, unite_contenu_dans_programme.intitule_complet)
-        self.assertEqual(unite_contenue.quadrimestre, unite_contenu_dans_programme.quadrimestre)
-        self.assertEqual(unite_contenue.quadrimestre_texte, unite_contenu_dans_programme.quadrimestre_texte)
-        self.assertEqual(unite_contenue.credits_absolus, unite_contenu_dans_programme.credits_absolus)
-        self.assertEqual(unite_contenue.volume_annuel_pm, unite_contenu_dans_programme.volume_annuel_pm)
-        self.assertEqual(unite_contenue.volume_annuel_pp, unite_contenu_dans_programme.volume_annuel_pp)
-        self.assertEqual(unite_contenue.obligatoire, unite_contenu_dans_programme.obligatoire)
-        self.assertEqual(unite_contenue.credits_relatifs, unite_contenu_dans_programme.credits_relatifs)
-        self.assertEqual(unite_contenue.session_derogation, unite_contenu_dans_programme.session_derogation)
+        self.assertEqual(unite_enseignement.bloc, unite_enseignement_catalogue_dto.bloc)
+        self.assertEqual(unite_enseignement.code, unite_enseignement_catalogue_dto.code)
+        self.assertEqual(unite_enseignement.intitule_complet, unite_enseignement_catalogue_dto.intitule_complet)
+        self.assertEqual(unite_enseignement.quadrimestre, unite_enseignement_catalogue_dto.quadrimestre)
+        self.assertEqual(unite_enseignement.quadrimestre_texte, unite_enseignement_catalogue_dto.quadrimestre_texte)
+        self.assertEqual(unite_enseignement.credits_absolus, unite_enseignement_catalogue_dto.credits_absolus)
+        self.assertEqual(unite_enseignement.volume_annuel_pm, unite_enseignement_catalogue_dto.volume_annuel_pm)
+        self.assertEqual(unite_enseignement.volume_annuel_pp, unite_enseignement_catalogue_dto.volume_annuel_pp)
+        self.assertEqual(unite_enseignement.obligatoire, unite_enseignement_catalogue_dto.obligatoire)
+        self.assertEqual(unite_enseignement.session_derogation, unite_enseignement_catalogue_dto.session_derogation)
+        self.assertEqual(unite_enseignement.credits_relatifs, unite_enseignement_catalogue_dto.credits_relatifs)

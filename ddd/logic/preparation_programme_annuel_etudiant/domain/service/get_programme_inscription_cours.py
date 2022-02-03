@@ -24,7 +24,7 @@
 #
 ##############################################################################
 import itertools
-from typing import List
+from typing import List, Union
 
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetProgrammeInscriptionCoursCommand
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
@@ -62,18 +62,17 @@ class GetProgrammeInscriptionCours(interface.DomainService):
             groupements_ajustes,
             catalogue_unites_enseignement_translator
         )
-        groupements = cls.__build_groupement_inscription_cours_dtos(
-            formation.racine.groupements_contenus,
-            groupements_ajustes,
-            unite_enseignements_ajoutes_dto
-        )
         return ProgrammeInscriptionCoursDTO(
             uuid='uuid-1234',
             code=formation.racine.groupement_contenant.code,
             annee=cmd.annee,
             version=formation.version,
             intitule_complet_formation=formation.intitule_formation,
-            sous_programme=groupements,
+            racine=cls.__build_contenu(
+                [formation.racine],
+                groupements_ajustes,
+                unite_enseignements_ajoutes_dto
+            )[0],
         )
 
     @classmethod
@@ -98,44 +97,42 @@ class GetProgrammeInscriptionCours(interface.DomainService):
         )
 
     @classmethod
-    def __build_groupement_inscription_cours_dtos(
+    def __build_contenu(
             cls,
-            groupements_contenus: List[ContenuGroupementCatalogueDTO],
+            contenu_ordonne_catalogue: List[Union['UniteEnseignementCatalogueDTO', 'ContenuGroupementCatalogueDTO']],
             groupements_ajustes: List['GroupementAjusteInscriptionCours'],
             unite_enseignement_ajoutes_dto: List['UniteEnseignementCatalogueDTO']
-    ) -> List[GroupementInscriptionCoursDTO]:
-        return [
-            GroupementInscriptionCoursDTO(
-                intitule_complet=groupement.groupement_contenant.intitule_complet,
-                obligatoire=groupement.groupement_contenant.obligatoire,
-                code=groupement.groupement_contenant.code,
-                unites_enseignements=cls.__build_unite_enseignement_programme_dtos(groupement),
-                unites_enseignement_ajoutees=cls.__build_unite_enseignement_ajoute_dtos(
-                    groupement,
-                    groupements_ajustes,
-                    unite_enseignement_ajoutes_dto
-                ),
-                sous_programme=cls.__build_groupement_inscription_cours_dtos(
-                    groupement.groupements_contenus,
-                    groupements_ajustes,
-                    unite_enseignement_ajoutes_dto
-                ),
-            ) for groupement in groupements_contenus
-        ]
-
-    @classmethod
-    def __build_unite_enseignement_programme_dtos(
-            cls,
-            groupement: 'ContenuGroupementCatalogueDTO',
-            ) -> List['UniteEnseignementProgrammeDTO']:
-        return [
-            UniteEnseignementProgrammeDTO(
-                code=unite_enseignement.code,
-                intitule=unite_enseignement.intitule_complet,
-                obligatoire=unite_enseignement.obligatoire,
-                bloc=unite_enseignement.bloc,
-            ) for unite_enseignement in groupement.unites_enseignement_contenues
-        ]
+    ) -> List[Union['UniteEnseignementProgrammeDTO', 'GroupementInscriptionCoursDTO']]:
+        contenu = []
+        for element in contenu_ordonne_catalogue:
+            if isinstance(element, UniteEnseignementCatalogueDTO):
+                contenu.append(
+                    UniteEnseignementProgrammeDTO(
+                        code=element.code,
+                        intitule=element.intitule_complet,
+                        obligatoire=element.obligatoire,
+                        bloc=element.bloc,
+                    )
+                )
+            elif isinstance(element, ContenuGroupementCatalogueDTO):
+                contenu.append(
+                    GroupementInscriptionCoursDTO(
+                        intitule_complet=element.groupement_contenant.intitule_complet,
+                        obligatoire=element.groupement_contenant.obligatoire,
+                        code=element.groupement_contenant.code,
+                        unites_enseignement_ajoutees=cls.__build_unite_enseignement_ajoute_dtos(
+                            element,
+                            groupements_ajustes,
+                            unite_enseignement_ajoutes_dto
+                        ),
+                        contenu=cls.__build_contenu(
+                            element.contenu_ordonne_catalogue,
+                            groupements_ajustes,
+                            unite_enseignement_ajoutes_dto
+                        )
+                    )
+                )
+        return contenu
 
     @classmethod
     def __build_unite_enseignement_ajoute_dtos(

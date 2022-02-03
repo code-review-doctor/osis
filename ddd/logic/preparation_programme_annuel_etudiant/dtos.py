@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from decimal import Decimal
-from typing import List
+from typing import List, Union
 
 import attr
 
@@ -46,6 +46,10 @@ class UniteEnseignementDTO(DTO):
     credits_relatifs: int
     chemin_acces: str  # Exemple : 'LDROI1001B|LDROI102C|LDROI1001
 
+    @property
+    def type(self):
+        return "UNITE_ENSEIGNEMENT"
+
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
 class GroupementDTO(DTO):
@@ -54,12 +58,15 @@ class GroupementDTO(DTO):
     obligatoire: bool
     chemin_acces: str  # Exemple : 'LDROI1001B|LDROI102C|LDROI1001
 
+    @property
+    def type(self):
+        return "GROUPEMENT"
+
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
 class ContenuGroupementDTO(DTO):
     groupement_contenant: GroupementDTO
-    unites_enseignement_contenues: List['UniteEnseignementDTO']
-    groupements_contenus: List['ContenuGroupementDTO']
+    contenu: List[Union['UniteEnseignementDTO', 'ContenuGroupementDTO']]
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
@@ -97,11 +104,12 @@ class GroupementCatalogueDTO(DTO):
     intitule_complet: str
 
 
+# FIXME: Rename to GroupementCatalogueDTO
 @attr.s(frozen=True, slots=True, auto_attribs=True)
 class ContenuGroupementCatalogueDTO(DTO):
+    # groupement provenant du catalogue (sans surcharge d'ajout, suppression ou modification)
     groupement_contenant: GroupementCatalogueDTO
-    unites_enseignement_contenues: List['UniteEnseignementCatalogueDTO']
-    groupements_contenus: List['ContenuGroupementCatalogueDTO']
+    contenu_ordonne_catalogue: List[Union['UniteEnseignementCatalogueDTO', 'ContenuGroupementCatalogueDTO']]
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
@@ -120,7 +128,7 @@ class ProgrammeInscriptionCoursDTO(DTO):
     annee: int
     version: str
     intitule_complet_formation: str  # intitulé de la formation + version formation
-    sous_programme: List['GroupementInscriptionCoursDTO']
+    racine: 'GroupementInscriptionCoursDTO'
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
@@ -132,8 +140,12 @@ class GroupementInscriptionCoursDTO(DTO):
     #  Comment because nominal case (program without adjustment) only for now
     # unites_enseignement_supprimees: List['UniteEnseignementSupprimeeDTO']
     # unites_enseignement_modifiees: List['UniteEnseignementModifieeDTO']
-    unites_enseignements: List['UniteEnseignementProgrammeDTO']
-    sous_programme: List['GroupementInscriptionCoursDTO']
+    # unites_enseignements: List['UniteEnseignementProgrammeDTO']
+    contenu: List[Union['UniteEnseignementProgrammeDTO', 'GroupementInscriptionCoursDTO']]
+
+    @property
+    def type(self):
+        return 'GROUPEMENT'
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
@@ -142,6 +154,10 @@ class UniteEnseignementProgrammeDTO(DTO):
     intitule: str
     obligatoire: bool
     bloc: int
+
+    @property
+    def type(self):
+        return 'UNITE_ENSEIGNEMENT'
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
