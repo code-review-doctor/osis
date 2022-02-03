@@ -48,7 +48,10 @@ class IsHasPrerequisiteForAllTreesValidator(business_validator.BusinessValidator
     def validate(self, *args, **kwargs):
         learning_unit_nodes = self.__get_learning_unit_nodes_to_detach()
         if learning_unit_nodes:
-            prerequisites = self.prerequisite_repository.search(learning_unit_nodes=learning_unit_nodes)
+            prerequisites = self.prerequisite_repository.search(
+                learning_unit_nodes=learning_unit_nodes,
+                academic_year=self.parent_node.academic_year.year
+            )
             tree_identities = [p.context_tree for p in prerequisites]
             trees_containing_prerequisites = self.program_tree_repository.search(entity_ids=tree_identities)
             for tree in trees_containing_prerequisites:
