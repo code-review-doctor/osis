@@ -148,9 +148,8 @@
                 var annee = data.node.li_attr.annee;
                 var code_programme = data.node.li_attr.code_programme;
                 var code_groupement = data.node.li_attr.code_groupement;
-                var url = "{% url 'consulter_contenu_groupement_view' annee 'code_programme' 'code_groupement' %}";
+                var url = "{% url 'consulter_contenu_groupement_view' annee '{{code_programme}}' 'code_groupement' %}";
                 url = url.replace('annee', annee);
-                url = url.replace('code_programme', code_programme);
                 url = url.replace('code_groupement', code_groupement);
                 htmx.ajax('GET', url, '#content-of-main-panel')
             });
