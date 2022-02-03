@@ -29,7 +29,6 @@ from rest_framework import serializers
 
 from reference.models.country import Country
 
-
 RelatedCountryField = partial(
     serializers.SlugRelatedField,
     slug_field='iso_code',
@@ -50,5 +49,6 @@ class CountrySerializer(serializers.HyperlinkedModelSerializer):
             'iso_code',
             'name',
             'name_en',
-            'nationality'
+            'nationality',
+            'dialing_code'
         )
