@@ -1,8 +1,6 @@
 {% load i18n static %}
 <li id="{{ sous_programme.code }}"
-    code_programme="{{ code_programme }}"
-    code_groupement="{{ sous_programme.code }}"
-    annee="{{ annee }}"
+    url="{% url 'consulter_contenu_groupement_view' annee=annee code_programme=code_programme code_groupement=sous_programme.code %}"
     data-jstree='{"icon":"{% if sous_programme.obligatoire %}{% static "img/education_group_year/mandatory.png" %}{% else %}{% static "img/education_group_year/optional.png" %}{% endif %}"}'
 >
     {{ sous_programme.code }} - {{ sous_programme.intitule_complet }}
