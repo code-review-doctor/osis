@@ -25,6 +25,7 @@
 ##############################################################################
 from typing import Optional
 
+from django.http import Http404
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.views.generic import TemplateView
@@ -78,4 +79,7 @@ class PreparationInscriptionMainView(PermissionRequiredMixin, TemplateView):
             annee=self.kwargs['annee'],
             code=self.kwargs['code_programme']
         )
-        return message_bus_instance.invoke(cmd)
+        formation = message_bus_instance.invoke(cmd)
+        if not formation:
+            raise Http404
+        return formation

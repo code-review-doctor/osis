@@ -30,7 +30,8 @@ from mock import mock
 
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import ProgrammeInscriptionCoursDTO
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import ProgrammeInscriptionCoursDTO, \
+    GroupementInscriptionCoursDTO
 from preparation_inscription.views.program_tree import ProgramTreeHTMLView
 from program_management.ddd.domain.program_tree_version import STANDARD
 
@@ -58,7 +59,13 @@ class TestProgramTreeView(TestCase):
                 annee=2022,
                 version=STANDARD,
                 intitule_complet_formation='Master [120] en communication',
-                sous_programme=[]
+                racine=GroupementInscriptionCoursDTO(
+                    intitule_complet='Master [120] en communication',
+                    obligatoire=False,
+                    code='LCORP201S',
+                    unites_enseignement_ajoutees=[],
+                    contenu=[]
+                )
             )
         )
         message_bus_patcher.start()

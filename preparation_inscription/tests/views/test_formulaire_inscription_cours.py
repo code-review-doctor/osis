@@ -65,8 +65,7 @@ class TestFormulaireInscriptionCoursView(TestCase):
                         chemin_acces='',
                         intitule_complet='intitule',
                     ),
-                    unites_enseignement_contenues=[],
-                    groupements_contenus=[]
+                    contenu=[],
                 )
             )
         )
