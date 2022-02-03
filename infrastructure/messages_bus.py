@@ -169,7 +169,8 @@ from ddd.logic.learning_unit.use_case.write.create_effective_class_service impor
 from ddd.logic.learning_unit.use_case.write.create_learning_unit_service import create_learning_unit
 from ddd.logic.learning_unit.use_case.write.delete_effective_class_service import delete_effective_class
 from ddd.logic.learning_unit.use_case.write.update_effective_class_service import update_effective_class
-from ddd.logic.preparation_programme_annuel_etudiant.commands import AjouterUEAuProgrammeCommand
+from ddd.logic.preparation_programme_annuel_etudiant.commands import AjouterUEAuProgrammeCommand, \
+    GetContenuGroupementCommand
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormulaireInscriptionCoursCommand, \
     GetFormationCommand
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetProgrammeInscriptionCoursCommand
@@ -244,6 +245,7 @@ from osis_common.ddd.interface import ApplicationServiceResult, CommandRequest
 from program_management.ddd.command import BulkUpdateLinkCommand, GetReportCommand, GetProgramTreeVersionCommand
 from program_management.ddd.repositories import program_tree as program_tree_repo
 from program_management.ddd.repositories.report import ReportRepository
+from program_management.ddd.service.read.get_content_service import get_content_service
 from program_management.ddd.service.read.get_program_tree_version_service import get_program_tree_version, \
     get_programme_formation
 from program_management.ddd.service.read.get_report_service import get_report
@@ -555,7 +557,8 @@ class MessageBusCommands(AbstractMessageBusCommands):
             GroupementAjusteInscriptionCoursInMemoryRepository(),
             CatalogueFormationsTranslator(),
             CatalogueUnitesEnseignementTranslator(),
-        )
+        ),
+        GetContenuGroupementCommand: lambda cmd: get_content_service(cmd),
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 
 

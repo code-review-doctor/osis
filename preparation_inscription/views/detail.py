@@ -54,13 +54,14 @@ class PreparationInscriptionMainView(PermissionRequiredMixin, TemplateView):
             'tree_panel_header': self.get_tree_panel_header(),
             'tree_panel_title': self.get_tree_panel_title(),
             'annee': self.kwargs['annee'],
-            'code_programme': self.kwargs['code_programme']
+            'code_programme': self.kwargs['code_programme'],
+            'code_groupement': self.kwargs['code_programme'],
         }
 
     def get_tree_view_url(self) -> str:
         return reverse('program-tree-view', kwargs={
             'annee': self.kwargs['annee'],
-            'code_programme': self.kwargs['code_programme']
+            'code_programme': self.kwargs['code_programme'],
         })
 
     def get_tree_panel_header(self) -> str:
