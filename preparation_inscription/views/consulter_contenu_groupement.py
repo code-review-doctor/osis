@@ -23,14 +23,27 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
+from decimal import Decimal
+from typing import List, Dict
 
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.template.defaultfilters import yesno
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
 from base.utils.htmx import HtmxMixin
+from ddd.logic.preparation_programme_annuel_etudiant.commands import GetContenuGroupementCommand
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import ContenuGroupementDTO
+from infrastructure.messages_bus import message_bus_instance
 
+CODE = 'code'
+INTITULE = 'intitule'
+VOLUMES = 'volumes'
+BLOC = 'bloc'
+QUADRI = 'quadri'
+CREDITS = 'credits'
+SESSION = 'session'
+OBLIGATOIRE = 'obligatoire'
 
 RAFRAICHIR_GROUPEMENT_CONTENANT = 'rafraichir_groupement_contenant'
 
@@ -42,110 +55,94 @@ class ConsulterContenuGroupementView(HtmxMixin, LoginRequiredMixin, TemplateView
     htmx_template_name = "preparation_inscription/consulter_contenu_groupement.html"
 
     def get_context_data(self, **kwargs):
-        return {
+        context = {
             **super().get_context_data(**kwargs),
             # TODO code_groupement_racine :: à implémenter quand la story "afficher contenu" est développée
-            'code_groupement_racine': 'LECGE100T',
+            'code_programme': self.kwargs['code_programme'],
+            'code_groupement': self.kwargs['code_groupement'],
             RAFRAICHIR_GROUPEMENT_CONTENANT: self.request.GET.get(RAFRAICHIR_GROUPEMENT_CONTENANT),
-            'search_result': self.get_content(),
-            'intitule_groupement': self.get_intitule_groupement(),
             'intitule_programme': self.get_intitule_programme(),
         }
 
-    def get_content(self):
-        data = [
-            {
-                'code_ue': 'LESPO1113',
-                'intitule': 'Sociologie et anthropologie des mondes contemporains',
-                'volumes': '10',
-                'bloc': '1',
-                'quadri': 'Q1',
-                'credits': '5/5',
-                'session': 'Oui',
-                'obligatoire': 'Oui',
-                'commentaire_fr': """Lorem Ipsum est un générateur de faux textes aléatoires. Vous choisissez le nombre de paragraphes, de mots ou de listes. Vous obtenez alors un texte aléatoire que vous pourrez ensuite utiliser librement dans vos maquettes.
-                    Le texte généré est du pseudo latin et peut donner l'impression d'être du vrai texte.
-                    Faux-Texte est une réalisation du studio de création de sites internet indépendant Prélude Prod.
-                    Si vous aimez la photographie d'art et l'esprit zen, jetez un œil sur le site de ce photographe à Palaiseau, en Essonne (France).
-                """,
-                'commentaire_en': '',
-                'type_ajustement': TypeAjustement.SUPPRESSION.name,
-            },
-            {
-                'code_ue': 'LESPO1321',
-                'intitule': 'Economic, Political and Social Ethics',
-                'volumes': '15+10',
-                'bloc': '1',
-                'quadri': 'Q1',
-                'credits': '4/5',
-                'session': 'Oui',
-                'obligatoire': 'Oui',
-                'commentaire_fr': '',
-                'commentaire_en': '',
-                'type_ajustement': TypeAjustement.SUPPRESSION.name,
-            },
-            {
-                'code_ue': 'LESPO1114',
-                'intitule': 'Political Science',
-                'volumes': '30',
-                'bloc': '2',
-                'quadri': 'Q1',
-                'credits': '5/5',
-                'session': 'Oui',
-                'obligatoire': 'Oui',
-                'commentaire_fr': '',
-                'commentaire_en': '',
-                'type_ajustement': TypeAjustement.MODIFICATION.name,
-            },
-            {
-                'code_ue': 'LECGE1115',
-                'intitule': 'Economie politique',
-                'volumes': '30',
-                'bloc': '1',
-                'quadri': 'Q2',
-                'credits': '3/3',
-                'session': 'Oui',
-                'obligatoire': 'Oui',
-                'commentaire_fr': '',
-                'commentaire_en': '',
-                'type_ajustement': None,
-            },
-            {
-                'code_ue': 'LINGE1122',
-                'intitule': 'Physique 1',
-                'volumes': '30',
-                'bloc': '1',
-                'quadri': 'Q2',
-                'credits': '3/3',
-                'session': 'Oui',
-                'obligatoire': 'Oui',
-                'commentaire_fr': '',
-                'commentaire_en': '',
-                'type_ajustement': TypeAjustement.AJOUT.name,
-            },
-            {
-                'code_ue': 'LINGE1125',
-                'intitule': 'Séminaire de travail universitaire en gestion',
-                'volumes': '25',
-                'bloc': '1',
-                'quadri': 'Q2',
-                'credits': '5/5',
-                'session': 'Oui',
-                'obligatoire': 'Non',
-                'commentaire_fr': '',
-                'commentaire_en': '',
-                'type_ajustement': TypeAjustement.AJOUT.name,
-            },
-        ]  # TODO :: message_bus.invoke(Command)
-        return data
+        context.update(self.get_content())
+        return context
 
-    def get_intitule_groupement(self):
-        # TODO :: to implement
-        return "Intitulé groupement"
+    def get_content(self):
+        cmd = GetContenuGroupementCommand(
+            sigle_formation='ECGE1BA',
+            version_formation='',
+            transition_formation='',
+            annee=self.kwargs['annee'],
+            code=self.kwargs.get('code_groupement', self.kwargs['code_programme']),
+        )
+
+        contenu_groupement_DTO = message_bus_instance.invoke(cmd)  # return ContenuGroupementDTO
+
+        data = self._build_donnees_des_groupements_contenus(contenu_groupement_DTO.groupements_contenus)
+        data.extend(
+            self._build_donnees_des_unites_enseignement_contenues(contenu_groupement_DTO.unites_enseignement_contenues)
+        )
+        return {
+            'search_result': data,
+            'intitule_groupement':
+                contenu_groupement_DTO.groupement_contenant.intitule if contenu_groupement_DTO else '',
+            'intitule_complet_groupement':
+                contenu_groupement_DTO.groupement_contenant.intitule_complet if contenu_groupement_DTO else '',
+        }
+
+    def _build_donnees_des_unites_enseignement_contenues(
+            self, unites_enseignement_contenues: List['UniteEnseignementDTO']
+    ) -> List[Dict]:
+        donnees = []
+        for ue_contenue in unites_enseignement_contenues:
+            donnees.append(
+                {
+                    CODE: ue_contenue.code,
+                    INTITULE: ue_contenue.intitule_complet,
+                    VOLUMES: '{}{}{}'.format(
+                        _get_volume(ue_contenue.volume_annuel_pm),
+                        '+' if ue_contenue.volume_annuel_pm and ue_contenue.volume_annuel_pp else '',
+                        _get_volume(ue_contenue.volume_annuel_pp)
+                    ),
+                    BLOC: ue_contenue.bloc,
+                    QUADRI: ue_contenue.quadrimestre_texte,
+                    CREDITS: _get_credits(ue_contenue.credits_relatifs, ue_contenue.credits_absolus),
+                    SESSION: ue_contenue.session_derogation,
+                    OBLIGATOIRE: yesno(ue_contenue.obligatoire),
+                }
+            )
+        return donnees
+
+    def _build_donnees_des_groupements_contenus(self, groupements_contenus: List['ContenuGroupementDTO']) -> List[Dict]:
+        donnees = []
+        for groupement_contenu in groupements_contenus:
+            donnees.append(
+                {
+                    CODE: groupement_contenu.groupement_contenant.intitule,
+                    INTITULE: groupement_contenu.groupement_contenant.intitule_complet,
+                    OBLIGATOIRE: yesno(groupement_contenu.groupement_contenant.obligatoire),
+                }
+            )
+        return donnees
 
     def get_intitule_programme(self):
         # TODO :: to implement
         return "Intitulé programme"
+
+
+def _get_credits(credits_relatifs: int, credits_absolus: Decimal) -> str:
+    if credits_relatifs:
+        if credits_relatifs != credits_absolus:
+            return "{}({})".format(credits_relatifs, credits_absolus.normalize() )
+        return "{}".format(credits_relatifs)
+    return str(credits_absolus.normalize())
+
+
+def _get_volume(volume: Decimal) -> str:
+    if volume:
+        str_volume = str(volume)
+        return str_volume.rstrip('0').rstrip('.') if '.' in str_volume else str_volume
+    return ''
 
 
 from base.models.utils.utils import ChoiceEnum

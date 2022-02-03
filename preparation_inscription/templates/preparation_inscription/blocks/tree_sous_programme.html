@@ -2,7 +2,11 @@
 <li id="{{ sous_programme.code }}"
     data-jstree='{"icon":"{% if sous_programme.obligatoire %}{% static "img/education_group_year/mandatory.png" %}{% else %}{% static "img/education_group_year/optional.png" %}{% endif %}"}'
 >
-    {{ sous_programme.code }} - {{ sous_programme.intitule_complet }}
+    <a href=""
+   id="lnk_{{ code_programme }}_{{ sous_programme.code }}"
+   hx-get="{% url 'consulter_contenu_groupement_view' annee code_programme sous_programme.code %}"
+   hx-target="#content-of-main-panel" hx-trigger="click"
+   >{{ sous_programme.code }} - {{ sous_programme.intitule_complet }}</a>
      <div class="node_block_text" style="background-color:white;"></div>
     {% if sous_programme.sous_programme or sous_programme.unites_enseignements %}
         <ul>
