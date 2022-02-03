@@ -66,8 +66,6 @@ class GroupementDTO(DTO):
 @attr.s(frozen=True, slots=True, auto_attribs=True)
 class ContenuGroupementDTO(DTO):
     groupement_contenant: GroupementDTO
-    # unites_enseignement_contenues: List['UniteEnseignementDTO']
-    # groupements_contenus: List['ContenuGroupementDTO']
     contenu: List[Union['UniteEnseignementDTO', 'ContenuGroupementDTO']]
 
 
