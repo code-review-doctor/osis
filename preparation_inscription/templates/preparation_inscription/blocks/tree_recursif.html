@@ -8,9 +8,9 @@
             <ul>
                 {% for element in tree.racine.contenu %}
                     {% if element.type == "UNITE_ENSEIGNEMENT" %}
-                        {% include 'preparation_inscription/blocks/tree_unites_enseignements.html' with unite_enseignement=element %}
+                        {% include 'preparation_inscription/blocks/tree_unites_enseignements.html' with unite_enseignement=element parent_code=tree.code %}
                     {% elif element.type == "GROUPEMENT" %}
-                        {% include 'preparation_inscription/blocks/tree_sous_programme.html' with tree=element %}
+                        {% include 'preparation_inscription/blocks/tree_sous_programme.html' with tree=element parent_code=tree.code %}
                     {% endif %}
                 {% endfor %}
             </ul>
