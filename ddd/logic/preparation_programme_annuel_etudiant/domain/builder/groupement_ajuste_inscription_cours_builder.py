@@ -81,4 +81,3 @@ class GroupementAjusteInscriptionCoursBuilder(interface.RootEntityBuilder):
             unites_enseignement_supprimees=[],
             unites_enseignement_modifiees=[],
         )
-

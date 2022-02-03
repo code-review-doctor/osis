@@ -34,8 +34,8 @@ from ddd.logic.preparation_programme_annuel_etudiant.commands import SupprimerUE
 from ddd.logic.preparation_programme_annuel_etudiant.domain.validator.exceptions import \
     UniteEnseignementDejaSupprimeeException
 from infrastructure.messages_bus import message_bus_instance
-from infrastructure.preparation_programme_annuel_etudiant.repository.in_memory.groupement_ajuste_inscription_cours import \
-    GroupementAjusteInscriptionCoursInMemoryRepository
+from infrastructure.preparation_programme_annuel_etudiant.repository.in_memory.groupement_ajuste_inscription_cours \
+    import GroupementAjusteInscriptionCoursInMemoryRepository
 
 
 class TestSupprimerUeDuProgramme(SimpleTestCase):

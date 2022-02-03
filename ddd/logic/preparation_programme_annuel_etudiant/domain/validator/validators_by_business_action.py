@@ -32,8 +32,8 @@ import attr
 
 from base.ddd.utils.business_validator import TwoStepsMultipleBusinessExceptionListValidator, BusinessValidator
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
-from ddd.logic.preparation_programme_annuel_etudiant.domain.validator._should_unite_enseignement_pas_deja_supprimee import \
-    ShouldUniteEnseignementPasDejaSupprimee
+from ddd.logic.preparation_programme_annuel_etudiant.domain.validator._should_unite_enseignement_pas_deja_supprimee \
+    import ShouldUniteEnseignementPasDejaSupprimee
 
 if TYPE_CHECKING:
     from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
