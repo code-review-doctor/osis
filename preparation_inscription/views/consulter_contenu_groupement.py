@@ -31,7 +31,6 @@ from django.views.generic import TemplateView
 
 from base.utils.htmx import HtmxMixin
 
-
 RAFRAICHIR_GROUPEMENT_CONTENANT = 'rafraichir_groupement_contenant'
 
 
@@ -152,6 +151,6 @@ from base.models.utils.utils import ChoiceEnum
 
 
 class TypeAjustement(ChoiceEnum):
-    SUPPRESSION = _('SUPPRESSION')
-    MODIFICATION = _('MODIFICATION')
-    AJOUT = _('AJOUT')
+    SUPPRESSION = _('DELETION')
+    MODIFICATION = _('EDITION')
+    AJOUT = _('ADDITION')

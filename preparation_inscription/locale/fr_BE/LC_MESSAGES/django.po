@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-01 14:28+0100\n"
+"POT-Creation-Date: 2022-02-03 14:20+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,8 +17,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-msgid "AJOUT"
-msgstr ""
+msgid "ADDITION"
+msgstr "AJOUT"
 
 msgid "Actions"
 msgstr "Actions"
@@ -26,110 +26,92 @@ msgstr "Actions"
 msgid "Add"
 msgstr "Ajouter"
 
-msgid "Ajouter des UE"
-msgstr ""
+msgid "Add learning units"
+msgstr "Ajouter des UE"
 
 msgid "Anac."
-msgstr ""
-
-msgid "Annuler ajout"
-msgstr ""
-
-msgid "Annuler l'ajout"
-msgstr ""
-
-msgid "Annuler l'ajout?"
-msgstr ""
-
-msgid "Annuler la modification"
-msgstr ""
-
-msgid "Annuler la modification ?"
-msgstr ""
-
-msgid "Annuler la suppression"
-msgstr ""
-
-msgid "Annuler la suppression ?"
-msgstr ""
-
-msgid "Annuler suppression"
-msgstr ""
-
-msgid "Bloc"
-msgstr ""
+msgstr "Anac."
 
 msgid "Block"
-msgstr ""
+msgstr "Bloc"
 
 msgid "Cancel"
-msgstr ""
+msgstr "Annuler"
 
-msgid "Cette action annulera l'ajout de l'UE X du groupement 'Y'"
-msgstr ""
+msgid "Cancel add"
+msgstr "Annuler ajout"
 
-msgid "Cette action annulera la modification de l'UE X du groupement 'Y'"
-msgstr ""
+msgid "Cancel add ?"
+msgstr "Annuler ajout ?"
 
-msgid "Cette action annulera la suppression de l'UE X du groupement 'Y'"
-msgstr ""
+msgid "Cancel delete ?"
+msgstr "Annuler suppression ?"
+
+msgid "Cancel deletion"
+msgstr "Annuler suppression"
+
+msgid "Cancel edition"
+msgstr "Annuler modification"
+
+msgid "Cancel edition ?"
+msgstr "Annuler modification ?"
 
 msgid "Check All"
 msgstr "Cocher tout"
 
 msgid "Code"
-msgstr ""
+msgstr "Code"
 
-msgid "Commentaire"
-msgstr ""
+msgid "Comment"
+msgstr "Commentaire"
 
-msgid "Commentaire en anglais"
-msgstr ""
+msgid "Components (PM/PP)"
+msgstr "Composants (PM/PP)"
 
-msgid "Composants (PM/PP)"
-msgstr ""
+msgid "Credits"
+msgstr "Crédits"
 
-msgid "Crédits"
-msgstr ""
+msgid "DELETION"
+msgstr "SUPPRESSION"
 
-msgid "Déplacer vers le bas"
-msgstr ""
+msgid "Delete learning unit"
+msgstr "Supprimer "
 
-msgid "Déplacer vers le haut"
-msgstr ""
+msgid "Delete learning units"
+msgstr "Supprimer unité d'enseignement"
 
-msgid "ECGE1BA - 2021-2022"
-msgstr ""
+msgid "Do not cancel"
+msgstr "Ne pas annuler"
 
-msgid "Formulaire d'inscriptions aux cours PAE"
-msgstr ""
+msgid "EDITION"
+msgstr "MODIFICATION"
 
-msgid "Intitulé"
-msgstr ""
+msgid "Edit properties"
+msgstr "Modifier les propriétés"
 
-msgid "MODIFICATION"
-msgstr ""
+msgid "English comment"
+msgstr "Commentaire en anglais"
 
-msgid "Modifier les propriétés"
-msgstr ""
+msgid "Mandatory"
+msgstr "Obligatoire"
 
-msgid "Ne pas annuler"
-msgstr ""
+msgid "Move downwards"
+msgstr "Déplacer vers le bas"
 
-msgid "Obligatoire"
-msgstr ""
+msgid "Move upwards"
+msgstr "Déplacer vers le haut"
 
-msgid "Preparation PAE"
-msgstr ""
+msgid "PAE preparation"
+msgstr "Préparation PAE"
+
+msgid "PAE registration form"
+msgstr "Formulaire d'inscriptions aux cours PAE"
 
 msgid "Quadri."
-msgstr ""
+msgstr "Quadri."
 
-msgid "Revenir à l'état initial du programme"
-msgstr ""
-
-msgid "SUPPRESSION"
-msgstr ""
+msgid "Reset to initial program state"
+msgstr "Revenir à l'état initial du programme"
 
 msgid "Search"
 msgstr "Rechercher"
@@ -137,17 +119,20 @@ msgstr "Rechercher"
 msgid "Session"
 msgstr "Session"
 
-msgid "Supprimer des UE"
-msgstr ""
-
-msgid "Supprimer unite enseignement"
-msgstr ""
-
 msgid "The learning units have been added"
 msgstr "Les unités d'enseignement ont été ajoutées"
 
 msgid "The learning units {} have been deleted"
 msgstr "Les unités d'enseignement {} ont été supprimées"
+
+msgid "This action will cancel addition of learning unit X to group Y"
+msgstr "Cette action annulera l'ajout de l'UE X du groupement Y"
+
+msgid "This action will cancel deletion"
+msgstr "Cette action annulera la suppression"
+
+msgid "This action will cancel edition of UE X from group Y"
+msgstr "Cette action annulera la modification de l'UE X du groupement Y"
 
 msgid "Title"
 msgstr "Intitule"
@@ -157,19 +142,19 @@ msgid "Year"
 msgstr "An"
 
 msgid "champs1"
-msgstr ""
+msgstr "champs1"
 
 msgid "champs2"
-msgstr ""
+msgstr "champs2"
 
 msgid "champs3"
-msgstr ""
+msgstr "champs3"
 
 msgid "champs4"
-msgstr ""
+msgstr "champs4"
 
 msgid "champs5"
-msgstr ""
+msgstr "champs5"
 
 msgid "credits"
 msgstr "crédits"
