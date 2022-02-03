@@ -125,6 +125,7 @@ class FormationDTO(DTO):
 class ProgrammeInscriptionCoursDTO(DTO):
     uuid: str
     code: str
+    sigle: str
     annee: int
     version: str
     intitule_complet_formation: str  # intitulé de la formation + version formation
