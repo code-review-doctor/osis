@@ -25,6 +25,7 @@
 ##############################################################################
 import uuid
 
+from django.db.models import F
 from django.test import RequestFactory
 from django.urls import reverse
 from rest_framework import status
@@ -32,20 +33,20 @@ from rest_framework.settings import api_settings
 from rest_framework.test import APITestCase
 
 from base.tests.factories.user import UserFactory
-from reference.api.serializers.country import CountrySerializer
-from reference.models.country import Country
-from reference.tests.factories.country import CountryFactory
+from reference.api.serializers.high_school import HighSchoolDetailSerializer, HighSchoolListSerializer
+from reference.models.high_school import HighSchool
+from reference.tests.factories.high_school import HighSchoolFactory
 
 
-class GetAllCountryTestCase(APITestCase):
+class GetAllHighSchoolTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
         cls.user = UserFactory()
-        cls.url = reverse('reference_api_v1:country-list')
+        cls.url = reverse('reference_api_v1:high_school-list')
 
-        CountryFactory(iso_code='BE')
-        CountryFactory(iso_code='FR')
-        CountryFactory(iso_code='UK')
+        HighSchoolFactory()
+        HighSchoolFactory()
+        HighSchoolFactory()
 
     def setUp(self):
         self.client.force_authenticate(user=self.user)
@@ -63,7 +64,7 @@ class GetAllCountryTestCase(APITestCase):
             response = getattr(self.client, method)(self.url)
             self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    def test_get_all_country_ensure_response_have_next_previous_results_count(self):
+    def test_get_all_high_school_ensure_response_have_next_previous_results_count(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -72,43 +73,55 @@ class GetAllCountryTestCase(APITestCase):
         self.assertTrue('results' in response.data)
 
         self.assertTrue('count' in response.data)
-        expected_count = Country.objects.all().count()
+        expected_count = HighSchool.objects.all().count()
         self.assertEqual(response.data['count'], expected_count)
 
-    def test_get_all_country_ensure_default_order(self):
-        """ This test ensure that default order is name [ASC Order]"""
+    def test_get_all_high_school_ensure_default_order(self):
+        """ This test ensure that default order is organization name [ASC Order]"""
 
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        countries = Country.objects.all().order_by('name')
-        serializer = CountrySerializer(countries, many=True, context={'request': RequestFactory().get(self.url)})
+        high_schools = HighSchool.objects.all().order_by('organization__name').annotate(
+            acronym=F('organization__acronym'),
+            name=F('organization__name'),
+        )
+        serializer = HighSchoolListSerializer(
+            high_schools,
+            many=True,
+            context={'request': RequestFactory().get(self.url)}
+        )
         self.assertEqual(response.data['results'], serializer.data)
 
-    def test_get_all_country_specify_ordering_field(self):
-        ordering_managed = ['name', 'iso_code']
+    def test_get_all_high_school_specify_ordering_field(self):
+        ordering_managed = [('organization__name', 'name'), ('organization__acronym', 'acronym')]
 
-        for order in ordering_managed:
-            query_string = {api_settings.ORDERING_PARAM: order}
+        for db_order, api_order in ordering_managed:
+            query_string = {api_settings.ORDERING_PARAM: api_order}
             response = self.client.get(self.url, kwargs=query_string)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-            countries = Country.objects.all().order_by(order)
-            serializer = CountrySerializer(
-                countries,
+            high_schools = HighSchool.objects.all().order_by(db_order).annotate(
+                acronym=F('organization__acronym'),
+                name=F('organization__name'),
+            )
+            serializer = HighSchoolListSerializer(
+                high_schools,
                 many=True,
                 context={'request': RequestFactory().get(self.url, query_string)},
             )
             self.assertEqual(response.data['results'], serializer.data)
 
 
-class GetCountryTestCase(APITestCase):
+class GetHighSchoolTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.country = CountryFactory()
+        cls.high_school = HighSchoolFactory()
+        cls.high_school.name = cls.high_school.organization.name
+        cls.high_school.acronym = cls.high_school.organization.acronym
 
         cls.user = UserFactory()
-        cls.url = reverse('reference_api_v1:country-detail', kwargs={'uuid': cls.country.uuid})
+        cls.url = reverse('reference_api_v1:high_school-detail', kwargs={'uuid': cls.high_school.uuid})
 
     def setUp(self):
         self.client.force_authenticate(user=self.user)
@@ -126,17 +139,17 @@ class GetCountryTestCase(APITestCase):
             response = getattr(self.client, method)(self.url)
             self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    def test_get_valid_country(self):
+    def test_get_valid_high_school(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        serializer = CountrySerializer(
-            self.country,
+        serializer = HighSchoolDetailSerializer(
+            self.high_school,
             context={'request': RequestFactory().get(self.url)},
         )
         self.assertEqual(response.data, serializer.data)
 
-    def test_get_invalid_country_case_not_found(self):
-        invalid_url = reverse('reference_api_v1:country-detail', kwargs={'uuid':  uuid.uuid4()})
+    def test_get_invalid_high_school_case_not_found(self):
+        invalid_url = reverse('reference_api_v1:high_school-detail', kwargs={'uuid': uuid.uuid4()})
         response = self.client.get(invalid_url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
