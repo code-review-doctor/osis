@@ -32,8 +32,9 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
 from base.utils.htmx import HtmxMixin
-from ddd.logic.preparation_programme_annuel_etudiant.commands import GetContenuGroupementCommand
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import ContenuGroupementDTO
+from ddd.logic.preparation_programme_annuel_etudiant.commands import GetContenuGroupementCommand, \
+    GetContenuGroupementAjusteCommand
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import ContenuGroupementDTO, UniteEnseignementDTO
 from infrastructure.messages_bus import message_bus_instance
 from preparation_inscription.utils.chiffres_significatifs_de_decimal import get_chiffres_significatifs
 
@@ -74,12 +75,10 @@ class ConsulterContenuGroupementView(HtmxMixin, PermissionRequiredMixin, Templat
         return context
 
     def get_content(self):
-        cmd = GetContenuGroupementCommand(
-            sigle_formation='ECGE1BA',
-            version_formation='',
-            transition_formation='',
+        cmd = GetContenuGroupementAjusteCommand(
+            code_programme=self.kwargs['code_programme'],
+            code_groupement=self.kwargs.get('code_groupement', self.kwargs['code_programme']),
             annee=self.kwargs['annee'],
-            code=self.kwargs.get('code_groupement', self.kwargs['code_programme']),
         )
 
         contenu_groupement_DTO = message_bus_instance.invoke(cmd)  # return ContenuGroupementDTO
@@ -112,6 +111,7 @@ class ConsulterContenuGroupementView(HtmxMixin, PermissionRequiredMixin, Templat
                     CREDITS: _get_credits(ue_contenue.credits_relatifs, ue_contenue.credits_absolus),
                     SESSION: ue_contenue.session_derogation,
                     OBLIGATOIRE: yesno(ue_contenue.obligatoire),
+                    "type_ajustement": "AJOUT" if ue_contenue.ajoutee else ""
                 }
             )
         return donnees
@@ -135,6 +135,7 @@ class ConsulterContenuGroupementView(HtmxMixin, PermissionRequiredMixin, Templat
                         CREDITS: _get_credits(ue_contenue.credits_relatifs, ue_contenue.credits_absolus),
                         SESSION: ue_contenue.session_derogation,
                         OBLIGATOIRE: yesno(ue_contenue.obligatoire),
+                        "type_ajustement": "AJOUT" if ue_contenue.ajoutee else ""
                     }
                 )
 

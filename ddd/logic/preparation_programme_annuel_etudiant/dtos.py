@@ -45,6 +45,7 @@ class UniteEnseignementDTO(DTO):
     session_derogation: str
     credits_relatifs: int
     chemin_acces: str  # Exemple : 'LDROI1001B|LDROI102C|LDROI1001
+    ajoutee: bool = attr.ib(default=False)
 
     @property
     def type(self):

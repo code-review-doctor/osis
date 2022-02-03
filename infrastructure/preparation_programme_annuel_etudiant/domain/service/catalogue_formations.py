@@ -23,14 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List, Union
+from typing import List, Union, Optional
 
-from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormationCommand
+from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormationCommand, GetContenuGroupementCommand
 from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import \
     ICatalogueFormationsTranslator
 from ddd.logic.preparation_programme_annuel_etudiant.domain.validator.exceptions import FormationIntrouvableException
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, \
-    ContenuGroupementCatalogueDTO, UniteEnseignementDTO, UniteEnseignementCatalogueDTO, GroupementCatalogueDTO
+    ContenuGroupementCatalogueDTO, UniteEnseignementDTO, UniteEnseignementCatalogueDTO, GroupementCatalogueDTO, \
+    ContenuGroupementDTO
 from program_management.ddd.dtos import ProgrammeDeFormationDTO, ContenuNoeudDTO, ElementType
 
 
@@ -47,6 +48,32 @@ class CatalogueFormationsTranslator(ICatalogueFormationsTranslator):
         if program_management_formation_dto:
             return _build_formation_dto(program_management_formation_dto)
         raise FormationIntrouvableException(code_programme=code_programme, annee=annee)
+
+    @classmethod
+    def get_contenu_groupement(
+            cls,
+            code_programme: str,
+            code_groupement: str,
+            annee: int
+            ) -> 'ContenuGroupementCatalogueDTO':
+        formation = cls.get_formation(code_programme=code_programme, annee=annee)
+        return _search_groupement(code_groupement, formation.racine)
+
+
+def _search_groupement(
+        code_groupement: str,
+        contenu_groupement: 'ContenuGroupementCatalogueDTO'
+        ) -> Optional['ContenuGroupementCatalogueDTO']:
+    if contenu_groupement.groupement_contenant.code == code_groupement:
+        return contenu_groupement
+    for contenu in contenu_groupement.contenu_ordonne_catalogue:
+        if not isinstance(contenu, ContenuGroupementCatalogueDTO):
+            continue
+
+        result = _search_groupement(code_groupement, contenu)
+        if result:
+            return result
+    return None
 
 
 def _build_formation_dto(program_management_formation_dto: ProgrammeDeFormationDTO) -> FormationDTO:
