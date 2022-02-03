@@ -23,12 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.utils.translation import gettext_lazy as _
 from decimal import Decimal
-from typing import List
-
+from typing import List, Union
 import attr
 
+from base.models.utils.utils import ChoiceEnum
 from osis_common.ddd.interface import DTO
+
+
+class ElementType(ChoiceEnum):
+    UNITE_ENSEIGNEMENT = _("Unite enseignement")
+    GROUPEMENT = _("Groupement")
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
@@ -45,22 +51,33 @@ class UniteEnseignementDTO(DTO):
     session_derogation: str
     credits_relatifs: int
 
+    @property
+    def type(self):
+        return ElementType.UNITE_ENSEIGNEMENT.name
 
-@attr.s(frozen=True, slots=True, auto_attribs=True)
-class GroupementDTO(DTO):
-    code: str
-    intitule: str
-    obligatoire: bool
-    remarque: str
-    intitule_complet: str
-    credits: Decimal
+    @property
+    def type_text(self):
+        return ElementType.UNITE_ENSEIGNEMENT.value
 
 
+# FIXME: Rename to GroupementDTO
 @attr.s(frozen=True, slots=True, auto_attribs=True)
 class ContenuNoeudDTO(DTO):
-    groupement_contenant: GroupementDTO
-    unites_enseignement_contenues: List['UniteEnseignementDTO']
-    groupements_contenus: List['ContenuNoeudDTO']
+    code: str
+    intitule: str
+    intitule_complet: str
+    obligatoire: bool
+    remarque: str
+    credits: Decimal
+    contenu_ordonne: List[Union['UniteEnseignementDTO', 'ContenuNoeudDTO']]
+
+    @property
+    def type(self):
+        return ElementType.GROUPEMENT.name
+
+    @property
+    def type_text(self):
+        return ElementType.GROUPEMENT.value
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)

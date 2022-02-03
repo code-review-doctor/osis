@@ -23,9 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
-
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
@@ -35,8 +33,13 @@ from base.utils.htmx import HtmxMixin
 RAFRAICHIR_GROUPEMENT_CONTENANT = 'rafraichir_groupement_contenant'
 
 
-class ConsulterContenuGroupementView(HtmxMixin, LoginRequiredMixin, TemplateView):
+class ConsulterContenuGroupementView(HtmxMixin, PermissionRequiredMixin, TemplateView):
     name = 'consulter_contenu_groupement_view'
+
+    # PermissionRequiredMixin
+    permission_required = "preparation_inscription.view_preparation_inscription_cours"
+    raise_exception = True
+
     # TemplateView
     template_name = "preparation_inscription/preparation_inscription.html"
     htmx_template_name = "preparation_inscription/consulter_contenu_groupement.html"
