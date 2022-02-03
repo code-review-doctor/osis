@@ -127,13 +127,13 @@
                                 "separator_before": true,
                                 "label": gettext("Open all"),
                                 "action": function (node) {
-                                    $tree.jstree('open_all');
+                                    $tree.jstree('open_all', node.reference);
                                 }
                             },
                             "close_all": {
                                 "label": gettext("Close all"),
                                 "action": function (node) {
-                                    $tree.jstree('close_all');
+                                    $tree.jstree('close_all', node.reference);
                                 }
                             },
                         }
