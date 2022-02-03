@@ -2,7 +2,10 @@
 
 <ul>
     <li id="{{ tree.code }}">
-        {{ tree.code }}
+        {{ tree.sigle }}
+        {% if tree.version %}
+            [{{tree.version}}]
+        {% endif %}
         <div class="node_block_text header">{% trans 'Block' %}</div>
         {% if tree.racine and tree.racine.contenu %}
             <ul>
