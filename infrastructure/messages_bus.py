@@ -169,7 +169,8 @@ from ddd.logic.learning_unit.use_case.write.create_effective_class_service impor
 from ddd.logic.learning_unit.use_case.write.create_learning_unit_service import create_learning_unit
 from ddd.logic.learning_unit.use_case.write.delete_effective_class_service import delete_effective_class
 from ddd.logic.learning_unit.use_case.write.update_effective_class_service import update_effective_class
-from ddd.logic.preparation_programme_annuel_etudiant.commands import AjouterUEAuProgrammeCommand
+from ddd.logic.preparation_programme_annuel_etudiant.commands import AjouterUEAuProgrammeCommand, \
+    SupprimerUEDuProgrammeCommand
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormulaireInscriptionCoursCommand, \
     GetFormationCommand
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetProgrammeInscriptionCoursCommand
@@ -179,6 +180,8 @@ from ddd.logic.preparation_programme_annuel_etudiant.use_case.read.get_programme
     get_programme_inscription_cours
 from ddd.logic.preparation_programme_annuel_etudiant.use_case.write.ajouter_UE_au_programme_service import \
     ajouter_UE_au_programme
+from ddd.logic.preparation_programme_annuel_etudiant.use_case.write.supprimer_UE_du_programme_service import \
+    supprimer_UE_du_programme
 from ddd.logic.shared_kernel.academic_year.commands import SearchAcademicYearCommand
 from ddd.logic.shared_kernel.academic_year.use_case.read.search_academic_years_service import search_academic_years
 from ddd.logic.shared_kernel.campus.commands import GetCampusCommand, SearchUclouvainCampusesCommand
@@ -539,6 +542,10 @@ class MessageBusCommands(AbstractMessageBusCommands):
             AttributionsEndDateReachedSummary()
         ),
         AjouterUEAuProgrammeCommand: lambda cmd: ajouter_UE_au_programme(
+            cmd,
+            GroupementAjusteInscriptionCoursInMemoryRepository(),
+        ),
+        SupprimerUEDuProgrammeCommand: lambda cmd: supprimer_UE_du_programme(
             cmd,
             GroupementAjusteInscriptionCoursInMemoryRepository(),
         ),

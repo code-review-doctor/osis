@@ -36,9 +36,9 @@ from ddd.logic.preparation_programme_annuel_etudiant.domain.model.unite_enseigne
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.unite_enseignement_modifiee import \
     UniteEnseignementModifiee
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.unite_enseignement_supprimee import \
-    UniteEnseignementSupprimee
+    UniteEnseignementSupprimee, UniteEnseignementSupprimeeIdentity
 from ddd.logic.preparation_programme_annuel_etudiant.domain.validator.validators_by_business_action import \
-    AjouterUniteEnseignementValidatorList
+    AjouterUniteEnseignementValidatorList, SupprimerUniteEnseignementValidatorList
 from education_group.ddd.domain.group import GroupIdentity
 from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
 from osis_common.ddd import interface
@@ -66,6 +66,9 @@ class GroupementAjusteInscriptionCours(interface.RootEntity):
     def get_identites_unites_enseignement_ajoutees(self) -> List['LearningUnitIdentity']:
         return [ue.unite_enseignement_identity for ue in self.unites_enseignement_ajoutees]
 
+    def get_identites_unites_enseignement_supprimees(self) -> List['LearningUnitIdentity']:
+        return [ue.unite_enseignement_identity for ue in self.unites_enseignement_supprimees]
+
     def ajouter_unites_enseignements(
             self,
             codes_unites_enseignement: List['CodeUniteEnseignement']
@@ -86,8 +89,25 @@ class GroupementAjusteInscriptionCours(interface.RootEntity):
                 )
             )
 
-    def retirer_unite_enseignement(self, unite_enseignement: 'LearningUnitYearIdentity'):
-        raise NotImplementedError
+    def supprimer_unite_enseignement(self, code_unite_enseignement: 'CodeUniteEnseignement'):
+        unite_enseignement = LearningUnitIdentityBuilder.build_from_code_and_year(
+            code=code_unite_enseignement,
+            year=self.annee
+        )
+        SupprimerUniteEnseignementValidatorList(
+            groupement_ajuste=self,
+            unite_enseignement=unite_enseignement
+        ).validate()
+
+        # retirer des ue ajoutees si déjà ajoutée
+        ue_ajoutee = next((ue for ue in self.unites_enseignement_ajoutees if ue.code == code_unite_enseignement), None)
+        if ue_ajoutee:
+            self.unites_enseignement_ajoutees.remove(ue_ajoutee)
+        else:
+            self.unites_enseignement_supprimees.append(UniteEnseignementSupprimee(
+                entity_id=UniteEnseignementSupprimeeIdentity(uuid.uuid4()),
+                unite_enseignement_identity=unite_enseignement
+            ))
 
     def ajuster_unite_enseignement(
             self,

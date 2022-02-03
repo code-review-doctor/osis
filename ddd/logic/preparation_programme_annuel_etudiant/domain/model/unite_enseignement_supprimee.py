@@ -41,3 +41,7 @@ class UniteEnseignementSupprimeeIdentity(interface.EntityIdentity):
 class UniteEnseignementSupprimee(interface.Entity):  # TODO  Entity VS ValueObject ?
     entity_id: UniteEnseignementSupprimeeIdentity
     unite_enseignement_identity: 'LearningUnitIdentity'
+
+    @property
+    def code(self):
+        return self.unite_enseignement_identity.code

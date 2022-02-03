@@ -3,12 +3,11 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-01 14:28+0100\n"
+"POT-Creation-Date: 2022-02-03 14:20+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,8 +17,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-msgid "AJOUT"
-msgstr "ADD"
+msgid "ADDITION"
+msgstr ""
 
 msgid "Actions"
 msgstr ""
@@ -27,38 +26,11 @@ msgstr ""
 msgid "Add"
 msgstr ""
 
-msgid "Ajouter des UE"
-msgstr "Add learning units"
+msgid "Add learning units"
+msgstr ""
 
 msgid "Anac."
 msgstr "Anac."
-
-msgid "Annuler ajout"
-msgstr "Cancel add"
-
-msgid "Annuler l'ajout"
-msgstr "Cancel add"
-
-msgid "Annuler l'ajout?"
-msgstr "Cancel add ?"
-
-msgid "Annuler la modification"
-msgstr "Cancel edition"
-
-msgid "Annuler la modification ?"
-msgstr "Cancel edition ?"
-
-msgid "Annuler la suppression"
-msgstr "Cancel deletion"
-
-msgid "Annuler la suppression ?"
-msgstr "Cancel deletion ?"
-
-msgid "Annuler suppression"
-msgstr "Cancel deletion"
-
-msgid "Bloc"
-msgstr "Block"
 
 msgid "Block"
 msgstr ""
@@ -66,14 +38,23 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-msgid "Cette action annulera l'ajout de l'UE X du groupement 'Y'"
-msgstr "This action will cancel learning unit X addition on group 'Y'"
+msgid "Cancel add"
+msgstr ""
 
-msgid "Cette action annulera la modification de l'UE X du groupement 'Y'"
-msgstr "This action will cancel learning unit X modification in group 'Y'"
+msgid "Cancel add ?"
+msgstr ""
 
-msgid "Cette action annulera la suppression de l'UE X du groupement 'Y'"
-msgstr "This action will cancel learning unit X deletion from group 'Y'"
+msgid "Cancel delete ?"
+msgstr ""
+
+msgid "Cancel deletion"
+msgstr ""
+
+msgid "Cancel edition"
+msgstr ""
+
+msgid "Cancel edition ?"
+msgstr ""
 
 msgid "Check All"
 msgstr ""
@@ -81,56 +62,56 @@ msgstr ""
 msgid "Code"
 msgstr ""
 
-msgid "Commentaire"
-msgstr "Comment"
-
-msgid "Commentaire en anglais"
-msgstr "English comment"
-
-msgid "Composants (PM/PP)"
-msgstr "Components (PM/PP)"
-
-msgid "Crédits"
-msgstr "Credits"
-
-msgid "Déplacer vers le bas"
-msgstr "Move downwards"
-
-msgid "Déplacer vers le haut"
-msgstr "Move upwards"
-
-msgid "ECGE1BA - 2021-2022"
+msgid "Comment"
 msgstr ""
 
-msgid "Formulaire d'inscriptions aux cours PAE"
-msgstr "Registration to PAE Form"
+msgid "Components (PM/PP)"
+msgstr ""
 
-msgid "Intitulé"
-msgstr "Title"
+msgid "Credits"
+msgstr ""
 
-msgid "MODIFICATION"
-msgstr "EDITION"
+msgid "DELETION"
+msgstr ""
 
-msgid "Modifier les propriétés"
-msgstr "Edit properties"
+msgid "Delete learning unit"
+msgstr ""
 
-msgid "Ne pas annuler"
-msgstr "Do not cancel"
+msgid "Delete learning units"
+msgstr ""
 
-msgid "Obligatoire"
-msgstr "Mandatory"
+msgid "Do not cancel"
+msgstr ""
 
-msgid "Preparation PAE"
-msgstr "PAE preparation"
+msgid "EDITION"
+msgstr ""
+
+msgid "Edit properties"
+msgstr ""
+
+msgid "English comment"
+msgstr ""
+
+msgid "Mandatory"
+msgstr ""
+
+msgid "Move downwards"
+msgstr ""
+
+msgid "Move upwards"
+msgstr ""
+
+msgid "PAE preparation"
+msgstr ""
+
+msgid "PAE registration form"
+msgstr ""
 
 msgid "Quadri."
-msgstr "Quadri."
+msgstr ""
 
-msgid "Revenir à l'état initial du programme"
-msgstr "Reset program to inital state"
-
-msgid "SUPPRESSION"
-msgstr "DELETION"
+msgid "Reset to initial program state"
+msgstr ""
 
 msgid "Search"
 msgstr ""
@@ -138,16 +119,19 @@ msgstr ""
 msgid "Session"
 msgstr ""
 
-msgid "Supprimer des UE"
-msgstr "Delete learning units"
-
-msgid "Supprimer unite enseignement"
-msgstr "Delete learning unit"
-
 msgid "The learning units have been added"
 msgstr ""
 
 msgid "The learning units {} have been deleted"
+msgstr ""
+
+msgid "This action will cancel addition of learning unit X to group Y"
+msgstr ""
+
+msgid "This action will cancel deletion"
+msgstr ""
+
+msgid "This action will cancel edition of UE X from group Y"
 msgstr ""
 
 msgid "Title"
@@ -158,19 +142,19 @@ msgid "Year"
 msgstr ""
 
 msgid "champs1"
-msgstr "field1"
+msgstr ""
 
 msgid "champs2"
-msgstr "field2"
+msgstr ""
 
 msgid "champs3"
-msgstr "field3"
+msgstr ""
 
 msgid "champs4"
-msgstr "field4"
+msgstr ""
 
 msgid "champs5"
-msgstr "field5"
+msgstr ""
 
 msgid "credits"
-msgstr "credits"
+msgstr ""

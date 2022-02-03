@@ -37,7 +37,7 @@ def ajouter_UE_au_programme(
         repository: 'IGroupementAjusteInscriptionCoursRepository',
 ) -> 'IdentiteGroupementAjusteInscriptionCours':
     # GIVEN
-    groupement_ajuste = GroupementAjusteInscriptionCoursBuilder.build_from_command(cmd, repository)
+    groupement_ajuste = GroupementAjusteInscriptionCoursBuilder.build_from_add_command(cmd, repository)
 
     # WHEN
     groupement_ajuste.ajouter_unites_enseignements(
