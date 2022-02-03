@@ -39,6 +39,7 @@ class CountryList(generics.ListAPIView):
     filterset_fields = (
         'iso_code',
         'name',
+        'dialing_code'
     )
     search_fields = (
         'name',
