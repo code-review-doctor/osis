@@ -128,6 +128,7 @@ def _build_ProgrammeDeFormationDTO():
         sigle='ECGE1BA',
         code='LECGE100B',
         version=STANDARD,
+        transition_name='',
         intitule_formation='Bachelier en sciences économiques et de gestion',
         racine=ContenuNoeudDTO(
             intitule='ECGE1BA',

@@ -118,6 +118,7 @@ class FormationDTO(DTO):
     annee: int
     sigle: str
     version: str
+    transition_name: str
     intitule_formation: str
 
 
@@ -128,8 +129,20 @@ class ProgrammeInscriptionCoursDTO(DTO):
     sigle: str
     annee: int
     version: str
+    transition_name: str
     intitule_complet_formation: str  # intitulé de la formation + version formation
     racine: 'GroupementInscriptionCoursDTO'
+
+    @property
+    def title(self):
+        title = self.sigle
+        if self.version and self.transition_name:
+            title += "[{} - {}]".format(self.version, self.transition_name)
+        elif self.version:
+            title += "[{}]".format(self.version)
+        elif self.transition_name:
+            title += "[{}]".format(self.transition_name)
+        return title
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)

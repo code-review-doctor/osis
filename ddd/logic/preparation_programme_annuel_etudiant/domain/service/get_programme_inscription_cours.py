@@ -74,6 +74,7 @@ class GetProgrammeInscriptionCours(interface.DomainService):
             annee=cmd.annee,
             sigle=formation.sigle,
             version=formation.version,
+            transition_name=formation.transition_name,
             intitule_complet_formation=formation.intitule_formation,
             racine=cls.__build_contenu(
                 [formation.racine],

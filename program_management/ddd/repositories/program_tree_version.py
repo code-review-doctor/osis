@@ -417,6 +417,7 @@ def build_dto(pgm_tree_version: 'ProgramTreeVersion', identity: ProgramTreeVersi
             "{}".format("[ {} ]".format(pgm_tree_version.title_fr) if pgm_tree_version.title_fr else '')
         ),
         code=tree.entity_id.code,
+        transition_name=identity.transition_name
     )
 
 
