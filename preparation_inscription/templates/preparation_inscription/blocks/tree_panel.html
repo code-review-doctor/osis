@@ -148,6 +148,13 @@
             $tree.bind('refreshNode', function (e, node_id) {
                 $tree.jstree(true).refresh_node(node_id);
             });
+
+            $tree.bind("activate_node.jstree", function (event, data) {
+                var url = data.node.li_attr.url;
+                if(url != undefined){
+                    htmx.ajax('GET', url, '#content-of-main-panel')
+                }
+            });
         });
     </script>
 </div>
