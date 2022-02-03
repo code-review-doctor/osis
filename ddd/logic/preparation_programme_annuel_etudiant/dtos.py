@@ -46,6 +46,10 @@ class UniteEnseignementDTO(DTO):
     credits_relatifs: int
     chemin_acces: str  # Exemple : 'LDROI1001B|LDROI102C|LDROI1001
 
+    @property
+    def type(self):
+        return "UNITE_ENSEIGNEMENT"
+
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
 class GroupementDTO(DTO):
@@ -54,12 +58,17 @@ class GroupementDTO(DTO):
     obligatoire: bool
     chemin_acces: str  # Exemple : 'LDROI1001B|LDROI102C|LDROI1001
 
+    @property
+    def type(self):
+        return "GROUPEMENT"
+
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
 class ContenuGroupementDTO(DTO):
     groupement_contenant: GroupementDTO
-    unites_enseignement_contenues: List['UniteEnseignementDTO']
-    groupements_contenus: List['ContenuGroupementDTO']
+    # unites_enseignement_contenues: List['UniteEnseignementDTO']
+    # groupements_contenus: List['ContenuGroupementDTO']
+    contenu: List[Union['UniteEnseignementDTO', 'ContenuGroupementDTO']]
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)

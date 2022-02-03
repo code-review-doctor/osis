@@ -35,7 +35,6 @@ from infrastructure.messages_bus import message_bus_instance
 from infrastructure.preparation_programme_annuel_etudiant.domain.service.in_memory.catalogue_formations import \
     CatalogueFormationsTranslatorInMemory, ANNEE
 from program_management.ddd.dtos import UniteEnseignementDTO, ContenuNoeudDTO
-from program_management.ddd.domain.program_tree_version import STANDARD, NOT_A_TRANSITION
 
 
 class GetFormulaireInscriptionCoursTest(SimpleTestCase):
