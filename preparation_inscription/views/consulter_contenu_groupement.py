@@ -35,6 +35,7 @@ from base.utils.htmx import HtmxMixin
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetContenuGroupementCommand
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import ContenuGroupementDTO
 from infrastructure.messages_bus import message_bus_instance
+from preparation_inscription.utils.chiffres_significatifs_de_decimal import get_chiffres_significatifs
 
 CODE = 'code'
 INTITULE = 'intitule'
@@ -100,9 +101,9 @@ class ConsulterContenuGroupementView(HtmxMixin, LoginRequiredMixin, TemplateView
                     CODE: ue_contenue.code,
                     INTITULE: ue_contenue.intitule_complet,
                     VOLUMES: '{}{}{}'.format(
-                        _get_volume(ue_contenue.volume_annuel_pm),
+                        get_chiffres_significatifs(ue_contenue.volume_annuel_pm),
                         '+' if ue_contenue.volume_annuel_pm and ue_contenue.volume_annuel_pp else '',
-                        _get_volume(ue_contenue.volume_annuel_pp)
+                        get_chiffres_significatifs(ue_contenue.volume_annuel_pp)
                     ),
                     BLOC: ue_contenue.bloc,
                     QUADRI: ue_contenue.quadrimestre_texte,
@@ -133,16 +134,9 @@ class ConsulterContenuGroupementView(HtmxMixin, LoginRequiredMixin, TemplateView
 def _get_credits(credits_relatifs: int, credits_absolus: Decimal) -> str:
     if credits_relatifs:
         if credits_relatifs != credits_absolus:
-            return "{}({})".format(credits_relatifs, credits_absolus.normalize() )
+            return "{}({})".format(credits_relatifs, get_chiffres_significatifs(credits_absolus))
         return "{}".format(credits_relatifs)
-    return str(credits_absolus.normalize())
-
-
-def _get_volume(volume: Decimal) -> str:
-    if volume:
-        str_volume = str(volume)
-        return str_volume.rstrip('0').rstrip('.') if '.' in str_volume else str_volume
-    return ''
+    return get_chiffres_significatifs(credits_absolus)
 
 
 from base.models.utils.utils import ChoiceEnum
