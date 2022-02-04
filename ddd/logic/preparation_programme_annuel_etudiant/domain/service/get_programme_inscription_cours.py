@@ -66,7 +66,9 @@ class GetProgrammeInscriptionCours(interface.DomainService):
             uuid='uuid-1234',
             code=formation.racine.groupement_contenant.code,
             annee=cmd.annee,
+            sigle=formation.sigle,
             version=formation.version,
+            transition_name=formation.transition_name,
             intitule_complet_formation=formation.intitule_formation,
             racine=cls.__build_contenu(
                 [formation.racine],

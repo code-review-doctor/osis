@@ -65,11 +65,15 @@ class PreparationInscriptionMainView(PermissionRequiredMixin, TemplateView):
         })
 
     def get_tree_panel_header(self) -> str:
-        return "{sigle}{version} (RE) - {annee}".format(
-            sigle=self.formation.sigle,
-            version=" [{}]".format(self.formation.version) if self.formation.version else '',
-            annee=display_as_academic_year(self.formation.annee),
-        )
+        header = self.formation.sigle
+        if self.formation.version and self.formation.transition_name:
+            header += "[{} - {}]".format(self.formation.version, self.formation.transition_name)
+        elif self.formation.version:
+            header += "[{}]".format(self.formation.version)
+        elif self.formation.transition_name:
+            header += "[{}]".format(self.formation.transition_name)
+        header += ' (RE) - {annee}'.format(annee=display_as_academic_year(self.formation.annee))
+        return header
 
     def get_tree_panel_title(self) -> str:
         return self.formation.intitule_formation
