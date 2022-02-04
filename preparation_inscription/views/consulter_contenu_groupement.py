@@ -40,15 +40,6 @@ class TypeAjustement(ChoiceEnum):
     AJOUT = _('AJOUT')
 
 
-CODE = 'code'
-INTITULE = 'intitule'
-VOLUMES = 'volumes'
-BLOC = 'bloc'
-QUADRI = 'quadri'
-CREDITS = 'credits'
-SESSION = 'session'
-OBLIGATOIRE = 'obligatoire'
-
 RAFRAICHIR_GROUPEMENT_CONTENANT = 'rafraichir_groupement_contenant'
 
 
