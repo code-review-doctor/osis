@@ -23,25 +23,45 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from functools import partial
 
 from rest_framework import serializers
 
-from reference.models.language import Language
-
-RelatedLanguageField = partial(
-    serializers.SlugRelatedField,
-    slug_field='code',
-    queryset=Language.objects.all(),
-    allow_null=True,
-)
+from reference.models.high_school import HighSchool
 
 
-class LanguageSerializer(serializers.ModelSerializer):
+class HighSchoolListSerializer(serializers.HyperlinkedModelSerializer):
+    url = serializers.HyperlinkedIdentityField(view_name='reference_api_v1:high_school-detail', lookup_field='uuid')
+    name = serializers.CharField(read_only=True)
+    acronym = serializers.CharField(read_only=True)
+
     class Meta:
-        model = Language
+        model = HighSchool
         fields = (
-            'code',
+            'url',
+            'uuid',
             'name',
-            'name_en'
+            'acronym',
+            'type',
+        )
+
+
+class HighSchoolDetailSerializer(HighSchoolListSerializer):
+    linguistic_regime = serializers.CharField(read_only=True, source='linguistic_regime.code')
+    zipcode = serializers.CharField(read_only=True, source='zip_code.zip_code')
+    city = serializers.CharField(read_only=True, source='zip_code.municipality')
+    country = serializers.CharField(read_only=True, source='zip_code.country.iso_code')
+
+    class Meta(HighSchoolListSerializer.Meta):
+        fields = HighSchoolListSerializer.Meta.fields + (
+            'phone',
+            'fax',
+            'email',
+            'start_year',
+            'end_year',
+            'linguistic_regime',
+            'country',
+            'zipcode',
+            'city',
+            'street',
+            'street_number',
         )

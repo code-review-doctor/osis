@@ -92,6 +92,92 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
         - countries
+  /high_schools/:
+    get:
+      description: Return a list of high schools with optional filtering.
+      operationId: high_schools_list
+      parameters:
+        - in: query
+          name: search
+          schema:
+            description: A search term which will look up at high school name or acronym
+            type: string
+        - in: query
+          name: country
+          schema:
+            description: Filter by ISO 3166-1 2-letter country code
+            type: string
+        - in: query
+          name: name
+          schema:
+            description: Filter by high school name
+            type: string
+        - in: query
+          name: acronym
+          schema:
+            description: Filter by high school acronym
+            type: string
+        - in: query
+          name: zipcode
+          schema:
+            description: Filter by high school zip code
+            type: string
+        - in: query
+          name: type
+          schema:
+            description: Filter by high school zip type
+            type: string
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
+        - $ref: '#/components/parameters/PaginationLimit'
+        - $ref: '#/components/parameters/PaginationOffset'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedHighSchool'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      tags:
+        - high_schools
+  /high_schools/{uuid}:
+    get:
+      description: Return the detail of high scool
+      operationId: high_school_read
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            description: Universal unique identifier in version 4
+            type: string
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HighSchool'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - countries
   /cities/:
     get:
       description: Return a list of cities with optional filtering.
@@ -367,6 +453,15 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/Country'
+    PaginatedHighSchool:
+      allOf:
+        - $ref: '#/components/schemas/Paging'
+        - type: object
+          properties:
+            results:
+              type: array
+              items:
+                $ref: '#/components/schemas/Country'
     PaginatedCity:
       allOf:
         - $ref: '#/components/schemas/Paging'
@@ -418,6 +513,67 @@ components:
           type: string
           description: The dialing code of the country
           nullable: true
+    HighSchool:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+        uuid:
+          type: string
+          format: uuid
+        type:
+          type: string
+          description: The type of high school
+          nullable: true
+        name:
+          type: string
+          description: The name of the high school
+        acronym:
+          type: string
+          description: The acronym of the high school
+          nullable: true
+        phone:
+          type: string
+          description: The phone number of the high school
+        fax:
+          type: string
+          description: The fax number of the high school
+          nullable: true
+        email:
+          type: string
+          format: email
+          description: The email of the high school
+          nullable: true
+        start_year:
+          type: integer
+          example: 2018
+        end_year:
+          type: integer
+          example: 2021
+          nullable: true
+        linguistic_regime:
+          type: string
+          example: 'FR'
+          description: The linguistic regime of the high school (iso code format)
+          nullable: true
+        country:
+          type: string
+          example: 'BE'
+          description: The country code (of the high school) according to ISO 3166-1 specification
+        zipcode:
+          type: string
+          description: The postal code of the high school
+          example: '1348'
+        city:
+          type: string
+          description: The city of the high school
+        street:
+          type: string
+          description: The street of the high school
+        street_number:
+          type: string
+          description: The street number of the high school
     PaginatedStudyDomain:
       allOf:
         - $ref: '#/components/schemas/Paging'
