@@ -64,9 +64,13 @@ class CatalogueUnitesEnseignementTranslator(ICatalogueUnitesEnseignementTranslat
             quadrimestre=learning_unit_search_dto.quadrimester,
             quadrimestre_texte=LearningUnitYearQuadrimester[learning_unit_search_dto.quadrimester].value,
             credits_absolus=learning_unit_search_dto.credits,
-            credits_relatifs=learning_unit_search_dto.credits,
-            volume_annuel_pm=learning_unit_search_dto.lecturing_volume_annual,
-            volume_annuel_pp=learning_unit_search_dto.practical_volume_annual,
+            credits_relatifs=None,
+            volume_annuel_pm=int(
+                learning_unit_search_dto.lecturing_volume_annual
+            ) if learning_unit_search_dto.lecturing_volume_annual else None,
+            volume_annuel_pp=int(
+                learning_unit_search_dto.practical_volume_annual
+            ) if learning_unit_search_dto.practical_volume_annual else None,
             obligatoire=True,
             session_derogation=learning_unit_search_dto.session_derogation
         )
