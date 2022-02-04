@@ -23,7 +23,6 @@
 #
 ##############################################################################
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetContenuGroupementCommand
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import ContenuGroupementDTO
 from infrastructure.preparation_programme_annuel_etudiant.domain.service.catalogue_formations import \
     CatalogueFormationsTranslator
 
@@ -33,4 +32,3 @@ def get_contenu_groupement_service(
         translator: 'CatalogueFormationsTranslator',
 ) -> 'GroupementContenantDTO':
     return translator.get_contenu_groupement(cmd)
-

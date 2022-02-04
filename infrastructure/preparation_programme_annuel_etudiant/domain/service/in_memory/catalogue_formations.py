@@ -25,6 +25,7 @@
 ##############################################################################
 from decimal import Decimal
 
+from ddd.logic.preparation_programme_annuel_etudiant.commands import GetContenuGroupementCommand
 from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import \
     ICatalogueFormationsTranslator
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, ContenuGroupementCatalogueDTO, \
@@ -623,4 +624,8 @@ class CatalogueFormationsTranslatorInMemory(ICatalogueFormationsTranslator):
             version_formation: str,
             code_groupement: str
     ) -> 'GroupementDTO':
+        raise NotImplementedError()
+
+    @classmethod
+    def get_contenu_groupement(cls, cmd: GetContenuGroupementCommand) -> 'GroupementContenantDTO':
         raise NotImplementedError()
