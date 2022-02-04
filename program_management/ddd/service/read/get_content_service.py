@@ -27,7 +27,7 @@ from ddd.logic.preparation_programme_annuel_etudiant.commands import GetContenuG
 from program_management.ddd.domain import exception
 from program_management.ddd.dtos import UniteEnseignementDTO, ContenuNoeudDTO
 from program_management.ddd.repositories import program_tree_version as program_tree_version_repository
-from program_management.ddd.repositories.program_tree_version import _build_contenu, _get_credits
+from program_management.ddd.repositories.program_tree_version import _get_credits
 from program_management.ddd.repositories.program_tree_version import get_verbose_title_group
 
 
