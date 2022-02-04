@@ -24,7 +24,7 @@
 #
 ##############################################################################
 
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
@@ -43,7 +43,12 @@ class TypeAjustement(ChoiceEnum):
 RAFRAICHIR_GROUPEMENT_CONTENANT = 'rafraichir_groupement_contenant'
 
 
-class ConsulterContenuGroupementView(HtmxMixin, LoginRequiredMixin, TemplateView):
+class ConsulterContenuGroupementView(HtmxMixin, PermissionRequiredMixin, LoginRequiredMixin, TemplateView):
+
+    # PermissionRequiredMixin
+    permission_required = "preparation_inscription.view_preparation_inscription_cours"
+    raise_exception = True
+
     name = 'consulter_contenu_groupement_view'
     # TemplateView
     template_name = "preparation_inscription/preparation_inscription.html"
