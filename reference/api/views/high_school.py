@@ -23,44 +23,55 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import django_filters as filters
+from django.db.models import F
+from django_filters import rest_framework as filters
 from rest_framework import generics
 
-from reference.api.serializers.study_domain import StudyDomainSerializer
-from reference.models.domain import Domain
-from reference.models.enums.decree_type import DecreeType
+from reference.api.serializers.high_school import HighSchoolDetailSerializer, \
+    HighSchoolListSerializer
+from reference.models.high_school import HighSchool
 
 
-class StudyDomainFilter(filters.FilterSet):
-    decree = filters.ChoiceFilter(choices=DecreeType.choices(), field_name='decree__name', method='filter_by_decree')
+class HighSchoolFilter(filters.FilterSet):
+    acronym = filters.CharFilter(field_name="organization__acronym")
+    name = filters.CharFilter(field_name="organization__name")
+    country = filters.CharFilter(field_name="zip_code__country__iso_code")
+    zipcode = filters.CharFilter(field_name="zip_code__zip_code")
 
     class Meta:
-        model = Domain
-        fields = ['code', 'name']
-
-    @staticmethod
-    def filter_by_decree(queryset, name, value):
-        return queryset.filter(**{name: DecreeType.get_value(value)})
+        model = HighSchool
+        fields = ['acronym', 'name', 'type', 'country', 'zipcode']
 
 
-class StudyDomainList(generics.ListAPIView):
+class HighSchoolList(generics.ListAPIView):
     """
-       Return a list of study domains. By default, it will return all official main study domains of 'Paysage'.
+       Return a list of all the high school.
     """
-    name = 'study_domains_list'
-    queryset = Domain.objects.filter(
-        parent__isnull=True,
-        adhoc=False,
+    name = 'high_school-list'
+    queryset = HighSchool.objects.all().annotate(
+        acronym=F('organization__acronym'),
+        name=F('organization__name'),
     )
-    serializer_class = StudyDomainSerializer
-    filterset_class = StudyDomainFilter
+    serializer_class = HighSchoolListSerializer
+    filterset_class = HighSchoolFilter
     search_fields = (
+        'acronym',
         'name',
     )
     ordering_fields = (
-        'code',
+        'acronym',
         'name',
     )
-    ordering = (
-        'name',
-    )  # Default ordering
+
+
+class HighSchoolDetail(generics.RetrieveAPIView):
+    """
+        Return the detail of the high school.
+    """
+    name = 'high_school-detail'
+    queryset = HighSchool.objects.all().annotate(
+        acronym=F('organization__acronym'),
+        name=F('organization__name'),
+    )
+    serializer_class = HighSchoolDetailSerializer
+    lookup_field = 'uuid'

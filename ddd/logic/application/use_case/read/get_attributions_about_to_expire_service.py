@@ -48,7 +48,9 @@ def get_attributions_about_to_expire(
     application_calendar = application_calendar_repository.get_current_application_calendar()
     applicant_id = ApplicantIdentityBuilder.build_from_global_id(global_id=cmd.global_id)
     applicant = applicant_repository.get(applicant_id)
-    all_existing_applications = application_repository.search(global_id=cmd.global_id)
+    all_existing_applications = application_repository.search(
+        applicant_id=ApplicantIdentityBuilder.build_from_global_id(cmd.global_id)
+    )
 
     return AttributionAboutToExpireRenew.get_list_with_renewal_availability(
         application_calendar,

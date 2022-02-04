@@ -10,10 +10,7 @@ logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 @celery_app.task
 def run() -> dict:
-    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    #  To be executed once a day
-    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    logger.info("run of task send_attribution_end_date_reached_summary started")
+    logger.info("Task send_attribution_end_date_reached_summary started")
     cmd = SendAttributionEndDateReachedSummaryCommand()
     message_bus_instance.invoke(cmd)
     return {}
