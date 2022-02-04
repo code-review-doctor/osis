@@ -59,6 +59,7 @@ class TestPreparationInscriptionMainView(TestCase):
                 annee=2022,
                 version=STANDARD,
                 intitule_formation='Master [120] en communication',
+                transition_name=''
             )
         )
         message_bus_patcher.start()

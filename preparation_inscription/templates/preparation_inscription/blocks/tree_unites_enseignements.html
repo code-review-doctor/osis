@@ -1,5 +1,5 @@
 {% load static %}
-<li id="{{ unite_enseignement.code }}"
+<li id="{{parent_code}}_{{ unite_enseignement.code }}"
     data-jstree='{"icon":"{% if unite_enseignement.obligatoire %}{% static "img/education_group_year/mandatory.png" %}{% else %}{% static "img/education_group_year/optional.png" %}{% endif %}"}'
 >
     <div class="node_block_text">

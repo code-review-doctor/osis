@@ -2,15 +2,15 @@
 
 <ul>
     <li id="{{ tree.code }}">
-        {{ tree.code }}
+        {{ tree.title }}
         <div class="node_block_text header">{% trans 'Block' %}</div>
         {% if tree.racine and tree.racine.contenu %}
             <ul>
                 {% for element in tree.racine.contenu %}
                     {% if element.type == "UNITE_ENSEIGNEMENT" %}
-                        {% include 'preparation_inscription/blocks/tree_unites_enseignements.html' with unite_enseignement=element %}
+                        {% include 'preparation_inscription/blocks/tree_unites_enseignements.html' with unite_enseignement=element parent_code=tree.code %}
                     {% elif element.type == "GROUPEMENT" %}
-                        {% include 'preparation_inscription/blocks/tree_sous_programme.html' with tree=element %}
+                        {% include 'preparation_inscription/blocks/tree_sous_programme.html' with tree=element parent_code=tree.code %}
                     {% endif %}
                 {% endfor %}
             </ul>
