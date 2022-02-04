@@ -174,6 +174,8 @@ from ddd.logic.preparation_programme_annuel_etudiant.commands import AjouterUEAu
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormulaireInscriptionCoursCommand, \
     GetFormationCommand
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetProgrammeInscriptionCoursCommand
+from ddd.logic.preparation_programme_annuel_etudiant.use_case.read.get_contenu_groupement_service import \
+    get_contenu_groupement_service
 from ddd.logic.preparation_programme_annuel_etudiant.use_case.read.get_formulaire_inscription_cours_service import \
     get_formulaire_inscription_cours_service
 from ddd.logic.preparation_programme_annuel_etudiant.use_case.read.get_programme_inscription_cours_service import \
@@ -558,7 +560,7 @@ class MessageBusCommands(AbstractMessageBusCommands):
             CatalogueFormationsTranslator(),
             CatalogueUnitesEnseignementTranslator(),
         ),
-        GetContenuGroupementCommand: lambda cmd: get_content_service(cmd),
+        GetContenuGroupementCommand: lambda cmd: get_contenu_groupement_service(cmd, CatalogueFormationsTranslator()),
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 
 

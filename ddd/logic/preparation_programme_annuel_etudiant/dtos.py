@@ -191,3 +191,23 @@ class GroupementAjusteFromRepositoryDTO(DTO):
     #  Comment because nominal case (program without adjustment) only for now
     # unites_enseignement_supprimees: List['UniteEnseignementSupprimeeDTO']
     # unites_enseignement_modifiees: List['UniteEnseignementModifieeDTO']
+
+
+@attr.s(frozen=True, slots=True, auto_attribs=True)
+class GroupementContenantDTO(DTO):
+    intitule: str
+    intitule_complet: str
+    elements_contenus: List['ElementContenuDTO']
+
+
+@attr.s(frozen=True, slots=True, auto_attribs=True)
+class ElementContenuDTO(DTO):
+    code: str
+    intitule_complet: str
+    obligatoire: bool
+
+    volumes: str
+    bloc: str
+    quadrimestre_texte: str
+    credits: str
+    session_derogation: str

@@ -62,20 +62,11 @@
     <tbody>
     {% for element in search_result %}
         <tr>
-            {% if element.type_ajustement == 'SUPPRESSION' %}
-                <td class="text-danger" headers="code"><span><i class="fas fa-folder-minus"></i>
-            {% elif element.type_ajustement == 'MODIFICATION' %}
-                <td class="text-info" headers="code"><span><i class="fas fa-folder"></i>
-            {% elif element.type_ajustement == 'AJOUT' %}
-                <td class="text-success" headers="code"><span><i class="fas fa-folder-plus"></i>
-            {% else %}
-                <td headers="code"><span>{% if element.type_ajustement %}<i class="fas fa-folder-plus" style="visibility: hidden" >{% endif %}</i>
-            {% endif %}
-                <span class="{% if element.type_ajustement %}emphasized-code{% endif %}">{{ element.code }}</span>
-            </span>
+            <td headers="code">
+                {{ element.code }}
             </td>
             <td headers="intitule">
-                {{ element.intitule }}
+                {{ element.intitule_complet }}
             </td>
             <td headers="volumes">
                 {{ element.volumes }}
@@ -97,7 +88,7 @@
                 {{ element.session }}
             </td>
             <td headers="obligatoire">
-                {{ element.obligatoire }}
+                {{ element.obligatoire | yesno | title }}
             </td>
             <td headers="action">
                 <div class="pull-right">
