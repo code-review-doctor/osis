@@ -23,7 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List, Union, Optional
+from decimal import Decimal
+from typing import List, Union
 
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormationCommand, GetContenuGroupementCommand
 from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import \
@@ -31,8 +32,13 @@ from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_
 from ddd.logic.preparation_programme_annuel_etudiant.domain.validator.exceptions import FormationIntrouvableException
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, \
     ContenuGroupementCatalogueDTO, UniteEnseignementDTO, UniteEnseignementCatalogueDTO, GroupementCatalogueDTO, \
-    ContenuGroupementDTO
-from program_management.ddd.dtos import ProgrammeDeFormationDTO, ContenuNoeudDTO, ElementType
+    ElementContenuDTO, GroupementContenantDTO
+from preparation_inscription.utils.chiffres_significatifs_de_decimal import get_chiffres_significatifs
+from program_management.ddd.dtos import ProgrammeDeFormationDTO, ContenuNoeudDTO, ElementType, \
+    UniteEnseignementDTO as ProgramManagementUniteEnseignementDTO
+from program_management.ddd.service.read.get_content_service import get_content_service
+
+EMPTY_VALUE = ''
 
 
 class CatalogueFormationsTranslator(ICatalogueFormationsTranslator):
@@ -50,30 +56,13 @@ class CatalogueFormationsTranslator(ICatalogueFormationsTranslator):
         raise FormationIntrouvableException(code_programme=code_programme, annee=annee)
 
     @classmethod
-    def get_contenu_groupement(
-            cls,
-            code_programme: str,
-            code_groupement: str,
-            annee: int
-            ) -> 'ContenuGroupementCatalogueDTO':
-        formation = cls.get_formation(code_programme=code_programme, annee=annee)
-        return _search_groupement(code_groupement, formation.racine)
-
-
-def _search_groupement(
-        code_groupement: str,
-        contenu_groupement: 'ContenuGroupementCatalogueDTO'
-        ) -> Optional['ContenuGroupementCatalogueDTO']:
-    if contenu_groupement.groupement_contenant.code == code_groupement:
-        return contenu_groupement
-    for contenu in contenu_groupement.contenu_ordonne_catalogue:
-        if not isinstance(contenu, ContenuGroupementCatalogueDTO):
-            continue
-
-        result = _search_groupement(code_groupement, contenu)
-        if result:
-            return result
-    return None
+    def get_contenu_groupement(cls, cmd: 'GetContenuGroupementCommand') -> GroupementContenantDTO:
+        contenu_noeud_DTO = get_content_service(cmd)
+        return GroupementContenantDTO(
+            intitule=contenu_noeud_DTO.intitule,
+            intitule_complet=contenu_noeud_DTO.intitule_complet,
+            elements_contenus=_build_donnees_contenus(contenu_noeud_DTO.contenu_ordonne)
+        )
 
 
 def _build_formation_dto(program_management_formation_dto: ProgrammeDeFormationDTO) -> FormationDTO:
@@ -122,3 +111,53 @@ def __build_contenu_ordonne_catalogue(contenu_ordonne: List[Union['UniteEnseigne
         elif element.type == ElementType.GROUPEMENT.name:
             contenu_ordonne_catalogue.append(__build_groupement_contenu(element))
     return contenu_ordonne_catalogue
+
+
+def _build_donnees_ue(ue_contenue: 'ProgramManagementUniteEnseignementDTO') -> ElementContenuDTO:
+    return ElementContenuDTO(
+        code=ue_contenue.code,
+        intitule_complet=ue_contenue.intitule_complet,
+        volumes='{}{}{}'.format(
+            ue_contenue.volume_annuel_pm or '',
+            '+' if ue_contenue.volume_annuel_pm and ue_contenue.volume_annuel_pp else '',
+            ue_contenue.volume_annuel_pp or ''
+        ),
+        bloc=ue_contenue.bloc,
+        quadrimestre_texte=ue_contenue.quadrimestre_texte,
+        credits=_get_credits(ue_contenue.credits_relatifs, ue_contenue.credits_absolus),
+        session_derogation=ue_contenue.session_derogation,
+        obligatoire=ue_contenue.obligatoire,
+    )
+
+
+def _build_donnees_groupement(groupement_contenu: 'ContenuNoeudDTO') -> ElementContenuDTO:
+    return ElementContenuDTO(
+        code=groupement_contenu.intitule,
+        intitule_complet=groupement_contenu.intitule_complet,
+        obligatoire=groupement_contenu.obligatoire,
+        volumes=EMPTY_VALUE,
+        bloc=EMPTY_VALUE,
+        quadrimestre_texte=EMPTY_VALUE,
+        credits=EMPTY_VALUE,
+        session_derogation=EMPTY_VALUE,
+    )
+
+
+def _build_donnees_contenus(
+        elements_contenus: List[Union['ProgramManagementUniteEnseignementDTO', 'ContenuNoeudDTO']]
+) -> List[ElementContenuDTO]:
+    donnees = []
+    for element_contenu in elements_contenus:
+        if isinstance(element_contenu, ContenuNoeudDTO):
+            donnees.append(_build_donnees_groupement(element_contenu))
+        else:
+            donnees.append(_build_donnees_ue(element_contenu))
+    return donnees
+
+
+def _get_credits(credits_relatifs: int, credits_absolus: Decimal) -> str:
+    if credits_relatifs:
+        if credits_relatifs != credits_absolus:
+            return "{}({})".format(credits_relatifs, get_chiffres_significatifs(credits_absolus))
+        return "{}".format(credits_relatifs)
+    return get_chiffres_significatifs(credits_absolus)

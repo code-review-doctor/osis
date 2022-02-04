@@ -170,7 +170,7 @@ from ddd.logic.learning_unit.use_case.write.create_learning_unit_service import 
 from ddd.logic.learning_unit.use_case.write.delete_effective_class_service import delete_effective_class
 from ddd.logic.learning_unit.use_case.write.update_effective_class_service import update_effective_class
 from ddd.logic.preparation_programme_annuel_etudiant.commands import AjouterUEAuProgrammeCommand, \
-    GetContenuGroupementCommand, GetContenuGroupementAjusteCommand
+    GetContenuGroupementCommand
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormulaireInscriptionCoursCommand, \
     GetFormationCommand
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetProgrammeInscriptionCoursCommand
@@ -560,8 +560,7 @@ class MessageBusCommands(AbstractMessageBusCommands):
             CatalogueFormationsTranslator(),
             CatalogueUnitesEnseignementTranslator(),
         ),
-        GetContenuGroupementCommand: lambda cmd: get_content_service(cmd),
-        GetContenuGroupementAjusteCommand: lambda cmd: get_contenu_groupement_service(
+        GetContenuGroupementCommand: lambda cmd: get_contenu_groupement_service(
             cmd,
             GroupementAjusteInscriptionCoursInMemoryRepository(),
             CatalogueFormationsTranslator(),

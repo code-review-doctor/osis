@@ -23,40 +23,28 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from decimal import Decimal
-from typing import List, Dict
 
-from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.template.defaultfilters import yesno
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
+from base.models.utils.utils import ChoiceEnum
 from base.utils.htmx import HtmxMixin
-from ddd.logic.preparation_programme_annuel_etudiant.commands import GetContenuGroupementCommand, \
-    GetContenuGroupementAjusteCommand
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import ContenuGroupementDTO, UniteEnseignementDTO
+from ddd.logic.preparation_programme_annuel_etudiant.commands import GetContenuGroupementCommand
 from infrastructure.messages_bus import message_bus_instance
-from preparation_inscription.utils.chiffres_significatifs_de_decimal import get_chiffres_significatifs
 
-CODE = 'code'
-INTITULE = 'intitule'
-VOLUMES = 'volumes'
-BLOC = 'bloc'
-QUADRI = 'quadri'
-CREDITS = 'credits'
-SESSION = 'session'
-OBLIGATOIRE = 'obligatoire'
+
+class TypeAjustement(ChoiceEnum):
+    SUPPRESSION = _('SUPPRESSION')
+    MODIFICATION = _('MODIFICATION')
+    AJOUT = _('AJOUT')
+
 
 RAFRAICHIR_GROUPEMENT_CONTENANT = 'rafraichir_groupement_contenant'
 
 
-class ConsulterContenuGroupementView(HtmxMixin, PermissionRequiredMixin, TemplateView):
+class ConsulterContenuGroupementView(HtmxMixin, LoginRequiredMixin, TemplateView):
     name = 'consulter_contenu_groupement_view'
-
-    # PermissionRequiredMixin
-    permission_required = "preparation_inscription.view_preparation_inscription_cours"
-    raise_exception = True
-
     # TemplateView
     template_name = "preparation_inscription/preparation_inscription.html"
     htmx_template_name = "preparation_inscription/consulter_contenu_groupement.html"
@@ -75,97 +63,21 @@ class ConsulterContenuGroupementView(HtmxMixin, PermissionRequiredMixin, Templat
         return context
 
     def get_content(self):
-        cmd = GetContenuGroupementAjusteCommand(
-            code_programme=self.kwargs['code_programme'],
-            code_groupement=self.kwargs.get('code_groupement', self.kwargs['code_programme']),
+        cmd = GetContenuGroupementCommand(
+            code_formation=self.kwargs['code_programme'],
             annee=self.kwargs['annee'],
+            code=self.kwargs.get('code_groupement', self.kwargs['code_programme']),
         )
 
         contenu_groupement_DTO = message_bus_instance.invoke(cmd)  # return ContenuGroupementDTO
-
-        data = self._build_donnees_des_groupements_contenus(contenu_groupement_DTO.contenu)
         return {
-            'search_result': data,
+            'search_result': contenu_groupement_DTO.elements_contenus,
             'intitule_groupement':
-                contenu_groupement_DTO.groupement_contenant.intitule if contenu_groupement_DTO else '',
+                contenu_groupement_DTO.intitule if contenu_groupement_DTO else '',
             'intitule_complet_groupement':
-                contenu_groupement_DTO.groupement_contenant.intitule_complet if contenu_groupement_DTO else '',
+                contenu_groupement_DTO.intitule_complet if contenu_groupement_DTO else '',
         }
-
-    def _build_donnees_des_unites_enseignement_contenues(
-            self, unites_enseignement_contenues: List['UniteEnseignementDTO']
-    ) -> List[Dict]:
-        donnees = []
-        for ue_contenue in unites_enseignement_contenues:
-            donnees.append(
-                {
-                    CODE: ue_contenue.code,
-                    INTITULE: ue_contenue.intitule_complet,
-                    VOLUMES: '{}{}{}'.format(
-                        get_chiffres_significatifs(ue_contenue.volume_annuel_pm),
-                        '+' if ue_contenue.volume_annuel_pm and ue_contenue.volume_annuel_pp else '',
-                        get_chiffres_significatifs(ue_contenue.volume_annuel_pp)
-                    ),
-                    BLOC: ue_contenue.bloc,
-                    QUADRI: ue_contenue.quadrimestre_texte,
-                    CREDITS: _get_credits(ue_contenue.credits_relatifs, ue_contenue.credits_absolus),
-                    SESSION: ue_contenue.session_derogation,
-                    OBLIGATOIRE: yesno(ue_contenue.obligatoire),
-                    "type_ajustement": "AJOUT" if ue_contenue.ajoutee else ""
-                }
-            )
-        return donnees
-
-    def _build_donnees_des_groupements_contenus(self, groupements_contenus: List['ContenuGroupementDTO']) -> List[Dict]:
-        donnees = []
-        for groupement_contenu in groupements_contenus:
-            if getattr(groupement_contenu, "type", "") == "UNITE_ENSEIGNEMENT":
-                ue_contenue = groupement_contenu
-                donnees.append(
-                    {
-                        CODE: ue_contenue.code,
-                        INTITULE: ue_contenue.intitule_complet,
-                        VOLUMES: '{}{}{}'.format(
-                            get_chiffres_significatifs(ue_contenue.volume_annuel_pm),
-                            '+' if ue_contenue.volume_annuel_pm and ue_contenue.volume_annuel_pp else '',
-                            get_chiffres_significatifs(ue_contenue.volume_annuel_pp)
-                        ),
-                        BLOC: ue_contenue.bloc,
-                        QUADRI: ue_contenue.quadrimestre_texte,
-                        CREDITS: _get_credits(ue_contenue.credits_relatifs, ue_contenue.credits_absolus),
-                        SESSION: ue_contenue.session_derogation,
-                        OBLIGATOIRE: yesno(ue_contenue.obligatoire),
-                        "type_ajustement": "AJOUT" if ue_contenue.ajoutee else ""
-                    }
-                )
-
-            else:
-                donnees.append(
-                    {
-                        CODE: groupement_contenu.groupement_contenant.intitule,
-                        INTITULE: groupement_contenu.groupement_contenant.intitule_complet,
-                        OBLIGATOIRE: yesno(groupement_contenu.groupement_contenant.obligatoire),
-                    }
-                )
-        return donnees
 
     def get_intitule_programme(self):
         # TODO :: to implement
         return "Intitulé programme"
-
-
-def _get_credits(credits_relatifs: int, credits_absolus: Decimal) -> str:
-    if credits_relatifs:
-        if credits_relatifs != credits_absolus:
-            return "{}({})".format(credits_relatifs, get_chiffres_significatifs(credits_absolus))
-        return "{}".format(credits_relatifs)
-    return get_chiffres_significatifs(credits_absolus)
-
-
-from base.models.utils.utils import ChoiceEnum
-
-
-class TypeAjustement(ChoiceEnum):
-    SUPPRESSION = _('SUPPRESSION')
-    MODIFICATION = _('MODIFICATION')
-    AJOUT = _('AJOUT')

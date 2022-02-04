@@ -151,10 +151,10 @@
 
             $tree.bind("activate_node.jstree", function (event, data) {
                 var url = data.node.li_attr.url;
-                htmx.ajax('GET', url, '#content-of-main-panel')
+                if(url != undefined){
+                    htmx.ajax('GET', url, '#content-of-main-panel')
+                }
             });
-
         });
-
     </script>
 </div>

@@ -1,7 +1,7 @@
 {% load i18n static %}
 
 <ul>
-    <li id="{{ tree.code }}">
+    <li id="{{ tree.code }}" url="{% url 'consulter_contenu_groupement_view' annee=annee code_programme=code_programme code_groupement=tree.code %}">
         {{ tree.code }}
         <div class="node_block_text header">{% trans 'Block' %}</div>
         {% if tree.racine and tree.racine.contenu %}

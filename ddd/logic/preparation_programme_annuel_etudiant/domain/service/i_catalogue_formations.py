@@ -24,8 +24,8 @@
 ##############################################################################
 import abc
 
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, ContenuGroupementDTO, \
-    ContenuGroupementCatalogueDTO
+from ddd.logic.preparation_programme_annuel_etudiant.commands import GetContenuGroupementCommand
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, GroupementContenantDTO
 from osis_common.ddd import interface
 
 
@@ -38,10 +38,5 @@ class ICatalogueFormationsTranslator(interface.DomainService):
 
     @classmethod
     @abc.abstractmethod
-    def get_contenu_groupement(
-            cls,
-            code_programme: str,
-            code_groupement: str,
-            annee: int
-            ) -> 'ContenuGroupementCatalogueDTO':
+    def get_contenu_groupement(cls, cmd: GetContenuGroupementCommand) -> 'GroupementContenantDTO':
         raise NotImplementedError()
