@@ -244,7 +244,8 @@ from infrastructure.shared_kernel.entite.repository.entiteucl import EntiteUCLRe
 from infrastructure.shared_kernel.language.repository.language import LanguageRepository
 from infrastructure.utils import AbstractMessageBusCommands, load_message_bus_instance
 from osis_common.ddd.interface import ApplicationServiceResult, CommandRequest
-from program_management.ddd.command import BulkUpdateLinkCommand, GetReportCommand, GetProgramTreeVersionCommand
+from program_management.ddd.command import BulkUpdateLinkCommand, GetReportCommand, GetProgramTreeVersionCommand, \
+    GetContenuGroupementCatalogueCommand
 from program_management.ddd.repositories import program_tree as program_tree_repo
 from program_management.ddd.repositories.report import ReportRepository
 from program_management.ddd.service.read.get_content_service import get_content_service
@@ -566,6 +567,7 @@ class MessageBusCommands(AbstractMessageBusCommands):
             CatalogueFormationsTranslator(),
             CatalogueUnitesEnseignementTranslator(),
         ),
+        GetContenuGroupementCatalogueCommand: lambda cmd: get_content_service(cmd),
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 
 
