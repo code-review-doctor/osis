@@ -44,6 +44,7 @@ class IGroupementAjusteInscriptionCoursRepository(interface.AbstractRepository):
     def search(
             cls,
             entity_ids: Optional[List['IdentiteGroupementAjusteInscriptionCours']] = None,
+            code_programme: str = None,
             groupement_id: 'GroupIdentity' = None,
             **kwargs
     ) -> List['GroupementAjusteInscriptionCours']:

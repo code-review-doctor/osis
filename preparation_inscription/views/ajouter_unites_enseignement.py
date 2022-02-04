@@ -96,7 +96,7 @@ class AjouterUnitesEnseignementView(LoginRequiredMixin, HtmxMixin, TemplateView)
         cmd = AjouterUEAuProgrammeCommand(
             annee=self.kwargs['annee'],
             code_programme=self.kwargs['code_programme'],
-            ajouter_dans='LECGE100R',
+            ajouter_dans=self.kwargs['code_groupement'],
             unites_enseignements=selected_ues
         )
         try:
@@ -110,12 +110,10 @@ class AjouterUnitesEnseignementView(LoginRequiredMixin, HtmxMixin, TemplateView)
         return redirect(self.get_consulter_contenu_groupement_url())
 
     def get_intitule_groupement(self):
-        # TODO :: to implement
-        return "Intitulé groupement"
+        return self.kwargs['code_groupement']
 
     def get_intitule_programme(self):
-        # TODO :: to implement
-        return "Intitulé programme"
+        return self.kwargs['code_programme']
 
     def get_context_data(self, **kwargs):
         return {
@@ -126,12 +124,16 @@ class AjouterUnitesEnseignementView(LoginRequiredMixin, HtmxMixin, TemplateView)
             'intitule_programme': self.get_intitule_programme(),
             'cancel_url': self.get_consulter_contenu_groupement_url(),
             'annee': self.kwargs['annee'],
-            'code_programme': self.kwargs['code_programme']
+            'code_programme': self.kwargs['code_programme'],
+            'code_groupement': self.kwargs['code_groupement']
         }
 
     def get_consulter_contenu_groupement_url(self):
         return reverse(
             'consulter_contenu_groupement_view',
-            args=self.args,
-            kwargs=self.kwargs
+            kwargs={
+                "annee": self.kwargs['annee'],
+                "code_programme": self.kwargs['code_programme'],
+                "code_groupement": self.kwargs['code_groupement']
+            }
         ) + "?{}=1".format(RAFRAICHIR_GROUPEMENT_CONTENANT)

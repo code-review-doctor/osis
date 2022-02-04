@@ -29,7 +29,7 @@
 
 <div class="panel-body">
 
-    <form hx-get="{% url 'ajouter_unites_enseignement_view' annee code_programme %}" hx-target="#content-of-main-panel"
+    <form hx-get="{% url 'ajouter_unites_enseignement_view' annee code_programme code_groupement %}" hx-target="#content-of-main-panel"
           id="form_recherche_ues_a_ajouter">
 
         {{ formulaire_recherche_ues.media }}
@@ -99,10 +99,10 @@
 </div>
 
 <div class="panel-footer text-right">
-    <a href="" hx-get="{% url 'consulter_contenu_groupement_view' annee code_programme %}"
+    <a href="" hx-get="{% url 'consulter_contenu_groupement_view' annee code_programme code_groupement %}"
        hx-target="#content-of-main-panel" hx-trigger="click" type="button"
        class="btn btn-default">{% trans "Cancel" %}</a>
-    <a href="" hx-post="{% url 'ajouter_unites_enseignement_view' annee code_programme %}"
+    <a href="" hx-post="{% url 'ajouter_unites_enseignement_view' annee code_programme code_groupement %}"
        hx-include="#form_ajouter_ues" hx-target="#content-of-main-panel" hx-trigger="click" type="button"
        class="btn btn-primary">{% trans "Add" %}</a>
 </div>

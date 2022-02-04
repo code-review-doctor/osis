@@ -45,6 +45,7 @@ class UniteEnseignementDTO(DTO):
     session_derogation: str
     credits_relatifs: int
     chemin_acces: str  # Exemple : 'LDROI1001B|LDROI102C|LDROI1001
+    ajoutee: bool = attr.ib(default=False)
 
     @property
     def type(self):
@@ -205,3 +206,27 @@ class GroupementAjusteFromRepositoryDTO(DTO):
     #  Comment because nominal case (program without adjustment) only for now
     # unites_enseignement_supprimees: List['UniteEnseignementSupprimeeDTO']
     # unites_enseignement_modifiees: List['UniteEnseignementModifieeDTO']
+
+
+@attr.s(frozen=True, slots=True, auto_attribs=True)
+class GroupementContenantDTO(DTO):
+    intitule: str
+    intitule_complet: str
+    elements_contenus: List['ElementContenuDTO']
+
+
+@attr.s(frozen=True, slots=True, auto_attribs=True)
+class ElementContenuDTO(DTO):
+    code: str
+    intitule_complet: str
+    obligatoire: bool
+
+    volumes: str
+    bloc: str
+    quadrimestre_texte: str
+    credits: str
+    session_derogation: str
+
+    ajoute: bool = attr.ib(default=False)
+    modifie: bool = attr.ib(default=False)
+    supprime: bool = attr.ib(default=False)

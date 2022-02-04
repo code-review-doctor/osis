@@ -71,12 +71,13 @@ class GroupementAjusteInscriptionCoursBuilder(interface.RootEntityBuilder):
             group_identity: 'GroupIdentity',
             repository: 'IGroupementAjusteInscriptionCoursRepository'
     ):
-        groupements_ajustes = repository.search(groupement_id=group_identity)
+        groupements_ajustes = repository.search(code_programme=cmd.code_programme, groupement_id=group_identity)
         if groupements_ajustes:
             return groupements_ajustes[0]
         return GroupementAjusteInscriptionCours(
             entity_id=IdentiteGroupementAjusteInscriptionCours(uuid=uuid.uuid4()),
             groupement_id=group_identity,
+            code_programme=cmd.code_programme,
             unites_enseignement_ajoutees=[],
             unites_enseignement_supprimees=[],
             unites_enseignement_modifiees=[],

@@ -32,6 +32,12 @@ msgid ""
 "Application on this vacant course is not reserved for interns/open for extern"
 msgstr ""
 
+msgid ""
+"Automatic renewal is not possible because the volume declared vacant is "
+"lower than the volume to be renewed. Please go through \"Add a new "
+"application\"."
+msgstr ""
+
 msgid "Can't create a learning unit lower than 2019-20"
 msgstr ""
 

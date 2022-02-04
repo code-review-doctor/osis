@@ -38,8 +38,14 @@ urlpatterns = [
     path('<int:annee>/<str:code_programme>/', include([
         path('', PreparationInscriptionMainView.as_view(), name=PreparationInscriptionMainView.name),
         path('detail', ConsulterContenuGroupementView.as_view(), name=ConsulterContenuGroupementView.name),
+        path('<str:code_groupement>/detail', ConsulterContenuGroupementView.as_view(),
+             name=ConsulterContenuGroupementView.name),
         path('delete', SupprimerUnitesEnseignementView.as_view(), name=SupprimerUnitesEnseignementView.name),
-        path('add', AjouterUnitesEnseignementView.as_view(), name=AjouterUnitesEnseignementView.name),
+        path(
+            'add/<str:code_groupement>',
+            AjouterUnitesEnseignementView.as_view(),
+            name=AjouterUnitesEnseignementView.name
+        ),
         path('update', ModifierProprietesContenuView.as_view(), name=ModifierProprietesContenuView.name),
         path('tree/', ProgramTreeHTMLView.as_view(), name=ProgramTreeHTMLView.name),
         path(

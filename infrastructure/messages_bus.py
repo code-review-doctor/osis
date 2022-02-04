@@ -170,10 +170,13 @@ from ddd.logic.learning_unit.use_case.write.create_learning_unit_service import 
 from ddd.logic.learning_unit.use_case.write.delete_effective_class_service import delete_effective_class
 from ddd.logic.learning_unit.use_case.write.update_effective_class_service import update_effective_class
 from ddd.logic.preparation_programme_annuel_etudiant.commands import AjouterUEAuProgrammeCommand, \
-    SupprimerUEDuProgrammeCommand
+    GetContenuGroupementCommand
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormulaireInscriptionCoursCommand, \
     GetFormationCommand
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetProgrammeInscriptionCoursCommand
+from ddd.logic.preparation_programme_annuel_etudiant.commands import SupprimerUEDuProgrammeCommand
+from ddd.logic.preparation_programme_annuel_etudiant.use_case.read.get_contenu_groupement_service import \
+    get_contenu_groupement_service
 from ddd.logic.preparation_programme_annuel_etudiant.use_case.read.get_formulaire_inscription_cours_service import \
     get_formulaire_inscription_cours_service
 from ddd.logic.preparation_programme_annuel_etudiant.use_case.read.get_programme_inscription_cours_service import \
@@ -562,7 +565,13 @@ class MessageBusCommands(AbstractMessageBusCommands):
             GroupementAjusteInscriptionCoursInMemoryRepository(),
             CatalogueFormationsTranslator(),
             CatalogueUnitesEnseignementTranslator(),
-        )
+        ),
+        GetContenuGroupementCommand: lambda cmd: get_contenu_groupement_service(
+            cmd,
+            GroupementAjusteInscriptionCoursInMemoryRepository(),
+            CatalogueFormationsTranslator(),
+            CatalogueUnitesEnseignementTranslator(),
+        ),
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 
 
