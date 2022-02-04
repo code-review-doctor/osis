@@ -88,3 +88,4 @@ class ProgrammeDeFormationDTO(DTO):
     version: str
     code: str
     intitule_formation: str
+    transition_name: str
