@@ -47,21 +47,31 @@
 <div class="panel-body">
     <table id="table_search_list" class="table table-hover">
         <thead>
-        <tr>
-            <th id="code" class="code-col">{% trans 'Code' %}</th>
-        <th id="intitule">{% trans 'Intitulé' %}</th>
-        <th id="volumes">{% trans 'Composants (PM+PP)' %}</th>
-        <th id="bloc">{% trans 'Bloc' %}</th>
-        <th id="quadri">{% trans 'Quadri.' %}</th>
-        <th id="credits">{% trans 'Crédits' %}</th>
-        <th id="session">{% trans "Derogation's session" %}</th>
-        <th id="obligatoire">{% trans 'Obligatoire' %}</th>
-        <th id="action" class="actions-col"></th>
-    </tr>
-    </thead>
+            <tr>
+                <th id="icon"></th>
+                <th id="code" class="code-col">{% trans 'Code' %}</th>
+                <th id="intitule">{% trans 'Intitulé' %}</th>
+                <th id="volumes">{% trans 'Composants (PM+PP)' %}</th>
+                <th id="bloc">{% trans 'Bloc' %}</th>
+                <th id="quadri">{% trans 'Quadri.' %}</th>
+                <th id="credits">{% trans 'Crédits' %}</th>
+                <th id="session">{% trans "Derogation's session" %}</th>
+                <th id="obligatoire">{% trans 'Obligatoire' %}</th>
+                <th id="action" class="actions-col"></th>
+            </tr>
+        </thead>
     <tbody>
     {% for element in search_result %}
         <tr>
+            <td headers="icon">
+                {% if element.supprime %}
+                    <span class="text-danger"><i class="fas fa-folder-minus"></i></span>
+                {% elif element.modifie %}
+                    <span class="text-info"><i class="fas fa-folder"></i></span>
+                {% elif element.ajoute %}
+                    <span class="text-success"><i class="fas fa-folder-plus"></i></span>
+                {% endif %}
+            </td>
             <td headers="code">
                 {{ element.code }}
             </td>

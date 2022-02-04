@@ -29,7 +29,7 @@ from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_
     ICatalogueFormationsTranslator
 from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_unites_enseignement import \
     ICatalogueUnitesEnseignementTranslator
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import ContenuGroupementDTO
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import GroupementContenantDTO
 from ddd.logic.preparation_programme_annuel_etudiant.repository.i_groupement_ajuste_inscription_cours import \
     IGroupementAjusteInscriptionCoursRepository
 
@@ -39,7 +39,7 @@ def get_contenu_groupement_service(
         repo: 'IGroupementAjusteInscriptionCoursRepository',
         catalogue_formations_translator: 'ICatalogueFormationsTranslator',
         catalogue_unites_enseignement_translator: 'ICatalogueUnitesEnseignementTranslator'
-) -> 'ContenuGroupementDTO':
+) -> 'GroupementContenantDTO':
     return GetContenuGroupement.get_contenu_groupement(
         cmd,
         repo,

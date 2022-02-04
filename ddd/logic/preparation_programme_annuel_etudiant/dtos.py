@@ -212,3 +212,7 @@ class ElementContenuDTO(DTO):
     quadrimestre_texte: str
     credits: str
     session_derogation: str
+
+    ajoute: bool = attr.ib(default=False)
+    modifie: bool = attr.ib(default=False)
+    supprime: bool = attr.ib(default=False)
