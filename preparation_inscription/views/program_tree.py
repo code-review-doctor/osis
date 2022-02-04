@@ -23,19 +23,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from pprint import pprint
-from typing import List
 
 from django.views.generic import TemplateView
-from rules.contrib.views import LoginRequiredMixin
+from rules.contrib.views import PermissionRequiredMixin
 
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetProgrammeInscriptionCoursCommand
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import ProgrammeInscriptionCoursDTO
 from infrastructure.messages_bus import message_bus_instance
 
 
-class ProgramTreeHTMLView(LoginRequiredMixin, TemplateView):
+class ProgramTreeHTMLView(PermissionRequiredMixin, TemplateView):
     name = 'program-tree-view'
+
+    # PermissionRequiredMixin
+    permission_required = "preparation_inscription.view_preparation_inscription_cours"
+    raise_exception = True
 
     # TemplateView
     template_name = "preparation_inscription/blocks/tree_recursif.html"
@@ -54,10 +56,8 @@ class ProgramTreeHTMLView(LoginRequiredMixin, TemplateView):
 
     def get_tree(self) -> 'ProgrammeInscriptionCoursDTO':
         cmd = GetProgrammeInscriptionCoursCommand(
-            annee_formation=self.kwargs['year'],
-            sigle_formation=self.kwargs['acronym'],
-            version_formation='',
-            transition_formation='',
+            annee=self.kwargs['annee'],
+            code_programme=self.kwargs['code_programme'],
         )
         tree_dto = message_bus_instance.invoke(cmd)
         return tree_dto

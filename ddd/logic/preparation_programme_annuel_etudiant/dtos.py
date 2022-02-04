@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from decimal import Decimal
-from typing import List
+from typing import List, Union
 
 import attr
 
@@ -46,6 +46,10 @@ class UniteEnseignementDTO(DTO):
     credits_relatifs: int
     chemin_acces: str  # Exemple : 'LDROI1001B|LDROI102C|LDROI1001
 
+    @property
+    def type(self):
+        return "UNITE_ENSEIGNEMENT"
+
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
 class GroupementDTO(DTO):
@@ -54,12 +58,15 @@ class GroupementDTO(DTO):
     obligatoire: bool
     chemin_acces: str  # Exemple : 'LDROI1001B|LDROI102C|LDROI1001
 
+    @property
+    def type(self):
+        return "GROUPEMENT"
+
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
 class ContenuGroupementDTO(DTO):
     groupement_contenant: GroupementDTO
-    unites_enseignement_contenues: List['UniteEnseignementDTO']
-    groupements_contenus: List['ContenuGroupementDTO']
+    contenu: List[Union['UniteEnseignementDTO', 'ContenuGroupementDTO']]
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
@@ -79,10 +86,10 @@ class UniteEnseignementCatalogueDTO(DTO):
     quadrimestre: str
     quadrimestre_texte: str
     credits_absolus: Decimal
+    credits_relatifs: int
     volume_annuel_pm: int
     volume_annuel_pp: int
     obligatoire: bool
-    credits_relatifs: int
     session_derogation: str
 
 
@@ -97,11 +104,12 @@ class GroupementCatalogueDTO(DTO):
     intitule_complet: str
 
 
+# FIXME: Rename to GroupementCatalogueDTO
 @attr.s(frozen=True, slots=True, auto_attribs=True)
 class ContenuGroupementCatalogueDTO(DTO):
+    # groupement provenant du catalogue (sans surcharge d'ajout, suppression ou modification)
     groupement_contenant: GroupementCatalogueDTO
-    unites_enseignement_contenues: List['UniteEnseignementCatalogueDTO']
-    groupements_contenus: List['ContenuGroupementCatalogueDTO']
+    contenu_ordonne_catalogue: List[Union['UniteEnseignementCatalogueDTO', 'ContenuGroupementCatalogueDTO']]
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
@@ -110,6 +118,7 @@ class FormationDTO(DTO):
     annee: int
     sigle: str
     version: str
+    transition_name: str
     intitule_formation: str
 
 
@@ -117,11 +126,23 @@ class FormationDTO(DTO):
 class ProgrammeInscriptionCoursDTO(DTO):
     uuid: str
     code: str
+    sigle: str
     annee: int
     version: str
-    transition: str
+    transition_name: str
     intitule_complet_formation: str  # intitulé de la formation + version formation
-    sous_programme: List['GroupementInscriptionCoursDTO']
+    racine: 'GroupementInscriptionCoursDTO'
+
+    @property
+    def title(self):
+        title = self.sigle
+        if self.version and self.transition_name:
+            title += "[{} - {}]".format(self.version, self.transition_name)
+        elif self.version:
+            title += "[{}]".format(self.version)
+        elif self.transition_name:
+            title += "[{}]".format(self.transition_name)
+        return title
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
@@ -133,8 +154,12 @@ class GroupementInscriptionCoursDTO(DTO):
     #  Comment because nominal case (program without adjustment) only for now
     # unites_enseignement_supprimees: List['UniteEnseignementSupprimeeDTO']
     # unites_enseignement_modifiees: List['UniteEnseignementModifieeDTO']
-    unites_enseignements: List['UniteEnseignementProgrammeDTO']
-    sous_programme: List['GroupementInscriptionCoursDTO']
+    # unites_enseignements: List['UniteEnseignementProgrammeDTO']
+    contenu: List[Union['UniteEnseignementProgrammeDTO', 'GroupementInscriptionCoursDTO']]
+
+    @property
+    def type(self):
+        return 'GROUPEMENT'
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
@@ -143,6 +168,10 @@ class UniteEnseignementProgrammeDTO(DTO):
     intitule: str
     obligatoire: bool
     bloc: int
+
+    @property
+    def type(self):
+        return 'UNITE_ENSEIGNEMENT'
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)

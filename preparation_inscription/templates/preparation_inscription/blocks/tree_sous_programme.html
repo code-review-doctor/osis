@@ -1,18 +1,20 @@
 {% load i18n static %}
-<li id="{{ sous_programme.code }}"
-    data-jstree='{"icon":"{% if sous_programme.obligatoire %}{% static "img/education_group_year/mandatory.png" %}{% else %}{% static "img/education_group_year/optional.png" %}{% endif %}"}'
+<li id="{{parent_code}}_{{ tree.code }}"
+    data-jstree='{"icon":"{% if tree.obligatoire %}{% static "img/education_group_year/mandatory.png" %}{% else %}{% static "img/education_group_year/optional.png" %}{% endif %}"}'
 >
-    {{ sous_programme.code }} - {{ sous_programme.intitule_complet }}
-    {% if sous_programme.sous_programme or sous_programme.unites_enseignements %}
+    {{ tree.intitule_complet }}
+     <div class="node_block_text"></div>
+    {% if tree.contenu %}
         <ul>
-            {% for sous_programme in sous_programme.sous_programme %}
-                {% include 'preparation_inscription/blocks/tree_sous_programme.html' with tree=sous_programme %}
-            {% endfor %}
-            {% for unite_enseignement in tree.unites_enseignements %}
-                {% include 'preparation_inscription/blocks/tree_unites_enseignements.html' with unite_enseignement=unite_enseignement %}
+            {% for element in tree.contenu %}
+                {% if element.type == "UNITE_ENSEIGNEMENT" %}
+                    {% include 'preparation_inscription/blocks/tree_unites_enseignements.html' with unite_enseignement=element parent_code=tree.code %}
+                {% elif element.type == "GROUPEMENT" %}
+                    {% include 'preparation_inscription/blocks/tree_sous_programme.html' with tree=element parent_code=tree.code %}
+                {% endif %}
             {% endfor %}
             {% for unite_enseignement in tree.unites_enseignement_ajoutees %}
-                {% include 'preparation_inscription/blocks/tree_unites_enseignements_ajoutees.html' with unite_enseignement=unite_enseignement %}
+                {% include 'preparation_inscription/blocks/tree_unites_enseignements_ajoutees.html' with unite_enseignement=unite_enseignement parent_code=tree.code%}
             {% endfor %}
         </ul>
     {% endif %}

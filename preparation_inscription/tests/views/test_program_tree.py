@@ -23,64 +23,64 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import mock
 from django.http.response import HttpResponseForbidden
 from django.test import TestCase
 from django.urls import reverse
+from mock import mock
 
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormulaireInscriptionCoursDTO, ContenuGroupementDTO, \
-    GroupementDTO
-from education_group.tests.ddd.factories.domain.group import GroupFactory
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import ProgrammeInscriptionCoursDTO, \
+    GroupementInscriptionCoursDTO
+from preparation_inscription.views.program_tree import ProgramTreeHTMLView
 from program_management.ddd.domain.program_tree_version import STANDARD
 
-ACRONYM = 'LCOMI200M'
 
-YEAR = 2021
-
-
-class TestFormulaireInscriptionCoursView(TestCase):
+class TestProgramTreeView(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.url = reverse('pae_formulaire_inscription_view', kwargs={'annee': YEAR, 'code_programme': ACRONYM})
+        cls.url = reverse(
+            ProgramTreeHTMLView.name,
+            kwargs={'annee': 2022, 'code_programme': 'LCORP201S'}
+        )
 
     def setUp(self) -> None:
         pgm_manager = ProgramManagerFactory()
-        self.person = pgm_manager.person
-        self.client.force_login(self.person.user)
+        self.client.force_login(pgm_manager.person.user)
+        self.__mock_service_bus()
 
-        self.fetch_from_cache_patcher = mock.patch(
-            'preparation_inscription.views.formulaire_inscription_cours._get_formation_inscription_cours',
-            return_value=FormulaireInscriptionCoursDTO(
-                annee_formation=YEAR,
-                sigle_formation=ACRONYM,
-                version_formation=STANDARD,
-                intitule_formation='Bachelier en sciences économiques et de gestion',
-                racine=ContenuGroupementDTO(
-                    groupement_contenant=GroupementDTO(
-                        intitule='intitule',
-                        obligatoire=True,
-                        chemin_acces='',
-                        intitule_complet='intitule',
-                    ),
-                    contenu=[],
+    def __mock_service_bus(self):
+        message_bus_patcher = mock.patch(
+            'infrastructure.messages_bus.get_programme_inscription_cours',
+            return_value=ProgrammeInscriptionCoursDTO(
+                uuid='aa0d2466-e013-4038-9c0d-6a8c726c4f88',
+                code='LCORP201S',
+                annee=2022,
+                version=STANDARD,
+                transition_name='',
+                sigle='COMMU2M',
+                intitule_complet_formation='Master [120] en communication',
+                racine=GroupementInscriptionCoursDTO(
+                    intitule_complet='Master [120] en communication',
+                    obligatoire=False,
+                    code='LCORP201S',
+                    unites_enseignement_ajoutees=[],
+                    contenu=[]
                 )
             )
         )
-        self.fetch_from_cache_patcher.start()
-        self.addCleanup(self.fetch_from_cache_patcher.stop)
+        message_bus_patcher.start()
+        self.addCleanup(message_bus_patcher.stop)
 
     def test_user_has_not_permission(self):
         person_without_permission = PersonFactory()
         self.client.force_login(person_without_permission.user)
 
         response = self.client.get(self.url)
-
         self.assertTemplateUsed(response, "access_denied.html")
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
     def test_assert_template_used(self):
         response = self.client.get(self.url)
-        self.assertTemplateUsed(response, "preparation_inscription/blocks/formulaire_inscription.html")
+        self.assertTemplateUsed(response, "preparation_inscription/blocks/tree_recursif.html")

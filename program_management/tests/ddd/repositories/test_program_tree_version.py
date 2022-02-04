@@ -266,6 +266,5 @@ class TestProgramTreeVersionRepositoryGetDtoMethod(TestCase):
                          )
 
         self.assertIsInstance(programme_de_formation_dto.racine, ContenuNoeudDTO)
-        self.assertEqual(programme_de_formation_dto.racine.groupement_contenant.intitule, root_group.acronym)
-        self.assertEqual(programme_de_formation_dto.racine.groupements_contenus, [])
-        self.assertEqual(programme_de_formation_dto.racine.unites_enseignement_contenues, [])
+        self.assertEqual(programme_de_formation_dto.racine.intitule, root_group.acronym)
+        self.assertEqual(programme_de_formation_dto.racine.contenu_ordonne, [])

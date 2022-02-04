@@ -2,15 +2,16 @@
 
 <ul>
     <li id="{{ tree.code }}">
-        {{ tree.code }} - {{ tree.intitule_complet_formation }}
-        <span class="node_block_text" style="background-color:white;">{% trans 'Block' %}</span>
-        {% if tree.sous_programme.0.sous_programme %}
+        {{ tree.title }}
+        <div class="node_block_text header">{% trans 'Block' %}</div>
+        {% if tree.racine and tree.racine.contenu %}
             <ul>
-                {% for sous_programme in tree.sous_programme.0.sous_programme %}
-                    {% include 'preparation_inscription/blocks/tree_sous_programme.html' with sous_programme=sous_programme %}
-                {% endfor %}
-                {% for unite_enseignement in tree.sous_programme.0.unites_enseignements %}
-                    {% include 'preparation_inscription/blocks/tree_unites_enseignements.html' with unite_enseignement=unite_enseignement %}
+                {% for element in tree.racine.contenu %}
+                    {% if element.type == "UNITE_ENSEIGNEMENT" %}
+                        {% include 'preparation_inscription/blocks/tree_unites_enseignements.html' with unite_enseignement=element parent_code=tree.code %}
+                    {% elif element.type == "GROUPEMENT" %}
+                        {% include 'preparation_inscription/blocks/tree_sous_programme.html' with tree=element parent_code=tree.code %}
+                    {% endif %}
                 {% endfor %}
             </ul>
         {% endif %}

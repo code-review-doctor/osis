@@ -11,10 +11,20 @@
     }
 
     .node_block_text {
+        background-color: #f5f5f5;
+        display: inline-block;
         position: absolute;
         right: 0;
         width: 40px;
         text-align: center;
+        border-left: 1px solid #ccc;
+        height: 26px;
+        box-shadow: -5px 0px 0px 0px white;
+    }
+
+    .node_block_text.header {
+        z-index: 2;
+        height: 27px;
     }
 
     #tree a {
@@ -32,8 +42,17 @@
     }
 
     #tree {
+        position: relative;
         overflow-x: scroll;
         height: 60vh;
+    }
+
+    #tree a.jstree-anchor {
+        padding-right: 45px;
+    }
+
+    .jstree-default .jstree-search {
+        color: #000!important;
     }
 </style>
 <div id="js_tree_panel">
@@ -41,6 +60,18 @@
     <div id="tree"></div>
 
     <script>
+        document.querySelector('#tree').addEventListener('scroll', (e) => {
+            const currentScrollLeft = e.target.scrollLeft;
+            const currentScrollTop = e.target.scrollTop;
+
+            document.querySelectorAll('.node_block_text').forEach((el) => {
+                if (el.classList.contains('header')){
+                    el.style.top = currentScrollTop + "px";
+                }
+                el.style.right = -currentScrollLeft + "px";
+            });
+        });
+
         $(document).ready(() => {
             const $tree = $('#tree');
             const $tree_search = $('#tree_search');
@@ -68,7 +99,7 @@
                 },
                 "search": {
                     "case_insensitive": true,
-                    "show_only_matches": true
+                    "show_only_matches": false
                 },
                 "contextmenu": {
                     "select_node": false,
@@ -96,13 +127,13 @@
                                 "separator_before": true,
                                 "label": gettext("Open all"),
                                 "action": function (node) {
-                                    $tree.jstree('open_all');
+                                    $tree.jstree('open_all', node.reference);
                                 }
                             },
                             "close_all": {
                                 "label": gettext("Close all"),
                                 "action": function (node) {
-                                    $tree.jstree('close_all');
+                                    $tree.jstree('close_all', node.reference);
                                 }
                             },
                         }

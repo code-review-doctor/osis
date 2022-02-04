@@ -18,23 +18,31 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
- * A copy of this license - GNU General Public License - is available
- * at the root of the source code of this program.  If not,
- * see http://www.gnu.org/licenses/.
+    *
+    * A copy of this license - GNU General Public License - is available
+    * at the root of the source code of this program.  If not,
+    * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
 {% block content %}
-    <div id="tabs" >
+    <div id="tabs">
 
         <ul class="nav nav-tabs">
-            <li role="presentation" class="active"><a href="" hx-get="{% url 'consulter_contenu_groupement_view' year acronym %}" hx-target="#content-of-main-panel" hx-trigger="click" hx-swap="innerHTML" data-toggle="tab">Contenu</a></li>
-            <li role="presentation" class=""><a href="" hx-get="{% url 'pae_formulaire_inscription_view' year acronym %}" hx-target="#content-of-main-panel" hx-trigger="click" hx-swap="innerHTML" data-toggle="tab">Formulaire</a></li>
+            <li role="presentation" class="active"><a href=""
+                                                      hx-get="{% url 'consulter_contenu_groupement_view' annee code_programme %}"
+                                                      hx-target="#content-of-main-panel" hx-trigger="click"
+                                                      hx-swap="innerHTML" data-toggle="tab">Contenu</a></li>
+            <li role="presentation" class=""><a href=""
+                                                hx-get="{% url 'pae_formulaire_inscription_view' annee code_programme %}"
+                                                hx-target="#content-of-main-panel" hx-trigger="click"
+                                                hx-swap="innerHTML" data-toggle="tab">Formulaire</a></li>
         </ul>
         <br>
 
         <div class="tab-content">
-            <div id="content-of-main-panel" class="panel panel-default" hx-get="{% url 'consulter_contenu_groupement_view' year acronym %}" hx-trigger="load after:100ms">
+            <div id="content-of-main-panel" class="panel panel-default"
+                 hx-get="{% url 'consulter_contenu_groupement_view' annee code_programme %}"
+                 hx-trigger="load after:100ms">
             </div>
         </div>
 

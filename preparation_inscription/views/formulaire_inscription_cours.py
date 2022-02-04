@@ -45,45 +45,38 @@ class FormulaireInscriptionCoursView(PermissionRequiredMixin, HtmxMixin, LoginRe
 
     def get_context_data(
             self,
-            year: int,
-            acronym: str,
-            version_name: str = '',
-            transition_name: str = '',
+            annee: int,
+            code_programme: str,
             **kwargs
     ):
         context = super().get_context_data(**kwargs)
         context.update(
             contexte_commun_preparation_inscription(
-                self.kwargs['acronym'],
-                transition_name if transition_name else '',
-                version_name if version_name != STANDARD else '',
-                year
+                self.kwargs['code_programme'],
+                annee
             )
         )
 
         return context
 
 
-def _get_formation_inscription_cours(year: int, acronym: str, version_name: str, transition_name: str) \
-        -> FormulaireInscriptionCoursDTO:
+def _get_formation_inscription_cours(annee: int, code_programme: str) -> FormulaireInscriptionCoursDTO:
     cmd = GetFormulaireInscriptionCoursCommand(
-        annee_formation=year,
-        sigle_formation=acronym,
-        version_formation=version_name,
-        transition_formation=transition_name,
+        annee=annee,
+        code_programme=code_programme,
     )
     return message_bus_instance.invoke(cmd)
 
 
-def contexte_commun_preparation_inscription(sigle, transition_name, version_name, year) -> dict:
-    formulaire = _get_formation_inscription_cours(year, sigle, version_name, transition_name)
+def contexte_commun_preparation_inscription(code_programme: str, annee: int) -> dict:
+    formulaire = _get_formation_inscription_cours(annee, code_programme)
     return {
         'code': "{}{}".format(
             formulaire.sigle_formation,
             formulaire.version_formation if formulaire.version_formation != STANDARD else ''
         ),
-        'acronym': sigle,
+        'acronym': code_programme,
         'title': formulaire.intitule_formation,
         'formulaire_inscription_cours': formulaire,
-        'year': year,
-        }
+        'year': annee,
+    }

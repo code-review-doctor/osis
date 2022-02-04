@@ -30,57 +30,49 @@ from django.urls import reverse
 
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormulaireInscriptionCoursDTO, ContenuGroupementDTO, \
-    GroupementDTO
-from education_group.tests.ddd.factories.domain.group import GroupFactory
+from preparation_inscription.views.detail import PreparationInscriptionMainView
 from program_management.ddd.domain.program_tree_version import STANDARD
-
-ACRONYM = 'LCOMI200M'
-
-YEAR = 2021
+from program_management.ddd.dtos import ProgrammeDeFormationDTO
 
 
-class TestFormulaireInscriptionCoursView(TestCase):
+class TestPreparationInscriptionMainView(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.url = reverse('pae_formulaire_inscription_view', kwargs={'annee': YEAR, 'code_programme': ACRONYM})
+        cls.url = reverse(
+            PreparationInscriptionMainView.name,
+            kwargs={'annee': 2022, 'code_programme': 'LCORP201S'}
+        )
 
     def setUp(self) -> None:
         pgm_manager = ProgramManagerFactory()
-        self.person = pgm_manager.person
-        self.client.force_login(self.person.user)
+        self.client.force_login(pgm_manager.person.user)
+        self.__mock_service_bus()
 
-        self.fetch_from_cache_patcher = mock.patch(
-            'preparation_inscription.views.formulaire_inscription_cours._get_formation_inscription_cours',
-            return_value=FormulaireInscriptionCoursDTO(
-                annee_formation=YEAR,
-                sigle_formation=ACRONYM,
-                version_formation=STANDARD,
-                intitule_formation='Bachelier en sciences économiques et de gestion',
-                racine=ContenuGroupementDTO(
-                    groupement_contenant=GroupementDTO(
-                        intitule='intitule',
-                        obligatoire=True,
-                        chemin_acces='',
-                        intitule_complet='intitule',
-                    ),
-                    contenu=[],
-                )
+    def __mock_service_bus(self):
+        message_bus_patcher = mock.patch(
+            'infrastructure.messages_bus.get_programme_formation',
+            return_value=ProgrammeDeFormationDTO(
+                racine=None,
+                code='LCORP201S',
+                sigle='ECGE1BA',
+                annee=2022,
+                version=STANDARD,
+                intitule_formation='Master [120] en communication',
+                transition_name=''
             )
         )
-        self.fetch_from_cache_patcher.start()
-        self.addCleanup(self.fetch_from_cache_patcher.stop)
+        message_bus_patcher.start()
+        self.addCleanup(message_bus_patcher.stop)
 
     def test_user_has_not_permission(self):
         person_without_permission = PersonFactory()
         self.client.force_login(person_without_permission.user)
 
         response = self.client.get(self.url)
-
         self.assertTemplateUsed(response, "access_denied.html")
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
     def test_assert_template_used(self):
         response = self.client.get(self.url)
-        self.assertTemplateUsed(response, "preparation_inscription/blocks/formulaire_inscription.html")
+        self.assertTemplateUsed(response, "preparation_inscription/preparation_inscription.html")

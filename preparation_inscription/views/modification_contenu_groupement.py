@@ -82,6 +82,8 @@ class ModifierProprietesContenuView(LoginRequiredMixin, HtmxMixin, FormView):
             'form': self.get_form(self.form_class),
             'intitule_groupement': self.get_intitule_groupement(),
             'intitule_programme': self.get_intitule_programme(),
+            'annee': self.kwargs['annee'],
+            'code_programme': self.kwargs['code_programme']
         }
 
     def get_contenu_groupement_modifiable(self):
