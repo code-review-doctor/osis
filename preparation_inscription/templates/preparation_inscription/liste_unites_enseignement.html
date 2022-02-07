@@ -38,142 +38,47 @@
 </div>
 
 <div class="panel-body">
-    <form method="POST" id="form_tri_preferences">
-        {{ form.media }}
-        {{ crsf_token }}
-        <div class="row">
-            <div class="col-md-5">
-                {% bootstrap_field form.tri_principal layout='horizontal'%}
-            </div>
-            <div class="col-md-5">
-                {% bootstrap_field form.tri_secondaire layout='horizontal'%}
-            </div>
-            <div class="col-md-2">
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-save"></i>
-                    {% trans 'Save' %}
-                </button>
-            </div>
-        </div>
-    </form>
-
-    <hr/>
-
     <table id="table_search_list" class="table table-hover">
         <thead>
         <tr>
-        <th id="type_ajustement">
-            <div class="btn-group">
-              <a type="button" style="cursor: pointer;" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  <i class="fas fa-filter text-primary"></i>
-              </a>
-              <ul class="dropdown-menu">
-                <li>
-                    <a>
-                        <input type="checkbox" checked>
-                        <i class="fas fa-folder-plus text-success"></i>
-                        {% trans 'Ajout' %}
-                    </a>
-                </li>
-                <li>
-                    <a>
-                        <input type="checkbox" checked>
-                        <i class="fas fa-folder-minus text-danger"></i>
-                        {% trans 'Suppression' %}
-                    </a>
-                </li>
-                <li>
-                    <a>
-                        <input type="checkbox" checked>
-                        <i class="fas fa-folder text-info"></i>
-                        {% trans 'Modification' %}
-                    </a>
-                </li>
-              </ul>
-            </div>
-        </th>
-        <th id="code_ue" class="code-col">
-            {% trans 'Code' %}
-            <i class="glyphicon glyphicon-sort text-primary" style="margin-left: 3px;"></i>
-        </th>
-        <th id="intitule">{% trans 'Intitulé' %}
-            <i class="glyphicon glyphicon-sort text-primary" style="margin-left: 3px;"></i></th>
-        <th id="volumes">{% trans 'Composants (PM/PP)' %}
-            <i class="glyphicon glyphicon-sort text-primary" style="margin-left: 3px;"></i></th>
-        <th id="bloc">
-            {% trans 'Bloc' %}
-            <i class="glyphicon glyphicon-sort text-primary" style="margin-left: 3px;"></i></th>
-        <th id="quadri">{% trans 'Quadri.' %}
-            <i class="glyphicon glyphicon-sort text-primary" style="margin-left: 3px;"></i></th>
-        <th id="credits">{% trans 'Crédits' %}
-            <i class="glyphicon glyphicon-sort text-primary" style="margin-left: 3px;"></i></th>
-        <th id="session">{% trans 'Session' %}
-            <i class="glyphicon glyphicon-sort text-primary" style="margin-left: 3px;"></i></th>
-        <th id="obligatoire">{% trans 'Obligatoire' %}
-            <i class="glyphicon glyphicon-sort text-primary" style="margin-left: 3px;"></i></th>
-        <th id="commentaire_fr">{% trans 'Commentaire' %}
-            <i class="glyphicon glyphicon-sort text-primary" style="margin-left: 3px;"></i></th>
-        <th id="commentaire_en">{% trans 'Commentaire en anglais' %}
-            <i class="glyphicon glyphicon-sort text-primary" style="margin-left: 3px;"></i></th>
+        <th id="code_ue" class="code-col">{% trans 'Code' %}</th>
+        <th id="intitule">{% trans 'Title' %}</th>
+        <th id="volumes">{% trans 'Components'%} (PM/PP)</th>
+        <th id="bloc">{% trans 'Block' %}</th>
+        <th id="quadri">{% trans 'Quadri.' %}</th>
+        <th id="credits">{% trans 'Credits' %}</th>
+        <th id="session">{% trans 'Session derogation' %}</th>
+        <th id="obligatoire">{% trans 'Mandatory' %}</th>
     </tr>
     </thead>
     <tbody>
     {% for element in search_result %}
         <tr>
             <td>
-                {% if element.type_ajustement == 'SUPPRESSION' %}
-                    <i class="fas fa-folder-minus text-danger"></i>
-                {% elif element.type_ajustement == 'MODIFICATION' %}
-                    <i class="fas fa-folder text-info"></i>
-                {% elif element.type_ajustement == 'AJOUT' %}
-                    <i class="fas fa-folder-plus text-success"></i>
-                {% endif %}
-            </td>
-
-            <td>
-                <span class="emphasized-code
-                {% if element.type_ajustement == 'SUPPRESSION' %}
-                    text-danger
-                {% elif element.type_ajustement == 'MODIFICATION' %}
-                    text-info
-                {% elif element.type_ajustement == 'AJOUT' %}
-                    text-success
-                {% endif %}
-                ">{{ element.code_ue }}</span>
+                {{ element.code }}
             </td>
             <td headers="intitule">
-                {{ element.intitule }}
+                {{ element.intitule_complet }}
             </td>
             <td headers="volumes">
                 {{ element.volumes }}
             </td>
             <td headers="bloc">
-                {% if element.type_ajustement == 'MODIFICATION' %}
-                    <b class="text-info" style="font-weight: bolder; text-shadow: 0px 0px 2px currentColor;">{{ element.bloc }}</b>
-                {% else %}
-                    {{ element.bloc }}
-                {% endif %}
+                {{ element.bloc }}
             </td>
             <td headers="quadri">
-                {{ element.quadri }}
+                {{ element.quadrimestre_texte }}
             </td>
             <td headers="credits">
                 {{ element.credits }}
             </td>
             <td headers="session">
-                {{ element.session }}
+                {{ element.session_derogation }}
             </td>
             <td headers="obligatoire">
-                {{ element.obligatoire }}
-            </td>
-            <td headers="commentaire_fr">
-                <div data-toggle="tooltip" title="{{ element.commentaire_fr }}">{{ element.commentaire_fr|truncatechars:10 }}</div>
-            </td>
-            <td headers="commentaire_en">
-                {{ element.commentaire_en }}
+                {{ element.obligatoire | yesno | title }}
             </td>
         </tr>
-
     {% endfor %}
     </tbody>
 </table>

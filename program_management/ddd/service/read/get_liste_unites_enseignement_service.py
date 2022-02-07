@@ -1,0 +1,74 @@
+#############################################################################
+#    OSIS stands for Open Student Information System. It's an application
+#    designed to manage the core business of higher education institutions,
+#    such as universities, faculties, institutes and professional schools.
+#    The core business involves the administration of students, teachers,
+#    courses, programs and so on.
+#
+#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#    GNU General Public License for more details.
+#
+#    A copy of this license - GNU General Public License - is available
+#    at the root of the source code of this program.  If not,
+#    see http://www.gnu.org/licenses/.
+#
+##############################################################################
+from typing import List
+
+from program_management.ddd.command import GetListeUnitesEnseignementContenuesCatalogueCommand
+from program_management.ddd.domain import exception
+from program_management.ddd.dtos import UniteEnseignementDTO
+from program_management.ddd.repositories import program_tree_version as program_tree_version_repository
+
+
+def get_liste_unites_enseignement(
+        cmd: 'GetListeUnitesEnseignementContenuesCatalogueCommand'
+) -> 'UniteEnseignementDTO':
+
+    try:
+        pgm_tree_version = program_tree_version_repository.ProgramTreeVersionRepository().search(
+            code=cmd.code,
+            year=cmd.annee
+        )[0]
+
+        return _build_contenu_pgm(
+            pgm_tree_version.get_tree().get_node_by_code_and_year(code=cmd.code, year=cmd.annee)
+        )
+
+    except exception.ProgramTreeVersionNotFoundException:
+        return None
+
+
+def _build_contenu_pgm(node: 'Node', contenu: List['UniteEnseignementDTO'] = []) -> List['UniteEnseignementDTO']:
+    for lien in node.children:
+        if lien.child.is_learning_unit():
+            contenu.append(
+                UniteEnseignementDTO(
+                    bloc=lien.block,
+                    code=lien.child.code,
+                    intitule_complet=lien.child.title,
+                    quadrimestre=lien.child.quadrimester,
+                    quadrimestre_texte=lien.child.quadrimester.value if lien.child.quadrimester else "",
+                    credits_absolus=lien.child.credits,
+                    volume_annuel_pm=int(lien.child.volume_total_lecturing)
+                    if lien.child.volume_total_lecturing else None,
+                    volume_annuel_pp=int(lien.child.volume_total_practical)
+                    if lien.child.volume_total_practical else None,
+                    obligatoire=lien.is_mandatory if lien else False,
+                    session_derogation=lien.child.session_derogation,
+                    credits_relatifs=lien.relative_credits
+                )
+            )
+        else:
+            contenu = _build_contenu_pgm(lien.child, contenu)
+    return contenu
+

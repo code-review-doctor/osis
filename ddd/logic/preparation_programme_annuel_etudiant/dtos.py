@@ -29,6 +29,7 @@ from typing import List, Union
 import attr
 
 from osis_common.ddd.interface import DTO
+from preparation_inscription.utils.chiffres_significatifs_de_decimal import get_chiffres_significatifs
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
@@ -49,6 +50,22 @@ class UniteEnseignementDTO(DTO):
     @property
     def type(self):
         return "UNITE_ENSEIGNEMENT"
+
+    @property
+    def volumes(self):
+        return '{}{}{}'.format(
+            self.volume_annuel_pm or '',
+            '+' if self.volume_annuel_pm and self.volume_annuel_pp else '',
+            self.volume_annuel_pp or ''
+        )
+
+    @property
+    def credits(self) -> str:
+        if self.credits_relatifs:
+            if self.credits_relatifs != self.credits_absolus:
+                return "{}({})".format(self.credits_relatifs, get_chiffres_significatifs(self.credits_absolus))
+            return "{}".format(self.credits_relatifs)
+        return get_chiffres_significatifs(self.credits_absolus)
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
