@@ -31,6 +31,8 @@ from django.test import TestCase
 from django.urls import reverse
 
 from base.tests.factories.program_manager import ProgramManagerFactory
+from program_management.ddd.domain.node import Node
+from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 
 
@@ -41,13 +43,28 @@ class TestSupprimerUnitesEnseignement(TestCase):
         cls.education_group_year = EducationGroupVersionFactory().offer
         cls.url = reverse('supprimer_unites_enseignement_view', kwargs={
             'annee': cls.education_group_year.academic_year.year,
-            'code_programme': cls.education_group_year.partial_acronym
+            'code_programme': cls.education_group_year.partial_acronym,
+            'code_groupement': cls.education_group_year.partial_acronym
         })
 
     def setUp(self) -> None:
         self.client.force_login(ProgramManagerFactory(
             education_group=self.education_group_year.education_group
         ).person.user)
+        self.__mock_pgm_tree()
+
+    def __mock_pgm_tree(self):
+        program_tree_patcher = mock.patch(
+            'program_management.ddd.repositories.program_tree.ProgramTreeRepository.get',
+            return_value=ProgramTree(root_node=Node(code="A", children=[]))
+        )
+        contenu_pgm_patcher = mock.patch(
+            'program_management.ddd.service.read.get_content_service._build_contenu_pgm',
+        )
+        program_tree_patcher.start()
+        contenu_pgm_patcher.start()
+        self.addCleanup(program_tree_patcher.stop)
+        self.addCleanup(contenu_pgm_patcher.stop)
 
     def test_assert_access_denied(self):
         lambda_prgm_manager = ProgramManagerFactory()
