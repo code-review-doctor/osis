@@ -404,8 +404,6 @@ msgstr "Infos générales"
 msgid "Group"
 msgstr "Groupement"
 
-#, fuzzy
-#| msgid "Group"
 msgid "Groupement"
 msgstr "Groupement"
 
