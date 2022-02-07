@@ -12,7 +12,6 @@ from ddd.logic.preparation_programme_annuel_etudiant.commands import SupprimerUE
 from education_group.models.group_year import GroupYear
 from infrastructure.messages_bus import message_bus_instance
 from osis_role.contrib.views import PermissionRequiredMixin
-from preparation_inscription.views.consulter_contenu_groupement import TypeAjustement
 
 
 class SupprimerUnitesEnseignementView(PermissionRequiredMixin, LoginRequiredMixin, HtmxMixin, TemplateView):
@@ -24,7 +23,7 @@ class SupprimerUnitesEnseignementView(PermissionRequiredMixin, LoginRequiredMixi
     def get_context_data(self, **kwargs):
         return {
             **super().get_context_data(**kwargs),
-            'deletable_content': self.get_content(),
+            'deletable_content': self.get_deletable_content(),
             'intitule_groupement': self.get_intitule_groupement(),
             'intitule_programme': self.get_intitule_programme(),
             'annee': self.kwargs['annee'],
@@ -33,7 +32,7 @@ class SupprimerUnitesEnseignementView(PermissionRequiredMixin, LoginRequiredMixi
         }
 
     def get_deletable_content(self):
-        return [ue for ue in self.get_content() if ue['type_ajustement'] != TypeAjustement.SUPPRESSION.name]
+        return [ue for ue in self.get_content() if not ue.supprime]
 
     def get_content(self):
         cmd = GetContenuGroupementCommand(
@@ -70,7 +69,7 @@ class SupprimerUnitesEnseignementView(PermissionRequiredMixin, LoginRequiredMixi
         return SupprimerUEDuProgrammeCommand(
             code_programme=self.kwargs['code_programme'],
             annee=self.kwargs['annee'],
-            retirer_de='LECGE900R',
+            retirer_de=self.kwargs['code_groupement'],
             unites_enseignements=[GetUniteEnseignementCommand(code=code) for code in to_delete]
         )
 
