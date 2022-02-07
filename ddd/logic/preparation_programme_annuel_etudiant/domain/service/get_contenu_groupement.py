@@ -63,21 +63,28 @@ class GetContenuGroupement(interface.DomainService):
         groupement_id = GroupIdentity(code=cmd.code, year=cmd.annee)
         try:
             groupement_ajuste = repo.search(code_programme=cmd.code_formation, groupement_id=groupement_id)[0]
-            unites_enseignement_ajoutes_dto = catalogue_unites_enseignement_translator.search(
-                entity_ids=groupement_ajuste.get_identites_unites_enseignement_ajoutees()
+            unites_enseignements_ajustees_dto = catalogue_unites_enseignement_translator.search(
+                entity_ids=groupement_ajuste.get_identites_unites_enseignement_ajustees()
             )
-            unites_enseignement_supprimees_dto = catalogue_unites_enseignement_translator.search(
-                entity_ids=groupement_ajuste.get_identites_unites_enseignement_supprimees()
-            )
+            unites_enseignement_ajoutees_dto = [
+                ue for ue in unites_enseignements_ajustees_dto if ue.code in [
+                    ue.code for ue in groupement_ajuste.get_identites_unites_enseignement_ajoutees()
+                ]
+            ]
+            unites_enseignement_supprimees_dto = [
+                ue for ue in unites_enseignements_ajustees_dto if ue.code in [
+                    ue.code for ue in groupement_ajuste.get_identites_unites_enseignement_supprimees()
+                ]
+            ]
         except IndexError:
             groupement_ajuste = None
-            unites_enseignement_ajoutes_dto = []
+            unites_enseignement_ajoutees_dto = []
             unites_enseignement_supprimees_dto = []
 
         return cls.__ajuster_contenu_groupement(
             contenu_groupement,
             groupement_ajuste,
-            unites_enseignement_ajoutes_dto,
+            unites_enseignement_ajoutees_dto,
             unites_enseignement_supprimees_dto
         )
 

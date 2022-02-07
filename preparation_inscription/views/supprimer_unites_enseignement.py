@@ -1,6 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
 from django.views.generic import TemplateView
 
@@ -20,37 +21,49 @@ class SupprimerUnitesEnseignementView(PermissionRequiredMixin, LoginRequiredMixi
     template_name = "preparation_inscription/supprimer_unites_enseignement.html"
     htmx_template_name = "preparation_inscription/supprimer_unites_enseignement.html"
 
+    @cached_property
+    def code_groupement(self):
+        return self.kwargs.get('code_groupement', self.code_programme)
+
+    @cached_property
+    def code_programme(self):
+        return self.kwargs['code_programme']
+
+    @cached_property
+    def annee(self):
+        return self.kwargs['annee']
+
+    @cached_property
+    def contenu(self):
+        return message_bus_instance.invoke(
+            GetContenuGroupementCommand(
+                code_formation=self.code_programme,
+                annee=self.annee,
+                code=self.code_groupement,
+            )
+        )
+
+    @cached_property
+    def intitule_groupement(self):
+        return self.contenu.intitule
+
+    @cached_property
+    def intitule_programme(self):
+        return self.contenu.intitule_complet
+
     def get_context_data(self, **kwargs):
         return {
             **super().get_context_data(**kwargs),
             'deletable_content': self.get_deletable_content(),
-            'intitule_groupement': self.get_intitule_groupement(),
-            'intitule_programme': self.get_intitule_programme(),
-            'annee': self.kwargs['annee'],
-            'code_programme': self.kwargs['code_programme'],
-            'code_groupement': self.kwargs['code_groupement']
+            'intitule_groupement': self.intitule_groupement,
+            'intitule_complet_groupement': self.intitule_programme,
+            'annee': self.annee,
+            'code_programme': self.code_programme,
+            'code_groupement': self.code_groupement
         }
 
     def get_deletable_content(self):
-        return [ue for ue in self.get_content() if not ue.supprime]
-
-    def get_content(self):
-        cmd = GetContenuGroupementCommand(
-            code_formation=self.kwargs['code_programme'],
-            annee=self.kwargs['annee'],
-            code=self.kwargs.get('code_groupement', self.kwargs['code_programme']),
-        )
-
-        contenu_groupement_DTO = message_bus_instance.invoke(cmd)
-        return contenu_groupement_DTO.elements_contenus
-
-    def get_intitule_groupement(self):
-        # TODO :: to implement
-        return "Intitulé groupement"
-
-    def get_intitule_programme(self):
-        # TODO :: to implement
-        return "Intitulé programme"
+        return [ue for ue in self.contenu.elements_contenus if not ue.supprime]
 
     def post(self, request, *args, **kwargs):
         to_delete = request.POST.getlist('to_delete')

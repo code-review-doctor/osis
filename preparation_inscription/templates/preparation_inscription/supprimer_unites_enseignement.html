@@ -30,7 +30,7 @@
 {% csrf_token %}
 
 <div class="panel-heading">
-    <h5>{{ intitule_groupement }}</h5>
+    <h5>{{ intitule_groupement }} - {{ intitule_complet_groupement }}</h5>
 </div>
 
 <div class="panel-body">
@@ -95,7 +95,7 @@
                 {{ element.credits }}
             </td>
             <td headers="session">
-                {{ element.session_derogation | default_if_none:'' }}
+                {{ element.session_derogation }}
             </td>
             <td headers="obligatoire">
                 {{ element.obligatoire | yesno | title }}

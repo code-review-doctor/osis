@@ -60,7 +60,6 @@ class ConsulterContenuGroupementView(HtmxMixin, PermissionRequiredMixin, LoginRe
             'code_programme': self.kwargs['code_programme'],
             'code_groupement': self.kwargs['code_groupement'],
             RAFRAICHIR_GROUPEMENT_CONTENANT: self.request.GET.get(RAFRAICHIR_GROUPEMENT_CONTENANT),
-            'intitule_programme': self.get_intitule_programme(),
         }
 
         context.update(self.get_content())
@@ -81,10 +80,6 @@ class ConsulterContenuGroupementView(HtmxMixin, PermissionRequiredMixin, LoginRe
             'intitule_complet_groupement':
                 contenu_groupement_DTO.intitule_complet if contenu_groupement_DTO else '',
         }
-
-    def get_intitule_programme(self):
-        # TODO :: to implement
-        return "Intitulé programme"
 
 
 from base.models.utils.utils import ChoiceEnum
