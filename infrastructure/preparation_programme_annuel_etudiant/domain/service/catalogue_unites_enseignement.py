@@ -62,7 +62,7 @@ class CatalogueUnitesEnseignementTranslator(ICatalogueUnitesEnseignementTranslat
             code=learning_unit_search_dto.code,
             intitule_complet=learning_unit_search_dto.full_title,
             quadrimestre=learning_unit_search_dto.quadrimester,
-            quadrimestre_texte=LearningUnitYearQuadrimester[learning_unit_search_dto.quadrimester].value,
+            quadrimestre_texte=LearningUnitYearQuadrimester[learning_unit_search_dto.quadrimester].value if learning_unit_search_dto.quadrimester else "",
             credits_absolus=learning_unit_search_dto.credits,
             credits_relatifs=None,
             volume_annuel_pm=learning_unit_search_dto.lecturing_volume_annual,

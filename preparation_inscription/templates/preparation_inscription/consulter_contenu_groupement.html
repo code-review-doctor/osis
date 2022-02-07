@@ -118,6 +118,8 @@
 
 {% if rafraichir_groupement_contenant %}
     <script>
-        $('#tree').trigger('refreshNode', '{{ code_groupement_racine }}');
+        document.addEventListener('htmx:afterSettle', function(event){
+            $('#tree').trigger('refreshNode', '{{ code_programme }}');
+        })
     </script>
 {% endif %}
