@@ -65,12 +65,10 @@ class AddressesListViewTestCase(APITestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        results = response.json()['results']
-        self.assertEqual(len(results), 1)
-
         self.assertCountEqual(
-            list(results[0].keys()), [
+            list(response.data.keys()), [
                 'city',
+                'location',
                 'street',
                 'street_number',
                 'postal_code',

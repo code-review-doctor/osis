@@ -73,10 +73,11 @@ class Command(BaseCommand):
 
     @staticmethod
     def _get_iso_code_and_default_values(row: List[str]) -> Tuple[str, Dict[str, str]]:
-        iso_code, name_fr, name_en, continent_code = row
+        iso_code, name_fr, name_en, continent_code, dialing_code = row
         defaults_value = {
             'name': name_fr,
             'name_en': name_en,
+            'dialing_code': dialing_code
         }
         if continent_code:
             defaults_value.update({

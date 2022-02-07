@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@ from reference.api.views.academic_calendar import AcademicCalendarList
 from reference.api.views.academic_year import AcademicYears
 from reference.api.views.city import CityList
 from reference.api.views.country import CountryList, CountryDetail
+from reference.api.views.high_school import HighSchoolList, HighSchoolDetail
 from reference.api.views.language import LanguageList
 from reference.api.views.study_domain import StudyDomainList
 
@@ -37,6 +38,8 @@ urlpatterns = [
     url(r'^cities/$', CityList.as_view(), name=CityList.name),
     url(r'^countries/$', CountryList.as_view(), name=CountryList.name),
     url(r'^countries/(?P<uuid>[0-9a-f-]+)$', CountryDetail.as_view(), name=CountryDetail.name),
+    url(r'^high_schools/$', HighSchoolList.as_view(), name=HighSchoolList.name),
+    url(r'^high_schools/(?P<uuid>[0-9a-f-]+)$', HighSchoolDetail.as_view(), name=HighSchoolDetail.name),
     url(r'^study-domains$', StudyDomainList.as_view(), name=StudyDomainList.name),
     url(r'^languages$', LanguageList.as_view(), name=LanguageList.name),
     url(r'^academic_years$', AcademicYears.as_view(), name=AcademicYears.name),

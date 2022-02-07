@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,8 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import RegexValidator
 from django.db import models
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
@@ -56,38 +60,46 @@ def copy_to_next_year(modeladmin, request, queryset):
         # Have to check if the ue's acronym is the same in the destination year
         lc = obj.learning_component_year.learning_unit_year.learning_container_year.learning_container
         destination_year = obj.learning_component_year.learning_unit_year.academic_year.year + 1
-        destination_luy = LearningUnitYear.objects.get(
-            academic_year__year=destination_year,
-            learning_container_year__learning_container=lc
-        )
-        cmd = CreateEffectiveClassCommand(
-            class_code=obj.acronym,
-            learning_unit_code=destination_luy.acronym,
-            year=destination_year,
-            title_fr=obj.title_fr,
-            title_en=obj.title_en,
-            teaching_place_uuid=obj.campus.uuid,
-            derogation_quadrimester=obj.quadrimester,
-            session_derogation=obj.session,
-            volume_first_quadrimester=obj.hourly_volume_partial_q1,
-            volume_second_quadrimester=obj.hourly_volume_partial_q2
-
-        )
         try:
-            new_classe_identity = message_bus_instance.invoke(cmd)
-            cmd_get_effective_class_created = GetEffectiveClassCommand(
-                class_code=new_classe_identity.class_code,
-                learning_unit_code=new_classe_identity.learning_unit_identity.code,
-                learning_unit_year=new_classe_identity.learning_unit_identity.academic_year.year
+            destination_luy = LearningUnitYear.objects.get(
+                academic_year__year=599999,
+                learning_container_year__learning_container=lc
             )
-            effective_class_created = message_bus_instance.invoke(cmd_get_effective_class_created)
-            classe_result = "{} — {}".format(
-                effective_class_created.complete_acronym,
-                effective_class_created.entity_id.learning_unit_identity.academic_year
-            )
+            cmd = CreateEffectiveClassCommand(
+                class_code=obj.acronym,
+                learning_unit_code=destination_luy.acronym,
+                year=destination_year,
+                title_fr=obj.title_fr,
+                title_en=obj.title_en,
+                teaching_place_uuid=obj.campus.uuid,
+                derogation_quadrimester=obj.quadrimester,
+                session_derogation=obj.session,
+                volume_first_quadrimester=obj.hourly_volume_partial_q1,
+                volume_second_quadrimester=obj.hourly_volume_partial_q2
 
-        except MultipleBusinessExceptions as multiple_exceptions:
-            copy_exception = ", ". join([str(ex.message) for ex in list(multiple_exceptions.exceptions)])
+            )
+            try:
+                new_classe_identity = message_bus_instance.invoke(cmd)
+                cmd_get_effective_class_created = GetEffectiveClassCommand(
+                    class_code=new_classe_identity.class_code,
+                    learning_unit_code=new_classe_identity.learning_unit_identity.code,
+                    learning_unit_year=new_classe_identity.learning_unit_identity.academic_year.year
+                )
+                effective_class_created = message_bus_instance.invoke(cmd_get_effective_class_created)
+                classe_result = "{} — {}".format(
+                    effective_class_created.complete_acronym,
+                    effective_class_created.entity_id.learning_unit_identity.academic_year
+                )
+
+            except MultipleBusinessExceptions as multiple_exceptions:
+                copy_exception = ", ". join([str(ex.message) for ex in list(multiple_exceptions.exceptions)])
+        except ObjectDoesNotExist:
+            message = _(
+                "You cannot create class in %(year)s because there is no learning unit corresponding in %(year)s"
+            ) % {
+                'year': destination_year,
+            }
+            copy_exception = "{}".format(message)
 
         report.append({
             'source': classe_source,
@@ -173,3 +185,15 @@ class LearningClassYear(models.Model):
         volume_total_of_classes += self.hourly_volume_partial_q1 or 0
         volume_total_of_classes += self.hourly_volume_partial_q2 or 0
         return volume_total_of_classes
+
+
+@receiver(post_delete, sender=LearningClassYear)
+def _learningclassyear_delete(sender, instance: LearningClassYear, **kwargs):
+    # This post_delete is used to update field subdivise into epc (for the learning_unit_year)
+    # When the learning unit year has no classes, set it to false
+    # But when deleting all classes, there are no updated changed field.
+    from base.models.learning_unit_year import LearningUnitYear
+    luy = LearningUnitYear.objects.filter(
+        id=instance.learning_component_year.learning_unit_year_id
+    )
+    luy.update(changed=timezone.now())

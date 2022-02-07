@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-202 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -36,6 +36,7 @@ from education_group.models.group_year import GroupYear
 from education_group.tests.factories.group_year import GroupYearFactory
 from program_management.ddd.domain.node import Node
 from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION, ProgramTreeVersion
+from program_management.ddd.dtos import ProgrammeDeFormationDTO, ContenuNoeudDTO
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory, \
@@ -223,3 +224,47 @@ class TestProgramTreeVersionRepositoryGetMethod(TestCase):
         self.assertEqual(
             version_tree_domain_obj.start_year, root_group.group.start_year.year
         )
+
+
+class TestProgramTreeVersionRepositoryGetDtoMethod(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.year = AcademicYearFactory(current=True).year
+        cls.repository = ProgramTreeVersionRepository()
+
+    def test_field_mapping_with_education_group_version(self):
+        entity_id = ProgramTreeVersionIdentityFactory(year=self.year, transition_name=NOT_A_TRANSITION)
+        root_group = ElementFactory(
+            group_year=GroupYearFactory(
+                academic_year__year=entity_id.year,
+                group__end_year=AcademicYearFactory(current=True),
+            )
+        ).group_year
+
+        education_group_version_model_obj = EducationGroupVersionFactory(
+            offer__acronym=entity_id.offer_acronym,
+            offer__academic_year__year=entity_id.year,
+            version_name=entity_id.version_name,
+            transition_name=entity_id.transition_name,
+            root_group=root_group
+        )
+
+        programme_de_formation_dto = self.repository.get_dto(entity_id)
+
+        self.assertIsInstance(programme_de_formation_dto, ProgrammeDeFormationDTO)
+
+        self.assertEqual(programme_de_formation_dto.sigle, education_group_version_model_obj.offer.acronym)
+        self.assertEqual(programme_de_formation_dto.annee, education_group_version_model_obj.offer.academic_year.year)
+        self.assertEqual(programme_de_formation_dto.version, education_group_version_model_obj.version_name)
+        self.assertEqual(programme_de_formation_dto.intitule_formation,
+                         "{}{}".format(
+                             education_group_version_model_obj.offer.title,
+                             "{}".format(
+                                "[ {} ]".format(education_group_version_model_obj.title_fr) if education_group_version_model_obj.title_fr else '')
+                         )
+                         )
+
+        self.assertIsInstance(programme_de_formation_dto.racine, ContenuNoeudDTO)
+        self.assertEqual(programme_de_formation_dto.racine.intitule, root_group.acronym)
+        self.assertEqual(programme_de_formation_dto.racine.contenu_ordonne, [])
