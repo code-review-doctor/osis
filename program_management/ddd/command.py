@@ -697,3 +697,10 @@ class PostponeProgramTreesUntilNPlus6Command(interface.CommandRequest):
 @attr.s(frozen=True, slots=True)
 class PostponeProgramTreeVersionsUntilNPlus6Command(interface.CommandRequest):
     pass
+
+
+@attr.s(frozen=True, slots=True, auto_attribs=True)
+class GetContenuGroupementCatalogueCommand(interface.CommandRequest):
+    code_formation: str
+    code: str
+    annee: int

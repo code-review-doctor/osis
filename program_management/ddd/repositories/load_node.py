@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -246,7 +246,8 @@ def __load_multiple_node_learning_unit_year(node_learning_unit_year_ids: List[in
         common_title_en=F('learning_container_year__common_title_english'),
         volume_total_lecturing=Subquery(subquery_component_pm.values('hourly_volume_total_annual')),
         volume_total_practical=Subquery(subquery_component_pp.values('hourly_volume_total_annual')),
-        language_code=F('language__code')
+        language_code=F('language__code'),
+        session_derogation=F('session')
     ).values(
         'id',
         'type',
@@ -271,5 +272,6 @@ def __load_multiple_node_learning_unit_year(node_learning_unit_year_ids: List[in
         'exchange_students',
         'french_friendly',
         'english_friendly',
-        'language_code'
+        'language_code',
+        'session_derogation'
     )
