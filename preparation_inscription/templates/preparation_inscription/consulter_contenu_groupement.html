@@ -103,7 +103,7 @@
                 {{ element.credits }}
             </td>
             <td headers="session">
-                {{ element.session_derogation }}
+                {{ element.session_derogation | default_if_none:'' }}
             </td>
             <td headers="obligatoire">
                 {{ element.obligatoire | yesno | title }}

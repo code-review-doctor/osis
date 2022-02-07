@@ -150,9 +150,9 @@ class GetContenuGroupement(interface.DomainService):
         )
 
 
-def _get_credits(credits_relatifs: int, credits_absolus: Decimal) -> str:
+def _get_credits(credits_relatifs, credits_absolus: Decimal) -> str:
     if credits_relatifs:
         if credits_relatifs != credits_absolus:
             return "{}({})".format(credits_relatifs, get_chiffres_significatifs(credits_absolus))
-        return "{}".format(credits_relatifs)
+        return "{}".format(get_chiffres_significatifs(credits_relatifs))
     return get_chiffres_significatifs(credits_absolus)
