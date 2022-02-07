@@ -25,6 +25,7 @@
 
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetContenuGroupementCommand
 from program_management.ddd.domain import exception
+from program_management.ddd.domain.node import build_title
 from program_management.ddd.dtos import UniteEnseignementDTO, ContenuNoeudDTO
 from program_management.ddd.repositories import program_tree_version as program_tree_version_repository
 from program_management.ddd.repositories.program_tree_version import _get_credits
@@ -60,7 +61,7 @@ def _build_contenu_pgm(node: 'Node', lien_parent: 'Link' = None) -> 'ContenuNoeu
                     volume_annuel_pp=int(lien.child.volume_total_practical)
                     if lien.child.volume_total_practical else None,
                     obligatoire=lien.is_mandatory if lien else False,
-                    session_derogation='',
+                    session_derogation=lien.child.session_derogation,
                     credits_relatifs=lien.relative_credits
                 )
             )
@@ -68,12 +69,16 @@ def _build_contenu_pgm(node: 'Node', lien_parent: 'Link' = None) -> 'ContenuNoeu
             groupement_contenu = _build_contenu_pgm(lien.child, lien_parent=lien)
             contenu.append(groupement_contenu)
 
+    if node.is_group():
+        full_title = get_verbose_title_group(node)
+    else:
+        full_title = build_title(node, "fr_be").lstrip(' - ')
     return ContenuNoeudDTO(
         code=node.code,
-        intitule=node.title,
+        intitule=node.full_acronym,
         remarque=node.remark_fr,
         obligatoire=lien_parent.is_mandatory if lien_parent else False,
         credits=_get_credits(lien_parent),
-        intitule_complet=get_verbose_title_group(node),
+        intitule_complet=full_title,
         contenu_ordonne=contenu,
     )

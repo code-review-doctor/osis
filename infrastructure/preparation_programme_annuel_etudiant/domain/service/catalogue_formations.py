@@ -37,7 +37,6 @@ from preparation_inscription.utils.chiffres_significatifs_de_decimal import get_
 from program_management.ddd.command import GetContenuGroupementCatalogueCommand
 from program_management.ddd.dtos import ProgrammeDeFormationDTO, ContenuNoeudDTO, ElementType, \
     UniteEnseignementDTO as ProgramManagementUniteEnseignementDTO
-from program_management.ddd.service.read.get_content_service import get_content_service
 
 EMPTY_VALUE = ''
 
@@ -132,10 +131,10 @@ def _build_donnees_ue(ue_contenue: 'ProgramManagementUniteEnseignementDTO') -> E
             '+' if ue_contenue.volume_annuel_pm and ue_contenue.volume_annuel_pp else '',
             ue_contenue.volume_annuel_pp or ''
         ),
-        bloc=ue_contenue.bloc,
+        bloc=ue_contenue.bloc or '',
         quadrimestre_texte=ue_contenue.quadrimestre_texte,
         credits=_get_credits(ue_contenue.credits_relatifs, ue_contenue.credits_absolus),
-        session_derogation=ue_contenue.session_derogation,
+        session_derogation=ue_contenue.session_derogation or '',
         obligatoire=ue_contenue.obligatoire,
     )
 
