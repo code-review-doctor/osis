@@ -63,7 +63,7 @@
     {% for element in search_result %}
         <tr>
             <td headers="code">
-                {{ element.code }}
+                {{ element.code }}{{ element.intitule }}
             </td>
             <td headers="intitule">
                 {{ element.intitule_complet }}
@@ -79,13 +79,13 @@
                 {% endif %}
             </td>
             <td headers="quadri">
-                {{ element.quadri }}
+                {{ element.quadrimestre_texte }}
             </td>
             <td headers="credits">
                 {{ element.credits }}
             </td>
             <td headers="session">
-                {{ element.session }}
+                {{ element.session_derogation }}
             </td>
             <td headers="obligatoire">
                 {{ element.obligatoire | yesno | title }}
