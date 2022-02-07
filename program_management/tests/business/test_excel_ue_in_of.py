@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -58,7 +58,7 @@ from program_management.business.excel_ue_in_of import FIX_TITLES, \
     _get_headers, optional_header_for_proposition, optional_header_for_credits, optional_header_for_volume, \
     _get_attribution_line, optional_header_for_required_entity, optional_header_for_active, \
     optional_header_for_allocation_entity, optional_header_for_description_fiche, optional_header_for_english_title, \
-    optional_header_for_language, optional_header_for_periodicity, optional_header_for_quadrimester, \
+    optional_header_for_language_and_exchange, optional_header_for_periodicity, optional_header_for_quadrimester, \
     optional_header_for_session_derogation, optional_header_for_specifications, optional_header_for_teacher_list, \
     _fix_data, _get_workbook_for_custom_xls, _build_legend_sheet, LEGEND_WB_CONTENT, LEGEND_WB_STYLE, _optional_data, \
     _build_excel_lines_ues, _get_optional_data, BOLD_FONT, _build_validate_html_list_to_string, \
@@ -129,7 +129,7 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
                 'teacher_list': 'on',
                 'proposition': 'on',
                 'english_title': 'on',
-                'language': 'on',
+                'language_and_exchange': 'on',
                 'specifications': 'on',
                 'description_fiche': 'on',
                 'force_majeure': 'on'
@@ -143,8 +143,8 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
             optional_header_for_credits + optional_header_for_periodicity + optional_header_for_active + \
             optional_header_for_quadrimester + optional_header_for_session_derogation + optional_header_for_volume + \
             optional_header_for_teacher_list + optional_header_for_proposition + optional_header_for_english_title + \
-            optional_header_for_language + optional_header_for_specifications + optional_header_for_description_fiche \
-            + optional_header_for_force_majeure
+            optional_header_for_language_and_exchange + optional_header_for_specifications + \
+            optional_header_for_description_fiche + optional_header_for_force_majeure
         self.assertListEqual(_get_headers(custom_xls_form)[0], expected_headers)
 
     def test_get_descritpion_fiche_header_if_force_majeure_checked(self):
@@ -204,7 +204,10 @@ class TestContent(TestCase):
             status=True,
             attributions=[cls.attribution_1, cls.attribution_2],
             achievements=[cls.achievement_1, cls.achievement_2, cls.achievement_3, cls.achievement_4],
-            specifications=specifications
+            specifications=specifications,
+            english_friendly=True,
+            french_friendly=True,
+            exchange_students=True
         )
         tree = ProgramTreeFactory(root_node=cls.parent_node)
         cls.tree_version = StandardProgramTreeVersionFactory(tree=tree)
@@ -304,7 +307,7 @@ class TestContent(TestCase):
                               'has_volume': False,
                               'has_quadrimester': False,
                               'has_session_derogation': False,
-                              'has_language': False,
+                              'has_language_and_exchange': False,
                               'has_description_fiche': False,
                               'has_specifications': False,
                               'has_force_majeure': False
@@ -323,7 +326,7 @@ class TestContent(TestCase):
                               'volume': 'on',
                               'quadrimester': 'on',
                               'session_derogation': 'on',
-                              'language': 'on',
+                              'language_and_exchange': 'on',
                               'description_fiche': 'on',
                               'specifications': 'on',
                               'force_majeure': 'on'
@@ -344,7 +347,7 @@ class TestContent(TestCase):
                               'has_volume': True,
                               'has_quadrimester': True,
                               'has_session_derogation': True,
-                              'has_language': True,
+                              'has_language_and_exchange': True,
                               'has_description_fiche': True,
                               'has_specifications': True,
                               'has_force_majeure': True
@@ -414,11 +417,11 @@ class TestContent(TestCase):
         self.assertCountEqual(_get_optional_data([], self.luy, optional_data, self.link_1_1, []),
                               [self.luy.full_title_en])
 
-    def test_get_optional_has_language(self):
+    def test_get_optional_has_language_and_exchange(self):
         optional_data = initialize_optional_data()
-        optional_data['has_language'] = True
+        optional_data['has_language_and_exchange'] = True
         self.assertCountEqual(_get_optional_data([], self.luy, optional_data, self.link_1_1, []),
-                              [self.luy.main_language])
+                              [self.luy.main_language, _('yes'), _('yes'), _('yes')])
 
     def test_get_optional_has_teacher_list(self):
         optional_data = initialize_optional_data()
@@ -537,7 +540,7 @@ def initialize_optional_data():
         'has_teacher_list': False,
         'has_proposition': False,
         'has_english_title': False,
-        'has_language': False,
+        'has_language_and_exchange': False,
         'has_description_fiche': False,
         'has_specifications': False,
         'has_force_majeure': False
