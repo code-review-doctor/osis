@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from decimal import Decimal
 from typing import List, Union
 
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormationCommand, GetContenuGroupementCommand
@@ -33,11 +32,9 @@ from ddd.logic.preparation_programme_annuel_etudiant.domain.validator.exceptions
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, \
     ContenuGroupementCatalogueDTO, UniteEnseignementDTO, UniteEnseignementCatalogueDTO, GroupementCatalogueDTO, \
     ElementContenuDTO, GroupementContenantDTO
-from preparation_inscription.utils.chiffres_significatifs_de_decimal import get_chiffres_significatifs
 from program_management.ddd.command import GetContenuGroupementCatalogueCommand
 from program_management.ddd.dtos import ProgrammeDeFormationDTO, ContenuNoeudDTO, ElementType, \
     UniteEnseignementDTO as ProgramManagementUniteEnseignementDTO
-from program_management.ddd.service.read.get_content_service import get_content_service
 
 EMPTY_VALUE = ''
 
@@ -129,11 +126,11 @@ def _build_donnees_ue(ue_contenue: 'ProgramManagementUniteEnseignementDTO') -> E
         intitule_complet=ue_contenue.intitule_complet,
         volume_annuel_pm=ue_contenue.volume_annuel_pm,
         volume_annuel_pp=ue_contenue.volume_annuel_pp,
-        bloc=str(ue_contenue.bloc),
+        bloc=ue_contenue.bloc or '',
         quadrimestre_texte=ue_contenue.quadrimestre_texte,
         credits_relatifs=ue_contenue.credits_relatifs,
         credits_absolus=ue_contenue.credits_absolus,
-        session_derogation=ue_contenue.session_derogation,
+        session_derogation=ue_contenue.session_derogation or '',
         obligatoire=ue_contenue.obligatoire,
     )
 
@@ -163,4 +160,3 @@ def _build_donnees_contenus(
         else:
             donnees.append(_build_donnees_ue(element_contenu))
     return donnees
-
