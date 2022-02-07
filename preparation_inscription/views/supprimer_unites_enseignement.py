@@ -8,7 +8,7 @@ from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.utils.htmx import HtmxMixin
 from base.views.common import display_success_messages, display_error_messages
 from ddd.logic.preparation_programme_annuel_etudiant.commands import SupprimerUEDuProgrammeCommand, \
-    GetUniteEnseignementCommand
+    GetUniteEnseignementCommand, GetContenuGroupementCommand
 from education_group.models.group_year import GroupYear
 from infrastructure.messages_bus import message_bus_instance
 from osis_role.contrib.views import PermissionRequiredMixin
@@ -29,80 +29,21 @@ class SupprimerUnitesEnseignementView(PermissionRequiredMixin, LoginRequiredMixi
             'intitule_programme': self.get_intitule_programme(),
             'annee': self.kwargs['annee'],
             'code_programme': self.kwargs['code_programme'],
-            'consulter_contenu_groupement_url': self.get_consulter_contenu_groupement_url()
+            'code_groupement': self.kwargs['code_groupement']
         }
 
     def get_deletable_content(self):
         return [ue for ue in self.get_content() if ue['type_ajustement'] != TypeAjustement.SUPPRESSION.name]
 
     def get_content(self):
-        return [
-            {
-                'code_ue': 'LESPO1113',
-                'intitule': 'Sociologie...',
-                'volumes': '10',
-                'bloc': '1',
-                'quadri': 'Q1',
-                'credits': '5/5',
-                'session': 'Oui',
-                'obligatoire': '',
-                'commentaire_fr': '',
-                'commentaire_en': '',
-                'type_ajustement': TypeAjustement.SUPPRESSION.name,
-            },
-            {
-                'code_ue': 'LESPO1321',
-                'intitule': 'Economic...',
-                'volumes': '15+10',
-                'bloc': '1',
-                'quadri': 'Q1',
-                'credits': '4/5',
-                'session': 'Oui',
-                'obligatoire': '',
-                'commentaire_fr': '',
-                'commentaire_en': '',
-                'type_ajustement': TypeAjustement.SUPPRESSION.name,
-            },
-            {
-                'code_ue': 'LESPO1114',
-                'intitule': 'Political...',
-                'volumes': '30',
-                'bloc': '2',
-                'quadri': 'Q1',
-                'credits': '5/5',
-                'session': 'Oui',
-                'obligatoire': '',
-                'commentaire_fr': '',
-                'commentaire_en': '',
-                'type_ajustement': TypeAjustement.MODIFICATION.name,
-            },
-            {
-                'code_ue': 'LINGE1122',
-                'intitule': 'Physique...',
-                'volumes': '30',
-                'bloc': '1',
-                'quadri': 'Q2',
-                'credits': '3/3',
-                'session': 'Oui',
-                'obligatoire': '',
-                'commentaire_fr': '',
-                'commentaire_en': '',
-                'type_ajustement': TypeAjustement.AJOUT.name,
-            },
-            {
-                'code_ue': 'LINGE1125',
-                'intitule': 'Séminaire...',
-                'volumes': '25',
-                'bloc': '1',
-                'quadri': 'Q2',
-                'credits': '5/5',
-                'session': 'Oui',
-                'obligatoire': '',
-                'commentaire_fr': '',
-                'commentaire_en': '',
-                'type_ajustement': TypeAjustement.AJOUT.name,
-            },
-        ]
+        cmd = GetContenuGroupementCommand(
+            code_formation=self.kwargs['code_programme'],
+            annee=self.kwargs['annee'],
+            code=self.kwargs.get('code_groupement', self.kwargs['code_programme']),
+        )
+
+        contenu_groupement_DTO = message_bus_instance.invoke(cmd)
+        return contenu_groupement_DTO.elements_contenus
 
     def get_intitule_groupement(self):
         # TODO :: to implement
