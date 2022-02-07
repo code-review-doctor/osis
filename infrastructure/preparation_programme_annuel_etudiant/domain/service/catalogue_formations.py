@@ -80,6 +80,7 @@ def _build_formation_dto(program_management_formation_dto: ProgrammeDeFormationD
         annee=program_management_formation_dto.annee,
         sigle=program_management_formation_dto.sigle,
         version=program_management_formation_dto.version,
+        transition_name=program_management_formation_dto.transition_name,
         intitule_formation=program_management_formation_dto.intitule_formation,
     )
 

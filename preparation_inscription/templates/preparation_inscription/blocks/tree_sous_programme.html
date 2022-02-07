@@ -1,5 +1,5 @@
 {% load i18n static %}
-<li id="{{ tree.code }}"
+<li id="{{parent_code}}_{{ tree.code }}"
     url="{% if element.type == "GROUPEMENT" %}{% url 'consulter_contenu_groupement_view' annee=annee code_programme=code_programme code_groupement=tree.code %}{% endif %}"
     data-jstree='{"icon":"{% if tree.obligatoire %}{% static "img/education_group_year/mandatory.png" %}{% else %}{% static "img/education_group_year/optional.png" %}{% endif %}"}'
 >
@@ -9,13 +9,13 @@
         <ul>
             {% for element in tree.contenu %}
                 {% if element.type == "UNITE_ENSEIGNEMENT" %}
-                    {% include 'preparation_inscription/blocks/tree_unites_enseignements.html' with unite_enseignement=element %}
+                    {% include 'preparation_inscription/blocks/tree_unites_enseignements.html' with unite_enseignement=element parent_code=tree.code %}
                 {% elif element.type == "GROUPEMENT" %}
-                    {% include 'preparation_inscription/blocks/tree_sous_programme.html' with tree=element %}
+                    {% include 'preparation_inscription/blocks/tree_sous_programme.html' with tree=element parent_code=tree.code %}
                 {% endif %}
             {% endfor %}
             {% for unite_enseignement in tree.unites_enseignement_ajoutees %}
-                {% include 'preparation_inscription/blocks/tree_unites_enseignements_ajoutees.html' with unite_enseignement=unite_enseignement %}
+                {% include 'preparation_inscription/blocks/tree_unites_enseignements_ajoutees.html' with unite_enseignement=unite_enseignement parent_code=tree.code%}
             {% endfor %}
         </ul>
     {% endif %}

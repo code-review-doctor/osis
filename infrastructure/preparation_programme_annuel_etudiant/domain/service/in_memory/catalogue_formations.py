@@ -138,6 +138,7 @@ def _cas_nominal_formation_version_standard():
         annee=ANNEE,
         sigle=SIGLE,
         version=STANDARD,
+        transition_name='',
         intitule_formation='Bachelier en sciences économiques et de gestion'
     )
 
@@ -186,6 +187,7 @@ def _cas_formation_version_particuliere():
         annee=ANNEE,
         sigle=SIGLE,
         version='DDSHERBROOKE',
+        transition_name='',
         intitule_formation='Master [120] en communication[ Double diplôme UCLouvain - uSherbrooke ]',
     )
 
@@ -235,6 +237,7 @@ def _cas_formation_version_transition():
         annee=ANNEE,
         sigle=SIGLE,
         version='Version 2020',
+        transition_name='',
         intitule_formation=INTITULE,
     )
 
@@ -286,6 +289,7 @@ def _cas_formation_version_particuliere_transition():
         annee=ANNEE,
         sigle=SIGLE,
         version=VERSION,
+        transition_name='',
         intitule_formation=INTITULE,
     )
 
@@ -334,6 +338,7 @@ def _cas_formation_version_standard_annee_moins_1():
         annee=ANNEE-1,
         sigle=SIGLE,
         version=STANDARD,
+        transition_name='',
         intitule_formation=INTITULE
     )
 
@@ -382,6 +387,7 @@ def _cas_mini_formation_version_standard():
         annee=ANNEE,
         sigle=SIGLE,
         version=STANDARD,
+        transition_name='',
         intitule_formation=INTITULE
     )
 
@@ -431,6 +437,7 @@ def _cas_mini_formation_version_particuliere():
         annee=ANNEE,
         sigle=SIGLE,
         version=VERSION,
+        transition_name='',
         intitule_formation=INTITULE
     )
 
@@ -480,6 +487,7 @@ def _cas_mini_formation_version_transition():
         annee=ANNEE,
         sigle=SIGLE,
         version=VERSION,
+        transition_name='',
         intitule_formation=INTITULE
     )
 
@@ -529,6 +537,7 @@ def _cas_mini_formation_version_particuliere_transition():
         annee=ANNEE,
         sigle=SIGLE,
         version=VERSION,
+        transition_name='',
         intitule_formation=INTITULE
     )
 
@@ -578,6 +587,7 @@ def _cas_mini_formation_version_standard_annee_moins_1():
         annee=ANNEE-1,
         sigle=SIGLE,
         version=VERSION,
+        transition_name='',
         intitule_formation=INTITULE
     )
 

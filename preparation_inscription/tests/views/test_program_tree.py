@@ -58,6 +58,8 @@ class TestProgramTreeView(TestCase):
                 code='LCORP201S',
                 annee=2022,
                 version=STANDARD,
+                transition_name='',
+                sigle='COMMU2M',
                 intitule_complet_formation='Master [120] en communication',
                 racine=GroupementInscriptionCoursDTO(
                     intitule_complet='Master [120] en communication',
