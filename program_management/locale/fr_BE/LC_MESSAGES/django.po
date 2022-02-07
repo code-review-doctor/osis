@@ -287,7 +287,7 @@ msgid "English comment"
 msgstr "Commentaire anglais"
 
 msgid "English-friendly"
-msgstr ""
+msgstr "English-friendly"
 
 msgid "Enrollment campus"
 msgstr "Lieu d'inscription"
@@ -309,7 +309,7 @@ msgid "Evaluation methods (force majeure)"
 msgstr "Mode d'évaluation des acquis des étudiants (force majeure)"
 
 msgid "Exchange students"
-msgstr ""
+msgstr "Etudiants d'échange"
 
 msgid "Export"
 msgstr "Exporter"
@@ -375,7 +375,7 @@ msgid "Formation catalogue"
 msgstr "Catalogue des formations"
 
 msgid "French-friendly"
-msgstr ""
+msgstr "French-friendly"
 
 msgid "Full title of the english version"
 msgstr "Intitulé de la version en anglais"
