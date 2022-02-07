@@ -188,10 +188,8 @@ msgstr ""
 msgid "What type of education did (do) you follow?"
 msgstr ""
 
-#, fuzzy
-#| msgid "Higher education"
 msgid "Other education, to specify"
-msgstr "Enseignement supérieur"
+msgstr ""
 
 msgid "Another institute"
 msgstr ""
@@ -346,10 +344,8 @@ msgstr ""
 msgid "More than 75%"
 msgstr ""
 
-#, fuzzy
-#| msgid "Higher education"
 msgid "Teaching of general education"
-msgstr "Enseignement supérieur"
+msgstr ""
 
 msgid "Transition method"
 msgstr ""
