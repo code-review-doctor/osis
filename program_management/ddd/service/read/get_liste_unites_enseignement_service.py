@@ -22,53 +22,26 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
 
-from program_management.ddd.command import GetListeUnitesEnseignementContenuesCatalogueCommand
-from program_management.ddd.domain import exception
+from program_management.ddd.command import GetUnitesEnseignementContenuesDansProgrammeCommand
+from program_management.ddd.domain.service.get_unites_enseignement_contenues_dans_pgm import \
+    build_unites_enseignement_contenues_dans_pgm
+
 from program_management.ddd.dtos import UniteEnseignementDTO
 from program_management.ddd.repositories import program_tree_version as program_tree_version_repository
 
 
-def get_liste_unites_enseignement(
-        cmd: 'GetListeUnitesEnseignementContenuesCatalogueCommand'
+def get_unites_enseignement(
+        cmd: 'GetUnitesEnseignementContenuesDansProgrammeCommand'
 ) -> 'UniteEnseignementDTO':
 
-    try:
-        pgm_tree_version = program_tree_version_repository.ProgramTreeVersionRepository().search(
-            code=cmd.code,
-            year=cmd.annee
-        )[0]
+    pgm_tree_version = program_tree_version_repository.ProgramTreeVersionRepository().search(
+        code=cmd.code_programme,
+        year=cmd.annee
+    )[0]
 
-        return _build_contenu_pgm(
-            pgm_tree_version.get_tree().get_node_by_code_and_year(code=cmd.code, year=cmd.annee)
-        )
+    return build_unites_enseignement_contenues_dans_pgm(
+        pgm_tree_version.get_tree().get_node_by_code_and_year(code=cmd.code_programme, year=cmd.annee)
+    )
 
-    except exception.ProgramTreeVersionNotFoundException:
-        return None
-
-
-def _build_contenu_pgm(node: 'Node', contenu: List['UniteEnseignementDTO'] = []) -> List['UniteEnseignementDTO']:
-    for lien in node.children:
-        if lien.child.is_learning_unit():
-            contenu.append(
-                UniteEnseignementDTO(
-                    bloc=lien.block,
-                    code=lien.child.code,
-                    intitule_complet=lien.child.title,
-                    quadrimestre=lien.child.quadrimester,
-                    quadrimestre_texte=lien.child.quadrimester.value if lien.child.quadrimester else "",
-                    credits_absolus=lien.child.credits,
-                    volume_annuel_pm=int(lien.child.volume_total_lecturing)
-                    if lien.child.volume_total_lecturing else None,
-                    volume_annuel_pp=int(lien.child.volume_total_practical)
-                    if lien.child.volume_total_practical else None,
-                    obligatoire=lien.is_mandatory if lien else False,
-                    session_derogation=lien.child.session_derogation,
-                    credits_relatifs=lien.relative_credits
-                )
-            )
-        else:
-            contenu = _build_contenu_pgm(lien.child, contenu)
-    return contenu
 

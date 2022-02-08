@@ -35,7 +35,7 @@ from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, \
     ElementContenuDTO, GroupementContenantDTO
 from preparation_inscription.utils.chiffres_significatifs_de_decimal import get_chiffres_significatifs
 from program_management.ddd.command import GetContenuGroupementCatalogueCommand, \
-    GetListeUnitesEnseignementContenuesCatalogueCommand
+    GetUnitesEnseignementContenuesDansProgrammeCommand
 from program_management.ddd.dtos import ProgrammeDeFormationDTO, ContenuNoeudDTO, ElementType, \
     UniteEnseignementDTO as ProgramManagementUniteEnseignementDTO
 
@@ -74,10 +74,11 @@ class CatalogueFormationsTranslator(ICatalogueFormationsTranslator):
         )
 
     @classmethod
-    def get_liste_unites_enseignement(cls, cmd: 'GetContenuGroupementCommand') -> List['ElementContenuDTO']:
+    def get_unites_enseignement(cls, cmd: 'GetContenuGroupementCommand') -> List['ElementContenuDTO']:
         from infrastructure.messages_bus import message_bus_instance
-        cmd = GetListeUnitesEnseignementContenuesCatalogueCommand(
-            code=cmd.code,
+
+        cmd = GetUnitesEnseignementContenuesDansProgrammeCommand(
+            code_programme=cmd.code,
             annee=cmd.annee,
         )
         liste_unites_contenues_dto = message_bus_instance.invoke(

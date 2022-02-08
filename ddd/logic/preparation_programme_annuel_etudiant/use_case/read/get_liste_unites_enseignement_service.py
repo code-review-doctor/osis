@@ -23,13 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.preparation_programme_annuel_etudiant.commands import GetListeUnitesEnseignementContenuesCommand
+from ddd.logic.preparation_programme_annuel_etudiant.commands import GetUnitesEnseignementContenuesCommand
 from infrastructure.preparation_programme_annuel_etudiant.domain.service.catalogue_formations import \
     CatalogueFormationsTranslator
 
 
-def get_liste_unites_enseignement_service(
-        cmd: 'GetListeUnitesEnseignementContenuesCommand',
+def get_unites_enseignement_service(
+        cmd: 'GetUnitesEnseignementContenuesCommand',
         translator: 'CatalogueFormationsTranslator',
 ) -> 'ElementContenuDTO':
-    return translator.get_liste_unites_enseignement(cmd)
+    return translator.get_unites_enseignement(cmd)

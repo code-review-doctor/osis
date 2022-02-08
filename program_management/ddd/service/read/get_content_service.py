@@ -24,7 +24,6 @@
 ##############################################################################
 
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetContenuGroupementCommand
-from program_management.ddd.domain import exception
 from program_management.ddd.domain.node import build_title
 from program_management.ddd.dtos import UniteEnseignementDTO, ContenuNoeudDTO
 from program_management.ddd.repositories import program_tree_version as program_tree_version_repository
@@ -33,15 +32,11 @@ from program_management.ddd.repositories.program_tree_version import get_verbose
 
 
 def get_content_service(cmd: GetContenuGroupementCommand) -> ContenuNoeudDTO:
-    try:
-        pgm_tree_version = program_tree_version_repository.ProgramTreeVersionRepository().search(
-            code=cmd.code_formation,
-            year=cmd.annee
-        )[0]
-        return _build_contenu_pgm(pgm_tree_version.get_tree().get_node_by_code_and_year(code=cmd.code, year=cmd.annee))
-
-    except exception.ProgramTreeVersionNotFoundException:
-        return None
+    pgm_tree_version = program_tree_version_repository.ProgramTreeVersionRepository().search(
+        code=cmd.code_formation,
+        year=cmd.annee
+    )[0]
+    return _build_contenu_pgm(pgm_tree_version.get_tree().get_node_by_code_and_year(code=cmd.code, year=cmd.annee))
 
 
 def _build_contenu_pgm(node: 'Node', lien_parent: 'Link' = None) -> 'ContenuNoeudDTO':

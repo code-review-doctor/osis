@@ -1,4 +1,4 @@
-{% load static i18n bootstrap3 %}
+{% load static i18n bootstrap3 formatage_liste_ues %}
 
 {% comment "License" %}
  * OSIS stands for Open Student Information System. It's an application
@@ -61,7 +61,7 @@
                 {{ element.intitule_complet }}
             </td>
             <td headers="volumes">
-                {{ element.volumes }}
+                {{ element|formater_volumes_totaux }}
             </td>
             <td headers="bloc">
                 {{ element.bloc }}
@@ -70,7 +70,7 @@
                 {{ element.quadrimestre_texte }}
             </td>
             <td headers="credits">
-                {{ element.credits }}
+                {{ element|formatage_credits }}
             </td>
             <td headers="session">
                 {{ element.session_derogation }}

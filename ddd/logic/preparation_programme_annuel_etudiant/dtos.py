@@ -29,7 +29,9 @@ from typing import List, Union
 import attr
 
 from osis_common.ddd.interface import DTO
-from preparation_inscription.utils.chiffres_significatifs_de_decimal import get_chiffres_significatifs
+
+UNITE_ENSEIGNEMENT = "UNITE_ENSEIGNEMENT"
+GROUPEMENT = "GROUPEMENT"
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
@@ -49,23 +51,7 @@ class UniteEnseignementDTO(DTO):
 
     @property
     def type(self):
-        return "UNITE_ENSEIGNEMENT"
-
-    @property
-    def volumes(self):
-        return '{}{}{}'.format(
-            self.volume_annuel_pm or '',
-            '+' if self.volume_annuel_pm and self.volume_annuel_pp else '',
-            self.volume_annuel_pp or ''
-        )
-
-    @property
-    def credits(self) -> str:
-        if self.credits_relatifs:
-            if self.credits_relatifs != self.credits_absolus:
-                return "{}({})".format(self.credits_relatifs, get_chiffres_significatifs(self.credits_absolus))
-            return "{}".format(self.credits_relatifs)
-        return get_chiffres_significatifs(self.credits_absolus)
+        return UNITE_ENSEIGNEMENT
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
@@ -77,7 +63,7 @@ class GroupementDTO(DTO):
 
     @property
     def type(self):
-        return "GROUPEMENT"
+        return GROUPEMENT
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
@@ -176,7 +162,7 @@ class GroupementInscriptionCoursDTO(DTO):
 
     @property
     def type(self):
-        return 'GROUPEMENT'
+        return GROUPEMENT
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
@@ -188,7 +174,7 @@ class UniteEnseignementProgrammeDTO(DTO):
 
     @property
     def type(self):
-        return 'UNITE_ENSEIGNEMENT'
+        return UNITE_ENSEIGNEMENT
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)

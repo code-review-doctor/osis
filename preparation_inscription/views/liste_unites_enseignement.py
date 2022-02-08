@@ -23,12 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.functional import cached_property
 from django.views.generic import TemplateView
 
 from base.utils.htmx import HtmxMixin
-from ddd.logic.preparation_programme_annuel_etudiant.commands import GetListeUnitesEnseignementContenuesCommand
+from ddd.logic.preparation_programme_annuel_etudiant.commands import GetUnitesEnseignementContenuesCommand
 from infrastructure.messages_bus import message_bus_instance
 
 
@@ -43,22 +45,11 @@ class ListeUnitesEnseignementView(HtmxMixin, LoginRequiredMixin, TemplateView):
             **super().get_context_data(**kwargs),
             # TODO code_groupement_racine :: à implémenter quand la story "afficher contenu" est développée
             'search_result': self.get_content(),
-            'intitule_groupement': self.get_intitule_groupement(),
-            'intitule_programme': self.get_intitule_programme(),
         }
 
-    def get_content(self):
-        cmd = GetListeUnitesEnseignementContenuesCommand(code=self.code_programme, annee=self.annee)
-        unites_enseignement = message_bus_instance.invoke(cmd)
-        return unites_enseignement
-
-    def get_intitule_groupement(self):
-        # TODO :: to implement
-        return "Intitulé groupement"
-
-    def get_intitule_programme(self):
-        # TODO :: to implement
-        return "Intitulé programme"
+    def get_content(self) -> List['UniteEnseignementDTO']:
+        cmd = GetUnitesEnseignementContenuesCommand(code=self.code_programme, annee=self.annee)
+        return message_bus_instance.invoke(cmd)
 
     @cached_property
     def code_programme(self) -> str:

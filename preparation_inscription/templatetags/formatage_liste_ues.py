@@ -23,21 +23,26 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from decimal import Decimal
 from django import template
 
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import UniteEnseignementCatalogueDTO
+from preparation_inscription.templatetags.formatage_volumes_totaux import formater_volumes
+from preparation_inscription.utils.chiffres_significatifs_de_decimal import get_chiffres_significatifs
 
 register = template.Library()
 
 
 @register.filter
-def formater_volumes_totaux(unite_catalogue_dto: 'UniteEnseignementCatalogueDTO') -> str:
+def formatage_credits(unite_catalogue_dto: 'UniteEnseignementDTO') -> str:
+    if unite_catalogue_dto.credits_relatifs:
+        if unite_catalogue_dto.credits_relatifs != unite_catalogue_dto.credits_absolus:
+            return "{}({})".format(
+                unite_catalogue_dto.credits_relatifs,
+                get_chiffres_significatifs(unite_catalogue_dto.credits_absolus)
+            )
+        return "{}".format(unite_catalogue_dto.credits_relatifs)
+    return get_chiffres_significatifs(unite_catalogue_dto.credits_absolus)
+
+
+@register.filter
+def formater_volumes_totaux(unite_catalogue_dto: 'UniteEnseignementDTO') -> str:
     return formater_volumes(unite_catalogue_dto.volume_annuel_pm, unite_catalogue_dto.volume_annuel_pp)
-
-
-def formater_volumes(volume_annuel_pm: int, volume_annuel_pp: int) -> str:
-    return "%(total_lecturing)gh + %(total_practical)gh" % {
-        "total_lecturing": volume_annuel_pm or Decimal(0.0),
-        "total_practical": volume_annuel_pp or Decimal(0.0)
-    }

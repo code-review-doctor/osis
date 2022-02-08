@@ -128,6 +128,6 @@ class GetFormationCommand(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
-class GetListeUnitesEnseignementContenuesCommand(interface.CommandRequest):
+class GetUnitesEnseignementContenuesCommand(interface.CommandRequest):
     code: str
     annee: int
