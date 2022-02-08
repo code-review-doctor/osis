@@ -99,32 +99,47 @@ class LearningUnitRepositoryTestCase(TestCase):
             acronym='LTEST1212X',
             academic_year=luy_db.academic_year
         )
-        dtos = self.learning_unit_repository.search_learning_units_dto(
-            code_annee_values={(luy_db.acronym, luy_db.academic_year.year)}
-        )
 
-        self.assertCountEqual(
-            dtos,
-            [
-                LearningUnitSearchDTO(
-                    year=luy_db.academic_year.year,
-                    code=luy_db.acronym,
-                    full_title="{} - {}".format(luy_db.learning_container_year.common_title, luy_db.specific_title),
-                    type=luy_db.learning_container_year.container_type,
-                    responsible_entity_code=None,
-                    responsible_entity_title=None,
-                    partims=[
-                        LearningUnitPartimDTO(
-                            code=partim_db.acronym,
-                            full_title="{} - {}".format(
-                                partim_db.learning_container_year.common_title,
-                                partim_db.specific_title
-                            )
+        parameters = [
+            {'code_annee_values': {(luy_db.acronym, luy_db.academic_year.year)}},
+            {'code': luy_db.acronym},
+            {'code': luy_db.acronym, 'annee_academique': luy_db.academic_year.year},
+
+        ]
+
+        for parameter in parameters:
+            with self.subTest(parameter=parameter):
+                dtos = self.learning_unit_repository.search_learning_units_dto(
+                    **parameter
+                )
+
+                self.assertCountEqual(
+                    dtos,
+                    [
+                        LearningUnitSearchDTO(
+                            year=luy_db.academic_year.year,
+                            code=luy_db.acronym,
+                            full_title="{} - {}".format(luy_db.learning_container_year.common_title, luy_db.specific_title),
+                            type=luy_db.learning_container_year.container_type,
+                            responsible_entity_code=None,
+                            responsible_entity_title=None,
+                            partims=[
+                                LearningUnitPartimDTO(
+                                    code=partim_db.acronym,
+                                    full_title="{} - {}".format(
+                                        partim_db.learning_container_year.common_title,
+                                        partim_db.specific_title
+                                    )
+                                )
+                            ],
+                            quadrimester=luy_db.quadrimester,
+                            credits=luy_db.credits,
+                            lecturing_volume_annual=None,
+                            practical_volume_annual=None,
+                            session_derogation=luy_db.session
                         )
                     ]
                 )
-            ]
-        )
 
     def test_assert_learning_unit_domain_object_is_not_a_partim(self):
         luy_db = LearningUnitYearFullFactory(academic_year__current=True)

@@ -73,7 +73,7 @@ class TestSearchLearningUnits(SimpleTestCase):
 
         self.assertListEqual(result, [])
 
-    def test_should_retourner_resultats_si_criteres_corresponds(self):
+    def test_should_retourner_resultats_si_code_annee_criteres_corresponds(self):
         result = self.message_bus.invoke(self.cmd)
 
         self.assertCountEqual(
@@ -86,8 +86,42 @@ class TestSearchLearningUnits(SimpleTestCase):
                     type=self.course_with_partim.type,
                     responsible_entity_code=self.course_with_partim.responsible_entity_identity.code,
                     responsible_entity_title='',
-                    partims=self.course_with_partim.get_partims_information()
+                    partims=self.course_with_partim.get_partims_information(),
+                    credits=self.course_with_partim.credits,
+                    quadrimester=self.course_with_partim.derogation_quadrimester,
+                    lecturing_volume_annual=self.course_with_partim.lecturing_part.volumes.volume_annual if
+                    self.course_with_partim.has_lecturing_volume() else 0,
+                    practical_volume_annual=self.course_with_partim.practical_part.volumes.volume_annual if
+                    self.course_with_partim.has_practical_volume() else 0,
+                    session_derogation=self.course_with_partim.derogation_session
                 )
             ]
         )
 
+    def test_should_retourner_resultats_si_code_correspond(self):
+        cmd = attr.evolve(
+            self.cmd,
+            code_annee_values=None,
+            code=self.course_with_partim.code,
+        )
+
+        result = self.message_bus.invoke(cmd)
+
+        self.assertCountEqual(
+            [dto.code for dto in result],
+            [self.course_with_partim.code]
+        )
+
+    def test_should_retourner_resultats_si_intitule_correspond(self):
+        cmd = attr.evolve(
+            self.cmd,
+            code_annee_values=None,
+            intitule=self.course_with_partim.complete_title_fr,
+        )
+
+        result = self.message_bus.invoke(cmd)
+
+        self.assertCountEqual(
+            [dto.code for dto in result],
+            [self.course_with_partim.code]
+        )
