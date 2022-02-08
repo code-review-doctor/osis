@@ -23,17 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from decimal import Decimal
 from typing import List, Union
 
-from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormationCommand
+from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormationCommand, GetContenuGroupementCommand
 from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import \
     ICatalogueFormationsTranslator
 from ddd.logic.preparation_programme_annuel_etudiant.domain.validator.exceptions import FormationIntrouvableException
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, \
     ContenuGroupementCatalogueDTO, UniteEnseignementDTO, UniteEnseignementCatalogueDTO, GroupementCatalogueDTO, \
     ElementContenuDTO, GroupementContenantDTO
-from preparation_inscription.utils.chiffres_significatifs_de_decimal import get_chiffres_significatifs
 from program_management.ddd.command import GetContenuGroupementCatalogueCommand
 from program_management.ddd.dtos import ProgrammeDeFormationDTO, ContenuNoeudDTO, ElementType, \
     UniteEnseignementDTO as ProgramManagementUniteEnseignementDTO
@@ -126,14 +124,12 @@ def _build_donnees_ue(ue_contenue: 'ProgramManagementUniteEnseignementDTO') -> E
     return ElementContenuDTO(
         code=ue_contenue.code,
         intitule_complet=ue_contenue.intitule_complet,
-        volumes='{}{}{}'.format(
-            ue_contenue.volume_annuel_pm or '',
-            '+' if ue_contenue.volume_annuel_pm and ue_contenue.volume_annuel_pp else '',
-            ue_contenue.volume_annuel_pp or ''
-        ),
+        volume_annuel_pm=ue_contenue.volume_annuel_pm,
+        volume_annuel_pp=ue_contenue.volume_annuel_pp,
         bloc=ue_contenue.bloc or '',
         quadrimestre_texte=ue_contenue.quadrimestre_texte,
-        credits=_get_credits(ue_contenue.credits_relatifs, ue_contenue.credits_absolus),
+        credits_relatifs=ue_contenue.credits_relatifs,
+        credits_absolus=ue_contenue.credits_absolus,
         session_derogation=ue_contenue.session_derogation or '',
         obligatoire=ue_contenue.obligatoire,
     )
@@ -144,11 +140,13 @@ def _build_donnees_groupement(groupement_contenu: 'ContenuNoeudDTO') -> ElementC
         code=groupement_contenu.intitule,
         intitule_complet=groupement_contenu.intitule_complet,
         obligatoire=groupement_contenu.obligatoire,
-        volumes=EMPTY_VALUE,
         bloc=EMPTY_VALUE,
         quadrimestre_texte=EMPTY_VALUE,
-        credits=EMPTY_VALUE,
         session_derogation=EMPTY_VALUE,
+        credits_relatifs=None,
+        credits_absolus=None,
+        volume_annuel_pp=None,
+        volume_annuel_pm=None
     )
 
 
@@ -162,11 +160,3 @@ def _build_donnees_contenus(
         else:
             donnees.append(_build_donnees_ue(element_contenu))
     return donnees
-
-
-def _get_credits(credits_relatifs: int, credits_absolus: Decimal) -> str:
-    if credits_relatifs:
-        if credits_relatifs != credits_absolus:
-            return "{}({})".format(credits_relatifs, get_chiffres_significatifs(credits_absolus))
-        return "{}".format(credits_relatifs)
-    return get_chiffres_significatifs(credits_absolus)

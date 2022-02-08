@@ -59,10 +59,7 @@ class GetProgrammeInscriptionCours(interface.DomainService):
         )
 
         groupements_ajustes = groupement_ajuste_repository.search(
-            groupement_id=GroupIdentity(
-                year=cmd.annee,
-                code=cmd.code_programme,
-            )
+            programme_id=GroupIdentity(code=cmd.code_programme, year=cmd.annee)
         )
         unite_enseignements_ajoutes_dto = cls.rechercher_unites_enseignement_ajoutees_catalogue_dto(
             groupements_ajustes,

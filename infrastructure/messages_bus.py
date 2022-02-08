@@ -561,7 +561,12 @@ class MessageBusCommands(AbstractMessageBusCommands):
             CatalogueFormationsTranslator(),
             CatalogueUnitesEnseignementTranslator(),
         ),
-        GetContenuGroupementCommand: lambda cmd: get_contenu_groupement_service(cmd, CatalogueFormationsTranslator()),
+        GetContenuGroupementCommand: lambda cmd: get_contenu_groupement_service(
+            cmd,
+            GroupementAjusteInscriptionCoursInMemoryRepository(),
+            CatalogueFormationsTranslator(),
+            CatalogueUnitesEnseignementTranslator(),
+        ),
         GetContenuGroupementCatalogueCommand: lambda cmd: get_content_service(cmd),
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 

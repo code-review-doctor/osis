@@ -23,26 +23,28 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.preparation_programme_annuel_etudiant.commands import GetContenuGroupementCommand
-from ddd.logic.preparation_programme_annuel_etudiant.domain.service.get_contenu_groupement import GetContenuGroupement
-from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import \
-    ICatalogueFormationsTranslator
-from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_unites_enseignement import \
-    ICatalogueUnitesEnseignementTranslator
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import GroupementContenantDTO
-from ddd.logic.preparation_programme_annuel_etudiant.repository.i_groupement_ajuste_inscription_cours import \
-    IGroupementAjusteInscriptionCoursRepository
+from decimal import Decimal
+from typing import Optional
+
+from django import template
+
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import UniteEnseignementCatalogueDTO
+
+register = template.Library()
 
 
-def get_contenu_groupement_service(
-        cmd: 'GetContenuGroupementCommand',
-        repo: 'IGroupementAjusteInscriptionCoursRepository',
-        catalogue_formations_translator: 'ICatalogueFormationsTranslator',
-        catalogue_unites_enseignement_translator: 'ICatalogueUnitesEnseignementTranslator'
-) -> 'GroupementContenantDTO':
-    return GetContenuGroupement.get_contenu_groupement(
-        cmd,
-        repo,
-        catalogue_formations_translator,
-        catalogue_unites_enseignement_translator
+@register.filter
+def formater_volumes_totaux(unite_catalogue_dto: 'UniteEnseignementCatalogueDTO') -> str:
+    return "%(total_lecturing)gh + %(total_practical)gh" % {
+        "total_lecturing": unite_catalogue_dto.volume_annuel_pm or Decimal(0.0),
+        "total_practical": unite_catalogue_dto.volume_annuel_pp or Decimal(0.0)
+    }
+
+
+@register.simple_tag
+def formater_volumes(volume_annuel_pm: Optional[int], volume_annuel_pp: Optional[int]) -> str:
+    return '{}{}{}'.format(
+        volume_annuel_pm or '',
+        '+' if volume_annuel_pm and volume_annuel_pp else '',
+        volume_annuel_pp or ''
     )

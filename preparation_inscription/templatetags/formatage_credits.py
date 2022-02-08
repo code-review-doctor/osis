@@ -24,25 +24,36 @@
 #
 ##############################################################################
 from decimal import Decimal
+from typing import Optional
+
 from django import template
 from django.utils.translation import gettext_lazy as _
-
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import UniteEnseignementCatalogueDTO
-from preparation_inscription.utils.chiffres_significatifs_de_decimal import get_chiffres_significatifs
 
 register = template.Library()
 
 
-@register.filter
-def formater_credits_ue(unite_enseignement: 'UniteEnseignementCatalogueDTO') -> str:
-    if unite_enseignement and (unite_enseignement.credits_absolus or unite_enseignement.credits_relatifs):
-        credits_absolus = get_chiffres_significatifs(unite_enseignement.credits_absolus) \
-            if unite_enseignement.credits_absolus else None
-        return "({} {})".format(
-            unite_enseignement.credits_relatifs or credits_absolus or 0,
-            _("credits")
-        )
+def get_chiffres_significatifs(nombre_decimal: Decimal) -> str:
+    if nombre_decimal:
+        str_volume = str(nombre_decimal)
+        return str_volume.rstrip('0').rstrip('.') if '.' in str_volume else str_volume
+    return ''
+
+
+@register.simple_tag
+def formater_credits_ue_formulaire(credits_relatifs: Optional[int], credits_absolus: Optional[Decimal]) -> str:
+    if credits_absolus or credits_relatifs:
+        credits_absolus = get_chiffres_significatifs(credits_absolus) if credits_absolus else None
+        return "({} {})".format(credits_relatifs or credits_absolus or 0, _("credits"))
     return ""
+
+
+@register.simple_tag
+def formater_credits_ue(credits_relatifs: Optional[int], credits_absolus: Optional[Decimal]) -> str:
+    if credits_relatifs:
+        if credits_relatifs != credits_absolus:
+            return "{}({})".format(credits_relatifs, get_chiffres_significatifs(credits_absolus))
+        return "{}".format(credits_relatifs)
+    return get_chiffres_significatifs(credits_absolus)
 
 
 @register.filter

@@ -23,26 +23,28 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.preparation_programme_annuel_etudiant.commands import GetContenuGroupementCommand
-from ddd.logic.preparation_programme_annuel_etudiant.domain.service.get_contenu_groupement import GetContenuGroupement
-from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import \
-    ICatalogueFormationsTranslator
-from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_unites_enseignement import \
-    ICatalogueUnitesEnseignementTranslator
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import GroupementContenantDTO
-from ddd.logic.preparation_programme_annuel_etudiant.repository.i_groupement_ajuste_inscription_cours import \
-    IGroupementAjusteInscriptionCoursRepository
+import uuid
+
+import factory
+
+from ddd.logic.learning_unit.tests.factory.learning_unit import LearningUnitIdentityFactory
+from ddd.logic.preparation_programme_annuel_etudiant.domain.model.unite_enseignement_ajoutee import \
+    UniteEnseignementAjoutee, UniteEnseignementAjouteeIdentity
 
 
-def get_contenu_groupement_service(
-        cmd: 'GetContenuGroupementCommand',
-        repo: 'IGroupementAjusteInscriptionCoursRepository',
-        catalogue_formations_translator: 'ICatalogueFormationsTranslator',
-        catalogue_unites_enseignement_translator: 'ICatalogueUnitesEnseignementTranslator'
-) -> 'GroupementContenantDTO':
-    return GetContenuGroupement.get_contenu_groupement(
-        cmd,
-        repo,
-        catalogue_formations_translator,
-        catalogue_unites_enseignement_translator
-    )
+class UniteEnseignementAjouteeIdentityFactory(factory.Factory):
+    class Meta:
+        model = UniteEnseignementAjouteeIdentity
+        abstract = False
+
+    uuid = factory.LazyFunction(uuid.uuid4)
+
+
+class UniteEnseignementAjouteeFactory(factory.Factory):
+    class Meta:
+        model = UniteEnseignementAjoutee
+        abstract = False
+
+    entity_id = factory.SubFactory(UniteEnseignementAjouteeIdentityFactory)
+    unite_enseignement_identity = factory.SubFactory(LearningUnitIdentityFactory)
+    a_la_suite_de = None
