@@ -24,22 +24,28 @@
 ##############################################################################
 
 from program_management.ddd.command import GetUnitesEnseignementContenuesDansProgrammeCommand
-
-
-from program_management.ddd.dtos import UniteEnseignementDTO
-from program_management.ddd.repositories import program_tree_version as program_tree_version_repository
+from program_management.ddd.domain.node import NodeIdentity
+from program_management.ddd.domain.service import identity_search
 from program_management.ddd.domain.service.get_unites_enseignement_contenues_dans_pgm import \
     GetUnitesEnseignementContenuesDansPgrm
+from program_management.ddd.dtos import UniteEnseignementDTO
+from program_management.ddd.repositories import program_tree_version as program_tree_version_repository
 
 
 def get_unites_enseignement(
         cmd: 'GetUnitesEnseignementContenuesDansProgrammeCommand'
 ) -> 'UniteEnseignementDTO':
 
-    pgm_tree_version = program_tree_version_repository.ProgramTreeVersionRepository().get_by_code_year(
-        code=cmd.code_programme,
-        year=cmd.annee
+    tree_version_identity = identity_search.ProgramTreeVersionIdentitySearch(
+    ).get_from_node_identity(
+        NodeIdentity(
+            code=cmd.code_programme,
+            year=cmd.annee
+        )
     )
+    pgm_tree_version = tree_version_identity and program_tree_version_repository.ProgramTreeVersionRepository(
+    ).get(tree_version_identity)
+
     return GetUnitesEnseignementContenuesDansPgrm.build_unites_enseignement_contenues_dans_pgm(
         pgm_tree_version.get_tree().get_all_links()
     )

@@ -24,7 +24,9 @@
 ##############################################################################
 
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetContenuGroupementCommand
+from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.node import build_title
+from program_management.ddd.domain.service import identity_search
 from program_management.ddd.dtos import UniteEnseignementDTO, ContenuNoeudDTO
 from program_management.ddd.repositories import program_tree_version as program_tree_version_repository
 from program_management.ddd.repositories.program_tree_version import _get_credits
@@ -32,10 +34,17 @@ from program_management.ddd.repositories.program_tree_version import get_verbose
 
 
 def get_content_service(cmd: GetContenuGroupementCommand) -> ContenuNoeudDTO:
-    pgm_tree_version = program_tree_version_repository.ProgramTreeVersionRepository().get_by_code_year(
-        code=cmd.code_formation,
-        year=cmd.annee
+
+    tree_version_identity = identity_search.ProgramTreeVersionIdentitySearch(
+    ).get_from_node_identity(
+        NodeIdentity(
+            code=cmd.code_formation,
+            year=cmd.annee
+        )
     )
+    pgm_tree_version = tree_version_identity and program_tree_version_repository.ProgramTreeVersionRepository(
+    ).get(tree_version_identity)
+
     return _build_contenu_pgm(pgm_tree_version.get_tree().get_node_by_code_and_year(code=cmd.code, year=cmd.annee))
 
 
