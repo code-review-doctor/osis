@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import uuid
+
 import mock
 from django.contrib import messages
 from django.contrib.messages import get_messages
@@ -31,7 +33,10 @@ from django.test import TestCase
 from django.urls import reverse
 
 from base.tests.factories.program_manager import ProgramManagerFactory
-from ddd.logic.preparation_programme_annuel_etudiant.commands import GetContenuGroupementCommand
+from ddd.logic.preparation_programme_annuel_etudiant.commands import GetContenuGroupementCommand, \
+    SupprimerUEDuProgrammeCommand
+from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
+    IdentiteGroupementAjusteInscriptionCours
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import GroupementContenantDTO
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 
@@ -65,6 +70,8 @@ class TestSupprimerUnitesEnseignement(TestCase):
                 intitule_complet='ECGE1BA title',
                 elements_contenus=[]
             )
+        if isinstance(cmd, SupprimerUEDuProgrammeCommand):
+            return IdentiteGroupementAjusteInscriptionCours(uuid=uuid.uuid4())
         raise Exception('Bus Command not mocked in test')
 
     def test_assert_access_denied(self):
