@@ -27,6 +27,7 @@ from typing import List
 from django import forms
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from rules.contrib.views import LoginRequiredMixin
@@ -69,11 +70,23 @@ class AjouterUnitesEnseignementView(LoginRequiredMixin, HtmxMixin, TemplateView)
     template_name = "preparation_inscription/ajouter_unites_enseignement.html"
     htmx_template_name = "preparation_inscription/ajouter_unites_enseignement.html"
 
+    @cached_property
+    def code_programme(self):
+        return self.kwargs['code_programme']
+
+    @cached_property
+    def code_groupement(self):
+        return self.kwargs['code_groupement']
+
+    @cached_property
+    def annee(self):
+        return self.kwargs['annee']
+
     def get_search_form(self):
         return SearchLearningUnitForm(
             data=self.request.GET or None,
             initial={
-                'annee_academique': 2021
+                'annee_academique': self.annee
             }
         )
 
@@ -94,9 +107,9 @@ class AjouterUnitesEnseignementView(LoginRequiredMixin, HtmxMixin, TemplateView)
     def post(self, request, *args, **kwargs):
         selected_ues = request.POST.getlist('selected_ue')
         cmd = AjouterUEAuProgrammeCommand(
-            annee=self.kwargs['annee'],
-            code_programme=self.kwargs['code_programme'],
-            ajouter_dans=self.kwargs['code_groupement'],
+            annee=self.annee,
+            code_programme=self.code_programme,
+            ajouter_dans=self.code_groupement,
             unites_enseignements=selected_ues
         )
         try:
@@ -110,10 +123,10 @@ class AjouterUnitesEnseignementView(LoginRequiredMixin, HtmxMixin, TemplateView)
         return redirect(self.get_consulter_contenu_groupement_url())
 
     def get_intitule_groupement(self):
-        return self.kwargs['code_groupement']
+        return self.code_groupement
 
     def get_intitule_programme(self):
-        return self.kwargs['code_programme']
+        return self.code_programme
 
     def get_context_data(self, **kwargs):
         return {
@@ -123,17 +136,17 @@ class AjouterUnitesEnseignementView(LoginRequiredMixin, HtmxMixin, TemplateView)
             'intitule_groupement': self.get_intitule_groupement(),
             'intitule_programme': self.get_intitule_programme(),
             'cancel_url': self.get_consulter_contenu_groupement_url(),
-            'annee': self.kwargs['annee'],
-            'code_programme': self.kwargs['code_programme'],
-            'code_groupement': self.kwargs['code_groupement']
+            'annee': self.annee,
+            'code_programme': self.code_programme,
+            'code_groupement': self.code_groupement
         }
 
     def get_consulter_contenu_groupement_url(self):
         return reverse(
             'consulter_contenu_groupement_view',
             kwargs={
-                "annee": self.kwargs['annee'],
-                "code_programme": self.kwargs['code_programme'],
-                "code_groupement": self.kwargs['code_groupement']
+                "annee": self.annee,
+                "code_programme": self.code_programme,
+                "code_groupement": self.code_groupement
             }
         ) + "?{}=1".format(RAFRAICHIR_GROUPEMENT_CONTENANT)
