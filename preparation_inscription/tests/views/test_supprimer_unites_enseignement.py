@@ -31,6 +31,8 @@ from django.test import TestCase
 from django.urls import reverse
 
 from base.tests.factories.program_manager import ProgramManagerFactory
+from ddd.logic.preparation_programme_annuel_etudiant.commands import GetContenuGroupementCommand
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import GroupementContenantDTO
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 
 
@@ -49,14 +51,21 @@ class TestSupprimerUnitesEnseignement(TestCase):
         self.client.force_login(ProgramManagerFactory(
             education_group=self.education_group_year.education_group
         ).person.user)
-        self.__mock_get_contenu()
-
-    def __mock_get_contenu(self):
         get_contenu_patcher = mock.patch(
-            'infrastructure.messages_bus.get_contenu_groupement_service',
+            'preparation_inscription.views.supprimer_unites_enseignement.message_bus_instance.invoke',
+            side_effect=self.__mock_message_bus_invoke
         )
         get_contenu_patcher.start()
         self.addCleanup(get_contenu_patcher.stop)
+
+    def __mock_message_bus_invoke(self, cmd):
+        if isinstance(cmd, GetContenuGroupementCommand):
+            return GroupementContenantDTO(
+                intitule='ECGE1BA',
+                intitule_complet='ECGE1BA title',
+                elements_contenus=[]
+            )
+        raise Exception('Bus Command not mocked in test')
 
     def test_assert_access_denied(self):
         lambda_prgm_manager = ProgramManagerFactory()
