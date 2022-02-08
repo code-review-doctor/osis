@@ -22,6 +22,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from decimal import Decimal
 from typing import List, Optional, Union
 
 import attr
