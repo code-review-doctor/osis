@@ -85,7 +85,7 @@ class GetContenuGroupementServiceTest(SimpleTestCase):
 
         self.assertEqual(result, expected_result)
 
-    def test_should_retourner_contenu_du_groupement_si_groupement_contient_des_elements(self):
+    def test_should_retourner_contenu_sans_ajustement(self):
         cmd = GetContenuGroupementCommand(
             annee=2021,
             code="LECGE100R",
