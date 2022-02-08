@@ -38,7 +38,7 @@ def get_content_service(cmd: GetContenuGroupementCommand) -> ContenuNoeudDTO:
     tree_version_identity = identity_search.ProgramTreeVersionIdentitySearch(
     ).get_from_node_identity(
         NodeIdentity(
-            code=cmd.code_formation,
+            code=cmd.code_programme,
             year=cmd.annee
         )
     )

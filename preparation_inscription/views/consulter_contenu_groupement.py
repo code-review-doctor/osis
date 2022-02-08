@@ -69,9 +69,9 @@ class ConsulterContenuGroupementView(HtmxMixin, PermissionRequiredMixin, LoginRe
 
     def get_content(self):
         cmd = GetContenuGroupementCommand(
-            code_formation=self.code_programme,
+            code_programme=self.code_programme,
             annee=self.annee,
-            code= self.code_groupement or self.code_programme,
+            code=self.code_groupement or self.code_programme,
         )
 
         contenu_groupement_DTO = message_bus_instance.invoke(cmd)  # return ContenuGroupementDTO
