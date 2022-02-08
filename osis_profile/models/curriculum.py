@@ -23,6 +23,8 @@
 #  see http://www.gnu.org/licenses/.
 #
 # ##############################################################################
+import uuid
+
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.dispatch import receiver
@@ -65,6 +67,12 @@ class CurriculumYear(models.Model):
 
 class Experience(models.Model):
     # Common
+    uuid = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        unique=True,
+        db_index=True,
+    )
     curriculum_year = models.ForeignKey(
         CurriculumYear,
         on_delete=models.CASCADE,
