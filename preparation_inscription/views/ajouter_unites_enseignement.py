@@ -24,9 +24,9 @@
 ##############################################################################
 from typing import List
 
-from django import forms
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from rules.contrib.views import LoginRequiredMixin
@@ -37,43 +37,34 @@ from base.views.common import display_error_messages, display_success_messages
 from ddd.logic.learning_unit.commands import LearningUnitSearchCommand
 from ddd.logic.learning_unit.dtos import LearningUnitSearchDTO
 from ddd.logic.preparation_programme_annuel_etudiant.commands import AjouterUEAuProgrammeCommand
-from ddd.logic.shared_kernel.academic_year.commands import SearchAcademicYearCommand
-from education_group.forms.fields import UpperCaseCharField
 from infrastructure.messages_bus import message_bus_instance
+from preparation_inscription.forms.search_learning_units import SearchLearningUnitForm
 from preparation_inscription.views.consulter_contenu_groupement import RAFRAICHIR_GROUPEMENT_CONTENANT
-
-
-class SearchLearningUnitForm(forms.Form):
-    annee_academique = forms.ChoiceField(
-        label=_("Anac.").capitalize(),
-        required=False
-    )
-    code = UpperCaseCharField(max_length=15, label=_("Code").capitalize(), required=False)
-    intitule = forms.CharField(max_length=30, label=_("Title").capitalize(), required=False)
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.__init_academic_year_field()
-
-    def __init_academic_year_field(self):
-        all_academic_year = message_bus_instance.invoke(
-            SearchAcademicYearCommand()
-        )
-        self.fields['annee_academique'].choices = [(ac_year.year, str(ac_year)) for ac_year in all_academic_year]
 
 
 class AjouterUnitesEnseignementView(LoginRequiredMixin, HtmxMixin, TemplateView):
     name = 'ajouter_unites_enseignement_view'
 
-    # FormView
     template_name = "preparation_inscription/ajouter_unites_enseignement.html"
     htmx_template_name = "preparation_inscription/ajouter_unites_enseignement.html"
+
+    @cached_property
+    def code_programme(self):
+        return self.kwargs['code_programme']
+
+    @cached_property
+    def code_groupement(self):
+        return self.kwargs['code_groupement']
+
+    @cached_property
+    def annee(self):
+        return self.kwargs['annee']
 
     def get_search_form(self):
         return SearchLearningUnitForm(
             data=self.request.GET or None,
             initial={
-                'annee_academique': 2021
+                'annee_academique': self.annee
             }
         )
 
@@ -94,9 +85,9 @@ class AjouterUnitesEnseignementView(LoginRequiredMixin, HtmxMixin, TemplateView)
     def post(self, request, *args, **kwargs):
         selected_ues = request.POST.getlist('selected_ue')
         cmd = AjouterUEAuProgrammeCommand(
-            annee=self.kwargs['annee'],
-            code_programme=self.kwargs['code_programme'],
-            ajouter_dans='LECGE100R',
+            annee=self.annee,
+            code_programme=self.code_programme,
+            ajouter_dans=self.code_groupement,
             unites_enseignements=selected_ues
         )
         try:
@@ -110,12 +101,10 @@ class AjouterUnitesEnseignementView(LoginRequiredMixin, HtmxMixin, TemplateView)
         return redirect(self.get_consulter_contenu_groupement_url())
 
     def get_intitule_groupement(self):
-        # TODO :: to implement
-        return "Intitulé groupement"
+        return self.code_groupement
 
     def get_intitule_programme(self):
-        # TODO :: to implement
-        return "Intitulé programme"
+        return self.code_programme
 
     def get_context_data(self, **kwargs):
         return {
@@ -125,13 +114,17 @@ class AjouterUnitesEnseignementView(LoginRequiredMixin, HtmxMixin, TemplateView)
             'intitule_groupement': self.get_intitule_groupement(),
             'intitule_programme': self.get_intitule_programme(),
             'cancel_url': self.get_consulter_contenu_groupement_url(),
-            'annee': self.kwargs['annee'],
-            'code_programme': self.kwargs['code_programme']
+            'annee': self.annee,
+            'code_programme': self.code_programme,
+            'code_groupement': self.code_groupement
         }
 
     def get_consulter_contenu_groupement_url(self):
         return reverse(
             'consulter_contenu_groupement_view',
-            args=self.args,
-            kwargs=self.kwargs
+            kwargs={
+                "annee": self.annee,
+                "code_programme": self.code_programme,
+                "code_groupement": self.code_groupement
+            }
         ) + "?{}=1".format(RAFRAICHIR_GROUPEMENT_CONTENANT)

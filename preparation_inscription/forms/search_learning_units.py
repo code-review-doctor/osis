@@ -1,4 +1,3 @@
-##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -15,7 +14,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,17 +22,28 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from decimal import Decimal
-from django import template
+from django import forms
+from django.utils.translation import gettext_lazy as _
 
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import UniteEnseignementCatalogueDTO
+from ddd.logic.shared_kernel.academic_year.commands import SearchAcademicYearCommand
+from education_group.forms.fields import UpperCaseCharField
+from infrastructure.messages_bus import message_bus_instance
 
-register = template.Library()
 
+class SearchLearningUnitForm(forms.Form):
+    annee_academique = forms.ChoiceField(
+        label=_("Anac.").capitalize(),
+        required=False
+    )
+    code = UpperCaseCharField(max_length=15, label=_("Code").capitalize(), required=False)
+    intitule = forms.CharField(max_length=30, label=_("Title").capitalize(), required=False)
 
-@register.filter
-def formater_volumes_totaux(unite_catalogue_dto: 'UniteEnseignementCatalogueDTO') -> str:
-    return "%(total_lecturing)gh + %(total_practical)gh" % {
-        "total_lecturing": unite_catalogue_dto.volume_annuel_pm or Decimal(0.0),
-        "total_practical": unite_catalogue_dto.volume_annuel_pp or Decimal(0.0)
-    }
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.__init_academic_year_field()
+
+    def __init_academic_year_field(self):
+        all_academic_year = message_bus_instance.invoke(
+            SearchAcademicYearCommand()
+        )
+        self.fields['annee_academique'].choices = [(ac_year.year, str(ac_year)) for ac_year in all_academic_year]
