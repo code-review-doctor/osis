@@ -43,7 +43,7 @@ urlpatterns = [
              name=ConsulterContenuGroupementView.name),
         path('delete', SupprimerUnitesEnseignementView.as_view(), name=SupprimerUnitesEnseignementView.name),
         path('add', AjouterUnitesEnseignementView.as_view(), name=AjouterUnitesEnseignementView.name),
-        path('update', ModifierProprietesContenuView.as_view(), name=ModifierProprietesContenuView.name),
+        path('<str:code_groupement>/update', ModifierProprietesContenuView.as_view(), name=ModifierProprietesContenuView.name),
         path('tree/', ProgramTreeHTMLView.as_view(), name=ProgramTreeHTMLView.name),
         path(
             'formulaire_inscription/',
