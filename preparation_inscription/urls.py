@@ -32,6 +32,7 @@ from preparation_inscription.views.formulaire_inscription_cours import Formulair
 from preparation_inscription.views.liste_unites_enseignement import ListeUnitesEnseignementView
 from preparation_inscription.views.modification_contenu_groupement import ModifierProprietesContenuView
 from preparation_inscription.views.program_tree import ProgramTreeHTMLView
+from preparation_inscription.views.remettre_etat_initial import RemettreEtatInitialView
 from preparation_inscription.views.supprimer_unites_enseignement import SupprimerUnitesEnseignementView
 
 urlpatterns = [
@@ -54,6 +55,11 @@ urlpatterns = [
             FormulaireInscriptionCoursView.as_view(),
             name=FormulaireInscriptionCoursView.name
         ),
-        path('liste_unites_enseignement/', ListeUnitesEnseignementView.as_view(), name=ListeUnitesEnseignementView.name)
+        path(
+            'liste_unites_enseignement/',
+            ListeUnitesEnseignementView.as_view(),
+            name=ListeUnitesEnseignementView.name
+        ),
+        path('etat_initial/', RemettreEtatInitialView.as_view(), name=RemettreEtatInitialView.name)
     ])),
 ]

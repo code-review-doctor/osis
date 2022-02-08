@@ -125,3 +125,9 @@ class DeplacerVersLeBasUEAjouteeDansProgrammeCommand(interface.CommandRequest):
 class GetFormationCommand(interface.CommandRequest):
     annee: int
     code: str
+
+
+@attr.s(frozen=True, slots=True, auto_attribs=True)
+class RemettreProgrammeDansEtatInitialCommand(interface.CommandRequest):
+    code_programme: str
+    annee: int

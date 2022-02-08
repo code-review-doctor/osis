@@ -65,3 +65,7 @@ class IGroupementAjusteInscriptionCoursRepository(interface.AbstractRepository):
             program_tree_version_identity: ProgramTreeVersionIdentity
     ) -> List['GroupementAjusteFromRepositoryDTO']:
         pass
+
+    @classmethod
+    def bulk_delete(cls, entities: List['GroupementAjusteInscriptionCours']) -> None:
+        pass
