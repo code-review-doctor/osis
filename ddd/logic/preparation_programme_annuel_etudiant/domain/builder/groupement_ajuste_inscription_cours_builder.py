@@ -44,7 +44,10 @@ class GroupementAjusteInscriptionCoursBuilder(interface.RootEntityBuilder):
             repository: 'IGroupementAjusteInscriptionCoursRepository'
     ) -> 'GroupementAjusteInscriptionCours':
         return cls._build_from_group_identity(
-            code_programme=cmd.code_programme,
+            programme_identity=GroupIdentity(
+                code=cmd.code_programme,
+                year=cmd.annee
+            ),
             group_identity=GroupIdentity(
                 code=cmd.ajouter_dans,
                 year=cmd.annee,
@@ -59,7 +62,10 @@ class GroupementAjusteInscriptionCoursBuilder(interface.RootEntityBuilder):
             repository: 'IGroupementAjusteInscriptionCoursRepository'
     ) -> 'GroupementAjusteInscriptionCours':
         return cls._build_from_group_identity(
-            code_programme=cmd.code_programme,
+            programme_identity=GroupIdentity(
+                code=cmd.code_programme,
+                year=cmd.annee
+            ),
             group_identity=GroupIdentity(
                 code=cmd.retirer_de,
                 year=cmd.annee,
@@ -70,17 +76,17 @@ class GroupementAjusteInscriptionCoursBuilder(interface.RootEntityBuilder):
     @classmethod
     def _build_from_group_identity(
             cls,
-            code_programme: str,
+            programme_identity: 'GroupIdentity',
             group_identity: 'GroupIdentity',
             repository: 'IGroupementAjusteInscriptionCoursRepository'
     ):
-        groupements_ajustes = repository.search(code_programme=code_programme, groupement_id=group_identity)
+        groupements_ajustes = repository.search(programme_id=programme_identity, groupement_id=group_identity)
         if groupements_ajustes:
             return groupements_ajustes[0]
         return GroupementAjusteInscriptionCours(
             entity_id=IdentiteGroupementAjusteInscriptionCours(uuid=uuid.uuid4()),
             groupement_id=group_identity,
-            code_programme=code_programme,
+            programme_id=programme_identity,
             unites_enseignement_ajoutees=[],
             unites_enseignement_supprimees=[],
             unites_enseignement_modifiees=[],

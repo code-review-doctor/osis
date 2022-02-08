@@ -30,7 +30,7 @@
 {% csrf_token %}
 
 <div class="panel-heading">
-    <h5>{{ intitule_groupement }}</h5>
+    <h5>{{ intitule_groupement }} - {{ intitule_complet_groupement }}</h5>
 </div>
 
 <div class="panel-body">
@@ -40,6 +40,7 @@
         <th id="checkbox">
             <input id="id_check_all" type="checkbox" name="check_all" title="{% trans 'Check All' %}"/>
         </th>
+        <th></th>
         <th id="code_ue" class="code-col">{% trans 'Code' %}</th>
         <th id="intitule">{% trans 'Title' %}</th>
         <th id="volumes">{% trans 'Components (PM/PP)' %}</th>
@@ -65,12 +66,18 @@
                     <span class="text-info"><i class="fas fa-folder"></i></span>
                 {% elif element.ajoute %}
                     <span class="text-success"><i class="fas fa-folder-plus"></i></span>
-                {% else %}
-                    <span><i class="fas fa-folder"></i></span>
                 {% endif %}
-                <span class="emphasized-code">
-                    {{ element.code }}
-                </span>
+            </td>
+            <td headers="code" class="emphasized-code
+                {% if element.supprime %}
+                    text-danger
+                {% elif element.modifie %}
+                    text-info
+                {% elif element.ajoute %}
+                    text-success
+                {% endif %}
+            ">
+                {{ element.code }}{{ element.intitule }}
             </td>
             <td headers="intitule">
                 {{ element.intitule_complet }}
@@ -88,7 +95,7 @@
                 {{ element.credits }}
             </td>
             <td headers="session">
-                {{ element.session }}
+                {{ element.session_derogation }}
             </td>
             <td headers="obligatoire">
                 {{ element.obligatoire | yesno | title }}
@@ -100,6 +107,12 @@
                 {{ element.commentaire_en }}
             </td>
         </tr>
+        {% empty %}
+            <tr>
+                <td colspan="12" class="text-center">
+                    {% trans 'No deletable content' %}
+                </td>
+            </tr>
         {% endfor %}
     </tbody>
 </table>

@@ -63,21 +63,28 @@ class GetContenuGroupement(interface.DomainService):
         groupement_id = GroupIdentity(code=cmd.code, year=cmd.annee)
         try:
             groupement_ajuste = repo.search(code_programme=cmd.code_formation, groupement_id=groupement_id)[0]
-            unites_enseignement_ajoutes_dto = catalogue_unites_enseignement_translator.search(
-                entity_ids=groupement_ajuste.get_identites_unites_enseignement_ajoutees()
+            unites_enseignements_ajustees_dto = catalogue_unites_enseignement_translator.search(
+                entity_ids=groupement_ajuste.get_identites_unites_enseignement_ajustees()
             )
-            unites_enseignement_supprimees_dto = catalogue_unites_enseignement_translator.search(
-                entity_ids=groupement_ajuste.get_identites_unites_enseignement_supprimees()
-            )
+            unites_enseignement_ajoutees_dto = [
+                ue for ue in unites_enseignements_ajustees_dto if ue.code in [
+                    ue.code for ue in groupement_ajuste.get_identites_unites_enseignement_ajoutees()
+                ]
+            ]
+            unites_enseignement_supprimees_dto = [
+                ue for ue in unites_enseignements_ajustees_dto if ue.code in [
+                    ue.code for ue in groupement_ajuste.get_identites_unites_enseignement_supprimees()
+                ]
+            ]
         except IndexError:
             groupement_ajuste = None
-            unites_enseignement_ajoutes_dto = []
+            unites_enseignement_ajoutees_dto = []
             unites_enseignement_supprimees_dto = []
 
         return cls.__ajuster_contenu_groupement(
             contenu_groupement,
             groupement_ajuste,
-            unites_enseignement_ajoutes_dto,
+            unites_enseignement_ajoutees_dto,
             unites_enseignement_supprimees_dto
         )
 
@@ -92,23 +99,29 @@ class GetContenuGroupement(interface.DomainService):
         if not groupement_ajuste:
             return contenu_groupement
 
+        elements_ajoutes = [
+            cls.__convert_unite_enseignement_ajuste_to_element_contenu_dto(
+                unite_enseignement_ajoutee,
+                unites_enseignement_ajoutees_dto,
+                ajoute=True
+            ) for unite_enseignement_ajoutee in groupement_ajuste.unites_enseignement_ajoutees
+        ]
+
+        elements_supprimes = [
+            cls.__convert_unite_enseignement_ajuste_to_element_contenu_dto(
+                unite_enseignement_supprimee,
+                unites_enseignement_supprimees_dto,
+                supprime=True
+            ) for unite_enseignement_supprimee in groupement_ajuste.unites_enseignement_supprimees
+        ]
+
+        elements_non_ajustes = [
+            el for el in contenu_groupement.elements_contenus if el.code not in [el.code for el in elements_supprimes]
+        ]
+
         return attr.evolve(
             contenu_groupement,
-            elements_contenus=contenu_groupement.elements_contenus + [
-                cls.__convert_unite_enseignement_ajuste_to_element_contenu_dto(
-                    unite_enseignement_ajoutee,
-                    unites_enseignement_ajoutees_dto,
-                    ajoute=True
-                )
-                for unite_enseignement_ajoutee in groupement_ajuste.unites_enseignement_ajoutees
-            ] + [
-                cls.__convert_unite_enseignement_ajuste_to_element_contenu_dto(
-                    unite_enseignement_supprimee,
-                    unites_enseignement_supprimees_dto,
-                    supprime=True
-                )
-                for unite_enseignement_supprimee in groupement_ajuste.unites_enseignement_supprimees
-            ]
+            elements_contenus=elements_ajoutes + elements_supprimes + elements_non_ajustes
         )
 
     @classmethod
@@ -144,9 +157,9 @@ class GetContenuGroupement(interface.DomainService):
         )
 
 
-def _get_credits(credits_relatifs: int, credits_absolus: Decimal) -> str:
+def _get_credits(credits_relatifs, credits_absolus: Decimal) -> str:
     if credits_relatifs:
         if credits_relatifs != credits_absolus:
             return "{}({})".format(credits_relatifs, get_chiffres_significatifs(credits_absolus))
-        return "{}".format(credits_relatifs)
+        return "{}".format(get_chiffres_significatifs(credits_relatifs))
     return get_chiffres_significatifs(credits_absolus)

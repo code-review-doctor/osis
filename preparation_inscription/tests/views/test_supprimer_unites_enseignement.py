@@ -41,13 +41,22 @@ class TestSupprimerUnitesEnseignement(TestCase):
         cls.education_group_year = EducationGroupVersionFactory().offer
         cls.url = reverse('supprimer_unites_enseignement_view', kwargs={
             'annee': cls.education_group_year.academic_year.year,
-            'code_programme': cls.education_group_year.partial_acronym
+            'code_programme': cls.education_group_year.partial_acronym,
+            'code_groupement': cls.education_group_year.partial_acronym
         })
 
     def setUp(self) -> None:
         self.client.force_login(ProgramManagerFactory(
             education_group=self.education_group_year.education_group
         ).person.user)
+        self.__mock_get_contenu()
+
+    def __mock_get_contenu(self):
+        get_contenu_patcher = mock.patch(
+            'infrastructure.messages_bus.get_contenu_groupement_service',
+        )
+        get_contenu_patcher.start()
+        self.addCleanup(get_contenu_patcher.stop)
 
     def test_assert_access_denied(self):
         lambda_prgm_manager = ProgramManagerFactory()

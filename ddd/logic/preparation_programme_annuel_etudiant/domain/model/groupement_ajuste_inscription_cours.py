@@ -56,7 +56,7 @@ class IdentiteGroupementAjusteInscriptionCours(interface.EntityIdentity):
 class GroupementAjusteInscriptionCours(interface.RootEntity):
     entity_id: IdentiteGroupementAjusteInscriptionCours
     groupement_id: 'GroupIdentity'
-    code_programme: 'CodeProgramme'
+    programme_id: 'GroupIdentity'
     unites_enseignement_ajoutees: List['UniteEnseignementAjoutee']
     unites_enseignement_supprimees: List['UniteEnseignementSupprimee']
     unites_enseignement_modifiees: List['UniteEnseignementModifiee']
@@ -70,6 +70,9 @@ class GroupementAjusteInscriptionCours(interface.RootEntity):
 
     def get_identites_unites_enseignement_supprimees(self) -> List['LearningUnitIdentity']:
         return [ue.unite_enseignement_identity for ue in self.unites_enseignement_supprimees]
+
+    def get_identites_unites_enseignement_ajustees(self) -> List['LearningUnitIdentity']:
+        return self.get_identites_unites_enseignement_ajoutees() + self.get_identites_unites_enseignement_supprimees()
 
     def ajouter_unites_enseignements(
             self,
