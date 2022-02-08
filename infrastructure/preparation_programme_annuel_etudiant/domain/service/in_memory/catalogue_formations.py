@@ -637,5 +637,5 @@ class CatalogueFormationsTranslatorInMemory(ICatalogueFormationsTranslator):
         raise NotImplementedError()
 
     @classmethod
-    def get_contenu_groupement(cls, cmd: GetContenuGroupementCommand) -> 'GroupementContenantDTO':
+    def get_contenu_groupement(cls, code_formation: str, code: str, annee: int) -> 'GroupementContenantDTO':
         raise NotImplementedError()

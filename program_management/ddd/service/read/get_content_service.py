@@ -32,10 +32,10 @@ from program_management.ddd.repositories.program_tree_version import get_verbose
 
 
 def get_content_service(cmd: GetContenuGroupementCommand) -> ContenuNoeudDTO:
-    pgm_tree_version = program_tree_version_repository.ProgramTreeVersionRepository().search(
+    pgm_tree_version = program_tree_version_repository.ProgramTreeVersionRepository().get_by_code_year(
         code=cmd.code_formation,
         year=cmd.annee
-    )[0]
+    )
     return _build_contenu_pgm(pgm_tree_version.get_tree().get_node_by_code_and_year(code=cmd.code, year=cmd.annee))
 
 

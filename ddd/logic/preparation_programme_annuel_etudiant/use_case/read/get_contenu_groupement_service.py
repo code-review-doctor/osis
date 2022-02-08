@@ -31,4 +31,4 @@ def get_contenu_groupement_service(
         cmd: 'GetContenuGroupementCommand',
         translator: 'CatalogueFormationsTranslator',
 ) -> 'GroupementContenantDTO':
-    return translator.get_contenu_groupement(cmd)
+    return translator.get_contenu_groupement(code_formation=cmd.code_formation, code=cmd.code, annee=cmd.annee)

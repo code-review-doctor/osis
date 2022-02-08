@@ -57,12 +57,12 @@ class CatalogueFormationsTranslator(ICatalogueFormationsTranslator):
         raise FormationIntrouvableException(code_programme=code_programme, annee=annee)
 
     @classmethod
-    def get_contenu_groupement(cls, cmd: 'GetContenuGroupementCommand') -> GroupementContenantDTO:
+    def get_contenu_groupement(cls, code_formation: str, code: str, annee: int) -> GroupementContenantDTO:
         from infrastructure.messages_bus import message_bus_instance
         cmd = GetContenuGroupementCatalogueCommand(
-            code_formation=cmd.code_formation,
-            code=cmd.code,
-            annee=cmd.annee,
+            code_formation=code_formation,
+            code=code,
+            annee=annee,
         )
         contenu_noeud_DTO = message_bus_instance.invoke(
             cmd
@@ -74,11 +74,11 @@ class CatalogueFormationsTranslator(ICatalogueFormationsTranslator):
         )
 
     @classmethod
-    def get_unites_enseignement(cls, code: str, annee: int) -> List['ElementContenuDTO']:
+    def get_unites_enseignement(cls, code_programme: str, annee: int) -> List['ElementContenuDTO']:
         from infrastructure.messages_bus import message_bus_instance
 
         cmd = GetUnitesEnseignementContenuesDansProgrammeCommand(
-            code_programme=code,
+            code_programme=code_programme,
             annee=annee,
         )
         liste_unites_contenues_dto = message_bus_instance.invoke(

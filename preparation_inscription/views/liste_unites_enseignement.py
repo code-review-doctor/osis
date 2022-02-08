@@ -48,7 +48,7 @@ class ListeUnitesEnseignementView(HtmxMixin, LoginRequiredMixin, TemplateView):
         }
 
     def get_content(self) -> List['UniteEnseignementDTO']:
-        cmd = GetUnitesEnseignementContenuesCommand(code=self.code_programme, annee=self.annee)
+        cmd = GetUnitesEnseignementContenuesCommand(code_programme=self.code_programme, annee=self.annee)
         return message_bus_instance.invoke(cmd)
 
     @cached_property

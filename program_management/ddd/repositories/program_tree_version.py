@@ -271,6 +271,10 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
             return build_dto(pgm_tree_version[0], pgm_tree_version[0].entity_identity)
         raise ProgramTreeVersionNotFoundException
 
+    @classmethod
+    def get_by_code_year(cls, code: str = None, year: int = None) -> 'ProgramTreeVersion':
+        return cls.search(code=code, year=year)[0]
+
 
 def _update_start_year_and_end_year(
         educ_group_version: EducationGroupVersion,

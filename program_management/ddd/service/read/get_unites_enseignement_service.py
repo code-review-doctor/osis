@@ -36,11 +36,10 @@ def get_unites_enseignement(
         cmd: 'GetUnitesEnseignementContenuesDansProgrammeCommand'
 ) -> 'UniteEnseignementDTO':
 
-    pgm_tree_version = program_tree_version_repository.ProgramTreeVersionRepository().search(
+    pgm_tree_version = program_tree_version_repository.ProgramTreeVersionRepository().get_by_code_year(
         code=cmd.code_programme,
         year=cmd.annee
-    )[0]
+    )
     return GetUnitesEnseignementContenuesDansPgrm.build_unites_enseignement_contenues_dans_pgm(
         pgm_tree_version.get_tree().get_all_links()
-
     )
