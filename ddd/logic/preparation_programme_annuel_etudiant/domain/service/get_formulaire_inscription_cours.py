@@ -65,7 +65,7 @@ class GetFormulaireInscriptionCours(interface.DomainService):
             racine=cls.__build_contenu_formulaire_inscription_cours_dto([formation.racine])[0]
         )
 
-        groupements_ajustes = repo.search(code_programme=cmd.code_programme)
+        groupements_ajustes = repo.search(programme_id=GroupIdentity(code=cmd.code_programme, year=cmd.annee))
         unite_enseignements_ajoutes_dto = cls.rechercher_unites_enseignement_ajoutees_catalogue_dto(
             groupements_ajustes,
             catalogue_unites_enseignement_translator

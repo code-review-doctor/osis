@@ -1,4 +1,5 @@
 {% load static i18n bootstrap3 %}
+{% load formatage_credits formatage_volumes %}
 
 {% comment "License" %}
  * OSIS stands for Open Student Information System. It's an application
@@ -87,7 +88,7 @@
                 {{ element.intitule_complet }}
             </td>
             <td headers="volumes">
-                {{ element.volumes }}
+                {% formater_volumes element.volume_annuel_pm element.volume_annuel_pp %}
             </td>
             <td headers="bloc">
                 {% if element.type_ajustement == 'MODIFICATION' %}
@@ -100,7 +101,7 @@
                 {{ element.quadrimestre_texte }}
             </td>
             <td headers="credits">
-                {{ element.credits }}
+                {% formater_credits_ue element.credits_relatifs element.credits_absolus %}
             </td>
             <td headers="session">
                 {{ element.session_derogation }}
@@ -171,6 +172,8 @@
 
 {% if rafraichir_groupement_contenant %}
     <script>
-        $('#tree').trigger('refreshNode', '{{ code_groupement_racine }}');
+        document.addEventListener('htmx:afterSettle', function(event){
+            $('#tree').trigger('refreshNode', '{{ code_programme }}');
+        })
     </script>
 {% endif %}

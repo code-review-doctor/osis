@@ -31,6 +31,7 @@ from django.views.generic import TemplateView
 from base.models.utils.utils import ChoiceEnum
 from base.utils.htmx import HtmxMixin
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetContenuGroupementCommand
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import GroupementContenantDTO
 from infrastructure.messages_bus import message_bus_instance
 
 
@@ -72,7 +73,7 @@ class ConsulterContenuGroupementView(HtmxMixin, PermissionRequiredMixin, LoginRe
             code=self.kwargs.get('code_groupement', self.kwargs['code_programme']),
         )
 
-        contenu_groupement_DTO = message_bus_instance.invoke(cmd)  # return ContenuGroupementDTO
+        contenu_groupement_DTO = message_bus_instance.invoke(cmd)  # type: GroupementContenantDTO
         return {
             'search_result': contenu_groupement_DTO.elements_contenus,
             'intitule_groupement':

@@ -60,9 +60,11 @@ class GetContenuGroupement(interface.DomainService):
 
         contenu_groupement = catalogue_formations_translator.get_contenu_groupement(cmd=cmd)
 
-        groupement_id = GroupIdentity(code=cmd.code, year=cmd.annee)
         try:
-            groupement_ajuste = repo.search(code_programme=cmd.code_formation, groupement_id=groupement_id)[0]
+            groupement_ajuste = repo.search(
+                programme_id=GroupIdentity(code=cmd.code_formation, year=cmd.annee),
+                groupement_id=GroupIdentity(code=cmd.code, year=cmd.annee)
+            )[0]
             unites_enseignements_ajustees_dto = catalogue_unites_enseignement_translator.search(
                 entity_ids=groupement_ajuste.get_identites_unites_enseignement_ajustees()
             )
@@ -140,18 +142,12 @@ class GetContenuGroupement(interface.DomainService):
             obligatoire=unite_enseignement_dto_correspondant.obligatoire,
             bloc=str(unite_enseignement_dto_correspondant.bloc),
             session_derogation=unite_enseignement_dto_correspondant.session_derogation,
-            credits=_get_credits(
-                unite_enseignement_dto_correspondant.credits_relatifs,
-                unite_enseignement_dto_correspondant.credits_absolus
-            ),
             intitule_complet=unite_enseignement_dto_correspondant.intitule_complet,
             quadrimestre_texte=unite_enseignement_dto_correspondant.quadrimestre_texte,
-            volumes='{}{}{}'.format(
-                unite_enseignement_dto_correspondant.volume_annuel_pm or '',
-                '+' if unite_enseignement_dto_correspondant.volume_annuel_pm
-                    and unite_enseignement_dto_correspondant.volume_annuel_pp else '',
-                unite_enseignement_dto_correspondant.volume_annuel_pp or ''
-            ),
+            credits_absolus=unite_enseignement_dto_correspondant.credits_absolus,
+            credits_relatifs=unite_enseignement_dto_correspondant.credits_relatifs,
+            volume_annuel_pm=unite_enseignement_dto_correspondant.volume_annuel_pm,
+            volume_annuel_pp=unite_enseignement_dto_correspondant.volume_annuel_pp,
             ajoute=ajoute,
             supprime=supprime
         )
