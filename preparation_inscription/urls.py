@@ -40,7 +40,11 @@ urlpatterns = [
         path('detail', ConsulterContenuGroupementView.as_view(), name=ConsulterContenuGroupementView.name),
         path('<str:code_groupement>/detail', ConsulterContenuGroupementView.as_view(),
              name=ConsulterContenuGroupementView.name),
-        path('delete', SupprimerUnitesEnseignementView.as_view(), name=SupprimerUnitesEnseignementView.name),
+        path(
+            'delete/<str:code_groupement>',
+            SupprimerUnitesEnseignementView.as_view(),
+            name=SupprimerUnitesEnseignementView.name
+        ),
         path(
             'add/<str:code_groupement>',
             AjouterUnitesEnseignementView.as_view(),

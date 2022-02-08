@@ -23,18 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.utils.translation import gettext_lazy as _
 from decimal import Decimal
 from typing import List, Union
+
 import attr
+from django.utils.translation import gettext_lazy as _
 
 from base.models.utils.utils import ChoiceEnum
 from osis_common.ddd.interface import DTO
 
 
 class ElementType(ChoiceEnum):
-    UNITE_ENSEIGNEMENT = _("Unite enseignement")
-    GROUPEMENT = _("Groupement")
+    UNITE_ENSEIGNEMENT = _("Learning unit")
+    GROUPEMENT = _("Group")
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-03 14:50+0100\n"
+"POT-Creation-Date: 2022-02-08 15:06+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,9 +20,6 @@ msgstr ""
 msgid "ADDITION"
 msgstr ""
 
-msgid "AJOUT"
-msgstr ""
-
 msgid "Actions"
 msgstr ""
 
@@ -32,14 +29,11 @@ msgstr ""
 msgid "Add learning units"
 msgstr ""
 
-msgid "Ajout"
+msgid "Addition"
 msgstr ""
 
 msgid "Anac."
 msgstr "Anac."
-
-msgid "Bloc"
-msgstr ""
 
 msgid "Block"
 msgstr ""
@@ -74,22 +68,10 @@ msgstr ""
 msgid "Comment"
 msgstr ""
 
-msgid "Commentaire"
-msgstr ""
-
-msgid "Commentaire en anglais"
-msgstr ""
-
 msgid "Components (PM/PP)"
 msgstr ""
 
-msgid "Composants (PM/PP)"
-msgstr ""
-
 msgid "Credits"
-msgstr ""
-
-msgid "Crédits"
 msgstr ""
 
 msgid "DELETION"
@@ -101,6 +83,9 @@ msgstr ""
 msgid "Delete learning units"
 msgstr ""
 
+msgid "Derogation's session"
+msgstr ""
+
 msgid "Do not cancel"
 msgstr ""
 
@@ -110,19 +95,16 @@ msgstr ""
 msgid "Edit properties"
 msgstr ""
 
+msgid "Edition"
+msgstr ""
+
 msgid "English comment"
 msgstr ""
 
-msgid "Intitulé"
-msgstr ""
-
-msgid "MODIFICATION"
+msgid "Main sort"
 msgstr ""
 
 msgid "Mandatory"
-msgstr ""
-
-msgid "Modification"
 msgstr ""
 
 msgid "Move downwards"
@@ -131,7 +113,7 @@ msgstr ""
 msgid "Move upwards"
 msgstr ""
 
-msgid "Obligatoire"
+msgid "No deletable content"
 msgstr ""
 
 msgid "PAE preparation"
@@ -146,16 +128,28 @@ msgstr ""
 msgid "Reset to initial program state"
 msgstr ""
 
-msgid "SUPPRESSION"
-msgstr ""
-
 msgid "Save"
 msgstr ""
 
 msgid "Search"
 msgstr ""
 
+msgid "Secondary sort"
+msgstr ""
+
 msgid "Session"
+msgstr ""
+
+msgid "Sort by block"
+msgstr ""
+
+msgid "Sort by code"
+msgstr ""
+
+msgid "Sort by program order"
+msgstr ""
+
+msgid "Sort by quadrimester"
 msgstr ""
 
 msgid "Suppression"
@@ -179,42 +173,24 @@ msgstr ""
 msgid "Title"
 msgstr ""
 
-msgid "Tri par bloc"
-msgstr ""
-
-msgid "Tri par code"
-msgstr ""
-
-msgid "Tri par ordre du programme"
-msgstr ""
-
-msgid "Tri par quadrimestre"
-msgstr ""
-
-msgid "Tri principal"
-msgstr ""
-
-msgid "Tri secondaire"
-msgstr ""
-
 msgctxt "student_path_year"
 msgid "Year"
 msgstr ""
 
-msgid "champs1"
-msgstr ""
-
-msgid "champs2"
-msgstr ""
-
-msgid "champs3"
-msgstr ""
-
-msgid "champs4"
-msgstr ""
-
-msgid "champs5"
-msgstr ""
-
 msgid "credits"
+msgstr ""
+
+msgid "field1"
+msgstr ""
+
+msgid "field2"
+msgstr ""
+
+msgid "field3"
+msgstr ""
+
+msgid "field4"
+msgstr ""
+
+msgid "field5"
 msgstr ""

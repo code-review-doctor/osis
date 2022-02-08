@@ -35,7 +35,7 @@
             <ul class="dropdown-menu pull-right" aria-labelledby="btn-action-down">
                 <li><a href="" hx-get="{% url 'ajouter_unites_enseignement_view' annee code_programme code_groupement%}"
                        hx-target="#content-of-main-panel" hx-trigger="click">{% trans "Add learning units" %}</a></li>
-                <li><a href="" hx-get="{% url 'supprimer_unites_enseignement_view' annee code_programme %}"
+                <li><a href="" hx-get="{% url 'supprimer_unites_enseignement_view' annee code_programme code_groupement %}"
                        hx-target="#content-of-main-panel" hx-trigger="click">{% trans "Delete learning units" %}</a></li>
                 <li><a href="" hx-get="{% url 'modifier_proprietes_contenu_view' annee code_programme %}"
                        hx-target="#content-of-main-panel" hx-trigger="click">{% trans "Edit properties" %}</a>
@@ -49,16 +49,15 @@
     <table id="table_search_list" class="table table-hover">
         <thead>
         <tr>
-            <th id="code_ue" class="code-col">{% trans 'Code' %}</th>
+        <th></th>
+        <th id="code" class="code-col">{% trans 'Code' %}</th>
         <th id="intitule">{% trans 'Title' %}</th>
         <th id="volumes">{% trans 'Components (PM/PP)' %}</th>
         <th id="bloc">{% trans 'Block' %}</th>
         <th id="quadri">{% trans 'Quadri.' %}</th>
         <th id="credits">{% trans 'Credits' %}</th>
-        <th id="session">{% trans 'Session' %}</th>
+        <th id="session">{% trans "Derogation's session" %}</th>
         <th id="obligatoire">{% trans 'Mandatory' %}</th>
-        <th id="commentaire_fr">{% trans 'Comment' %}</th>
-        <th id="commentaire_en">{% trans 'English comment' %}</th>
         <th id="action" class="actions-col"></th>
     </tr>
     </thead>
@@ -74,7 +73,15 @@
                     <span class="text-success"><i class="fas fa-folder-plus"></i></span>
                 {% endif %}
             </td>
-            <td headers="code">
+            <td headers="code" class="emphasized-code
+                {% if element.supprime %}
+                    text-danger
+                {% elif element.modifie %}
+                    text-info
+                {% elif element.ajoute %}
+                    text-success
+                {% endif %}
+            ">
                 {{ element.code }}{{ element.intitule }}
             </td>
             <td headers="intitule">

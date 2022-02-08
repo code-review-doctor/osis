@@ -1,6 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
 from django.views.generic import TemplateView
 
@@ -8,11 +9,10 @@ from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.utils.htmx import HtmxMixin
 from base.views.common import display_success_messages, display_error_messages
 from ddd.logic.preparation_programme_annuel_etudiant.commands import SupprimerUEDuProgrammeCommand, \
-    GetUniteEnseignementCommand
+    GetUniteEnseignementCommand, GetContenuGroupementCommand
 from education_group.models.group_year import GroupYear
 from infrastructure.messages_bus import message_bus_instance
 from osis_role.contrib.views import PermissionRequiredMixin
-from preparation_inscription.views.consulter_contenu_groupement import TypeAjustement
 
 
 class SupprimerUnitesEnseignementView(PermissionRequiredMixin, LoginRequiredMixin, HtmxMixin, TemplateView):
@@ -21,96 +21,49 @@ class SupprimerUnitesEnseignementView(PermissionRequiredMixin, LoginRequiredMixi
     template_name = "preparation_inscription/supprimer_unites_enseignement.html"
     htmx_template_name = "preparation_inscription/supprimer_unites_enseignement.html"
 
+    @cached_property
+    def code_groupement(self):
+        return self.kwargs.get('code_groupement', self.code_programme)
+
+    @cached_property
+    def code_programme(self):
+        return self.kwargs['code_programme']
+
+    @cached_property
+    def annee(self):
+        return self.kwargs['annee']
+
+    @cached_property
+    def contenu(self):
+        return message_bus_instance.invoke(
+            GetContenuGroupementCommand(
+                code_formation=self.code_programme,
+                annee=self.annee,
+                code=self.code_groupement,
+            )
+        )
+
+    @cached_property
+    def intitule_groupement(self):
+        return self.contenu.intitule
+
+    @cached_property
+    def intitule_programme(self):
+        return self.contenu.intitule_complet
+
     def get_context_data(self, **kwargs):
         return {
             **super().get_context_data(**kwargs),
-            'deletable_content': self.get_content(),
-            'intitule_groupement': self.get_intitule_groupement(),
-            'intitule_programme': self.get_intitule_programme(),
-            'annee': self.kwargs['annee'],
-            'code_programme': self.kwargs['code_programme'],
-            'consulter_contenu_groupement_url': self.get_consulter_contenu_groupement_url()
+            'deletable_content': self.get_deletable_content(),
+            'intitule_groupement': self.intitule_groupement,
+            'intitule_complet_groupement': self.intitule_programme,
+            'annee': self.annee,
+            'code_programme': self.code_programme,
+            'code_groupement': self.code_groupement
         }
 
     def get_deletable_content(self):
-        return [ue for ue in self.get_content() if ue['type_ajustement'] != TypeAjustement.SUPPRESSION.name]
-
-    def get_content(self):
-        return [
-            {
-                'code_ue': 'LESPO1113',
-                'intitule': 'Sociologie...',
-                'volumes': '10',
-                'bloc': '1',
-                'quadri': 'Q1',
-                'credits': '5/5',
-                'session': 'Oui',
-                'obligatoire': '',
-                'commentaire_fr': '',
-                'commentaire_en': '',
-                'type_ajustement': TypeAjustement.SUPPRESSION.name,
-            },
-            {
-                'code_ue': 'LESPO1321',
-                'intitule': 'Economic...',
-                'volumes': '15+10',
-                'bloc': '1',
-                'quadri': 'Q1',
-                'credits': '4/5',
-                'session': 'Oui',
-                'obligatoire': '',
-                'commentaire_fr': '',
-                'commentaire_en': '',
-                'type_ajustement': TypeAjustement.SUPPRESSION.name,
-            },
-            {
-                'code_ue': 'LESPO1114',
-                'intitule': 'Political...',
-                'volumes': '30',
-                'bloc': '2',
-                'quadri': 'Q1',
-                'credits': '5/5',
-                'session': 'Oui',
-                'obligatoire': '',
-                'commentaire_fr': '',
-                'commentaire_en': '',
-                'type_ajustement': TypeAjustement.MODIFICATION.name,
-            },
-            {
-                'code_ue': 'LINGE1122',
-                'intitule': 'Physique...',
-                'volumes': '30',
-                'bloc': '1',
-                'quadri': 'Q2',
-                'credits': '3/3',
-                'session': 'Oui',
-                'obligatoire': '',
-                'commentaire_fr': '',
-                'commentaire_en': '',
-                'type_ajustement': TypeAjustement.AJOUT.name,
-            },
-            {
-                'code_ue': 'LINGE1125',
-                'intitule': 'Séminaire...',
-                'volumes': '25',
-                'bloc': '1',
-                'quadri': 'Q2',
-                'credits': '5/5',
-                'session': 'Oui',
-                'obligatoire': '',
-                'commentaire_fr': '',
-                'commentaire_en': '',
-                'type_ajustement': TypeAjustement.AJOUT.name,
-            },
-        ]
-
-    def get_intitule_groupement(self):
-        # TODO :: to implement
-        return "Intitulé groupement"
-
-    def get_intitule_programme(self):
-        # TODO :: to implement
-        return "Intitulé programme"
+        return [ue for ue in self.contenu.elements_contenus if not ue.supprime]
 
     def post(self, request, *args, **kwargs):
         to_delete = request.POST.getlist('to_delete')
@@ -129,7 +82,7 @@ class SupprimerUnitesEnseignementView(PermissionRequiredMixin, LoginRequiredMixi
         return SupprimerUEDuProgrammeCommand(
             code_programme=self.kwargs['code_programme'],
             annee=self.kwargs['annee'],
-            retirer_de='LECGE900R',
+            retirer_de=self.kwargs['code_groupement'],
             unites_enseignements=[GetUniteEnseignementCommand(code=code) for code in to_delete]
         )
 

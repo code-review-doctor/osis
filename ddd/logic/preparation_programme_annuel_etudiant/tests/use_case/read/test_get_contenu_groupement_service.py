@@ -133,18 +133,6 @@ class GetContenuGroupementServiceTest(SimpleTestCase):
             intitule_complet="Formation pluridisciplinaire en sciences humaines",
             elements_contenus=[
                 ElementContenuDTO(
-                    bloc="3",
-                    code='LESPO1321',
-                    intitule_complet='Economic, Political and Social Ethics',
-                    quadrimestre_texte='Q2',
-                    credits_absolus=Decimal(3),
-                    credits_relatifs=None,
-                    volume_annuel_pm=30,
-                    volume_annuel_pp=0,
-                    obligatoire=True,
-                    session_derogation='',
-                ),
-                ElementContenuDTO(
                     bloc="1",
                     code='LSINF1311',
                     intitule_complet='Human-computer interaction',
@@ -156,6 +144,18 @@ class GetContenuGroupementServiceTest(SimpleTestCase):
                     obligatoire=True,
                     session_derogation='',
                     ajoute=True
+                ),
+                ElementContenuDTO(
+                    bloc="3",
+                    code='LESPO1321',
+                    intitule_complet='Economic, Political and Social Ethics',
+                    quadrimestre_texte='Q2',
+                    credits_absolus=Decimal(3),
+                    credits_relatifs=None,
+                    volume_annuel_pm=30,
+                    volume_annuel_pp=0,
+                    obligatoire=True,
+                    session_derogation='',
                 )
             ]
         )
