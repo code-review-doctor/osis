@@ -182,8 +182,8 @@ from ddd.logic.preparation_programme_annuel_etudiant.use_case.read.get_programme
     get_programme_inscription_cours
 from ddd.logic.preparation_programme_annuel_etudiant.use_case.write.ajouter_UE_au_programme_service import \
     ajouter_UE_au_programme
-from ddd.logic.preparation_programme_annuel_etudiant.use_case.write.remettre_programme_dans_etat_initial_service import \
-    remettre_programme_dans_etat_initial
+from ddd.logic.preparation_programme_annuel_etudiant.use_case.write.remettre_programme_dans_etat_initial_service \
+    import remettre_programme_dans_etat_initial
 from ddd.logic.shared_kernel.academic_year.commands import SearchAcademicYearCommand
 from ddd.logic.shared_kernel.academic_year.use_case.read.search_academic_years_service import search_academic_years
 from ddd.logic.shared_kernel.campus.commands import GetCampusCommand, SearchUclouvainCampusesCommand
