@@ -1,0 +1,117 @@
+{% load static i18n bootstrap3 %}
+
+{% comment "License" %}
+ * OSIS stands for Open Student Information System. It's an application
+ * designed to manage the core business of higher education institutions,
+ * such as universities, faculties, institutes and professional schools.
+ * The core business involves the administration of students, teachers,
+ * courses, programs and so on.
+ *
+ * Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * A copy of this license - GNU General Public License - is available
+ * at the root of the source code of this program.  If not,
+    * see http://www.gnu.org/licenses/.
+{% endcomment %}
+<div class="panel-heading">
+    <div class="pull-right">
+        <div class="dropdown">
+            <button class="btn btn-default dropdown-toggle" type="button" id="btn-action-down" data-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="true">
+                <span class="fa fa-cog" aria-hidden="true"></span> {% trans 'Actions' %}
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu pull-right" aria-labelledby="btn-action-down">
+                <li><a href="" hx-get="{% url 'ajouter_unites_enseignement_view' annee code_programme %}"
+                       hx-target="#content-of-main-panel" hx-trigger="click">{% trans "Ajouter des UE" %}</a></li>
+                <li><a href="" hx-get="{% url 'supprimer_unites_enseignement_view' annee code_programme %}"
+                       hx-target="#content-of-main-panel" hx-trigger="click">{% trans "Supprimer des UE" %}</a></li>
+                <li class="divider"></li>
+                <li><a href="" hx-get="{% url 'ajouter-groupements-view' %}" hx-target="#content-of-main-panel" hx-trigger="click">
+                    {% trans "Ajouter des groupements" %}</a></li>
+                <li class="divider"></li>
+                <li><a href="" hx-get="{% url 'modifier_proprietes_contenu_view' annee code_programme %}"
+                       hx-target="#content-of-main-panel" hx-trigger="click">{% trans "Modifier les propriétés" %}</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <h5>{{ intitule_groupement }} - {{ intitule_complet_groupement }}</h5>
+</div>
+<div class="panel-body">
+    <table id="table_search_list" class="table table-hover">
+        <thead>
+        <tr>
+            <th id="code" class="code-col">{% trans 'Code' %}</th>
+        <th id="intitule">{% trans 'Intitulé' %}</th>
+        <th id="volumes">{% trans 'Composants (PM+PP)' %}</th>
+        <th id="bloc">{% trans 'Bloc' %}</th>
+        <th id="quadri">{% trans 'Quadri.' %}</th>
+        <th id="credits">{% trans 'Crédits' %}</th>
+        <th id="session">{% trans "Derogation's session" %}</th>
+        <th id="obligatoire">{% trans 'Obligatoire' %}</th>
+        <th id="action" class="actions-col"></th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for element in search_result %}
+        <tr>
+            <td headers="code">
+                {{ element.code }}{{ element.intitule }}
+            </td>
+            <td headers="intitule">
+                {{ element.intitule_complet }}
+            </td>
+            <td headers="volumes">
+                {{ element.volumes }}
+            </td>
+            <td headers="bloc">
+                {% if element.type_ajustement == 'MODIFICATION' %}
+                    <b class="text-info" style="font-weight: bolder; text-shadow: 0px 0px 2px currentColor;">{{ element.bloc }}</b>
+                {% else %}
+                    {{ element.bloc }}
+                {% endif %}
+            </td>
+            <td headers="quadri">
+                {{ element.quadrimestre_texte }}
+            </td>
+            <td headers="credits">
+                {{ element.credits }}
+            </td>
+            <td headers="session">
+                {{ element.session_derogation }}
+            </td>
+            <td headers="obligatoire">
+                {{ element.obligatoire | yesno | title }}
+            </td>
+            <td headers="action">
+                <div class="pull-right">
+
+                </div>
+            </td>
+        </tr>
+
+    {% endfor %}
+    </tbody>
+</table>
+</div>
+
+{% include 'preparation_inscription/modal_confirmer_annuler_suppression.html' %}
+{% include 'preparation_inscription/modal_confirmer_annuler_modification.html' %}
+{% include 'preparation_inscription/modal_confirmer_annuler_ajout.html' %}
+
+{% if rafraichir_groupement_contenant %}
+    <script>
+        $('#tree').trigger('refreshNode', '{{ code_groupement_racine }}');
+    </script>
+{% endif %}

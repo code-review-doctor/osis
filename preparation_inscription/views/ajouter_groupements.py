@@ -57,6 +57,8 @@ class AjouterGroupementsView(LoginRequiredMixin, TemplateView):
             **super().get_context_data(**kwargs),
             'search_form': self.get_search_form(),
             'search_results': self.get_search_result(),
+            'annee': 2020,
+            'code_programme': 'LECGE100B'
         }
 
     def get_search_form(self):
