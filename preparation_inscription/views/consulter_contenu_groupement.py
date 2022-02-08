@@ -35,9 +35,9 @@ from infrastructure.messages_bus import message_bus_instance
 
 
 class TypeAjustement(ChoiceEnum):
-    SUPPRESSION = _('SUPPRESSION')
-    MODIFICATION = _('MODIFICATION')
-    AJOUT = _('AJOUT')
+    SUPPRESSION = _('DELETION')
+    MODIFICATION = _('EDITION')
+    AJOUT = _('ADDITION')
 
 RAFRAICHIR_GROUPEMENT_CONTENANT = 'rafraichir_groupement_contenant'
 
