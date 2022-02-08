@@ -24,12 +24,13 @@
 #
 ##############################################################################
 from decimal import Decimal
+from typing import Optional, Union
 
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetContenuGroupementCommand
 from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import \
     ICatalogueFormationsTranslator
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, ContenuGroupementCatalogueDTO, \
-    GroupementDTO, GroupementCatalogueDTO, UniteEnseignementCatalogueDTO
+    GroupementDTO, GroupementCatalogueDTO, UniteEnseignementCatalogueDTO, GroupementContenantDTO, ElementContenuDTO
 from program_management.ddd.domain.program_tree_version import STANDARD
 
 
@@ -132,7 +133,18 @@ def _cas_nominal_formation_version_standard():
                                     session_derogation='',
                                 )
                             ]),
-                    ])
+                    ]),
+                ContenuGroupementCatalogueDTO(
+                    groupement_contenant=GroupementCatalogueDTO(
+                        intitule='Economie et gestion',
+                        obligatoire=True,
+                        remarque='',
+                        credits=Decimal(10),
+                        intitule_complet='Economie et gestion',
+                        code='MAT2ECGE',
+                    ),
+                    contenu_ordonne_catalogue=[]
+                ),
             ],
         ),
         annee=ANNEE,
@@ -638,4 +650,71 @@ class CatalogueFormationsTranslatorInMemory(ICatalogueFormationsTranslator):
 
     @classmethod
     def get_contenu_groupement(cls, cmd: GetContenuGroupementCommand) -> 'GroupementContenantDTO':
-        raise NotImplementedError()
+        formation = cls.get_formation(cmd.code_formation, cmd.annee)
+        groupement = cls.__search_groupement(cmd.code, formation.racine)
+        return cls.__convert_contenu_groupement_catalogue_dto_to_groupement_contenant_dto(groupement)
+
+    @classmethod
+    def __search_groupement(
+            cls,
+            code_groupement,
+            contenu_groupement: 'ContenuGroupementCatalogueDTO'
+            ) -> Optional['ContenuGroupementCatalogueDTO']:
+        if contenu_groupement.groupement_contenant.code == code_groupement:
+            return contenu_groupement
+
+        for element in contenu_groupement.contenu_ordonne_catalogue:
+            if not isinstance(element, ContenuGroupementCatalogueDTO):
+                continue
+            result = cls.__search_groupement(code_groupement, element)
+            if result:
+                return result
+
+        return None
+
+    @classmethod
+    def __convert_contenu_groupement_catalogue_dto_to_groupement_contenant_dto(
+            cls,
+            groupement: 'ContenuGroupementCatalogueDTO'
+            ) -> 'GroupementContenantDTO':
+        return GroupementContenantDTO(
+            intitule=groupement.groupement_contenant.intitule,
+            intitule_complet=groupement.groupement_contenant.intitule_complet,
+            elements_contenus=[
+                cls.__convert_to_element_contenu_dto(element)
+                for element in groupement.contenu_ordonne_catalogue
+            ]
+        )
+
+    @classmethod
+    def __convert_to_element_contenu_dto(
+            cls,
+            element: Union['UniteEnseignementCatalogueDTO', 'ContenuGroupementCatalogueDTO']
+            ) -> 'ElementContenuDTO':
+        if isinstance(element, UniteEnseignementCatalogueDTO):
+            return ElementContenuDTO(
+                code=element.code,
+                intitule_complet=element.intitule_complet,
+                obligatoire=element.obligatoire,
+                volume_annuel_pp=element.volume_annuel_pp,
+                volume_annuel_pm=element.volume_annuel_pm,
+                bloc=str(element.bloc),
+                quadrimestre_texte=element.quadrimestre_texte,
+                credits_relatifs=element.credits_relatifs,
+                credits_absolus=element.credits_absolus,
+                session_derogation=element.session_derogation,
+            )
+        else:
+            return ElementContenuDTO(
+                code=element.groupement_contenant.code,
+                intitule_complet=element.groupement_contenant.intitule_complet,
+                obligatoire=element.groupement_contenant.obligatoire,
+                volume_annuel_pp=None,
+                volume_annuel_pm=None,
+                bloc="",
+                quadrimestre_texte='',
+                credits_relatifs=None,
+                credits_absolus=None,
+                session_derogation="",
+            )
+

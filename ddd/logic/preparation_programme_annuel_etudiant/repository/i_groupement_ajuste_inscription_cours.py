@@ -30,6 +30,7 @@ from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_aju
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
     IdentiteGroupementAjusteInscriptionCours
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import GroupementAjusteFromRepositoryDTO
+from education_group.ddd.domain.group import GroupIdentity
 from osis_common.ddd import interface
 from osis_common.ddd.interface import ApplicationService
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
@@ -44,7 +45,7 @@ class IGroupementAjusteInscriptionCoursRepository(interface.AbstractRepository):
     def search(
             cls,
             entity_ids: Optional[List['IdentiteGroupementAjusteInscriptionCours']] = None,
-            code_programme: str = None,
+            programme_id: 'GroupIdentity' = None,
             groupement_id: 'GroupIdentity' = None,
             **kwargs
     ) -> List['GroupementAjusteInscriptionCours']:

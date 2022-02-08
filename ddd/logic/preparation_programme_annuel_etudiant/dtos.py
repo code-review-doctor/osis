@@ -24,11 +24,12 @@
 #
 ##############################################################################
 from decimal import Decimal
-from typing import List, Union
+from typing import List, Union, Optional
 
 import attr
 
 from osis_common.ddd.interface import DTO
+from preparation_inscription.utils.chiffres_significatifs_de_decimal import get_chiffres_significatifs
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
@@ -87,9 +88,9 @@ class UniteEnseignementCatalogueDTO(DTO):
     quadrimestre: str
     quadrimestre_texte: str
     credits_absolus: Decimal
-    credits_relatifs: int
-    volume_annuel_pm: int
-    volume_annuel_pp: int
+    credits_relatifs: Optional[int]
+    volume_annuel_pm: Optional[int]
+    volume_annuel_pp: Optional[int]
     obligatoire: bool
     session_derogation: str
 
@@ -221,10 +222,12 @@ class ElementContenuDTO(DTO):
     intitule_complet: str
     obligatoire: bool
 
-    volumes: str
+    volume_annuel_pm: Optional[int]
+    volume_annuel_pp: Optional[int]
     bloc: str
     quadrimestre_texte: str
-    credits: str
+    credits_relatifs: Optional[int]
+    credits_absolus: Optional[Decimal]
     session_derogation: str
 
     ajoute: bool = attr.ib(default=False)
