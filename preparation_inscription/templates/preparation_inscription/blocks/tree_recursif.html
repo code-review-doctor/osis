@@ -1,7 +1,8 @@
 {% load i18n static %}
 
 <ul>
-    <li id="{{ tree.code }}" url="{% url 'consulter_contenu_groupement_view' annee=annee code_programme=code_programme code_groupement=tree.code %}">
+    <li id="{{ tree.code }}"
+        url="{% url 'consulter_contenu_groupement_view' annee=annee code_programme=code_programme code_groupement=tree.code %}">
         {{ tree.title }}
         <div class="node_block_text header">{% trans 'Block' %}</div>
         {% if tree.racine and tree.racine.contenu %}
@@ -12,6 +13,9 @@
                     {% elif element.type == "GROUPEMENT" %}
                         {% include 'preparation_inscription/blocks/tree_sous_programme.html' with tree=element parent_code=tree.code %}
                     {% endif %}
+                {% endfor %}
+                {% for unite_enseignement in tree.racine.unites_enseignement_ajoutees %}
+                    {% include 'preparation_inscription/blocks/tree_unites_enseignements_ajoutees.html' with unite_enseignement=unite_enseignement parent_code=tree.code %}
                 {% endfor %}
             </ul>
         {% endif %}

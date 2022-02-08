@@ -2,27 +2,27 @@
 {% load static i18n bootstrap3 %}
 
 {% comment "License" %}
- * OSIS stands for Open Student Information System. It's an application
- * designed to manage the core business of higher education institutions,
- * such as universities, faculties, institutes and professional schools.
- * The core business involves the administration of students, teachers,
- * courses, programs and so on.
- *
- * Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * A copy of this license - GNU General Public License - is available
- * at the root of the source code of this program.  If not,
- * see http://www.gnu.org/licenses/.
+    * OSIS stands for Open Student Information System. It's an application
+    * designed to manage the core business of higher education institutions,
+    * such as universities, faculties, institutes and professional schools.
+    * The core business involves the administration of students, teachers,
+    * courses, programs and so on.
+    *
+    * Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
+    *
+    * This program is free software: you can redistribute it and/or modify
+    * it under the terms of the GNU General Public License as published by
+    * the Free Software Foundation, either version 3 of the License, or
+    * (at your option) any later version.
+    *
+    * This program is distributed in the hope that it will be useful,
+    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    * GNU General Public License for more details.
+    *
+    * A copy of this license - GNU General Public License - is available
+    * at the root of the source code of this program.  If not,
+    * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
 {% block breadcrumb %}
@@ -32,37 +32,39 @@
 {% endblock %}
 {% block content %}
 
-<div class="row">
-    <div class="col-md-3">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <div class="pull-right">
-                    <div class="dropdown">
-                        <button class="btn btn-default dropdown-toggle" type="button" id="btn-action-down" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                            <span class="fa fa-cog" aria-hidden="true"></span> {% trans 'Actions' %}
-                            <span class="caret"></span>
-                        </button>
-                        <ul class="dropdown-menu pull-right" aria-labelledby="btn-action-down">
-                            <li><a href="#">{% trans "Revenir à l'état initial du programme" %}</a></li>
-                        </ul>
+    <div class="row">
+        <div class="col-md-3">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="pull-right">
+                        <div class="dropdown">
+                            <button class="btn btn-default dropdown-toggle" type="button" id="btn-action-down"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                <span class="fa fa-cog" aria-hidden="true"></span> {% trans 'Actions' %}
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu pull-right" aria-labelledby="btn-action-down">
+                                <li><a class="trigger_modal"
+                                       data-url="{% url 'remettre_etat_initial_view' annee code_programme %}"
+                                >{% trans "Revenir à l'état initial du programme" %}</a></li>
+                            </ul>
+                        </div>
                     </div>
+                    <h4 data-toggle="tooltip" title="{{ tree_panel_title }}">{{ tree_panel_header }}</h4>
                 </div>
-                <h4 data-toggle="tooltip" title="{{ tree_panel_title }}">{{ tree_panel_header }}</h4>
-            </div>
 
-            <div class="panel-body">
-                <div class="row">
-                    <div class="col-md-12">
-                        {% include "preparation_inscription/blocks/tree_panel.html" %}
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            {% include "preparation_inscription/blocks/tree_panel.html" %}
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+        <div class="col-md-9 pae-panel">
+            {% include 'preparation_inscription/tabs.html' %}
+        </div>
     </div>
-    <div class="col-md-9 pae-panel">
-        {% include 'preparation_inscription/tabs.html' %}
-    </div>
-</div>
-
 
 {% endblock %}
