@@ -57,7 +57,7 @@ class GroupementAjusteInscriptionCoursFactory(factory.Factory):
 
     entity_id = factory.SubFactory(IdentiteGroupementAjusteInscriptionCoursFactory)
     groupement_id = factory.SubFactory(GroupIdentityFactory)
-    code_programme = "LECGE100B"
+    programme_id = factory.SubFactory(GroupIdentityFactory, code="LECGE100B")
 
     unites_enseignement_ajoutees = factory.LazyFunction(list)
     unites_enseignement_supprimees = factory.LazyFunction(list)

@@ -40,6 +40,7 @@ from ddd.logic.preparation_programme_annuel_etudiant.dtos import ProgrammeInscri
     UniteEnseignementAjouteeDTO, UniteEnseignementCatalogueDTO
 from ddd.logic.preparation_programme_annuel_etudiant.repository.i_groupement_ajuste_inscription_cours import \
     IGroupementAjusteInscriptionCoursRepository
+from education_group.ddd.domain.group import GroupIdentity
 from osis_common.ddd import interface
 
 
@@ -57,7 +58,9 @@ class GetProgrammeInscriptionCours(interface.DomainService):
             annee=cmd.annee,
         )
 
-        groupements_ajustes = groupement_ajuste_repository.search(code_programme=cmd.code_programme)
+        groupements_ajustes = groupement_ajuste_repository.search(
+            programme_id=GroupIdentity(code=cmd.code_programme, year=cmd.annee)
+        )
         unite_enseignements_ajoutes_dto = cls.rechercher_unites_enseignement_ajoutees_catalogue_dto(
             groupements_ajustes,
             catalogue_unites_enseignement_translator
