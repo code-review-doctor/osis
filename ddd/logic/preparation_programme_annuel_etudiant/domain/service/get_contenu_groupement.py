@@ -22,7 +22,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from decimal import Decimal
 from typing import List, Optional
 
 import attr
@@ -43,7 +42,6 @@ from ddd.logic.preparation_programme_annuel_etudiant.repository.i_groupement_aju
     IGroupementAjusteInscriptionCoursRepository
 from education_group.ddd.domain.group import GroupIdentity
 from osis_common.ddd import interface
-from preparation_inscription.utils.chiffres_significatifs_de_decimal import get_chiffres_significatifs
 
 
 class GetContenuGroupement(interface.DomainService):
@@ -58,9 +56,11 @@ class GetContenuGroupement(interface.DomainService):
 
         contenu_groupement = catalogue_formations_translator.get_contenu_groupement(cmd=cmd)
 
-        groupement_id = GroupIdentity(code=cmd.code, year=cmd.annee)
         try:
-            groupement_ajuste = repo.search(code_programme=cmd.code_formation, groupement_id=groupement_id)[0]
+            groupement_ajuste = repo.search(
+                programme_id=GroupIdentity(code=cmd.code_formation, year=cmd.annee),
+                groupement_id=GroupIdentity(code=cmd.code, year=cmd.annee)
+            )[0]
             entity_id_unites_enseignement = [
                 unite_enseignement.unite_enseignement_identity
                 for unite_enseignement in groupement_ajuste.unites_enseignement_ajoutees
@@ -113,25 +113,11 @@ class GetContenuGroupement(interface.DomainService):
             obligatoire=unite_enseignement_dto_correspondant.obligatoire,
             bloc=str(unite_enseignement_dto_correspondant.bloc),
             session_derogation=unite_enseignement_dto_correspondant.session_derogation,
-            credits=_get_credits(
-                unite_enseignement_dto_correspondant.credits_relatifs,
-                unite_enseignement_dto_correspondant.credits_absolus
-            ),
             intitule_complet=unite_enseignement_dto_correspondant.intitule_complet,
             quadrimestre_texte=unite_enseignement_dto_correspondant.quadrimestre_texte,
-            volumes='{}{}{}'.format(
-                unite_enseignement_dto_correspondant.volume_annuel_pm or '',
-                '+' if unite_enseignement_dto_correspondant.volume_annuel_pm
-                    and unite_enseignement_dto_correspondant.volume_annuel_pp else '',
-                unite_enseignement_dto_correspondant.volume_annuel_pp or ''
-            ),
+            credits_absolus=unite_enseignement_dto_correspondant.credits_absolus,
+            credits_relatifs=unite_enseignement_dto_correspondant.credits_relatifs,
+            volume_annuel_pm=unite_enseignement_dto_correspondant.volume_annuel_pm,
+            volume_annuel_pp=unite_enseignement_dto_correspondant.volume_annuel_pp,
             ajoute=True
         )
-
-
-def _get_credits(credits_relatifs: int, credits_absolus: Decimal) -> str:
-    if credits_relatifs:
-        if credits_relatifs != credits_absolus:
-            return "{}({})".format(credits_relatifs, get_chiffres_significatifs(credits_absolus))
-        return "{}".format(credits_relatifs)
-    return get_chiffres_significatifs(credits_absolus)

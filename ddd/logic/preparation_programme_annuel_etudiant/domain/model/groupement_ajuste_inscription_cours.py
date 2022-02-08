@@ -56,7 +56,7 @@ class IdentiteGroupementAjusteInscriptionCours(interface.EntityIdentity):
 class GroupementAjusteInscriptionCours(interface.RootEntity):
     entity_id: IdentiteGroupementAjusteInscriptionCours
     groupement_id: 'GroupIdentity'
-    code_programme: 'CodeProgramme'
+    programme_id: 'GroupIdentity'
     unites_enseignement_ajoutees: List['UniteEnseignementAjoutee']
     unites_enseignement_supprimees: List['UniteEnseignementSupprimee']
     unites_enseignement_modifiees: List['UniteEnseignementModifiee']

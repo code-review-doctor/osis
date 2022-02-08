@@ -77,7 +77,7 @@ class GroupementAjusteInscriptionCoursBuilder(interface.RootEntityBuilder):
         return GroupementAjusteInscriptionCours(
             entity_id=IdentiteGroupementAjusteInscriptionCours(uuid=uuid.uuid4()),
             groupement_id=group_identity,
-            code_programme=cmd.code_programme,
+            programme_id=programme_id,
             unites_enseignement_ajoutees=[],
             unites_enseignement_supprimees=[],
             unites_enseignement_modifiees=[],
