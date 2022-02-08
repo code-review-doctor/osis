@@ -74,12 +74,12 @@ class CatalogueFormationsTranslator(ICatalogueFormationsTranslator):
         )
 
     @classmethod
-    def get_unites_enseignement(cls, cmd: 'GetContenuGroupementCommand') -> List['ElementContenuDTO']:
+    def get_unites_enseignement(cls, code: str, annee: int) -> List['ElementContenuDTO']:
         from infrastructure.messages_bus import message_bus_instance
 
         cmd = GetUnitesEnseignementContenuesDansProgrammeCommand(
-            code_programme=cmd.code,
-            annee=cmd.annee,
+            code_programme=code,
+            annee=annee,
         )
         liste_unites_contenues_dto = message_bus_instance.invoke(
             cmd

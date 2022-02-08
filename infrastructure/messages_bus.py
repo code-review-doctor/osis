@@ -255,7 +255,7 @@ from program_management.ddd.command import BulkUpdateLinkCommand, GetReportComma
 from program_management.ddd.repositories import program_tree as program_tree_repo
 from program_management.ddd.repositories.report import ReportRepository
 from program_management.ddd.service.read.get_content_service import get_content_service
-from program_management.ddd.service.read.get_liste_unites_enseignement_service import get_unites_enseignement
+from program_management.ddd.service.read.get_unites_enseignement_service import get_unites_enseignement
 from program_management.ddd.service.read.get_program_tree_version_service import get_program_tree_version, \
     get_programme_formation
 from program_management.ddd.service.read.get_report_service import get_report

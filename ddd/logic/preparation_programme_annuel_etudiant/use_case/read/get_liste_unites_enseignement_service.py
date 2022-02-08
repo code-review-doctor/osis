@@ -32,4 +32,4 @@ def get_unites_enseignement_service(
         cmd: 'GetUnitesEnseignementContenuesCommand',
         translator: 'CatalogueFormationsTranslator',
 ) -> 'ElementContenuDTO':
-    return translator.get_unites_enseignement(cmd)
+    return translator.get_unites_enseignement(cmd.code, cmd.annee)
