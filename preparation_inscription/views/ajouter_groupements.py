@@ -22,23 +22,7 @@ class SearchGroupementsForm(forms.Form):
     )
     code = UpperCaseCharField(max_length=15, label=_("code").capitalize(), required=False)
     sigle = UpperCaseCharField(max_length=15, label=_("sigle").capitalize(), required=False)
-    # sigle = forms.ChoiceField(
-    #     initial=ActiveStatusEnum.ACTIVE.name,
-    #     choices=add_blank(list(ActiveStatusEnum.choices())),
-    #     label=_("sigle").capitalize(),
-    # )
     intitule = UpperCaseCharField(max_length=15, label=_("intitule").capitalize(), required=False)
-    champs4 = forms.BooleanField(label=_('champs4').capitalize())
-    management_entity = MainEntitiesVersionChoiceField(
-        queryset=None,
-        label=_('champs4').capitalize(),
-    )
-    champs5 = forms.DecimalField(
-        max_digits=7,
-        decimal_places=4,
-        label=_('champs5').capitalize(),
-        validators=[MinValueValidator(1), MaxValueValidator(9999)],
-    )
 
     def __init__(self, *args, user: User, **kwargs):
         self.user = user
@@ -58,7 +42,8 @@ class AjouterGroupementsView(LoginRequiredMixin, TemplateView):
             'search_form': self.get_search_form(),
             'search_results': self.get_search_result(),
             'annee': 2020,
-            'code_programme': 'LECGE100B'
+            'code_programme': 'LECGE100B',
+            'code_groupement': 'MAT1ECGE',
         }
 
     def get_search_form(self):

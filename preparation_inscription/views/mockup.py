@@ -22,10 +22,7 @@ class TreeHTMLView(LoginRequiredMixin, TemplateView):
     template_name = "mockup/blocks/mockup_tree_apres_ajout_groupements.html"
 
     def get_context_data(self, **kwargs):
-        if self.request.GET.get('id') != "#":
-            tree = self.get_node_of_tree(self.request.GET['id'])
-        else:
-            tree = self.get_tree()
+        tree = self.get_tree()
 
         return {
             **super().get_context_data(**kwargs),
@@ -77,7 +74,7 @@ class TreeHTMLView(LoginRequiredMixin, TemplateView):
                                             },
                                             {
                                                 'id': '11115',
-                                                'text': 'Economie et gestion',
+                                                'text': 'LECGE101R - Economie et gestion',
                                                 'obligatoire': True,
                                                 'type_ajustement': TypeAjustement.AJOUT.name,
                                                 'children': []
@@ -93,19 +90,7 @@ class TreeHTMLView(LoginRequiredMixin, TemplateView):
         ]
 
     def get_node_of_tree(self, node_id: str) -> List:
-        return [
-            # {
-            #     'id': 'node_3',
-            #     'text': 'Node 3',
-            #     'children': [
-            #         {
-            #             'id': 'node_31',
-            #             'text': 'Node 31',
-            #             'children': []
-            #         },
-            #     ]
-            # }
-        ]
+        return []
 
 
 class ConsulterContenuGroupementViewMockup(ConsulterContenuGroupementView):
@@ -113,6 +98,54 @@ class ConsulterContenuGroupementViewMockup(ConsulterContenuGroupementView):
 
     # TemplateView
     template_name = "mockup/blocks/mockup_consulter_contenu_groupement.html"
+    htmx_template_name = "mockup/blocks/mockup_consulter_contenu_groupement.html"
 
     def get_content(self):
-        return []
+        return {
+            'search_result': [
+                {
+                    "code": "LESPO1113",
+                    "intitule": "Sociologie et anthropologie des mondes contemporains",
+                    "volumes": 40,
+                    "bloc": 1,
+                    "quadrimestre": "Q1 ou Q2",
+                    "credits": 5,
+                    "session_derogation": "",
+                    "obligatoire": "Oui"
+                },
+                {
+                    "code": "LESPO1321",
+                    "intitule": "Economic, Political and Social Ethics",
+                    "volumes": 30,
+                    "bloc": 3,
+                    "quadrimestre": "Q2",
+                    "credits": 3,
+                    "session_derogation": "",
+                    "obligatoire": "Oui"
+                },
+                {
+                    "code": "CHOIX",
+                    "intitule": "Cours au choix",
+                    "volumes": "",
+                    "bloc": "",
+                    "quadrimestre": "",
+                    "credits": "",
+                    "session_derogation": "",
+                    "obligatoire": "Oui"
+                },
+                {
+                    "code": "LECGE101R",
+                    "intitule": "Economie et gestion",
+                    "volumes": "",
+                    "bloc": "",
+                    "quadrimestre": "",
+                    "credits": "",
+                    "session_derogation": "",
+                    "obligatoire": "Oui",
+                    "type_ajustement": TypeAjustement.AJOUT.name
+                },
+
+            ],
+            'intitule_groupement': 'MAT1ECGE',
+            'intitule_complet_groupement': 'Formation pluridisciplinaire en sciences humaines',
+        }

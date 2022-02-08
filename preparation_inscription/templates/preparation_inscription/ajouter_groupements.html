@@ -81,7 +81,7 @@
 <div class="panel-footer text-right">
     <a href=""
        class="btn btn-default">{% trans "Cancel" %}</a>
-    <a href="" hx-post="{% url 'consulter-contenu-groupement-mockup-resultat-apres-ajout-groupements' annee code_programme %}"
+    <a href="" hx-get="{% url 'consulter-contenu-groupement-mockup-resultat-apres-ajout-groupements' annee code_programme code_groupement %}"
        hx-target="#content-of-main-panel" hx-trigger="click" type="button"
        class="btn btn-primary">{% trans "Add" %}</a>
 </div>
