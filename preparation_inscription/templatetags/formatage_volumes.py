@@ -27,40 +27,24 @@ from decimal import Decimal
 from typing import Optional
 
 from django import template
-from django.utils.translation import gettext_lazy as _
+
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import UniteEnseignementCatalogueDTO
 
 register = template.Library()
 
 
-def get_chiffres_significatifs(nombre_decimal: Decimal) -> str:
-    if nombre_decimal:
-        str_volume = str(nombre_decimal)
-        return str_volume.rstrip('0').rstrip('.') if '.' in str_volume else str_volume
-    return ''
-
-
-@register.simple_tag
-def formater_credits_ue_formulaire(credits_relatifs: Optional[int], credits_absolus: Optional[Decimal]) -> str:
-    if credits_absolus or credits_relatifs:
-        credits_absolus = get_chiffres_significatifs(credits_absolus) if credits_absolus else None
-        return "({} {})".format(credits_relatifs or credits_absolus or 0, _("credits"))
-    return ""
-
-
-@register.simple_tag
-def formater_credits_ue(credits_relatifs: Optional[int], credits_absolus: Optional[Decimal]) -> str:
-    if credits_relatifs:
-        if credits_relatifs != credits_absolus:
-            return "{}({})".format(credits_relatifs, get_chiffres_significatifs(credits_absolus))
-        return "{}".format(credits_relatifs)
-    return get_chiffres_significatifs(credits_absolus)
-
-
 @register.filter
-def formater_credits_groupement(credits: Decimal) -> str:
-    if credits:
-        return "({} {})".format(
-            credits or 0,
-            _("credits")
-        )
-    return ""
+def formater_volumes_totaux(unite_catalogue_dto: 'UniteEnseignementCatalogueDTO') -> str:
+    return "%(total_lecturing)gh + %(total_practical)gh" % {
+        "total_lecturing": unite_catalogue_dto.volume_annuel_pm or Decimal(0.0),
+        "total_practical": unite_catalogue_dto.volume_annuel_pp or Decimal(0.0)
+    }
+
+
+@register.simple_tag
+def formater_volumes(volume_annuel_pm: Optional[int], volume_annuel_pp: Optional[int]) -> str:
+    return '{}{}{}'.format(
+        volume_annuel_pm or '',
+        '+' if volume_annuel_pm and volume_annuel_pp else '',
+        volume_annuel_pp or ''
+    )

@@ -183,7 +183,7 @@ class LearningUnitRepository(ILearningUnitRepository):
                         ],
                         quadrimester=learning_unit_year_db_obj.quadrimester,
                         credits=learning_unit_year_db_obj.credits,
-                        session_derogation=learning_unit_year_db_obj.session,
+                        session_derogation=learning_unit_year_db_obj.session or "",
                         lecturing_volume_annual=learning_unit_year_db_obj.lecturing_volume_annual,
                         practical_volume_annual=learning_unit_year_db_obj.practical_volume_annual
                     )
