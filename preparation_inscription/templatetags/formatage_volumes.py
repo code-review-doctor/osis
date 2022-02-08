@@ -24,6 +24,8 @@
 #
 ##############################################################################
 from decimal import Decimal
+from typing import Optional
+
 from django import template
 
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import UniteEnseignementCatalogueDTO
@@ -37,3 +39,12 @@ def formater_volumes_totaux(unite_catalogue_dto: 'UniteEnseignementCatalogueDTO'
         "total_lecturing": unite_catalogue_dto.volume_annuel_pm or Decimal(0.0),
         "total_practical": unite_catalogue_dto.volume_annuel_pp or Decimal(0.0)
     }
+
+
+@register.simple_tag
+def formater_volumes(volume_annuel_pm: Optional[int], volume_annuel_pp: Optional[int]) -> str:
+    return '{}{}{}'.format(
+        volume_annuel_pm or '',
+        '+' if volume_annuel_pm and volume_annuel_pp else '',
+        volume_annuel_pp or ''
+    )

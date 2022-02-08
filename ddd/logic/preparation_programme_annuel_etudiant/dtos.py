@@ -233,20 +233,3 @@ class ElementContenuDTO(DTO):
     ajoute: bool = attr.ib(default=False)
     modifie: bool = attr.ib(default=False)
     supprime: bool = attr.ib(default=False)
-
-    @property
-    def volumes(self) -> str:
-        return '{}{}{}'.format(
-            self.volume_annuel_pm or '',
-            '+' if self.volume_annuel_pm and self.volume_annuel_pp else '',
-            self.volume_annuel_pp or ''
-        )
-
-    @property
-    def credits(self) -> str:
-        if self.credits_relatifs:
-            if self.credits_relatifs != self.credits_absolus:
-                return "{}({})".format(self.credits_relatifs, get_chiffres_significatifs(self.credits_absolus))
-            return "{}".format(self.credits_relatifs)
-        return get_chiffres_significatifs(self.credits_absolus)
-
