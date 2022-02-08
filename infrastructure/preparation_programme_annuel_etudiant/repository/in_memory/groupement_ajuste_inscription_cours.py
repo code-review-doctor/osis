@@ -69,3 +69,8 @@ class GroupementAjusteInscriptionCoursInMemoryRepository(
         if groupement_id:
             result = [entity for entity in result if entity.groupement_id == groupement_id]
         return result
+
+    @classmethod
+    def bulk_delete(cls, entities: List['GroupementAjusteInscriptionCours']) -> None:
+        for entity in entities:
+            cls.delete(entity.entity_id)
