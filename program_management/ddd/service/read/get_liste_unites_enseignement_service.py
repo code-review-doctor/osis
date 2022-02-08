@@ -43,5 +43,3 @@ def get_unites_enseignement(
     return build_unites_enseignement_contenues_dans_pgm(
         pgm_tree_version.get_tree().get_node_by_code_and_year(code=cmd.code_programme, year=cmd.annee)
     )
-
-
