@@ -31,12 +31,14 @@ from django.views.generic import FormView
 from base.views.mixins import AjaxTemplateMixin
 from ddd.logic.preparation_programme_annuel_etudiant.commands import RemettreProgrammeDansEtatInitialCommand
 from infrastructure.messages_bus import message_bus_instance
+from osis_role.contrib.views import PermissionRequiredMixin
 
 
-class RemettreEtatInitialView(LoginRequiredMixin, AjaxTemplateMixin, FormView):
+class RemettreEtatInitialView(LoginRequiredMixin, PermissionRequiredMixin, AjaxTemplateMixin, FormView):
     name = 'remettre_etat_initial_view'
     template_name = "preparation_inscription/modal_confirmer_remettre_etat_initial_inner.html"
     form_class = Form
+    permission_required = 'preparation_programme.can_reinit_programme_inscription'
 
     @property
     def annee(self):
