@@ -161,3 +161,50 @@ class GetContenuGroupementServiceTest(SimpleTestCase):
         )
 
         self.assertEqual(result, expected_result)
+
+    def test_should_retourner_contenu_du_groupement_ajuste_si_groupement_a_une_ue_supprimee(self):
+        self.repo.entities.append(
+            GroupementAjusteInscriptionCoursFactory(groupement_id__code='LECGE100R', supprimees=True)
+        )
+
+        cmd = GetContenuGroupementCommand(
+            annee=2021,
+            code="LECGE100R",
+            code_formation="LECGE100B"
+        )
+
+        result = self.message_bus.invoke(cmd)
+
+        expected_result = GroupementContenantDTO(
+            intitule="Formation pluridisciplinaire en sciences humaines",
+            intitule_complet="Formation pluridisciplinaire en sciences humaines",
+            elements_contenus=[
+                ElementContenuDTO(
+                    bloc="1",
+                    code='LINGE1225',
+                    intitule_complet='Programmation en économie et gestion',
+                    quadrimestre_texte='Q1',
+                    credits_absolus=Decimal(5),
+                    credits_relatifs=None,
+                    volume_annuel_pm=30,
+                    volume_annuel_pp=15,
+                    obligatoire=True,
+                    session_derogation='',
+                    supprime=True
+                ),
+                ElementContenuDTO(
+                    bloc="3",
+                    code='LESPO1321',
+                    intitule_complet='Economic, Political and Social Ethics',
+                    quadrimestre_texte='Q2',
+                    credits_absolus=Decimal(3),
+                    credits_relatifs=None,
+                    volume_annuel_pm=30,
+                    volume_annuel_pp=0,
+                    obligatoire=True,
+                    session_derogation='',
+                )
+            ]
+        )
+
+        self.assertEqual(result, expected_result)
