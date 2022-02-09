@@ -79,9 +79,9 @@ class ModifierUniteEnseignementCommand(interface.CommandRequest):
     code: str
     annee: int
     bloc: int
-    credits_relatifs: int
-    session_derogation: str
-    obligatoire: bool
+    # credits_relatifs: int
+    # session_derogation: str
+    # obligatoire: bool
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
