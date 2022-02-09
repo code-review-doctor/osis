@@ -1,4 +1,4 @@
-############################################################################
+##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -22,12 +22,29 @@
 #    at the root of the source code of this program.  If not,
 #    see http://www.gnu.org/licenses/.
 #
-############################################################################
-from django.core.cache import cache
-from django.core.management import BaseCommand
+##############################################################################
+import os
+
+from django.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):
-    def handle(self, *args, **options):
-        cache.clear()
-        self.stdout.write(self.style.SUCCESS('Successfully clear cache'))
+    def add_arguments(self, parser):
+        parser.add_argument('-k', action='store_true', help="keep the database")
+        parser.add_argument(
+            '--tests', '-t',
+            nargs='+',
+            help="path to the test case with dot (example : assessments.tests.views)",
+            required=True
+        )
+
+    def handle(self, *args, **kwargs):
+        command = "python manage.py test {reinit_db} {test_cases}".format(
+            reinit_db="-k" if kwargs['k'] is True else "",
+            test_cases=' '.join(kwargs['tests'])
+        )
+
+        while True:
+            result = os.system(command)
+            if result != 0:
+                break
