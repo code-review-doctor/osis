@@ -134,8 +134,8 @@ class LearningUnitRepositoryTestCase(TestCase):
                             ],
                             quadrimester=luy_db.quadrimester,
                             credits=luy_db.credits,
-                            lecturing_volume_annual=None,
-                            practical_volume_annual=None,
+                            lecturing_volume_annual=0,
+                            practical_volume_annual=0,
                             session_derogation=luy_db.session
                         )
                     ]
