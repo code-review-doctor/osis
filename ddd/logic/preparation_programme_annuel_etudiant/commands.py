@@ -88,7 +88,7 @@ class ModifierUniteEnseignementCommand(interface.CommandRequest):
 class ModifierUEDuGroupementCommand(interface.CommandRequest):
     annee: int
     code_programme: str
-    a_ajuster_dans: str  # code groupement
+    ajuster_dans: str  # code groupement
     unites_enseignements: List[ModifierUniteEnseignementCommand]
 
 
