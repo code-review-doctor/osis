@@ -1,170 +1,163 @@
-from django import forms
-from django.contrib.auth.models import User
-from django.core.validators import MaxValueValidator, MinValueValidator
-from django.utils.translation import gettext_lazy as _
-from django.views.generic import FormView
-from rules.contrib.views import LoginRequiredMixin
+##############################################################################
+#
+#    OSIS stands for Open Student Information System. It's an application
+#    designed to manage the core business of higher education institutions,
+#    such as universities, faculties, institutes and professional schools.
+#    The core business involves the administration of students, teachers,
+#    courses, programs and so on.
+#
+#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    A copy of this license - GNU General Public License - is available
+#    at the root of the source code of this program.  If not,
+#    see http://www.gnu.org/licenses/.
+#
+##############################################################################
+from gettext import ngettext
+from typing import List
 
-from base.forms.utils.choice_field import add_blank
-from base.models.enums.active_status import ActiveStatusEnum
+from django import forms
+from django.contrib import messages
+from django.forms import formset_factory
+from django.shortcuts import redirect
+from django.urls import reverse
+from django.utils.functional import cached_property
+from django.views.generic import FormView
+from django.utils.translation import gettext_lazy as _
+
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.utils.htmx import HtmxMixin
-from education_group.forms.fields import MainEntitiesVersionChoiceField, UpperCaseCharField
-from preparation_inscription.views.consulter_contenu_groupement import TypeAjustement
+from ddd.logic.preparation_programme_annuel_etudiant.commands import GetContenuGroupementCommand, \
+    ModifierUEDuGroupementCommand, ModifierUniteEnseignementCommand
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import GroupementContenantDTO
+from education_group.models.group_year import GroupYear
+from infrastructure.messages_bus import message_bus_instance
+from osis_role.contrib.views import PermissionRequiredMixin
+from preparation_inscription.views.consulter_contenu_groupement import RAFRAICHIR_GROUPEMENT_CONTENANT
 
 
 class ModifierProprietesContenuForm(forms.Form):
-    # autocomplete = forms.ChoiceField(
-    #     required=False,
-    #     label=_('Label').capitalize(),
-    #     widget=autocomplete.ListSelect2(
-    #         url='-autocomplete',
-    #         attrs={'data-html': True, 'data-placeholder': _('Name')},
-    #     )
-    # )
-    champs1 = UpperCaseCharField(max_length=15, label=_("champs1").capitalize())
-    champs2 = forms.ChoiceField(
-        initial=ActiveStatusEnum.ACTIVE.name,
-        choices=add_blank(list(ActiveStatusEnum.choices())),
-        label=_("champs2").capitalize(),
-    )
-    champs3 = forms.IntegerField(
-        label=_("champs3").capitalize(),
-        required=False,
-    )
-    champs4 = forms.BooleanField(label=_('champs4').capitalize())
-    management_entity = MainEntitiesVersionChoiceField(
-        queryset=None,
-        label=_('champs4').capitalize(),
-    )
-    champs5 = forms.DecimalField(
-        max_digits=7,
-        decimal_places=4,
-        label=_('champs5').capitalize(),
-        validators=[MinValueValidator(1), MaxValueValidator(9999)],
-    )
-
-    def __init__(self, *args, user: User, **kwargs):
-        self.user = user
-        super().__init__(*args, **kwargs)
+    code = forms.CharField(widget=forms.HiddenInput)
+    bloc = forms.CharField(required=False)
 
 
-class ModifierProprietesContenuView(LoginRequiredMixin, HtmxMixin, FormView):
+class ModifierProprietesContenuView(PermissionRequiredMixin, HtmxMixin, FormView):
     name = 'modifier_proprietes_contenu_view'
+
+    # PermissionRequiredMixin
+    permission_required = 'preparation_programme.can_modifier_contenu_groupement'
+    raise_exception = True
+
+    # HtmxMixin
+    htmx_template_name = "preparation_inscription/modification_unites_enseignement.html"
 
     # FormView
     template_name = "preparation_inscription/preparation_inscription.html"
-    htmx_template_name = "preparation_inscription/modification_unites_enseignement.html"
-
     form_class = ModifierProprietesContenuForm
 
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['user'] = self.request.user
-        return kwargs
+    @cached_property
+    def contenu(self) -> GroupementContenantDTO:
+        cmd = GetContenuGroupementCommand(
+            code_formation=self.kwargs['code_programme'],
+            annee=self.kwargs['annee'],
+            code=self.kwargs.get('code_groupement', self.kwargs['code_programme']),
+        )
+        return message_bus_instance.invoke(cmd)
+
+    def get_form_class(self):
+        return formset_factory(ModifierProprietesContenuForm, extra=0)
+
+    def get_initial(self) -> List:
+        return [
+            {
+                'code': element.code,
+                'bloc': element.bloc,
+            }
+            for element in self.contenu.elements_contenus
+        ]
 
     def form_valid(self, formset):
-        # TODO :: to implement
-        # cmd = Command(...)
-        # message__bus.invoke(cmd)
-        # display_error_messages(self.request, messages)
-        # display_success_messages(self.request, messages)
-        # self.render_to_response(self.get_context_data(form=self.get_form(self.form_class)))
-        return super().form_valid(formset)
+        cmd = ModifierUEDuGroupementCommand(
+            annee=self.kwargs['annee'],
+            code_programme=self.kwargs['code_programme'],
+            ajuster_dans=self.kwargs.get('code_groupement', self.kwargs['code_programme']),
+            unites_enseignements=[
+             ModifierUniteEnseignementCommand(
+                    code=form.cleaned_data['code'],
+                    annee=self.kwargs['annee'],
+                    bloc=form.cleaned_data['bloc'],
+                ) for form in formset if form.has_changed()
+            ]
+        )
 
-    def get_success_url(self):
-        # TODO :: to implement or to remove
-        return super().get_success_url()
+        if cmd.unites_enseignements:
+            try:
+                message_bus_instance.invoke(cmd)
+            except MultipleBusinessExceptions as e:
+                for exception in e.exceptions:
+                    form = next(
+                        form for form in formset
+                        if form.has_changed() and form.cleaned_data['code'] == exception.code
+                    )
+                    form.add_error('bloc', exception.message)
+
+        self.display_success_error_counter(cmd, formset)
+        if formset.is_valid():
+            return redirect(self.get_success_url())
+        return self.render_to_response(self.get_context_data(form=formset))
+
+    def display_success_error_counter(self, cmd: ModifierUEDuGroupementCommand, formset):
+        error_counter = sum(1 for form in formset if form.has_changed() and not form.is_valid())
+        success_counter = len(cmd.unites_enseignements) - error_counter
+
+        if error_counter > 0:
+            messages.error(
+                self.request,
+                ngettext(
+                    "There is %(error_counter)s error in form",
+                    "There are %(error_counter)s errors in form",
+                    error_counter
+                ) % {'error_counter': error_counter}
+            )
+        if success_counter > 0:
+            messages.success(self.request,  _('The learning units have been modified'))
 
     def get_context_data(self, **kwargs):
         return {
             **super().get_context_data(**self.kwargs),
-            'search_result': self.get_contenu_groupement_modifiable(),
-            'form': self.get_form(self.form_class),
+            'contenu': self.contenu.elements_contenus,
             'intitule_groupement': self.get_intitule_groupement(),
-            'intitule_programme': self.get_intitule_programme(),
+            'intitule_complet_groupement': self.get_intitule_complet_groupement(),
             'annee': self.kwargs['annee'],
             'code_programme': self.kwargs['code_programme'],
             'code_groupement': self.kwargs['code_groupement']
         }
 
-    def get_contenu_groupement_modifiable(self):
-        data = [
-            {
-                'code_ue': 'LESPO1113',
-                'intitule': 'Sociologie et anthropologie des mondes contemporains',
-                'volumes': '10',
-                'bloc': '1',
-                'quadri': 'Q1',
-                'credits': '5/5',
-                'session': 'Oui',
-                'obligatoire': 'Oui',
-                'commentaire_fr': """Lorem Ipsum est un générateur de faux textes aléatoires. Vous choisissez le nombre de paragraphes, de mots ou de listes. Vous obtenez alors un texte aléatoire que vous pourrez ensuite utiliser librement dans vos maquettes.
-                    Le texte généré est du pseudo latin et peut donner l'impression d'être du vrai texte.
-                    Faux-Texte est une réalisation du studio de création de sites internet indépendant Prélude Prod.
-                    Si vous aimez la photographie d'art et l'esprit zen, jetez un œil sur le site de ce photographe à Palaiseau, en Essonne (France).
-                """,
-                'commentaire_en': '',
-                'type_ajustement': TypeAjustement.SUPPRESSION.name,
-            },
-            {
-                'code_ue': 'LESPO1321',
-                'intitule': 'Economic, Political and Social Ethics',
-                'volumes': '15+10',
-                'bloc': '1',
-                'quadri': 'Q1',
-                'credits': '4/5',
-                'session': 'Oui',
-                'obligatoire': 'Oui',
-                'commentaire_fr': '',
-                'commentaire_en': '',
-                'type_ajustement': TypeAjustement.SUPPRESSION.name,
-            },
-            {
-                'code_ue': 'LESPO1114',
-                'intitule': 'Political Science',
-                'volumes': '30',
-                'bloc': '2',
-                'quadri': 'Q1',
-                'credits': '5/5',
-                'session': 'Oui',
-                'obligatoire': 'Oui',
-                'commentaire_fr': '',
-                'commentaire_en': '',
-                'type_ajustement': TypeAjustement.MODIFICATION.name,
-            },
-            {
-                'code_ue': 'LINGE1122',
-                'intitule': 'Physique 1',
-                'volumes': '30',
-                'bloc': '1',
-                'quadri': 'Q2',
-                'credits': '3/3',
-                'session': 'Oui',
-                'obligatoire': 'Oui',
-                'commentaire_fr': '',
-                'commentaire_en': '',
-                'type_ajustement': TypeAjustement.AJOUT.name,
-            },
-            {
-                'code_ue': 'LINGE1125',
-                'intitule': 'Séminaire de travail universitaire en gestion',
-                'volumes': '25',
-                'bloc': '1',
-                'quadri': 'Q2',
-                'credits': '5/5',
-                'session': 'Oui',
-                'obligatoire': 'Non',
-                'commentaire_fr': '',
-                'commentaire_en': '',
-                'type_ajustement': TypeAjustement.AJOUT.name,
-            },
-        ]  # TODO :: message_bus.invoke(Command)
-        return data
+    def get_intitule_groupement(self) -> str:
+        return self.contenu.intitule
 
-    def get_intitule_groupement(self):
-        # TODO :: to implement
-        return "Intitulé groupement"
+    def get_intitule_complet_groupement(self) -> str:
+        return self.contenu.intitule_complet
 
-    def get_intitule_programme(self):
-        # TODO :: to implement
-        return "Intitulé programme"
+    def get_success_url(self) -> str:
+        return reverse(
+            'consulter_contenu_groupement_view',
+            args=self.args,
+            kwargs=self.kwargs
+        ) + "?{}=1".format(RAFRAICHIR_GROUPEMENT_CONTENANT)
+
+    def get_permission_object(self):
+        return GroupYear.objects.get(
+            partial_acronym=self.kwargs['code_programme'],
+            academic_year__year=self.kwargs['annee']
+        )

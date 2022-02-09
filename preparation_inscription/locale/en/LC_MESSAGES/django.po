@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-26 07:08+0100\n"
+"POT-Creation-Date: 2022-02-09 17:01+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -27,13 +27,13 @@ msgstr ""
 msgid "Add"
 msgstr ""
 
+msgid "Ajout"
+msgstr ""
+
 msgid "Ajouter des UE"
 msgstr ""
 
 msgid "Anac."
-msgstr ""
-
-msgid "Annuler ajout"
 msgstr ""
 
 msgid "Annuler l'ajout"
@@ -54,10 +54,10 @@ msgstr ""
 msgid "Annuler la suppression ?"
 msgstr ""
 
-msgid "Annuler suppression"
+msgid "Bloc"
 msgstr ""
 
-msgid "Bloc"
+msgid "Block"
 msgstr ""
 
 msgid "Cancel"
@@ -84,16 +84,16 @@ msgstr ""
 msgid "Commentaire en anglais"
 msgstr ""
 
+msgid "Composants (PM+PP)"
+msgstr ""
+
 msgid "Composants (PM/PP)"
 msgstr ""
 
 msgid "Crédits"
 msgstr ""
 
-msgid "Déplacer vers le bas"
-msgstr ""
-
-msgid "Déplacer vers le haut"
+msgid "Derogation's session"
 msgstr ""
 
 msgid "ECGE1BA - 2021-2022"
@@ -106,6 +106,9 @@ msgid "Intitulé"
 msgstr ""
 
 msgid "MODIFICATION"
+msgstr ""
+
+msgid "Modification"
 msgstr ""
 
 msgid "Modifier les propriétés"
@@ -129,49 +132,52 @@ msgstr ""
 msgid "SUPPRESSION"
 msgstr ""
 
+msgid "Save"
+msgstr ""
+
 msgid "Search"
 msgstr ""
 
 msgid "Session"
 msgstr ""
 
-msgid "Supprimer des UE"
+msgid "Suppression"
 msgstr ""
 
-msgid "Supprimer unite enseignement"
+msgid "Supprimer des UE"
 msgstr ""
 
 msgid "The learning units have been added"
 msgstr ""
 
+msgid "The learning units have been modified"
+msgstr ""
+
+#, python-format
+msgid "There is %(error_counter)s error in form"
+msgid_plural "There are %(error_counter)s errors in form"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "Title"
 msgstr ""
 
-msgid "champs1"
+msgid "Tri par bloc"
 msgstr ""
 
-msgid "champs2"
+msgid "Tri par code"
 msgstr ""
 
-msgid "champs3"
+msgid "Tri par ordre du programme"
 msgstr ""
 
-msgid "champs4"
+msgid "Tri par quadrimestre"
 msgstr ""
 
-msgid "champs5"
+msgid "Tri principal"
 msgstr ""
 
-msgid "Form view"
-msgstr ""
-
-msgid "Program"
-msgstr ""
-
-msgid "Sections and programs"
-msgstr ""
-
-msgid "Training configuration"
+msgid "Tri secondaire"
 msgstr ""
 
 msgctxt "student_path_year"

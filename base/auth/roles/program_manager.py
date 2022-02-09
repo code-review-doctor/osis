@@ -127,6 +127,7 @@ class ProgramManager(EducationGroupRoleModel):
             'preparation_inscription.view_preparation_inscription_cours': rules.always_allow,
             'preparation_inscription.view_formulaire_inscription_cours': rules.always_allow,
             'preparation_programme.can_add_unites_enseignement_au_programme': is_linked_to_offer,
+            'preparation_programme.can_modifier_contenu_groupement': is_linked_to_offer,
         })
 
 
