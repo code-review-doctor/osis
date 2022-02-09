@@ -1,5 +1,5 @@
 {% load static i18n bootstrap3 %}
-{% load formatage_credits formatage_volumes %}
+{% load formatage_credits formatage_volumes osis_role %}
 
 {% comment "License" %}
  * OSIS stands for Open Student Information System. It's an application
@@ -33,8 +33,10 @@
                 <span class="caret"></span>
             </button>
             <ul class="dropdown-menu pull-right" aria-labelledby="btn-action-down">
-                <li><a href="" hx-get="{% url 'ajouter_unites_enseignement_view' annee code_programme code_groupement%}"
-                       hx-target="#content-of-main-panel" hx-trigger="click">{% trans "Ajouter des UE" %}</a></li>
+                <li>
+                    {% url 'ajouter_unites_enseignement_view' annee code_programme code_groupement as ajouter_url %}
+                    {% a_htmx_tag_has_perm ajouter_url _('Ajouter des UE') "#content-of-main-panel" permission_ajout_ue user group_year %}
+                </li>
                 <li><a href="" hx-get="{% url 'supprimer_unites_enseignement_view' annee code_programme %}"
                        hx-target="#content-of-main-panel" hx-trigger="click">{% trans "Supprimer des UE" %}</a></li>
                 <li><a href="" hx-get="{% url 'modifier_proprietes_contenu_view' annee code_programme %}"

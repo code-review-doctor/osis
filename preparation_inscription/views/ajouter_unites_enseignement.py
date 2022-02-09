@@ -24,7 +24,7 @@
 ##############################################################################
 from typing import List
 
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
@@ -37,16 +37,25 @@ from base.views.common import display_error_messages, display_success_messages
 from ddd.logic.learning_unit.commands import LearningUnitSearchCommand
 from ddd.logic.learning_unit.dtos import LearningUnitSearchDTO
 from ddd.logic.preparation_programme_annuel_etudiant.commands import AjouterUEAuProgrammeCommand
+from education_group.models.group_year import GroupYear
 from infrastructure.messages_bus import message_bus_instance
+from osis_role.contrib.views import PermissionRequiredMixin
 from preparation_inscription.forms.search_learning_units import SearchLearningUnitForm
 from preparation_inscription.views.consulter_contenu_groupement import RAFRAICHIR_GROUPEMENT_CONTENANT
 
 
-class AjouterUnitesEnseignementView(LoginRequiredMixin, HtmxMixin, TemplateView):
+class AjouterUnitesEnseignementView(HtmxMixin, PermissionRequiredMixin, LoginRequiredMixin, TemplateView):
     name = 'ajouter_unites_enseignement_view'
+
+    # PermissionRequiredMixin
+    permission_required = "preparation_programme.can_add_unites_enseignement_au_programme"
+    raise_exception = True
 
     template_name = "preparation_inscription/ajouter_unites_enseignement.html"
     htmx_template_name = "preparation_inscription/ajouter_unites_enseignement.html"
+
+    def get_permission_object(self):
+        return get_object_or_404(GroupYear, academic_year__year=self.annee, partial_acronym=self.code_programme)
 
     @cached_property
     def code_programme(self):

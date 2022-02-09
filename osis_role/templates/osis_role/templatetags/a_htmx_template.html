@@ -1,0 +1,14 @@
+{%  if has_perm %}
+    <a href=""
+       hx-get="{{ url }}"
+       hx-target="{{ target }}"
+       hx-trigger="click">
+        {{ text|safe }}
+    </a>
+{% else %}
+    <a href="#"
+       class="{{ class_a }}"
+       title="{{ error_msg }}">
+        {{ text|safe }}
+    </a>
+{% endif %}
