@@ -79,15 +79,16 @@ class ModifierUniteEnseignementCommand(interface.CommandRequest):
     code: str
     annee: int
     bloc: int
+    credits_relatifs: int
+    session_derogation: str
+    obligatoire: bool
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
 class ModifierUEDuGroupementCommand(interface.CommandRequest):
-    annee_formation: int
-    sigle_formation: str
-    version_formation: str
-    transition_formation: str
-    a_ajuster_dans: str  # TODO :: code groupement ou uuid groupement ?
+    annee: int
+    code_programme: str
+    a_ajuster_dans: str  # code groupement
     unites_enseignements: List[ModifierUniteEnseignementCommand]
 
 
