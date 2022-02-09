@@ -136,8 +136,6 @@
 
 {% if rafraichir_groupement_contenant %}
     <script>
-        document.addEventListener('htmx:afterSettle', function(event){
-            $('#tree').trigger('refreshNode', '{{ code_programme }}');
-        })
+        document.querySelector("#tree").dispatchEvent(new CustomEvent('refreshTree'))
     </script>
 {% endif %}
