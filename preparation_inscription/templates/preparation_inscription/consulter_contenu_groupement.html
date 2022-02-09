@@ -76,7 +76,22 @@
                 {% endif %}
             </td>
             <td headers="code">
-                {{ element.code }}{{ element.intitule }}
+                {% if element.supprime %}
+                    <span class="text-danger">
+                        {{ element.code }}{{ element.intitule }}
+                    </span>
+                {% elif element.modifie %}
+                    <span class="text-info">
+                        {{ element.code }}{{ element.intitule }}
+                    </span>
+                {% elif element.ajoute %}
+                    <span class="text-success">
+                        {{ element.code }}{{ element.intitule }}
+                    </span>
+                {% else %}
+                    {{ element.code }}{{ element.intitule }}
+                {% endif %}
+
             </td>
             <td headers="intitule">
                 {{ element.intitule_complet }}
