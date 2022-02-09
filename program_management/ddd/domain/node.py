@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -39,6 +39,7 @@ from base.models.enums.link_type import LinkTypes
 from base.models.enums.proposal_type import ProposalType
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from base.models.enums.schedule_type import ScheduleTypeEnum
+from base.models.enums import learning_unit_year_session
 from education_group.models.enums.constraint_type import ConstraintTypes
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from osis_common.ddd import interface
@@ -627,6 +628,7 @@ class NodeLearningUnitYear(Node):
     english_friendly = attr.ib(type=bool, default=False)
     french_friendly = attr.ib(type=bool, default=False)
     exchange_students = attr.ib(type=bool, default=True)
+    session_derogation = attr.ib(type=learning_unit_year_session.LEARNING_UNIT_YEAR_SESSION, default=None)
 
     def equals(self, learning_unit_year) -> bool:
         return learning_unit_year.entity_id.code == self.entity_id.code \

@@ -23,138 +23,66 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib.auth.mixins import PermissionRequiredMixin
+
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
-from base.utils.htmx import HtmxMixin
-
-
-RAFRAICHIR_GROUPEMENT_CONTENANT = 'rafraichir_groupement_contenant'
-
-
-class ConsulterContenuGroupementView(HtmxMixin, PermissionRequiredMixin, TemplateView):
-    name = 'consulter_contenu_groupement_view'
-
-    # PermissionRequiredMixin
-    permission_required = "preparation_inscription.view_preparation_inscription_cours"
-    raise_exception = True
-
-    # TemplateView
-    template_name = "preparation_inscription/preparation_inscription.html"
-    htmx_template_name = "preparation_inscription/consulter_contenu_groupement.html"
-
-    def get_context_data(self, **kwargs):
-        return {
-            **super().get_context_data(**kwargs),
-            # TODO code_groupement_racine :: à implémenter quand la story "afficher contenu" est développée
-            'code_groupement_racine': 'LECGE100T',
-            RAFRAICHIR_GROUPEMENT_CONTENANT: self.request.GET.get(RAFRAICHIR_GROUPEMENT_CONTENANT),
-            'search_result': self.get_content(),
-            'intitule_groupement': self.get_intitule_groupement(),
-            'intitule_programme': self.get_intitule_programme(),
-        }
-
-    def get_content(self):
-        data = [
-            {
-                'code_ue': 'LESPO1113',
-                'intitule': 'Sociologie et anthropologie des mondes contemporains',
-                'volumes': '10',
-                'bloc': '1',
-                'quadri': 'Q1',
-                'credits': '5/5',
-                'session': 'Oui',
-                'obligatoire': 'Oui',
-                'commentaire_fr': """Lorem Ipsum est un générateur de faux textes aléatoires. Vous choisissez le nombre de paragraphes, de mots ou de listes. Vous obtenez alors un texte aléatoire que vous pourrez ensuite utiliser librement dans vos maquettes.
-                    Le texte généré est du pseudo latin et peut donner l'impression d'être du vrai texte.
-                    Faux-Texte est une réalisation du studio de création de sites internet indépendant Prélude Prod.
-                    Si vous aimez la photographie d'art et l'esprit zen, jetez un œil sur le site de ce photographe à Palaiseau, en Essonne (France).
-                """,
-                'commentaire_en': '',
-                'type_ajustement': TypeAjustement.SUPPRESSION.name,
-            },
-            {
-                'code_ue': 'LESPO1321',
-                'intitule': 'Economic, Political and Social Ethics',
-                'volumes': '15+10',
-                'bloc': '1',
-                'quadri': 'Q1',
-                'credits': '4/5',
-                'session': 'Oui',
-                'obligatoire': 'Oui',
-                'commentaire_fr': '',
-                'commentaire_en': '',
-                'type_ajustement': TypeAjustement.SUPPRESSION.name,
-            },
-            {
-                'code_ue': 'LESPO1114',
-                'intitule': 'Political Science',
-                'volumes': '30',
-                'bloc': '2',
-                'quadri': 'Q1',
-                'credits': '5/5',
-                'session': 'Oui',
-                'obligatoire': 'Oui',
-                'commentaire_fr': '',
-                'commentaire_en': '',
-                'type_ajustement': TypeAjustement.MODIFICATION.name,
-            },
-            {
-                'code_ue': 'LECGE1115',
-                'intitule': 'Economie politique',
-                'volumes': '30',
-                'bloc': '1',
-                'quadri': 'Q2',
-                'credits': '3/3',
-                'session': 'Oui',
-                'obligatoire': 'Oui',
-                'commentaire_fr': '',
-                'commentaire_en': '',
-                'type_ajustement': None,
-            },
-            {
-                'code_ue': 'LINGE1122',
-                'intitule': 'Physique 1',
-                'volumes': '30',
-                'bloc': '1',
-                'quadri': 'Q2',
-                'credits': '3/3',
-                'session': 'Oui',
-                'obligatoire': 'Oui',
-                'commentaire_fr': '',
-                'commentaire_en': '',
-                'type_ajustement': TypeAjustement.AJOUT.name,
-            },
-            {
-                'code_ue': 'LINGE1125',
-                'intitule': 'Séminaire de travail universitaire en gestion',
-                'volumes': '25',
-                'bloc': '1',
-                'quadri': 'Q2',
-                'credits': '5/5',
-                'session': 'Oui',
-                'obligatoire': 'Non',
-                'commentaire_fr': '',
-                'commentaire_en': '',
-                'type_ajustement': TypeAjustement.AJOUT.name,
-            },
-        ]  # TODO :: message_bus.invoke(Command)
-        return data
-
-    def get_intitule_groupement(self):
-        # TODO :: to implement
-        return "Intitulé groupement"
-
-    def get_intitule_programme(self):
-        # TODO :: to implement
-        return "Intitulé programme"
-
-
 from base.models.utils.utils import ChoiceEnum
+from base.utils.htmx import HtmxMixin
+from ddd.logic.preparation_programme_annuel_etudiant.commands import GetContenuGroupementCommand
+from infrastructure.messages_bus import message_bus_instance
 
 
 class TypeAjustement(ChoiceEnum):
     SUPPRESSION = _('SUPPRESSION')
     MODIFICATION = _('MODIFICATION')
     AJOUT = _('AJOUT')
+
+
+RAFRAICHIR_GROUPEMENT_CONTENANT = 'rafraichir_groupement_contenant'
+
+
+class ConsulterContenuGroupementView(HtmxMixin, PermissionRequiredMixin, LoginRequiredMixin, TemplateView):
+
+    # PermissionRequiredMixin
+    permission_required = "preparation_inscription.view_preparation_inscription_cours"
+    raise_exception = True
+
+    name = 'consulter_contenu_groupement_view'
+    # TemplateView
+    template_name = "preparation_inscription/preparation_inscription.html"
+    htmx_template_name = "preparation_inscription/consulter_contenu_groupement.html"
+
+    def get_context_data(self, **kwargs):
+        context = {
+            **super().get_context_data(**kwargs),
+            # TODO code_groupement_racine :: à implémenter quand la story "afficher contenu" est développée
+            'code_programme': self.kwargs['code_programme'],
+            'code_groupement': self.kwargs['code_groupement'],
+            RAFRAICHIR_GROUPEMENT_CONTENANT: self.request.GET.get(RAFRAICHIR_GROUPEMENT_CONTENANT),
+            'intitule_programme': self.get_intitule_programme(),
+        }
+
+        context.update(self.get_content())
+        return context
+
+    def get_content(self):
+        cmd = GetContenuGroupementCommand(
+            code_formation=self.kwargs['code_programme'],
+            annee=self.kwargs['annee'],
+            code=self.kwargs.get('code_groupement', self.kwargs['code_programme']),
+        )
+
+        contenu_groupement_DTO = message_bus_instance.invoke(cmd)  # return ContenuGroupementDTO
+        return {
+            'search_result': contenu_groupement_DTO.elements_contenus,
+            'intitule_groupement':
+                contenu_groupement_DTO.intitule if contenu_groupement_DTO else '',
+            'intitule_complet_groupement':
+                contenu_groupement_DTO.intitule_complet if contenu_groupement_DTO else '',
+        }
+
+    def get_intitule_programme(self):
+        # TODO :: to implement
+        return "Intitulé programme"

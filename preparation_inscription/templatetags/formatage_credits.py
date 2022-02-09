@@ -28,6 +28,7 @@ from django import template
 from django.utils.translation import gettext_lazy as _
 
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import UniteEnseignementCatalogueDTO
+from preparation_inscription.utils.chiffres_significatifs_de_decimal import get_chiffres_significatifs
 
 register = template.Library()
 
@@ -35,7 +36,8 @@ register = template.Library()
 @register.filter
 def formater_credits_ue(unite_enseignement: 'UniteEnseignementCatalogueDTO') -> str:
     if unite_enseignement and (unite_enseignement.credits_absolus or unite_enseignement.credits_relatifs):
-        credits_absolus = unite_enseignement.credits_absolus.normalize() if unite_enseignement.credits_absolus else None
+        credits_absolus = get_chiffres_significatifs(unite_enseignement.credits_absolus) \
+            if unite_enseignement.credits_absolus else None
         return "({} {})".format(
             unite_enseignement.credits_relatifs or credits_absolus or 0,
             _("credits")

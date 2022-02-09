@@ -36,48 +36,37 @@
                        hx-target="#content-of-main-panel" hx-trigger="click">{% trans "Ajouter des UE" %}</a></li>
                 <li><a href="" hx-get="{% url 'supprimer_unites_enseignement_view' annee code_programme %}"
                        hx-target="#content-of-main-panel" hx-trigger="click">{% trans "Supprimer des UE" %}</a></li>
-                <li><a href="" hx-get="{% url 'modifier_proprietes_contenu_view' annee code_programme %}"
+                <li><a href="" hx-get="{% url 'modifier_proprietes_contenu_view' annee code_programme code_groupement %}"
                        hx-target="#content-of-main-panel" hx-trigger="click">{% trans "Modifier les propriétés" %}</a>
                 </li>
             </ul>
         </div>
     </div>
-    <h5>{{ intitule_groupement }}</h5>
+    <h5>{{ intitule_groupement }} - {{ intitule_complet_groupement }}</h5>
 </div>
 <div class="panel-body">
     <table id="table_search_list" class="table table-hover">
         <thead>
         <tr>
-            <th id="code_ue" class="code-col">{% trans 'Code' %}</th>
+            <th id="code" class="code-col">{% trans 'Code' %}</th>
         <th id="intitule">{% trans 'Intitulé' %}</th>
-        <th id="volumes">{% trans 'Composants (PM/PP)' %}</th>
+        <th id="volumes">{% trans 'Composants (PM+PP)' %}</th>
         <th id="bloc">{% trans 'Bloc' %}</th>
         <th id="quadri">{% trans 'Quadri.' %}</th>
         <th id="credits">{% trans 'Crédits' %}</th>
-        <th id="session">{% trans 'Session' %}</th>
+        <th id="session">{% trans "Derogation's session" %}</th>
         <th id="obligatoire">{% trans 'Obligatoire' %}</th>
-        <th id="commentaire_fr">{% trans 'Commentaire' %}</th>
-        <th id="commentaire_en">{% trans 'Commentaire en anglais' %}</th>
         <th id="action" class="actions-col"></th>
     </tr>
     </thead>
     <tbody>
     {% for element in search_result %}
         <tr>
-            {% if element.type_ajustement == 'SUPPRESSION' %}
-                <td class="text-danger" headers="code_ue"><span><i class="fas fa-folder-minus"></i>
-            {% elif element.type_ajustement == 'MODIFICATION' %}
-                <td class="text-info" headers="code_ue"><span><i class="fas fa-folder"></i>
-            {% elif element.type_ajustement == 'AJOUT' %}
-                <td class="text-success" headers="code_ue"><span><i class="fas fa-folder-plus"></i>
-            {% else %}
-                <td headers="code_ue"><span><i class="fas fa-folder-plus" style="visibility: hidden" ></i>
-            {% endif %}
-                <span class="emphasized-code">{{ element.code_ue }}</span>
-            </span>
+            <td headers="code">
+                {{ element.code }}{{ element.intitule }}
             </td>
             <td headers="intitule">
-                {{ element.intitule }}
+                {{ element.intitule_complet }}
             </td>
             <td headers="volumes">
                 {{ element.volumes }}
@@ -90,71 +79,20 @@
                 {% endif %}
             </td>
             <td headers="quadri">
-                {{ element.quadri }}
+                {{ element.quadrimestre_texte }}
             </td>
             <td headers="credits">
                 {{ element.credits }}
             </td>
             <td headers="session">
-                {{ element.session }}
+                {{ element.session_derogation }}
             </td>
             <td headers="obligatoire">
-                {{ element.obligatoire }}
-            </td>
-            <td headers="commentaire_fr">
-                <div data-toggle="tooltip" title="{{ element.commentaire_fr }}">{{ element.commentaire_fr|truncatechars:10 }}</div>
-            </td>
-            <td headers="commentaire_en">
-                {{ element.commentaire_en }}
+                {{ element.obligatoire | yesno | title }}
             </td>
             <td headers="action">
                 <div class="pull-right">
 
-                    {% if element.type_ajustement == 'SUPPRESSION' %}
-
-                        <a href="#"
-                           id="lnk_annuler_suppression"
-                           data-toggle="tooltip"
-                           title="{% trans 'Annuler suppression' %}"
-                        >
-                            <span class="fa fa-redo-alt" aria-hidden="true" data-toggle="modal" data-target="#annuler_suppression_modal"></span>
-                        </a>
-
-                    {% elif element.type_ajustement == 'MODIFICATION' %}
-
-                        <a href="#"
-                           id="lnk_supprimer_ue"
-                           data-toggle="tooltip"
-                           title="{% trans 'Supprimer unite enseignement' %}"
-                        >
-                            <span class="fa fa-redo-alt" aria-hidden="true" data-toggle="modal" data-target="#annuler_modification_modal"></span>
-                        </a>
-
-                    {% else %}
-
-                        <a href="#"
-                           id="lnk_deplacer_bas"
-                           data-toggle="tooltip"
-                           title="{% trans 'Déplacer vers le bas' %}"
-                        >
-                            <span class="fa fa-long-arrow-alt-down" aria-hidden="true"></span>
-                        </a>
-                        <a href="#"
-                           id="lnk_deplacer_haut"
-                           data-toggle="tooltip"
-                           title="{% trans 'Déplacer vers le haut' %}"
-                        >
-                            <span class="fa fa-long-arrow-alt-up" aria-hidden="true"></span>
-                        </a>
-                        <a href="#"
-                           id="lnk_annuler_ajout"
-                           data-toggle="tooltip"
-                           title="{% trans 'Annuler ajout' %}"
-                        >
-                            <span class="fa fa-times" aria-hidden="true" data-toggle="modal" data-target="#annuler_ajout_modal"></span>
-                        </a>
-
-                    {% endif %}
                 </div>
             </td>
         </tr>
