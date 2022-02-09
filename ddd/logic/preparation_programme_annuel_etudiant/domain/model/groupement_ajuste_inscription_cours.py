@@ -34,7 +34,7 @@ from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdent
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.unite_enseignement_ajoutee import \
     UniteEnseignementAjoutee, UniteEnseignementAjouteeIdentity
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.unite_enseignement_modifiee import \
-    UniteEnseignementModifiee
+    UniteEnseignementModifiee, UniteEnseignementModifieeIdentity
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.unite_enseignement_supprimee import \
     UniteEnseignementSupprimee
 from ddd.logic.preparation_programme_annuel_etudiant.domain.validator.validators_by_business_action import \
@@ -91,9 +91,16 @@ class GroupementAjusteInscriptionCours(interface.RootEntity):
 
     def ajuster_unite_enseignement(
             self,
-            unite_enseignement: 'LearningUnitYearIdentity',
+            unite_enseignement: 'LearningUnitIdentity',
+            bloc: int = None
     ):
-        raise NotImplementedError
+        self.unites_enseignement_modifiees.append(
+            UniteEnseignementModifiee(
+                entity_id=UniteEnseignementModifieeIdentity(uuid.uuid4()),
+                unite_enseignement_identity=unite_enseignement,
+                bloc=bloc
+            )
+        )
 
     def annuler_action_sur_unite_enseignement(
             self,

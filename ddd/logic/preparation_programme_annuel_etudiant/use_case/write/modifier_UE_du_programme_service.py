@@ -24,10 +24,12 @@
 #
 ##############################################################################
 from ddd.logic.preparation_programme_annuel_etudiant.commands import ModifierUEDuGroupementCommand
-from ddd.logic.preparation_programme_annuel_etudiant.domain.builder.groupement_ajuste_inscription_cours_identity_builder import \
-    GroupementAjusteInscriptionCoursIdentityBuilder
+from ddd.logic.preparation_programme_annuel_etudiant.domain.builder.groupement_ajuste_inscription_cours_builder import \
+    GroupementAjusteInscriptionCoursBuilder
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
     IdentiteGroupementAjusteInscriptionCours
+from ddd.logic.preparation_programme_annuel_etudiant.domain.service.modifier_unites_enseignement import \
+    ModifierUnitesEnseignement
 from ddd.logic.preparation_programme_annuel_etudiant.repository.i_groupement_ajuste_inscription_cours import \
     IGroupementAjusteInscriptionCoursRepository
 
@@ -37,16 +39,14 @@ def modifier_UE_du_programme(
         repository: 'IGroupementAjusteInscriptionCoursRepository',
 ) -> 'IdentiteGroupementAjusteInscriptionCours':
     # GIVEN
-    identite_groupement_ajuste = GroupementAjusteInscriptionCoursIdentityBuilder.build_from_command(cmd)
-    groupement_ajuste = repository.get(
-        entity_id=identite_groupement_ajuste
+    groupement_ajuste = GroupementAjusteInscriptionCoursBuilder.build_from_code_groupement_et_annee(
+        code_groupement_a_ajuster=cmd.ajuster_dans,
+        annee=cmd.annee,
+        repository=repository
     )
 
     # WHEN
-    for cmd_ue in cmd.unites_enseignements:
-        groupement_ajuste.ajuster_unite_enseignement(
-            unite_enseignement=cmd_ue.code,
-        )
+    ModifierUnitesEnseignement.modifier_unites_enseignement(cmd, groupement_ajuste)
 
     # THEN
     repository.save(groupement_ajuste)
