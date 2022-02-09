@@ -159,12 +159,12 @@ class GetProgrammeInscriptionCours(interface.DomainService):
             ),
             None
         )
-        unites_enseignements_ajoutes = groupement_ajuste_correspondant.unites_enseignement_ajoutees if \
+        unites_enseignement_ajoutees = groupement_ajuste_correspondant.unites_enseignement_ajoutees if \
             groupement_ajuste_correspondant else []
 
         return [
             cls.__build_unite_enseignement_ajoute_dto(unite_enseignement, unite_enseignement_ajoutes_dto)
-            for unite_enseignement in unites_enseignements_ajoutes
+            for unite_enseignement in unites_enseignement_ajoutees
         ]
 
     @classmethod
