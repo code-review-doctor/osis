@@ -29,7 +29,6 @@ from typing import List, Union, Optional
 import attr
 
 from osis_common.ddd.interface import DTO
-from preparation_inscription.utils.chiffres_significatifs_de_decimal import get_chiffres_significatifs
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
@@ -153,8 +152,8 @@ class GroupementInscriptionCoursDTO(DTO):
     obligatoire: bool
     code: str
     unites_enseignement_ajoutees: List['UniteEnseignementAjouteeDTO']
+    unites_enseignement_supprimees: List[str]
     #  Comment because nominal case (program without adjustment) only for now
-    # unites_enseignement_supprimees: List['UniteEnseignementSupprimeeDTO']
     # unites_enseignement_modifiees: List['UniteEnseignementModifieeDTO']
     # unites_enseignements: List['UniteEnseignementProgrammeDTO']
     contenu: List[Union['UniteEnseignementProgrammeDTO', 'GroupementInscriptionCoursDTO']]

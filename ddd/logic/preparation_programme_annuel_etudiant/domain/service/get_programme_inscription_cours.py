@@ -76,7 +76,7 @@ class GetProgrammeInscriptionCours(interface.DomainService):
             racine=cls.__build_contenu(
                 [formation.racine],
                 groupements_ajustes,
-                unite_enseignements_ajoutes_dto
+                unite_enseignements_ajoutes_dto,
             )[0],
         )
 
@@ -101,12 +101,13 @@ class GetProgrammeInscriptionCours(interface.DomainService):
             entity_ids=entity_id_unites_enseignement
         )
 
+
     @classmethod
     def __build_contenu(
             cls,
             contenu_ordonne_catalogue: List[Union['UniteEnseignementCatalogueDTO', 'ContenuGroupementCatalogueDTO']],
             groupements_ajustes: List['GroupementAjusteInscriptionCours'],
-            unite_enseignement_ajoutes_dto: List['UniteEnseignementCatalogueDTO']
+            unite_enseignement_ajoutes_dto: List['UniteEnseignementCatalogueDTO'],
     ) -> List[Union['UniteEnseignementProgrammeDTO', 'GroupementInscriptionCoursDTO']]:
         contenu = []
         for element in contenu_ordonne_catalogue:
@@ -129,6 +130,10 @@ class GetProgrammeInscriptionCours(interface.DomainService):
                             element,
                             groupements_ajustes,
                             unite_enseignement_ajoutes_dto
+                        ),
+                        unites_enseignement_supprimees=cls.__build_unite_enseignement_supprimees_dtos(
+                            element,
+                            groupements_ajustes,
                         ),
                         contenu=cls.__build_contenu(
                             element.contenu_ordonne_catalogue,
@@ -154,13 +159,32 @@ class GetProgrammeInscriptionCours(interface.DomainService):
             ),
             None
         )
-        unites_enseignemnts_ajoutes = groupement_ajuste_correspondant.unites_enseignement_ajoutees if \
+        unites_enseignements_ajoutes = groupement_ajuste_correspondant.unites_enseignement_ajoutees if \
             groupement_ajuste_correspondant else []
 
         return [
             cls.__build_unite_enseignement_ajoute_dto(unite_enseignement, unite_enseignement_ajoutes_dto)
-            for unite_enseignement in unites_enseignemnts_ajoutes
+            for unite_enseignement in unites_enseignements_ajoutes
         ]
+
+    @classmethod
+    def __build_unite_enseignement_supprimees_dtos(
+            cls,
+            groupement: 'ContenuGroupementCatalogueDTO',
+            groupements_ajustes: List['GroupementAjusteInscriptionCours'],
+    ) -> List[str]:
+        groupement_ajuste_correspondant = next(
+            (
+                groupement_ajuste
+                for groupement_ajuste in groupements_ajustes
+                if groupement_ajuste.groupement_id.code == groupement.groupement_contenant.code
+            ),
+            None
+        )
+        unites_enseignements_supprimees = groupement_ajuste_correspondant.unites_enseignement_supprimees if \
+            groupement_ajuste_correspondant else []
+
+        return [unite_enseignement.code for unite_enseignement in unites_enseignements_supprimees]
 
     @classmethod
     def __build_unite_enseignement_ajoute_dto(
