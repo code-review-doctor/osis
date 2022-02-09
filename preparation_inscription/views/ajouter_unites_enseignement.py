@@ -101,8 +101,9 @@ class AjouterUnitesEnseignementView(HtmxMixin, PermissionRequiredMixin, LoginReq
         )
         try:
             message_bus_instance.invoke(cmd)
-            success_message = _('The learning units have been added')
-            display_success_messages(self.request, success_message)
+            if selected_ues:
+                success_message = _('The learning units have been added')
+                display_success_messages(self.request, success_message)
         except MultipleBusinessExceptions as exceptions:
             messages = [exception.message for exception in exceptions.exceptions]
             display_error_messages(self.request, messages)

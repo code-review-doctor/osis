@@ -141,7 +141,7 @@ msgid "Supprimer unite enseignement"
 msgstr ""
 
 msgid "The learning units have been added"
-msgstr "Les unitées d'enseignement ont été ajoutées"
+msgstr "Les unités d'enseignement ont été ajoutées"
 
 msgid "Title"
 msgstr "Intitule"
