@@ -43,6 +43,7 @@ from education_group.models.group_year import GroupYear
 from infrastructure.messages_bus import message_bus_instance
 from osis_role.contrib.views import PermissionRequiredMixin
 from preparation_inscription.forms.search_learning_units import SearchLearningUnitForm
+from preparation_inscription.perms import AJOUTER_UNITE_ENSEIGNEMENT_PERMISSION
 from preparation_inscription.views.consulter_contenu_groupement import RAFRAICHIR_GROUPEMENT_CONTENANT
 
 
@@ -50,7 +51,7 @@ class AjouterUnitesEnseignementView(HtmxMixin, PermissionRequiredMixin, LoginReq
     name = 'ajouter_unites_enseignement_view'
 
     # PermissionRequiredMixin
-    permission_required = "preparation_programme.can_add_unites_enseignement_au_programme"
+    permission_required = AJOUTER_UNITE_ENSEIGNEMENT_PERMISSION
     raise_exception = True
 
     template_name = "preparation_inscription/ajouter_unites_enseignement.html"
