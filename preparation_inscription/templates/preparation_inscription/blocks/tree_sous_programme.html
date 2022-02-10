@@ -3,7 +3,7 @@
     url="{% if element.type == "GROUPEMENT" %}{% url 'consulter_contenu_groupement_view' annee=annee code_programme=code_programme code_groupement=tree.code %}{% endif %}"
     data-jstree='{"icon":"{% if tree.obligatoire %}{% static "img/education_group_year/mandatory.png" %}{% else %}{% static "img/education_group_year/optional.png" %}{% endif %}"}'
 >
-    {{ tree.intitule_complet }} {{parent_code}}_{{ tree.code }}
+    {{ tree.intitule_complet }}
      <div class="node_block_text"></div>
     {% if tree.contenu %}
         <ul>

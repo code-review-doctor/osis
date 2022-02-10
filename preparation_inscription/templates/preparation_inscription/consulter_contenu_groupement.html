@@ -48,7 +48,6 @@
         </div>
     </div>
     <h5>{{ intitule_groupement }} - {{ intitule_complet_groupement }}</h5>
-    {{ tree }}_{{ code_groupement }}
 </div>
 <div class="panel-body">
     <table id="table_search_list" class="table table-hover">
@@ -177,10 +176,10 @@
 
 {% if rafraichir_groupement_contenant %}
     <script>
-        const node_id = document.querySelector(".jstree-clicked").parentNode.id;
-        console.log(node_id);
-        document.addEventListener('htmx:afterSettle', function(event){
-            $('#tree').trigger('refreshNode', node_id);
-        })
+        document.querySelector("#tree").dispatchEvent(
+            new CustomEvent('refreshNode', {'detail': {
+                'nodeId': document.querySelector(".jstree-clicked").parentNode.id
+            }
+        }));
     </script>
 {% endif %}

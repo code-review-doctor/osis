@@ -146,8 +146,7 @@
             });
 
             $tree.bind('refreshNode', function (e, node_id) {
-                console.log(e);
-                console.log(node_id);
+                node_id = node_id || e.originalEvent.detail.nodeId;
                 $tree.jstree(true).refresh_node(node_id);
             });
 
