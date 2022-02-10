@@ -25,7 +25,7 @@
 ##############################################################################
 from typing import List
 
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.utils.functional import cached_property
 from django.views.generic import TemplateView
 
@@ -34,7 +34,11 @@ from ddd.logic.preparation_programme_annuel_etudiant.commands import GetUnitesEn
 from infrastructure.messages_bus import message_bus_instance
 
 
-class ListeUnitesEnseignementView(HtmxMixin, LoginRequiredMixin, TemplateView):
+class ListeUnitesEnseignementView(HtmxMixin, PermissionRequiredMixin, LoginRequiredMixin, TemplateView):
+    # PermissionRequiredMixin
+    permission_required = "preparation_inscription.view_preparation_inscription_cours"
+    raise_exception = True
+
     name = 'liste_unites_enseignement_view'
     # TemplateView
     template_name = "preparation_inscription/liste_unites_enseignement.html"

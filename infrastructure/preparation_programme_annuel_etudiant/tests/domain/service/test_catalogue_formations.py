@@ -27,14 +27,32 @@ from decimal import Decimal
 from typing import List, Union
 from unittest import mock
 
+import mock
 from django.test import SimpleTestCase
 
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import UniteEnseignementCatalogueDTO, \
-    ContenuGroupementCatalogueDTO
+    ContenuGroupementCatalogueDTO, UniteEnseignementDTO
 from infrastructure.preparation_programme_annuel_etudiant.domain.service.catalogue_formations import \
     CatalogueFormationsTranslator
+from infrastructure.preparation_programme_annuel_etudiant.domain.service.in_memory.catalogue_formations import \
+    CatalogueFormationsTranslatorInMemory
 from program_management.ddd.domain.program_tree_version import STANDARD
-from program_management.ddd.dtos import ProgrammeDeFormationDTO, ContenuNoeudDTO, UniteEnseignementDTO
+from program_management.ddd.dtos import ProgrammeDeFormationDTO, ContenuNoeudDTO, UniteEnseignementDTO \
+    as ProgramManagementUniteEnseignementDTO
+
+UE_LESPO1113 = ProgramManagementUniteEnseignementDTO(
+    bloc=1,
+    code='LESPO1113',
+    intitule_complet='Sociologie et anthropologie des mondes contemporains',
+    quadrimestre='Q1or2',
+    quadrimestre_texte='Q1 ou Q2',
+    credits_absolus=Decimal(5),
+    volume_annuel_pm=40,
+    volume_annuel_pp=0,
+    obligatoire=False,
+    credits_relatifs=5,
+    session_derogation='',
+)
 
 ANNEE = 2021
 
@@ -73,7 +91,9 @@ class CatalogueFormationsTranslatorTest(SimpleTestCase):
 
     def _assert_equal_groupements_contenus(
             self,
-            formation_groupements_contenus: List[Union['UniteEnseignementCatalogueDTO', 'ContenuGroupementCatalogueDTO']],
+            formation_groupements_contenus: List[
+                Union['UniteEnseignementCatalogueDTO', 'ContenuGroupementCatalogueDTO']
+            ],
             prgm_racine_groupements_contenus: List[Union['UniteEnseignementDTO', 'ContenuNoeudDTO']],
     ):
         for idx, pgm_contenu in enumerate(formation_groupements_contenus):
@@ -146,21 +166,43 @@ def _build_ProgrammeDeFormationDTO():
                     intitule_complet='Contenu :',
                     code='LECGE100T',
                     contenu_ordonne=[
-                        UniteEnseignementDTO(
-                            bloc=1,
-                            code='LESPO1113pp',
-                            intitule_complet='Sociologie et anthropologie des mondes contemporains',
-                            quadrimestre='Q1or2',
-                            quadrimestre_texte='Q1 ou Q2',
-                            credits_absolus=Decimal(5),
-                            volume_annuel_pm=40,
-                            volume_annuel_pp=0,
-                            obligatoire=False,
-                            credits_relatifs=5,
-                            session_derogation='',
-                        )
+                        UE_LESPO1113
                     ]
                 )
             ]
         )
     )
+
+
+class CatalogueFormationsTranslatorGetUnitesEnseignementTest(SimpleTestCase):
+
+    def setUp(self) -> None:
+        self.translator = CatalogueFormationsTranslator()
+        self.formationECGE1BA = CatalogueFormationsTranslatorInMemory.dtos[0]
+
+    @mock.patch("infrastructure.messages_bus.get_unites_enseignement")
+    def test_should_get_unites_enseignement_de_version_standard(self, mock_get_unites_enseignement):
+        mock_get_unites_enseignement.return_value = [UE_LESPO1113]
+
+        ues_liste_plate_dto = self.translator.get_unites_enseignement(
+            code_programme=self.formationECGE1BA.sigle,
+            annee=self.formationECGE1BA.annee
+        )
+        ue_liste_plate_dto = ues_liste_plate_dto[0]
+        self._assert_equal_unite_enseignement_conversion(UE_LESPO1113, ue_liste_plate_dto)
+
+    def _assert_equal_unite_enseignement_conversion(
+            self,
+            unite_contenue: ProgramManagementUniteEnseignementDTO,
+            unite_contenu_dans_programme: UniteEnseignementDTO
+    ):
+        self.assertEqual(unite_contenue.bloc, unite_contenu_dans_programme.bloc)
+        self.assertEqual(unite_contenue.code, unite_contenu_dans_programme.code)
+        self.assertEqual(unite_contenue.intitule_complet, unite_contenu_dans_programme.intitule_complet)
+        self.assertEqual(unite_contenue.quadrimestre, unite_contenu_dans_programme.quadrimestre)
+        self.assertEqual(unite_contenue.credits_absolus, unite_contenu_dans_programme.credits_absolus)
+        self.assertEqual(unite_contenue.volume_annuel_pm, unite_contenu_dans_programme.volume_annuel_pm)
+        self.assertEqual(unite_contenue.volume_annuel_pp, unite_contenu_dans_programme.volume_annuel_pp)
+        self.assertEqual(unite_contenue.obligatoire, unite_contenu_dans_programme.obligatoire)
+        self.assertEqual(unite_contenue.credits_relatifs, unite_contenu_dans_programme.credits_relatifs)
+        self.assertEqual(unite_contenue.session_derogation, unite_contenu_dans_programme.session_derogation)
