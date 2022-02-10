@@ -33,19 +33,25 @@ from base.tests.factories.person import PersonFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import GroupementContenantDTO
 from preparation_inscription.views.modification_contenu_groupement import ModifierProprietesContenuView
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 
 
 class TestModificationContenuGroupementGETView(TestCase):
 
     @classmethod
     def setUpTestData(cls):
+        cls.education_group_version = EducationGroupVersionFactory(
+            root_group__partial_acronym='LCORP201S',
+            root_group__academic_year__year=2021
+        )
+
         cls.url = reverse(
             ModifierProprietesContenuView.name,
             kwargs={'annee': 2021, 'code_programme': 'LCORP201S', 'code_groupement': 'LCORP201S'}
         )
 
     def setUp(self) -> None:
-        pgm_manager = ProgramManagerFactory()
+        pgm_manager = ProgramManagerFactory(education_group=self.education_group_version.offer.education_group)
         self.client.force_login(pgm_manager.person.user)
         self.__mock_service_bus()
 
