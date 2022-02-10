@@ -28,7 +28,7 @@ import os
 from django.core.management.base import BaseCommand
 
 
-class RunTestUntilFirstFail(BaseCommand):
+class Command(BaseCommand):
     """
     Launch test/test case/tests app until first failed. This makes it easier to fail a random test fail
     Arguments :

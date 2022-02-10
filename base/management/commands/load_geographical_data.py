@@ -13,7 +13,7 @@ COUNTRY_FILE = 'countries.csv'
 ZIPCODE_FILE = 'zipcode.csv'
 
 
-class LoadGeographicalData(BaseCommand):
+class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('--debug', nargs='?', default=False, type=bool)
         parser.add_argument('--countries', nargs='?', default=True)
