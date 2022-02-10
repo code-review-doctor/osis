@@ -134,7 +134,7 @@ class ConsulterContenuGroupementViewMockup(ConsulterContenuGroupementView):
                     "obligatoire": "Oui"
                 },
                 {
-                    "code": "LECGE101R",
+                    "code": "MAT2ECGE",
                     "intitule": "Economie et gestion",
                     "volumes": "",
                     "bloc": "",
