@@ -40,6 +40,7 @@ class TypeAjustement(ChoiceEnum):
     MODIFICATION = _('EDITION')
     AJOUT = _('ADDITION')
 
+
 RAFRAICHIR_GROUPEMENT_CONTENANT = 'rafraichir_groupement_contenant'
 
 

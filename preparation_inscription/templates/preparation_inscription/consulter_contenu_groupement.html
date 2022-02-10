@@ -178,7 +178,7 @@
     <script>
         document.querySelector("#tree").dispatchEvent(
             new CustomEvent('refreshNode', {'detail': {
-                'nodeId': document.querySelector(".jstree-clicked").parentNode.id
+                'nodeIdSuffix': '{{ code_groupement }}'
             }
         }));
     </script>

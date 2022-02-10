@@ -145,9 +145,12 @@
                 $tree.jstree(true).search(e.target.value);
             });
 
-            $tree.bind('refreshNode', function (e, node_id) {
-                node_id = node_id || e.originalEvent.detail.nodeId;
-                $tree.jstree(true).refresh_node(node_id);
+            // use node_id_suffix to refresh same nodes from different parents
+            $tree.bind('refreshNode', function (e, node_id_suffix) {
+                node_id_suffix = node_id_suffix || e.originalEvent.detail.nodeIdSuffix;
+                document.querySelectorAll(`[id$="${node_id_suffix}"]`).forEach((node => {
+                    $tree.jstree(true).refresh_node(node);
+                }));
             });
 
             $tree.bind("activate_node.jstree", function (event, data) {
