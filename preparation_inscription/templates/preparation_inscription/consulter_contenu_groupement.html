@@ -37,13 +37,18 @@
                        hx-target="#content-of-main-panel" hx-trigger="click">{% trans "Add learning units" %}</a></li>
                 <li><a href="" hx-get="{% url 'supprimer_unites_enseignement_view' annee code_programme code_groupement %}"
                        hx-target="#content-of-main-panel" hx-trigger="click">{% trans "Delete learning units" %}</a></li>
-                <li><a href="" hx-get="{% url 'modifier_proprietes_contenu_view' annee code_programme %}"
+                <li class="divider"></li>
+                <li><a href="" hx-get="{% url 'ajouter-groupements-view' annee code_programme %}" hx-target="#content-of-main-panel" hx-trigger="click">
+                    {% trans "Ajouter des groupements" %}</a></li>
+                <li class="divider"></li>
+                <li><a href="" hx-get="{% url 'modifier_proprietes_contenu_view' annee code_programme code_groupement %}"
                        hx-target="#content-of-main-panel" hx-trigger="click">{% trans "Edit properties" %}</a>
                 </li>
             </ul>
         </div>
     </div>
     <h5>{{ intitule_groupement }} - {{ intitule_complet_groupement }}</h5>
+    {{ tree }}_{{ code_groupement }}
 </div>
 <div class="panel-body">
     <table id="table_search_list" class="table table-hover">
@@ -172,6 +177,10 @@
 
 {% if rafraichir_groupement_contenant %}
     <script>
-        document.querySelector("#tree").dispatchEvent(new CustomEvent('refreshTree'))
+        const node_id = document.querySelector(".jstree-clicked").parentNode.id;
+        console.log(node_id);
+        document.addEventListener('htmx:afterSettle', function(event){
+            $('#tree').trigger('refreshNode', node_id);
+        })
     </script>
 {% endif %}
