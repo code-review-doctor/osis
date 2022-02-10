@@ -139,6 +139,13 @@ class Person(SerializableModel):
         min_files=1,
         null=True
     )
+    curriculum = FileField(
+        blank=True,
+        mimetypes=['application/pdf'],
+        max_size=FILE_MAX_SIZE,
+        null=True,
+        verbose_name=_('Curriculum'),
+    )
 
     source = models.CharField(
         max_length=25, blank=True, null=True,
