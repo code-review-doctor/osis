@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,22 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
-import uuid as uuid
-
-import attr
-
-from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
-from osis_common.ddd import interface
+from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
+from ddd.logic.preparation_programme_annuel_etudiant.commands import ModifierUEDuGroupementCommand
+from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
+    GroupementAjusteInscriptionCours
 
 
-@attr.s(frozen=True, slots=True, auto_attribs=True)
-class UniteEnseignementModifieeIdentity(interface.EntityIdentity):
-    uuid: uuid.UUID
-
-
-@attr.s(slots=True, auto_attribs=True)
-class UniteEnseignementModifiee(interface.Entity):  # TODO  Entity VS ValueObject ?
-    entity_id: UniteEnseignementModifieeIdentity
-    unite_enseignement_identity: 'LearningUnitIdentity'
-    bloc: int
+class ModifierUnitesEnseignement:
+    @classmethod
+    def modifier_unites_enseignement(
+            cls,
+            cmd: 'ModifierUEDuGroupementCommand',
+            groupement_ajuste: 'GroupementAjusteInscriptionCours'
+    ) -> None:
+        for cmd_ue in cmd.unites_enseignements:
+            learning_unit_identity = LearningUnitIdentityBuilder.build_from_code_and_year(
+                code=cmd_ue.code,
+                year=cmd_ue.annee
+            )
+            groupement_ajuste.ajuster_unite_enseignement(
+                unite_enseignement=learning_unit_identity,
+                bloc=cmd_ue.bloc
+            )

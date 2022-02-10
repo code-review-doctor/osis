@@ -42,9 +42,18 @@ class GroupementAjusteInscriptionCoursBuilder(interface.RootEntityBuilder):
             cmd: Union['AjouterUEAuProgrammeCommand'],
             repository: 'IGroupementAjusteInscriptionCoursRepository'
     ) -> 'GroupementAjusteInscriptionCours':
+        return cls.build_from_code_groupement_et_annee(cmd.code_programme, cmd.annee, repository)
+
+    @classmethod
+    def build_from_code_groupement_et_annee(
+            cls,
+            code_groupement_a_ajuster: str,
+            annee: int,
+            repository: 'IGroupementAjusteInscriptionCoursRepository'
+    ) -> 'GroupementAjusteInscriptionCours':
         groupement_id = GroupIdentity(
-            code=cmd.ajouter_dans,
-            year=cmd.annee,
+            code=code_groupement_a_ajuster,
+            year=annee,
         )
         groupements_ajustes = repository.search(groupement_id=groupement_id)
         if groupements_ajustes:
