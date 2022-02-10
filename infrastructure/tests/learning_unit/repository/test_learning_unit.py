@@ -94,6 +94,11 @@ class LearningUnitRepositoryTestCase(TestCase):
 
     def test_search_dtos(self):
         luy_db = LearningUnitYearFullFactory(academic_year__current=True)
+        lecturing_component = LecturingLearningComponentYearFactory(
+            learning_unit_year=luy_db,
+
+        )
+
         partim_db = LearningUnitYearPartimFactory(
             learning_container_year=luy_db.learning_container_year,
             acronym='LTEST1212X',
@@ -134,8 +139,8 @@ class LearningUnitRepositoryTestCase(TestCase):
                             ],
                             quadrimester=luy_db.quadrimester,
                             credits=luy_db.credits,
-                            lecturing_volume_annual=None,
-                            practical_volume_annual=None,
+                            lecturing_volume_annual=int(lecturing_component.hourly_volume_total_annual),
+                            practical_volume_annual=0,
                             session_derogation=luy_db.session
                         )
                     ]
