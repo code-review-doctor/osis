@@ -28,13 +28,26 @@ import os
 from django.core.management.base import BaseCommand
 
 
-class Command(BaseCommand):
+class RunTestUntilFirstFail(BaseCommand):
+    """
+    Launch test/test case/tests app until first failed. This makes it easier to fail a random test fail
+    Arguments :
+            -k : if presents, keep the database
+            --tests/-t : mandatory, followed by one or many tests separated by a space
+    Example:
+            python manage.py run_test_until_first_fail -k --tests assessments.tests.views assessments.tests.forms
+    """
+
     def add_arguments(self, parser):
         parser.add_argument('-k', action='store_true', help="keep the database")
         parser.add_argument(
             '--tests', '-t',
             nargs='+',
-            help="path to the test case with dot (example : assessments.tests.views)",
+            help="path to the test/test case/app to test  with dot (Examples : "
+                 "- assessments.tests.views.test_scores_responsible.ScoresResponsibleSearchTestCase."
+                 "                      test_assert_template_used"
+                 "- assessments.tests.views.test_scores_responsible.ScoresResponsibleSearchTestCase"
+                 "- assessments",
             required=True
         )
 
