@@ -146,6 +146,21 @@ class LearningUnitRepositoryTestCase(TestCase):
                     ]
                 )
 
+    def test_search_dtos_should_not_be_case_sensitive(self):
+        self.learning_unit_repository.save(self.learning_unit)
+
+        dtos = self.learning_unit_repository.search_learning_units_dto(
+            intitule=self.learning_unit.titles.complete_fr
+        )
+        dtos_with_different_case = self.learning_unit_repository.search_learning_units_dto(
+            intitule=self.learning_unit.titles.complete_fr.upper()
+        )
+
+        self.assertCountEqual(
+            dtos,
+            dtos_with_different_case
+        )
+
     def test_assert_learning_unit_domain_object_is_not_a_partim(self):
         luy_db = LearningUnitYearFullFactory(academic_year__current=True)
         partim_db = LearningUnitYearPartimFactory(

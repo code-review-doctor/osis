@@ -158,7 +158,7 @@ class LearningUnitRepository(ILearningUnitRepository):
         )
 
         if intitule:
-            qs = qs.filter(full_title__contains=intitule)
+            qs = qs.filter(full_title__icontains=intitule)
 
         result = []
         for learning_unit_year_db_obj in qs:
