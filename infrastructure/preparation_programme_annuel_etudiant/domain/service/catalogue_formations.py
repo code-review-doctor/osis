@@ -74,7 +74,7 @@ class CatalogueFormationsTranslator(ICatalogueFormationsTranslator):
         )
 
     @classmethod
-    def get_unites_enseignement(cls, code_programme: str, annee: int) -> List['ElementContenuDTO']:
+    def get_unites_enseignement(cls, code_programme: str, annee: int) -> List['UniteEnseignementDTO']:
         from infrastructure.messages_bus import message_bus_instance
 
         cmd = GetUnitesEnseignementContenuesDansProgrammeCommand(
@@ -190,7 +190,7 @@ def _get_credits(credits_relatifs: int, credits_absolus: Decimal) -> str:
     return get_chiffres_significatifs(credits_absolus)
 
 
-def _build_donnees_unite_enseignement_DTO(ue_contenue: 'UniteEnseignementCatalogueDTO') -> UniteEnseignementDTO:
+def _build_donnees_unite_enseignement_DTO(ue_contenue: 'ProgramManagementUniteEnseignementDTO') -> UniteEnseignementDTO:
     return UniteEnseignementDTO(
         code=ue_contenue.code,
         intitule_complet=ue_contenue.intitule_complet,

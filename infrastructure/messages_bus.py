@@ -180,7 +180,7 @@ from ddd.logic.preparation_programme_annuel_etudiant.use_case.read.get_contenu_g
     get_contenu_groupement_service
 from ddd.logic.preparation_programme_annuel_etudiant.use_case.read.get_formulaire_inscription_cours_service import \
     get_formulaire_inscription_cours_service
-from ddd.logic.preparation_programme_annuel_etudiant.use_case.read.get_liste_unites_enseignement_service import \
+from ddd.logic.preparation_programme_annuel_etudiant.use_case.read.get_unites_enseignement_service import \
     get_unites_enseignement_service
 from ddd.logic.preparation_programme_annuel_etudiant.use_case.read.get_programme_inscription_cours_service import \
     get_programme_inscription_cours

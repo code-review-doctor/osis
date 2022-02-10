@@ -22,6 +22,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
 
 from program_management.ddd.command import GetUnitesEnseignementContenuesDansProgrammeCommand
 from program_management.ddd.domain.node import NodeIdentity
@@ -34,7 +35,7 @@ from program_management.ddd.repositories import program_tree_version as program_
 
 def get_unites_enseignement(
         cmd: 'GetUnitesEnseignementContenuesDansProgrammeCommand'
-) -> 'UniteEnseignementDTO':
+) -> List['UniteEnseignementDTO']:
 
     tree_version_identity = identity_search.ProgramTreeVersionIdentitySearch(
     ).get_from_node_identity(
