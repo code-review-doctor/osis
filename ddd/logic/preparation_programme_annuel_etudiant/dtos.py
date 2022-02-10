@@ -214,17 +214,34 @@ class GroupementAjusteFromRepositoryDTO(DTO):
 class GroupementContenantDTO(DTO):
     intitule: str
     intitule_complet: str
-    elements_contenus: List['ElementContenuDTO']
+    elements_contenus: List[Union['UniteEnseignementContenueDTO', 'GroupementContenuDTO']]
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
-class ElementContenuDTO(DTO):
+class UniteEnseignementContenueDTO(DTO):
     code: str
     intitule_complet: str
     obligatoire: bool
 
-    volumes: str
+    volume_annuel_pm: int
+    volume_annuel_pp: int
     bloc: str
     quadrimestre_texte: str
-    credits: str
+    credits_absolus: Decimal
+    credits_relatifs: int
     session_derogation: str
+
+    @property
+    def type(self):
+        return UNITE_ENSEIGNEMENT
+
+
+@attr.s(frozen=True, slots=True, auto_attribs=True)
+class GroupementContenuDTO(DTO):
+    code: str
+    intitule_complet: str
+    obligatoire: bool
+
+    @property
+    def type(self):
+        return GROUPEMENT

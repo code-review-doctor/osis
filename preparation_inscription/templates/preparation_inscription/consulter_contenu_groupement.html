@@ -61,42 +61,12 @@
     </thead>
     <tbody>
     {% for element in search_result %}
-        <tr>
-            <td headers="code">
-                {{ element.code }}{{ element.intitule }}
-            </td>
-            <td headers="intitule">
-                {{ element.intitule_complet }}
-            </td>
-            <td headers="volumes">
-                {{ element.volumes }}
-            </td>
-            <td headers="bloc">
-                {% if element.type_ajustement == 'MODIFICATION' %}
-                    <b class="text-info" style="font-weight: bolder; text-shadow: 0px 0px 2px currentColor;">{{ element.bloc }}</b>
-                {% else %}
-                    {{ element.bloc }}
-                {% endif %}
-            </td>
-            <td headers="quadri">
-                {{ element.quadrimestre_texte }}
-            </td>
-            <td headers="credits">
-                {{ element.credits }}
-            </td>
-            <td headers="session">
-                {{ element.session_derogation }}
-            </td>
-            <td headers="obligatoire">
-                {{ element.obligatoire | yesno | title }}
-            </td>
-            <td headers="action">
-                <div class="pull-right">
-
-                </div>
-            </td>
-        </tr>
-
+        {% if element.type == 'UNITE_ENSEIGNEMENT' %}
+            {% include 'preparation_inscription/blocks/contenu_groupement_ligne_unite_enseignement.html' %}
+        {% endif %}
+        {% if element.type == 'GROUPEMENT' %}
+            {% include 'preparation_inscription/blocks/contenu_groupement_ligne_groupement.html' %}
+        {% endif %}
     {% endfor %}
     </tbody>
 </table>

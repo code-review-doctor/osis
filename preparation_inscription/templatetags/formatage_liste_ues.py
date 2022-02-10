@@ -23,8 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Union
+
 from django import template
 
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import UniteEnseignementContenueDTO, UniteEnseignementDTO
 from preparation_inscription.templatetags.formatage_volumes_totaux import formater_volumes
 from preparation_inscription.utils.chiffres_significatifs_de_decimal import get_chiffres_significatifs
 
@@ -32,7 +35,7 @@ register = template.Library()
 
 
 @register.filter
-def formatage_credits(unite_catalogue_dto: 'UniteEnseignementDTO') -> str:
+def formatage_credits(unite_catalogue_dto: Union['UniteEnseignementDTO', 'UniteEnseignementContenueDTO']) -> str:
     if unite_catalogue_dto.credits_relatifs:
         if unite_catalogue_dto.credits_relatifs != unite_catalogue_dto.credits_absolus:
             return "{}({})".format(
@@ -44,5 +47,5 @@ def formatage_credits(unite_catalogue_dto: 'UniteEnseignementDTO') -> str:
 
 
 @register.filter
-def formater_volumes_totaux(unite_catalogue_dto: 'UniteEnseignementDTO') -> str:
+def formater_volumes_totaux(unite_catalogue_dto: Union['UniteEnseignementDTO', 'UniteEnseignementContenueDTO']) -> str:
     return formater_volumes(unite_catalogue_dto.volume_annuel_pm, unite_catalogue_dto.volume_annuel_pp)
