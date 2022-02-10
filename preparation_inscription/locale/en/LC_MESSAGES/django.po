@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-09 17:01+0100\n"
+"POT-Creation-Date: 2022-02-10 09:46+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -84,10 +84,16 @@ msgstr ""
 msgid "Commentaire en anglais"
 msgstr ""
 
+msgid "Components (PM+PP)"
+msgstr ""
+
 msgid "Composants (PM+PP)"
 msgstr ""
 
 msgid "Composants (PM/PP)"
+msgstr ""
+
+msgid "Credits"
 msgstr ""
 
 msgid "Crédits"
@@ -106,6 +112,9 @@ msgid "Intitulé"
 msgstr ""
 
 msgid "MODIFICATION"
+msgstr ""
+
+msgid "Mandatory"
 msgstr ""
 
 msgid "Modification"

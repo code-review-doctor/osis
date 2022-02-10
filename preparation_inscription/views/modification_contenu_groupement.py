@@ -29,7 +29,7 @@ from typing import List
 from django import forms
 from django.contrib import messages
 from django.forms import formset_factory
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.views.generic import FormView
@@ -157,7 +157,8 @@ class ModifierProprietesContenuView(PermissionRequiredMixin, HtmxMixin, FormView
         ) + "?{}=1".format(RAFRAICHIR_GROUPEMENT_CONTENANT)
 
     def get_permission_object(self):
-        return GroupYear.objects.get(
+        return get_object_or_404(
+            GroupYear,
             partial_acronym=self.kwargs['code_programme'],
             academic_year__year=self.kwargs['annee']
         )

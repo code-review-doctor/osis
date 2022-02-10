@@ -35,13 +35,13 @@
                 <thead>
                     <tr>
                         <th id="code" class="code-col">{% trans 'Code' %}</th>
-                        <th id="intitule">{% trans 'Intitulé' %}</th>
-                        <th id="volumes">{% trans 'Composants (PM+PP)' %}</th>
-                        <th id="bloc">{% trans 'Bloc' %}</th>
+                        <th id="intitule">{% trans 'Title' %}</th>
+                        <th id="volumes">{% trans 'Components (PM+PP)' %}</th>
+                        <th id="bloc">{% trans 'Block' %}</th>
                         <th id="quadri">{% trans 'Quadri.' %}</th>
-                        <th id="credits">{% trans 'Crédits' %}</th>
+                        <th id="credits">{% trans 'Credits' %}</th>
                         <th id="session">{% trans "Derogation's session" %}</th>
-                        <th id="obligatoire">{% trans 'Obligatoire' %}</th>
+                        <th id="obligatoire">{% trans 'Mandatory' %}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -84,8 +84,8 @@
 
 <div class="panel-footer text-right">
     <a href="" hx-get="{% url 'consulter_contenu_groupement_view' annee code_programme code_groupement %}"
-       hx-target="#content-of-main-panel" hx-trigger="click" type="button" class="btn btn-default">Annuler</a>
+       hx-target="#content-of-main-panel" hx-trigger="click" type="button" class="btn btn-default">{% trans 'Cancel' %}</a>
     <a href="" hx-post="{% url 'modifier_proprietes_contenu_view' annee code_programme code_groupement %}"
        hx-include="#modifier_proprietes_contenu_form" hx-target="#content-of-main-panel"
-       hx-trigger="click" type="button" class="btn btn-primary">Enregistrer</a>
+       hx-trigger="click" type="button" class="btn btn-primary">{% trans 'Save' %}</a>
 </div>
