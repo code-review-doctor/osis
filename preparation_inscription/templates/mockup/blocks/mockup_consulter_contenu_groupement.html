@@ -52,25 +52,37 @@
     <table id="table_search_list" class="table table-hover">
         <thead>
         <tr>
+            <th id="icon"></th>
             <th id="code" class="code-col">{% trans 'Code' %}</th>
-        <th id="intitule">{% trans 'Intitulé' %}</th>
-        <th id="volumes">{% trans 'Composants (PM+PP)' %}</th>
-        <th id="bloc">{% trans 'Bloc' %}</th>
-        <th id="quadri">{% trans 'Quadri.' %}</th>
-        <th id="credits">{% trans 'Crédits' %}</th>
-        <th id="session">{% trans "Derogation's session" %}</th>
-        <th id="obligatoire">{% trans 'Obligatoire' %}</th>
-        <th id="action" class="actions-col"></th>
+            <th id="intitule">{% trans 'Intitulé' %}</th>
+            <th id="volumes">{% trans 'Composants (PM+PP)' %}</th>
+            <th id="bloc">{% trans 'Bloc' %}</th>
+            <th id="quadri">{% trans 'Quadri.' %}</th>
+            <th id="credits">{% trans 'Crédits' %}</th>
+            <th id="session">{% trans "Derogation's session" %}</th>
+            <th id="obligatoire">{% trans 'Obligatoire' %}</th>
+            <th id="action" class="actions-col"></th>
     </tr>
     </thead>
     <tbody>
     {% for element in search_result %}
         <tr>
+            <td headers="icon">
+                {% if element.type_ajustement == "AJOUT" %}
+                    <span class="text-success">
+                    <i class="fas fa-folder-plus"></i>
+                    </span>
+                {% endif %}
+            </td>
             <td headers="code">
-                {{ element.code }}{{ element.intitule }}
+                {% if element.type_ajustement == "AJOUT" %}
+                    <span class="text-success">{{ element.code }}</span>
+                {% else %}
+                    {{ element.code }}
+                {% endif %}
             </td>
             <td headers="intitule">
-                {{ element.intitule_complet }}
+                {{ element.intitule }}
             </td>
             <td headers="volumes">
                 {{ element.volumes }}
@@ -83,7 +95,7 @@
                 {% endif %}
             </td>
             <td headers="quadri">
-                {{ element.quadrimestre_texte }}
+                {{ element.quadrimestre }}
             </td>
             <td headers="credits">
                 {{ element.credits }}
@@ -92,7 +104,7 @@
                 {{ element.session_derogation }}
             </td>
             <td headers="obligatoire">
-                {{ element.obligatoire | yesno | title }}
+                {{ element.obligatoire }}
             </td>
             <td headers="action">
                 <div class="pull-right">
@@ -110,8 +122,12 @@
 {% include 'preparation_inscription/modal_confirmer_annuler_modification.html' %}
 {% include 'preparation_inscription/modal_confirmer_annuler_ajout.html' %}
 
-{% if rafraichir_groupement_contenant %}
-    <script>
-        $('#tree').trigger('refreshNode', '{{ code_groupement_racine }}');
-    </script>
-{% endif %}
+
+<script>
+    $('#tree').jstree(true).settings.core.data = {
+        'url' : '{% url "tree-view-mockup-resultat-apres-ajout-groupements" annee code_programme %}'
+    }
+    document.addEventListener('htmx:afterSettle', function(event){
+        $('#tree').trigger('refreshNode', '{{ code_programme }}');
+    })
+</script>
