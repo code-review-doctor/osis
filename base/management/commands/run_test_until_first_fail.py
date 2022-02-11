@@ -58,10 +58,10 @@ class Command(BaseCommand):
             reinit_db="-k" if kwargs['k'] is True else "",
             test_cases=' '.join(kwargs['tests'])
         )
-        n = int(kwargs['n']) if kwargs.get('n') else float('inf')
-        i = 0
-        while i < n:
+        max_try = int(kwargs['n']) if kwargs.get('n') else float('inf')
+        number_of_try = 0
+        while number_of_try < max_try:
             result = os.system(command)
             if result != 0:
                 break
-            i += 1
+            number_of_try += 1
