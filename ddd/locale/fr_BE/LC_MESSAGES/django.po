@@ -120,7 +120,7 @@ msgid "Lecturing charge or practical charge must be filled"
 msgstr "Le vol.1 postulé ou le vol.2 postulé doit être rempli"
 
 msgid "No learning units to add."
-msgstr "Aucune unités d'enseignement à ajouter."
+msgstr "Aucune unité d'enseignement à ajouter."
 
 msgid "No vacant corresponding activity"
 msgstr "Pas de cours vacant correspondant"
