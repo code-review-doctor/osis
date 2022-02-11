@@ -23,10 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib.postgres.fields import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import MaxValueValidator
 from django.db import models
+from django.db.models import JSONField
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
