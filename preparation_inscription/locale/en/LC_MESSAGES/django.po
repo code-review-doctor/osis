@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-11 09:32+0100\n"
+"POT-Creation-Date: 2022-02-11 11:36+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,19 +20,19 @@ msgstr ""
 msgid "ADDITION"
 msgstr ""
 
+msgid "AJOUT"
+msgstr ""
+
 msgid "Actions"
 msgstr ""
 
 msgid "Add"
 msgstr ""
 
-msgid "Ajout"
-msgstr ""
-
-msgid "Add learning units"
-msgstr ""
-
 msgid "Addition"
+msgstr ""
+
+msgid "Ajouter des UE"
 msgstr ""
 
 msgid "Ajouter des groupements"
@@ -41,10 +41,16 @@ msgstr ""
 msgid "Anac."
 msgstr "Anac."
 
+msgid "Bloc"
+msgstr ""
+
 msgid "Block"
 msgstr ""
 
-msgid "Annuler l'ajout"
+msgid "Cancel"
+msgstr ""
+
+msgid "Cancel add"
 msgstr ""
 
 msgid "Cancel add ?"
@@ -62,13 +68,10 @@ msgstr ""
 msgid "Cancel edition ?"
 msgstr ""
 
-msgid "Bloc"
+msgid "Check All"
 msgstr ""
 
-msgid "Block"
-msgstr ""
-
-msgid "Cancel"
+msgid "Code"
 msgstr ""
 
 msgid "Comment"
@@ -77,40 +80,49 @@ msgstr ""
 msgid "Components (PM/PP)"
 msgstr ""
 
-msgid "Credits"
-msgstr ""
-
-msgid "DELETION"
-msgstr ""
-
-msgid "Delete learning unit"
-msgstr ""
-
-msgid "Delete learning units"
-msgstr ""
-
-msgid "Derogation's session"
-msgstr ""
-
 msgid "Composants (PM+PP)"
-msgstr ""
-
-msgid "Composants (PM/PP)"
 msgstr ""
 
 msgid "Content"
 msgstr ""
 
-msgid "EDITION"
+msgid "Credits"
+msgstr ""
+
+msgid "Crédits"
+msgstr ""
+
+msgid "DELETION"
 msgstr ""
 
 msgid "Derogation's session"
 msgstr ""
 
-msgid "ECGE1BA - 2021-2022"
+msgid "Do not cancel"
+msgstr ""
+
+msgid "EDITION"
+msgstr ""
+
+msgid "Edit properties"
+msgstr ""
+
+msgid "Edition"
+msgstr ""
+
+msgid "English comment"
 msgstr ""
 
 msgid "Form view"
+msgstr ""
+
+msgid "Intitulé"
+msgstr ""
+
+msgid "Label"
+msgstr ""
+
+msgid "MODIFICATION"
 msgstr ""
 
 msgid "Main sort"
@@ -119,22 +131,16 @@ msgstr ""
 msgid "Mandatory"
 msgstr ""
 
-msgid "Label"
-msgstr ""
-
-msgid "Move downwards"
-msgstr ""
-
-msgid "Modification"
-msgstr ""
-
-msgid "Move upwards"
+msgid "Modifier les propriétés"
 msgstr ""
 
 msgid "Name"
 msgstr ""
 
 msgid "No deletable content"
+msgstr ""
+
+msgid "Obligatoire"
 msgstr ""
 
 msgid "PAE preparation"
@@ -149,7 +155,7 @@ msgstr ""
 msgid "Reset to initial program state"
 msgstr ""
 
-msgid "Save"
+msgid "SUPPRESSION"
 msgstr ""
 
 msgid "Save"
@@ -158,16 +164,13 @@ msgstr ""
 msgid "Search"
 msgstr ""
 
+msgid "Secondary sort"
+msgstr ""
+
 msgid "Session"
 msgstr ""
 
 msgid "Sigle"
-msgstr ""
-
-msgid "Suppression"
-msgstr ""
-
-msgid "Supprimer des UE"
 msgstr ""
 
 msgid "Sort by block"
@@ -176,29 +179,7 @@ msgstr ""
 msgid "Sort by code"
 msgstr ""
 
-msgid "Tri par bloc"
-msgstr ""
-
-msgid "Tri par code"
-msgstr ""
-
-msgid "Tri par ordre du programme"
-msgstr ""
-
-msgid "Tri par quadrimestre"
-msgstr ""
-
-msgid "Tri principal"
-msgstr ""
-
-msgid "Tri secondaire"
-msgstr ""
-
-msgctxt "student_path_year"
-msgid "Year"
-msgstr ""
-
-msgid "champs1"
+msgid "Sort by program order"
 msgstr ""
 
 msgid "Sort by quadrimester"
@@ -207,28 +188,35 @@ msgstr ""
 msgid "Suppression"
 msgstr ""
 
+msgid "Supprimer des UE"
+msgstr ""
+
 msgid "The learning units have been added"
 msgstr ""
 
 msgid "The learning units {} have been deleted"
 msgstr ""
 
-msgid "Form view"
+msgid "This action will cancel addition of learning unit X to group Y"
 msgstr ""
 
-msgid "Program"
+msgid "This action will cancel deletion"
 msgstr ""
 
-msgid "Sections and programs"
+msgid "This action will cancel edition of UE X from group Y"
 msgstr ""
 
-msgid "Training configuration"
+msgid "Title"
 msgstr ""
 
-msgid "intitule"
+msgctxt "student_path_year"
+msgid "Year"
 msgstr ""
 
-msgid "sigle"
+msgid "code"
+msgstr ""
+
+msgid "credits"
 msgstr ""
 
 msgid "field1"
@@ -244,4 +232,10 @@ msgid "field4"
 msgstr ""
 
 msgid "field5"
+msgstr ""
+
+msgid "intitule"
+msgstr ""
+
+msgid "sigle"
 msgstr ""
