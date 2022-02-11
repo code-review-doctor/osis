@@ -69,7 +69,7 @@ class RetirerUEDuProgrammeCommand(interface.CommandRequest):
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
 class GetContenuGroupementCommand(interface.CommandRequest):
-    code_formation: str
+    code_programme: str
     code: str  # TODO :: code groupement ou uuid groupement ?
     annee: int
 
@@ -125,3 +125,9 @@ class DeplacerVersLeBasUEAjouteeDansProgrammeCommand(interface.CommandRequest):
 class GetFormationCommand(interface.CommandRequest):
     annee: int
     code: str
+
+
+@attr.s(frozen=True, slots=True, auto_attribs=True)
+class GetUnitesEnseignementContenuesCommand(interface.CommandRequest):
+    code_programme: str
+    annee: int

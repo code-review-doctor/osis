@@ -22,16 +22,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
 
-from ddd.logic.preparation_programme_annuel_etudiant.commands import GetContenuGroupementCommand
-from ddd.logic.program_management.builder.contenu_noeud_dto_builder import ContenuNoeudDTOBuilder
+from program_management.ddd.command import GetUnitesEnseignementContenuesDansProgrammeCommand
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.service import identity_search
-from program_management.ddd.dtos import ContenuNoeudDTO
+from program_management.ddd.domain.service.get_unites_enseignement_contenues_dans_pgm import \
+    GetUnitesEnseignementContenuesDansPgrm
+from program_management.ddd.dtos import UniteEnseignementDTO
 from program_management.ddd.repositories import program_tree_version as program_tree_version_repository
 
 
-def get_content_service(cmd: GetContenuGroupementCommand) -> ContenuNoeudDTO:
+def get_unites_enseignement(
+        cmd: 'GetUnitesEnseignementContenuesDansProgrammeCommand'
+) -> List['UniteEnseignementDTO']:
 
     tree_version_identity = identity_search.ProgramTreeVersionIdentitySearch(
     ).get_from_node_identity(
@@ -40,8 +44,9 @@ def get_content_service(cmd: GetContenuGroupementCommand) -> ContenuNoeudDTO:
             year=cmd.annee
         )
     )
-    pgm_tree_version = program_tree_version_repository.ProgramTreeVersionRepository(
+    pgm_tree_version = tree_version_identity and program_tree_version_repository.ProgramTreeVersionRepository(
     ).get(tree_version_identity)
-    return ContenuNoeudDTOBuilder.get(
-        pgm_tree_version.get_tree().get_node_by_code_and_year(code=cmd.code, year=cmd.annee)
+
+    return GetUnitesEnseignementContenuesDansPgrm.build_unites_enseignement_contenues_dans_pgm(
+        pgm_tree_version.get_tree().get_all_links()
     )

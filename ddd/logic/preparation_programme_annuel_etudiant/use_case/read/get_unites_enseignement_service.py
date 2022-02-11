@@ -23,21 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from decimal import Decimal
-from django import template
+from typing import List
 
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import UniteEnseignementCatalogueDTO
-
-register = template.Library()
-
-
-@register.filter
-def formater_volumes_totaux(unite_catalogue_dto: 'UniteEnseignementCatalogueDTO') -> str:
-    return formater_volumes(unite_catalogue_dto.volume_annuel_pm, unite_catalogue_dto.volume_annuel_pp)
+from ddd.logic.preparation_programme_annuel_etudiant.commands import GetUnitesEnseignementContenuesCommand
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import UniteEnseignementDTO
+from infrastructure.preparation_programme_annuel_etudiant.domain.service.catalogue_formations import \
+    CatalogueFormationsTranslator
 
 
-def formater_volumes(volume_annuel_pm: int, volume_annuel_pp: int) -> str:
-    return "%(total_lecturing)gh + %(total_practical)gh" % {
-        "total_lecturing": volume_annuel_pm or Decimal(0.0),
-        "total_practical": volume_annuel_pp or Decimal(0.0)
-    }
+def get_unites_enseignement_service(
+        cmd: 'GetUnitesEnseignementContenuesCommand',
+        translator: 'CatalogueFormationsTranslator',
+) -> List['UniteEnseignementDTO']:
+    return translator.get_unites_enseignement(cmd.code_programme, cmd.annee)

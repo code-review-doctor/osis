@@ -426,19 +426,7 @@ def _build_contenu(node: 'Node', lien_parent: 'Link' = None) -> 'ContenuNoeudDTO
     for lien in node.children:
         if lien.child.is_learning_unit():
             contenu_ordonne.append(
-                UniteEnseignementDTO(
-                    bloc=lien.block,
-                    code=lien.child.code,
-                    intitule_complet=lien.child.title,
-                    quadrimestre=lien.child.quadrimester,
-                    quadrimestre_texte=lien.child.quadrimester.value if lien.child.quadrimester else "",
-                    credits_absolus=lien.child.credits,
-                    volume_annuel_pm=lien.child.volume_total_lecturing,
-                    volume_annuel_pp=lien.child.volume_total_practical,
-                    obligatoire=lien.is_mandatory if lien else False,
-                    session_derogation='',
-                    credits_relatifs=lien.relative_credits,
-                )
+                build_unite_enseignement_DTO_depuis_link(lien)
             )
         else:
             groupement_contenu = _build_contenu(lien.child, lien_parent=lien)
@@ -473,3 +461,19 @@ def _get_credits(link: 'Link') -> Optional[Decimal]:
     if link:
         return link.relative_credits or link.child.credits or 0
     return None
+
+
+def build_unite_enseignement_DTO_depuis_link(lien: 'Link') -> UniteEnseignementDTO:
+    return UniteEnseignementDTO(
+        bloc=lien.block,
+        code=lien.child.code,
+        intitule_complet=lien.child.title,
+        quadrimestre=lien.child.quadrimester,
+        quadrimestre_texte=lien.child.quadrimester.value if lien.child.quadrimester else "",
+        credits_absolus=lien.child.credits,
+        volume_annuel_pm=lien.child.volume_total_lecturing,
+        volume_annuel_pp=lien.child.volume_total_practical,
+        obligatoire=lien.is_mandatory if lien else False,
+        session_derogation=lien.child.session_derogation,
+        credits_relatifs=lien.relative_credits,
+    )

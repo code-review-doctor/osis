@@ -30,6 +30,9 @@ import attr
 
 from osis_common.ddd.interface import DTO
 
+UNITE_ENSEIGNEMENT = "UNITE_ENSEIGNEMENT"
+GROUPEMENT = "GROUPEMENT"
+
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
 class UniteEnseignementDTO(DTO):
@@ -48,7 +51,7 @@ class UniteEnseignementDTO(DTO):
 
     @property
     def type(self):
-        return "UNITE_ENSEIGNEMENT"
+        return UNITE_ENSEIGNEMENT
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
@@ -60,7 +63,7 @@ class GroupementDTO(DTO):
 
     @property
     def type(self):
-        return "GROUPEMENT"
+        return GROUPEMENT
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
@@ -159,7 +162,7 @@ class GroupementInscriptionCoursDTO(DTO):
 
     @property
     def type(self):
-        return 'GROUPEMENT'
+        return GROUPEMENT
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
@@ -171,7 +174,7 @@ class UniteEnseignementProgrammeDTO(DTO):
 
     @property
     def type(self):
-        return 'UNITE_ENSEIGNEMENT'
+        return UNITE_ENSEIGNEMENT
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
@@ -211,17 +214,34 @@ class GroupementAjusteFromRepositoryDTO(DTO):
 class GroupementContenantDTO(DTO):
     intitule: str
     intitule_complet: str
-    elements_contenus: List['ElementContenuDTO']
+    elements_contenus: List[Union['UniteEnseignementContenueDTO', 'GroupementContenuDTO']]
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
-class ElementContenuDTO(DTO):
+class UniteEnseignementContenueDTO(DTO):
     code: str
     intitule_complet: str
     obligatoire: bool
 
-    volumes: str
+    volume_annuel_pm: int
+    volume_annuel_pp: int
     bloc: str
     quadrimestre_texte: str
-    credits: str
+    credits_absolus: Decimal
+    credits_relatifs: int
     session_derogation: str
+
+    @property
+    def type(self):
+        return UNITE_ENSEIGNEMENT
+
+
+@attr.s(frozen=True, slots=True, auto_attribs=True)
+class GroupementContenuDTO(DTO):
+    code: str
+    intitule_complet: str
+    obligatoire: bool
+
+    @property
+    def type(self):
+        return GROUPEMENT

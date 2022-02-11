@@ -1,5 +1,4 @@
-##############################################################################
-#
+#############################################################################
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
 #    such as universities, faculties, institutes and professional schools.
@@ -15,7 +14,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,21 +22,24 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from decimal import Decimal
-from django import template
+from typing import List
 
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import UniteEnseignementCatalogueDTO
-
-register = template.Library()
-
-
-@register.filter
-def formater_volumes_totaux(unite_catalogue_dto: 'UniteEnseignementCatalogueDTO') -> str:
-    return formater_volumes(unite_catalogue_dto.volume_annuel_pm, unite_catalogue_dto.volume_annuel_pp)
+from program_management.ddd.domain.link import LinkWithChildBranch
+from program_management.ddd.repositories.program_tree_version import build_unite_enseignement_DTO_depuis_link
+from osis_common.ddd import interface
 
 
-def formater_volumes(volume_annuel_pm: int, volume_annuel_pp: int) -> str:
-    return "%(total_lecturing)gh + %(total_practical)gh" % {
-        "total_lecturing": volume_annuel_pm or Decimal(0.0),
-        "total_practical": volume_annuel_pp or Decimal(0.0)
-    }
+class GetUnitesEnseignementContenuesDansPgrm(interface.DomainService):
+
+    @classmethod
+    def build_unites_enseignement_contenues_dans_pgm(
+            cls,
+            liens: List['LinkWithChildBranch'],
+            contenu: List['UniteEnseignementDTO'] = []
+    ) -> List['UniteEnseignementDTO']:
+        for lien in liens:
+            if lien.child.is_learning_unit():
+                contenu.append(
+                    build_unite_enseignement_DTO_depuis_link(lien)
+                )
+        return contenu

@@ -26,6 +26,7 @@
 
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.utils.translation import gettext_lazy as _
+from django.utils.functional import cached_property
 from django.views.generic import TemplateView
 
 from base.models.utils.utils import ChoiceEnum
@@ -58,10 +59,9 @@ class ConsulterContenuGroupementView(HtmxMixin, PermissionRequiredMixin, LoginRe
         context = {
             **super().get_context_data(**kwargs),
             # TODO code_groupement_racine :: à implémenter quand la story "afficher contenu" est développée
-            'code_programme': self.kwargs['code_programme'],
-            'code_groupement': self.kwargs['code_groupement'],
+            'code_programme': self.code_programme,
+            'code_groupement': self.code_groupement,
             RAFRAICHIR_GROUPEMENT_CONTENANT: self.request.GET.get(RAFRAICHIR_GROUPEMENT_CONTENANT),
-            'intitule_programme': self.get_intitule_programme(),
         }
 
         context.update(self.get_content())
@@ -69,9 +69,9 @@ class ConsulterContenuGroupementView(HtmxMixin, PermissionRequiredMixin, LoginRe
 
     def get_content(self):
         cmd = GetContenuGroupementCommand(
-            code_formation=self.kwargs['code_programme'],
-            annee=self.kwargs['annee'],
-            code=self.kwargs.get('code_groupement', self.kwargs['code_programme']),
+            code_programme=self.code_programme,
+            annee=self.annee,
+            code=self.code_groupement or self.code_programme,
         )
 
         contenu_groupement_DTO = message_bus_instance.invoke(cmd)  # return ContenuGroupementDTO
@@ -83,6 +83,14 @@ class ConsulterContenuGroupementView(HtmxMixin, PermissionRequiredMixin, LoginRe
                 contenu_groupement_DTO.intitule_complet if contenu_groupement_DTO else '',
         }
 
-    def get_intitule_programme(self):
-        # TODO :: to implement
-        return "Intitulé programme"
+    @cached_property
+    def code_programme(self) -> str:
+        return self.kwargs['code_programme']
+
+    @cached_property
+    def annee(self) -> str:
+        return self.kwargs['annee']
+
+    @cached_property
+    def code_groupement(self) -> str:
+        return self.kwargs['code_groupement']
