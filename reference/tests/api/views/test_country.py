@@ -120,14 +120,14 @@ class GetAllCountryTestCase(APITestCase):
             self.assertEqual(response.data['results'], serializer.data)
 
     def test_get_all_country_with_exclude_iso_code(self):
-        response = self.client.get(self.url + '?not_iso_code=BE')
+        response = self.client.get(self.url + '?not_iso_code=BE,UK')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        countries = Country.objects.all().exclude(iso_code='BE')
+        countries = Country.objects.all().exclude(iso_code__in=['BE', 'UK'])
         serializer = CountrySerializer(
             countries,
             many=True,
-            context={'request': RequestFactory().get(self.url, {'not_iso_code': 'BE'})},
+            context={'request': RequestFactory().get(self.url, {'not_iso_code': 'BE,UK'})},
         )
         self.assertEqual(response.data['results'], serializer.data)
 
