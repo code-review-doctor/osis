@@ -1,3 +1,4 @@
+##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -14,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -22,6 +23,27 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import uuid
 
-AJOUTER_UNITE_ENSEIGNEMENT_PERMISSION = "preparation_programme.can_add_unites_enseignement_au_programme"
-SUPPRIMER_UNITE_ENSEIGNEMENT_PERMISSION = "preparation_inscription.can_delete_unites_enseignement_du_programme"
+import factory
+
+from ddd.logic.learning_unit.tests.factory.learning_unit import LearningUnitIdentityFactory
+from ddd.logic.preparation_programme_annuel_etudiant.domain.model.unite_enseignement_supprimee import \
+    UniteEnseignementSupprimeeIdentity, UniteEnseignementSupprimee
+
+
+class UniteEnseignementSupprimeeIdentityFactory(factory.Factory):
+    class Meta:
+        model = UniteEnseignementSupprimeeIdentity
+        abstract = False
+
+    uuid = factory.LazyFunction(uuid.uuid4)
+
+
+class UniteEnseignementSupprimeeFactory(factory.Factory):
+    class Meta:
+        model = UniteEnseignementSupprimee
+        abstract = False
+
+    entity_id = factory.SubFactory(UniteEnseignementSupprimeeIdentityFactory)
+    unite_enseignement_identity = factory.SubFactory(LearningUnitIdentityFactory)

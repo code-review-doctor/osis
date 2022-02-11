@@ -46,6 +46,19 @@ class CatalogueUnitesEnseignementTranslatorInMemory(ICatalogueUnitesEnseignement
             volume_annuel_pp=15,
             obligatoire=True,
             session_derogation=""
+        ),
+        UniteEnseignementCatalogueDTO(
+            bloc=1,
+            code="LINGE1225",
+            intitule_complet="Programmation en économie et gestion",
+            quadrimestre="Q1",
+            quadrimestre_texte="Q1",
+            credits_absolus=Decimal(5),
+            credits_relatifs=None,
+            volume_annuel_pm=30,
+            volume_annuel_pp=15,
+            obligatoire=True,
+            session_derogation=""
         )
     ]
 

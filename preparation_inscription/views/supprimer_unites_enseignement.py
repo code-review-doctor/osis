@@ -13,11 +13,13 @@ from ddd.logic.preparation_programme_annuel_etudiant.commands import SupprimerUE
 from education_group.models.group_year import GroupYear
 from infrastructure.messages_bus import message_bus_instance
 from osis_role.contrib.views import PermissionRequiredMixin
+from preparation_inscription.perms import SUPPRIMER_UNITE_ENSEIGNEMENT_PERMISSION
+from preparation_inscription.views.consulter_contenu_groupement import RAFRAICHIR_GROUPEMENT_CONTENANT
 
 
 class SupprimerUnitesEnseignementView(PermissionRequiredMixin, LoginRequiredMixin, HtmxMixin, TemplateView):
     name = 'supprimer_unites_enseignement_view'
-    permission_required = 'preparation_inscription.can_delete_unites_enseignement_du_programme'
+    permission_required = SUPPRIMER_UNITE_ENSEIGNEMENT_PERMISSION
     template_name = "preparation_inscription/supprimer_unites_enseignement.html"
     htmx_template_name = "preparation_inscription/supprimer_unites_enseignement.html"
 
@@ -87,7 +89,9 @@ class SupprimerUnitesEnseignementView(PermissionRequiredMixin, LoginRequiredMixi
         )
 
     def get_consulter_contenu_groupement_url(self):
-        return reverse('consulter_contenu_groupement_view', args=self.args, kwargs=self.kwargs)
+        return reverse(
+            'consulter_contenu_groupement_view', args=self.args, kwargs=self.kwargs
+        ) + "?{}=1".format(RAFRAICHIR_GROUPEMENT_CONTENANT)
 
     def get_permission_object(self):
         return GroupYear.objects.get(

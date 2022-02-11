@@ -23,13 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import factory
 import uuid
+
+import factory
 
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
     GroupementAjusteInscriptionCours, IdentiteGroupementAjusteInscriptionCours
 from ddd.logic.preparation_programme_annuel_etudiant.tests.factory.unite_enseignement_ajoutee import \
     UniteEnseignementAjouteeFactory
+from ddd.logic.preparation_programme_annuel_etudiant.tests.factory.unite_enseignement_supprimee import \
+    UniteEnseignementSupprimeeFactory
 from education_group.ddd.domain.group import GroupIdentity
 
 
@@ -68,6 +71,14 @@ class GroupementAjusteInscriptionCoursFactory(factory.Factory):
             unites_enseignement_ajoutees=[
                 UniteEnseignementAjouteeFactory(
                     unite_enseignement_identity__code='LSINF1311',
+                    unite_enseignement_identity__academic_year__year=2021,
+                )
+            ]
+        )
+        supprimees = factory.Trait(
+            unites_enseignement_supprimees=[
+                UniteEnseignementSupprimeeFactory(
+                    unite_enseignement_identity__code='LINGE1225',
                     unite_enseignement_identity__academic_year__year=2021,
                 )
             ]

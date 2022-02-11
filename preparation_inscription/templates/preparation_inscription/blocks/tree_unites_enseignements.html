@@ -1,6 +1,7 @@
 {% load static %}
 <li id="{{parent_code}}_{{ unite_enseignement.code }}"
     data-jstree='{"icon":"{% if unite_enseignement.obligatoire %}{% static "img/education_group_year/mandatory.png" %}{% else %}{% static "img/education_group_year/optional.png" %}{% endif %}"}'
+    {% if unite_enseignement.code in tree.unites_enseignement_supprimees %} class="strikethrough text-danger" {% endif %}
 >
     <div class="node_block_text">
         <span>{{ unite_enseignement.bloc|default_if_none:'' }}</span>

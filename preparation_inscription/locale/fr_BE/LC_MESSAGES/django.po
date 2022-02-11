@@ -3,12 +3,11 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-11 09:32+0100\n"
+"POT-Creation-Date: 2022-02-11 11:36+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +15,9 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+msgid "ADDITION"
+msgstr ""
 
 msgid "AJOUT"
 msgstr ""
@@ -26,9 +28,6 @@ msgstr "Actions"
 msgid "Add"
 msgstr "Ajouter"
 
-msgid "Ajout"
-msgstr ""
-
 msgid "Ajouter des UE"
 msgstr ""
 
@@ -36,24 +35,6 @@ msgid "Ajouter des groupements"
 msgstr ""
 
 msgid "Anac."
-msgstr ""
-
-msgid "Annuler l'ajout"
-msgstr ""
-
-msgid "Annuler l'ajout?"
-msgstr ""
-
-msgid "Annuler la modification"
-msgstr ""
-
-msgid "Annuler la modification ?"
-msgstr ""
-
-msgid "Annuler la suppression"
-msgstr ""
-
-msgid "Annuler la suppression ?"
 msgstr ""
 
 msgid "Bloc"
@@ -65,13 +46,22 @@ msgstr "Bloc"
 msgid "Cancel"
 msgstr ""
 
-msgid "Cette action annulera l'ajout de l'UE X du groupement 'Y'"
+msgid "Cancel add"
 msgstr ""
 
-msgid "Cette action annulera la modification de l'UE X du groupement 'Y'"
+msgid "Cancel add ?"
 msgstr ""
 
-msgid "Cette action annulera la suppression de l'UE X du groupement 'Y'"
+msgid "Cancel delete ?"
+msgstr ""
+
+msgid "Cancel deletion"
+msgstr ""
+
+msgid "Cancel edition"
+msgstr ""
+
+msgid "Cancel edition ?"
 msgstr ""
 
 msgid "Check All"
@@ -80,35 +70,47 @@ msgstr ""
 msgid "Code"
 msgstr ""
 
-msgid "Commentaire"
+msgid "Comment"
 msgstr ""
 
-msgid "Commentaire en anglais"
+msgid "Components (PM/PP)"
 msgstr ""
 
 msgid "Composants (PM+PP)"
 msgstr ""
 
-msgid "Composants (PM/PP)"
-msgstr ""
+msgid "Content"
+msgstr "Contenu"
+
+msgid "Credits"
+msgstr "Crédits"
 
 msgid "Crédits"
 msgstr ""
 
-msgid "Content"
-msgstr "Contenu"
+msgid "DELETION"
+msgstr ""
 
 msgid "Derogation's session"
 msgstr "Session dérogation"
 
-msgid "ECGE1BA - 2021-2022"
+msgid "Do not cancel"
+msgstr ""
+
+msgid "EDITION"
+msgstr ""
+
+msgid "Edit properties"
+msgstr ""
+
+msgid "Edition"
+msgstr ""
+
+msgid "English comment"
 msgstr ""
 
 msgid "Form view"
 msgstr "Vue formulaire"
-
-msgid "Formulaire d'inscriptions aux cours PAE"
-msgstr ""
 
 msgid "Intitulé"
 msgstr ""
@@ -119,7 +121,10 @@ msgstr ""
 msgid "MODIFICATION"
 msgstr ""
 
-msgid "Modification"
+msgid "Main sort"
+msgstr ""
+
+msgid "Mandatory"
 msgstr ""
 
 msgid "Modifier les propriétés"
@@ -128,19 +133,22 @@ msgstr ""
 msgid "Name"
 msgstr "Nom"
 
-msgid "Ne pas annuler"
+msgid "No deletable content"
 msgstr ""
 
 msgid "Obligatoire"
 msgstr ""
 
-msgid "Preparation PAE"
+msgid "PAE preparation"
+msgstr ""
+
+msgid "PAE registration form"
 msgstr ""
 
 msgid "Quadri."
 msgstr ""
 
-msgid "Revenir à l'état initial du programme"
+msgid "Reset to initial program state"
 msgstr ""
 
 msgid "SUPPRESSION"
@@ -152,14 +160,29 @@ msgstr "Enregistrer"
 msgid "Search"
 msgstr "Rechercher"
 
+msgid "Secondary sort"
+msgstr ""
+
 msgid "Session"
 msgstr "Session"
 
-msgid "Suppression"
-msgstr "Suppression"
-
 msgid "Sigle"
 msgstr ""
+
+msgid "Sort by block"
+msgstr ""
+
+msgid "Sort by code"
+msgstr ""
+
+msgid "Sort by program order"
+msgstr ""
+
+msgid "Sort by quadrimester"
+msgstr ""
+
+msgid "Suppression"
+msgstr "Suppression"
 
 msgid "Supprimer des UE"
 msgstr ""
@@ -167,51 +190,45 @@ msgstr ""
 msgid "The learning units have been added"
 msgstr "Les unités d'enseignement ont été ajoutées"
 
+msgid "The learning units {} have been deleted"
+msgstr "Les unités d'enseignement {} ont été supprimées"
+
+msgid "This action will cancel addition of learning unit X to group Y"
+msgstr ""
+
+msgid "This action will cancel deletion"
+msgstr ""
+
+msgid "This action will cancel edition of UE X from group Y"
+msgstr ""
+
 msgid "Title"
 msgstr "Intitule"
-
-msgid "Tri par bloc"
-msgstr ""
-
-msgid "Tri par code"
-msgstr ""
-
-msgid "Tri par ordre du programme"
-msgstr ""
-
-msgid "Tri par quadrimestre"
-msgstr ""
-
-msgid "Tri principal"
-msgstr ""
-
-msgid "Tri secondaire"
-msgstr ""
 
 msgctxt "student_path_year"
 msgid "Year"
 msgstr "An"
-
-msgid "champs1"
-msgstr ""
-
-msgid "champs2"
-msgstr ""
-
-msgid "champs3"
-msgstr ""
-
-msgid "champs4"
-msgstr ""
-
-msgid "champs5"
-msgstr ""
 
 msgid "code"
 msgstr ""
 
 msgid "credits"
 msgstr "crédits"
+
+msgid "field1"
+msgstr ""
+
+msgid "field2"
+msgstr ""
+
+msgid "field3"
+msgstr ""
+
+msgid "field4"
+msgstr ""
+
+msgid "field5"
+msgstr ""
 
 msgid "intitule"
 msgstr ""
