@@ -31,7 +31,7 @@
             <li role="presentation" class="active"><a href=""
                                                       hx-get="{% url 'consulter_contenu_groupement_view' annee code_programme code_groupement %}"
                                                       hx-target="#content-of-main-panel" hx-trigger="click"
-                                                      hx-swap="innerHTML" data-toggle="tab">Contenu</a></li>
+                                                      hx-swap="innerHTML" data-toggle="tab">{% trans 'Content' %}</a></li>
             <li role="presentation" class=""><a href=""
                                     hx-get="{% url 'liste_unites_enseignement_view' annee code_programme %}"
                                     hx-target="#content-of-main-panel" hx-trigger="click"
@@ -39,7 +39,7 @@
             <li role="presentation" class=""><a href=""
                                                 hx-get="{% url 'pae_formulaire_inscription_view' annee code_programme %}"
                                                 hx-target="#content-of-main-panel" hx-trigger="click"
-                                                hx-swap="innerHTML" data-toggle="tab">Formulaire</a></li>
+                                                hx-swap="innerHTML" data-toggle="tab">{% trans 'Form view' %}</a></li>
         </ul>
         <br>
 

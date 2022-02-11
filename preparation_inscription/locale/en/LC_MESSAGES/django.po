@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-26 07:08+0100\n"
+"POT-Creation-Date: 2022-02-11 09:32+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -27,13 +27,16 @@ msgstr ""
 msgid "Add"
 msgstr ""
 
+msgid "Ajout"
+msgstr ""
+
 msgid "Ajouter des UE"
 msgstr ""
 
-msgid "Anac."
+msgid "Ajouter des groupements"
 msgstr ""
 
-msgid "Annuler ajout"
+msgid "Anac."
 msgstr ""
 
 msgid "Annuler l'ajout"
@@ -54,10 +57,10 @@ msgstr ""
 msgid "Annuler la suppression ?"
 msgstr ""
 
-msgid "Annuler suppression"
+msgid "Bloc"
 msgstr ""
 
-msgid "Bloc"
+msgid "Block"
 msgstr ""
 
 msgid "Cancel"
@@ -84,19 +87,25 @@ msgstr ""
 msgid "Commentaire en anglais"
 msgstr ""
 
+msgid "Composants (PM+PP)"
+msgstr ""
+
 msgid "Composants (PM/PP)"
+msgstr ""
+
+msgid "Content"
 msgstr ""
 
 msgid "Crédits"
 msgstr ""
 
-msgid "Déplacer vers le bas"
-msgstr ""
-
-msgid "Déplacer vers le haut"
+msgid "Derogation's session"
 msgstr ""
 
 msgid "ECGE1BA - 2021-2022"
+msgstr ""
+
+msgid "Form view"
 msgstr ""
 
 msgid "Formulaire d'inscriptions aux cours PAE"
@@ -105,10 +114,19 @@ msgstr ""
 msgid "Intitulé"
 msgstr ""
 
+msgid "Label"
+msgstr ""
+
 msgid "MODIFICATION"
 msgstr ""
 
+msgid "Modification"
+msgstr ""
+
 msgid "Modifier les propriétés"
+msgstr ""
+
+msgid "Name"
 msgstr ""
 
 msgid "Ne pas annuler"
@@ -129,22 +147,50 @@ msgstr ""
 msgid "SUPPRESSION"
 msgstr ""
 
+msgid "Save"
+msgstr ""
+
 msgid "Search"
 msgstr ""
 
 msgid "Session"
 msgstr ""
 
-msgid "Supprimer des UE"
+msgid "Sigle"
 msgstr ""
 
-msgid "Supprimer unite enseignement"
+msgid "Suppression"
+msgstr ""
+
+msgid "Supprimer des UE"
 msgstr ""
 
 msgid "The learning units have been added"
 msgstr ""
 
 msgid "Title"
+msgstr ""
+
+msgid "Tri par bloc"
+msgstr ""
+
+msgid "Tri par code"
+msgstr ""
+
+msgid "Tri par ordre du programme"
+msgstr ""
+
+msgid "Tri par quadrimestre"
+msgstr ""
+
+msgid "Tri principal"
+msgstr ""
+
+msgid "Tri secondaire"
+msgstr ""
+
+msgctxt "student_path_year"
+msgid "Year"
 msgstr ""
 
 msgid "champs1"
@@ -162,21 +208,14 @@ msgstr ""
 msgid "champs5"
 msgstr ""
 
-msgid "Form view"
-msgstr ""
-
-msgid "Program"
-msgstr ""
-
-msgid "Sections and programs"
-msgstr ""
-
-msgid "Training configuration"
-msgstr ""
-
-msgctxt "student_path_year"
-msgid "Year"
+msgid "code"
 msgstr ""
 
 msgid "credits"
+msgstr ""
+
+msgid "intitule"
+msgstr ""
+
+msgid "sigle"
 msgstr ""

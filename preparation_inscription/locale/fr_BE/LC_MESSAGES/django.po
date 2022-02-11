@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-26 07:08+0100\n"
+"POT-Creation-Date: 2022-02-11 09:32+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -26,13 +26,16 @@ msgstr "Actions"
 msgid "Add"
 msgstr "Ajouter"
 
+msgid "Ajout"
+msgstr ""
+
 msgid "Ajouter des UE"
 msgstr ""
 
-msgid "Anac."
+msgid "Ajouter des groupements"
 msgstr ""
 
-msgid "Annuler ajout"
+msgid "Anac."
 msgstr ""
 
 msgid "Annuler l'ajout"
@@ -53,11 +56,11 @@ msgstr ""
 msgid "Annuler la suppression ?"
 msgstr ""
 
-msgid "Annuler suppression"
-msgstr ""
-
 msgid "Bloc"
 msgstr ""
+
+msgid "Block"
+msgstr "Bloc"
 
 msgid "Cancel"
 msgstr ""
@@ -83,20 +86,26 @@ msgstr ""
 msgid "Commentaire en anglais"
 msgstr ""
 
+msgid "Composants (PM+PP)"
+msgstr ""
+
 msgid "Composants (PM/PP)"
 msgstr ""
+
+msgid "Content"
+msgstr "Contenu"
 
 msgid "Crédits"
 msgstr ""
 
-msgid "Déplacer vers le bas"
-msgstr ""
-
-msgid "Déplacer vers le haut"
-msgstr ""
+msgid "Derogation's session"
+msgstr "Session dérogation"
 
 msgid "ECGE1BA - 2021-2022"
 msgstr ""
+
+msgid "Form view"
+msgstr "Vue formulaire"
 
 msgid "Formulaire d'inscriptions aux cours PAE"
 msgstr ""
@@ -104,11 +113,20 @@ msgstr ""
 msgid "Intitulé"
 msgstr ""
 
+msgid "Label"
+msgstr ""
+
 msgid "MODIFICATION"
+msgstr ""
+
+msgid "Modification"
 msgstr ""
 
 msgid "Modifier les propriétés"
 msgstr ""
+
+msgid "Name"
+msgstr "Nom"
 
 msgid "Ne pas annuler"
 msgstr ""
@@ -128,16 +146,22 @@ msgstr ""
 msgid "SUPPRESSION"
 msgstr ""
 
+msgid "Save"
+msgstr "Enregistrer"
+
 msgid "Search"
 msgstr "Rechercher"
 
 msgid "Session"
 msgstr "Session"
 
-msgid "Supprimer des UE"
+msgid "Sigle"
 msgstr ""
 
-msgid "Supprimer unite enseignement"
+msgid "Suppression"
+msgstr "Session"
+
+msgid "Supprimer des UE"
 msgstr ""
 
 msgid "The learning units have been added"
@@ -146,21 +170,51 @@ msgstr "Les unitées d'enseignement ont été ajoutées"
 msgid "Title"
 msgstr "Intitule"
 
-msgid "Form view"
-msgstr "Vue formulaire"
+msgid "Tri par bloc"
+msgstr ""
 
-msgid "Program"
-msgstr "Parcours étudiant"
+msgid "Tri par code"
+msgstr ""
 
-msgid "Sections and programs"
-msgstr "Sections et programmes"
+msgid "Tri par ordre du programme"
+msgstr ""
 
-msgid "Training configuration"
-msgstr "Configuration de la formation"
+msgid "Tri par quadrimestre"
+msgstr ""
+
+msgid "Tri principal"
+msgstr ""
+
+msgid "Tri secondaire"
+msgstr ""
 
 msgctxt "student_path_year"
 msgid "Year"
 msgstr "An"
 
+msgid "champs1"
+msgstr ""
+
+msgid "champs2"
+msgstr ""
+
+msgid "champs3"
+msgstr ""
+
+msgid "champs4"
+msgstr ""
+
+msgid "champs5"
+msgstr ""
+
+msgid "code"
+msgstr ""
+
 msgid "credits"
 msgstr "crédits"
+
+msgid "intitule"
+msgstr ""
+
+msgid "sigle"
+msgstr ""
