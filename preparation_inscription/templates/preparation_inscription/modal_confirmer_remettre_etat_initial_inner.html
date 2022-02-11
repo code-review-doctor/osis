@@ -4,16 +4,16 @@
     {% csrf_token %}
     <div class="modal-header">
         <h5 class="modal-title text-center"
-            id="annuler_etat_initial_modal_label">{% trans "Réinitialiser le contenu du programme ?" %}</h5>
+            id="annuler_etat_initial_modal_label">{% trans "Return to the initial state of the program ?" %}</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
     </div>
     <div class="modal-body">
-        {% trans "Etes-vous sûr.e de vouloir réinitialiser tout le contenu du programme ?" %}
+        {% trans "Are you sure you want to reset all program content ?" %}
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal"> {% trans "Annuler" %}</button>
-        <input type="submit" class="btn btn-danger" value="{% trans "Oui, je confirme" %}">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal"> {% trans "Cancel" %}</button>
+        <input type="submit" class="btn btn-danger" value="{% trans "Yes I confirm" %}">
     </div>
 </form>

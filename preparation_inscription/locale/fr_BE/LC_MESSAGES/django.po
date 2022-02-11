@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-11 09:32+0100\n"
+"POT-Creation-Date: 2022-02-11 14:42+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -56,6 +56,10 @@ msgstr ""
 msgid "Annuler la suppression ?"
 msgstr ""
 
+msgid "Are you sure you want to reset all program content ?"
+msgstr ""
+"Etes-vous sûr.e de vouloir réinitialiser tout le contenu du programme ?"
+
 msgid "Bloc"
 msgstr ""
 
@@ -92,11 +96,11 @@ msgstr ""
 msgid "Composants (PM/PP)"
 msgstr ""
 
-msgid "Crédits"
-msgstr ""
-
 msgid "Content"
 msgstr "Contenu"
+
+msgid "Crédits"
+msgstr ""
 
 msgid "Derogation's session"
 msgstr "Session dérogation"
@@ -140,6 +144,9 @@ msgstr ""
 msgid "Quadri."
 msgstr ""
 
+msgid "Return to the initial state of the program ?"
+msgstr "Return to the initial state of the program ?"
+
 msgid "Revenir à l'état initial du programme"
 msgstr ""
 
@@ -155,17 +162,20 @@ msgstr "Rechercher"
 msgid "Session"
 msgstr "Session"
 
-msgid "Suppression"
-msgstr "Suppression"
-
 msgid "Sigle"
 msgstr ""
+
+msgid "Suppression"
+msgstr "Suppression"
 
 msgid "Supprimer des UE"
 msgstr ""
 
 msgid "The learning units have been added"
 msgstr "Les unités d'enseignement ont été ajoutées"
+
+msgid "The program has returned to its original state."
+msgstr "Le programme est revenu à son état initial."
 
 msgid "Title"
 msgstr "Intitule"
@@ -191,6 +201,9 @@ msgstr ""
 msgctxt "student_path_year"
 msgid "Year"
 msgstr "An"
+
+msgid "Yes I confirm"
+msgstr "Oui, je confirme"
 
 msgid "champs1"
 msgstr ""
