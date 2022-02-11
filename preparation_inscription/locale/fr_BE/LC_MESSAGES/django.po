@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-11 14:33+0100\n"
+"POT-Creation-Date: 2022-02-11 14:42+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -38,9 +38,6 @@ msgstr ""
 msgid "Anac."
 msgstr ""
 
-msgid "Annuler"
-msgstr ""
-
 msgid "Annuler l'ajout"
 msgstr ""
 
@@ -60,7 +57,8 @@ msgid "Annuler la suppression ?"
 msgstr ""
 
 msgid "Are you sure you want to reset all program content ?"
-msgstr "Etes-vous sûr.e de vouloir réinitialiser tout le contenu du programme ?"
+msgstr ""
+"Etes-vous sûr.e de vouloir réinitialiser tout le contenu du programme ?"
 
 msgid "Bloc"
 msgstr ""
@@ -140,9 +138,6 @@ msgstr ""
 msgid "Obligatoire"
 msgstr ""
 
-msgid "Oui, je confirme"
-msgstr ""
-
 msgid "Preparation PAE"
 msgstr ""
 
@@ -206,6 +201,9 @@ msgstr ""
 msgctxt "student_path_year"
 msgid "Year"
 msgstr "An"
+
+msgid "Yes I confirm"
+msgstr "Oui, je confirme"
 
 msgid "champs1"
 msgstr ""
