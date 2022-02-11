@@ -14,7 +14,7 @@ pendulum==1.2.0
 djangorestframework==3.12.4
 gitpython==2.1.9
 requests==2.20.0
-django-bootstrap3==11.1.0
+django-bootstrap3==15.0.0
 django-ordered-model==3.4.3
 django-waffle==2.2.1
 redis==2.10.6
@@ -23,7 +23,7 @@ beautifulsoup4==4.6.3
 pypom==2.2.0
 selenium==3.11.0
 python-magic==0.4.15
-django-ajax-selects==1.7.1
+django-ajax-selects==1.9.1
 celery==5.0.5
 django-celery-beat==2.2.1
 django-celery-results==2.2.0
