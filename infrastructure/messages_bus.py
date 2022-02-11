@@ -193,7 +193,9 @@ from ddd.logic.shared_kernel.campus.use_case.read.search_uclouvain_campuses_serv
 from ddd.logic.shared_kernel.language.commands import GetLanguageCommand, SearchLanguagesCommand
 from ddd.logic.shared_kernel.language.use_case.read.get_language_service import get_language
 from ddd.logic.shared_kernel.language.use_case.read.search_languages_service import search_languages
+from education_group.ddd.command import GetGroupCommand
 from education_group.ddd.repository.training import TrainingRepository
+from education_group.ddd.service.read.get_group_service import get_group
 from infrastructure.application.repository.applicant import ApplicantRepository
 from infrastructure.application.repository.application import ApplicationRepository
 from infrastructure.application.repository.application_calendar import ApplicationCalendarRepository
@@ -575,6 +577,7 @@ class MessageBusCommands(AbstractMessageBusCommands):
             CatalogueUnitesEnseignementTranslator(),
         ),
         GetContenuGroupementCatalogueCommand: lambda cmd: get_content_service(cmd),
+        GetGroupCommand: lambda cmd: get_group(cmd),
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 
 

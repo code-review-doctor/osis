@@ -158,7 +158,7 @@ class LearningUnitRepository(ILearningUnitRepository):
         )
 
         if intitule:
-            qs = qs.filter(full_title__contains=intitule)
+            qs = qs.filter(full_title__icontains=intitule)
 
         result = []
         for learning_unit_year_db_obj in qs:
@@ -184,8 +184,12 @@ class LearningUnitRepository(ILearningUnitRepository):
                         quadrimester=learning_unit_year_db_obj.quadrimester,
                         credits=learning_unit_year_db_obj.credits,
                         session_derogation=learning_unit_year_db_obj.session or "",
-                        lecturing_volume_annual=learning_unit_year_db_obj.lecturing_volume_annual,
-                        practical_volume_annual=learning_unit_year_db_obj.practical_volume_annual
+                        lecturing_volume_annual=int(
+                            learning_unit_year_db_obj.lecturing_volume_annual
+                        ) if learning_unit_year_db_obj.lecturing_volume_annual else 0,
+                        practical_volume_annual=int(
+                            learning_unit_year_db_obj.practical_volume_annual
+                        ) if learning_unit_year_db_obj.practical_volume_annual else 0,
                     )
                 )
         return result

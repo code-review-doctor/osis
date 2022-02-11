@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-08 10:00+0100\n"
+"POT-Creation-Date: 2022-02-10 08:50+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -121,6 +121,9 @@ msgstr "L'UE est utilisée dans les formations suivantes : {}"
 
 msgid "Lecturing charge or practical charge must be filled"
 msgstr "Le vol.1 postulé ou le vol.2 postulé doit être rempli"
+
+msgid "No learning units to add."
+msgstr "Aucune unité d'enseignement à ajouter."
 
 msgid "No vacant corresponding activity"
 msgstr "Pas de cours vacant correspondant"

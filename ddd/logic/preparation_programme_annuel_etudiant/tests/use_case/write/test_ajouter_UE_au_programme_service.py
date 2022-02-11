@@ -31,9 +31,10 @@ from django.test import SimpleTestCase
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from ddd.logic.preparation_programme_annuel_etudiant.commands import AjouterUEAuProgrammeCommand
 from ddd.logic.preparation_programme_annuel_etudiant.domain.validator.exceptions import \
-    UniteEnseignementDejaAjouteeException
+    UniteEnseignementDejaAjouteeException, AucuneUnitesEnseignementsAAjouterException
 from infrastructure.messages_bus import message_bus_instance
-from infrastructure.preparation_programme_annuel_etudiant.repository.in_memory.groupement_ajuste_inscription_cours import \
+from infrastructure.preparation_programme_annuel_etudiant.repository.in_memory.groupement_ajuste_inscription_cours \
+    import \
     GroupementAjusteInscriptionCoursInMemoryRepository
 from program_management.ddd.domain.program_tree_version import STANDARD
 
@@ -84,3 +85,16 @@ class TestAjouterUeAuProgramme(SimpleTestCase):
             self.message_bus.invoke(cmd)
         exception = class_exceptions.exception.exceptions.pop()
         self.assertIsInstance(exception, UniteEnseignementDejaAjouteeException)
+
+    def test_should_pas_accepter_liste_vide_d_unites_enseignement_a_ajouter(self):
+        cmd = AjouterUEAuProgrammeCommand(
+            annee=self.annee,
+            code_programme=self.code_programme,
+            ajouter_dans='LECGE100T',
+            unites_enseignements=[],
+        )
+        with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
+            self.message_bus.invoke(cmd)
+
+        exception = class_exceptions.exception.exceptions.pop()
+        self.assertIsInstance(exception, AucuneUnitesEnseignementsAAjouterException)
