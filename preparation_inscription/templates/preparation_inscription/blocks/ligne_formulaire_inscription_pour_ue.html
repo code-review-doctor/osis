@@ -1,6 +1,6 @@
 {% load static %}
 {% load i18n %}
-{% load bootstrap3 formatage_credits formatage_volumes_totaux %}
+{% load bootstrap3 formatage_credits formatage_volumes %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -32,7 +32,7 @@
             {{ contenu.code }} {{ contenu.intitule_complet }}
             [{{ contenu|formater_volumes_totaux }}]
             {{ contenu.quadrimestre_texte }}
-            {{ contenu|formater_credits_ue }}
+            {% formater_credits_ue_formulaire contenu.credits_relatifs contenu.credits_absolus %}
         </span>
     </td>
     <td>{% if  contenu.bloc == 1 %}<label title="{% trans 'Year' context 'student_path_year' %} 1">X</label>{% endif %}</td>

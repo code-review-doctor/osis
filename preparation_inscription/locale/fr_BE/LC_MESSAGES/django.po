@@ -92,11 +92,11 @@ msgstr ""
 msgid "Composants (PM/PP)"
 msgstr ""
 
-msgid "Content"
-msgstr "Contenu"
-
 msgid "Crédits"
 msgstr ""
+
+msgid "Content"
+msgstr "Contenu"
 
 msgid "Derogation's session"
 msgstr "Session dérogation"
@@ -155,17 +155,17 @@ msgstr "Rechercher"
 msgid "Session"
 msgstr "Session"
 
+msgid "Suppression"
+msgstr "Suppression"
+
 msgid "Sigle"
 msgstr ""
-
-msgid "Suppression"
-msgstr "Session"
 
 msgid "Supprimer des UE"
 msgstr ""
 
 msgid "The learning units have been added"
-msgstr "Les unitées d'enseignement ont été ajoutées"
+msgstr "Les unités d'enseignement ont été ajoutées"
 
 msgid "Title"
 msgstr "Intitule"
