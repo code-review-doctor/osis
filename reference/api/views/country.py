@@ -31,11 +31,17 @@ from reference.models.country import Country
 
 
 class CountryFilter(filters.FilterSet):
-    not_iso_code = filters.CharFilter(field_name='iso_code', exclude=True)
+    not_iso_code = filters.CharFilter(field_name='iso_code', method='exclude_by_iso_code')
 
     class Meta:
         model = Country
         fields = ['iso_code', 'name', 'name_en', 'dialing_code']
+
+    @staticmethod
+    def exclude_by_iso_code(queryset, name, value):
+        return queryset.exclude(
+            iso_code__in=[iso_code for iso_code in value.split(',')]
+        )
 
 
 class CountryList(generics.ListAPIView):

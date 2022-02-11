@@ -34,8 +34,9 @@ paths:
         - in: query
           name: not_iso_code
           schema:
-            description: Exclude by ISO 3166-1 2-letter country code
+            description: Exclude by ISO 3166-1 2-letter country code (multiple possible separated with coma)
             type: string
+            explode: true
         - in: query
           name: name
           schema:

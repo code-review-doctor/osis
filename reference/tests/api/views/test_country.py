@@ -92,7 +92,6 @@ class GetAllCountryTestCase(APITestCase):
             query_string = {api_settings.ORDERING_PARAM: order}
             response = self.client.get(self.url, kwargs=query_string)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
-            print(query_string)
             countries = Country.objects.all().order_by(order)
             serializer = CountrySerializer(
                 countries,
