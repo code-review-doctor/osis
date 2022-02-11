@@ -681,6 +681,9 @@ msgstr "Création"
 msgid "Credits"
 msgstr "Crédits"
 
+msgid "Curriculum"
+msgstr "Curriculum"
+
 msgid "DDI"
 msgstr "HTM"
 

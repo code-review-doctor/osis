@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -130,9 +130,6 @@ from ddd.logic.encodage_des_notes.soumission.use_case.read.search_responsable_de
 from ddd.logic.encodage_des_notes.soumission.use_case.write.assigner_responsable_de_notes_service import \
     assigner_responsable_de_notes
 from ddd.logic.encodage_des_notes.soumission.use_case.write \
-    .supprimer_adresse_feuille_de_note_premiere_annee_de_bachelier import \
-    supprimer_adresse_feuille_de_note_premiere_annee_de_bachelier
-from ddd.logic.encodage_des_notes.soumission.use_case.write \
     .encoder_adresse_entite_comme_adresse_feuille_de_notes_service import \
     encoder_adresse_entite_comme_adresse_feuille_de_notes
 from ddd.logic.encodage_des_notes.soumission.use_case.write.encoder_adresse_feuille_de_notes_specifique_service import \
@@ -140,6 +137,9 @@ from ddd.logic.encodage_des_notes.soumission.use_case.write.encoder_adresse_feui
 from ddd.logic.encodage_des_notes.soumission.use_case.write.encoder_notes_etudiant_service import encoder_notes_etudiant
 from ddd.logic.encodage_des_notes.soumission.use_case.write.soumettre_notes_etudiant_service import \
     soumettre_notes_etudiant
+from ddd.logic.encodage_des_notes.soumission.use_case.write \
+    .supprimer_adresse_feuille_de_note_premiere_annee_de_bachelier import \
+    supprimer_adresse_feuille_de_note_premiere_annee_de_bachelier
 from ddd.logic.formation_catalogue.commands import SearchFormationsCommand
 from ddd.logic.formation_catalogue.use_case.read.search_formation_service import search_formations
 from ddd.logic.learning_unit.commands import (
@@ -169,6 +169,16 @@ from ddd.logic.learning_unit.use_case.write.create_effective_class_service impor
 from ddd.logic.learning_unit.use_case.write.create_learning_unit_service import create_learning_unit
 from ddd.logic.learning_unit.use_case.write.delete_effective_class_service import delete_effective_class
 from ddd.logic.learning_unit.use_case.write.update_effective_class_service import update_effective_class
+from ddd.logic.preparation_programme_annuel_etudiant.commands import AjouterUEAuProgrammeCommand
+from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormulaireInscriptionCoursCommand, \
+    GetFormationCommand
+from ddd.logic.preparation_programme_annuel_etudiant.commands import GetProgrammeInscriptionCoursCommand
+from ddd.logic.preparation_programme_annuel_etudiant.use_case.read.get_formulaire_inscription_cours_service import \
+    get_formulaire_inscription_cours_service
+from ddd.logic.preparation_programme_annuel_etudiant.use_case.read.get_programme_inscription_cours_service import \
+    get_programme_inscription_cours
+from ddd.logic.preparation_programme_annuel_etudiant.use_case.write.ajouter_UE_au_programme_service import \
+    ajouter_UE_au_programme
 from ddd.logic.shared_kernel.academic_year.commands import SearchAcademicYearCommand
 from ddd.logic.shared_kernel.academic_year.use_case.read.search_academic_years_service import search_academic_years
 from ddd.logic.shared_kernel.campus.commands import GetCampusCommand, SearchUclouvainCampusesCommand
@@ -219,15 +229,23 @@ from infrastructure.learning_unit.domain.service.tutor_distributed_to_class impo
 from infrastructure.learning_unit.repository.effective_class import EffectiveClassRepository
 from infrastructure.learning_unit.repository.entity import UclEntityRepository
 from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
+from infrastructure.preparation_programme_annuel_etudiant.domain.service.catalogue_formations import \
+    CatalogueFormationsTranslator
+from infrastructure.preparation_programme_annuel_etudiant.domain.service.catalogue_unites_enseignement import \
+    CatalogueUnitesEnseignementTranslator
+from infrastructure.preparation_programme_annuel_etudiant.repository.in_memory.groupement_ajuste_inscription_cours \
+    import GroupementAjusteInscriptionCoursInMemoryRepository
 from infrastructure.shared_kernel.academic_year.repository.academic_year import AcademicYearRepository
 from infrastructure.shared_kernel.campus.repository.uclouvain_campus import UclouvainCampusRepository
 from infrastructure.shared_kernel.entite.repository.entiteucl import EntiteUCLRepository
 from infrastructure.shared_kernel.language.repository.language import LanguageRepository
 from infrastructure.utils import AbstractMessageBusCommands, load_message_bus_instance
 from osis_common.ddd.interface import ApplicationServiceResult, CommandRequest
-from program_management.ddd.command import BulkUpdateLinkCommand, GetReportCommand
+from program_management.ddd.command import BulkUpdateLinkCommand, GetReportCommand, GetProgramTreeVersionCommand
 from program_management.ddd.repositories import program_tree as program_tree_repo
 from program_management.ddd.repositories.report import ReportRepository
+from program_management.ddd.service.read.get_program_tree_version_service import get_program_tree_version, \
+    get_programme_formation
 from program_management.ddd.service.read.get_report_service import get_report
 from program_management.ddd.service.write.bulk_update_link_service import bulk_update_and_postpone_links
 
@@ -519,6 +537,24 @@ class MessageBusCommands(AbstractMessageBusCommands):
             ApplicationCalendarRepository(),
             ApplicantRepository(),
             AttributionsEndDateReachedSummary()
+        ),
+        AjouterUEAuProgrammeCommand: lambda cmd: ajouter_UE_au_programme(
+            cmd,
+            GroupementAjusteInscriptionCoursInMemoryRepository(),
+        ),
+        GetProgramTreeVersionCommand: lambda cmd: get_program_tree_version(cmd),
+        GetFormulaireInscriptionCoursCommand: lambda cmd: get_formulaire_inscription_cours_service(
+            cmd,
+            GroupementAjusteInscriptionCoursInMemoryRepository(),
+            CatalogueFormationsTranslator(),
+            CatalogueUnitesEnseignementTranslator(),
+        ),
+        GetFormationCommand: lambda cmd: get_programme_formation(cmd),
+        GetProgrammeInscriptionCoursCommand: lambda cmd: get_programme_inscription_cours(
+            cmd,
+            GroupementAjusteInscriptionCoursInMemoryRepository(),
+            CatalogueFormationsTranslator(),
+            CatalogueUnitesEnseignementTranslator(),
         ),
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 

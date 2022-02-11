@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -25,10 +25,11 @@
 ##############################################################################
 import contextlib
 import warnings
+from _decimal import Decimal
 from typing import Optional, List
 
 from django.db import IntegrityError
-from django.db.models import F, Case, When, IntegerField, QuerySet, Max, OuterRef, Exists, Subquery
+from django.db.models import F, Case, When, IntegerField, QuerySet, Max, OuterRef, Subquery
 from django.db.models import Q
 
 from base.models.academic_year import AcademicYear
@@ -39,12 +40,15 @@ from education_group.models.group import Group
 from education_group.models.group_year import GroupYear
 from osis_common.ddd import interface
 from osis_common.ddd.interface import RootEntity
+from program_management import formatter
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception
 from program_management.ddd.domain import program_tree
 from program_management.ddd.domain import program_tree_version
+from program_management.ddd.domain.exception import ProgramTreeVersionNotFoundException
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, STANDARD, NOT_A_TRANSITION
+from program_management.ddd.dtos import UniteEnseignementDTO, ContenuNoeudDTO, ProgrammeDeFormationDTO
 from program_management.ddd.repositories import program_tree as program_tree_repository
 from program_management.models.education_group_version import EducationGroupVersion
 
@@ -188,9 +192,9 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
 
     @classmethod
     def delete(
-           cls,
-           entity_id: 'ProgramTreeVersionIdentity',
-           delete_program_tree_service: interface.ApplicationService = None
+            cls,
+            entity_id: 'ProgramTreeVersionIdentity',
+            delete_program_tree_service: interface.ApplicationService = None
     ) -> None:
         program_tree_version = cls.get(entity_id)
 
@@ -254,6 +258,18 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
         for record_dict in qs:
             results.append(_instanciate_tree_version(record_dict))
         return results
+
+    @classmethod
+    def get_dto(cls, identity: ProgramTreeVersionIdentity) -> Optional['ProgrammeDeFormationDTO']:
+        pgm_tree_version = cls.get(identity)
+        return build_dto(pgm_tree_version, identity)
+
+    @classmethod
+    def get_dto_from_year_and_code(cls, code: str, year: int) -> Optional['ProgrammeDeFormationDTO']:
+        pgm_tree_version = cls.search(code=code, year=year)
+        if pgm_tree_version:
+            return build_dto(pgm_tree_version[0], pgm_tree_version[0].entity_identity)
+        raise ProgramTreeVersionNotFoundException
 
 
 def _update_start_year_and_end_year(
@@ -385,3 +401,75 @@ def _get_common_queryset() -> QuerySet:
         'end_year_of_existence',
         'start_year',
     )
+
+
+def build_dto(pgm_tree_version: 'ProgramTreeVersion', identity: ProgramTreeVersionIdentity) \
+        -> 'ProgrammeDeFormationDTO':
+    tree = pgm_tree_version.get_tree()
+    contenu = _build_contenu(tree.root_node, )
+    return ProgrammeDeFormationDTO(
+        racine=contenu,
+        annee=identity.year,
+        sigle=identity.offer_acronym,
+        version=identity.version_name,
+        intitule_formation="{}{}".format(
+            tree.root_node.offer_title_fr,
+            "{}".format("[ {} ]".format(pgm_tree_version.title_fr) if pgm_tree_version.title_fr else '')
+        ),
+        code=tree.entity_id.code,
+        transition_name=identity.transition_name
+    )
+
+
+def _build_contenu(node: 'Node', lien_parent: 'Link' = None) -> 'ContenuNoeudDTO':
+    contenu_ordonne = []
+    for lien in node.children:
+        if lien.child.is_learning_unit():
+            contenu_ordonne.append(
+                UniteEnseignementDTO(
+                    bloc=lien.block,
+                    code=lien.child.code,
+                    intitule_complet=lien.child.title,
+                    quadrimestre=lien.child.quadrimester,
+                    quadrimestre_texte=lien.child.quadrimester.value if lien.child.quadrimester else "",
+                    credits_absolus=lien.child.credits,
+                    volume_annuel_pm=lien.child.volume_total_lecturing,
+                    volume_annuel_pp=lien.child.volume_total_practical,
+                    obligatoire=lien.is_mandatory if lien else False,
+                    session_derogation='',
+                    credits_relatifs=lien.relative_credits,
+                )
+            )
+        else:
+            groupement_contenu = _build_contenu(lien.child, lien_parent=lien)
+            contenu_ordonne.append(groupement_contenu)
+
+    return ContenuNoeudDTO(
+        code=node.code,
+        intitule=node.title,
+        remarque=node.remark_fr,
+        obligatoire=lien_parent.is_mandatory if lien_parent else False,
+        credits=_get_credits(lien_parent),
+        intitule_complet=get_verbose_title_group(node),
+        contenu_ordonne=contenu_ordonne,
+    )
+
+
+def get_verbose_title_group(node: 'NodeGroupYear') -> str:
+    if node.is_finality():
+        return format_complete_title_label(node, node.offer_partial_title_fr)
+    if node.is_option():
+        return format_complete_title_label(node, node.offer_title_fr)
+    else:
+        return node.group_title_fr
+
+
+def format_complete_title_label(node, title_fr) -> str:
+    version_complete_label = formatter.format_version_complete_name(node, "fr-be")
+    return "{}{}".format(title_fr, version_complete_label)
+
+
+def _get_credits(link: 'Link') -> Optional[Decimal]:
+    if link:
+        return link.relative_credits or link.child.credits or 0
+    return None

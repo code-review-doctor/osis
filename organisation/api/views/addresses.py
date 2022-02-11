@@ -25,18 +25,20 @@
 ##############################################################################
 from rest_framework import generics
 
-from base.models.entity_version_address import EntityVersionAddress
+from base.models.entity_version import EntityVersion
 from organisation.api.serializers.addresses import AddressSerializer
 
 
-class AddressesListView(generics.ListAPIView):
+class AddressesListView(generics.RetrieveAPIView):
     """
        Return all the addresses of an entity
     """
     name = 'entity_addresses'
     serializer_class = AddressSerializer
 
-    def get_queryset(self):
-        return EntityVersionAddress.objects.filter(
-            entity_version__uuid=self.kwargs['uuid']
-        )
+    def get_object(self):
+        return EntityVersion.objects.filter(uuid=self.kwargs['uuid']).first().entity
+        #  TODO: Use this when migration of entity addresses is done
+        # return EntityVersionAddress.objects.filter(
+        #     entity_version__uuid=self.kwargs['uuid']
+        # )
