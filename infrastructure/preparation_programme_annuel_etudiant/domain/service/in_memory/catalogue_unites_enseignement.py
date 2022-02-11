@@ -23,26 +23,33 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.preparation_programme_annuel_etudiant.commands import GetContenuGroupementCommand
-from ddd.logic.preparation_programme_annuel_etudiant.domain.service.get_contenu_groupement import GetContenuGroupement
-from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import \
-    ICatalogueFormationsTranslator
+from decimal import Decimal
+from typing import List
+
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_unites_enseignement import \
     ICatalogueUnitesEnseignementTranslator
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import GroupementContenantDTO
-from ddd.logic.preparation_programme_annuel_etudiant.repository.i_groupement_ajuste_inscription_cours import \
-    IGroupementAjusteInscriptionCoursRepository
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import UniteEnseignementCatalogueDTO
 
 
-def get_contenu_groupement_service(
-        cmd: 'GetContenuGroupementCommand',
-        repo: 'IGroupementAjusteInscriptionCoursRepository',
-        catalogue_formations_translator: 'ICatalogueFormationsTranslator',
-        catalogue_unites_enseignement_translator: 'ICatalogueUnitesEnseignementTranslator'
-) -> 'GroupementContenantDTO':
-    return GetContenuGroupement.get_contenu_groupement(
-        cmd,
-        repo,
-        catalogue_formations_translator,
-        catalogue_unites_enseignement_translator
-    )
+class CatalogueUnitesEnseignementTranslatorInMemory(ICatalogueUnitesEnseignementTranslator):
+    dtos = [
+        UniteEnseignementCatalogueDTO(
+            bloc=1,
+            code="LSINF1311",
+            intitule_complet="Human-computer interaction",
+            quadrimestre="Q1",
+            quadrimestre_texte="Q1",
+            credits_absolus=Decimal(5),
+            credits_relatifs=None,
+            volume_annuel_pm=30,
+            volume_annuel_pp=15,
+            obligatoire=True,
+            session_derogation=""
+        )
+    ]
+
+    @classmethod
+    def search(cls, entity_ids: List['LearningUnitIdentity']) -> List['UniteEnseignementCatalogueDTO']:
+        codes = [entity_id.code for entity_id in entity_ids]
+        return [dto for dto in cls.dtos if dto.code in codes]

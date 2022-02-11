@@ -1,4 +1,3 @@
-##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -15,7 +14,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,25 +22,3 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.utils.translation import gettext_lazy as _
-
-from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
-from osis_common.ddd.interface import BusinessException
-
-
-class UniteEnseignementDejaAjouteeException(BusinessException):
-    def __init__(self, unite_enseignement: 'LearningUnitIdentity', **kwargs):
-        message = _("Learning unit {} already added in this ajusted group.").format(unite_enseignement)
-        super().__init__(message, **kwargs)
-
-
-class AucuneUnitesEnseignementsAAjouterException(BusinessException):
-    def __init__(self, **kwargs):
-        message = _("No learning units to add.")
-        super().__init__(message, **kwargs)
-
-
-class FormationIntrouvableException(BusinessException):
-    def __init__(self, code_programme: str, annee: int, **kwargs):
-        message = _("Training {} - {} not found").format(code_programme, str(annee))
-        super().__init__(message, **kwargs)

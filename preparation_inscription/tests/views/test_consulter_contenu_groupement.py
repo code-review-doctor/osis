@@ -32,6 +32,7 @@ from django.urls import reverse
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import GroupementContenantDTO
+from education_group.tests.factories.group_year import GroupYearFactory
 from preparation_inscription.views.consulter_contenu_groupement import ConsulterContenuGroupementView
 
 
@@ -42,6 +43,10 @@ class TestConsulterContenuGroupementView(TestCase):
         cls.url = reverse(
             ConsulterContenuGroupementView.name,
             kwargs={'annee': 2021, 'code_programme': 'LCORP201S', 'code_groupement': 'LCORP201S'}
+        )
+        GroupYearFactory(
+            academic_year__year=2021,
+            partial_acronym="LCORP201S"
         )
 
     def setUp(self) -> None:

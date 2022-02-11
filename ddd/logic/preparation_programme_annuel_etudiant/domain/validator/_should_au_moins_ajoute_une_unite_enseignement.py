@@ -23,17 +23,22 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from decimal import Decimal
-from django import template
+from typing import TYPE_CHECKING, List
 
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import UniteEnseignementCatalogueDTO
+import attr
 
-register = template.Library()
+from base.ddd.utils.business_validator import BusinessValidator
+from ddd.logic.preparation_programme_annuel_etudiant.domain.validator.exceptions import \
+    AucuneUnitesEnseignementsAAjouterException
+
+if TYPE_CHECKING:
+    from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 
 
-@register.filter
-def formater_volumes_totaux(unite_catalogue_dto: 'UniteEnseignementCatalogueDTO') -> str:
-    return "%(total_lecturing)gh + %(total_practical)gh" % {
-        "total_lecturing": unite_catalogue_dto.volume_annuel_pm or Decimal(0.0),
-        "total_practical": unite_catalogue_dto.volume_annuel_pp or Decimal(0.0)
-    }
+@attr.s(frozen=True, slots=True, auto_attribs=True)
+class ShouldAuMoinsAjouterUneUniteEnseignement(BusinessValidator):
+    unite_enseignements: List['LearningUnitIdentity']
+
+    def validate(self, *args, **kwargs):
+        if not self.unite_enseignements:
+            raise AucuneUnitesEnseignementsAAjouterException()

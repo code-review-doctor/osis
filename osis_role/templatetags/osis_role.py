@@ -40,6 +40,19 @@ def a_tag_modal_target_has_perm(target, text, perm, user, obj=None):
     }
 
 
+@register.inclusion_tag('osis_role/templatetags/a_htmx_template.html')
+def a_htmx_tag_has_perm(url, text, target, perm, user, obj=None):
+    has_perm = user.has_perm(perm, obj)
+    context = {"text": text, "url": url, "target": target, "has_perm": has_perm}
+    if not has_perm:
+        context.update({
+            "url": "#",
+            "class_a": "disabled",
+            "error_msg": errors.get_permission_error(user, perm) or "",
+        })
+    return context
+
+
 @register.inclusion_tag('osis_role/templatetags/submit_btn_template.html')
 def submit_btn_has_perm(inner_html, perm, user, obj=None, class_btn=''):
     context = {"inner_html": inner_html, "class_btn": class_btn}
