@@ -34,12 +34,14 @@ class Command(BaseCommand):
     Arguments :
             -k : if presents, keep the database
             --tests/-t : mandatory, followed by one or many tests separated by a space
+            -n : number of try
     Example:
             python manage.py run_test_until_first_fail -k --tests assessments.tests.views assessments.tests.forms
     """
 
     def add_arguments(self, parser):
         parser.add_argument('-k', action='store_true', help="keep the database")
+        parser.add_argument('-n', action='store', help="number of try")
         parser.add_argument(
             '--tests', '-t',
             nargs='+',
@@ -56,8 +58,10 @@ class Command(BaseCommand):
             reinit_db="-k" if kwargs['k'] is True else "",
             test_cases=' '.join(kwargs['tests'])
         )
-
-        while True:
+        max_try = int(kwargs['n']) if kwargs.get('n') else float('inf')
+        number_of_try = 0
+        while number_of_try < max_try:
             result = os.system(command)
             if result != 0:
                 break
+            number_of_try += 1
