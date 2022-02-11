@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-10 08:49+0100\n"
+"POT-Creation-Date: 2022-02-11 09:32+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -31,6 +31,9 @@ msgid "Ajout"
 msgstr ""
 
 msgid "Ajouter des UE"
+msgstr ""
+
+msgid "Ajouter des groupements"
 msgstr ""
 
 msgid "Anac."
@@ -90,6 +93,9 @@ msgstr ""
 msgid "Composants (PM/PP)"
 msgstr ""
 
+msgid "Content"
+msgstr ""
+
 msgid "Crédits"
 msgstr ""
 
@@ -99,10 +105,16 @@ msgstr ""
 msgid "ECGE1BA - 2021-2022"
 msgstr ""
 
+msgid "Form view"
+msgstr ""
+
 msgid "Formulaire d'inscriptions aux cours PAE"
 msgstr ""
 
 msgid "Intitulé"
+msgstr ""
+
+msgid "Label"
 msgstr ""
 
 msgid "MODIFICATION"
@@ -112,6 +124,9 @@ msgid "Modification"
 msgstr ""
 
 msgid "Modifier les propriétés"
+msgstr ""
+
+msgid "Name"
 msgstr ""
 
 msgid "Ne pas annuler"
@@ -139,6 +154,9 @@ msgid "Search"
 msgstr ""
 
 msgid "Session"
+msgstr ""
+
+msgid "Sigle"
 msgstr ""
 
 msgid "Suppression"
@@ -190,5 +208,14 @@ msgstr ""
 msgid "champs5"
 msgstr ""
 
+msgid "code"
+msgstr ""
+
 msgid "credits"
+msgstr ""
+
+msgid "intitule"
+msgstr ""
+
+msgid "sigle"
 msgstr ""
