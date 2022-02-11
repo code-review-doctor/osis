@@ -24,7 +24,7 @@
 ##############################################################################
 from typing import List
 
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
@@ -37,16 +37,28 @@ from base.views.common import display_error_messages, display_success_messages
 from ddd.logic.learning_unit.commands import LearningUnitSearchCommand
 from ddd.logic.learning_unit.dtos import LearningUnitSearchDTO
 from ddd.logic.preparation_programme_annuel_etudiant.commands import AjouterUEAuProgrammeCommand
+from education_group.ddd.command import GetGroupCommand
+from education_group.ddd.domain.group import Group
+from education_group.models.group_year import GroupYear
 from infrastructure.messages_bus import message_bus_instance
+from osis_role.contrib.views import PermissionRequiredMixin
 from preparation_inscription.forms.search_learning_units import SearchLearningUnitForm
+from preparation_inscription.perms import AJOUTER_UNITE_ENSEIGNEMENT_PERMISSION
 from preparation_inscription.views.consulter_contenu_groupement import RAFRAICHIR_GROUPEMENT_CONTENANT
 
 
-class AjouterUnitesEnseignementView(LoginRequiredMixin, HtmxMixin, TemplateView):
+class AjouterUnitesEnseignementView(HtmxMixin, PermissionRequiredMixin, LoginRequiredMixin, TemplateView):
     name = 'ajouter_unites_enseignement_view'
+
+    # PermissionRequiredMixin
+    permission_required = AJOUTER_UNITE_ENSEIGNEMENT_PERMISSION
+    raise_exception = True
 
     template_name = "preparation_inscription/ajouter_unites_enseignement.html"
     htmx_template_name = "preparation_inscription/ajouter_unites_enseignement.html"
+
+    def get_permission_object(self):
+        return get_object_or_404(GroupYear, academic_year__year=self.annee, partial_acronym=self.code_programme)
 
     @cached_property
     def code_programme(self):
@@ -59,6 +71,12 @@ class AjouterUnitesEnseignementView(LoginRequiredMixin, HtmxMixin, TemplateView)
     @cached_property
     def annee(self):
         return self.kwargs['annee']
+
+    @cached_property
+    def group(self) -> 'Group':
+        return message_bus_instance.invoke(
+            GetGroupCommand(code=self.code_groupement, year=self.annee)
+        )
 
     def get_search_form(self):
         return SearchLearningUnitForm(
@@ -101,10 +119,7 @@ class AjouterUnitesEnseignementView(LoginRequiredMixin, HtmxMixin, TemplateView)
         return redirect(self.get_consulter_contenu_groupement_url())
 
     def get_intitule_groupement(self):
-        return self.code_groupement
-
-    def get_intitule_programme(self):
-        return self.code_programme
+        return "{} - {}".format(self.group.abbreviated_title, self.group.titles.title_fr)
 
     def get_context_data(self, **kwargs):
         return {
@@ -112,7 +127,6 @@ class AjouterUnitesEnseignementView(LoginRequiredMixin, HtmxMixin, TemplateView)
             'search_form': self.get_search_form(),
             'search_result': self.get_search_result(),
             'intitule_groupement': self.get_intitule_groupement(),
-            'intitule_programme': self.get_intitule_programme(),
             'cancel_url': self.get_consulter_contenu_groupement_url(),
             'annee': self.annee,
             'code_programme': self.code_programme,

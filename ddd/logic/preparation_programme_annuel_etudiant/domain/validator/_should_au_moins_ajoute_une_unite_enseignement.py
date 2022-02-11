@@ -23,25 +23,22 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.utils.translation import gettext_lazy as _
+from typing import TYPE_CHECKING, List
 
-from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
-from osis_common.ddd.interface import BusinessException
+import attr
 
+from base.ddd.utils.business_validator import BusinessValidator
+from ddd.logic.preparation_programme_annuel_etudiant.domain.validator.exceptions import \
+    AucuneUnitesEnseignementsAAjouterException
 
-class UniteEnseignementDejaAjouteeException(BusinessException):
-    def __init__(self, unite_enseignement: 'LearningUnitIdentity', **kwargs):
-        message = _("Learning unit {} already added in this ajusted group.").format(unite_enseignement)
-        super().__init__(message, **kwargs)
-
-
-class AucuneUnitesEnseignementsAAjouterException(BusinessException):
-    def __init__(self, **kwargs):
-        message = _("No learning units to add.")
-        super().__init__(message, **kwargs)
+if TYPE_CHECKING:
+    from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 
 
-class FormationIntrouvableException(BusinessException):
-    def __init__(self, code_programme: str, annee: int, **kwargs):
-        message = _("Training {} - {} not found").format(code_programme, str(annee))
-        super().__init__(message, **kwargs)
+@attr.s(frozen=True, slots=True, auto_attribs=True)
+class ShouldAuMoinsAjouterUneUniteEnseignement(BusinessValidator):
+    unite_enseignements: List['LearningUnitIdentity']
+
+    def validate(self, *args, **kwargs):
+        if not self.unite_enseignements:
+            raise AucuneUnitesEnseignementsAAjouterException()

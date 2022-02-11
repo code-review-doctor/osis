@@ -1,5 +1,4 @@
 {% load static i18n bootstrap3 %}
-{% load formatage_credits formatage_volumes osis_role %}
 
 {% comment "License" %}
  * OSIS stands for Open Student Information System. It's an application
@@ -33,10 +32,8 @@
                 <span class="caret"></span>
             </button>
             <ul class="dropdown-menu pull-right" aria-labelledby="btn-action-down">
-                <li>
-                    {% url 'ajouter_unites_enseignement_view' annee code_programme code_groupement as ajouter_url %}
-                    {% a_htmx_tag_has_perm ajouter_url _('Ajouter des UE') "#content-of-main-panel" permission_ajout_ue user group_year %}
-                </li>
+                <li><a href="" hx-get="{% url 'ajouter_unites_enseignement_view' annee code_programme code_groupement %}"
+                       hx-target="#content-of-main-panel" hx-trigger="click">{% trans "Ajouter des UE" %}</a></li>
                 <li><a href="" hx-get="{% url 'supprimer_unites_enseignement_view' annee code_programme %}"
                        hx-target="#content-of-main-panel" hx-trigger="click">{% trans "Supprimer des UE" %}</a></li>
                 <li class="divider"></li>
@@ -54,54 +51,41 @@
 <div class="panel-body">
     <table id="table_search_list" class="table table-hover">
         <thead>
-            <tr>
-                <th id="icon"></th>
-                <th id="code" class="code-col">{% trans 'Code' %}</th>
-                <th id="intitule">{% trans 'Intitulé' %}</th>
-                <th id="volumes">{% trans 'Composants (PM+PP)' %}</th>
-                <th id="bloc">{% trans 'Bloc' %}</th>
-                <th id="quadri">{% trans 'Quadri.' %}</th>
-                <th id="credits">{% trans 'Crédits' %}</th>
-                <th id="session">{% trans "Derogation's session" %}</th>
-                <th id="obligatoire">{% trans 'Obligatoire' %}</th>
-                <th id="action" class="actions-col"></th>
-            </tr>
-        </thead>
+        <tr>
+            <th id="icon"></th>
+            <th id="code" class="code-col">{% trans 'Code' %}</th>
+            <th id="intitule">{% trans 'Intitulé' %}</th>
+            <th id="volumes">{% trans 'Composants (PM+PP)' %}</th>
+            <th id="bloc">{% trans 'Bloc' %}</th>
+            <th id="quadri">{% trans 'Quadri.' %}</th>
+            <th id="credits">{% trans 'Crédits' %}</th>
+            <th id="session">{% trans "Derogation's session" %}</th>
+            <th id="obligatoire">{% trans 'Obligatoire' %}</th>
+            <th id="action" class="actions-col"></th>
+    </tr>
+    </thead>
     <tbody>
     {% for element in search_result %}
         <tr>
             <td headers="icon">
-                {% if element.supprime %}
-                    <span class="text-danger"><i class="fas fa-folder-minus"></i></span>
-                {% elif element.modifie %}
-                    <span class="text-info"><i class="fas fa-folder"></i></span>
-                {% elif element.ajoute %}
-                    <span class="text-success"><i class="fas fa-folder-plus"></i></span>
+                {% if element.type_ajustement == "AJOUT" %}
+                    <span class="text-success">
+                    <i class="fas fa-folder-plus"></i>
+                    </span>
                 {% endif %}
             </td>
             <td headers="code">
-                {% if element.supprime %}
-                    <span class="text-danger">
-                        <b>{{ element.code }}{{ element.intitule }}</b>
-                    </span>
-                {% elif element.modifie %}
-                    <span class="text-info">
-                        <b>{{ element.code }}{{ element.intitule }}</b>
-                    </span>
-                {% elif element.ajoute %}
-                    <span class="text-success">
-                        <b>{{ element.code }}{{ element.intitule }}</b>
-                    </span>
+                {% if element.type_ajustement == "AJOUT" %}
+                    <span class="text-success">{{ element.code }}</span>
                 {% else %}
-                    {{ element.code }}{{ element.intitule }}
+                    {{ element.code }}
                 {% endif %}
-
             </td>
             <td headers="intitule">
-                {{ element.intitule_complet }}
+                {{ element.intitule }}
             </td>
             <td headers="volumes">
-                {% formater_volumes element.volume_annuel_pm element.volume_annuel_pp %}
+                {{ element.volumes }}
             </td>
             <td headers="bloc">
                 {% if element.type_ajustement == 'MODIFICATION' %}
@@ -111,16 +95,16 @@
                 {% endif %}
             </td>
             <td headers="quadri">
-                {{ element.quadrimestre_texte }}
+                {{ element.quadrimestre }}
             </td>
             <td headers="credits">
-                {% formater_credits_ue element.credits_relatifs element.credits_absolus %}
+                {{ element.credits }}
             </td>
             <td headers="session">
                 {{ element.session_derogation }}
             </td>
             <td headers="obligatoire">
-                {{ element.obligatoire | yesno | title }}
+                {{ element.obligatoire }}
             </td>
             <td headers="action">
                 <div class="pull-right">
@@ -138,8 +122,12 @@
 {% include 'preparation_inscription/modal_confirmer_annuler_modification.html' %}
 {% include 'preparation_inscription/modal_confirmer_annuler_ajout.html' %}
 
-{% if rafraichir_groupement_contenant %}
-    <script>
-        document.querySelector("#tree").dispatchEvent(new CustomEvent('refreshTree'))
-    </script>
-{% endif %}
+
+<script>
+    $('#tree').jstree(true).settings.core.data = {
+        'url' : '{% url "tree-view-mockup-resultat-apres-ajout-groupements" annee code_programme %}'
+    }
+    document.addEventListener('htmx:afterSettle', function(event){
+        $('#tree').trigger('refreshNode', '{{ code_programme }}');
+    })
+</script>

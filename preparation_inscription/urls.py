@@ -25,11 +25,13 @@
 ##############################################################################
 from django.urls import path, include
 
+from preparation_inscription.views.ajouter_groupements import AjouterGroupementsView
 from preparation_inscription.views.ajouter_unites_enseignement import AjouterUnitesEnseignementView
 from preparation_inscription.views.consulter_contenu_groupement import ConsulterContenuGroupementView
 from preparation_inscription.views.detail import PreparationInscriptionMainView
 from preparation_inscription.views.formulaire_inscription_cours import FormulaireInscriptionCoursView
 from preparation_inscription.views.liste_unites_enseignement import ListeUnitesEnseignementView
+from preparation_inscription.views.mockup import ConsulterContenuGroupementViewMockup, TreeHTMLView
 from preparation_inscription.views.modification_contenu_groupement import ModifierProprietesContenuView
 from preparation_inscription.views.program_tree import ProgramTreeHTMLView
 from preparation_inscription.views.remettre_etat_initial import RemettreEtatInitialView
@@ -48,7 +50,7 @@ urlpatterns = [
             AjouterUnitesEnseignementView.as_view(),
             name=AjouterUnitesEnseignementView.name
         ),
-        path('update', ModifierProprietesContenuView.as_view(), name=ModifierProprietesContenuView.name),
+        path('<str:code_groupement>/update', ModifierProprietesContenuView.as_view(), name=ModifierProprietesContenuView.name),
         path('tree/', ProgramTreeHTMLView.as_view(), name=ProgramTreeHTMLView.name),
         path(
             'formulaire_inscription/',
@@ -61,5 +63,12 @@ urlpatterns = [
             name=ListeUnitesEnseignementView.name
         ),
         path('etat_initial/', RemettreEtatInitialView.as_view(), name=RemettreEtatInitialView.name)
+        path('add_group', AjouterGroupementsView.as_view(), name=AjouterGroupementsView.name),
+        path(
+            '<str:code_groupement>/mockup/detail',
+            ConsulterContenuGroupementViewMockup.as_view(),
+            name=ConsulterContenuGroupementViewMockup.name
+        ),
+        path('mockup/tree', TreeHTMLView.as_view(), name=TreeHTMLView.name),
     ])),
 ]
