@@ -153,6 +153,10 @@
                 }));
             });
 
+            $tree.bind('refreshTree', function (e) {
+                $tree.jstree(true).refresh();
+            });
+
             $tree.bind("activate_node.jstree", function (event, data) {
                 var url = data.node.li_attr.url;
                 if(url != undefined){

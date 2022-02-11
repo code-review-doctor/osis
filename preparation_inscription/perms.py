@@ -22,27 +22,5 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django import forms
-from django.utils.translation import gettext_lazy as _
 
-from backoffice.settings.base import MINIMUM_LUE_YEAR
-from ddd.logic.shared_kernel.academic_year.commands import SearchAcademicYearCommand
-from education_group.forms.fields import UpperCaseCharField
-from infrastructure.messages_bus import message_bus_instance
-
-
-class SearchLearningUnitForm(forms.Form):
-    annee_academique = forms.ChoiceField(
-        label=_("Anac.").capitalize(),
-        required=False
-    )
-    code = UpperCaseCharField(max_length=15, label=_("Code").capitalize(), required=False)
-    intitule = forms.CharField(max_length=30, label=_("Title").capitalize(), required=False)
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.__init_academic_year_field()
-
-    def __init_academic_year_field(self):
-        all_academic_year = message_bus_instance.invoke(SearchAcademicYearCommand(year=MINIMUM_LUE_YEAR))
-        self.fields['annee_academique'].choices = [(ac_year.year, str(ac_year)) for ac_year in all_academic_year]
+AJOUTER_UNITE_ENSEIGNEMENT_PERMISSION = "preparation_programme.can_add_unites_enseignement_au_programme"

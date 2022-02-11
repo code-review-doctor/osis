@@ -25,6 +25,8 @@
 ##############################################################################
 
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.shortcuts import get_object_or_404
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
@@ -32,13 +34,16 @@ from base.models.utils.utils import ChoiceEnum
 from base.utils.htmx import HtmxMixin
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetContenuGroupementCommand
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import GroupementContenantDTO
+from education_group.models.group_year import GroupYear
 from infrastructure.messages_bus import message_bus_instance
+from preparation_inscription.perms import AJOUTER_UNITE_ENSEIGNEMENT_PERMISSION
 
 
 class TypeAjustement(ChoiceEnum):
-    SUPPRESSION = _('DELETION')
-    MODIFICATION = _('EDITION')
-    AJOUT = _('ADDITION')
+    SUPPRESSION = _('SUPPRESSION')
+    MODIFICATION = _('MODIFICATION')
+    AJOUT = _('AJOUT')
+
 
 
 RAFRAICHIR_GROUPEMENT_CONTENANT = 'rafraichir_groupement_contenant'
@@ -55,13 +60,32 @@ class ConsulterContenuGroupementView(HtmxMixin, PermissionRequiredMixin, LoginRe
     template_name = "preparation_inscription/preparation_inscription.html"
     htmx_template_name = "preparation_inscription/consulter_contenu_groupement.html"
 
+    @cached_property
+    def annee(self) -> int:
+        return self.kwargs['annee']
+
+    @cached_property
+    def code_programme(self) -> str:
+        return self.kwargs['code_programme']
+
+    @cached_property
+    def code_groupement(self) -> str:
+        return self.kwargs.get('code_groupement', self.kwargs['code_programme'])
+
+    @cached_property
+    def group_year(self) -> 'GroupYear':
+        return get_object_or_404(GroupYear, academic_year__year=self.annee, partial_acronym=self.code_programme)
+
     def get_context_data(self, **kwargs):
         context = {
             **super().get_context_data(**kwargs),
             # TODO code_groupement_racine :: à implémenter quand la story "afficher contenu" est développée
-            'code_programme': self.kwargs['code_programme'],
-            'code_groupement': self.kwargs['code_groupement'],
+            'code_programme': self.code_programme,
+            'code_groupement': self.code_groupement,
             RAFRAICHIR_GROUPEMENT_CONTENANT: self.request.GET.get(RAFRAICHIR_GROUPEMENT_CONTENANT),
+            'intitule_programme': self.get_intitule_programme(),
+            'group_year': self.group_year,
+            'permission_ajout_ue': AJOUTER_UNITE_ENSEIGNEMENT_PERMISSION
         }
 
         context.update(self.get_content())
@@ -69,9 +93,9 @@ class ConsulterContenuGroupementView(HtmxMixin, PermissionRequiredMixin, LoginRe
 
     def get_content(self):
         cmd = GetContenuGroupementCommand(
-            code_formation=self.kwargs['code_programme'],
-            annee=self.kwargs['annee'],
-            code=self.kwargs.get('code_groupement', self.kwargs['code_programme']),
+            code_formation=self.code_programme,
+            annee=self.annee,
+            code=self.code_groupement,
         )
 
         contenu_groupement_DTO = message_bus_instance.invoke(cmd)  # type: GroupementContenantDTO
@@ -83,11 +107,6 @@ class ConsulterContenuGroupementView(HtmxMixin, PermissionRequiredMixin, LoginRe
                 contenu_groupement_DTO.intitule_complet if contenu_groupement_DTO else '',
         }
 
-
-from base.models.utils.utils import ChoiceEnum
-
-
-class TypeAjustement(ChoiceEnum):
-    SUPPRESSION = _('DELETION')
-    MODIFICATION = _('EDITION')
-    AJOUT = _('ADDITION')
+    def get_intitule_programme(self):
+        # TODO :: to implement
+        return "Intitulé programme"
