@@ -126,7 +126,7 @@ msgid "Modifier les propriétés"
 msgstr ""
 
 msgid "Name"
-msgstr ""
+msgstr "Nom"
 
 msgid "Ne pas annuler"
 msgstr ""
@@ -147,7 +147,7 @@ msgid "SUPPRESSION"
 msgstr ""
 
 msgid "Save"
-msgstr ""
+msgstr "Enregistrer"
 
 msgid "Search"
 msgstr "Rechercher"
