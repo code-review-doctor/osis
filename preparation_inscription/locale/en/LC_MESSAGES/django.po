@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-11 09:32+0100\n"
+"POT-Creation-Date: 2022-02-11 14:33+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -39,6 +39,9 @@ msgstr ""
 msgid "Anac."
 msgstr ""
 
+msgid "Annuler"
+msgstr ""
+
 msgid "Annuler l'ajout"
 msgstr ""
 
@@ -55,6 +58,9 @@ msgid "Annuler la suppression"
 msgstr ""
 
 msgid "Annuler la suppression ?"
+msgstr ""
+
+msgid "Are you sure you want to reset all program content ?"
 msgstr ""
 
 msgid "Bloc"
@@ -135,10 +141,16 @@ msgstr ""
 msgid "Obligatoire"
 msgstr ""
 
+msgid "Oui, je confirme"
+msgstr ""
+
 msgid "Preparation PAE"
 msgstr ""
 
 msgid "Quadri."
+msgstr ""
+
+msgid "Return to the initial state of the program ?"
 msgstr ""
 
 msgid "Revenir à l'état initial du programme"
@@ -166,6 +178,9 @@ msgid "Supprimer des UE"
 msgstr ""
 
 msgid "The learning units have been added"
+msgstr ""
+
+msgid "The program has returned to its original state."
 msgstr ""
 
 msgid "Title"

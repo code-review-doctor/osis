@@ -26,8 +26,10 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.forms import Form
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 
+from base.views.common import display_success_messages
 from base.views.mixins import AjaxTemplateMixin
 from ddd.logic.preparation_programme_annuel_etudiant.commands import RemettreProgrammeDansEtatInitialCommand
 from infrastructure.messages_bus import message_bus_instance
@@ -54,6 +56,7 @@ class RemettreEtatInitialView(LoginRequiredMixin, PermissionRequiredMixin, AjaxT
             annee=self.annee
         )
         message_bus_instance.invoke(command)
+        display_success_messages(self.request, _("The program has returned to its original state."))
         return super().post(*args, **kwargs)
 
     def get_success_url(self):

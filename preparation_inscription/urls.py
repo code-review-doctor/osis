@@ -62,7 +62,7 @@ urlpatterns = [
             ListeUnitesEnseignementView.as_view(),
             name=ListeUnitesEnseignementView.name
         ),
-        path('etat_initial/', RemettreEtatInitialView.as_view(), name=RemettreEtatInitialView.name)
+        path('etat_initial/', RemettreEtatInitialView.as_view(), name=RemettreEtatInitialView.name),
         path('add_group', AjouterGroupementsView.as_view(), name=AjouterGroupementsView.name),
         path(
             '<str:code_groupement>/mockup/detail',
