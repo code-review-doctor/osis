@@ -24,3 +24,4 @@
 ##############################################################################
 
 AJOUTER_UNITE_ENSEIGNEMENT_PERMISSION = "preparation_programme.can_add_unites_enseignement_au_programme"
+SUPPRIMER_UNITE_ENSEIGNEMENT_PERMISSION = "preparation_inscription.can_delete_unites_enseignement_du_programme"

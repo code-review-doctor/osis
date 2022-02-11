@@ -36,7 +36,7 @@ from ddd.logic.preparation_programme_annuel_etudiant.commands import GetContenuG
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import GroupementContenantDTO
 from education_group.models.group_year import GroupYear
 from infrastructure.messages_bus import message_bus_instance
-from preparation_inscription.perms import AJOUTER_UNITE_ENSEIGNEMENT_PERMISSION
+from preparation_inscription.perms import AJOUTER_UNITE_ENSEIGNEMENT_PERMISSION, SUPPRIMER_UNITE_ENSEIGNEMENT_PERMISSION
 
 
 class TypeAjustement(ChoiceEnum):
@@ -85,7 +85,8 @@ class ConsulterContenuGroupementView(HtmxMixin, PermissionRequiredMixin, LoginRe
             RAFRAICHIR_GROUPEMENT_CONTENANT: self.request.GET.get(RAFRAICHIR_GROUPEMENT_CONTENANT),
             'intitule_programme': self.get_intitule_programme(),
             'group_year': self.group_year,
-            'permission_ajout_ue': AJOUTER_UNITE_ENSEIGNEMENT_PERMISSION
+            'permission_ajout_ue': AJOUTER_UNITE_ENSEIGNEMENT_PERMISSION,
+            'permission_suppression_ue': SUPPRIMER_UNITE_ENSEIGNEMENT_PERMISSION
         }
 
         context.update(self.get_content())
