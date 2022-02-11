@@ -11,7 +11,7 @@ servers:
  - url: https://osis.uclouvain.be/api/v1/reference/
    description: Production server
 info:
-  version: '1.18'
+  version: '1.19'
   title: Reference Service
   description: |-
     A set of API endpoints that allow you to get reference data.
@@ -30,6 +30,11 @@ paths:
           name: iso_code
           schema:
             description: Filter by ISO 3166-1 2-letter country code
+            type: string
+        - in: query
+          name: not_iso_code
+          schema:
+            description: Exclude by ISO 3166-1 2-letter country code
             type: string
         - in: query
           name: name
