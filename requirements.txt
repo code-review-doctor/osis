@@ -33,7 +33,7 @@ django-reversion==3.0.9
 mock==2.0.0
 behave-django==1.4.0
 exrex==0.10.5
-django-autocomplete-light==3.8.2
+django-autocomplete-light==3.5.1
 bleach==3.3.0
 django-cte==1.1.5
 pycodestyle==2.4.0

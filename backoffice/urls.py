@@ -35,6 +35,11 @@ js_info_dict = {
 }
 
 urlpatterns = (
+    url(r'^admin/', include([
+        url(r'^data/$', common.data, name='data'),
+        url(r'^data/maintenance$', common.data_maintenance, name='data_maintenance'),
+        url(r'^storage/$', common.storage, name='storage'),
+    ])),
     url(r'^login/$', common.login, name='login'),
     url(r'^logout/$', common.log_out, name='logout'),
     url(r'^logged_out/$', common.logged_out, name='logged_out'),
@@ -43,7 +48,6 @@ urlpatterns = (
     url(r'', include('base.urls')),
     url(r'^hijack/', include('hijack.urls', namespace='hijack')),
     url(r'^jsi18n/', JavaScriptCatalog.as_view(), js_info_dict),
-
 )
 
 if 'assistant' in settings.INSTALLED_APPS:

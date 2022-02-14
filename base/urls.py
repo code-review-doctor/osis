@@ -43,8 +43,8 @@ import base.views.learning_units.search.proposal
 import base.views.learning_units.search.service_course
 import base.views.learning_units.search.simple
 import base.views.learning_units.update
-from attribution.views.attribution import LearningUnitAttributions
 import base.views.student.detail
+from attribution.views.attribution import LearningUnitAttributions
 from base.views import geocoding
 from base.views import learning_achievement, search, user_list
 from base.views import learning_unit, common, institution, organization, academic_calendar, \
@@ -70,7 +70,6 @@ from learning_unit.views.learning_unit.edit_educational_information import EditE
     EditEducationalInformationForceMajeure
 from learning_unit.views.learning_unit.teaching_material import CreateTeachingMaterial, UpdateTeachingMaterial, \
     DeleteTeachingMaterial
-from base.views.entity.detail import EntityRead, EntityDiagramRead, EntityVersionsRead, EntityReadByAcronym
 
 urlpatterns = [
     url(r'^$', common.home, name='home'),
@@ -118,11 +117,6 @@ urlpatterns = [
         ),
     ])),
 
-    url(r'^admin/', include([
-        url(r'^data/$', common.data, name='data'),
-        url(r'^data/maintenance$', common.data_maintenance, name='data_maintenance'),
-        url(r'^storage/$', common.storage, name='storage'),
-    ])),
     url(r'^catalog/$', common.catalog, name='catalog'),
 
     url(r'^entities/', include([

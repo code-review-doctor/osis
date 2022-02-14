@@ -87,6 +87,7 @@ INSTALLED_APPS = (
     'django_celery_results',
     'django_filters',
     'hijack',
+    'hijack.contrib.admin',
     'reversion',
     'django.contrib.gis',
     'ddd',
