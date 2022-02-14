@@ -114,6 +114,9 @@ msgstr ""
 msgid "Formulaire d'inscriptions aux cours PAE"
 msgstr ""
 
+msgid "Hourly volumes"
+msgstr ""
+
 msgid "Intitulé"
 msgstr ""
 
