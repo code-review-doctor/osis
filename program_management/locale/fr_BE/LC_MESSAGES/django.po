@@ -1165,7 +1165,7 @@ msgid "Unable to publish sections for {code} - {year}"
 msgstr "Impossible de publier les sections pour {code} - {year}"
 
 msgid "Unite enseignement"
-msgstr ""
+msgstr "Unite enseignement"
 
 msgid "University certificate"
 msgstr "Certificat universitaire"
