@@ -347,6 +347,9 @@ msgctxt "male plural"
 msgid "All"
 msgstr "Tous"
 
+msgid "All the scores are encoded."
+msgstr "Toutes les notes ont été soumises."
+
 msgid "Alloc. Ent."
 msgstr "Ent. attrib."
 
@@ -1348,6 +1351,9 @@ msgstr "Cours isolés"
 
 msgid "It is necessary to indicate the internship subtype."
 msgstr "Il est nécessaire d'indiquer le sous-type de stage."
+
+msgid "It remains notes to encode."
+msgstr "Il reste encore des notes à encoder."
 
 msgid "January"
 msgstr "Janvier"
