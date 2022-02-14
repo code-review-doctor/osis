@@ -29,7 +29,7 @@ from django.db import models
 from django.db.models import F
 from django.utils.translation import gettext_lazy as _
 from ordered_model.admin import OrderedModelAdmin
-from ordered_model.models import OrderedModel
+from ordered_model.models import OrderedModel, OrderedModelQuerySet
 
 
 class AbstractEducationGroupAchievementAdmin(OrderedModelAdmin):
@@ -38,7 +38,7 @@ class AbstractEducationGroupAchievementAdmin(OrderedModelAdmin):
     search_fields = ['code_name', 'order']
 
 
-class AbstractEducationGroupAchievementQuerySet(models.QuerySet):
+class AbstractEducationGroupAchievementQuerySet(OrderedModelQuerySet):
     def annotate_text(self, language_code):
         return self.annotate(
             text=F('french_text') if language_code == settings.LANGUAGE_CODE_FR else F('english_text')

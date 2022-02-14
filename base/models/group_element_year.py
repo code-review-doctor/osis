@@ -30,7 +30,7 @@ from ckeditor.fields import RichTextField
 from django.core.exceptions import ValidationError
 from django.db import models, connection
 from django.utils.translation import gettext_lazy as _
-from ordered_model.models import OrderedModel
+from ordered_model.models import OrderedModel, OrderedModelManager
 from reversion.admin import VersionAdmin
 
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType
@@ -72,7 +72,7 @@ def validate_block_value(value: int):
         raise ValidationError(_error_msg)
 
 
-class GroupElementYearManager(models.Manager):
+class GroupElementYearManager(OrderedModelManager):
     def get_adjacency_list(self, root_elements_ids):
         if not isinstance(root_elements_ids, Iterable):
             raise Exception('root_elements_ids must be an instance of list')

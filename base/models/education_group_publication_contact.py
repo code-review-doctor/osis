@@ -29,7 +29,7 @@ from django.db import models
 from django.db.models import F
 from django.utils.translation import gettext_lazy as _
 from ordered_model.admin import OrderedModelAdmin
-from ordered_model.models import OrderedModel
+from ordered_model.models import OrderedModel, OrderedModelQuerySet
 from reversion.admin import VersionAdmin
 
 from base.models.enums.publication_contact_type import PublicationContactType
@@ -40,7 +40,7 @@ ROLE_REQUIRED_FOR_TYPES = (
 )
 
 
-class EducationGroupPublicationQuerySet(models.QuerySet):
+class EducationGroupPublicationQuerySet(OrderedModelQuerySet):
     def annotate_text(self, language_code):
         return self.annotate(
             role_text=F('role_fr') if language_code == settings.LANGUAGE_CODE_FR else F('role_en'),
