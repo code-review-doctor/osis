@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-07 10:59+0100\n"
+"POT-Creation-Date: 2022-02-14 15:25+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -25,6 +25,11 @@ msgstr "\"%(child)s\" a été %(copy_message)s dans \"%(parent)s\""
 #, python-format
 msgid "\"%(child)s\" has been detached from \"%(parent)s\""
 msgstr "\"%(child)s\" a été retiré de \"%(parent)s\""
+
+msgid ""
+"$ the result must end with the indicated characters (e.g. MED$ will exclude "
+"MEDE training)."
+msgstr "$ le résultat doit terminer par les caractères indiqués (ex. MED$ exclura les formations MEDE)."
 
 #, python-format
 msgid "%(node)s has been moved"
@@ -54,6 +59,16 @@ msgstr "%(start_index)s à %(end_index)s sur %(total_counts)s formations"
 #, python-format
 msgid "%(title)s in %(year)s has been filled"
 msgstr "%(title)s en %(year)s a été remplie"
+
+msgid ""
+". replaces one character in the search (e.g. MUS.9CE will find MUSI9CE and "
+"MUSA9CE)"
+msgstr ". remplace un caractère dans la recherche (ex. MUS.9CE trouvera MUSI9CE et MUSA9CE)"
+
+msgid ""
+".+ replaces several characters in the search (e.g. FIL.+CE will find "
+"FILA9CE, FILO3CE, FILO9CE)"
+msgstr ".+ remplace plusieurs caractères dans la recherche (ex. FIL.+CE trouvera FILA9CE, FILO3CE, FILO9CE)"
 
 msgid "1st quadri"
 msgstr "1er quadri"
@@ -1188,6 +1203,11 @@ msgstr "Volume"
 msgid "Web re-registration"
 msgstr "Ré-inscription par internet"
 
+msgid ""
+"When searching, it is possible to use a series of special characters in all "
+"free input fields :"
+msgstr "Lors de la recherche, il est possible d’utiliser une série de caractères spéciaux dans toutes les zones de saisie libre :"
+
 #, python-format
 msgid "Which type of %(category)s do you want to create ?"
 msgstr "Quel type de %(category)s voulez-vous créer ?"
@@ -1286,6 +1306,11 @@ msgstr ""
 #, python-format
 msgid "[%(academic_year)s] The content of the program is not empty."
 msgstr "[%(academic_year)s] Le contenu de la formation n'est pas vide."
+
+msgid ""
+"^ the result must start with the indicated characters (e.g. ^AUCHOIX will "
+"exclude ACTIVITYAUCHOIX)"
+msgstr "^ le résultat doit commencer par les caractères indiqués (ex. ^AUCHOIX exclura ACTIVITESAUCHOIX)"
 
 msgid "activities in English"
 msgstr "activités en anglais"

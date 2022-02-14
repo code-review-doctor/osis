@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-07 10:59+0100\n"
+"POT-Creation-Date: 2022-02-14 15:25+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,6 +22,11 @@ msgstr ""
 
 #, python-format
 msgid "\"%(child)s\" has been detached from \"%(parent)s\""
+msgstr ""
+
+msgid ""
+"$ the result must end with the indicated characters (e.g. MED$ will exclude "
+"MEDE training)."
 msgstr ""
 
 #, python-format
@@ -48,6 +53,16 @@ msgstr ""
 
 #, python-format
 msgid "%(title)s in %(year)s has been filled"
+msgstr ""
+
+msgid ""
+". replaces one character in the search (e.g. MUS.9CE will find MUSI9CE and "
+"MUSA9CE)"
+msgstr ""
+
+msgid ""
+".+ replaces several characters in the search (e.g. FIL.+CE will find "
+"FILA9CE, FILO3CE, FILO9CE)"
 msgstr ""
 
 msgid "1st quadri"
@@ -1086,6 +1101,11 @@ msgstr ""
 msgid "Web re-registration"
 msgstr ""
 
+msgid ""
+"When searching, it is possible to use a series of special characters in all "
+"free input fields :"
+msgstr ""
+
 #, python-format
 msgid "Which type of %(category)s do you want to create ?"
 msgstr ""
@@ -1160,6 +1180,11 @@ msgstr ""
 
 #, python-format
 msgid "[%(academic_year)s] The content of the program is not empty."
+msgstr ""
+
+msgid ""
+"^ the result must start with the indicated characters (e.g. ^AUCHOIX will "
+"exclude ACTIVITYAUCHOIX)"
 msgstr ""
 
 msgid "activities in English"
