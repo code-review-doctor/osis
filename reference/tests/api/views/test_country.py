@@ -43,7 +43,7 @@ class GetAllCountryTestCase(APITestCase):
         cls.user = UserFactory()
         cls.url = reverse('reference_api_v1:country-list')
 
-        CountryFactory(iso_code='BE')
+        CountryFactory(iso_code='BE', name='Belgique', name_en='Belgium')
         CountryFactory(iso_code='FR')
         CountryFactory(iso_code='UK')
 
@@ -92,7 +92,6 @@ class GetAllCountryTestCase(APITestCase):
             query_string = {api_settings.ORDERING_PARAM: order}
             response = self.client.get(self.url, kwargs=query_string)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
-
             countries = Country.objects.all().order_by(order)
             serializer = CountrySerializer(
                 countries,
@@ -100,6 +99,37 @@ class GetAllCountryTestCase(APITestCase):
                 context={'request': RequestFactory().get(self.url, query_string)},
             )
             self.assertEqual(response.data['results'], serializer.data)
+
+    def test_get_all_country_with_filter(self):
+        filters_managed_with_value = [
+            ('name', 'Belgique'),
+            ('iso_code', 'BE'),
+            ('name_en', 'Belgium')
+        ]
+
+        for filter, value in filters_managed_with_value:
+            query_string = {filter: value}
+            response = self.client.get(self.url + '?{}={}'.format(filter, value))
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            countries = Country.objects.all().filter(**query_string)
+            serializer = CountrySerializer(
+                countries,
+                many=True,
+                context={'request': RequestFactory().get(self.url, query_string)},
+            )
+            self.assertEqual(response.data['results'], serializer.data)
+
+    def test_get_all_country_with_exclude_iso_code(self):
+        response = self.client.get(self.url + '?not_iso_code=BE,UK')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        countries = Country.objects.all().exclude(iso_code__in=['BE', 'UK'])
+        serializer = CountrySerializer(
+            countries,
+            many=True,
+            context={'request': RequestFactory().get(self.url, {'not_iso_code': 'BE,UK'})},
+        )
+        self.assertEqual(response.data['results'], serializer.data)
 
 
 class GetCountryTestCase(APITestCase):

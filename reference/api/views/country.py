@@ -23,10 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django_filters import rest_framework as filters
 from rest_framework import generics
 
 from reference.api.serializers.country import CountrySerializer
 from reference.models.country import Country
+
+
+class CountryFilter(filters.FilterSet):
+    not_iso_code = filters.CharFilter(field_name='iso_code', method='exclude_by_iso_code')
+
+    class Meta:
+        model = Country
+        fields = ['iso_code', 'name', 'name_en', 'dialing_code']
+
+    @staticmethod
+    def exclude_by_iso_code(queryset, name, value):
+        return queryset.exclude(
+            iso_code__in=[iso_code for iso_code in value.split(',')]
+        )
 
 
 class CountryList(generics.ListAPIView):
@@ -36,11 +51,7 @@ class CountryList(generics.ListAPIView):
     name = 'country-list'
     queryset = Country.objects.all()
     serializer_class = CountrySerializer
-    filterset_fields = (
-        'iso_code',
-        'name',
-        'dialing_code'
-    )
+    filter_class = CountryFilter
     search_fields = (
         'name',
     )
