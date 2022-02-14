@@ -135,3 +135,16 @@ class TestUpdateTrainingVersion(DDDTestCase):
         ]
 
         self.assertEqual(expected, result)
+
+    def test_should_not_duplicate_mandatory_children(self):
+        update_and_postpone_training_version_service.update_and_postpone_training_version(self.cmd)
+        identities = update_and_postpone_training_version_service.update_and_postpone_training_version(self.cmd)
+
+        program_tree_version = self.fake_program_tree_version_repository.get(identities[1])
+        program_tree = program_tree_version.get_tree()
+
+        NUMBER_MANDATORY_CHILDREN_EXPECTED = 3
+        self.assertEqual(
+            len(program_tree.root_node.get_direct_children_as_nodes()),
+            NUMBER_MANDATORY_CHILDREN_EXPECTED
+        )
