@@ -207,7 +207,13 @@ class LearningUnitFilter(FilterSet):
         if not selected_types:
             return queryset
 
-        filter_clauses = Q(learning_container_year__container_type__in=selected_types)
+        selected_types_without_mobility_and_external = [
+            type
+            for type in selected_types
+            if type not in (MOBILITY, learning_container_year_types.EXTERNAL)
+        ]
+
+        filter_clauses = Q(learning_container_year__container_type__in=selected_types_without_mobility_and_external)
         if MOBILITY in selected_types:
             filter_clauses = filter_clauses | Q(externallearningunityear__mobility=True)
         if learning_container_year_types.EXTERNAL in selected_types:
