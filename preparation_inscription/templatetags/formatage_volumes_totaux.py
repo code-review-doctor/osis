@@ -32,18 +32,14 @@ from ddd.logic.preparation_programme_annuel_etudiant.dtos import UniteEnseigneme
 register = template.Library()
 
 
-def formater_volumes(volume_annuel_pm: int = 0, volume_annuel_pp: int = 0) -> str:
+def formater_volumes(volume_annuel_pm: int, volume_annuel_pp: int) -> str:
     return "{}{}{}".format(
-        "{}".format("{}h".format(volume_annuel_pm) if est_un_volume_significatif(volume_annuel_pm) else ''),
-        " + " if est_un_volume_significatif(volume_annuel_pm) and est_un_volume_significatif(volume_annuel_pp) else '',
+        "{}".format("{}h".format(volume_annuel_pm) if volume_annuel_pm > 0 else ''),
+        " + " if volume_annuel_pm > 0 and volume_annuel_pp > 0 else '',
         "{}".format(
-            "{}h".format(volume_annuel_pp) if est_un_volume_significatif(volume_annuel_pp) else ''
+            "{}h".format(volume_annuel_pp) if volume_annuel_pp > 0 else ''
         )
     )
-
-
-def est_un_volume_significatif(volume: int) -> bool:
-    return volume and volume > 0
 
 
 @register.filter

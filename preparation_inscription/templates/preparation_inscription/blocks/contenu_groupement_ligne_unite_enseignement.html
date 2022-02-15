@@ -37,7 +37,7 @@
         {{ element|formater_volumes_totaux  }}
     </td>
     <td headers="bloc">
-        {% if element.modification%}
+        {% if element.is_modifie %}
             <b class="text-info" style="font-weight: bolder; text-shadow: 0px 0px 2px currentColor;">{{ element.bloc }}</b>
         {% else %}
             {{ element.bloc }}

@@ -36,6 +36,4 @@ register = template.Library()
 def est_une_donnee_de_type_unite_enseignement(
         obj: Union['UniteEnseignementContenueDTO', 'GroupementContenuDTO']
 ) -> bool:
-    if isinstance(obj, UniteEnseignementContenueDTO):
-        return True
-    return False
+    return isinstance(obj, UniteEnseignementContenueDTO)

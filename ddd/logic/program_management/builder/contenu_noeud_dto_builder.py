@@ -22,18 +22,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
-from ddd.logic.preparation_programme_annuel_etudiant.commands import GetContenuGroupementCommand
-from program_management.ddd.domain.node import NodeIdentity
-from program_management.ddd.domain.node import build_title
-from program_management.ddd.domain.service import identity_search
+from program_management.ddd.domain.link import Link
+from program_management.ddd.domain.node import build_title, Node
 from program_management.ddd.dtos import UniteEnseignementDTO, ContenuNoeudDTO
-from program_management.ddd.repositories import program_tree_version as program_tree_version_repository
 from program_management.ddd.repositories.program_tree_version import _get_credits
 from program_management.ddd.repositories.program_tree_version import get_verbose_title_group
 
 
-class ContenuNoeudDTOBuilder():
+class ContenuNoeudDTOBuilder:
 
     @classmethod
     def get(
@@ -56,10 +52,8 @@ def _build_contenu_pgm(node: 'Node', lien_parent: 'Link' = None) -> 'ContenuNoeu
                     quadrimestre=lien.child.quadrimester,
                     quadrimestre_texte=lien.child.quadrimester.value if lien.child.quadrimester else "",
                     credits_absolus=lien.child.credits,
-                    volume_annuel_pm=int(lien.child.volume_total_lecturing)
-                    if lien.child.volume_total_lecturing else None,
-                    volume_annuel_pp=int(lien.child.volume_total_practical)
-                    if lien.child.volume_total_practical else None,
+                    volume_annuel_pm=int(lien.child.volume_total_lecturing or 0),
+                    volume_annuel_pp=int(lien.child.volume_total_practical or 0),
                     obligatoire=lien.is_mandatory if lien else False,
                     session_derogation=lien.child.session_derogation,
                     credits_relatifs=lien.relative_credits

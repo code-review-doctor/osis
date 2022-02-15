@@ -240,6 +240,10 @@ class UniteEnseignementContenueDTO(DTO):
     def type(self):
         return UNITE_ENSEIGNEMENT
 
+    @property
+    def is_modifie(self):
+        return self.modifie
+
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
 class GroupementContenuDTO(DTO):
