@@ -99,7 +99,6 @@ INSTALLED_APPS = (
     'osis_export',
     'osis_notification',
     'osis_async',
-    'mockup',
     'django_htmx',
 )
 

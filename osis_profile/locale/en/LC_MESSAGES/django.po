@@ -1,0 +1,402 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-01-27 15:01+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Academic year"
+msgstr ""
+
+msgid "Experience valuated from this accepted admission."
+msgstr ""
+
+msgid "Type"
+msgstr ""
+
+msgid "Country"
+msgstr ""
+
+msgid "Institute name"
+msgstr ""
+
+msgid "Institute city"
+msgstr ""
+
+msgid "Institute"
+msgstr ""
+
+msgid "Institute postal code"
+msgstr ""
+
+msgid "Education name"
+msgstr ""
+
+msgid "Result"
+msgstr ""
+
+msgid "Is it your graduation year?"
+msgstr ""
+
+msgid "Obtained grade"
+msgstr ""
+
+msgid "Rank in diploma"
+msgstr ""
+
+msgid "Issue diploma date"
+msgstr ""
+
+msgid "Credit type"
+msgstr ""
+
+msgid "Entered credit number"
+msgstr ""
+
+msgid "Acquired credit number"
+msgstr ""
+
+msgid "Transcript"
+msgstr ""
+
+msgid "Graduate degree"
+msgstr ""
+
+msgid "Access certificate after a 60 master"
+msgstr ""
+
+msgid "Dissertation title"
+msgstr ""
+
+msgid "Dissertation score"
+msgstr ""
+
+msgid "Dissertation summary"
+msgstr ""
+
+msgid "Education community"
+msgstr ""
+
+msgid "Program"
+msgstr ""
+
+msgid "Study system"
+msgstr ""
+
+msgid "Curriculum"
+msgstr ""
+
+msgid "Study cycle type"
+msgstr ""
+
+msgid "Linguistic regime"
+msgstr ""
+
+msgid "Transcript translation"
+msgstr ""
+
+msgid "Graduate degree translation"
+msgstr ""
+
+msgid "Activity type"
+msgstr ""
+
+msgid "Other activity type"
+msgstr ""
+
+msgid "Activity certificate"
+msgstr ""
+
+msgid "Activity position"
+msgstr ""
+
+msgid "Latin"
+msgstr ""
+
+msgid "Greek"
+msgstr ""
+
+msgid "Chemistry"
+msgstr ""
+
+msgid "Physic"
+msgstr ""
+
+msgid "Biology"
+msgstr ""
+
+msgid "German"
+msgstr ""
+
+msgid "Dutch"
+msgstr ""
+
+msgid "English"
+msgstr ""
+
+msgid "french"
+msgstr ""
+
+msgid "Other"
+msgstr ""
+
+msgid "If other language, please specify"
+msgstr ""
+
+msgid "Mathematics"
+msgstr ""
+
+msgid "IT"
+msgstr ""
+
+msgid "Social sciences"
+msgstr ""
+
+msgid "Economic sciences"
+msgstr ""
+
+msgid "If other optional domains, please specify"
+msgstr ""
+
+msgid "Please mention the academic graduation year"
+msgstr ""
+
+msgid "At which result level do you consider yourself?"
+msgstr ""
+
+msgid "A transcript or your last year at high school"
+msgstr ""
+
+msgid "High school diploma"
+msgstr ""
+
+msgid "In what Community did (do) you follow last year of high school?"
+msgstr ""
+
+msgid "What type of education did (do) you follow?"
+msgstr ""
+
+msgid "Other education, to specify"
+msgstr ""
+
+msgid "Another institute"
+msgstr ""
+
+msgid ""
+"In case you could not find your institute in the list, please mention it "
+"below. "
+msgstr ""
+
+msgid ""
+"Please complete here below the schedule of your last year of high school, "
+"indicating for each domain the number of hours of education followed per "
+"week (h/w). "
+msgstr ""
+
+msgid "What diploma did you get (or will you get)?"
+msgstr ""
+
+msgid "If other linguistic regime, please clarify"
+msgstr ""
+
+msgid "Organizing country"
+msgstr ""
+
+msgid ""
+"Is this diploma subject to an equivalence decision by the services of the "
+"French community of Belgium?"
+msgstr ""
+
+msgid ""
+"A certified translation of your official transcript of marks for your final "
+"year of secondary education"
+msgstr ""
+
+msgid "Person"
+msgstr ""
+
+msgid "Language"
+msgstr ""
+
+msgid "Please rate your listening comprehension"
+msgstr ""
+
+msgid "Please rate your speaking ability"
+msgstr ""
+
+msgid "Please rate your writing ability"
+msgstr ""
+
+msgid "Higher education"
+msgstr "Enseignement supérieur"
+
+msgid "Other activity"
+msgstr ""
+
+msgid "Continuing education"
+msgstr ""
+
+msgid "Full-time education"
+msgstr ""
+
+msgid "Failure"
+msgstr ""
+
+msgid "No result"
+msgstr ""
+
+msgid "Success"
+msgstr ""
+
+msgid "Success with residual credits"
+msgstr ""
+
+msgid "Greater distinction"
+msgstr ""
+
+msgid "Great distinction"
+msgstr ""
+
+msgid "Distinction"
+msgstr ""
+
+msgid "Satisfaction"
+msgstr ""
+
+msgid "Success without distinction"
+msgstr ""
+
+msgid "No grade"
+msgstr ""
+
+msgid "European Union credits"
+msgstr ""
+
+msgid "Non European Union credits"
+msgstr ""
+
+msgid "Semesters"
+msgstr ""
+
+msgid "Bachelor"
+msgstr ""
+
+msgid "Doctorate"
+msgstr ""
+
+msgid "Master"
+msgstr ""
+
+msgid "Other higher education"
+msgstr ""
+
+msgid "Illness"
+msgstr ""
+
+msgid "Internship"
+msgstr ""
+
+msgid "Unemployment"
+msgstr ""
+
+msgid "Volunteering"
+msgstr ""
+
+msgid "Work"
+msgstr ""
+
+msgid "Belgian"
+msgstr ""
+
+msgid "Foreign"
+msgstr ""
+
+msgid "French-speaking Community of Belgium"
+msgstr ""
+
+msgid "Flemish-speaking Community"
+msgstr ""
+
+msgid "German-speaking Community"
+msgstr ""
+
+msgid "Not known yet"
+msgstr ""
+
+msgid "Less than 65%"
+msgstr ""
+
+msgid "Between 65 and 75%"
+msgstr ""
+
+msgid "More than 75%"
+msgstr ""
+
+msgid "Teaching of general education"
+msgstr ""
+
+msgid "Transition method"
+msgstr ""
+
+msgid "Artistic transition"
+msgstr ""
+
+msgid "Qualification method"
+msgstr ""
+
+msgid "Artistic qualification"
+msgstr ""
+
+msgid "Professional education"
+msgstr ""
+
+msgid "Professional education + Maturity exam"
+msgstr ""
+
+msgid "National Bachelor (or government diploma, ...)"
+msgstr ""
+
+msgid "European Bachelor (Schola Europaea)"
+msgstr ""
+
+msgid "International Baccalaureate"
+msgstr ""
+
+msgid "Yes"
+msgstr ""
+
+msgid "No"
+msgstr ""
+
+msgid "Pending"
+msgstr ""
+
+msgid "A1"
+msgstr ""
+
+msgid "A2"
+msgstr ""
+
+msgid "B1"
+msgstr ""
+
+msgid "B2"
+msgstr ""
+
+msgid "C1"
+msgstr ""
+
+msgid "C2"
+msgstr ""
