@@ -219,26 +219,6 @@ class GroupementContenantDTO(DTO):
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
-class ElementContenuDTO(DTO):
-    code: str
-    intitule_complet: str
-    obligatoire: bool
-
-    volume_annuel_pm: Optional[int]
-    volume_annuel_pp: Optional[int]
-    bloc: str
-    quadrimestre_texte: str
-    credits_relatifs: Optional[int]
-    credits_absolus: Optional[Decimal]
-    session_derogation: str
-    type: str
-
-    ajoute: bool = attr.ib(default=False)
-    modifie: bool = attr.ib(default=False)
-    supprime: bool = attr.ib(default=False)
-
-
-@attr.s(frozen=True, slots=True, auto_attribs=True)
 class UniteEnseignementContenueDTO(DTO):
     code: str
     intitule_complet: str

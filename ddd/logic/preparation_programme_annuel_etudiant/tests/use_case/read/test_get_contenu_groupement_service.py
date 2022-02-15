@@ -28,8 +28,7 @@ import mock
 from django.test import SimpleTestCase
 
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetContenuGroupementCommand
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import GroupementContenantDTO, ElementContenuDTO, \
-    UNITE_ENSEIGNEMENT, UniteEnseignementContenueDTO
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import GroupementContenantDTO, UniteEnseignementContenueDTO
 from ddd.logic.preparation_programme_annuel_etudiant.tests.factory.groupement_ajuste_inscription_cours import \
     GroupementAjusteInscriptionCoursFactory
 from infrastructure.messages_bus import message_bus_instance
@@ -109,8 +108,7 @@ class GetContenuGroupementServiceTest(SimpleTestCase):
                     volume_annuel_pm=30,
                     volume_annuel_pp=0,
                     obligatoire=True,
-                    session_derogation='',
-                    type=UNITE_ENSEIGNEMENT
+                    session_derogation=''
                 )
             ]
         )
@@ -145,9 +143,8 @@ class GetContenuGroupementServiceTest(SimpleTestCase):
                     volume_annuel_pp=0,
                     obligatoire=True,
                     session_derogation='',
-                    type=UNITE_ENSEIGNEMENT
                 ),
-                ElementContenuDTO(
+                UniteEnseignementContenueDTO(
                     bloc="1",
                     code='LSINF1311',
                     intitule_complet='Human-computer interaction',
@@ -158,8 +155,7 @@ class GetContenuGroupementServiceTest(SimpleTestCase):
                     volume_annuel_pp=15,
                     obligatoire=True,
                     session_derogation='',
-                    ajoute=True,
-                    type=UNITE_ENSEIGNEMENT
+                    ajoute=True
                 )
             ]
         )
