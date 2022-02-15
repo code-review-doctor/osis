@@ -23,6 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import functools
+import operator
+from typing import List
+
+from dal import autocomplete
 from django import forms
 from django.db.models import Q, OuterRef, Exists, Case, When, Value, CharField
 from django.utils.translation import gettext_lazy as _, pgettext_lazy
@@ -95,13 +100,16 @@ class LearningUnitFilter(FilterSet):
         empty_label=pgettext_lazy("male plural", "All"),
     )
 
-    container_type = filters.ChoiceFilter(
+    container_type = filters.MultipleChoiceFilter(
         choices=LearningContainerYearType.choices() + MOBILITY_CHOICE,
         required=False,
         field_name="learning_container_year__container_type",
         label=_('Type'),
-        empty_label=pgettext_lazy("male plural", "All"),
-        method="filter_container_type"
+        method="filter_container_type",
+        widget=autocomplete.Select2Multiple(
+            url='learning_unit_type_autocomplete',
+            forward=None,
+        ),
     )
     subtype = filters.ChoiceFilter(
         choices=learning_unit_year_subtypes.LEARNING_UNIT_YEAR_SUBTYPES,
@@ -195,12 +203,17 @@ class LearningUnitFilter(FilterSet):
             ).distinct()
         return queryset
 
-    def filter_container_type(self, queryset, name, value):
-        if value == MOBILITY:
-            return queryset.filter(externallearningunityear__mobility=True)
-        elif value == learning_container_year_types.EXTERNAL:
-            return queryset.filter(externallearningunityear__co_graduation=True)
-        return queryset.filter(learning_container_year__container_type=value)
+    def filter_container_type(self, queryset, name: str, selected_types: List[str]):
+        if not selected_types:
+            return queryset
+
+        filter_clauses = Q(learning_container_year__container_type__in=selected_types)
+        if MOBILITY in selected_types:
+            filter_clauses = filter_clauses | Q(externallearningunityear__mobility=True)
+        if learning_container_year_types.EXTERNAL in selected_types:
+            filter_clauses = filter_clauses | Q(externallearningunityear__co_graduation=True)
+
+        return queryset.filter(filter_clauses)
 
     def filter_entity(self, queryset, name, value):
         return filter_by_entities(name,
