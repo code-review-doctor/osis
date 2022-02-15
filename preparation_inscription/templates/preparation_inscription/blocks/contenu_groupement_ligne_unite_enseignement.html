@@ -37,7 +37,7 @@
         {{ element|formater_volumes_totaux  }}
     </td>
     <td headers="bloc">
-        {% if element.type_ajustement == 'MODIFICATION' %}
+        {% if element.modification%}
             <b class="text-info" style="font-weight: bolder; text-shadow: 0px 0px 2px currentColor;">{{ element.bloc }}</b>
         {% else %}
             {{ element.bloc }}
@@ -47,7 +47,7 @@
         {{ element.quadrimestre_texte }}
     </td>
     <td headers="credits">
-        {% formater_credits_ue element.credits_relatifs element.credits_absolus acronyme_programme %}
+        {% formater_credits_ue sigle_programme element.credits_relatifs element.credits_absolus %}
     </td>
     <td headers="session">
         {{ element.session_derogation }}

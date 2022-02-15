@@ -1,5 +1,5 @@
 {% load static i18n bootstrap3 %}
-{% load formatage_credits formatage_volumes osis_role %}
+{% load formatage_credits formatage_volumes osis_role type_donnee %}
 
 {% comment "License" %}
  * OSIS stands for Open Student Information System. It's an application
@@ -69,10 +69,9 @@
         </thead>
     <tbody>
     {% for element in search_result %}
-        {% if element.type == 'UNITE_ENSEIGNEMENT' %}
+        {% if element|est_une_donnee_de_type_unite_enseignement %}
             {% include 'preparation_inscription/blocks/contenu_groupement_ligne_unite_enseignement.html' %}
-        {% endif %}
-        {% if element.type == 'GROUPEMENT' %}
+        {% else %}
             {% include 'preparation_inscription/blocks/contenu_groupement_ligne_groupement.html' %}
         {% endif %}
     {% endfor %}

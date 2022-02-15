@@ -25,7 +25,6 @@
 ##############################################################################
 
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.shortcuts import get_object_or_404
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
@@ -34,7 +33,8 @@ from base.models.utils.utils import ChoiceEnum
 from base.utils.htmx import HtmxMixin
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetContenuGroupementCommand
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import GroupementContenantDTO
-from education_group.models.group_year import GroupYear
+from education_group.ddd.command import GetGroupCommand
+from education_group.ddd.domain.group import Group
 from infrastructure.messages_bus import message_bus_instance
 from preparation_inscription.perms import AJOUTER_UNITE_ENSEIGNEMENT_PERMISSION
 
@@ -72,8 +72,10 @@ class ConsulterContenuGroupementView(HtmxMixin, PermissionRequiredMixin, LoginRe
         return self.kwargs.get('code_groupement', self.kwargs['code_programme'])
 
     @cached_property
-    def group_year(self) -> 'GroupYear':
-        return get_object_or_404(GroupYear, academic_year__year=self.annee, partial_acronym=self.code_programme)
+    def groupemement_racine(self) -> 'Group':
+        return message_bus_instance.invoke(
+            GetGroupCommand(code=self.code_programme, year=self.annee)
+        )
 
     def get_context_data(self, **kwargs):
         context = {
@@ -82,7 +84,6 @@ class ConsulterContenuGroupementView(HtmxMixin, PermissionRequiredMixin, LoginRe
             'code_programme': self.code_programme,
             'code_groupement': self.code_groupement,
             RAFRAICHIR_GROUPEMENT_CONTENANT: self.request.GET.get(RAFRAICHIR_GROUPEMENT_CONTENANT),
-            'group_year': self.group_year,
             'permission_ajout_ue': AJOUTER_UNITE_ENSEIGNEMENT_PERMISSION
         }
 
@@ -93,7 +94,7 @@ class ConsulterContenuGroupementView(HtmxMixin, PermissionRequiredMixin, LoginRe
         cmd = GetContenuGroupementCommand(
             code_programme=self.code_programme,
             annee=self.annee,
-            code=self.code_groupement or self.code_programme,
+            code_groupement=self.code_groupement or self.code_programme,
         )
 
         contenu_groupement_DTO = message_bus_instance.invoke(cmd)  # type: GroupementContenantDTO
@@ -103,5 +104,5 @@ class ConsulterContenuGroupementView(HtmxMixin, PermissionRequiredMixin, LoginRe
                 contenu_groupement_DTO.intitule if contenu_groupement_DTO else '',
             'intitule_complet_groupement':
                 contenu_groupement_DTO.intitule_complet if contenu_groupement_DTO else '',
-            'acronyme_programme': self.group_year.acronym
+            'sigle_programme': self.groupemement_racine.abbreviated_title
         }

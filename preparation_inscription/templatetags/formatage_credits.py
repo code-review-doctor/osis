@@ -24,7 +24,6 @@
 #
 ##############################################################################
 from decimal import Decimal
-from typing import Optional
 
 from django import template
 from django.utils.safestring import mark_safe
@@ -41,7 +40,7 @@ def get_chiffres_significatifs(nombre_decimal: Decimal) -> str:
 
 
 @register.simple_tag
-def formater_credits_ue_formulaire(credits_relatifs: Optional[int], credits_absolus: Optional[Decimal]) -> str:
+def formater_credits_ue_formulaire(credits_relatifs: int = None, credits_absolus: Decimal = None) -> str:
     if credits_absolus or credits_relatifs:
         credits_absolus = get_chiffres_significatifs(credits_absolus) if credits_absolus else None
         return "({} {})".format(credits_relatifs or credits_absolus or 0, _("credits"))
@@ -50,9 +49,10 @@ def formater_credits_ue_formulaire(credits_relatifs: Optional[int], credits_abso
 
 @register.simple_tag
 def formater_credits_ue(
-        credits_relatifs: Optional[int],
-        credits_absolus: Optional[Decimal],
-        intitule_groupement: str
+        intitule_groupement: str,
+        credits_relatifs: int = None,
+        credits_absolus: Decimal = None
+
 ) -> str:
     if credits_relatifs:
         if credits_relatifs != credits_absolus:

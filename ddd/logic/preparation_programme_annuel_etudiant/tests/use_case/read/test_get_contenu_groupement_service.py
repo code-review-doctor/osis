@@ -29,7 +29,7 @@ from django.test import SimpleTestCase
 
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetContenuGroupementCommand
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import GroupementContenantDTO, ElementContenuDTO, \
-    UNITE_ENSEIGNEMENT
+    UNITE_ENSEIGNEMENT, UniteEnseignementContenueDTO
 from ddd.logic.preparation_programme_annuel_etudiant.tests.factory.groupement_ajuste_inscription_cours import \
     GroupementAjusteInscriptionCoursFactory
 from infrastructure.messages_bus import message_bus_instance
@@ -54,8 +54,8 @@ class GetContenuGroupementServiceTest(SimpleTestCase):
 
         self.cmd = GetContenuGroupementCommand(
             annee=2021,
-            code="MAT2ECGE",
-            code_formation="LECGE100B"
+            code_groupement="MAT2ECGE",
+            code_programme="LECGE100B"
         )
 
     def __mock_service_bus(self):
@@ -72,8 +72,8 @@ class GetContenuGroupementServiceTest(SimpleTestCase):
     def test_should_retourner_contenu_vide_si_groupement_est_vide(self):
         cmd = GetContenuGroupementCommand(
             annee=2021,
-            code="MAT2ECGE",
-            code_formation="LECGE100B"
+            code_groupement="MAT2ECGE",
+            code_programme="LECGE100B"
         )
 
         result = self.message_bus.invoke(cmd)
@@ -89,8 +89,8 @@ class GetContenuGroupementServiceTest(SimpleTestCase):
     def test_should_retourner_contenu_sans_ajustement(self):
         cmd = GetContenuGroupementCommand(
             annee=2021,
-            code="LECGE100R",
-            code_formation="LECGE100B"
+            code_groupement="LECGE100R",
+            code_programme="LECGE100B"
         )
 
         result = self.message_bus.invoke(cmd)
@@ -99,7 +99,7 @@ class GetContenuGroupementServiceTest(SimpleTestCase):
             intitule="Formation pluridisciplinaire en sciences humaines",
             intitule_complet="Formation pluridisciplinaire en sciences humaines",
             elements_contenus=[
-                ElementContenuDTO(
+                UniteEnseignementContenueDTO(
                     bloc="3",
                     code='LESPO1321',
                     intitule_complet='Economic, Political and Social Ethics',
@@ -124,8 +124,8 @@ class GetContenuGroupementServiceTest(SimpleTestCase):
 
         cmd = GetContenuGroupementCommand(
             annee=2021,
-            code="LECGE100R",
-            code_formation="LECGE100B"
+            code_groupement="LECGE100R",
+            code_programme="LECGE100B"
         )
 
         result = self.message_bus.invoke(cmd)
@@ -134,7 +134,7 @@ class GetContenuGroupementServiceTest(SimpleTestCase):
             intitule="Formation pluridisciplinaire en sciences humaines",
             intitule_complet="Formation pluridisciplinaire en sciences humaines",
             elements_contenus=[
-                ElementContenuDTO(
+                UniteEnseignementContenueDTO(
                     bloc="3",
                     code='LESPO1321',
                     intitule_complet='Economic, Political and Social Ethics',

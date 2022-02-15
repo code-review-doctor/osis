@@ -647,9 +647,9 @@ class CatalogueFormationsTranslatorInMemory(ICatalogueFormationsTranslator):
         raise NotImplementedError()
 
     @classmethod
-    def get_contenu_groupement(cls, code_programme: str, code: str, annee: int) -> 'GroupementContenantDTO':
+    def get_contenu_groupement(cls, code_programme: str, code_groupement: str, annee: int) -> 'GroupementContenantDTO':
         formation = cls.get_formation(code_programme, annee)
-        groupement = cls.__search_groupement(code, formation.racine)
+        groupement = cls.__search_groupement(code_groupement, formation.racine)
         return cls.__convert_contenu_groupement_catalogue_dto_to_groupement_contenant_dto(groupement)
 
     @classmethod

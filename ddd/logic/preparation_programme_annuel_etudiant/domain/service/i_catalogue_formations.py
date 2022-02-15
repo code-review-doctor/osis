@@ -37,5 +37,5 @@ class ICatalogueFormationsTranslator(interface.DomainService):
 
     @classmethod
     @abc.abstractmethod
-    def get_contenu_groupement(cls, code_programme: str, code: str, annee: int) -> 'GroupementContenantDTO':
+    def get_contenu_groupement(cls, code_programme: str, code_groupement: str, annee: int) -> 'GroupementContenantDTO':
         raise NotImplementedError()

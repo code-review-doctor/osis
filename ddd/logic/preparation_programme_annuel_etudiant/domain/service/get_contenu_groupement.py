@@ -56,14 +56,14 @@ class GetContenuGroupement(interface.DomainService):
 
         contenu_groupement = catalogue_formations_translator.get_contenu_groupement(
             code_programme=cmd.code_programme,
-            code=cmd.code,
+            code_groupement=cmd.code_groupement,
             annee=cmd.annee
         )
 
         try:
             groupement_ajuste = repo.search(
                 programme_id=GroupIdentity(code=cmd.code_programme, year=cmd.annee),
-                groupement_id=GroupIdentity(code=cmd.code, year=cmd.annee)
+                groupement_id=GroupIdentity(code=cmd.code_groupement, year=cmd.annee)
             )[0]
             entity_id_unites_enseignement = [
                 unite_enseignement.unite_enseignement_identity

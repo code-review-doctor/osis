@@ -27,25 +27,15 @@ from typing import Union
 
 from django import template
 
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import UniteEnseignementDTO, UniteEnseignementContenueDTO
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import UniteEnseignementContenueDTO, GroupementContenuDTO
 
 register = template.Library()
 
 
-def formater_volumes(volume_annuel_pm: int = 0, volume_annuel_pp: int = 0) -> str:
-    return "{}{}{}".format(
-        "{}".format("{}h".format(volume_annuel_pm) if est_un_volume_significatif(volume_annuel_pm) else ''),
-        " + " if est_un_volume_significatif(volume_annuel_pm) and est_un_volume_significatif(volume_annuel_pp) else '',
-        "{}".format(
-            "{}h".format(volume_annuel_pp) if est_un_volume_significatif(volume_annuel_pp) else ''
-        )
-    )
-
-
-def est_un_volume_significatif(volume: int) -> bool:
-    return volume and volume > 0
-
-
 @register.filter
-def formater_volumes_totaux(unite_catalogue_dto: Union['UniteEnseignementDTO', 'UniteEnseignementContenueDTO']) -> str:
-    return formater_volumes(unite_catalogue_dto.volume_annuel_pm, unite_catalogue_dto.volume_annuel_pp)
+def est_une_donnee_de_type_unite_enseignement(
+        obj: Union['UniteEnseignementContenueDTO', 'GroupementContenuDTO']
+) -> bool:
+    if isinstance(obj, UniteEnseignementContenueDTO):
+        return True
+    return False
