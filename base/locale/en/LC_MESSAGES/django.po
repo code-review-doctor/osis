@@ -95,7 +95,7 @@ msgstr ""
 
 msgid ""
 ".+ replaces several characters in the search (ex. LARK.+ will find LARKE, "
-"LARKO, LARKA)"
+"LARKO, LARKA; L.+E will find LARKE, LINGE)"
 msgstr ""
 
 msgid "1"

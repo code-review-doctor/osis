@@ -107,7 +107,9 @@ msgstr ". remplace un caractère dans la recherche (ex. LBIR.2 trouvera LBIRE21
 msgid ""
 ".+ replaces several characters in the search (ex. LARK.+ will find LARKE, "
 "LARKO, LARKA)"
-msgstr ".+ remplace plusieurs caractères dans la recherche (ex. LARK.+ trouvera LARKE, LARKO, LARKA)"
+msgstr ""
+".+ remplace plusieurs caractères dans la recherche (ex. LARK.+ trouvera LARKE, LARKO, LARKA;"
+"L.+E trouvera LARKE, LINGE)"
 
 msgid "1"
 msgstr "1"
