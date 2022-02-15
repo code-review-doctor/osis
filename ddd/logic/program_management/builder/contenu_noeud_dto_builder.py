@@ -45,7 +45,7 @@ def _build_contenu_pgm(node: 'Node', lien_parent: 'Link' = None) -> 'ContenuNoeu
     for lien in node.children:
         if lien.child.is_learning_unit():
             contenu.append(
-                _conversion_link_vers_unite_enseignement_DTO(lien)
+                _convertir_link_vers_unite_enseignement_DTO(lien)
             )
         else:
             groupement_contenu = _build_contenu_pgm(lien.child, lien_parent=lien)
@@ -66,7 +66,7 @@ def _build_contenu_pgm(node: 'Node', lien_parent: 'Link' = None) -> 'ContenuNoeu
     )
 
 
-def _conversion_link_vers_unite_enseignement_DTO(lien):
+def _convertir_link_vers_unite_enseignement_DTO(lien: 'Link') -> 'UniteEnseignementDTO':
     return UniteEnseignementDTO(
         bloc=lien.block,
         code=lien.child.code,

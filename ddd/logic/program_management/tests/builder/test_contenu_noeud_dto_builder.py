@@ -25,7 +25,7 @@ from decimal import Decimal
 
 from django.test import SimpleTestCase
 
-from ddd.logic.program_management.builder.contenu_noeud_dto_builder import _conversion_link_vers_unite_enseignement_DTO
+from ddd.logic.program_management.builder.contenu_noeud_dto_builder import _convertir_link_vers_unite_enseignement_DTO
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 
@@ -54,13 +54,13 @@ class TestContenuNoeudDTOBuilder(SimpleTestCase):
         )
 
     def test_conversion_unite_enseignement_volumes_non_nuls_conversion_en_int(self):
-        result = _conversion_link_vers_unite_enseignement_DTO(self.lien_ue_avec_volumes_non_nuls)
+        result = _convertir_link_vers_unite_enseignement_DTO(self.lien_ue_avec_volumes_non_nuls)
 
         self.assertEqual(result.volume_annuel_pm, int(self.unite_enseignement_volumes_non_nuls.volume_total_lecturing))
         self.assertEqual(result.volume_annuel_pp, int(self.unite_enseignement_volumes_non_nuls.volume_total_practical))
 
     def test_conversion_unite_enseignement_volumes_nuls_conversion_none_en_0(self):
-        result = _conversion_link_vers_unite_enseignement_DTO(self.lien_ue_avec_volumes_nuls)
+        result = _convertir_link_vers_unite_enseignement_DTO(self.lien_ue_avec_volumes_nuls)
 
         self.assertEqual(result.volume_annuel_pm, 0)
         self.assertEqual(result.volume_annuel_pp, 0)
