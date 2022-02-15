@@ -82,4 +82,3 @@ def _build_contenu_pgm(node: 'Node', lien_parent: 'Link' = None) -> 'ContenuNoeu
         intitule_complet=full_title,
         contenu_ordonne=contenu,
     )
-
