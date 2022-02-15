@@ -177,7 +177,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
       tags:
-        - countries
+        - high_schools
   /cities/:
     get:
       description: Return a list of cities with optional filtering.

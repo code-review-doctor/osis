@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -104,7 +104,9 @@ optional_header_for_volume = [
 ]
 optional_header_for_quadrimester = [_('Quadrimester')]
 optional_header_for_session_derogation = [_('Session derogation')]
-optional_header_for_language = [_('Language')]
+optional_header_for_language_and_exchange = [
+    _('Language'), _('English-friendly'), _('French-friendly'), _('Exchange students')
+]
 optional_header_for_description_fiche = [
     _('Content'), "{} {}".format(_('Content'), _('in English')),
     _('Teaching methods'), "{} {}".format(_('Teaching methods'), _('in English')),
@@ -451,8 +453,11 @@ def _get_optional_data(
             data.append('')
     if optional_data_needed['has_english_title']:
         data.append(luy.full_title_en)
-    if optional_data_needed['has_language']:
+    if optional_data_needed['has_language_and_exchange']:
         data.append(luy.main_language)
+        data.append(str.strip(yesno(luy.english_friendly)))
+        data.append(str.strip(yesno(luy.french_friendly)))
+        data.append(str.strip(yesno(luy.exchange_students)))
     if optional_data_needed['has_specifications']:
         specifications_data = _build_specifications_cols(luy)
         for k, v in zip(specifications_data._fields, specifications_data):
