@@ -43,5 +43,5 @@ def get_content_service(cmd: GetContenuGroupementCommand) -> ContenuNoeudDTO:
     pgm_tree_version = program_tree_version_repository.ProgramTreeVersionRepository(
     ).get(tree_version_identity)
     return ContenuNoeudDTOBuilder.get(
-        pgm_tree_version.get_tree().get_node_by_code_and_year(code=cmd.code, year=cmd.annee)
+        pgm_tree_version.get_tree().get_node_by_code_and_year(code=cmd.code_groupement, year=cmd.annee)
     )

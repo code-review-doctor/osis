@@ -702,5 +702,5 @@ class PostponeProgramTreeVersionsUntilNPlus6Command(interface.CommandRequest):
 @attr.s(frozen=True, slots=True, auto_attribs=True)
 class GetContenuGroupementCatalogueCommand(interface.CommandRequest):
     code_programme: str
-    code: str
+    code_groupement: str
     annee: int

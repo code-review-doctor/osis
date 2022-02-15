@@ -59,7 +59,7 @@ class CatalogueFormationsTranslator(ICatalogueFormationsTranslator):
         from infrastructure.messages_bus import message_bus_instance
         cmd = GetContenuGroupementCatalogueCommand(
             code_programme=code_programme,
-            code=code_groupement,
+            code_groupement=code_groupement,
             annee=annee,
         )
         contenu_noeud_DTO = message_bus_instance.invoke(
