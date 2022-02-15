@@ -43,7 +43,7 @@ class LearningUnitTypeAutoComplete(LoginRequiredMixin, autocomplete.Select2ListV
         )
 
     def autocomplete_results(self, results: List[Tuple[ID, TEXT]]) -> List[Tuple[ID, TEXT]]:
-        return [result for result in results if self.q.lower() in str(result[1]).lower()]
+        return [(id, text) for id, text in results if self.q.lower() in str(text).lower()]
 
     def results(self, results: List[Tuple[ID, TEXT]]) -> List[Dict]:
-        return [dict(id=result[0], text=result[1]) for result in results]
+        return [dict(id=id, text=text) for id, text in results]
