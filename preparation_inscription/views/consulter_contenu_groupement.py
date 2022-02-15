@@ -82,7 +82,6 @@ class ConsulterContenuGroupementView(HtmxMixin, PermissionRequiredMixin, LoginRe
             'code_programme': self.code_programme,
             'code_groupement': self.code_groupement,
             RAFRAICHIR_GROUPEMENT_CONTENANT: self.request.GET.get(RAFRAICHIR_GROUPEMENT_CONTENANT),
-            'intitule_programme': self.get_intitule_programme(),
             'group_year': self.group_year,
             'permission_ajout_ue': AJOUTER_UNITE_ENSEIGNEMENT_PERMISSION
         }
@@ -92,9 +91,9 @@ class ConsulterContenuGroupementView(HtmxMixin, PermissionRequiredMixin, LoginRe
 
     def get_content(self):
         cmd = GetContenuGroupementCommand(
-            code_formation=self.code_programme,
+            code_programme=self.code_programme,
             annee=self.annee,
-            code=self.code_groupement,
+            code=self.code_groupement or self.code_programme,
         )
 
         contenu_groupement_DTO = message_bus_instance.invoke(cmd)  # type: GroupementContenantDTO
@@ -106,7 +105,3 @@ class ConsulterContenuGroupementView(HtmxMixin, PermissionRequiredMixin, LoginRe
                 contenu_groupement_DTO.intitule_complet if contenu_groupement_DTO else '',
             'acronyme_programme': self.group_year.acronym
         }
-
-    def get_intitule_programme(self):
-        # TODO :: to implement
-        return "Intitulé programme"

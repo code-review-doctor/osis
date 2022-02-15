@@ -25,13 +25,14 @@
 ##############################################################################
 from typing import List, Union
 
-from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormationCommand, GetContenuGroupementCommand
+from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormationCommand
 from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import \
     ICatalogueFormationsTranslator
 from ddd.logic.preparation_programme_annuel_etudiant.domain.validator.exceptions import FormationIntrouvableException
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, \
     ContenuGroupementCatalogueDTO, UniteEnseignementDTO, UniteEnseignementCatalogueDTO, GroupementCatalogueDTO, \
-    ElementContenuDTO, GroupementContenantDTO, UNITE_ENSEIGNEMENT, GROUPEMENT
+    GroupementContenantDTO, UniteEnseignementContenueDTO, \
+    GroupementContenuDTO
 from program_management.ddd.command import GetContenuGroupementCatalogueCommand
 from program_management.ddd.dtos import ProgrammeDeFormationDTO, ContenuNoeudDTO, ElementType, \
     UniteEnseignementDTO as ProgramManagementUniteEnseignementDTO
@@ -54,12 +55,12 @@ class CatalogueFormationsTranslator(ICatalogueFormationsTranslator):
         raise FormationIntrouvableException(code_programme=code_programme, annee=annee)
 
     @classmethod
-    def get_contenu_groupement(cls, cmd: 'GetContenuGroupementCommand') -> GroupementContenantDTO:
+    def get_contenu_groupement(cls, code_programme: str, code: str, annee: int) -> 'GroupementContenantDTO':
         from infrastructure.messages_bus import message_bus_instance
         cmd = GetContenuGroupementCatalogueCommand(
-            code_formation=cmd.code_formation,
-            code=cmd.code,
-            annee=cmd.annee,
+            code_programme=code_programme,
+            code=code,
+            annee=annee,
         )
         contenu_noeud_DTO = message_bus_instance.invoke(
             cmd
@@ -120,8 +121,8 @@ def __build_contenu_ordonne_catalogue(contenu_ordonne: List[Union['UniteEnseigne
     return contenu_ordonne_catalogue
 
 
-def _build_donnees_ue(ue_contenue: 'ProgramManagementUniteEnseignementDTO') -> ElementContenuDTO:
-    return ElementContenuDTO(
+def _build_donnees_ue(ue_contenue: 'ProgramManagementUniteEnseignementDTO') -> 'UniteEnseignementContenueDTO':
+    return UniteEnseignementContenueDTO(
         code=ue_contenue.code,
         intitule_complet=ue_contenue.intitule_complet,
         volume_annuel_pm=ue_contenue.volume_annuel_pm,
@@ -132,29 +133,20 @@ def _build_donnees_ue(ue_contenue: 'ProgramManagementUniteEnseignementDTO') -> E
         credits_absolus=ue_contenue.credits_absolus,
         session_derogation=ue_contenue.session_derogation or '',
         obligatoire=ue_contenue.obligatoire,
-        type=UNITE_ENSEIGNEMENT
     )
 
 
-def _build_donnees_groupement(groupement_contenu: 'ContenuNoeudDTO') -> ElementContenuDTO:
-    return ElementContenuDTO(
+def _build_donnees_groupement(groupement_contenu: 'ContenuNoeudDTO') -> 'GroupementContenuDTO':
+    return GroupementContenuDTO(
         code=groupement_contenu.intitule,
         intitule_complet=groupement_contenu.intitule_complet,
         obligatoire=groupement_contenu.obligatoire,
-        bloc=EMPTY_VALUE,
-        quadrimestre_texte=EMPTY_VALUE,
-        session_derogation=EMPTY_VALUE,
-        credits_relatifs=None,
-        credits_absolus=None,
-        volume_annuel_pp=None,
-        volume_annuel_pm=None,
-        type=GROUPEMENT
     )
 
 
 def _build_donnees_contenus(
         elements_contenus: List[Union['ProgramManagementUniteEnseignementDTO', 'ContenuNoeudDTO']]
-) -> List[ElementContenuDTO]:
+) -> [Union['UniteEnseignementContenueDTO', 'GroupementContenuDTO']]:
     donnees = []
     for element_contenu in elements_contenus:
         if isinstance(element_contenu, ContenuNoeudDTO):

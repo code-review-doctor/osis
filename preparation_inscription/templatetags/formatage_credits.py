@@ -59,7 +59,7 @@ def formater_credits_ue(
             return mark_safe('<div data-toggle="tooltip" title="{} {} ({})">{}({})</div>'.format(
                 _("Program credits"),
                 intitule_groupement,
-                _("Learning unit credits"),
+                _("Learning unit credits").lower(),
                 credits_relatifs,
                 get_chiffres_significatifs(credits_absolus))
             )

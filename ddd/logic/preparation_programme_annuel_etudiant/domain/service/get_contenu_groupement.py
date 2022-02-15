@@ -37,7 +37,7 @@ from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_
     ICatalogueUnitesEnseignementTranslator
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import UniteEnseignementCatalogueDTO, \
     GroupementContenantDTO, \
-    ElementContenuDTO, UNITE_ENSEIGNEMENT
+    UniteEnseignementContenueDTO
 from ddd.logic.preparation_programme_annuel_etudiant.repository.i_groupement_ajuste_inscription_cours import \
     IGroupementAjusteInscriptionCoursRepository
 from education_group.ddd.domain.group import GroupIdentity
@@ -54,11 +54,15 @@ class GetContenuGroupement(interface.DomainService):
             catalogue_unites_enseignement_translator: 'ICatalogueUnitesEnseignementTranslator'
     ) -> 'GroupementContenantDTO':
 
-        contenu_groupement = catalogue_formations_translator.get_contenu_groupement(cmd=cmd)
+        contenu_groupement = catalogue_formations_translator.get_contenu_groupement(
+            code_programme=cmd.code_programme,
+            code=cmd.code,
+            annee=cmd.annee
+        )
 
         try:
             groupement_ajuste = repo.search(
-                programme_id=GroupIdentity(code=cmd.code_formation, year=cmd.annee),
+                programme_id=GroupIdentity(code=cmd.code_programme, year=cmd.annee),
                 groupement_id=GroupIdentity(code=cmd.code, year=cmd.annee)
             )[0]
             entity_id_unites_enseignement = [
@@ -104,11 +108,11 @@ class GetContenuGroupement(interface.DomainService):
             cls,
             unite_enseignement_ajoute: 'UniteEnseignementAjoutee',
             unite_enseignement_dtos: List['UniteEnseignementCatalogueDTO']
-    ) -> 'ElementContenuDTO':
+    ) -> 'UniteEnseignementContenueDTO':
         unite_enseignement_dto_correspondant = next(
             dto for dto in unite_enseignement_dtos if dto.code == unite_enseignement_ajoute.code
         )
-        return ElementContenuDTO(
+        return UniteEnseignementContenueDTO(
             code=unite_enseignement_ajoute.code,
             obligatoire=unite_enseignement_dto_correspondant.obligatoire,
             bloc=str(unite_enseignement_dto_correspondant.bloc),
@@ -120,5 +124,4 @@ class GetContenuGroupement(interface.DomainService):
             volume_annuel_pm=unite_enseignement_dto_correspondant.volume_annuel_pm,
             volume_annuel_pp=unite_enseignement_dto_correspondant.volume_annuel_pp,
             ajoute=True,
-            type=UNITE_ENSEIGNEMENT
         )

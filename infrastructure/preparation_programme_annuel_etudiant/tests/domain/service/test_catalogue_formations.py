@@ -27,14 +27,30 @@ from decimal import Decimal
 from typing import List, Union
 from unittest import mock
 
+import mock
 from django.test import SimpleTestCase
 
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import UniteEnseignementCatalogueDTO, \
-    ContenuGroupementCatalogueDTO
+    ContenuGroupementCatalogueDTO, UniteEnseignementDTO
 from infrastructure.preparation_programme_annuel_etudiant.domain.service.catalogue_formations import \
     CatalogueFormationsTranslator
 from program_management.ddd.domain.program_tree_version import STANDARD
-from program_management.ddd.dtos import ProgrammeDeFormationDTO, ContenuNoeudDTO, UniteEnseignementDTO
+from program_management.ddd.dtos import ProgrammeDeFormationDTO, ContenuNoeudDTO, UniteEnseignementDTO \
+    as ProgramManagementUniteEnseignementDTO
+
+UE_LESPO1113 = ProgramManagementUniteEnseignementDTO(
+    bloc=1,
+    code='LESPO1113',
+    intitule_complet='Sociologie et anthropologie des mondes contemporains',
+    quadrimestre='Q1or2',
+    quadrimestre_texte='Q1 ou Q2',
+    credits_absolus=Decimal(5),
+    volume_annuel_pm=40,
+    volume_annuel_pp=0,
+    obligatoire=False,
+    credits_relatifs=5,
+    session_derogation='',
+)
 
 ANNEE = 2021
 
@@ -73,7 +89,9 @@ class CatalogueFormationsTranslatorTest(SimpleTestCase):
 
     def _assert_equal_groupements_contenus(
             self,
-            formation_groupements_contenus: List[Union['UniteEnseignementCatalogueDTO', 'ContenuGroupementCatalogueDTO']],
+            formation_groupements_contenus: List[
+                Union['UniteEnseignementCatalogueDTO', 'ContenuGroupementCatalogueDTO']
+            ],
             prgm_racine_groupements_contenus: List[Union['UniteEnseignementDTO', 'ContenuNoeudDTO']],
     ):
         for idx, pgm_contenu in enumerate(formation_groupements_contenus):
@@ -146,19 +164,7 @@ def _build_ProgrammeDeFormationDTO():
                     intitule_complet='Contenu :',
                     code='LECGE100T',
                     contenu_ordonne=[
-                        UniteEnseignementDTO(
-                            bloc=1,
-                            code='LESPO1113pp',
-                            intitule_complet='Sociologie et anthropologie des mondes contemporains',
-                            quadrimestre='Q1or2',
-                            quadrimestre_texte='Q1 ou Q2',
-                            credits_absolus=Decimal(5),
-                            volume_annuel_pm=40,
-                            volume_annuel_pp=0,
-                            obligatoire=False,
-                            credits_relatifs=5,
-                            session_derogation='',
-                        )
+                        UE_LESPO1113
                     ]
                 )
             ]
