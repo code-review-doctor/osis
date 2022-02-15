@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-17 11:07+0100\n"
+"POT-Creation-Date: 2022-02-14 15:22+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -17,6 +17,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Poedit 2.2.1\n"
+
+msgid ""
+"$ the result must end with the indicated characters (e.g. DEVILLE$ will "
+"exclude the activities of Pr. DEVILLERS)."
+msgstr "$ le résultat doit terminer par les caractères indiqués (ex. DEVILLE$ exclura les activités du Pr. DEVILLERS)."
 
 #, python-format
 msgid "%(access_value)s is not an accepted value"
@@ -93,6 +98,18 @@ msgstr ""
 #, python-format
 msgid "%(title)s has been updated"
 msgstr "%(title)s a été modifié(e)"
+
+msgid ""
+". replaces one character in the search (e.g. LBIR.2 will find LBIRE2100 and "
+"LBIRA2100)"
+msgstr ". remplace un caractère dans la recherche (ex. LBIR.2 trouvera LBIRE2100 et LBIRA2100)"
+
+msgid ""
+".+ replaces several characters in the search (ex. LARK.+ will find LARKE, "
+"LARKO, LARKA)"
+msgstr ""
+".+ remplace plusieurs caractères dans la recherche (ex. LARK.+ trouvera LARKE, LARKO, LARKA;"
+"L.+E trouvera LARKE, LINGE)"
 
 msgid "1"
 msgstr "1"
@@ -3180,6 +3197,11 @@ msgctxt "section title"
 msgid "Welcome"
 msgstr "Accueil"
 
+msgid ""
+"When searching, it is possible to use a series of special characters in all "
+"free input fields :"
+msgstr "Lors de la recherche, il est possible d’utiliser une série de caractères spéciaux dans toutes les zones de saisie libre :"
+
 msgid "Widowed"
 msgstr "Veuf.ve"
 
@@ -3253,6 +3275,11 @@ msgid "Your username and password didn't match. Please try again."
 msgstr ""
 "La combinaison login/mot de passe entrée n'est pas valide. Veuillez "
 "réessayer."
+
+msgid ""
+"^ the result must begin with the indicated characters (e.g. ^E will exclude "
+"UEs beginning with B, L,M,W)"
+msgstr "^ le résultat doit commencer par les caractères indiqués (ex. ^E exclura les UE qui commencent par B, L,M,W)"
 
 msgid "a partim volume value is greater than corresponding volume of parent"
 msgstr ""

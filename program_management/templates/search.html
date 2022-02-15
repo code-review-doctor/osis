@@ -4,27 +4,27 @@
 {% load osis_role pagination %}
 
 {% comment "License" %}
- * OSIS stands for Open Student Information System. It's an application
- * designed to manage the core business of higher education institutions,
- * such as universities, faculties, institutes and professional schools.
- * The core business involves the administration of students, teachers,
- * courses, programs and so on.
- *
- * Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * A copy of this license - GNU General Public License - is available
- * at the root of the source code of this program.  If not,
- * see http://www.gnu.org/licenses/.
+    * OSIS stands for Open Student Information System. It's an application
+    * designed to manage the core business of higher education institutions,
+    * such as universities, faculties, institutes and professional schools.
+    * The core business involves the administration of students, teachers,
+    * courses, programs and so on.
+    *
+    * Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+    *
+    * This program is free software: you can redistribute it and/or modify
+    * it under the terms of the GNU General Public License as published by
+    * the Free Software Foundation, either version 3 of the License, or
+    * (at your option) any later version.
+    *
+    * This program is distributed in the hope that it will be useful,
+    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    * GNU General Public License for more details.
+    *
+    * A copy of this license - GNU General Public License - is available
+    * at the root of the source code of this program.  If not,
+    * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
 {% block breadcrumb %}
@@ -43,7 +43,8 @@
 
                 <!-- Create dropdown -->
                 <div class="btn-group pull-right" style="margin-top:20px;">
-                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false">
                         <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
                         {% trans 'Actions' %}
                         <span class="caret"></span>
@@ -62,7 +63,7 @@
                             {% a_tag_modal_has_perm create_mini_training_url _('New Mini-Training') 'base.add_minitraining' user %}
                         </li>
                     </ul>
-                 </div>
+                </div>
             </div>
         </div>
     </div>
@@ -73,7 +74,7 @@
             <form id="search_form">
                 <div class="row">
                     <div class="col-md-2">
-                       {% bootstrap_field form.academic_year__year %}
+                        {% bootstrap_field form.academic_year__year %}
                         {{ form.media }}
                     </div>
                     <div class="col-md-2">
@@ -88,8 +89,23 @@
                         {% bootstrap_label form.full_title_fr.label %}
                         {% bootstrap_field form.full_title_fr show_label=False %}
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         {% bootstrap_field form.main_teaching_campus %}
+                    </div>
+                    <div class="col-md-1">
+                        <i
+                                style="color: yellow"
+                                class="fas fa-lightbulb fa-3x"
+                                data-html="true"
+                                title="{% trans 'When searching, it is possible to use a series of special characters in all free input fields :' %}
+                                <ul>
+                                        <li>{% trans '. replaces one character in the search (e.g. MUS.9CE will find MUSI9CE and MUSA9CE)' %}</li>
+                                        <li>{% trans '.+ replaces several characters in the search (e.g. FIL.+CE will find FILA9CE, FILO3CE, FILO9CE)' %}</li>
+                                        <li>{% trans '^ the result must start with the indicated characters (e.g. ^AUCHOIX will exclude ACTIVITYAUCHOIX)' %}</li>
+                                        <li>{% trans '$ the result must end with the indicated characters (e.g. MED$ will exclude MEDE training).' %}</li>
+                                </ul>"
+                                data-toggle="tooltip"
+                        ></i>
                     </div>
                 </div>
                 <div class="row" style="margin-top:10px;">
@@ -103,13 +119,13 @@
                         {% bootstrap_field form.management_entity %}
                     </div>
                     <div class="col-md-2" style="margin-top: 28px;">
-                         {% bootstrap_field form.with_entity_subordinated %}
+                        {% bootstrap_field form.with_entity_subordinated %}
                     </div>
                     <div class="col-md-1">
                         {% bootstrap_field form.version %}
                     </div>
                     <div class="col-md-2" style="margin-top: 28px;">
-                         {% bootstrap_field form.with_entity_transition %}
+                        {% bootstrap_field form.with_entity_transition %}
                     </div>
                     <div class="col-md-1">
                         <br>
@@ -135,7 +151,8 @@
                 <input type="hidden" id="hdn_with_activities" name="with_activities">
                 <input type="hidden" id="hdn_with_responsibles_and_contacts" name="with_responsibles_and_contacts">
                 <input type="hidden" id="hdn_with_diploma_and_certificat" name="with_diploma_and_certificat">
-                <input type="hidden" id="hdn_with_co_graduation_and_partnership" name="with_co_graduation_and_partnership">
+                <input type="hidden" id="hdn_with_co_graduation_and_partnership"
+                       name="with_co_graduation_and_partnership">
                 <input type="hidden" id="hdn_with_ares_code" name="with_ares_code">
                 <input type="hidden" id="hdn_with_enrollment" name="with_enrollment">
                 <input type="hidden" id="hdn_with_funding" name="with_funding">
@@ -192,15 +209,16 @@
 
                     <table id="table_education_groups" class="table table-striped table-hover" width="99.99%">
                         <thead>
-                            <tr>
-                                <th id="th_0_academic_year.year" width="4%">{% trans 'Ac yr.' %}</th>
-                                <th id="th_1_acronym" width="10%">{% trans 'Acronym/Short title' context "abbreviation" %}</th>
-                                <th id="th_2_title_fr">{% trans 'Title' %}</th>
-                                <th id="th_3_education_group_type.name" width="15%">{% trans 'Type' %}</th>
-                                <th id="th_4_management_entity_version.acronym" width="4%">{% trans 'Entity' %}</th>
-                                <th id="th_5_main_teaching_campus_name" width="8%">{% trans 'Learning location' %}</th>
-                                <th id="th_6_partial_acronym" width="5%">{% trans 'Code' %}</th>
-                            </tr>
+                        <tr>
+                            <th id="th_0_academic_year.year" width="4%">{% trans 'Ac yr.' %}</th>
+                            <th id="th_1_acronym"
+                                width="10%">{% trans 'Acronym/Short title' context "abbreviation" %}</th>
+                            <th id="th_2_title_fr">{% trans 'Title' %}</th>
+                            <th id="th_3_education_group_type.name" width="15%">{% trans 'Type' %}</th>
+                            <th id="th_4_management_entity_version.acronym" width="4%">{% trans 'Entity' %}</th>
+                            <th id="th_5_main_teaching_campus_name" width="8%">{% trans 'Learning location' %}</th>
+                            <th id="th_6_partial_acronym" width="5%">{% trans 'Code' %}</th>
+                        </tr>
                         </thead>
                     </table>
                     <div class="text-center">
@@ -224,19 +242,19 @@
                     "name": "acronym",
                     "targets": 1,
                     "data": "complete_title_fr",
-                    "render": function ( data, type, row, meta ) {
+                    "render": function (data, type, row, meta) {
                         return outputAnchorOuterHtml(row["url"], data);
                     }
                 },
                 {"name": "full_title_fr", "targets": 2, "data": "full_title_fr"},
-                {"name": "type", "targets": 3,  "data": "education_group_type_text"},
+                {"name": "type", "targets": 3, "data": "education_group_type_text"},
                 {"name": "management_entity", "targets": 4, "data": "management_entity"},
                 {"name": "main_teaching_campus", "targets": 5, "data": "main_teaching_campus"},
                 {"name": "code", "targets": 6, "data": "code"},
             ];
 
             initializeDataTable("search_form", "table_education_groups", "educationGroupIds", {{ page_obj.number }},
-            {{items_per_page}}, "{% url 'version_program' %}", columnDefs);
+                {{items_per_page}}, "{% url 'version_program' %}", columnDefs);
         });
         // FIXME remove xls_order_col / xls_order ==> USE ordering params
         $("#btn_produce_xls, #btn_produce_xls_administrative_data").click(function (e) {
@@ -245,7 +263,7 @@
             let action_value;
             if ($(this).attr('id') === 'btn_produce_xls') {
                 action_value = 'xls';
-            } else if ( $(this).attr('id') === 'btn_produce_xls_administrative_data' ) {
+            } else if ($(this).attr('id') === 'btn_produce_xls_administrative_data') {
                 action_value = 'xls_administrative';
             }
             prepare_xls(e, action_value);
@@ -262,24 +280,24 @@
         }
 
         // Disable typing on education group type select input
-        $('#id_education_group_type').on('select2:opening select2:closing', function( event ) {
+        $('#id_education_group_type').on('select2:opening select2:closing', function (event) {
             let $searchfield = $(this).parent().find('.select2-search__field');
             $searchfield.prop('disabled', true);
         });
 
-        $("#btn_xls_with_parameters").click(function(e) {
+        $("#btn_xls_with_parameters").click(function (e) {
             set_order_hidden_fields();
             prepare_xls(e, 'xls_customized');
             parameters = ['validity', 'osis_code', 'partial_english_titles', 'education_fields', 'organization',
                 'activities', 'responsibles_and_contacts', 'diploma_and_certificat', 'co_graduation_and_partnership',
                 'ares_code', 'enrollment', 'funding', 'other_legal_information', 'additional_info', 'keywords'];
             for (i = 0; i < parameters.length; i++) {
-               $("#hdn_with_" + parameters[i]).val('');
+                $("#hdn_with_" + parameters[i]).val('');
             }
             reset_order_hidden_fields();
         });
 
-        function set_order_hidden_fields(){
+        function set_order_hidden_fields() {
             let table = $('#table_education_groups').DataTable();
             let order = table.order();
             $("#xls_order_col").val(get_ordering_column(order));
