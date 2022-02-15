@@ -1,4 +1,5 @@
 {% load static i18n bootstrap3 %}
+{% load formatage_credits formatage_volumes %}
 
 {% comment "License" %}
  * OSIS stands for Open Student Information System. It's an application
@@ -49,8 +50,6 @@
         <th id="credits">{% trans 'Credits' %}</th>
         <th id="session">{% trans "Derogation's session" %}</th>
         <th id="obligatoire">{% trans 'Mandatory' %}</th>
-        <th id="commentaire_fr">{% trans 'Comment' %}</th>
-        <th id="commentaire_en">{% trans 'English comment' %}</th>
     </tr>
     </thead>
     <tbody>
@@ -68,43 +67,47 @@
                     <span class="text-success"><i class="fas fa-folder-plus"></i></span>
                 {% endif %}
             </td>
-            <td headers="code" class="emphasized-code
+            <td headers="code">
                 {% if element.supprime %}
-                    text-danger
+                    <span class="text-danger">
+                        <b>{{ element.code }}{{ element.intitule }}</b>
+                    </span>
                 {% elif element.modifie %}
-                    text-info
+                    <span class="text-info">
+                        <b>{{ element.code }}{{ element.intitule }}</b>
+                    </span>
                 {% elif element.ajoute %}
-                    text-success
+                    <span class="text-success">
+                        <b>{{ element.code }}{{ element.intitule }}</b>
+                    </span>
+                {% else %}
+                    <b>{{ element.code }}{{ element.intitule }}</b>
                 {% endif %}
-            ">
-                {{ element.code }}{{ element.intitule }}
             </td>
             <td headers="intitule">
                 {{ element.intitule_complet }}
             </td>
             <td headers="volumes">
-                {{ element.volumes }}
+                {% formater_volumes element.volume_annuel_pm element.volume_annuel_pp %}
             </td>
             <td headers="bloc">
-                {{ element.bloc }}
+                {% if element.type_ajustement == 'MODIFICATION' %}
+                    <b class="text-info" style="font-weight: bolder; text-shadow: 0px 0px 2px currentColor;">{{ element.bloc }}</b>
+                {% else %}
+                    {{ element.bloc }}
+                {% endif %}
             </td>
             <td headers="quadri">
-                {{ element.quadri }}
+                {{ element.quadrimestre_texte }}
             </td>
             <td headers="credits">
-                {{ element.credits }}
+                {% formater_credits_ue element.credits_relatifs element.credits_absolus %}
             </td>
             <td headers="session">
                 {{ element.session_derogation }}
             </td>
             <td headers="obligatoire">
                 {{ element.obligatoire | yesno | title }}
-            </td>
-            <td headers="commentaire_fr">
-                {{ element.commentaire_fr }}
-            </td>
-            <td headers="commentaire_en">
-                {{ element.commentaire_en }}
             </td>
         </tr>
         {% empty %}
