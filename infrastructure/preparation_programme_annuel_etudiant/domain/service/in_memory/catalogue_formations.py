@@ -30,7 +30,8 @@ from ddd.logic.preparation_programme_annuel_etudiant.commands import GetContenuG
 from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import \
     ICatalogueFormationsTranslator
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, ContenuGroupementCatalogueDTO, \
-    GroupementDTO, GroupementCatalogueDTO, UniteEnseignementCatalogueDTO, GroupementContenantDTO, ElementContenuDTO
+    GroupementDTO, GroupementCatalogueDTO, UniteEnseignementCatalogueDTO, GroupementContenantDTO, ElementContenuDTO, \
+    UNITE_ENSEIGNEMENT, GROUPEMENT
 from program_management.ddd.domain.program_tree_version import STANDARD
 
 
@@ -703,6 +704,7 @@ class CatalogueFormationsTranslatorInMemory(ICatalogueFormationsTranslator):
                 credits_relatifs=element.credits_relatifs,
                 credits_absolus=element.credits_absolus,
                 session_derogation=element.session_derogation,
+                type=UNITE_ENSEIGNEMENT
             )
         else:
             return ElementContenuDTO(
@@ -716,5 +718,6 @@ class CatalogueFormationsTranslatorInMemory(ICatalogueFormationsTranslator):
                 credits_relatifs=None,
                 credits_absolus=None,
                 session_derogation="",
+                type=GROUPEMENT
             )
 

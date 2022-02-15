@@ -58,7 +58,7 @@
                 <th id="icon"></th>
                 <th id="code" class="code-col">{% trans 'Code' %}</th>
                 <th id="intitule">{% trans 'Intitulé' %}</th>
-                <th id="volumes">{% trans 'Composants (PM+PP)' %}</th>
+                <th id="volumes">{% trans 'Hourly volumes' %}</th>
                 <th id="bloc">{% trans 'Bloc' %}</th>
                 <th id="quadri">{% trans 'Quadri.' %}</th>
                 <th id="credits">{% trans 'Crédits' %}</th>
@@ -71,29 +71,37 @@
     {% for element in search_result %}
         <tr>
             <td headers="icon">
-                {% if element.supprime %}
-                    <span class="text-danger"><i class="fas fa-folder-minus"></i></span>
-                {% elif element.modifie %}
-                    <span class="text-info"><i class="fas fa-folder"></i></span>
-                {% elif element.ajoute %}
-                    <span class="text-success"><i class="fas fa-folder-plus"></i></span>
+                {% if element.type == 'UNITE_ENSEIGNEMENT' %}
+                    {% if element.supprime %}
+                        <span class="text-danger"><i class="fas fa-folder-minus"></i></span>
+                    {% elif element.modifie %}
+                        <span class="text-info"><i class="fas fa-folder"></i></span>
+                    {% elif element.ajoute %}
+                        <span class="text-success"><i class="fas fa-folder-plus"></i></span>
+                    {% else %}
+                        <span><i class="far fa-file"></i></span>
+                    {% endif %}
+                {% else %}
+                    <span><i class="far fa-folder"></i></span>
                 {% endif %}
             </td>
             <td headers="code">
-                {% if element.supprime %}
-                    <span class="text-danger">
-                        <b>{{ element.code }}{{ element.intitule }}</b>
-                    </span>
-                {% elif element.modifie %}
-                    <span class="text-info">
-                        <b>{{ element.code }}{{ element.intitule }}</b>
-                    </span>
-                {% elif element.ajoute %}
-                    <span class="text-success">
-                        <b>{{ element.code }}{{ element.intitule }}</b>
-                    </span>
-                {% else %}
-                    {{ element.code }}{{ element.intitule }}
+                {% if element.type == 'UNITE_ENSEIGNEMENT' %}
+                    {% if element.supprime %}
+                        <span class="text-danger">
+                            <b>{{ element.code }}{{ element.intitule }}</b>
+                        </span>
+                    {% elif element.modifie %}
+                        <span class="text-info">
+                            <b>{{ element.code }}{{ element.intitule }}</b>
+                        </span>
+                    {% elif element.ajoute %}
+                        <span class="text-success">
+                            <b>{{ element.code }}{{ element.intitule }}</b>
+                        </span>
+                    {% else %}
+                        {{ element.code }}{{ element.intitule }}
+                    {% endif %}
                 {% endif %}
 
             </td>
@@ -114,7 +122,7 @@
                 {{ element.quadrimestre_texte }}
             </td>
             <td headers="credits">
-                {% formater_credits_ue element.credits_relatifs element.credits_absolus %}
+                {% formater_credits_ue element.credits_relatifs element.credits_absolus acronyme_programme %}
             </td>
             <td headers="session">
                 {{ element.session_derogation }}

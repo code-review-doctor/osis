@@ -31,6 +31,9 @@ import attr
 from osis_common.ddd.interface import DTO
 from preparation_inscription.utils.chiffres_significatifs_de_decimal import get_chiffres_significatifs
 
+UNITE_ENSEIGNEMENT = 'UNITE_ENSEIGNEMENT'
+GROUPEMENT = 'GROUPEMENT'
+
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
 class UniteEnseignementDTO(DTO):
@@ -161,7 +164,7 @@ class GroupementInscriptionCoursDTO(DTO):
 
     @property
     def type(self):
-        return 'GROUPEMENT'
+        return GROUPEMENT
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
@@ -173,7 +176,7 @@ class UniteEnseignementProgrammeDTO(DTO):
 
     @property
     def type(self):
-        return 'UNITE_ENSEIGNEMENT'
+        return '%s' % UNITE_ENSEIGNEMENT
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
@@ -229,6 +232,7 @@ class ElementContenuDTO(DTO):
     credits_relatifs: Optional[int]
     credits_absolus: Optional[Decimal]
     session_derogation: str
+    type: str
 
     ajoute: bool = attr.ib(default=False)
     modifie: bool = attr.ib(default=False)

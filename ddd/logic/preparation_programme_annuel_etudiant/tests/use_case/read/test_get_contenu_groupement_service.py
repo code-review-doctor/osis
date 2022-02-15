@@ -28,7 +28,8 @@ import mock
 from django.test import SimpleTestCase
 
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetContenuGroupementCommand
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import GroupementContenantDTO, ElementContenuDTO
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import GroupementContenantDTO, ElementContenuDTO, \
+    UNITE_ENSEIGNEMENT
 from ddd.logic.preparation_programme_annuel_etudiant.tests.factory.groupement_ajuste_inscription_cours import \
     GroupementAjusteInscriptionCoursFactory
 from infrastructure.messages_bus import message_bus_instance
@@ -109,6 +110,7 @@ class GetContenuGroupementServiceTest(SimpleTestCase):
                     volume_annuel_pp=0,
                     obligatoire=True,
                     session_derogation='',
+                    type=UNITE_ENSEIGNEMENT
                 )
             ]
         )
@@ -143,6 +145,7 @@ class GetContenuGroupementServiceTest(SimpleTestCase):
                     volume_annuel_pp=0,
                     obligatoire=True,
                     session_derogation='',
+                    type=UNITE_ENSEIGNEMENT
                 ),
                 ElementContenuDTO(
                     bloc="1",
@@ -155,7 +158,8 @@ class GetContenuGroupementServiceTest(SimpleTestCase):
                     volume_annuel_pp=15,
                     obligatoire=True,
                     session_derogation='',
-                    ajoute=True
+                    ajoute=True,
+                    type=UNITE_ENSEIGNEMENT
                 )
             ]
         )

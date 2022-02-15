@@ -104,6 +104,7 @@ class ConsulterContenuGroupementView(HtmxMixin, PermissionRequiredMixin, LoginRe
                 contenu_groupement_DTO.intitule if contenu_groupement_DTO else '',
             'intitule_complet_groupement':
                 contenu_groupement_DTO.intitule_complet if contenu_groupement_DTO else '',
+            'acronyme_programme': self.group_year.acronym
         }
 
     def get_intitule_programme(self):

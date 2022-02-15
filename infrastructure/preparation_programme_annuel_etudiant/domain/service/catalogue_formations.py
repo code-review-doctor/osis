@@ -31,7 +31,7 @@ from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_
 from ddd.logic.preparation_programme_annuel_etudiant.domain.validator.exceptions import FormationIntrouvableException
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, \
     ContenuGroupementCatalogueDTO, UniteEnseignementDTO, UniteEnseignementCatalogueDTO, GroupementCatalogueDTO, \
-    ElementContenuDTO, GroupementContenantDTO
+    ElementContenuDTO, GroupementContenantDTO, UNITE_ENSEIGNEMENT, GROUPEMENT
 from program_management.ddd.command import GetContenuGroupementCatalogueCommand
 from program_management.ddd.dtos import ProgrammeDeFormationDTO, ContenuNoeudDTO, ElementType, \
     UniteEnseignementDTO as ProgramManagementUniteEnseignementDTO
@@ -132,6 +132,7 @@ def _build_donnees_ue(ue_contenue: 'ProgramManagementUniteEnseignementDTO') -> E
         credits_absolus=ue_contenue.credits_absolus,
         session_derogation=ue_contenue.session_derogation or '',
         obligatoire=ue_contenue.obligatoire,
+        type=UNITE_ENSEIGNEMENT
     )
 
 
@@ -146,7 +147,8 @@ def _build_donnees_groupement(groupement_contenu: 'ContenuNoeudDTO') -> ElementC
         credits_relatifs=None,
         credits_absolus=None,
         volume_annuel_pp=None,
-        volume_annuel_pm=None
+        volume_annuel_pm=None,
+        type=GROUPEMENT
     )
 
 

@@ -37,7 +37,7 @@ from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_
     ICatalogueUnitesEnseignementTranslator
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import UniteEnseignementCatalogueDTO, \
     GroupementContenantDTO, \
-    ElementContenuDTO
+    ElementContenuDTO, UNITE_ENSEIGNEMENT
 from ddd.logic.preparation_programme_annuel_etudiant.repository.i_groupement_ajuste_inscription_cours import \
     IGroupementAjusteInscriptionCoursRepository
 from education_group.ddd.domain.group import GroupIdentity
@@ -119,5 +119,6 @@ class GetContenuGroupement(interface.DomainService):
             credits_relatifs=unite_enseignement_dto_correspondant.credits_relatifs,
             volume_annuel_pm=unite_enseignement_dto_correspondant.volume_annuel_pm,
             volume_annuel_pp=unite_enseignement_dto_correspondant.volume_annuel_pp,
-            ajoute=True
+            ajoute=True,
+            type=UNITE_ENSEIGNEMENT
         )

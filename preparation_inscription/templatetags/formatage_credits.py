@@ -27,6 +27,7 @@ from decimal import Decimal
 from typing import Optional
 
 from django import template
+from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
 register = template.Library()
@@ -48,10 +49,20 @@ def formater_credits_ue_formulaire(credits_relatifs: Optional[int], credits_abso
 
 
 @register.simple_tag
-def formater_credits_ue(credits_relatifs: Optional[int], credits_absolus: Optional[Decimal]) -> str:
+def formater_credits_ue(
+        credits_relatifs: Optional[int],
+        credits_absolus: Optional[Decimal],
+        intitule_groupement: str
+) -> str:
     if credits_relatifs:
         if credits_relatifs != credits_absolus:
-            return "{}({})".format(credits_relatifs, get_chiffres_significatifs(credits_absolus))
+            return mark_safe('<div data-toggle="tooltip" title="{} {} ({})">{}({})</div>'.format(
+                _("Program credits"),
+                intitule_groupement,
+                _("Learning unit credits"),
+                credits_relatifs,
+                get_chiffres_significatifs(credits_absolus))
+            )
         return "{}".format(credits_relatifs)
     return get_chiffres_significatifs(credits_absolus)
 
