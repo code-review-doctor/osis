@@ -45,19 +45,7 @@ def _build_contenu_pgm(node: 'Node', lien_parent: 'Link' = None) -> 'ContenuNoeu
     for lien in node.children:
         if lien.child.is_learning_unit():
             contenu.append(
-                UniteEnseignementDTO(
-                    bloc=lien.block,
-                    code=lien.child.code,
-                    intitule_complet=lien.child.title,
-                    quadrimestre=lien.child.quadrimester,
-                    quadrimestre_texte=lien.child.quadrimester.value if lien.child.quadrimester else "",
-                    credits_absolus=lien.child.credits,
-                    volume_annuel_pm=int(lien.child.volume_total_lecturing or 0),
-                    volume_annuel_pp=int(lien.child.volume_total_practical or 0),
-                    obligatoire=lien.is_mandatory if lien else False,
-                    session_derogation=lien.child.session_derogation,
-                    credits_relatifs=lien.relative_credits
-                )
+                _conversion_link_vers_unite_enseignement_DTO(lien)
             )
         else:
             groupement_contenu = _build_contenu_pgm(lien.child, lien_parent=lien)
@@ -75,4 +63,20 @@ def _build_contenu_pgm(node: 'Node', lien_parent: 'Link' = None) -> 'ContenuNoeu
         credits=_get_credits(lien_parent),
         intitule_complet=full_title,
         contenu_ordonne=contenu,
+    )
+
+
+def _conversion_link_vers_unite_enseignement_DTO(lien):
+    return UniteEnseignementDTO(
+        bloc=lien.block,
+        code=lien.child.code,
+        intitule_complet=lien.child.title,
+        quadrimestre=lien.child.quadrimester,
+        quadrimestre_texte=lien.child.quadrimester.value if lien.child.quadrimester else "",
+        credits_absolus=lien.child.credits,
+        volume_annuel_pm=int(lien.child.volume_total_lecturing or 0),
+        volume_annuel_pp=int(lien.child.volume_total_practical or 0),
+        obligatoire=lien.is_mandatory if lien else False,
+        session_derogation=lien.child.session_derogation,
+        credits_relatifs=lien.relative_credits
     )
