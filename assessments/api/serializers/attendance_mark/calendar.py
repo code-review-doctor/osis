@@ -32,6 +32,7 @@ class AttendanceMarkCalendarSerializer(serializers.Serializer):
     start_date = serializers.DateField()
     end_date = serializers.DateField(allow_null=True)
     authorized_target_year = serializers.IntegerField()
+    month_session_name = serializers.CharField()
     is_open = serializers.SerializerMethodField()
 
     def get_is_open(self, obj: AcademicEvent) -> bool:

@@ -87,7 +87,7 @@ class AcademicEventFactory:
         }
         if type in (AcademicCalendarTypes.SCORES_EXAM_DIFFUSION.name, AcademicCalendarTypes.SCORES_EXAM_SUBMISSION.name,
                     AcademicCalendarTypes.DISSERTATION_SUBMISSION.name, AcademicCalendarTypes.EXAM_ENROLLMENTS.name,
-                    AcademicCalendarTypes.DELIBERATION.name,):
+                    AcademicCalendarTypes.DELIBERATION.name, AcademicCalendarTypes.ATTENDANCE_MARK.name,):
             return AcademicSessionEvent(**kwargs, session=session)
         return AcademicEvent(**kwargs)
 

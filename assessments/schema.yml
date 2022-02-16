@@ -404,6 +404,10 @@ components:
         authorized_target_year:
           type: integer
           example: 2022
+        month_session_name:
+          type: string
+          example: "January"
+          nullable: true
         is_open:
           type: boolean
 security:
