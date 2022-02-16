@@ -44,6 +44,7 @@ from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYea
 from osis_common.ddd import interface
 
 CodeUniteEnseignement = str
+CodeProgramme = str
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
@@ -55,6 +56,7 @@ class IdentiteGroupementAjusteInscriptionCours(interface.EntityIdentity):
 class GroupementAjusteInscriptionCours(interface.RootEntity):
     entity_id: IdentiteGroupementAjusteInscriptionCours
     groupement_id: 'GroupIdentity'
+    programme_id: 'GroupIdentity'
     unites_enseignement_ajoutees: List['UniteEnseignementAjoutee']
     unites_enseignement_supprimees: List['UniteEnseignementSupprimee']
     unites_enseignement_modifiees: List['UniteEnseignementModifiee']

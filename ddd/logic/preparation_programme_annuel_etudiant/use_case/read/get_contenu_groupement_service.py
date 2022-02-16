@@ -1,3 +1,4 @@
+##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -14,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,12 +24,25 @@
 #
 ##############################################################################
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetContenuGroupementCommand
-from infrastructure.preparation_programme_annuel_etudiant.domain.service.catalogue_formations import \
-    CatalogueFormationsTranslator
+from ddd.logic.preparation_programme_annuel_etudiant.domain.service.get_contenu_groupement import GetContenuGroupement
+from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import \
+    ICatalogueFormationsTranslator
+from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_unites_enseignement import \
+    ICatalogueUnitesEnseignementTranslator
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import GroupementContenantDTO
+from ddd.logic.preparation_programme_annuel_etudiant.repository.i_groupement_ajuste_inscription_cours import \
+    IGroupementAjusteInscriptionCoursRepository
 
 
 def get_contenu_groupement_service(
         cmd: 'GetContenuGroupementCommand',
-        translator: 'CatalogueFormationsTranslator',
+        repo: 'IGroupementAjusteInscriptionCoursRepository',
+        catalogue_formations_translator: 'ICatalogueFormationsTranslator',
+        catalogue_unites_enseignement_translator: 'ICatalogueUnitesEnseignementTranslator'
 ) -> 'GroupementContenantDTO':
-    return translator.get_contenu_groupement(cmd)
+    return GetContenuGroupement.get_contenu_groupement(
+        cmd,
+        repo,
+        catalogue_formations_translator,
+        catalogue_unites_enseignement_translator
+    )

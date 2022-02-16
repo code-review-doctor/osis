@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-10 09:46+0100\n"
+"POT-Creation-Date: 2022-02-16 08:56+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -30,6 +30,9 @@ msgid "Ajout"
 msgstr ""
 
 msgid "Ajouter des UE"
+msgstr ""
+
+msgid "Ajouter des groupements"
 msgstr ""
 
 msgid "Anac."
@@ -57,7 +60,7 @@ msgid "Bloc"
 msgstr ""
 
 msgid "Block"
-msgstr ""
+msgstr "Bloc"
 
 msgid "Cancel"
 msgstr ""
@@ -92,6 +95,9 @@ msgstr ""
 msgid "Composants (PM/PP)"
 msgstr ""
 
+msgid "Content"
+msgstr "Contenu"
+
 msgid "Credits"
 msgstr "Crédits"
 
@@ -99,15 +105,21 @@ msgid "Crédits"
 msgstr ""
 
 msgid "Derogation's session"
-msgstr ""
+msgstr "Session dérogation"
 
 msgid "ECGE1BA - 2021-2022"
 msgstr ""
+
+msgid "Form view"
+msgstr "Vue formulaire"
 
 msgid "Formulaire d'inscriptions aux cours PAE"
 msgstr ""
 
 msgid "Intitulé"
+msgstr ""
+
+msgid "Label"
 msgstr ""
 
 msgid "MODIFICATION"
@@ -121,6 +133,9 @@ msgstr ""
 
 msgid "Modifier les propriétés"
 msgstr ""
+
+msgid "Name"
+msgstr "Nom"
 
 msgid "Ne pas annuler"
 msgstr ""
@@ -141,13 +156,16 @@ msgid "SUPPRESSION"
 msgstr ""
 
 msgid "Save"
-msgstr ""
+msgstr "Enregistrer"
 
 msgid "Search"
 msgstr "Rechercher"
 
 msgid "Session"
 msgstr "Session"
+
+msgid "Sigle"
+msgstr ""
 
 msgid "Suppression"
 msgstr "Suppression"
@@ -156,10 +174,10 @@ msgid "Supprimer des UE"
 msgstr ""
 
 msgid "The learning units have been added"
-msgstr "Les unitées d'enseignement ont été ajoutées"
+msgstr "Les unités d'enseignement ont été ajoutées"
 
 msgid "The learning units have been modified"
-msgstr "Les unitées d'enseignement ont été modifiées"
+msgstr "Les unités d'enseignement ont été modifiées"
 
 #, python-format
 msgid "There is %(error_counter)s error in form"
@@ -192,5 +210,14 @@ msgctxt "student_path_year"
 msgid "Year"
 msgstr "An"
 
+msgid "code"
+msgstr ""
+
 msgid "credits"
 msgstr "crédits"
+
+msgid "intitule"
+msgstr ""
+
+msgid "sigle"
+msgstr ""
