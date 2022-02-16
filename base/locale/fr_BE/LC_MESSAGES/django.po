@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-17 11:07+0100\n"
+"POT-Creation-Date: 2022-02-16 14:45+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -332,9 +332,6 @@ msgctxt "male plural"
 msgid "All"
 msgstr "Tous"
 
-msgid "All the scores are encoded."
-msgstr "Toutes les notes ont été soumises."
-
 msgid "Alloc. Ent."
 msgstr "Ent. attrib."
 
@@ -407,6 +404,9 @@ msgstr "Entités attachées"
 
 msgid "Attached to"
 msgstr "Attachée à"
+
+msgid "Attendance mark"
+msgstr "Note de présence"
 
 msgid "Attrib. vol1"
 msgstr "Attrib. vol1"
@@ -1336,9 +1336,6 @@ msgstr "Cours isolés"
 
 msgid "It is necessary to indicate the internship subtype."
 msgstr "Il est nécessaire d'indiquer le sous-type de stage."
-
-msgid "It remains notes to encode."
-msgstr "Il reste encore des notes à encoder."
 
 msgid "January"
 msgstr "Janvier"
@@ -2826,6 +2823,12 @@ msgstr ""
 "L'année de fin selectionnée (%(partim_end_year)s) est plus grande que "
 "l'année de fin de l'UE complète %(lu_parent)s"
 
+msgid ""
+"The start date cannot be lower than the score encoding start date and the "
+"end date cannot be greater than the score encoding end date"
+msgstr "La date de début ne peut pas être plus petite que la date de début de période d'encodage des notes et "
+"la date de fin ne peut pas être plus grande que la date de fin de période d'encodage des notes"
+
 msgid "The start date must be equals or lower than the end date"
 msgstr "La date de début doit être égale ou inférieure à la date de fin"
 
@@ -3563,3 +3566,9 @@ msgstr "oui"
 
 msgid "yes,no"
 msgstr "oui,non"
+
+#~ msgid "All the scores are encoded."
+#~ msgstr "Toutes les notes ont été soumises."
+
+#~ msgid "It remains notes to encode."
+#~ msgstr "Il reste encore des notes à encoder."
