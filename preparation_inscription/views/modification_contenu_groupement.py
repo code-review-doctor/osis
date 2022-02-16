@@ -81,7 +81,7 @@ class ModifierProprietesContenuView(PermissionRequiredMixin, HtmxMixin, FormView
         return [
             {
                 'code': element.code,
-                'bloc': element.bloc,
+                'bloc': str(element.bloc) if element.bloc else '',
             }
             for element in self.contenu.elements_contenus
         ]

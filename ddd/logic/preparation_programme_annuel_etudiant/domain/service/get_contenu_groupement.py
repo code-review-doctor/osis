@@ -88,6 +88,14 @@ class GetContenuGroupement(interface.DomainService):
         if not groupement_ajuste:
             return contenu_groupement
 
+        contenu_groupement = attr.evolve(
+            contenu_groupement,
+            elements_contenus=[
+                cls.__append_unite_enseignement_modifiee_to_element_contenu_dto(element, groupement_ajuste)
+                for element in contenu_groupement.elements_contenus
+            ]
+        )
+
         return attr.evolve(
             contenu_groupement,
             elements_contenus=contenu_groupement.elements_contenus + [
@@ -121,3 +129,21 @@ class GetContenuGroupement(interface.DomainService):
             volume_annuel_pp=unite_enseignement_dto_correspondant.volume_annuel_pp,
             ajoute=True
         )
+
+    @classmethod
+    def __append_unite_enseignement_modifiee_to_element_contenu_dto(
+            cls,
+            element_contenu_dto: ElementContenuDTO,
+            groupement_ajuste: 'GroupementAjusteInscriptionCours'
+    ):
+        unite_enseignement_modifiee = next(
+            (ue for ue in groupement_ajuste.unites_enseignement_modifiees if ue.code == element_contenu_dto.code),
+            None
+        )
+        if unite_enseignement_modifiee:
+            element_contenu_dto = attr.evolve(
+                element_contenu_dto,
+                bloc=str(unite_enseignement_modifiee.bloc),
+                modifie=True
+            )
+        return element_contenu_dto

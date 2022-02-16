@@ -1,4 +1,4 @@
-{% load i18n bootstrap3 index %}
+{% load i18n bootstrap3 index formatage_credits formatage_volumes %}
 
 {% comment "License" %}
  * OSIS stands for Open Student Information System. It's an application
@@ -34,6 +34,7 @@
             <table id="table_modification_contenu" class="table table-hover">
                 <thead>
                     <tr>
+                        <th id="type_ajustement"></th>
                         <th id="code" class="code-col">{% trans 'Code' %}</th>
                         <th id="intitule">{% trans 'Title' %}</th>
                         <th id="volumes">{% trans 'Components (PM+PP)' %}</th>
@@ -48,24 +49,55 @@
                     {% for element in contenu %}
                         {% with contenu_form=form|index:forloop.counter0 %}
                             <tr>
+                                <td>
+                                    {% if element.supprime %}
+                                        <i class="fas fa-folder-minus text-danger"></i>
+                                    {% elif element.modifie %}
+                                        <i class="fas fa-folder text-info"></i>
+                                    {% elif element.ajoute %}
+                                        <i class="fas fa-folder-plus text-success"></i>
+                                    {% endif %}
+                                </td>
+
                                 <td headers="code">
-                                    {% bootstrap_field contenu_form.code show_label=False %}
-                                    {{ element.code }}{{ element.intitule }}
+                                    {% if not element.supprime %}
+                                        {% bootstrap_field contenu_form.code show_label=False %}
+                                    {% endif %}
+
+                                     {% if element.supprime %}
+                                        <span class="text-danger">
+                                            <b>{{ element.code }}{{ element.intitule }}</b>
+                                        </span>
+                                    {% elif element.modifie %}
+                                        <span class="text-info">
+                                            <b>{{ element.code }}{{ element.intitule }}</b>
+                                        </span>
+                                    {% elif element.ajoute %}
+                                        <span class="text-success">
+                                            <b>{{ element.code }}{{ element.intitule }}</b>
+                                        </span>
+                                    {% else %}
+                                        {{ element.code }}{{ element.intitule }}
+                                    {% endif %}
                                 </td>
                                 <td headers="intitule">
                                     {{ element.intitule_complet }}
                                 </td>
                                 <td headers="volumes">
-                                    {{ element.volumes }}
+                                     {% formater_volumes element.volume_annuel_pm element.volume_annuel_pp %}
                                 </td>
                                 <td headers="bloc">
-                                    {% bootstrap_field contenu_form.bloc show_label=False %}
+                                    {% if element.supprime %}
+                                         {{ element.bloc }}
+                                    {% else %}
+                                        {% bootstrap_field contenu_form.bloc show_label=False %}
+                                    {% endif %}
                                 </td>
                                 <td headers="quadri">
                                    {{ element.quadrimestre_texte }}
                                 </td>
                                 <td headers="credits">
-                                    {{ element.credits }} / {{ element.credits }}
+                                    {% formater_credits_ue element.credits_relatifs element.credits_absolus %}
                                 </td>
                                 <td headers="session">
                                     {{ element.session_derogation }}

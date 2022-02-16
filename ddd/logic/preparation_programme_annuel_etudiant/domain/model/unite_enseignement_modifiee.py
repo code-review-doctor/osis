@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
 import uuid as uuid
 
 import attr
@@ -42,3 +41,7 @@ class UniteEnseignementModifiee(interface.Entity):  # TODO  Entity VS ValueObjec
     entity_id: UniteEnseignementModifieeIdentity
     unite_enseignement_identity: 'LearningUnitIdentity'
     bloc: int
+
+    @property
+    def code(self):
+        return self.unite_enseignement_identity.code

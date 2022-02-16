@@ -104,7 +104,7 @@
                 {% formater_volumes element.volume_annuel_pm element.volume_annuel_pp %}
             </td>
             <td headers="bloc">
-                {% if element.type_ajustement == 'MODIFICATION' %}
+                {% if element.modifie %}
                     <b class="text-info" style="font-weight: bolder; text-shadow: 0px 0px 2px currentColor;">{{ element.bloc }}</b>
                 {% else %}
                     {{ element.bloc }}
