@@ -72,6 +72,5 @@ class GroupementAjusteInscriptionCoursInMemoryRepository(
 
     @classmethod
     def bulk_delete(cls, entities: List['GroupementAjusteInscriptionCours']) -> None:
-        ReinitialiserProgrammeValidatorList(groupements_ajustes=entities).validate()
         for entity in entities:
             cls.delete(entity.entity_id)
