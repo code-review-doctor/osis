@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-10 08:50+0100\n"
+"POT-Creation-Date: 2022-02-16 14:45+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -104,6 +104,9 @@ msgid "Learning unit {} is used in following programs : {}"
 msgstr ""
 
 msgid "Lecturing charge or practical charge must be filled"
+msgstr ""
+
+msgid "No content to reset"
 msgstr ""
 
 msgid "No learning units to add."

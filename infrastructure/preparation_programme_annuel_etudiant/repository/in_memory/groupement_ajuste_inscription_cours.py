@@ -28,6 +28,8 @@ from typing import Optional, List
 from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
     IdentiteGroupementAjusteInscriptionCours, GroupementAjusteInscriptionCours
+from ddd.logic.preparation_programme_annuel_etudiant.domain.validator.validators_by_business_action import \
+    ReinitialiserProgrammeValidatorList
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import GroupementAjusteFromRepositoryDTO
 from ddd.logic.preparation_programme_annuel_etudiant.repository.i_groupement_ajuste_inscription_cours import \
     IGroupementAjusteInscriptionCoursRepository
@@ -72,5 +74,6 @@ class GroupementAjusteInscriptionCoursInMemoryRepository(
 
     @classmethod
     def bulk_delete(cls, entities: List['GroupementAjusteInscriptionCours']) -> None:
+        ReinitialiserProgrammeValidatorList(groupements_ajustes=entities).validate()
         for entity in entities:
             cls.delete(entity.entity_id)

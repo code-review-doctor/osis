@@ -1,5 +1,5 @@
 {% extends "layout.html" %}
-{% load static i18n bootstrap3 %}
+{% load static i18n bootstrap3 osis_role %}
 
 {% comment "License" %}
     * OSIS stands for Open Student Information System. It's an application
@@ -44,9 +44,10 @@
                                 <span class="caret"></span>
                             </button>
                             <ul class="dropdown-menu pull-right" aria-labelledby="btn-action-down">
-                                <li><a class="trigger_modal"
-                                       data-url="{% url 'remettre_etat_initial_view' annee code_programme %}"
-                                >{% trans "Revenir à l'état initial du programme" %}</a></li>
+                                <li>
+                                    {% url 'remettre_etat_initial_view' annee code_programme as reinit_url %}
+                                    {% a_tag_modal_has_perm reinit_url _('Return to the initial state of the program') 'preparation_programme.can_reinit_programme_inscription' user group_year %}
+                                </li>
                             </ul>
                         </div>
                     </div>
