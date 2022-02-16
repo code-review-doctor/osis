@@ -25,6 +25,7 @@
 # ##############################################################################
 try:
     from .education import BelgianHighSchoolDiploma, ForeignHighSchoolDiploma, Schedule
+    from .curriculum import CurriculumYear, Experience
 except RuntimeError as e:  # pragma: no cover
     # There's a weird bug when running tests, the test runner seeing a models
     # package tries to import it directly, failing to do so
@@ -37,4 +38,6 @@ __all__ = [
     "BelgianHighSchoolDiploma",
     "ForeignHighSchoolDiploma",
     "Schedule",
+    "CurriculumYear",
+    "Experience",
 ]
