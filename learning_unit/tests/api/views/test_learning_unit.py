@@ -104,6 +104,7 @@ class LearningUnitListTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         qs = LearningUnitYear.objects.all().annotate_full_title().order_by('-academic_year__year', 'acronym')
+        qs = LearningUnitYearQuerySet.annotate_entities_allocation_and_requirement_acronym(qs)
         serializer = LearningUnitSerializer(
             qs,
             many=True,
@@ -123,6 +124,7 @@ class LearningUnitListTestCase(APITestCase):
         qs = LearningUnitYear.objects.filter(
             learning_container_year__isnull=False
         ).annotate_full_title().order_by('-academic_year__year', 'acronym')
+        qs = LearningUnitYearQuerySet.annotate_entities_allocation_and_requirement_acronym(qs)
         serializer = LearningUnitSerializer(
             qs,
             many=True,
@@ -144,6 +146,7 @@ class LearningUnitListTestCase(APITestCase):
             Q(learning_container_year__isnull=False) &
             (Q(externallearningunityear__mobility=False) | Q(externallearningunityear__isnull=True))
         ).annotate_full_title().order_by('-academic_year__year', 'acronym')
+        qs = LearningUnitYearQuerySet.annotate_entities_allocation_and_requirement_acronym(qs)
         serializer = LearningUnitSerializer(
             qs,
             many=True,
@@ -162,7 +165,7 @@ class LearningUnitListTestCase(APITestCase):
         qs = LearningUnitYear.objects.filter(
             pk=self.learning_unit_years[3].pk
         ).annotate_full_title().order_by('-academic_year__year', 'acronym')
-
+        qs = LearningUnitYearQuerySet.annotate_entities_allocation_and_requirement_acronym(qs)
         serializer = LearningUnitSerializer(
             qs,
             many=True,
@@ -183,7 +186,7 @@ class LearningUnitListTestCase(APITestCase):
         qs = LearningUnitYear.objects.filter(
             pk=expected_learning_unit_year.pk
         ).annotate_full_title().order_by('-academic_year__year', 'acronym')
-
+        qs = LearningUnitYearQuerySet.annotate_entities_allocation_and_requirement_acronym(qs)
         serializer = LearningUnitSerializer(
             qs,
             many=True,
@@ -202,7 +205,7 @@ class LearningUnitListTestCase(APITestCase):
         qs = LearningUnitYear.objects.filter(
             pk=self.learning_unit_years[2].pk
         ).annotate_full_title().order_by('-academic_year__year', 'acronym')
-
+        qs = LearningUnitYearQuerySet.annotate_entities_allocation_and_requirement_acronym(qs)
         serializer = LearningUnitSerializer(
             qs,
             many=True,
