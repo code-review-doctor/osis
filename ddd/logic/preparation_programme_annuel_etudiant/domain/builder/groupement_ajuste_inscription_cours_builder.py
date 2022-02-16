@@ -26,7 +26,8 @@
 import uuid
 from typing import Union
 
-from ddd.logic.preparation_programme_annuel_etudiant.commands import AjouterUEAuProgrammeCommand
+from ddd.logic.preparation_programme_annuel_etudiant.commands import AjouterUEAuProgrammeCommand, \
+    ModifierUEDuGroupementCommand
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
     IdentiteGroupementAjusteInscriptionCours, GroupementAjusteInscriptionCours
 from ddd.logic.preparation_programme_annuel_etudiant.repository.i_groupement_ajuste_inscription_cours import \
@@ -42,18 +43,35 @@ class GroupementAjusteInscriptionCoursBuilder(interface.RootEntityBuilder):
             cmd: Union['AjouterUEAuProgrammeCommand'],
             repository: 'IGroupementAjusteInscriptionCoursRepository'
     ) -> 'GroupementAjusteInscriptionCours':
-        return cls.build_from_code_groupement_et_annee(cmd.code_programme, cmd.annee, repository)
+        groupement_id = GroupIdentity(
+            code=cmd.ajouter_dans,
+            year=cmd.annee,
+        )
+        programme_id = GroupIdentity(
+            code=cmd.code_programme,
+            year=cmd.annee
+        )
+        groupements_ajustes = repository.search(code_programme=cmd.code_programme, groupement_id=groupement_id)
+        if groupements_ajustes:
+            return groupements_ajustes[0]
+        return GroupementAjusteInscriptionCours(
+            entity_id=IdentiteGroupementAjusteInscriptionCours(uuid=uuid.uuid4()),
+            groupement_id=groupement_id,
+            programme_id=programme_id,
+            unites_enseignement_ajoutees=[],
+            unites_enseignement_supprimees=[],
+            unites_enseignement_modifiees=[],
+        )
 
     @classmethod
-    def build_from_code_groupement_et_annee(
+    def build_from_modifier_command(
             cls,
-            code_groupement_a_ajuster: str,
-            annee: int,
+            cmd: 'ModifierUEDuGroupementCommand',
             repository: 'IGroupementAjusteInscriptionCoursRepository'
     ) -> 'GroupementAjusteInscriptionCours':
         groupement_id = GroupIdentity(
-            code=code_groupement_a_ajuster,
-            year=annee,
+            code=cmd.ajuster_dans,
+            year=cmd.annee,
         )
         programme_id = GroupIdentity(
             code=cmd.code_programme,

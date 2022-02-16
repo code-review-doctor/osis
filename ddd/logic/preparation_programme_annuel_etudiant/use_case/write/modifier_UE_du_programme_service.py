@@ -39,9 +39,8 @@ def modifier_UE_du_programme(
         repository: 'IGroupementAjusteInscriptionCoursRepository',
 ) -> 'IdentiteGroupementAjusteInscriptionCours':
     # GIVEN
-    groupement_ajuste = GroupementAjusteInscriptionCoursBuilder.build_from_code_groupement_et_annee(
-        code_groupement_a_ajuster=cmd.ajuster_dans,
-        annee=cmd.annee,
+    groupement_ajuste = GroupementAjusteInscriptionCoursBuilder.build_from_modifier_command(
+        cmd=cmd,
         repository=repository
     )
 
