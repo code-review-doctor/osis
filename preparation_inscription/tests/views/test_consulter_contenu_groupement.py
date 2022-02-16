@@ -24,7 +24,6 @@
 #
 ##############################################################################
 import mock
-
 from django.http.response import HttpResponseForbidden
 from django.test import TestCase
 from django.urls import reverse
@@ -34,6 +33,7 @@ from base.tests.factories.program_manager import ProgramManagerFactory
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import GroupementContenantDTO
 from education_group.tests.factories.group_year import GroupYearFactory
 from preparation_inscription.views.consulter_contenu_groupement import ConsulterContenuGroupementView
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 
 
 class TestConsulterContenuGroupementView(TestCase):
@@ -44,10 +44,11 @@ class TestConsulterContenuGroupementView(TestCase):
             ConsulterContenuGroupementView.name,
             kwargs={'annee': 2021, 'code_programme': 'LCORP201S', 'code_groupement': 'LCORP201S'}
         )
-        GroupYearFactory(
+        gy = GroupYearFactory(
             academic_year__year=2021,
             partial_acronym="LCORP201S"
         )
+        EducationGroupVersionFactory(root_group=gy)
 
     def setUp(self) -> None:
         pgm_manager = ProgramManagerFactory()
