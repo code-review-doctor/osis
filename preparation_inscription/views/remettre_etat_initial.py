@@ -29,11 +29,11 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 
-from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.views.common import display_success_messages, display_error_messages
 from base.views.mixins import AjaxTemplateMixin
 from ddd.logic.preparation_programme_annuel_etudiant.commands import RemettreProgrammeDansEtatInitialCommand
 from infrastructure.messages_bus import message_bus_instance
+from osis_common.ddd.interface import BusinessException
 from osis_role.contrib.views import PermissionRequiredMixin
 
 
@@ -60,9 +60,8 @@ class RemettreEtatInitialView(LoginRequiredMixin, PermissionRequiredMixin, AjaxT
             message_bus_instance.invoke(command)
             display_success_messages(request, _("The program has returned to its original state."))
             return super().post(*args, **kwargs)
-        except MultipleBusinessExceptions as exceptions:
-            messages = [exception.message for exception in exceptions.exceptions]
-            display_error_messages(request, messages)
+        except BusinessException as exception:
+            display_error_messages(request, exception.message)
             return self.get(request, *args, **kwargs)
 
     def get_success_url(self):

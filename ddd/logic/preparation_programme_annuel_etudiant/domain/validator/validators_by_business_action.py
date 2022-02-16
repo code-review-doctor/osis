@@ -33,10 +33,7 @@ import attr
 from base.ddd.utils.business_validator import TwoStepsMultipleBusinessExceptionListValidator, BusinessValidator
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 from ddd.logic.preparation_programme_annuel_etudiant.domain.validator._should_au_moins_ajoute_une_unite_enseignement \
-    import \
-    ShouldAuMoinsAjouterUneUniteEnseignement
-from ddd.logic.preparation_programme_annuel_etudiant.domain.validator._should_au_moins_avoir_un_groupement_ajuste import \
-    ShouldAuMoinsAvoirUnGroupementAjuste
+    import ShouldAuMoinsAjouterUneUniteEnseignement
 
 if TYPE_CHECKING:
     from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
@@ -61,16 +58,3 @@ class AjouterUniteEnseignementValidatorList(TwoStepsMultipleBusinessExceptionLis
             ShouldUniteEnseignementPasDejaAjoutee(self.groupement_ajuste, ue)
             for ue in self.unites_enseignement
         ]
-
-
-@attr.s(frozen=True, slots=True, auto_attribs=True)
-class ReinitialiserProgrammeValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
-    groupements_ajustes: List['GroupementAjusteInscriptionCours']
-
-    def get_data_contract_validators(self) -> List[BusinessValidator]:
-        return [
-            ShouldAuMoinsAvoirUnGroupementAjuste(self.groupements_ajustes)
-        ]
-
-    def get_invariants_validators(self) -> List[BusinessValidator]:
-        return []
