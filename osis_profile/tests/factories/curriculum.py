@@ -1,4 +1,4 @@
-##############################################################################
+# ##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -22,25 +22,24 @@
 #    at the root of the source code of this program.  If not,
 #    see http://www.gnu.org/licenses/.
 #
-##############################################################################
+# ##############################################################################
+import factory
 
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import redirect
-from django.views.generic import TemplateView
-
-from base.utils.htmx import HtmxMixin
+from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.person import PersonFactory
+from osis_profile.models import CurriculumYear, Experience
 
 
-class FormulaireInscriptionView(HtmxMixin, LoginRequiredMixin, TemplateView):
-    name = 'formulaire_inscription_view'
-    # TemplateView
-    template_name = "mockup/tabs.html"
-    htmx_template_name = "mockup/blocks/tab_formulaire_inscription.html"
+class CurriculumYearFactory(factory.DjangoModelFactory):
+    academic_year = factory.SubFactory(AcademicYearFactory)
+    person = factory.SubFactory(PersonFactory)
 
-    def get_context_data(self, **kwargs):
-        return {
-            **super().get_context_data(**kwargs),
-        }
+    class Meta:
+        model = CurriculumYear
 
-    def post(self, request, *args, **kwargs):
-        return redirect("formulaire_inscription_view")
+
+class ExperienceFactory(factory.DjangoModelFactory):
+    curriculum_year = factory.SubFactory(CurriculumYearFactory)
+
+    class Meta:
+        model = Experience

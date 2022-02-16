@@ -412,7 +412,7 @@ function initializeJsTree($documentTree, tree_json_url, cut_element_url, copy_el
                         },
                         "search": {
                             "separator_before": true,
-                            "label": gettext("Search"),
+                            "label": gettext("Add content"),
                             "data-modal_class": "modal-lg",
                             "action": function (data) {
                                 let __ret = get_data_from_tree(data);

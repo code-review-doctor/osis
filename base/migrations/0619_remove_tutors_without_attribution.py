@@ -29,6 +29,7 @@ def delete_tutors_without_attribution(apps, schema_editor):
 class Migration(migrations.Migration):
     dependencies = [
         ('base', '0618_merge_20211215_1448'),
+        ('attribution', '0045_auto_20210318_0949'),
     ]
 
     operations = [
