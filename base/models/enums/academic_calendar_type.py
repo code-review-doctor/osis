@@ -34,6 +34,7 @@ class AcademicCalendarTypes(ChoiceEnum):
     EXAM_ENROLLMENTS = _("Exam enrollments")
     SCORES_EXAM_DIFFUSION = _("Scores diffusion")
     SCORES_EXAM_SUBMISSION = _("Scores exam submission")
+    ATTENDANCE_MARK = _("Attendance mark")
     TEACHING_CHARGE_APPLICATION = _("Application for vacant courses")
     ACCESS_SCHEDULE_CALENDAR = _("Access schedule calendar")
     COURSE_ENROLLMENT = _("Course enrollment")

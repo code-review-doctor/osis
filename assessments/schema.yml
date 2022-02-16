@@ -11,10 +11,10 @@ servers:
  - url: https://osis.uclouvain.be/api/v1/assessments/
    description: 'Production server'
 info:
-  version: '1.1.0'
+  version: '1.2.0'
   title: 'Assessments Service'
   description: |-
-    A set of API endpoints that allow you to get score sheet
+    A set of API endpoints that allow you to get score sheet and submit attendance mark
 paths:
   /{code}/xls_export:
     get:
@@ -216,6 +216,33 @@ paths:
             $ref: '#/components/responses/Unauthorized'
         tags:
           - score_encoding
+  /attendance_mark/calendars/:
+    get:
+      description: Return all calendars related to attendance marks.
+      operationId: attendancemarkscalendars_list
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AttendanceMarkCalendar'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - application
 components:
   securitySchemes:
     Token:
@@ -359,6 +386,25 @@ components:
           example: "Doe John"
           nullable: true
         has_peps:
+          type: boolean
+    AttendanceMarkCalendar:
+      type: object
+      properties:
+        title:
+          type: string
+          example: "Demande de notes de présence"
+        start_date:
+          type: string
+          format: date
+          example: "2021-02-15"
+        end_date:
+          type: string
+          format: date
+          example: "2021-02-28"
+        authorized_target_year:
+          type: integer
+          example: 2022
+        is_open:
           type: boolean
 security:
   - Token: []
