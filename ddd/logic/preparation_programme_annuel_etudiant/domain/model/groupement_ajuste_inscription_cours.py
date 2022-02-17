@@ -106,7 +106,10 @@ class GroupementAjusteInscriptionCours(interface.RootEntity):
 
         for unite_enseignement in unites_enseignement:
             # retirer des ue ajoutees si déjà ajoutée
-            ue_ajoutee = next((ue for ue in self.unites_enseignement_ajoutees if ue.code == unite_enseignement.code), None)
+            ue_ajoutee = next(
+                (ue for ue in self.unites_enseignement_ajoutees if ue.code == unite_enseignement.code),
+                None
+            )
             if ue_ajoutee:
                 self.unites_enseignement_ajoutees.remove(ue_ajoutee)
             else:

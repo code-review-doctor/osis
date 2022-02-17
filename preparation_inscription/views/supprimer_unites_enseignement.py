@@ -56,7 +56,7 @@ class SupprimerUnitesEnseignementView(PermissionRequiredMixin, LoginRequiredMixi
     def get_context_data(self, **kwargs):
         return {
             **super().get_context_data(**kwargs),
-            'deletable_content': self.get_deletable_content(),
+            'deletable_content': self.contenu.elements_contenus,
             'intitule_groupement': self.intitule_groupement,
             'intitule_complet_groupement': self.intitule_programme,
             'annee': self.annee,
