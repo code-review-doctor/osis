@@ -62,7 +62,7 @@ class PreparationInscriptionMainView(PermissionRequiredMixin, TemplateView):
         return self.kwargs.get('code_groupement', self.kwargs['code_programme'])
 
     @cached_property
-    def group_year(self) -> 'GroupYear':
+    def permission_object(self) -> 'GroupYear':
         return get_object_or_404(GroupYear, academic_year__year=self.annee, partial_acronym=self.code_programme)
 
     def get_context_data(self, **kwargs):
@@ -74,7 +74,7 @@ class PreparationInscriptionMainView(PermissionRequiredMixin, TemplateView):
             'annee': self.annee,
             'code_programme': self.code_programme,
             'code_groupement':  self.code_groupement,
-            'group_year': self.group_year
+            'permission_object': self.permission_object
         }
 
     def get_tree_view_url(self) -> str:

@@ -46,7 +46,7 @@
                             <ul class="dropdown-menu pull-right" aria-labelledby="btn-action-down">
                                 <li>
                                     {% url 'remettre_etat_initial_view' annee code_programme as reinit_url %}
-                                    {% a_tag_modal_has_perm reinit_url _('Return to the initial state of the program') 'preparation_programme.can_reinit_programme_inscription' user group_year %}
+                                    {% a_tag_modal_has_perm reinit_url _('Return to the initial state of the program') 'preparation_programme.can_reinit_programme_inscription' user permission_object %}
                                 </li>
                             </ul>
                         </div>
