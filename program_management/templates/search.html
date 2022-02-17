@@ -64,6 +64,22 @@
                         </li>
                     </ul>
                 </div>
+                <div class="pull-right">
+                        <i
+                                style="margin-top: 10px;"
+                                class="fas fa-lightbulb fa-3x regex-info"
+                                data-html="true"
+                                data-placement="bottom"
+                                title="{% trans 'When searching, it is possible to use a series of special characters in all free input fields :' %}
+                                <ul>
+                                        <li>{% trans '. replaces one character in the search (e.g. MUS.9CE will find MUSI9CE and MUSA9CE)' %}</li>
+                                        <li>{% trans '.+ replaces several characters in the search (e.g. FIL.+CE will find FILA9CE, FILO3CE, FILO9CE)' %}</li>
+                                        <li>{% trans '^ the result must start with the indicated characters (e.g. ^AUCHOIX will exclude ACTIVITYAUCHOIX)' %}</li>
+                                        <li>{% trans '$ the result must end with the indicated characters (e.g. MED$ will exclude MEDE training).' %}</li>
+                                </ul>"
+                                data-toggle="tooltip"
+                        ></i>
+                </div>
             </div>
         </div>
     </div>
@@ -89,23 +105,8 @@
                         {% bootstrap_label form.full_title_fr.label %}
                         {% bootstrap_field form.full_title_fr show_label=False %}
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-3">
                         {% bootstrap_field form.main_teaching_campus %}
-                    </div>
-                    <div class="col-md-1">
-                        <i
-                                style="color: yellow"
-                                class="fas fa-lightbulb fa-3x"
-                                data-html="true"
-                                title="{% trans 'When searching, it is possible to use a series of special characters in all free input fields :' %}
-                                <ul>
-                                        <li>{% trans '. replaces one character in the search (e.g. MUS.9CE will find MUSI9CE and MUSA9CE)' %}</li>
-                                        <li>{% trans '.+ replaces several characters in the search (e.g. FIL.+CE will find FILA9CE, FILO3CE, FILO9CE)' %}</li>
-                                        <li>{% trans '^ the result must start with the indicated characters (e.g. ^AUCHOIX will exclude ACTIVITYAUCHOIX)' %}</li>
-                                        <li>{% trans '$ the result must end with the indicated characters (e.g. MED$ will exclude MEDE training).' %}</li>
-                                </ul>"
-                                data-toggle="tooltip"
-                        ></i>
                     </div>
                 </div>
                 <div class="row" style="margin-top:10px;">

@@ -105,12 +105,12 @@
                 </a>
             </li>
             <i
-                    class="fas fa-lightbulb pull-right"
-                    style="color: yellow; padding-right: 10px; font-size: 40px; margin-top: -10px;"
+                    class="fas fa-lightbulb fa-3x pull-right regex-info"
+                    style="margin-top: -10px;"
                     data-html="true"
                     data-placement="bottom"
                     title="{% trans 'When searching, it is possible to use a series of special characters in all free input fields :' %}
-                    <ul>
+                    <ul style='list-style: inside;'>
                             <li>{% trans '. replaces one character in the search (e.g. LBIR.2 will find LBIRE2100 and LBIRA2100)' %}</li>
                             <li>{% trans '.+ replaces several characters in the search (ex. LARK.+ will find LARKE, LARKO, LARKA)' %}</li>
                             <li>{% trans '^ the result must begin with the indicated characters (e.g. ^E will exclude UEs beginning with B, L,M,W)' %}</li>
