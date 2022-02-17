@@ -120,6 +120,9 @@ msgstr ""
 msgid "Label"
 msgstr ""
 
+msgid "Learning units list view"
+msgstr ""
+
 msgid "MODIFICATION"
 msgstr ""
 

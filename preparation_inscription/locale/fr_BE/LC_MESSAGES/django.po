@@ -119,6 +119,10 @@ msgstr ""
 msgid "Label"
 msgstr ""
 
+msgid "Learning units list view"
+msgstr "Vue liste des UE"
+
+
 msgid "MODIFICATION"
 msgstr ""
 

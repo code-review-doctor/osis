@@ -704,3 +704,9 @@ class GetContenuGroupementCatalogueCommand(interface.CommandRequest):
     code_programme: str
     code_groupement: str
     annee: int
+
+
+@attr.s(frozen=True, slots=True, auto_attribs=True)
+class GetUnitesEnseignementContenuesDansProgrammeCommand(interface.CommandRequest):
+    code_programme: str
+    annee: int
