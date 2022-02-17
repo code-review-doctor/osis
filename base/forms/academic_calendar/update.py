@@ -61,7 +61,7 @@ class AcademicCalendarUpdateForm(forms.Form):
                     "min": _("Start date"),
                 }
             })
-        attendance_mark_period_should_be_comprised_inside_score_encoding_period(
+        periode_de_note_de_presence_doit_etre_incluse_dans_periode_encodage_de_notes(
             self.academic_event,
             cleaned_data.get('start_date'),
             cleaned_data.get('end_date'),
@@ -70,7 +70,7 @@ class AcademicCalendarUpdateForm(forms.Form):
         return cleaned_data
 
 
-def attendance_mark_period_should_be_comprised_inside_score_encoding_period(
+def periode_de_note_de_presence_doit_etre_incluse_dans_periode_encodage_de_notes(
         academic_event: AcademicSessionEvent,
         new_start_date: datetime.date,
         new_end_date: datetime.date,

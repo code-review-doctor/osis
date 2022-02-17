@@ -76,7 +76,7 @@ class TesAcademicCalendarUpdateForm(SimpleTestCase):
         )
         self.assertTrue(form.is_valid())
 
-    def test_should_raise_validation_error_if_giving_attendance_mark_end_date_greater_than_score_submission(self):
+    def test_periode_de_note_de_presence_ne_peut_pas_se_finir_apres_periode_encodage_de_notes(self):
         form = AcademicCalendarUpdateForm(
             academic_event=self.attendance_mark_event,
             academic_event_repository=self.academic_year_repository,
@@ -87,7 +87,7 @@ class TesAcademicCalendarUpdateForm(SimpleTestCase):
         )
         self.assertFalse(form.is_valid())
 
-    def test_should_raise_validation_error_if_giving_attendance_mark_start_date_lower_than_score_submission(self):
+    def test_periode_de_note_de_presence_ne_peut_pas_commencer_avant_periode_encodage_de_notes(self):
         form = AcademicCalendarUpdateForm(
             academic_event=self.attendance_mark_event,
             academic_event_repository=self.academic_year_repository,
@@ -98,7 +98,7 @@ class TesAcademicCalendarUpdateForm(SimpleTestCase):
         )
         self.assertFalse(form.is_valid())
 
-    def test_should_be_valid_if_attendance_mark_dates_are_comprised_in_score_submission_period(self):
+    def test_should_be_valid_if_periode_de_note_de_presence_comprise_durant_periode_encodage_de_notes(self):
         form = AcademicCalendarUpdateForm(
             academic_event=self.attendance_mark_event,
             academic_event_repository=self.academic_year_repository,
