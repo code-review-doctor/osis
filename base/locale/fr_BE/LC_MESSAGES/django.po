@@ -3567,8 +3567,8 @@ msgstr "oui"
 msgid "yes,no"
 msgstr "oui,non"
 
-#~ msgid "All the scores are encoded."
-#~ msgstr "Toutes les notes ont été soumises."
+msgid "All the scores are encoded."
+msgstr "Toutes les notes ont été soumises."
 
-#~ msgid "It remains notes to encode."
-#~ msgstr "Il reste encore des notes à encoder."
+msgid "It remains notes to encode."
+msgstr "Il reste encore des notes à encoder."

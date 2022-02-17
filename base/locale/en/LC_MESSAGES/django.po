@@ -3391,3 +3391,9 @@ msgstr ""
 
 msgid "yes,no"
 msgstr ""
+
+msgid "All the scores are encoded."
+msgstr ""
+
+msgid "It remains notes to encode."
+msgstr ""
