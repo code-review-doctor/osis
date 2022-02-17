@@ -1,3 +1,4 @@
+##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -14,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -22,20 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import abc
+from typing import Union
 
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, GroupementContenantDTO
-from osis_common.ddd import interface
+from django import template
+
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import UniteEnseignementDTO, UniteEnseignementContenueDTO
+
+register = template.Library()
 
 
-class ICatalogueFormationsTranslator(interface.DomainService):
+def formater_volumes(volume_annuel_pm: int, volume_annuel_pp: int) -> str:
+    return "{}{}{}".format(
+        "{}".format("{}h".format(volume_annuel_pm) if volume_annuel_pm > 0 else ''),
+        " + " if volume_annuel_pm > 0 and volume_annuel_pp > 0 else '',
+        "{}".format(
+            "{}h".format(volume_annuel_pp) if volume_annuel_pp > 0 else ''
+        )
+    )
 
-    @classmethod
-    @abc.abstractmethod
-    def get_formation(cls, code_programme: str, annee: int) -> 'FormationDTO':
-        raise NotImplementedError()
 
-    @classmethod
-    @abc.abstractmethod
-    def get_contenu_groupement(cls, code_programme: str, code_groupement: str, annee: int) -> 'GroupementContenantDTO':
-        raise NotImplementedError()
+@register.filter
+def formater_volumes_totaux(unite_catalogue_dto: Union['UniteEnseignementDTO', 'UniteEnseignementContenueDTO']) -> str:
+    return formater_volumes(unite_catalogue_dto.volume_annuel_pm, unite_catalogue_dto.volume_annuel_pp)

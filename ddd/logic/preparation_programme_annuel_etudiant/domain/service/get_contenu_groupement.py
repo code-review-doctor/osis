@@ -37,7 +37,7 @@ from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_
     ICatalogueUnitesEnseignementTranslator
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import UniteEnseignementCatalogueDTO, \
     GroupementContenantDTO, \
-    ElementContenuDTO
+    UniteEnseignementContenueDTO
 from ddd.logic.preparation_programme_annuel_etudiant.repository.i_groupement_ajuste_inscription_cours import \
     IGroupementAjusteInscriptionCoursRepository
 from education_group.ddd.domain.group import GroupIdentity
@@ -55,15 +55,15 @@ class GetContenuGroupement(interface.DomainService):
     ) -> 'GroupementContenantDTO':
 
         contenu_groupement = catalogue_formations_translator.get_contenu_groupement(
-            code_formation=cmd.code_formation,
-            code=cmd.code,
+            code_programme=cmd.code_programme,
+            code_groupement=cmd.code_groupement,
             annee=cmd.annee
         )
 
         try:
             groupement_ajuste = repo.search(
-                programme_id=GroupIdentity(code=cmd.code_formation, year=cmd.annee),
-                groupement_id=GroupIdentity(code=cmd.code, year=cmd.annee)
+                programme_id=GroupIdentity(code=cmd.code_programme, year=cmd.annee),
+                groupement_id=GroupIdentity(code=cmd.code_groupement, year=cmd.annee)
             )[0]
             entity_id_unites_enseignement = [
                 unite_enseignement.unite_enseignement_identity
@@ -116,14 +116,14 @@ class GetContenuGroupement(interface.DomainService):
             cls,
             unite_enseignement_ajoute: 'UniteEnseignementAjoutee',
             unite_enseignement_dtos: List['UniteEnseignementCatalogueDTO']
-    ) -> 'ElementContenuDTO':
+    ) -> 'UniteEnseignementContenueDTO':
         unite_enseignement_dto_correspondant = next(
             dto for dto in unite_enseignement_dtos if dto.code == unite_enseignement_ajoute.code
         )
-        return ElementContenuDTO(
+        return UniteEnseignementContenueDTO(
             code=unite_enseignement_ajoute.code,
             obligatoire=unite_enseignement_dto_correspondant.obligatoire,
-            bloc=str(unite_enseignement_dto_correspondant.bloc),
+            bloc=unite_enseignement_dto_correspondant.bloc,
             session_derogation=unite_enseignement_dto_correspondant.session_derogation,
             intitule_complet=unite_enseignement_dto_correspondant.intitule_complet,
             quadrimestre_texte=unite_enseignement_dto_correspondant.quadrimestre_texte,
@@ -131,23 +131,23 @@ class GetContenuGroupement(interface.DomainService):
             credits_relatifs=unite_enseignement_dto_correspondant.credits_relatifs,
             volume_annuel_pm=unite_enseignement_dto_correspondant.volume_annuel_pm,
             volume_annuel_pp=unite_enseignement_dto_correspondant.volume_annuel_pp,
-            ajoute=True
+            ajoute=True,
         )
 
     @classmethod
     def __append_unite_enseignement_modifiee_to_element_contenu_dto(
             cls,
-            element_contenu_dto: ElementContenuDTO,
+            unite_enseignement_contenu_dto: 'UniteEnseignementContenueDTO',
             groupement_ajuste: 'GroupementAjusteInscriptionCours'
     ):
         unite_enseignement_modifiee = next(
-            (ue for ue in groupement_ajuste.unites_enseignement_modifiees if ue.code == element_contenu_dto.code),
-            None
+            (ue for ue in groupement_ajuste.unites_enseignement_modifiees
+             if ue.code == unite_enseignement_contenu_dto.code),None
         )
         if unite_enseignement_modifiee:
-            element_contenu_dto = attr.evolve(
-                element_contenu_dto,
+            unite_enseignement_contenu_dto = attr.evolve(
+                unite_enseignement_contenu_dto,
                 bloc=str(unite_enseignement_modifiee.bloc),
                 modifie=True
             )
-        return element_contenu_dto
+        return unite_enseignement_contenu_dto
