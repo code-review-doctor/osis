@@ -10,9 +10,9 @@ from preparation_inscription.views.consulter_contenu_groupement import Consulter
 
 
 class TypeAjustement(ChoiceEnum):
-    SUPPRESSION = _('SUPPRESSION')
-    MODIFICATION = _('MODIFICATION')
-    AJOUT = _('AJOUT')
+    SUPPRESSION = _('Suppression')
+    MODIFICATION = _('Modification')
+    AJOUT = _('Addition')
 
 
 class TreeHTMLView(LoginRequiredMixin, TemplateView):
