@@ -29,10 +29,11 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 
-from base.views.common import display_success_messages
+from base.views.common import display_success_messages, display_error_messages
 from base.views.mixins import AjaxTemplateMixin
 from ddd.logic.preparation_programme_annuel_etudiant.commands import RemettreProgrammeDansEtatInitialCommand
 from infrastructure.messages_bus import message_bus_instance
+from osis_common.ddd.interface import BusinessException
 from osis_role.contrib.views import PermissionRequiredMixin
 
 
@@ -50,14 +51,18 @@ class RemettreEtatInitialView(LoginRequiredMixin, PermissionRequiredMixin, AjaxT
     def code_programme(self):
         return self.kwargs['code_programme']
 
-    def post(self, *args, **kwargs):
-        command = RemettreProgrammeDansEtatInitialCommand(
-            code_programme=self.code_programme,
-            annee=self.annee
-        )
-        message_bus_instance.invoke(command)
-        display_success_messages(self.request, _("The program has returned to its original state."))
-        return super().post(*args, **kwargs)
+    def post(self, request, *args, **kwargs):
+        try:
+            command = RemettreProgrammeDansEtatInitialCommand(
+                code_programme=self.code_programme,
+                annee=self.annee
+            )
+            message_bus_instance.invoke(command)
+            display_success_messages(request, _("The program has returned to its original state."))
+            return super().post(*args, **kwargs)
+        except BusinessException as exception:
+            display_error_messages(request, exception.message)
+            return self.get(request, *args, **kwargs)
 
     def get_success_url(self):
         return reverse('preparation-inscription-main-view', kwargs={

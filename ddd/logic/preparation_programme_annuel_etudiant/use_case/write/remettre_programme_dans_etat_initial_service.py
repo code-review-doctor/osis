@@ -24,6 +24,8 @@
 #
 ##############################################################################
 from ddd.logic.preparation_programme_annuel_etudiant.commands import RemettreProgrammeDansEtatInitialCommand
+from ddd.logic.preparation_programme_annuel_etudiant.domain.service.can_reinitialiser_programme import \
+    CanReinitialiserProgramme
 from ddd.logic.preparation_programme_annuel_etudiant.repository.i_groupement_ajuste_inscription_cours import \
     IGroupementAjusteInscriptionCoursRepository
 from education_group.ddd.domain.group import GroupIdentity
@@ -41,4 +43,7 @@ def remettre_programme_dans_etat_initial(
     groupements_ajustes = repository.search(programme_id=groupement_racine_id)
 
     # WHEN
+    CanReinitialiserProgramme().verifier(groupements_ajustes)
+
+    # THEN
     repository.bulk_delete(groupements_ajustes)

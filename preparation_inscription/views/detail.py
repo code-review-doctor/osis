@@ -26,12 +26,14 @@
 from typing import Optional
 
 from django.http import Http404
+from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.views.generic import TemplateView
 from rules.contrib.views import PermissionRequiredMixin
 
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormationCommand
+from education_group.models.group_year import GroupYear
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from infrastructure.messages_bus import message_bus_instance
 from program_management.ddd.dtos import ProgrammeDeFormationDTO
@@ -47,21 +49,38 @@ class PreparationInscriptionMainView(PermissionRequiredMixin, TemplateView):
     # TemplateView
     template_name = "preparation_inscription/preparation_inscription.html"
 
+    @cached_property
+    def annee(self) -> int:
+        return self.kwargs['annee']
+
+    @cached_property
+    def code_programme(self) -> str:
+        return self.kwargs['code_programme']
+
+    @cached_property
+    def code_groupement(self) -> str:
+        return self.kwargs.get('code_groupement', self.kwargs['code_programme'])
+
+    @cached_property
+    def permission_object(self) -> 'GroupYear':
+        return get_object_or_404(GroupYear, academic_year__year=self.annee, partial_acronym=self.code_programme)
+
     def get_context_data(self, **kwargs):
         return {
             **super().get_context_data(**kwargs),
             'tree_view_url': self.get_tree_view_url(),
             'tree_panel_header': self.get_tree_panel_header(),
             'tree_panel_title': self.get_tree_panel_title(),
-            'annee': self.kwargs['annee'],
-            'code_programme': self.kwargs['code_programme'],
-            'code_groupement': self.kwargs['code_programme'],
+            'annee': self.annee,
+            'code_programme': self.code_programme,
+            'code_groupement':  self.code_groupement,
+            'permission_object': self.permission_object
         }
 
     def get_tree_view_url(self) -> str:
         return reverse('program-tree-view', kwargs={
-            'annee': self.kwargs['annee'],
-            'code_programme': self.kwargs['code_programme'],
+            'annee': self.annee,
+            'code_programme': self.code_programme,
         })
 
     def get_tree_panel_header(self) -> str:
@@ -81,8 +100,8 @@ class PreparationInscriptionMainView(PermissionRequiredMixin, TemplateView):
     @cached_property
     def formation(self) -> Optional['ProgrammeDeFormationDTO']:
         cmd = GetFormationCommand(
-            annee=self.kwargs['annee'],
-            code=self.kwargs['code_programme']
+            annee=self.annee,
+            code=self.code_programme
         )
         formation = message_bus_instance.invoke(cmd)
         if not formation:

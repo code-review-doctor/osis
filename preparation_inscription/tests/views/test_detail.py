@@ -30,9 +30,11 @@ from django.urls import reverse
 
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
+from education_group.tests.factories.group_year import GroupYearFactory
 from preparation_inscription.views.detail import PreparationInscriptionMainView
 from program_management.ddd.domain.program_tree_version import STANDARD
 from program_management.ddd.dtos import ProgrammeDeFormationDTO
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 
 
 class TestPreparationInscriptionMainView(TestCase):
@@ -43,6 +45,11 @@ class TestPreparationInscriptionMainView(TestCase):
             PreparationInscriptionMainView.name,
             kwargs={'annee': 2022, 'code_programme': 'LCORP201S'}
         )
+        gy = GroupYearFactory(
+            academic_year__year=2022,
+            partial_acronym="LCORP201S"
+        )
+        EducationGroupVersionFactory(root_group=gy)
 
     def setUp(self) -> None:
         pgm_manager = ProgramManagerFactory()

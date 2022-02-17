@@ -45,3 +45,9 @@ class FormationIntrouvableException(BusinessException):
     def __init__(self, code_programme: str, annee: int, **kwargs):
         message = _("Training {} - {} not found").format(code_programme, str(annee))
         super().__init__(message, **kwargs)
+
+
+class AucunContenuAReinitialiserException(BusinessException):
+    def __init__(self, **kwargs):
+        message = _("No content to reset")
+        super().__init__(message, **kwargs)
