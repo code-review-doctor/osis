@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-26 07:08+0100\n"
+"POT-Creation-Date: 2022-02-17 13:39+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,116 +17,90 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-msgid "AJOUT"
-msgstr ""
-
 msgid "Actions"
 msgstr "Actions"
 
 msgid "Add"
 msgstr "Ajouter"
 
-msgid "Ajouter des UE"
-msgstr ""
+msgid "Add LU"
+msgstr "Ajouter UE"
+
+msgid "Addition"
+msgstr "Ajout"
 
 msgid "Anac."
-msgstr ""
+msgstr "Anac."
 
-msgid "Annuler ajout"
-msgstr ""
-
-msgid "Annuler l'ajout"
-msgstr ""
-
-msgid "Annuler l'ajout?"
-msgstr ""
-
-msgid "Annuler la modification"
-msgstr ""
-
-msgid "Annuler la modification ?"
-msgstr ""
-
-msgid "Annuler la suppression"
-msgstr ""
-
-msgid "Annuler la suppression ?"
-msgstr ""
-
-msgid "Annuler suppression"
-msgstr ""
-
-msgid "Bloc"
-msgstr ""
+msgid "Block"
+msgstr "Bloc"
 
 msgid "Cancel"
-msgstr ""
+msgstr "Annuler"
 
-msgid "Cette action annulera l'ajout de l'UE X du groupement 'Y'"
-msgstr ""
+msgid "Cancel addition"
+msgstr "Annuler ajout"
 
-msgid "Cette action annulera la modification de l'UE X du groupement 'Y'"
-msgstr ""
+msgid "Cancel modification"
+msgstr "Annuler modification"
 
-msgid "Cette action annulera la suppression de l'UE X du groupement 'Y'"
-msgstr ""
+msgid "Cancel suppression"
+msgstr "Annuler suppression"
+
 
 msgid "Check All"
-msgstr ""
+msgstr "Tout cocher"
 
 msgid "Code"
-msgstr ""
+msgstr "Code"
 
-msgid "Commentaire"
-msgstr ""
+msgid "Comment"
+msgstr "Commentaire"
 
-msgid "Commentaire en anglais"
-msgstr ""
+msgid "Components (PM/PP)"
+msgstr "Composants (PM/PP)"
 
-msgid "Composants (PM/PP)"
-msgstr ""
+msgid "Course registration form PAE"
+msgstr "Formulaire d'inscriptions aux cours PAE"
 
-msgid "Crédits"
-msgstr ""
+msgid "Credits"
+msgstr "Crédits"
 
-msgid "Déplacer vers le bas"
-msgstr ""
+msgid "Do not cancel"
+msgstr "Ne pas annuler"
 
-msgid "Déplacer vers le haut"
-msgstr ""
+msgid "English comment"
+msgstr "Commentaire en anglais"
 
-msgid "ECGE1BA - 2021-2022"
-msgstr ""
+msgid "Mandatory"
+msgstr "Obligatoire"
 
-msgid "Formulaire d'inscriptions aux cours PAE"
-msgstr ""
+msgid "Modification"
+msgstr "Modification"
 
-msgid "Intitulé"
-msgstr ""
+msgid "Modify properties"
+msgstr "Modifier propriétés"
 
-msgid "MODIFICATION"
-msgstr ""
+msgid "Move down"
+msgstr "Déplacer vers le base"
 
-msgid "Modifier les propriétés"
-msgstr ""
-
-msgid "Ne pas annuler"
-msgstr ""
-
-msgid "Obligatoire"
-msgstr ""
+msgid "Move up"
+msgstr "Déplacer vers le haut"
 
 msgid "Preparation PAE"
-msgstr ""
+msgstr "Préparation PAE"
 
 msgid "Quadri."
-msgstr ""
+msgstr "Quadri."
 
-msgid "Revenir à l'état initial du programme"
-msgstr ""
+msgid "Remove LU"
+msgstr "Supprimer UE"
 
-msgid "SUPPRESSION"
-msgstr ""
+msgid "Remove learning unit"
+msgstr "Supprimer unité d'enseignement"
+
+msgid "Return program to initial state"
+msgstr "Revenir à l'état initial du programme"
 
 msgid "Search"
 msgstr "Rechercher"
@@ -134,29 +108,23 @@ msgstr "Rechercher"
 msgid "Session"
 msgstr "Session"
 
-msgid "Supprimer des UE"
-msgstr ""
+msgid "Suppression"
+msgstr "Suppression"
 
-msgid "Supprimer unite enseignement"
-msgstr ""
+msgid "That action will cancel the addition of the LU X in the group 'Y'"
+msgstr "Cette action va annuler l'ajout de l'UE x dans le group 'Y'"
+
+msgid "That action will cancel the modificatio of the LU X in the group 'Y'"
+msgstr "Cette action va annuler la modification de l'UE x dans le group 'Y'"
+
+msgid "That action will cancel the suppression of the LU X in the group 'Y'"
+msgstr "Cette action va annuler la suppression de l'UE x dans le group 'Y'"
 
 msgid "The learning units have been added"
 msgstr "Les unitées d'enseignement ont été ajoutées"
 
 msgid "Title"
 msgstr "Intitule"
-
-msgid "Form view"
-msgstr "Vue formulaire"
-
-msgid "Program"
-msgstr "Parcours étudiant"
-
-msgid "Sections and programs"
-msgstr "Sections et programmes"
-
-msgid "Training configuration"
-msgstr "Configuration de la formation"
 
 msgctxt "student_path_year"
 msgid "Year"

@@ -21,25 +21,25 @@ class ModifierProprietesContenuForm(forms.Form):
     #         attrs={'data-html': True, 'data-placeholder': _('Name')},
     #     )
     # )
-    champs1 = UpperCaseCharField(max_length=15, label=_("champs1").capitalize())
+    champs1 = UpperCaseCharField(max_length=15, label="champs1".capitalize())
     champs2 = forms.ChoiceField(
         initial=ActiveStatusEnum.ACTIVE.name,
         choices=add_blank(list(ActiveStatusEnum.choices())),
-        label=_("champs2").capitalize(),
+        label="champs2".capitalize(),
     )
     champs3 = forms.IntegerField(
-        label=_("champs3").capitalize(),
+        label="champs3".capitalize(),
         required=False,
     )
-    champs4 = forms.BooleanField(label=_('champs4').capitalize())
+    champs4 = forms.BooleanField(label='champs4'.capitalize())
     management_entity = MainEntitiesVersionChoiceField(
         queryset=None,
-        label=_('champs4').capitalize(),
+        label='champs4'.capitalize(),
     )
     champs5 = forms.DecimalField(
         max_digits=7,
         decimal_places=4,
-        label=_('champs5').capitalize(),
+        label='champs5'.capitalize(),
         validators=[MinValueValidator(1), MaxValueValidator(9999)],
     )
 
