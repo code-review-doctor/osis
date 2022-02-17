@@ -754,3 +754,8 @@ https://stackoverflow.com/questions/16897285/bootstrap-datepicker-is-displaying-
 .actions-col{
     min-width: 50px;
 }
+
+.regex-info {
+    color: rgb(255, 213, 71);
+    padding-right: 10px;
+}
