@@ -71,7 +71,7 @@ class AttendanceMarkCalendar(AcademicEventSessionCalendarHelper):
                 reference=cls.event_reference,
                 data_year=academic_year,
                 title="Demande de note de présence - Session 1",
-                start_date=datetime.date(academic_year.year, 12, 15),
+                start_date=datetime.date(academic_year.year, 12, 23),
                 end_date=datetime.date(academic_year.year + 1, 2, 28),
             )
             SessionExamCalendar.objects.create(number_session=1, academic_calendar=academic_calendar)
@@ -89,7 +89,7 @@ class AttendanceMarkCalendar(AcademicEventSessionCalendarHelper):
                 reference=cls.event_reference,
                 data_year=academic_year,
                 title="Demande de note de présence - Session 2",
-                start_date=datetime.date(academic_year.year + 1, 5, 15),
+                start_date=datetime.date(academic_year.year + 1, 6, 20),
                 end_date=datetime.date(academic_year.year + 1, 7, 10),
             )
             SessionExamCalendar.objects.create(number_session=2, academic_calendar=academic_calendar)
@@ -106,7 +106,7 @@ class AttendanceMarkCalendar(AcademicEventSessionCalendarHelper):
                 reference=cls.event_reference,
                 data_year=academic_year,
                 title="Demande de note de présence - Session 3",
-                start_date=datetime.date(academic_year.year + 1, 8, 1),
+                start_date=datetime.date(academic_year.year + 1, 8, 5),
                 end_date=datetime.date(academic_year.year + 1, 9, 15),
             )
             SessionExamCalendar.objects.create(number_session=3, academic_calendar=academic_calendar)
