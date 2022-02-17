@@ -35,8 +35,9 @@ class GetUnitesEnseignementContenuesDansPgrm(interface.DomainService):
     def build_unites_enseignement_contenues_dans_pgm(
             cls,
             liens: List['LinkWithChildBranch'],
-            contenu: List['UniteEnseignementDTO'] = []
+            contenu: List['UniteEnseignementDTO'] = None
     ) -> List['UniteEnseignementDTO']:
+        contenu = contenu or []
         for lien in liens:
             if lien.child.is_learning_unit():
                 contenu.append(
