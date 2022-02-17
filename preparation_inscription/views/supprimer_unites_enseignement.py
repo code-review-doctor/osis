@@ -39,9 +39,9 @@ class SupprimerUnitesEnseignementView(PermissionRequiredMixin, LoginRequiredMixi
     def contenu(self):
         return message_bus_instance.invoke(
             GetContenuGroupementCommand(
-                code_formation=self.code_programme,
+                code_programme=self.code_programme,
                 annee=self.annee,
-                code=self.code_groupement,
+                code_groupement=self.code_groupement,
             )
         )
 
