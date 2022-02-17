@@ -81,4 +81,4 @@ class TestModificationContenuGroupementGETView(TestCase):
 
     def test_assert_template_htmx_used(self):
         response = self.client.get(self.url, HTTP_HX_REQUEST='true')
-        self.assertTemplateUsed(response, "preparation_inscription/modification_unites_enseignement.html")
+        self.assertTemplateUsed(response, "preparation_inscription/modification_contenu_groupement.html")

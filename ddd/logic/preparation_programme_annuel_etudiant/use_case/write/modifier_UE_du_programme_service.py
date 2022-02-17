@@ -43,8 +43,8 @@ def modifier_UE_du_programme(
 ) -> 'IdentiteGroupementAjusteInscriptionCours':
     # GIVEN
     groupement_contenant = catalogue_formations_translator.get_contenu_groupement(
-        code_formation=cmd.code_programme,
-        code=cmd.ajuster_dans,
+        code_programme=cmd.code_programme,
+        code_groupement=cmd.ajuster_dans,
         annee=cmd.annee
     )
     groupement_ajuste = GroupementAjusteInscriptionCoursBuilder.build_from_modifier_command(

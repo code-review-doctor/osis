@@ -1,0 +1,70 @@
+{% load i18n bootstrap3 index type_donnee %}
+
+{% comment "License" %}
+ * OSIS stands for Open Student Information System. It's an application
+ * designed to manage the core business of higher education institutions,
+ * such as universities, faculties, institutes and professional schools.
+ * The core business involves the administration of students, teachers,
+ * courses, programs and so on.
+ *
+ * Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * A copy of this license - GNU General Public License - is available
+ * at the root of the source code of this program.  If not,
+ * see http://www.gnu.org/licenses/.
+{% endcomment %}
+<div class="panel-heading">
+    <h5>{{ intitule_groupement }} - {{ intitule_complet_groupement }}</h5>
+</div>
+<div class="panel-body">
+    <form id="modifier_proprietes_contenu_form">
+        {% csrf_token %}
+        {{ form.management_form }}
+        <div class="table-responsive">
+            <table id="table_modification_contenu" class="table table-hover">
+                <thead>
+                    <tr>
+                        <th id="icon"></th>
+                        <th id="code" class="code-col">{% trans 'Code' %}</th>
+                        <th id="intitule">{% trans 'Title' %}</th>
+                        <th id="volumes">{% trans 'Components (PM+PP)' %}</th>
+                        <th id="bloc">{% trans 'Block' %}</th>
+                        <th id="quadri">{% trans 'Quadri.' %}</th>
+                        <th id="credits">{% trans 'Credits' %}</th>
+                        <th id="session">{% trans "Derogation's session" %}</th>
+                        <th id="obligatoire">{% trans 'Mandatory' %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                     {% for element in contenu %}
+                        {% with contenu_form=form|index:forloop.counter0 %}
+                            {% if element|est_une_donnee_de_type_unite_enseignement %}
+                                {% include 'preparation_inscription/blocks/modification_contenu_ligne_unite_enseignement.html' %}
+                            {% else %}
+                                {% include 'preparation_inscription/blocks/modification_contenu_ligne_groupement.html' %}
+                            {% endif %}
+                        {% endwith %}
+                     {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </form>
+</div>
+
+<div class="panel-footer text-right">
+    <a href="" hx-get="{% url 'consulter_contenu_groupement_view' annee code_programme code_groupement %}"
+       hx-target="#content-of-main-panel" hx-trigger="click" type="button" class="btn btn-default">{% trans 'Cancel' %}</a>
+    <a href="" hx-post="{% url 'modifier_proprietes_contenu_view' annee code_programme code_groupement %}"
+       hx-include="#modifier_proprietes_contenu_form" hx-target="#content-of-main-panel"
+       hx-trigger="click" type="button" class="btn btn-primary">{% trans 'Save' %}</a>
+</div>

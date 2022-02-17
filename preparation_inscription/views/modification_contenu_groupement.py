@@ -59,11 +59,20 @@ class ModifierProprietesContenuView(PermissionRequiredMixin, HtmxMixin, FormView
     raise_exception = True
 
     # HtmxMixin
-    htmx_template_name = "preparation_inscription/modification_unites_enseignement.html"
+    htmx_template_name = "preparation_inscription/modification_contenu_groupement.html"
 
     # FormView
     template_name = "preparation_inscription/preparation_inscription.html"
     form_class = ModifierProprietesContenuForm
+
+    @cached_property
+    def groupemement_racine(self) -> GroupementContenantDTO:
+        cmd = GetContenuGroupementCommand(
+            code_programme=self.kwargs['code_programme'],
+            annee=self.kwargs['annee'],
+            code_groupement=self.kwargs['code_programme'],
+        )
+        return message_bus_instance.invoke(cmd)
 
     @cached_property
     def contenu(self) -> GroupementContenantDTO:
@@ -83,7 +92,7 @@ class ModifierProprietesContenuView(PermissionRequiredMixin, HtmxMixin, FormView
                 'code': element.code,
                 'bloc': str(getattr(element, 'bloc', ''))
             }
-            for element in self.contenu.elements_contenus
+            for element in self.contenu.elements_contenus if not getattr(element, 'supprime', False)
         ]
 
     def form_valid(self, formset):
@@ -140,7 +149,8 @@ class ModifierProprietesContenuView(PermissionRequiredMixin, HtmxMixin, FormView
             'intitule_complet_groupement': self.get_intitule_complet_groupement(),
             'annee': self.kwargs['annee'],
             'code_programme': self.kwargs['code_programme'],
-            'code_groupement': self.kwargs['code_groupement']
+            'code_groupement': self.kwargs['code_groupement'],
+            'sigle_programme': self.groupemement_racine.intitule
         }
 
     def get_intitule_groupement(self) -> str:
