@@ -41,6 +41,12 @@ class UniteEnseignementDejaSupprimeeException(BusinessException):
         super().__init__(message, **kwargs)
 
 
+class AucuneUnitesEnseignementsASupprimmerException(BusinessException):
+    def __init__(self, **kwargs):
+        message = _("No learning units to delete.")
+        super().__init__(message, **kwargs)
+
+
 class AucuneUnitesEnseignementsAAjouterException(BusinessException):
     def __init__(self, **kwargs):
         message = _("No learning units to add.")

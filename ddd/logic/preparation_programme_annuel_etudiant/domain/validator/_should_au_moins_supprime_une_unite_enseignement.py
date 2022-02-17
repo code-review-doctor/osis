@@ -23,27 +23,22 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import TYPE_CHECKING, List
 
-from ddd.logic.preparation_programme_annuel_etudiant.commands import SupprimerUEDuProgrammeCommand
-from ddd.logic.preparation_programme_annuel_etudiant.domain.builder.groupement_ajuste_inscription_cours_builder import \
-    GroupementAjusteInscriptionCoursBuilder
-from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
-    IdentiteGroupementAjusteInscriptionCours
-from ddd.logic.preparation_programme_annuel_etudiant.repository.i_groupement_ajuste_inscription_cours import \
-    IGroupementAjusteInscriptionCoursRepository
+import attr
+
+from base.ddd.utils.business_validator import BusinessValidator
+from ddd.logic.preparation_programme_annuel_etudiant.domain.validator.exceptions import \
+    AucuneUnitesEnseignementsASupprimmerException
+
+if TYPE_CHECKING:
+    from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 
 
-def supprimer_UE_du_programme(
-        cmd: 'SupprimerUEDuProgrammeCommand',
-        repository: 'IGroupementAjusteInscriptionCoursRepository',
-) -> 'IdentiteGroupementAjusteInscriptionCours':
-    # GIVEN
-    groupement_ajuste = GroupementAjusteInscriptionCoursBuilder.build_from_delete_command(cmd, repository)
+@attr.s(frozen=True, slots=True, auto_attribs=True)
+class ShouldAuMoinsSupprimerUneUniteEnseignement(BusinessValidator):
+    unites_enseignement: List['LearningUnitIdentity']
 
-    # WHEN
-    codes_unites_enseignements = [cmd_ue.code for cmd_ue in cmd.unites_enseignements]
-    groupement_ajuste.supprimer_unite_enseignement(codes_unites_enseignements=codes_unites_enseignements)
-
-    # THEN
-    repository.save(groupement_ajuste)
-    return groupement_ajuste.entity_id
+    def validate(self, *args, **kwargs):
+        if not self.unites_enseignement:
+            raise AucuneUnitesEnseignementsASupprimmerException()

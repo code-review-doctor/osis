@@ -34,6 +34,8 @@ from base.ddd.utils.business_validator import TwoStepsMultipleBusinessExceptionL
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 from ddd.logic.preparation_programme_annuel_etudiant.domain.validator._should_au_moins_ajoute_une_unite_enseignement import \
     ShouldAuMoinsAjouterUneUniteEnseignement
+from ddd.logic.preparation_programme_annuel_etudiant.domain.validator._should_au_moins_supprime_une_unite_enseignement import \
+    ShouldAuMoinsSupprimerUneUniteEnseignement
 from ddd.logic.preparation_programme_annuel_etudiant.domain.validator._should_unite_enseignement_pas_deja_supprimee import \
     ShouldUniteEnseignementPasDejaSupprimee
 
@@ -66,12 +68,15 @@ class AjouterUniteEnseignementValidatorList(TwoStepsMultipleBusinessExceptionLis
 class SupprimerUniteEnseignementValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
 
     groupement_ajuste: GroupementAjusteInscriptionCours
-    unite_enseignement: LearningUnitIdentity
+    unites_enseignement: List[LearningUnitIdentity]
 
     def get_data_contract_validators(self) -> List[BusinessValidator]:
-        return []
+        return [
+            ShouldAuMoinsSupprimerUneUniteEnseignement(self.unites_enseignement)
+        ]
 
     def get_invariants_validators(self) -> List[BusinessValidator]:
         return [
-            ShouldUniteEnseignementPasDejaSupprimee(self.groupement_ajuste, self.unite_enseignement)
+            ShouldUniteEnseignementPasDejaSupprimee(self.groupement_ajuste, ue)
+            for ue in self.unites_enseignement
         ]

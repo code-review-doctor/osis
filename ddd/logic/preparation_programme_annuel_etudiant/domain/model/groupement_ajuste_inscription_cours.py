@@ -94,25 +94,26 @@ class GroupementAjusteInscriptionCours(interface.RootEntity):
                 )
             )
 
-    def supprimer_unite_enseignement(self, code_unite_enseignement: 'CodeUniteEnseignement'):
-        unite_enseignement = LearningUnitIdentityBuilder.build_from_code_and_year(
-            code=code_unite_enseignement,
-            year=self.annee
-        )
+    def supprimer_unite_enseignement(self, codes_unites_enseignements: List['CodeUniteEnseignement']):
+        unites_enseignement = [
+            LearningUnitIdentityBuilder.build_from_code_and_year(code=code, year=self.annee)
+            for code in codes_unites_enseignements
+        ]
         SupprimerUniteEnseignementValidatorList(
             groupement_ajuste=self,
-            unite_enseignement=unite_enseignement
+            unites_enseignement=unites_enseignement
         ).validate()
 
-        # retirer des ue ajoutees si déjà ajoutée
-        ue_ajoutee = next((ue for ue in self.unites_enseignement_ajoutees if ue.code == code_unite_enseignement), None)
-        if ue_ajoutee:
-            self.unites_enseignement_ajoutees.remove(ue_ajoutee)
-        else:
-            self.unites_enseignement_supprimees.append(UniteEnseignementSupprimee(
-                entity_id=UniteEnseignementSupprimeeIdentity(uuid.uuid4()),
-                unite_enseignement_identity=unite_enseignement
-            ))
+        for unite_enseignement in unites_enseignement:
+            # retirer des ue ajoutees si déjà ajoutée
+            ue_ajoutee = next((ue for ue in self.unites_enseignement_ajoutees if ue.code == unite_enseignement.code), None)
+            if ue_ajoutee:
+                self.unites_enseignement_ajoutees.remove(ue_ajoutee)
+            else:
+                self.unites_enseignement_supprimees.append(UniteEnseignementSupprimee(
+                    entity_id=UniteEnseignementSupprimeeIdentity(uuid.uuid4()),
+                    unite_enseignement_identity=unite_enseignement
+                ))
 
     def ajuster_unite_enseignement(
             self,
