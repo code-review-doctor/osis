@@ -127,12 +127,20 @@ table.volumes thead {
     background-color: #5cb85c;
 }
 
+.badge.primary-color {
+    background-color:#337ab7
+}
+
 .badge.warning-color {
     background-color: #f0ad4e;
 }
 
 .badge.danger-color {
     background-color: #d9534f;
+}
+
+.badge.info-color {
+    background-color:#269abc;
 }
 
 .no_label {
@@ -298,4 +306,19 @@ table.dataTable thead .sorting_desc_disabled:after {
 table.dataTable thead th.sorting:after {
     color: #337ab7 !important;
     opacity: 1 !important;
+}
+
+.strikethrough .jstree-anchor{
+    text-decoration: line-through !important;
+}
+
+.emphasized-code{
+    font-weight: bolder;
+    margin-left: 10px;
+}
+.code-col{
+    min-width: 120px;
+}
+.actions-col{
+    min-width: 50px;
 }

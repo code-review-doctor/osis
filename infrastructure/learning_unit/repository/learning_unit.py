@@ -69,14 +69,24 @@ class LearningUnitRepository(ILearningUnitRepository):
         ).exists()
 
     @classmethod
-    def search_learning_units_dto(cls, code_annee_values: Set[Tuple[str, int]] = None) -> List['LearningUnitSearchDTO']:
+    def search_learning_units_dto(
+            cls,
+            code_annee_values: Set[Tuple[str, int]] = None,
+            code: str = None,
+            annee_academique: int = None,
+            intitule: str = None
+    ) -> List['LearningUnitSearchDTO']:
         qs = _get_common_queryset()
         # FIXME :: reuse Django filter
-        if code_annee_values is not None:
+        if code_annee_values:
             qs = qs.filter(
                 academic_year__year__in={annee for _, annee in code_annee_values},
                 acronym__in={code for code, _ in code_annee_values}
             )
+        if code:
+            qs = qs.filter(acronym__icontains=code)
+        if annee_academique:
+            qs = qs.filter(academic_year__year=annee_academique)
 
         partims_prefetch = LearningUnitYearDatabase.objects.filter(
             subtype=learning_unit_year_subtypes.PARTIM,
@@ -95,6 +105,12 @@ class LearningUnitRepository(ILearningUnitRepository):
                 output_field=CharField(),
             ),
         )
+
+        components = LearningComponentYearDatabase.objects.filter(
+            learning_unit_year_id=OuterRef('pk'),
+            hourly_volume_total_annual__gt=0.0,
+        )
+        non_practical_component_filter = (Q(type=LECTURING) | Q(type__isnull=True, acronym=UNTYPED_COMPONENT_ACRONYM))
 
         qs = qs.annotate(
             code=F('acronym'),
@@ -123,6 +139,14 @@ class LearningUnitRepository(ILearningUnitRepository):
                     entity__id=OuterRef('learning_container_year__requirement_entity_id')
                 ).order_by('-start_date').values('title')[:1]
             ),
+            lecturing_volume_annual=Subquery(
+                components.filter(
+                    non_practical_component_filter
+                ).values('hourly_volume_total_annual')
+            ),
+            practical_volume_annual=Subquery(
+                components.filter(type=PRACTICAL_EXERCISES).values('hourly_volume_total_annual')
+            ),
         ).select_related(
             "learning_container_year"
         ).prefetch_related(
@@ -132,6 +156,10 @@ class LearningUnitRepository(ILearningUnitRepository):
             "language",
             "academic_year"
         )
+
+        if intitule:
+            qs = qs.filter(full_title__contains=intitule)
+
         result = []
         for learning_unit_year_db_obj in qs:
             if code_annee_values is None or (
@@ -152,7 +180,12 @@ class LearningUnitRepository(ILearningUnitRepository):
                             )
                             for partim
                             in learning_unit_year_db_obj.learning_container_year.partims
-                        ]
+                        ],
+                        quadrimester=learning_unit_year_db_obj.quadrimester,
+                        credits=learning_unit_year_db_obj.credits,
+                        session_derogation=learning_unit_year_db_obj.session,
+                        lecturing_volume_annual=learning_unit_year_db_obj.lecturing_volume_annual,
+                        practical_volume_annual=learning_unit_year_db_obj.practical_volume_annual
                     )
                 )
         return result

@@ -25,6 +25,8 @@
 ##############################################################################
 from typing import Optional, List, Any
 
+from django.conf import settings
+
 from base.ddd.utils.singleton import SingletonMeta
 from osis_common.ddd import interface
 from osis_common.ddd.interface import ApplicationService, RootEntity, EntityIdentity
@@ -34,7 +36,8 @@ class InMemoryGenericRepository(interface.AbstractRepository, metaclass=Singleto
     entities = list()  # type: List[RootEntity]
 
     def __new__(cls) -> Any:
-        cls.reset()
+        if settings.TESTING:
+            cls.reset()
         return super().__new__(cls)
 
     @classmethod

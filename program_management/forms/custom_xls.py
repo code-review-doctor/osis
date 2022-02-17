@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ class CustomXlsForm(forms.Form):
     teacher_list = forms.BooleanField(required=False, label=_('Tutors (scores responsibles included)'))
     proposition = forms.BooleanField(required=False, label=_('Proposals'))
     english_title = forms.BooleanField(required=False, label=_('Title in English'))
-    language = forms.BooleanField(required=False, label=_('Language'))
+    language_and_exchange = forms.BooleanField(required=False, label=_('Language and exchange'))
     specifications = forms.BooleanField(required=False, label=_('Specifications'))
     description_fiche = forms.BooleanField(required=False, label=_('Description fiche'))
     force_majeure = forms.BooleanField(required=False, label=_('Description fiche (including force majeure)'))

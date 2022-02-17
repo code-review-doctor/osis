@@ -660,6 +660,9 @@ msgstr ""
 msgid "Credits"
 msgstr ""
 
+msgid "Curriculum"
+msgstr ""
+
 msgid "DDI"
 msgstr ""
 

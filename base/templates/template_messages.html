@@ -29,6 +29,8 @@
     <div id="message_info_container" class="alert alert-info" role="alert" style="visibility: hidden; display: none;"></div>
     <div id="message_success_container" class="alert alert-success" role="alert" style="visibility: hidden; display: none;"></div>
 
+    <div hx-get="{% url 'get_messages' %}" hx-trigger="htmx:afterOnLoad throttle:1s from:window"></div>
+
     {% as_messages_success as messages_success %}
     {% if messages_success %}
         <div id="pnl_succes_messages" class="alert alert-success" role="alert">
