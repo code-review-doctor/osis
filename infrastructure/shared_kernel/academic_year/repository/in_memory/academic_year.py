@@ -23,16 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List, Optional
+from typing import List
 
 from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
-from base.models.academic_year import AcademicYear as AcademicYearDatabase
-from ddd.logic.shared_kernel.academic_year.builder.academic_year_builder import AcademicYearBuilder
-from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYear, AcademicYearIdentity
-from ddd.logic.shared_kernel.academic_year.dtos import AcademicYearDataDTO
+from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYear
 from ddd.logic.shared_kernel.academic_year.repository.i_academic_year import IAcademicYearRepository
-from osis_common.ddd.interface import ApplicationService
 
 
 class AcademicYearInMemoryRepository(InMemoryGenericRepository, IAcademicYearRepository):
     entities = list()  # type: List[AcademicYear]
+
+    @classmethod
+    def search(cls, year: int = None, **kwargs) -> List['AcademicYear']:
+        if year is not None:
+            return [academic_year for academic_year in cls.entities if academic_year.year >= year]
+        return cls.entities
