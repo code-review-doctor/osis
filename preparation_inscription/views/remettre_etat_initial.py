@@ -59,7 +59,7 @@ class RemettreEtatInitialView(LoginRequiredMixin, PermissionRequiredMixin, AjaxT
             )
             message_bus_instance.invoke(command)
             display_success_messages(request, _("The program has returned to its original state."))
-            return super().post(*args, **kwargs)
+            return super().post(request, *args, **kwargs)
         except BusinessException as exception:
             display_error_messages(request, exception.message)
             return self.get(request, *args, **kwargs)
