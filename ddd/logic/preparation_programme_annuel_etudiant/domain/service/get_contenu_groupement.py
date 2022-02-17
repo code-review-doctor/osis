@@ -54,7 +54,11 @@ class GetContenuGroupement(interface.DomainService):
             catalogue_unites_enseignement_translator: 'ICatalogueUnitesEnseignementTranslator'
     ) -> 'GroupementContenantDTO':
 
-        contenu_groupement = catalogue_formations_translator.get_contenu_groupement(cmd=cmd)
+        contenu_groupement = catalogue_formations_translator.get_contenu_groupement(
+            code_formation=cmd.code_formation,
+            code=cmd.code,
+            annee=cmd.annee
+        )
 
         try:
             groupement_ajuste = repo.search(

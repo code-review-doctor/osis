@@ -27,6 +27,7 @@ from ddd.logic.learning_unit.builder.learning_unit_identity_builder import Learn
 from ddd.logic.preparation_programme_annuel_etudiant.commands import ModifierUEDuGroupementCommand
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
     GroupementAjusteInscriptionCours
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import GroupementContenantDTO
 
 
 class ModifierUnitesEnseignement:
@@ -34,6 +35,7 @@ class ModifierUnitesEnseignement:
     def modifier_unites_enseignement(
             cls,
             cmd: 'ModifierUEDuGroupementCommand',
+            groupement_contenant: 'GroupementContenantDTO',
             groupement_ajuste: 'GroupementAjusteInscriptionCours'
     ) -> None:
         for cmd_ue in cmd.unites_enseignements:
