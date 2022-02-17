@@ -108,3 +108,25 @@ class TesAcademicCalendarUpdateForm(SimpleTestCase):
             }
         )
         self.assertTrue(form.is_valid())
+
+    def test_periode_encodage_de_notes_ne_peut_pas_commencer_apres_periode_de_note_de_presence(self):
+        form = AcademicCalendarUpdateForm(
+            academic_event=self.score_encoding_event,
+            academic_event_repository=self.academic_year_repository,
+            data={
+                'start_date': self.attendance_mark_event.start_date + datetime.timedelta(days=1),
+                'end_date': self.score_encoding_event.end_date
+            }
+        )
+        self.assertFalse(form.is_valid())
+
+    def test_periode_encodage_de_notes_ne_peut_pas_se_finir_avant_periode_de_note_de_presence(self):
+        form = AcademicCalendarUpdateForm(
+            academic_event=self.score_encoding_event,
+            academic_event_repository=self.academic_year_repository,
+            data={
+                'start_date': self.score_encoding_event.start_date,
+                'end_date': self.attendance_mark_event.end_date - datetime.timedelta(days=1)
+            }
+        )
+        self.assertFalse(form.is_valid())
