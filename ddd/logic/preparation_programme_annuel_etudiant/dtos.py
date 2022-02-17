@@ -226,7 +226,7 @@ class UniteEnseignementContenueDTO(DTO):
 
     volume_annuel_pm: int
     volume_annuel_pp: int
-    bloc: str
+    bloc: Optional[int]
     quadrimestre_texte: str
     credits_absolus: Decimal
     credits_relatifs: int

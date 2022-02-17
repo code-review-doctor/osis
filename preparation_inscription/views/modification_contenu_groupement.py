@@ -48,7 +48,7 @@ from preparation_inscription.views.consulter_contenu_groupement import RAFRAICHI
 
 class ModifierProprietesContenuForm(forms.Form):
     code = forms.CharField(widget=forms.HiddenInput)
-    bloc = forms.CharField(required=False)
+    bloc = forms.IntegerField(required=False, widget=forms.TextInput())
 
 
 class ModifierProprietesContenuView(PermissionRequiredMixin, HtmxMixin, FormView):
@@ -90,7 +90,7 @@ class ModifierProprietesContenuView(PermissionRequiredMixin, HtmxMixin, FormView
         return [
             {
                 'code': element.code,
-                'bloc': str(getattr(element, 'bloc', ''))
+                'bloc': getattr(element, 'bloc', '')
             }
             for element in self.contenu.elements_contenus if not getattr(element, 'supprime', False)
         ]

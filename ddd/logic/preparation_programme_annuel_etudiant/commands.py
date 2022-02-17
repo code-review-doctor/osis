@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+from typing import List, Optional
 
 import attr
 
@@ -78,7 +78,7 @@ class GetContenuGroupementCommand(interface.CommandRequest):
 class ModifierUniteEnseignementCommand(interface.CommandRequest):
     code: str
     annee: int
-    bloc: int
+    bloc: Optional[int]
     # credits_relatifs: int
     # session_derogation: str
     # obligatoire: bool
