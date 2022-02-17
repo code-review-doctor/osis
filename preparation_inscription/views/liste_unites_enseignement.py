@@ -34,27 +34,27 @@ from base.utils.htmx import HtmxMixin
 
 
 class TypeAjustement(ChoiceEnum):
-    SUPPRESSION = _('SUPPRESSION')
-    MODIFICATION = _('MODIFICATION')
-    AJOUT = _('AJOUT')
+    SUPPRESSION = _('Suppression')
+    MODIFICATION = _('Modification')
+    AJOUT = _('Addition')
 
 
 class PreferenceTri(ChoiceEnum):
-    TRI_ORDRE_PROGRAMME = _("Tri par ordre du programme")
-    TRI_PAR_CODE = _("Tri par code")
-    TRI_PAR_BLOC = _("Tri par bloc")
-    TRI_PAR_QUADRIMESTRE = _("Tri par quadrimestre")
+    TRI_ORDRE_PROGRAMME = _("Order by order of program")
+    TRI_PAR_CODE = _("Order by code")
+    TRI_PAR_BLOC = _("Order by block")
+    TRI_PAR_QUADRIMESTRE = _("Order by quadrimester")
 
 
 class PreferenceTriForm(forms.Form):
     tri_principal = forms.ChoiceField(
         initial=PreferenceTri.TRI_ORDRE_PROGRAMME.name,
         choices=list(PreferenceTri.choices()),
-        label=_("Tri principal").capitalize(),
+        label=_("Principal order").capitalize(),
     )
     tri_secondaire = forms.ChoiceField(
         choices=add_blank(list(PreferenceTri.choices())),
-        label=_("Tri secondaire").capitalize(),
+        label=_("Secondary order").capitalize(),
         required=False
     )
 

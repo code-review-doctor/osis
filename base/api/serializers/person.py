@@ -25,17 +25,19 @@
 ##############################################################################
 from datetime import datetime
 
-from django.db.models import Q
+from django.db.models import Q, F, Case, When, Value, CharField
+from django.db.models.functions import Replace
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from base.models import education_group_year
+from base.auth.roles.program_manager import ProgramManager
 from base.models.entity_version import EntityVersion
 from base.models.enums.entity_type import FACULTY
 from base.models.person import Person
 from education_group.auth.roles.central_manager import CentralManager
 from education_group.auth.roles.faculty_manager import FacultyManager
 from education_group.auth.scope import Scope
+from education_group.models.enums.cohort_name import CohortName
 from osis_role.contrib.helper import EntityRoleHelper
 
 
@@ -96,6 +98,15 @@ class PersonRolesSerializer(serializers.ModelSerializer):
     @staticmethod
     def roles_for_program_managers(obj):
         return [
-            {'acronym': educ_group_year.acronym, 'year': educ_group_year.academic_year.year}
-            for educ_group_year in education_group_year.find_by_user(obj.user).select_related('academic_year')
+            {'acronym': program_manager.acronym}
+            for program_manager in ProgramManager.objects.filter(person=obj).annotate(
+                acronym=Case(
+                    When(
+                        Q(cohort=CohortName.FIRST_YEAR.name),
+                        then=Replace('education_group__educationgroupyear__acronym', Value('1'), Value('11'))
+                    ),
+                    default=F('education_group__educationgroupyear__acronym'),
+                    output_field=CharField()
+                ),
+            )
         ]

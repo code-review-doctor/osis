@@ -27,7 +27,7 @@ import logging
 from typing import Optional
 
 from django.conf import settings
-from django.db.models import Case, When, Q, F, Value, CharField, Max
+from django.db.models import Case, When, Q, F, Value, CharField, Subquery
 from django.db.models.functions import Replace, Concat, Lower, Substr
 from django.http import Http404
 from django.utils.functional import cached_property
@@ -103,10 +103,12 @@ class OfferEnrollmentsListView(LanguageContextSerializerMixin, generics.ListAPIV
         """
         qs = qs.filter(
             enrollment_state__in=list(offer_enrollment_state.VALID_ENROLLMENT_STATES)
-        ).annotate(
-            max_year=Max('education_group_year__academic_year__year')
         ).filter(
-            education_group_year__academic_year__year=F('max_year')
+            education_group_year__academic_year__year=Subquery(
+                qs.order_by(
+                    '-education_group_year__academic_year__year'
+                ).values('education_group_year__academic_year__year')[:1]
+            )
         )
         nomas = qs.values('student__registration_id').distinct()
         if len(nomas) > 1:

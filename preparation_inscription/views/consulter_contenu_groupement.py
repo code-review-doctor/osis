@@ -40,9 +40,9 @@ from preparation_inscription.perms import AJOUTER_UNITE_ENSEIGNEMENT_PERMISSION
 
 
 class TypeAjustement(ChoiceEnum):
-    SUPPRESSION = _('SUPPRESSION')
-    MODIFICATION = _('MODIFICATION')
-    AJOUT = _('AJOUT')
+    SUPPRESSION = _('Deletion')
+    MODIFICATION = _('Modification')
+    AJOUT = _('Addition')
 
 
 RAFRAICHIR_GROUPEMENT_CONTENANT = 'rafraichir_groupement_contenant'
