@@ -76,3 +76,39 @@ class TestModifierUEDuProgramme(SimpleTestCase):
             groupement_ajuste.unites_enseignement_modifiees[0].unite_enseignement_identity.year
         )
         self.assertEqual(2, groupement_ajuste.unites_enseignement_modifiees[0].bloc)
+
+    def test_should_modifier_bloc_UE_deja_modifie(self):
+        groupement_ajuste_id = self.message_bus.invoke(
+            ModifierUEDuGroupementCommand(
+                annee=self.annee,
+                code_programme=self.code_programme,
+                ajuster_dans='LECGE100R',
+                unites_enseignements=[
+                    ModifierUniteEnseignementCommand(
+                        code='LESPO1113',
+                        annee=self.annee,
+                        bloc=3
+                    )
+                ],
+            )
+        )
+        groupement_ajuste = self.repository.get(groupement_ajuste_id)
+        self.assertEqual(3, groupement_ajuste.unites_enseignement_modifiees[0].bloc)
+
+        groupement_ajuste_id = self.message_bus.invoke(
+            ModifierUEDuGroupementCommand(
+                annee=self.annee,
+                code_programme=self.code_programme,
+                ajuster_dans='LECGE100R',
+                unites_enseignements=[
+                    ModifierUniteEnseignementCommand(
+                        code='LESPO1113',
+                        annee=self.annee,
+                        bloc=2
+                    )
+                ],
+            )
+        )
+        groupement_ajuste = self.repository.get(groupement_ajuste_id)
+        self.assertEqual(len(groupement_ajuste.unites_enseignement_modifiees), 1)
+        self.assertEqual(2, groupement_ajuste.unites_enseignement_modifiees[0].bloc)

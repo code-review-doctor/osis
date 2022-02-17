@@ -96,13 +96,23 @@ class GroupementAjusteInscriptionCours(interface.RootEntity):
             unite_enseignement: 'LearningUnitIdentity',
             bloc: int = None
     ):
-        self.unites_enseignement_modifiees.append(
-            UniteEnseignementModifiee(
-                entity_id=UniteEnseignementModifieeIdentity(uuid.uuid4()),
-                unite_enseignement_identity=unite_enseignement,
+        try:
+            idx_unite_enseignementexistante = next(
+                idx for idx, ue_modifiee in enumerate(self.unites_enseignement_modifiees)
+                if ue_modifiee.unite_enseignement_identity == unite_enseignement
+            )
+            self.unites_enseignement_modifiees[idx_unite_enseignementexistante] = attr.evolve(
+                self.unites_enseignement_modifiees[idx_unite_enseignementexistante],
                 bloc=bloc
             )
-        )
+        except StopIteration:
+            self.unites_enseignement_modifiees.append(
+                UniteEnseignementModifiee(
+                    entity_id=UniteEnseignementModifieeIdentity(uuid.uuid4()),
+                    unite_enseignement_identity=unite_enseignement,
+                    bloc=bloc
+                )
+            )
 
     def annuler_action_sur_unite_enseignement(
             self,
