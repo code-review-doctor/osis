@@ -115,7 +115,7 @@ class GetContenuGroupement(interface.DomainService):
         return UniteEnseignementContenueDTO(
             code=unite_enseignement_ajoute.code,
             obligatoire=unite_enseignement_dto_correspondant.obligatoire,
-            bloc=str(unite_enseignement_dto_correspondant.bloc),
+            bloc=unite_enseignement_dto_correspondant.bloc,
             session_derogation=unite_enseignement_dto_correspondant.session_derogation,
             intitule_complet=unite_enseignement_dto_correspondant.intitule_complet,
             quadrimestre_texte=unite_enseignement_dto_correspondant.quadrimestre_texte,

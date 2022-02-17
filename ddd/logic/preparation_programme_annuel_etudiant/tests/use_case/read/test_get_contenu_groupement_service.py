@@ -99,7 +99,7 @@ class GetContenuGroupementServiceTest(SimpleTestCase):
             intitule_complet="Formation pluridisciplinaire en sciences humaines",
             elements_contenus=[
                 UniteEnseignementContenueDTO(
-                    bloc="3",
+                    bloc=3,
                     code='LESPO1321',
                     intitule_complet='Economic, Political and Social Ethics',
                     quadrimestre_texte='Q2',
@@ -108,12 +108,12 @@ class GetContenuGroupementServiceTest(SimpleTestCase):
                     volume_annuel_pm=30,
                     volume_annuel_pp=0,
                     obligatoire=True,
-                    session_derogation=''
+                    session_derogation='',
                 )
             ]
         )
 
-        self.assertEqual(result, expected_result)
+        self._assert_equals_groupement_contenant_DTO(expected_result, result)
 
     def test_should_retourner_contenu_du_groupement_ajuste_si_groupement_a_une_ue_ajoutee(self):
         self.repo.entities.append(
@@ -133,7 +133,7 @@ class GetContenuGroupementServiceTest(SimpleTestCase):
             intitule_complet="Formation pluridisciplinaire en sciences humaines",
             elements_contenus=[
                 UniteEnseignementContenueDTO(
-                    bloc="3",
+                    bloc=3,
                     code='LESPO1321',
                     intitule_complet='Economic, Political and Social Ethics',
                     quadrimestre_texte='Q2',
@@ -145,7 +145,7 @@ class GetContenuGroupementServiceTest(SimpleTestCase):
                     session_derogation='',
                 ),
                 UniteEnseignementContenueDTO(
-                    bloc="1",
+                    bloc=1,
                     code='LSINF1311',
                     intitule_complet='Human-computer interaction',
                     quadrimestre_texte='Q1',
@@ -160,4 +160,20 @@ class GetContenuGroupementServiceTest(SimpleTestCase):
             ]
         )
 
-        self.assertEqual(result, expected_result)
+        self._assert_equals_groupement_contenant_DTO(expected_result, result)
+
+    def _assert_equals_groupement_contenant_DTO(self, expected_result, result):
+        self.assertEqual(result.intitule, expected_result.intitule)
+        self.assertEqual(result.intitule_complet, expected_result.intitule_complet)
+        for cpt, ue_resultat in enumerate(result.elements_contenus):
+            ue_expected = expected_result.elements_contenus[cpt]
+            self.assertEqual(ue_resultat.bloc, ue_expected.bloc)
+            self.assertEqual(ue_resultat.code, ue_expected.code)
+            self.assertEqual(ue_resultat.intitule_complet, ue_expected.intitule_complet)
+            self.assertEqual(ue_resultat.quadrimestre_texte, ue_expected.quadrimestre_texte)
+            self.assertEqual(ue_resultat.credits_absolus, ue_expected.credits_absolus)
+            self.assertEqual(ue_resultat.credits_relatifs, ue_expected.credits_relatifs)
+            self.assertEqual(ue_resultat.volume_annuel_pm, ue_expected.volume_annuel_pm)
+            self.assertEqual(ue_resultat.volume_annuel_pp, ue_expected.volume_annuel_pp)
+            self.assertEqual(ue_resultat.obligatoire, ue_expected.obligatoire)
+            self.assertEqual(ue_resultat.session_derogation, ue_expected.session_derogation)
