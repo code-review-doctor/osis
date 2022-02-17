@@ -68,9 +68,9 @@ class ModifierProprietesContenuView(PermissionRequiredMixin, HtmxMixin, FormView
     @cached_property
     def contenu(self) -> GroupementContenantDTO:
         cmd = GetContenuGroupementCommand(
-            code_formation=self.kwargs['code_programme'],
+            code_programme=self.kwargs['code_programme'],
             annee=self.kwargs['annee'],
-            code=self.kwargs.get('code_groupement', self.kwargs['code_programme']),
+            code_groupement=self.kwargs.get('code_groupement', self.kwargs['code_programme']),
         )
         return message_bus_instance.invoke(cmd)
 
@@ -81,7 +81,7 @@ class ModifierProprietesContenuView(PermissionRequiredMixin, HtmxMixin, FormView
         return [
             {
                 'code': element.code,
-                'bloc': str(element.bloc) if element.bloc else '',
+                'bloc': str(getattr(element, 'bloc', ''))
             }
             for element in self.contenu.elements_contenus
         ]

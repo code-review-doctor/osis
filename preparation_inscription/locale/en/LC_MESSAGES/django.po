@@ -117,6 +117,9 @@ msgstr ""
 msgid "Formulaire d'inscriptions aux cours PAE"
 msgstr ""
 
+msgid "Hourly volumes"
+msgstr ""
+
 msgid "Intitulé"
 msgstr ""
 
@@ -145,6 +148,9 @@ msgid "Obligatoire"
 msgstr ""
 
 msgid "Preparation PAE"
+msgstr ""
+
+msgid "Program credits"
 msgstr ""
 
 msgid "Quadri."
