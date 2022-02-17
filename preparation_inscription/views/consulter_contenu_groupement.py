@@ -155,6 +155,6 @@ from base.models.utils.utils import ChoiceEnum
 
 
 class TypeAjustement(ChoiceEnum):
-    SUPPRESSION = _('Suppression')
+    SUPPRESSION = _('Deletion')
     MODIFICATION = _('Modification')
     AJOUT = _('Addition')

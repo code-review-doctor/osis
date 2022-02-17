@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-17 13:39+0100\n"
+"POT-Creation-Date: 2022-02-17 14:12+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -42,13 +42,10 @@ msgstr ""
 msgid "Cancel addition"
 msgstr ""
 
+msgid "Cancel deletion"
+msgstr ""
+
 msgid "Cancel modification"
-msgstr ""
-
-msgid "Cancel suppression"
-msgstr ""
-
-msgid "Cancer addition"
 msgstr ""
 
 msgid "Check All"
@@ -67,6 +64,9 @@ msgid "Course registration form PAE"
 msgstr ""
 
 msgid "Credits"
+msgstr ""
+
+msgid "Deletion"
 msgstr ""
 
 msgid "Do not cancel"
@@ -111,16 +111,13 @@ msgstr ""
 msgid "Session"
 msgstr ""
 
-msgid "Suppression"
-msgstr ""
-
 msgid "That action will cancel the addition of the LU X in the group 'Y'"
 msgstr ""
 
-msgid "That action will cancel the modificatio of the LU X in the group 'Y'"
+msgid "That action will cancel the deletion of the LU X in the group 'Y'"
 msgstr ""
 
-msgid "That action will cancel the suppression of the LU X in the group 'Y'"
+msgid "That action will cancel the modificatio of the LU X in the group 'Y'"
 msgstr ""
 
 msgid "The learning units have been added"
