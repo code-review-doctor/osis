@@ -294,7 +294,7 @@ class VolumeEditionFormsetContainer:
         return errors
 
 
-class SimplifiedVolumeForm(forms.ModelForm, PermissionFieldMixin):
+class SimplifiedVolumeForm(PermissionFieldMixin, forms.ModelForm):
     _learning_unit_year = None
 
     add_field = EmptyField(label="+")

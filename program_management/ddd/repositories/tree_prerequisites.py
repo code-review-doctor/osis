@@ -62,7 +62,8 @@ class TreePrerequisitesRepository(interface.AbstractRepository):
             cls,
             entity_ids: Optional[List['EntityIdentity']] = None,
             learning_unit_nodes: List['NodeLearningUnitYear'] = None,
-            tree_root_ids: List['TreeRootId'] = None
+            tree_root_ids: List['TreeRootId'] = None,
+            academic_year: int = None,
     ) -> List['Prerequisites']:
         qs = PrerequisiteItemModel.objects
         if entity_ids:
@@ -72,6 +73,10 @@ class TreePrerequisitesRepository(interface.AbstractRepository):
             qs = qs.filter(
                 Q(prerequisite__learning_unit_year_id__element__pk__in=node_pks)
                 | Q(learning_unit__learningunityear__element__pk__in=node_pks)
+            )
+        if academic_year:
+            qs = qs.filter(
+                prerequisite__learning_unit_year__academic_year__year=academic_year
             )
         if tree_root_ids:
             qs = qs.filter(prerequisite__education_group_version__root_group__element__id__in=tree_root_ids)

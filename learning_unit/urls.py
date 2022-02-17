@@ -25,6 +25,7 @@
 ##############################################################################
 from django.urls import include, path
 
+from learning_unit.views.autocomplete import LearningUnitTypeAutoComplete
 from learning_unit.views.learning_unit_class.create import CreateClassView as CreateClass
 from learning_unit.views.learning_unit_class.delete import DeleteClassView as DeleteClass
 from learning_unit.views.learning_unit_class.identification_read import ClassIdentificationView
@@ -52,5 +53,12 @@ urlpatterns = [
                  TutorRepartitionEditView.as_view(), name='edit_class_attribution'),
             path('delete', DeleteClass.as_view(), name='class_delete'),
         ]))
+    ])),
+    path('autocomplete/', include([
+        path(
+            'learning-unit-types/',
+            LearningUnitTypeAutoComplete.as_view(),
+            name='learning_unit_type_autocomplete'
+        ),
     ]))
 ]
