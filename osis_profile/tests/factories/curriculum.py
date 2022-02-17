@@ -1,3 +1,4 @@
+# ##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -14,28 +15,31 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
 #    at the root of the source code of this program.  If not,
 #    see http://www.gnu.org/licenses/.
 #
-##############################################################################
-import abc
+# ##############################################################################
+import factory
 
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, GroupementContenantDTO
-from osis_common.ddd import interface
+from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.person import PersonFactory
+from osis_profile.models import CurriculumYear, Experience
 
 
-class ICatalogueFormationsTranslator(interface.DomainService):
+class CurriculumYearFactory(factory.DjangoModelFactory):
+    academic_year = factory.SubFactory(AcademicYearFactory)
+    person = factory.SubFactory(PersonFactory)
 
-    @classmethod
-    @abc.abstractmethod
-    def get_formation(cls, code_programme: str, annee: int) -> 'FormationDTO':
-        raise NotImplementedError()
+    class Meta:
+        model = CurriculumYear
 
-    @classmethod
-    @abc.abstractmethod
-    def get_contenu_groupement(cls, code_programme: str, code_groupement: str, annee: int) -> 'GroupementContenantDTO':
-        raise NotImplementedError()
+
+class ExperienceFactory(factory.DjangoModelFactory):
+    curriculum_year = factory.SubFactory(CurriculumYearFactory)
+
+    class Meta:
+        model = Experience

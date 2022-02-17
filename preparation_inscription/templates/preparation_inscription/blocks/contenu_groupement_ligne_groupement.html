@@ -1,4 +1,3 @@
-{% extends "layout.html" %}
 {% load static i18n bootstrap3 %}
 
 {% comment "License" %}
@@ -22,39 +21,34 @@
  *
  * A copy of this license - GNU General Public License - is available
  * at the root of the source code of this program.  If not,
- * see http://www.gnu.org/licenses/.
+    * see http://www.gnu.org/licenses/.
 {% endcomment %}
+<tr>
+    <td>
+         <span><i class="far fa-folder"></i></span>
+    </td>
+    <td headers="code">
+    </td>
+    <td headers="intitule">
+        {{ element.intitule_complet }}
+    </td>
+    <td headers="volumes">
 
+    </td>
+    <td headers="bloc">
+    </td>
+    <td headers="quadri">
+    </td>
+    <td headers="credits">
+    </td>
+    <td headers="session">
+    </td>
+    <td headers="obligatoire">
+        {{ element.obligatoire | yesno | title }}
+    </td>
+    <td headers="action">
+        <div class="pull-right">
 
-{% block style %}
-    <!-- move these styles into osis.css when the mockup is effectively used as implementation -->
-    <style>
-        .emphasized-code{
-            font-weight: bolder;
-            margin-left: 10px;
-        }
-        .code-col{
-            min-width: 120px;
-        }
-        .actions-col{
-            min-width: 50px;
-        }
-    </style>
-{% endblock style %}
-
-{% block breadcrumb %}
-    <li><a href="#" id="lnk_preparation_PAE">{% trans 'Preparation PAE' %}</a></li>
-    <li><a href="#" id="lnk_form_inscr_cours">{% trans "Formulaire d'inscriptions aux cours PAE" %}</a></li>
-    <li class="active">{% trans 'ECGE1BA - 2021-2022' %}</li>
-{% endblock %}
-{% block content %}
-
-
-<div id="content-of-main-panel">
-{% include 'mockup/tabs.html' %}
-    </div>
-
-
-</div>
-
-{% endblock %}
+        </div>
+    </td>
+</tr>

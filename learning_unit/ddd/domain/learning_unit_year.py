@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2022 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -113,6 +113,9 @@ class LearningUnitYear:
             session: str = None,
             main_language: str = None,
             attributions: List['Attribution'] = None,
+            english_friendly: bool = None,
+            french_friendly: bool = None,
+            exchange_students: bool = None,
 
     ):
         self.entity_id = entity_id
@@ -145,6 +148,9 @@ class LearningUnitYear:
         self.session = session
         self.main_language = main_language
         self.attributions = attributions or []
+        self.english_friendly = english_friendly
+        self.french_friendly = french_friendly
+        self.exchange_students = exchange_students
 
     @property
     def full_title_fr(self):

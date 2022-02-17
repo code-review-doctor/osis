@@ -116,6 +116,9 @@ msgstr ""
 msgid "Form view"
 msgstr ""
 
+msgid "Hourly volumes"
+msgstr ""
+
 msgid "Intitulé"
 msgstr ""
 
@@ -147,6 +150,9 @@ msgid "PAE preparation"
 msgstr ""
 
 msgid "PAE registration form"
+msgstr ""
+
+msgid "Program credits"
 msgstr ""
 
 msgid "Quadri."

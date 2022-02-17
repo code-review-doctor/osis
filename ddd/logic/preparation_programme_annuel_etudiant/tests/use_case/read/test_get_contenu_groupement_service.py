@@ -28,7 +28,7 @@ import mock
 from django.test import SimpleTestCase
 
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetContenuGroupementCommand
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import GroupementContenantDTO, ElementContenuDTO
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import GroupementContenantDTO, UniteEnseignementContenueDTO
 from ddd.logic.preparation_programme_annuel_etudiant.tests.factory.groupement_ajuste_inscription_cours import \
     GroupementAjusteInscriptionCoursFactory
 from infrastructure.messages_bus import message_bus_instance
@@ -53,8 +53,8 @@ class GetContenuGroupementServiceTest(SimpleTestCase):
 
         self.cmd = GetContenuGroupementCommand(
             annee=2021,
-            code="MAT2ECGE",
-            code_formation="LECGE100B"
+            code_groupement="MAT2ECGE",
+            code_programme="LECGE100B"
         )
 
     def __mock_service_bus(self):
@@ -71,8 +71,8 @@ class GetContenuGroupementServiceTest(SimpleTestCase):
     def test_should_retourner_contenu_vide_si_groupement_est_vide(self):
         cmd = GetContenuGroupementCommand(
             annee=2021,
-            code="MAT2ECGE",
-            code_formation="LECGE100B"
+            code_groupement="MAT2ECGE",
+            code_programme="LECGE100B"
         )
 
         result = self.message_bus.invoke(cmd)
@@ -88,8 +88,8 @@ class GetContenuGroupementServiceTest(SimpleTestCase):
     def test_should_retourner_contenu_sans_ajustement(self):
         cmd = GetContenuGroupementCommand(
             annee=2021,
-            code="LECGE100R",
-            code_formation="LECGE100B"
+            code_groupement="LECGE100R",
+            code_programme="LECGE100B"
         )
 
         result = self.message_bus.invoke(cmd)
@@ -98,8 +98,8 @@ class GetContenuGroupementServiceTest(SimpleTestCase):
             intitule="Formation pluridisciplinaire en sciences humaines",
             intitule_complet="Formation pluridisciplinaire en sciences humaines",
             elements_contenus=[
-                ElementContenuDTO(
-                    bloc="3",
+                UniteEnseignementContenueDTO(
+                    bloc=3,
                     code='LESPO1321',
                     intitule_complet='Economic, Political and Social Ethics',
                     quadrimestre_texte='Q2',
@@ -113,7 +113,7 @@ class GetContenuGroupementServiceTest(SimpleTestCase):
             ]
         )
 
-        self.assertEqual(result, expected_result)
+        self._assert_equals_groupement_contenant_DTO(expected_result, result)
 
     def test_should_retourner_contenu_du_groupement_ajuste_si_groupement_a_une_ue_ajoutee(self):
         self.repo.entities.append(
@@ -122,8 +122,8 @@ class GetContenuGroupementServiceTest(SimpleTestCase):
 
         cmd = GetContenuGroupementCommand(
             annee=2021,
-            code="LECGE100R",
-            code_formation="LECGE100B"
+            code_groupement="LECGE100R",
+            code_programme="LECGE100B"
         )
 
         result = self.message_bus.invoke(cmd)
@@ -132,21 +132,8 @@ class GetContenuGroupementServiceTest(SimpleTestCase):
             intitule="Formation pluridisciplinaire en sciences humaines",
             intitule_complet="Formation pluridisciplinaire en sciences humaines",
             elements_contenus=[
-                ElementContenuDTO(
-                    bloc="1",
-                    code='LSINF1311',
-                    intitule_complet='Human-computer interaction',
-                    quadrimestre_texte='Q1',
-                    credits_absolus=Decimal(5),
-                    credits_relatifs=None,
-                    volume_annuel_pm=30,
-                    volume_annuel_pp=15,
-                    obligatoire=True,
-                    session_derogation='',
-                    ajoute=True
-                ),
-                ElementContenuDTO(
-                    bloc="3",
+                UniteEnseignementContenueDTO(
+                    bloc=3,
                     code='LESPO1321',
                     intitule_complet='Economic, Political and Social Ethics',
                     quadrimestre_texte='Q2',
@@ -179,8 +166,8 @@ class GetContenuGroupementServiceTest(SimpleTestCase):
             intitule="Formation pluridisciplinaire en sciences humaines",
             intitule_complet="Formation pluridisciplinaire en sciences humaines",
             elements_contenus=[
-                ElementContenuDTO(
-                    bloc="1",
+                UniteEnseignementContenueDTO(
+                    bloc=1,
                     code='LINGE1225',
                     intitule_complet='Programmation en économie et gestion',
                     quadrimestre_texte='Q1',
@@ -207,4 +194,20 @@ class GetContenuGroupementServiceTest(SimpleTestCase):
             ]
         )
 
-        self.assertEqual(result, expected_result)
+        self._assert_equals_groupement_contenant_DTO(expected_result, result)
+
+    def _assert_equals_groupement_contenant_DTO(self, expected_result, result):
+        self.assertEqual(result.intitule, expected_result.intitule)
+        self.assertEqual(result.intitule_complet, expected_result.intitule_complet)
+        for cpt, ue_resultat in enumerate(result.elements_contenus):
+            ue_expected = expected_result.elements_contenus[cpt]
+            self.assertEqual(ue_resultat.bloc, ue_expected.bloc)
+            self.assertEqual(ue_resultat.code, ue_expected.code)
+            self.assertEqual(ue_resultat.intitule_complet, ue_expected.intitule_complet)
+            self.assertEqual(ue_resultat.quadrimestre_texte, ue_expected.quadrimestre_texte)
+            self.assertEqual(ue_resultat.credits_absolus, ue_expected.credits_absolus)
+            self.assertEqual(ue_resultat.credits_relatifs, ue_expected.credits_relatifs)
+            self.assertEqual(ue_resultat.volume_annuel_pm, ue_expected.volume_annuel_pm)
+            self.assertEqual(ue_resultat.volume_annuel_pp, ue_expected.volume_annuel_pp)
+            self.assertEqual(ue_resultat.obligatoire, ue_expected.obligatoire)
+            self.assertEqual(ue_resultat.session_derogation, ue_expected.session_derogation)

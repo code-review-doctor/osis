@@ -40,7 +40,7 @@ from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_
     ICatalogueUnitesEnseignementTranslator
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import UniteEnseignementCatalogueDTO, \
     GroupementContenantDTO, \
-    ElementContenuDTO
+    UniteEnseignementContenueDTO
 from ddd.logic.preparation_programme_annuel_etudiant.repository.i_groupement_ajuste_inscription_cours import \
     IGroupementAjusteInscriptionCoursRepository
 from education_group.ddd.domain.group import GroupIdentity
@@ -58,12 +58,16 @@ class GetContenuGroupement(interface.DomainService):
             catalogue_unites_enseignement_translator: 'ICatalogueUnitesEnseignementTranslator'
     ) -> 'GroupementContenantDTO':
 
-        contenu_groupement = catalogue_formations_translator.get_contenu_groupement(cmd=cmd)
+        contenu_groupement = catalogue_formations_translator.get_contenu_groupement(
+            code_programme=cmd.code_programme,
+            code_groupement=cmd.code_groupement,
+            annee=cmd.annee
+        )
 
         try:
             groupement_ajuste = repo.search(
-                programme_id=GroupIdentity(code=cmd.code_formation, year=cmd.annee),
-                groupement_id=GroupIdentity(code=cmd.code, year=cmd.annee)
+                programme_id=GroupIdentity(code=cmd.code_programme, year=cmd.annee),
+                groupement_id=GroupIdentity(code=cmd.code_groupement, year=cmd.annee)
             )[0]
             unites_enseignements_ajustees_dto = catalogue_unites_enseignement_translator.search(
                 entity_ids=groupement_ajuste.get_identites_unites_enseignement_ajustees()
@@ -133,11 +137,11 @@ class GetContenuGroupement(interface.DomainService):
             unite_enseignement_dtos: List['UniteEnseignementCatalogueDTO'],
             ajoute=False,
             supprime=False
-    ) -> 'ElementContenuDTO':
+    ) -> 'UniteEnseignementContenueDTO':
         unite_enseignement_dto_correspondant = next(
             dto for dto in unite_enseignement_dtos if dto.code == unite_enseignement_ajustee.code
         )
-        return ElementContenuDTO(
+        return UniteEnseignementContenueDTO(
             code=unite_enseignement_ajustee.code,
             obligatoire=unite_enseignement_dto_correspondant.obligatoire,
             bloc=str(unite_enseignement_dto_correspondant.bloc),

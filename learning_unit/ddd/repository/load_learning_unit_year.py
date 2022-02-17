@@ -186,6 +186,9 @@ def __instanciate_learning_unit_year(
         session=learning_unit_data.session,
         main_language=learning_unit_data.main_language,
         attributions=attributions,
+        english_friendly=learning_unit_data.english_friendly,
+        french_friendly=learning_unit_data.french_friendly,
+        exchange_students=learning_unit_data.exchange_students
     )
 
 

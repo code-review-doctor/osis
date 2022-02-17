@@ -23,24 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Union
 
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import redirect
-from django.views.generic import TemplateView
+from django import template
 
-from base.utils.htmx import HtmxMixin
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import UniteEnseignementDTO, UniteEnseignementContenueDTO
+
+register = template.Library()
 
 
-class FormulaireInscriptionView(HtmxMixin, LoginRequiredMixin, TemplateView):
-    name = 'formulaire_inscription_view'
-    # TemplateView
-    template_name = "mockup/tabs.html"
-    htmx_template_name = "mockup/blocks/tab_formulaire_inscription.html"
+def formater_volumes(volume_annuel_pm: int, volume_annuel_pp: int) -> str:
+    return "{}{}{}".format(
+        "{}".format("{}h".format(volume_annuel_pm) if volume_annuel_pm > 0 else ''),
+        " + " if volume_annuel_pm > 0 and volume_annuel_pp > 0 else '',
+        "{}".format(
+            "{}h".format(volume_annuel_pp) if volume_annuel_pp > 0 else ''
+        )
+    )
 
-    def get_context_data(self, **kwargs):
-        return {
-            **super().get_context_data(**kwargs),
-        }
 
-    def post(self, request, *args, **kwargs):
-        return redirect("formulaire_inscription_view")
+@register.filter
+def formater_volumes_totaux(unite_catalogue_dto: Union['UniteEnseignementDTO', 'UniteEnseignementContenueDTO']) -> str:
+    return formater_volumes(unite_catalogue_dto.volume_annuel_pm, unite_catalogue_dto.volume_annuel_pp)
