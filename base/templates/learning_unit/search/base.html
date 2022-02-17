@@ -59,6 +59,20 @@
                     <div class="btn-group pull-right">
                         {% include "blocks/button/learning_units_action_button.html" %}
                     </div>
+                    <i
+                        class="fas fa-lightbulb fa-3x pull-right regex-info"
+                        style="margin-top: -10px;"
+                        data-html="true"
+                        data-placement="bottom"
+                        title="{% trans 'When searching, it is possible to use a series of special characters in all free input fields :' %}
+                        <ul style='list-style: inside;'>
+                                <li>{% trans '. replaces one character in the search (e.g. LBIR.2 will find LBIRE2100 and LBIRA2100)' %}</li>
+                                <li>{% trans '.+ replaces several characters in the search (ex. LARK.+ will find LARKE, LARKO, LARKA)' %}</li>
+                                <li>{% trans '^ the result must begin with the indicated characters (e.g. ^E will exclude UEs beginning with B, L,M,W)' %}</li>
+                                <li>{% trans '$ the result must end with the indicated characters (e.g. DEVILLE$ will exclude the activities of Pr. DEVILLERS).' %}</li>
+                        </ul>"
+                        data-toggle="tooltip"
+                ></i>
                 </div>
             </div>
         </div>
@@ -104,20 +118,6 @@
                     {% trans 'Description fiche status' %}
                 </a>
             </li>
-            <i
-                    class="fas fa-lightbulb fa-3x pull-right regex-info"
-                    style="margin-top: -10px;"
-                    data-html="true"
-                    data-placement="bottom"
-                    title="{% trans 'When searching, it is possible to use a series of special characters in all free input fields :' %}
-                    <ul style='list-style: inside;'>
-                            <li>{% trans '. replaces one character in the search (e.g. LBIR.2 will find LBIRE2100 and LBIRA2100)' %}</li>
-                            <li>{% trans '.+ replaces several characters in the search (ex. LARK.+ will find LARKE, LARKO, LARKA)' %}</li>
-                            <li>{% trans '^ the result must begin with the indicated characters (e.g. ^E will exclude UEs beginning with B, L,M,W)' %}</li>
-                            <li>{% trans '$ the result must end with the indicated characters (e.g. DEVILLE$ will exclude the activities of Pr. DEVILLERS).' %}</li>
-                    </ul>"
-                    data-toggle="tooltip"
-            ></i>
         </ul>
 
     {% endblock navtab %}
