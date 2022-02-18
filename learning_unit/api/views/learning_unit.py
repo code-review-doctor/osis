@@ -61,15 +61,6 @@ class LearningUnitList(LanguageContextSerializerMixin, generics.ListAPIView):
        Return a list of all the learning unit with optional filtering.
     """
     name = 'learningunits_list'
-    queryset = LearningUnitYear.objects.filter(
-        Q(learning_container_year__isnull=False) &
-        (Q(externallearningunityear__mobility=False) | Q(externallearningunityear__isnull=True))
-    ).select_related(
-        'academic_year',
-        'learning_container_year'
-    ).prefetch_related(
-        'learning_container_year__requirement_entity__entityversion_set',
-    ).annotate_full_title().annotate_has_classes()
     serializer_class = LearningUnitSerializer
     filterset_class = LearningUnitFilter
     search_fields = None
@@ -78,6 +69,18 @@ class LearningUnitList(LanguageContextSerializerMixin, generics.ListAPIView):
         '-academic_year__year',
         'acronym',
     )  # Default ordering
+
+    def get_queryset(self):
+        qs = LearningUnitYear.objects.filter(
+            Q(learning_container_year__isnull=False) &
+            (Q(externallearningunityear__mobility=False) | Q(externallearningunityear__isnull=True))
+        ).select_related(
+            'academic_year',
+            'learning_container_year'
+        ).prefetch_related(
+            'learning_container_year__requirement_entity__entityversion_set',
+        ).annotate_full_title().annotate_has_classes()
+        return LearningUnitYearQuerySet.annotate_entities_allocation_and_requirement_acronym(qs)
 
 
 class LearningUnitDetailed(LanguageContextSerializerMixin, generics.RetrieveAPIView):

@@ -36,6 +36,7 @@ from base.forms.learning_unit.search.external import ExternalLearningUnitFilter
 from base.forms.learning_unit.search.simple import LearningUnitFilter, MOBILITY
 from base.forms.search.search_form import get_research_criteria
 from base.models.enums import learning_container_year_types
+from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.campus import CampusFactory
@@ -88,7 +89,7 @@ class TestSearchForm(TestCase):
         })
         form = LearningUnitFilter(self.data).form
         self.assertTrue(form.is_valid())
-        expected_research_criteria = [(_('Type'), _("Course"))]
+        expected_research_criteria = [(_('Type'), [LearningContainerYearType.COURSE.name])]
         actual_research_criteria = get_research_criteria(form)
         self.assertListEqual(expected_research_criteria, actual_research_criteria)
 
@@ -115,6 +116,24 @@ class TestSearchForm(TestCase):
         learning_unit_filter = LearningUnitFilter(self.data)
         self.assertTrue(learning_unit_filter.is_valid())
         self.assertEqual(learning_unit_filter.qs.count(), 1)
+
+    def test_can_search_with_multiple_learning_unit_types(self):
+        ExternalLearningUnitYearFactory(
+            learning_unit_year__academic_year=self.academic_years[0],
+            learning_unit_year__learning_container_year__container_type=learning_container_year_types.EXTERNAL,
+            mobility=False,
+            co_graduation=True,
+        )
+
+        self.data.update({
+            "academic_year_id": str(self.academic_years[0].id),
+        })
+        self.data.appendlist("container_type", LearningContainerYearType.EXTERNAL.name)
+        self.data.appendlist("container_type", MOBILITY)
+
+        learning_unit_filter = LearningUnitFilter(self.data)
+        self.assertTrue(learning_unit_filter.is_valid(), learning_unit_filter.errors)
+        self.assertEqual(learning_unit_filter.qs.count(), 2)
 
     def test_search_on_external_title(self):
         ExternalLearningUnitYearFactory(

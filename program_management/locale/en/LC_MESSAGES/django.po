@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-07 10:59+0100\n"
+"POT-Creation-Date: 2022-02-17 12:58+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -368,9 +368,6 @@ msgid "General informations"
 msgstr ""
 
 msgid "Group"
-msgstr ""
-
-msgid "Groupement"
 msgstr ""
 
 msgid "ISCED domain"
@@ -1045,9 +1042,6 @@ msgstr ""
 
 #, python-brace-format
 msgid "Unable to publish sections for {code} - {year}"
-msgstr ""
-
-msgid "Unite enseignement"
 msgstr ""
 
 msgid "University certificate"
