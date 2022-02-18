@@ -152,8 +152,13 @@ class ProgramTreeBuilder:
             parent_node=root_next_year
         )
         children_current_year = copy_from.root_node.get_direct_children_as_nodes()
+        next_year_tree_direct_children_types = [
+            direct_child.node_type
+            for direct_child in program_tree_next_year.root_node.get_direct_children_as_nodes()
+        ]
         for child_current_year in children_current_year:
-            if child_current_year.node_type in mandatory_types:
+            if child_current_year.node_type in mandatory_types and \
+                    child_current_year.node_type not in next_year_tree_direct_children_types:
                 child_next_year = node_factory.copy_to_next_year(child_current_year)
                 root_next_year.add_child(child_next_year, is_mandatory=True)
         return program_tree_next_year

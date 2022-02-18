@@ -32,8 +32,9 @@ from ddd.logic.preparation_programme_annuel_etudiant.domain.validator.exceptions
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, \
     ContenuGroupementCatalogueDTO, UniteEnseignementDTO, UniteEnseignementCatalogueDTO, GroupementCatalogueDTO, \
     GroupementContenantDTO, UniteEnseignementContenueDTO, \
-    GroupementContenuDTO
-from program_management.ddd.command import GetContenuGroupementCatalogueCommand
+    GroupementContenuDTO, GroupementDTO, GroupementProgrammeDTO
+from program_management.ddd.command import GetContenuGroupementCatalogueCommand, \
+    GetUnitesEnseignementContenuesDansProgrammeCommand, GetGroupementCatalogueCommand
 from program_management.ddd.dtos import ProgrammeDeFormationDTO, ContenuNoeudDTO, ElementType, \
     UniteEnseignementDTO as ProgramManagementUniteEnseignementDTO
 
@@ -70,6 +71,37 @@ class CatalogueFormationsTranslator(ICatalogueFormationsTranslator):
             intitule_complet=contenu_noeud_DTO.intitule_complet,
             elements_contenus=_build_donnees_contenus(contenu_noeud_DTO.contenu_ordonne)
         )
+
+    @classmethod
+    def get_unites_enseignement(cls, code_programme: str, annee: int) -> List['UniteEnseignementDTO']:
+        from infrastructure.messages_bus import message_bus_instance
+
+        cmd = GetUnitesEnseignementContenuesDansProgrammeCommand(
+            code_programme=code_programme,
+            annee=annee,
+        )
+        liste_unites_contenues_dto = message_bus_instance.invoke(
+            cmd
+        )
+
+        data = []
+        for ue in liste_unites_contenues_dto:
+            data.append(_build_donnees_unite_enseignement_DTO(ue))
+        return data
+
+    @classmethod
+    def get_groupement(cls, code_programme: str, annee: int) -> 'GroupementProgrammeDTO':
+        from infrastructure.messages_bus import message_bus_instance
+
+        cmd = GetGroupementCatalogueCommand(
+            code=code_programme,
+            annee=annee,
+        )
+        groupement = message_bus_instance.invoke(
+            cmd
+        )
+
+        return GroupementProgrammeDTO(sigle_programme=groupement.sigle_programme)
 
 
 def _build_formation_dto(program_management_formation_dto: ProgrammeDeFormationDTO) -> FormationDTO:
@@ -154,3 +186,21 @@ def _build_donnees_contenus(
         else:
             donnees.append(_build_donnees_ue(element_contenu))
     return donnees
+
+
+def _build_donnees_unite_enseignement_DTO(ue_contenue: 'ProgramManagementUniteEnseignementDTO') \
+        -> 'UniteEnseignementDTO':
+    return UniteEnseignementDTO(
+        code=ue_contenue.code,
+        intitule_complet=ue_contenue.intitule_complet,
+        volume_annuel_pm=ue_contenue.volume_annuel_pm,
+        volume_annuel_pp=ue_contenue.volume_annuel_pp,
+        bloc=ue_contenue.bloc or '',
+        quadrimestre_texte=ue_contenue.quadrimestre_texte,
+        credits_relatifs=ue_contenue.credits_relatifs,
+        credits_absolus=ue_contenue.credits_absolus,
+        session_derogation=ue_contenue.session_derogation or '',
+        obligatoire=ue_contenue.obligatoire,
+        quadrimestre=ue_contenue.quadrimestre,
+        chemin_acces=''
+    )

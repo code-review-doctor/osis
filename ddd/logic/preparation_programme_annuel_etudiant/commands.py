@@ -126,3 +126,15 @@ class DeplacerVersLeBasUEAjouteeDansProgrammeCommand(interface.CommandRequest):
 class GetFormationCommand(interface.CommandRequest):
     annee: int
     code: str
+
+
+@attr.s(frozen=True, slots=True, auto_attribs=True)
+class GetUnitesEnseignementContenuesCommand(interface.CommandRequest):
+    code_programme: str
+    annee: int
+
+
+@attr.s(frozen=True, slots=True)
+class GetGroupementCommand(interface.CommandRequest):
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)

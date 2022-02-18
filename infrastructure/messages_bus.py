@@ -170,7 +170,8 @@ from ddd.logic.learning_unit.use_case.write.create_learning_unit_service import 
 from ddd.logic.learning_unit.use_case.write.delete_effective_class_service import delete_effective_class
 from ddd.logic.learning_unit.use_case.write.update_effective_class_service import update_effective_class
 from ddd.logic.preparation_programme_annuel_etudiant.commands import AjouterUEAuProgrammeCommand, \
-    GetContenuGroupementCommand, ModifierUEDuGroupementCommand
+    GetContenuGroupementCommand, GetUnitesEnseignementContenuesCommand, GetGroupementCommand, \
+    ModifierUEDuGroupementCommand
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormulaireInscriptionCoursCommand, \
     GetFormationCommand
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetProgrammeInscriptionCoursCommand
@@ -178,8 +179,11 @@ from ddd.logic.preparation_programme_annuel_etudiant.use_case.read.get_contenu_g
     get_contenu_groupement_service
 from ddd.logic.preparation_programme_annuel_etudiant.use_case.read.get_formulaire_inscription_cours_service import \
     get_formulaire_inscription_cours_service
+from ddd.logic.preparation_programme_annuel_etudiant.use_case.read.get_groupement_service import get_groupement_service
 from ddd.logic.preparation_programme_annuel_etudiant.use_case.read.get_programme_inscription_cours_service import \
     get_programme_inscription_cours
+from ddd.logic.preparation_programme_annuel_etudiant.use_case.read.get_unites_enseignement_service import \
+    get_unites_enseignement_service
 from ddd.logic.preparation_programme_annuel_etudiant.use_case.write.ajouter_UE_au_programme_service import \
     ajouter_UE_au_programme
 from ddd.logic.preparation_programme_annuel_etudiant.use_case.write.modifier_UE_du_programme_service import \
@@ -249,13 +253,16 @@ from infrastructure.shared_kernel.language.repository.language import LanguageRe
 from infrastructure.utils import AbstractMessageBusCommands, load_message_bus_instance
 from osis_common.ddd.interface import ApplicationServiceResult, CommandRequest
 from program_management.ddd.command import BulkUpdateLinkCommand, GetReportCommand, GetProgramTreeVersionCommand, \
-    GetContenuGroupementCatalogueCommand
+    GetContenuGroupementCatalogueCommand, GetUnitesEnseignementContenuesDansProgrammeCommand, \
+    GetGroupementCatalogueCommand
 from program_management.ddd.repositories import program_tree as program_tree_repo
 from program_management.ddd.repositories.report import ReportRepository
 from program_management.ddd.service.read.get_content_service import get_content_service
+from program_management.ddd.service.read.get_groupement_service import get_groupement
 from program_management.ddd.service.read.get_program_tree_version_service import get_program_tree_version, \
     get_programme_formation
 from program_management.ddd.service.read.get_report_service import get_report
+from program_management.ddd.service.read.get_unites_enseignement_service import get_unites_enseignement
 from program_management.ddd.service.write.bulk_update_link_service import bulk_update_and_postpone_links
 
 
@@ -573,6 +580,16 @@ class MessageBusCommands(AbstractMessageBusCommands):
         ),
         GetContenuGroupementCatalogueCommand: lambda cmd: get_content_service(cmd),
         GetGroupCommand: lambda cmd: get_group(cmd),
+        GetUnitesEnseignementContenuesCommand: lambda cmd: get_unites_enseignement_service(
+            cmd,
+            CatalogueFormationsTranslator()
+        ),
+        GetUnitesEnseignementContenuesDansProgrammeCommand: lambda cmd: get_unites_enseignement(cmd),
+        GetGroupementCommand: lambda cmd: get_groupement_service(
+            cmd,
+            CatalogueFormationsTranslator()
+        ),
+        GetGroupementCatalogueCommand: lambda cmd: get_groupement(cmd),
         ModifierUEDuGroupementCommand: lambda cmd: modifier_UE_du_programme(
             cmd,
             GroupementAjusteInscriptionCoursInMemoryRepository(),

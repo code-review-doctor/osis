@@ -28,6 +28,7 @@ from rest_framework import serializers
 
 from base.models.enums.summary_status import SummaryStatus
 from base.models.learning_unit_year import LearningUnitYear
+from education_group.api.serializers import utils
 from learning_unit.api.serializers.campus import LearningUnitCampusSerializer
 from learning_unit.api.serializers.component import LearningUnitComponentSerializer
 from learning_unit.api.serializers.utils import LearningUnitHyperlinkedIdentityField, \
@@ -79,6 +80,7 @@ class LearningUnitSerializer(LearningUnitTitleSerializer):
     subtype_text = serializers.CharField(source='get_subtype_display', read_only=True)
     has_proposal = serializers.SerializerMethodField()
     has_classes = serializers.BooleanField(default=False)
+    allocation_faculty = serializers.SerializerMethodField()
 
     class Meta(LearningUnitTitleSerializer.Meta):
         model = LearningUnitYear
@@ -91,6 +93,7 @@ class LearningUnitSerializer(LearningUnitTitleSerializer):
             'status',
             'requirement_entity',
             'allocation_entity',
+            'allocation_faculty',
             'type',
             'type_text',
             'subtype',
@@ -101,6 +104,10 @@ class LearningUnitSerializer(LearningUnitTitleSerializer):
 
     def get_has_proposal(self, learning_unit_year):
         return getattr(learning_unit_year, "has_proposal", None)
+
+    @staticmethod
+    def get_allocation_faculty(learning_unit_year):
+        return utils.get_entity(learning_unit_year.learning_container_year, 'allocation')
 
 
 class LearningUnitDetailedSerializer(LearningUnitSerializer):

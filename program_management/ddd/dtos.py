@@ -33,8 +33,8 @@ from osis_common.ddd.interface import DTO
 
 
 class ElementType(ChoiceEnum):
-    UNITE_ENSEIGNEMENT = _("Unite enseignement")
-    GROUPEMENT = _("Groupement")
+    UNITE_ENSEIGNEMENT = _("Learning unit")
+    GROUPEMENT = _("Group")
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
@@ -89,3 +89,8 @@ class ProgrammeDeFormationDTO(DTO):
     code: str
     intitule_formation: str
     transition_name: str
+
+
+@attr.s(frozen=True, slots=True, auto_attribs=True)
+class GroupDTO(DTO):
+    sigle_programme: str

@@ -3,12 +3,11 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-16 08:56+0100\n"
+"POT-Creation-Date: 2022-02-18 13:01+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-msgid "AJOUT"
+msgid "Acronym"
 msgstr ""
 
 msgid "Actions"
@@ -27,38 +26,17 @@ msgstr ""
 msgid "Add"
 msgstr ""
 
-msgid "Ajout"
+msgid "Add LU"
 msgstr ""
 
-msgid "Ajouter des UE"
+msgid "Add groups"
 msgstr ""
 
-msgid "Ajouter des groupements"
+msgid "Addition"
 msgstr ""
 
 msgid "Anac."
-msgstr ""
-
-msgid "Annuler l'ajout"
-msgstr ""
-
-msgid "Annuler l'ajout?"
-msgstr ""
-
-msgid "Annuler la modification"
-msgstr ""
-
-msgid "Annuler la modification ?"
-msgstr ""
-
-msgid "Annuler la suppression"
-msgstr ""
-
-msgid "Annuler la suppression ?"
-msgstr ""
-
-msgid "Bloc"
-msgstr ""
+msgstr "Anac."
 
 msgid "Block"
 msgstr ""
@@ -66,13 +44,13 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-msgid "Cette action annulera l'ajout de l'UE X du groupement 'Y'"
+msgid "Cancel addition"
 msgstr ""
 
-msgid "Cette action annulera la modification de l'UE X du groupement 'Y'"
+msgid "Cancel deletion"
 msgstr ""
 
-msgid "Cette action annulera la suppression de l'UE X du groupement 'Y'"
+msgid "Cancel modification"
 msgstr ""
 
 msgid "Check All"
@@ -81,70 +59,58 @@ msgstr ""
 msgid "Code"
 msgstr ""
 
-msgid "Commentaire"
-msgstr ""
-
-msgid "Commentaire en anglais"
+msgid "Comment"
 msgstr ""
 
 msgid "Components (PM+PP)"
 msgstr ""
 
-msgid "Composants (PM+PP)"
-msgstr ""
-
-msgid "Composants (PM/PP)"
-msgstr ""
-
 msgid "Content"
+msgstr ""
+
+msgid "Course registration form PAE"
 msgstr ""
 
 msgid "Credits"
 msgstr ""
 
-msgid "Crédits"
+msgid "Deletion"
 msgstr ""
 
 msgid "Derogation's session"
 msgstr ""
 
-msgid "ECGE1BA - 2021-2022"
+msgid "Do not cancel"
+msgstr ""
+
+msgid "English comment"
 msgstr ""
 
 msgid "Form view"
 msgstr ""
 
-msgid "Formulaire d'inscriptions aux cours PAE"
-msgstr ""
-
 msgid "Hourly volumes"
-msgstr ""
-
-msgid "Intitulé"
 msgstr ""
 
 msgid "Label"
 msgstr ""
 
-msgid "MODIFICATION"
+msgid "Learning unit credits"
+msgstr ""
+
+msgid "Learning units list view"
 msgstr ""
 
 msgid "Mandatory"
 msgstr ""
 
 msgid "Modification"
-msgstr ""
+msgstr "Modification"
 
-msgid "Modifier les propriétés"
+msgid "Modify properties"
 msgstr ""
 
 msgid "Name"
-msgstr ""
-
-msgid "Ne pas annuler"
-msgstr ""
-
-msgid "Obligatoire"
 msgstr ""
 
 msgid "Preparation PAE"
@@ -156,28 +122,31 @@ msgstr ""
 msgid "Quadri."
 msgstr ""
 
-msgid "Revenir à l'état initial du programme"
+msgid "Remove LU"
 msgstr ""
 
-msgid "SUPPRESSION"
+msgid "Return program to initial state"
 msgstr ""
 
 msgid "Save"
 msgstr ""
 
 msgid "Search"
-msgstr ""
+msgstr "Rechercher"
 
-msgid "Session"
-msgstr ""
-
-msgid "Sigle"
+msgid "Session derogation"
 msgstr ""
 
 msgid "Suppression"
 msgstr ""
 
-msgid "Supprimer des UE"
+msgid "That action will cancel the addition of the LU X in the group 'Y'"
+msgstr ""
+
+msgid "That action will cancel the deletion of the LU X in the group 'Y'"
+msgstr ""
+
+msgid "That action will cancel the modification of the LU X in the group 'Y'"
 msgstr ""
 
 msgid "The learning units have been added"
@@ -193,38 +162,17 @@ msgstr[0] ""
 msgstr[1] ""
 
 msgid "Title"
-msgstr ""
-
-msgid "Tri par bloc"
-msgstr ""
-
-msgid "Tri par code"
-msgstr ""
-
-msgid "Tri par ordre du programme"
-msgstr ""
-
-msgid "Tri par quadrimestre"
-msgstr ""
-
-msgid "Tri principal"
-msgstr ""
-
-msgid "Tri secondaire"
-msgstr ""
+msgstr "Intitulé"
 
 msgctxt "student_path_year"
 msgid "Year"
+msgstr ""
+
+msgid "acronym"
 msgstr ""
 
 msgid "code"
 msgstr ""
 
 msgid "credits"
-msgstr ""
-
-msgid "intitule"
-msgstr ""
-
-msgid "sigle"
 msgstr ""

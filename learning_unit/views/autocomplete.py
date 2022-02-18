@@ -22,26 +22,28 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import abc
+from typing import List, Dict, Tuple
 
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, GroupementContenantDTO, \
-    GroupementProgrammeDTO
-from osis_common.ddd import interface
+from dal import autocomplete
+from django.contrib.auth.mixins import LoginRequiredMixin
+
+from base.forms.learning_unit.search.simple import MOBILITY_CHOICE
+from base.models.enums.learning_container_year_types import LearningContainerYearType
 
 
-class ICatalogueFormationsTranslator(interface.DomainService):
+ID = str
+TEXT = str
 
-    @classmethod
-    @abc.abstractmethod
-    def get_formation(cls, code_programme: str, annee: int) -> 'FormationDTO':
-        raise NotImplementedError()
 
-    @classmethod
-    @abc.abstractmethod
-    def get_contenu_groupement(cls, code_programme: str, code_groupement: str, annee: int) -> 'GroupementContenantDTO':
-        raise NotImplementedError()
+class LearningUnitTypeAutoComplete(LoginRequiredMixin, autocomplete.Select2ListView):
+    def get_list(self) -> List[Tuple[ID, TEXT]]:
+        return sorted(
+            LearningContainerYearType.choices() + MOBILITY_CHOICE,
+            key=lambda container_type: container_type[1]
+        )
 
-    @classmethod
-    @abc.abstractmethod
-    def get_groupement(cls, code_programme: str, annee: int) -> 'GroupementProgrammeDTO':
-        raise NotImplementedError()
+    def autocomplete_results(self, results: List[Tuple[ID, TEXT]]) -> List[Tuple[ID, TEXT]]:
+        return [(id, text) for id, text in results if self.q.lower() in str(text).lower()]
+
+    def results(self, results: List[Tuple[ID, TEXT]]) -> List[Dict]:
+        return [dict(id=id, text=text) for id, text in results]

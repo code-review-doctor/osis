@@ -209,14 +209,17 @@ class PgmManagerAdministrationTest(TestCase):
         EducationGroupYearFactory(
             academic_year=self.academic_year_previous,
             management_entity=an_entity_management.entity,
+            education_group_type__bachelor=True
         )
         EducationGroupYearFactory(
             academic_year=self.academic_year_current,
             management_entity=an_entity_management.entity,
+            education_group_type__bachelor=True
         )
         EducationGroupYearFactory(
             academic_year=self.academic_year_current,
             management_entity=an_entity_management.entity,
+            education_group_type__bachelor=True
         )
         #  Mini-trainings : cannot be in results of _get_trainings
         MiniTrainingFactory(
