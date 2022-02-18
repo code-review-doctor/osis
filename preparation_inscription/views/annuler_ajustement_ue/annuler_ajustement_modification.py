@@ -24,56 +24,18 @@
 #
 ##############################################################################
 
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.shortcuts import get_object_or_404
-from django.utils.functional import cached_property
-from django.utils.translation import gettext_lazy as _
-from django.views.generic import TemplateView
-
-from base.models.utils.utils import ChoiceEnum
-from base.utils.htmx import HtmxMixin
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetContenuGroupementCommand
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import GroupementContenantDTO
-from education_group.models.group_year import GroupYear
 from infrastructure.messages_bus import message_bus_instance
 from preparation_inscription.perms import AJOUTER_UNITE_ENSEIGNEMENT_PERMISSION
-
-
-class TypeAjustement(ChoiceEnum):
-    SUPPRESSION = _('SUPPRESSION')
-    MODIFICATION = _('MODIFICATION')
-    AJOUT = _('AJOUT')
-
+from preparation_inscription.views.annuler_ajustement_ue.annuler_ajustement_common import AnnulerAjustementCommonView, get_content_fake
 
 RAFRAICHIR_GROUPEMENT_CONTENANT = 'rafraichir_groupement_contenant'
 
 
-class ConsulterContenuGroupementView(HtmxMixin, PermissionRequiredMixin, LoginRequiredMixin, TemplateView):
+class AnnulerAjustementModificationView(AnnulerAjustementCommonView):
 
-    # PermissionRequiredMixin
-    permission_required = "preparation_inscription.view_preparation_inscription_cours"
-    raise_exception = True
-
-    name = 'consulter_contenu_groupement_view'
-    # TemplateView
-    template_name = "preparation_inscription/preparation_inscription.html"
-    htmx_template_name = "preparation_inscription/consulter_contenu_groupement.html"
-
-    @cached_property
-    def annee(self) -> int:
-        return self.kwargs['annee']
-
-    @cached_property
-    def code_programme(self) -> str:
-        return self.kwargs['code_programme']
-
-    @cached_property
-    def code_groupement(self) -> str:
-        return self.kwargs.get('code_groupement', self.kwargs['code_programme'])
-
-    @cached_property
-    def group_year(self) -> 'GroupYear':
-        return get_object_or_404(GroupYear, academic_year__year=self.annee, partial_acronym=self.code_programme)
+    name = 'annuler_ajustement_modification_view'
 
     def get_context_data(self, **kwargs):
         context = {
@@ -85,7 +47,7 @@ class ConsulterContenuGroupementView(HtmxMixin, PermissionRequiredMixin, LoginRe
             'intitule_programme': self.get_intitule_programme(),
             'group_year': self.group_year,
             'permission_ajout_ue': AJOUTER_UNITE_ENSEIGNEMENT_PERMISSION,
-            'annee': self.annee,
+            'annee': self.annee
         }
 
         context.update(self.get_content())
@@ -117,71 +79,3 @@ class ConsulterContenuGroupementView(HtmxMixin, PermissionRequiredMixin, LoginRe
     def get_intitule_programme(self):
         # TODO :: to implement
         return "Intitulé programme"
-
-
-def get_content_fake():
-    return [
-        {
-            'code': 'LESPO1113',
-            'intitule': 'Sociologie...',
-            'volumes': '10',
-            'bloc': '1',
-            'quadri': 'Q1',
-            'credits': '5/5',
-            'session': 'Oui',
-            'obligatoire': '',
-            'commentaire_fr': '',
-            'commentaire_en': '',
-            'ajoute': True,
-        },
-        {
-            'code_ue': 'LESPO1321',
-            'intitule': 'Economic...',
-            'volumes': '15+10',
-            'bloc': '1',
-            'quadri': 'Q1',
-            'credits': '4/5',
-            'session': 'Oui',
-            'obligatoire': '',
-            'commentaire_fr': '',
-            'commentaire_en': '',
-            'modifie': True,
-        },
-        {
-            'code_ue': 'LESPO1114',
-            'intitule': 'Political...',
-            'volumes': '30',
-            'bloc': '2',
-            'quadri': 'Q1',
-            'credits': '5/5',
-            'session': 'Oui',
-            'obligatoire': '',
-            'commentaire_fr': '',
-            'commentaire_en': '',
-            'ajoute': True,
-        },
-        {
-            'code_ue': 'LINGE1122',
-            'intitule': 'Physique...',
-            'volumes': '30',
-            'bloc': '1',
-            'quadri': 'Q2',
-            'credits': '3/3',
-            'session': 'Oui',
-            'obligatoire': '',
-            'commentaire_fr': '',
-            'commentaire_en': '',
-        },
-        {
-            'code_ue': 'LINGE1125',
-            'intitule': 'Séminaire...',
-            'volumes': '25',
-            'bloc': '1',
-            'quadri': 'Q2',
-            'credits': '5/5',
-            'session': 'Oui',
-            'obligatoire': '',
-            'commentaire_fr': '',
-            'commentaire_en': '',
-        },
-    ]

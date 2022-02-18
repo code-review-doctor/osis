@@ -27,6 +27,9 @@ from django.urls import path, include
 
 from preparation_inscription.views.ajouter_groupements import AjouterGroupementsView
 from preparation_inscription.views.ajouter_unites_enseignement import AjouterUnitesEnseignementView
+from preparation_inscription.views.annuler_ajustement_ue.annuler_ajustement_ajout import AnnulerAjustementAjoutView
+from preparation_inscription.views.annuler_ajustement_ue.annuler_ajustement_modification import AnnulerAjustementModificationView
+from preparation_inscription.views.annuler_ajustement_ue.annuler_ajustement_suppression import AnnulerAjustementSuppressionView
 from preparation_inscription.views.consulter_contenu_groupement import ConsulterContenuGroupementView
 from preparation_inscription.views.detail import PreparationInscriptionMainView
 from preparation_inscription.views.formulaire_inscription_cours import FormulaireInscriptionCoursView
@@ -57,6 +60,14 @@ urlpatterns = [
             name=FormulaireInscriptionCoursView.name
         ),
         path('liste_unites_enseignement/', ListeUnitesEnseignementView.as_view(), name=ListeUnitesEnseignementView.name),
+        path('annuler_ajustement_ajout/<str:code_groupement>/<str:code_ue>/detail', AnnulerAjustementAjoutView.as_view(),
+             name=AnnulerAjustementAjoutView.name),
+        path('annuler_ajustement_modification/<str:code_groupement>/<str:code_ue>/detail',
+             AnnulerAjustementModificationView.as_view(),
+             name=AnnulerAjustementModificationView.name),
+        path('annuler_ajustement_suppression/<str:code_groupement>/<str:code_ue>/detail',
+             AnnulerAjustementSuppressionView.as_view(),
+             name=AnnulerAjustementSuppressionView.name),
         path('add_group', AjouterGroupementsView.as_view(), name=AjouterGroupementsView.name),
         path(
             '<str:code_groupement>/mockup/detail',

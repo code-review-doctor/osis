@@ -1,0 +1,19 @@
+{% load i18n %}
+
+<form>
+     {% csrf_token %}
+<a
+        type="button"
+        id="lnk_annuler_ajout_{{ code_ue }}"
+        class="btn btn-default btn-sm"
+        data-toggle="tooltip"
+        title="{% trans 'Cancel add' %}"
+        hx-post="{% url 'annuler_ajustement_ajout_view' annee code_programme code_groupement code_ue %}"
+                                                      hx-target="#content-of-main-panel" hx-trigger="click"
+                                                      hx-swap="innerHTML" data-toggle="tab"
+
+
+>
+    <span class="fa fa-times text-primary" aria-hidden="true"></span>
+</a>
+</form>

@@ -29,6 +29,12 @@ from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_aju
     GroupementAjusteInscriptionCours
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
     IdentiteGroupementAjusteInscriptionCours
+from ddd.logic.preparation_programme_annuel_etudiant.domain.model.unite_enseignement_ajoutee import \
+    UniteEnseignementAjoutee
+from ddd.logic.preparation_programme_annuel_etudiant.domain.model.unite_enseignement_modifiee import \
+    UniteEnseignementModifiee
+from ddd.logic.preparation_programme_annuel_etudiant.domain.model.unite_enseignement_supprimee import \
+    UniteEnseignementSupprimee
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import GroupementAjusteFromRepositoryDTO
 from education_group.ddd.domain.group import GroupIdentity
 from osis_common.ddd import interface
@@ -65,3 +71,48 @@ class IGroupementAjusteInscriptionCoursRepository(interface.AbstractRepository):
             program_tree_version_identity: ProgramTreeVersionIdentity
     ) -> List['GroupementAjusteFromRepositoryDTO']:
         pass
+
+    @classmethod
+    def search_ue_ajustee_en_ajout(
+            cls,
+            code_unite_enseignement: str,
+            programme_id: 'GroupIdentity',
+            groupement_id: 'GroupIdentity',
+            entity_ids: Optional[List['IdentiteGroupementAjusteInscriptionCours']] = None,
+            **kwargs
+    ) -> 'UniteEnseignementAjoutee':
+        pass
+
+    @classmethod
+    def search_ue_ajustee_en_modification(
+            cls,
+            code_unite_uuid: str,
+            programme_id: 'GroupIdentity',
+            groupement_id: 'GroupIdentity',
+            **kwargs
+    ) -> 'UniteEnseignementModifiee':
+        pass
+
+    @classmethod
+    def search_ue_ajustee_en_suppression(
+            cls,
+            code_unite_enseignement: str,
+            programme_id: 'GroupIdentity',
+            groupement_id: 'GroupIdentity',
+            entity_ids: Optional[List['IdentiteGroupementAjusteInscriptionCours']] = None,
+            **kwargs
+    ) -> 'UniteEnseignementSupprimee':
+        pass
+
+    @classmethod
+    def delete_ajustement_ajout(cls, entity: 'UniteEnseignementAjoutee') -> None:
+        pass
+
+    @classmethod
+    def delete_ajustement_modification(cls, entity: 'UniteEnseignementModifiee') -> None:
+        pass
+
+    @classmethod
+    def delete_ajustement_suppression(cls, entity: 'UniteEnseignementSupprimee') -> None:
+        pass
+

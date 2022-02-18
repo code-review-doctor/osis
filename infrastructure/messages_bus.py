@@ -170,7 +170,8 @@ from ddd.logic.learning_unit.use_case.write.create_learning_unit_service import 
 from ddd.logic.learning_unit.use_case.write.delete_effective_class_service import delete_effective_class
 from ddd.logic.learning_unit.use_case.write.update_effective_class_service import update_effective_class
 from ddd.logic.preparation_programme_annuel_etudiant.commands import AjouterUEAuProgrammeCommand, \
-    GetContenuGroupementCommand
+    GetContenuGroupementCommand, AnnulerAjustementDAjoutCommand, AnnulerAjustementDeModificationCommand, \
+    AnnulerAjustementDeSuppressionCommand
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetFormulaireInscriptionCoursCommand, \
     GetFormationCommand
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetProgrammeInscriptionCoursCommand
@@ -182,6 +183,12 @@ from ddd.logic.preparation_programme_annuel_etudiant.use_case.read.get_programme
     get_programme_inscription_cours
 from ddd.logic.preparation_programme_annuel_etudiant.use_case.write.ajouter_UE_au_programme_service import \
     ajouter_UE_au_programme
+from ddd.logic.preparation_programme_annuel_etudiant.use_case.write.annuler_ajustement_d_ajout_UE_service import \
+    annuler_ajustement_d_ajout_ue
+from ddd.logic.preparation_programme_annuel_etudiant.use_case.write.annuler_ajustement_de_modification_UE_service import \
+    annuler_ajustement_de_modification_ue
+from ddd.logic.preparation_programme_annuel_etudiant.use_case.write.annuler_ajustement_de_suppression_UE_service import \
+    annuler_ajustement_de_suppression_ue
 from ddd.logic.shared_kernel.academic_year.commands import SearchAcademicYearCommand
 from ddd.logic.shared_kernel.academic_year.use_case.read.search_academic_years_service import search_academic_years
 from ddd.logic.shared_kernel.campus.commands import GetCampusCommand, SearchUclouvainCampusesCommand
@@ -571,6 +578,19 @@ class MessageBusCommands(AbstractMessageBusCommands):
         ),
         GetContenuGroupementCatalogueCommand: lambda cmd: get_content_service(cmd),
         GetGroupCommand: lambda cmd: get_group(cmd),
+        AnnulerAjustementDAjoutCommand: lambda cmd: annuler_ajustement_d_ajout_ue(
+            cmd,
+            GroupementAjusteInscriptionCoursInMemoryRepository()
+        ),
+        AnnulerAjustementDeModificationCommand: lambda cmd: annuler_ajustement_de_modification_ue(
+            cmd,
+            GroupementAjusteInscriptionCoursInMemoryRepository()
+        ),
+        AnnulerAjustementDeSuppressionCommand: lambda cmd: annuler_ajustement_de_suppression_ue(
+            cmd,
+            GroupementAjusteInscriptionCoursInMemoryRepository()
+        ),
+
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 
 

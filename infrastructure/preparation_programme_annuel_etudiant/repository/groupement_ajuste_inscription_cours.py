@@ -27,6 +27,10 @@ from typing import Optional, List
 
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
     IdentiteGroupementAjusteInscriptionCours, GroupementAjusteInscriptionCours
+from ddd.logic.preparation_programme_annuel_etudiant.domain.model.unite_enseignement_modifiee import \
+    UniteEnseignementModifiee
+from ddd.logic.preparation_programme_annuel_etudiant.domain.model.unite_enseignement_supprimee import \
+    UniteEnseignementSupprimee
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import GroupementAjusteFromRepositoryDTO
 from ddd.logic.preparation_programme_annuel_etudiant.repository.i_groupement_ajuste_inscription_cours import \
     IGroupementAjusteInscriptionCoursRepository
@@ -60,4 +64,48 @@ class GroupementAjusteInscriptionCoursRepository(IGroupementAjusteInscriptionCou
 
     @classmethod
     def save(cls, entity: 'GroupementAjusteInscriptionCours') -> None:
+        raise NotImplementedError
+
+    @classmethod
+    def search_ue_ajustee_en_ajout(
+            cls,
+            code_unite_enseignement: str,
+            programme_id: 'GroupIdentity',
+            groupement_id: 'GroupIdentity',
+            entity_ids: Optional[List['IdentiteGroupementAjusteInscriptionCours']] = None,
+            **kwargs
+    ) -> 'UniteEnseignementAjoutee':
+        raise NotImplementedError
+
+    @classmethod
+    def search_ue_ajustee_en_modification(
+            cls,
+            code_unite_uuid: str,
+            programme_id: 'GroupIdentity',
+            groupement_id: 'GroupIdentity',
+            **kwargs
+    ) -> 'UniteEnseignementModifiee':
+        raise NotImplementedError
+
+    @classmethod
+    def search_ue_ajustee_en_suppression(
+            cls,
+            code_unite_enseignement: str,
+            programme_id: 'GroupIdentity',
+            groupement_id: 'GroupIdentity',
+            entity_ids: Optional[List['IdentiteGroupementAjusteInscriptionCours']] = None,
+            **kwargs
+    ) -> 'UniteEnseignementSupprimee':
+        raise NotImplementedError
+
+    @classmethod
+    def delete_ajustement_ajout(cls, entity: 'UniteEnseignementAjoutee') -> None:
+        raise NotImplementedError
+
+    @classmethod
+    def delete_ajustement_modification(cls, entity: 'UniteEnseignementModifiee') -> None:
+        raise NotImplementedError
+
+    @classmethod
+    def delete_ajustement_suppression(cls, entity: 'UniteEnseignementSupprimee') -> None:
         raise NotImplementedError
