@@ -48,7 +48,7 @@ from preparation_inscription.views.consulter_contenu_groupement import RAFRAICHI
 
 class ModifierProprietesContenuForm(forms.Form):
     code = forms.CharField(widget=forms.HiddenInput)
-    bloc = forms.IntegerField(required=False, widget=forms.TextInput())
+    bloc = forms.IntegerField(required=False, widget=forms.TextInput(attrs={'style': "width: 80px;"}))
 
 
 class ModifierProprietesContenuView(PermissionRequiredMixin, HtmxMixin, FormView):

@@ -130,6 +130,10 @@ class GetProgrammeInscriptionCours(interface.DomainService):
                             groupements_ajustes,
                             unite_enseignement_ajoutes_dto
                         ),
+                        unites_enseignement_modifiees=cls.__build_unite_enseignement_modifiees_dtos(
+                            element,
+                            groupements_ajustes
+                        ),
                         contenu=cls.__build_contenu(
                             element.contenu_ordonne_catalogue,
                             groupements_ajustes,
@@ -178,3 +182,22 @@ class GetProgrammeInscriptionCours(interface.DomainService):
             bloc=1,
             a_la_suite_de="",
         )
+
+    @classmethod
+    def __build_unite_enseignement_modifiees_dtos(
+            cls,
+            groupement: ContenuGroupementCatalogueDTO,
+            groupements_ajustes: List['GroupementAjusteInscriptionCours'],
+    ) -> List[str]:
+        groupement_ajuste_correspondant = next(
+            (
+                groupement_ajuste
+                for groupement_ajuste in groupements_ajustes
+                if groupement_ajuste.groupement_id.code == groupement.groupement_contenant.code
+            ),
+            None
+        )
+        unites_enseignements_modifiees = groupement_ajuste_correspondant.unites_enseignement_modifiees if \
+            groupement_ajuste_correspondant else []
+
+        return [unite_enseignement.code for unite_enseignement in unites_enseignements_modifiees]

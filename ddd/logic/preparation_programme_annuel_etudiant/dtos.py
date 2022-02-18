@@ -157,7 +157,7 @@ class GroupementInscriptionCoursDTO(DTO):
     unites_enseignement_ajoutees: List['UniteEnseignementAjouteeDTO']
     #  Comment because nominal case (program without adjustment) only for now
     # unites_enseignement_supprimees: List['UniteEnseignementSupprimeeDTO']
-    # unites_enseignement_modifiees: List['UniteEnseignementModifieeDTO']
+    unites_enseignement_modifiees: List[str]
     # unites_enseignements: List['UniteEnseignementProgrammeDTO']
     contenu: List[Union['UniteEnseignementProgrammeDTO', 'GroupementInscriptionCoursDTO']]
 
@@ -185,12 +185,6 @@ class UniteEnseignementAjouteeDTO(DTO):
     obligatoire: bool
     bloc: int
     a_la_suite_de: str
-
-
-@attr.s(frozen=True, slots=True, auto_attribs=True)
-class UniteEnseignementModifieeDTO(DTO):
-    code: str
-    #  TODO: champs éditables
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
