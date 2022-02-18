@@ -35,6 +35,7 @@ from ddd.logic.preparation_programme_annuel_etudiant.commands import GetContenuG
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import GroupementContenantDTO
 from education_group.ddd.command import GetGroupCommand
 from education_group.ddd.domain.group import Group
+from education_group.models.group_year import GroupYear
 from infrastructure.messages_bus import message_bus_instance
 from preparation_inscription.perms import AJOUTER_UNITE_ENSEIGNEMENT_PERMISSION, SUPPRIMER_UNITE_ENSEIGNEMENT_PERMISSION
 
@@ -78,6 +79,9 @@ class ConsulterContenuGroupementView(HtmxMixin, PermissionRequiredMixin, LoginRe
             GetGroupCommand(code=self.code_programme, year=self.annee)
         )
 
+    def get_permission_object(self):
+        return GroupYear.objects.get(academic_year__year=self.annee, partial_acronym=self.code_programme)
+
     def get_context_data(self, **kwargs):
         context = {
             **super().get_context_data(**kwargs),
@@ -86,7 +90,8 @@ class ConsulterContenuGroupementView(HtmxMixin, PermissionRequiredMixin, LoginRe
             'code_groupement': self.code_groupement,
             RAFRAICHIR_GROUPEMENT_CONTENANT: self.request.GET.get(RAFRAICHIR_GROUPEMENT_CONTENANT),
             'permission_ajout_ue': AJOUTER_UNITE_ENSEIGNEMENT_PERMISSION,
-            'permission_suppression_ue': SUPPRIMER_UNITE_ENSEIGNEMENT_PERMISSION
+            'permission_suppression_ue': SUPPRIMER_UNITE_ENSEIGNEMENT_PERMISSION,
+            'permission_objet': self.get_permission_object()
         }
 
         context.update(self.get_content())

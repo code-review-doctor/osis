@@ -35,11 +35,11 @@
             <ul class="dropdown-menu pull-right" aria-labelledby="btn-action-down">
                 <li>
                     {% url 'ajouter_unites_enseignement_view' annee code_programme code_groupement as ajouter_url %}
-                    {% a_htmx_tag_has_perm ajouter_url _('Ajouter des UE') "#content-of-main-panel" permission_ajout_ue user group_year %}
+                    {% a_htmx_tag_has_perm ajouter_url _('Ajouter des UE') "#content-of-main-panel" permission_ajout_ue user permission_objet %}
                 </li>
                 <li>
                     {% url 'supprimer_unites_enseignement_view' annee code_programme code_groupement as supprimer_url %}
-                    {% a_htmx_tag_has_perm supprimer_url _('Supprimer des UE') "#content-of-main-panel" permission_suppression_ue user group_year %}
+                    {% a_htmx_tag_has_perm supprimer_url _('Supprimer des UE') "#content-of-main-panel" permission_suppression_ue user permission_objet %}
                 </li>
                 <li class="divider"></li>
                 <li><a href="" hx-get="{% url 'ajouter-groupements-view' annee code_programme %}" hx-target="#content-of-main-panel" hx-trigger="click">
