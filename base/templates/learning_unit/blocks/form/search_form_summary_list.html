@@ -1,5 +1,5 @@
 {% extends "blocks/forms/search_form.html" %}
-{% load bootstrap3 i18n %}
+{% load bootstrap3 static i18n %}
 
 {% block search_form_row_1 %}
     {% bootstrap_field form.academic_year__year form_group_class="col-md-2" %}
@@ -13,6 +13,7 @@
     </div>
     {% bootstrap_field form.container_type form_group_class="col-md-2" %}
     {% bootstrap_field form.subtype form_group_class="col-md-2" %}
+    {{ form.media }}
 {% endblock %}
 
 {% block search_form_row_2 %}

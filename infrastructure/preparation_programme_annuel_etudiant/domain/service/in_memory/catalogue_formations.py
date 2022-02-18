@@ -26,13 +26,11 @@
 from decimal import Decimal
 from typing import Optional, Union
 
-from ddd.logic.preparation_programme_annuel_etudiant.commands import GetContenuGroupementCommand
 from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import \
     ICatalogueFormationsTranslator
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, ContenuGroupementCatalogueDTO, \
-    GroupementDTO, GroupementCatalogueDTO, UniteEnseignementCatalogueDTO, GroupementContenantDTO, ElementContenuDTO
+    GroupementDTO, GroupementCatalogueDTO, UniteEnseignementCatalogueDTO, GroupementContenantDTO, GroupementContenuDTO
 from program_management.ddd.domain.program_tree_version import STANDARD
-
 
 ANNEE = 2021
 
@@ -285,8 +283,8 @@ def _cas_formation_version_particuliere_transition():
                             bloc=2,
                             code='LCOMU9870',
                             intitule_complet="Séminaire d'intégration en communication stratégique (Sherbrooke)",
-                            quadrimestre=None,
-                            quadrimestre_texte=None,
+                            quadrimestre='Q1',
+                            quadrimestre_texte='Q1',
                             credits_absolus=Decimal(5),
                             credits_relatifs=None,
                             volume_annuel_pm=0,
@@ -649,9 +647,9 @@ class CatalogueFormationsTranslatorInMemory(ICatalogueFormationsTranslator):
         raise NotImplementedError()
 
     @classmethod
-    def get_contenu_groupement(cls, cmd: GetContenuGroupementCommand) -> 'GroupementContenantDTO':
-        formation = cls.get_formation(cmd.code_formation, cmd.annee)
-        groupement = cls.__search_groupement(cmd.code, formation.racine)
+    def get_contenu_groupement(cls, code_programme: str, code_groupement: str, annee: int) -> 'GroupementContenantDTO':
+        formation = cls.get_formation(code_programme, annee)
+        groupement = cls.__search_groupement(code_groupement, formation.racine)
         return cls.__convert_contenu_groupement_catalogue_dto_to_groupement_contenant_dto(groupement)
 
     @classmethod
@@ -690,31 +688,25 @@ class CatalogueFormationsTranslatorInMemory(ICatalogueFormationsTranslator):
     def __convert_to_element_contenu_dto(
             cls,
             element: Union['UniteEnseignementCatalogueDTO', 'ContenuGroupementCatalogueDTO']
-            ) -> 'ElementContenuDTO':
+            ) -> Union['UniteEnseignementCatalogueDTO', 'GroupementContenuDTO']:
         if isinstance(element, UniteEnseignementCatalogueDTO):
-            return ElementContenuDTO(
+            return UniteEnseignementCatalogueDTO(
                 code=element.code,
                 intitule_complet=element.intitule_complet,
                 obligatoire=element.obligatoire,
                 volume_annuel_pp=element.volume_annuel_pp,
                 volume_annuel_pm=element.volume_annuel_pm,
-                bloc=str(element.bloc),
+                bloc=element.bloc,
+                quadrimestre=element.quadrimestre,
                 quadrimestre_texte=element.quadrimestre_texte,
                 credits_relatifs=element.credits_relatifs,
                 credits_absolus=element.credits_absolus,
                 session_derogation=element.session_derogation,
             )
         else:
-            return ElementContenuDTO(
+            return GroupementContenuDTO(
                 code=element.groupement_contenant.code,
                 intitule_complet=element.groupement_contenant.intitule_complet,
                 obligatoire=element.groupement_contenant.obligatoire,
-                volume_annuel_pp=None,
-                volume_annuel_pm=None,
-                bloc="",
-                quadrimestre_texte='',
-                credits_relatifs=None,
-                credits_absolus=None,
-                session_derogation="",
             )
 

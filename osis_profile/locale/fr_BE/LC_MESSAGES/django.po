@@ -1,0 +1,409 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-01-27 15:01+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Academic year"
+msgstr "Année académique"
+
+msgid "Experience valuated from this accepted admission."
+msgstr "Expérience évaluée à partir de cette admission approuvée"
+
+msgid "Type"
+msgstr "Type"
+
+msgid "Country"
+msgstr "Pays"
+
+msgid "Institute name"
+msgstr "Nom de l'établissement"
+
+msgid "Institute city"
+msgstr "Localité de l'établissement"
+
+msgid "Institute"
+msgstr "Établissement"
+
+msgid "Institute postal code"
+msgstr "Code postal de l'établissement"
+
+msgid "Education name"
+msgstr "Nom de la formation"
+
+msgid "Result"
+msgstr "Résultat"
+
+msgid "Is it your graduation year?"
+msgstr "Est-ce l'année au cours de laquelle vous avez obtenu votre diplôme ?"
+
+msgid "Obtained grade"
+msgstr "Grade obtenu"
+
+msgid "Rank in diploma"
+msgstr "Rang dans le diplôme"
+
+msgid "Issue diploma date"
+msgstr "Date de délivrance du diplôme"
+
+msgid "Credit type"
+msgstr "Type de crédits"
+
+msgid "Entered credit number"
+msgstr "Crédits inscrits"
+
+msgid "Acquired credit number"
+msgstr "Crédits acquis"
+
+msgid "Transcript"
+msgstr "Relevé de notes"
+
+msgid "Graduate degree"
+msgstr "Diplôme d'études supérieures"
+
+msgid "Access certificate after a 60 master"
+msgstr "Attestation d'accès après un master 60"
+
+msgid "Dissertation title"
+msgstr "Titre du mémoire"
+
+msgid "Dissertation score"
+msgstr "Note du mémoire"
+
+msgid "Dissertation summary"
+msgstr "Résumé du mémoire"
+
+msgid "Education community"
+msgstr "Communauté d'enseignement"
+
+msgid "Program"
+msgstr "Programme"
+
+msgid "Study system"
+msgstr "Système d'études"
+
+msgid "Curriculum"
+msgstr "Curriculum vitae"
+
+msgid "Study cycle type"
+msgstr "Type du cycle d'études"
+
+msgid "Linguistic regime"
+msgstr "Régime linguistique"
+
+msgid "Transcript translation"
+msgstr "Traduction du relevé de notes"
+
+msgid "Graduate degree translation"
+msgstr "Traduction du diplôme d'études supérieures"
+
+msgid "Activity type"
+msgstr "Type d'activité"
+
+msgid "Other activity type"
+msgstr "Autre type d'activité"
+
+msgid "Activity certificate"
+msgstr "Attestation d'activité"
+
+msgid "Activity position"
+msgstr "Fonction occupée"
+
+msgid "Latin"
+msgstr "Latin"
+
+msgid "Greek"
+msgstr "Grec"
+
+msgid "Chemistry"
+msgstr "Chimie"
+
+msgid "Physic"
+msgstr "Physique"
+
+msgid "Biology"
+msgstr "Biologie"
+
+msgid "German"
+msgstr "Allemand"
+
+msgid "Dutch"
+msgstr "Néerlandais"
+
+msgid "English"
+msgstr "Anglais"
+
+msgid "french"
+msgstr "français"
+
+msgid "Other"
+msgstr "Autre"
+
+msgid "If other language, please specify"
+msgstr "Si autre langue, précisez"
+
+msgid "Mathematics"
+msgstr "Mathématiques"
+
+msgid "IT"
+msgstr "Informatique"
+
+msgid "Social sciences"
+msgstr "Sciences sociales"
+
+msgid "Economic sciences"
+msgstr "Sciences économiques"
+
+msgid "If other optional domains, please specify"
+msgstr "Si autres matières optionnelles, précisez"
+
+msgid "Please mention the academic graduation year"
+msgstr "Veuillez indiquer l'année académique d'obtention"
+
+msgid "At which result level do you consider yourself?"
+msgstr "Quel résultat avez-vous obtenu ?"
+
+msgid "A transcript or your last year at high school"
+msgstr "Un relevé de notes pour votre dernière année d'études secondaires"
+
+msgid "High school diploma"
+msgstr "Diplôme d'études secondaires"
+
+msgid "In what Community did (do) you follow last year of high school?"
+msgstr "Dans quelle communauté avez-vous suivi la dernière année d'études secondaires (ou suivez-vous actuellement) ?"
+
+msgid "What type of education did (do) you follow?"
+msgstr "Quel type d'enseignement avez-vous suivi (ou suivez-vous actuellement) ?"
+
+msgid "Other education, to specify"
+msgstr "Autre enseignement, précisez"
+
+msgid "Another institute"
+msgstr "Autre établissement"
+
+msgid ""
+"In case you could not find your institute in the list, please mention it "
+"below. "
+msgstr "Si vous ne trouvez pas votre institut dans la liste, merci de le préciser ici"
+
+msgid ""
+"Please complete here below the schedule of your last year of high school, "
+"indicating for each domain the number of hours of education followed per "
+"week (h/w). "
+msgstr ""
+"Veuillez compléter ci-dessous la grille horaire de votre dernière année "
+"d'études secondaires, en indiquant en regard de chaque matière, le nombre "
+"d'heures suivies par semaine (h/s)."
+
+msgid "What diploma did you get (or will you get)?"
+msgstr "Quel diplôme avez-vous obtenu (ou obtiendrez-vous) ?"
+
+msgid "If other linguistic regime, please clarify"
+msgstr "Si autre régime linguistique, précisez"
+
+msgid "Organizing country"
+msgstr "Pays organisateur"
+
+msgid ""
+"Is this diploma subject to an equivalence decision by the services of the "
+"French community of Belgium?"
+msgstr ""
+"Ce diplôme a-t-il fait l'objet d'une décision d'équivalence par les services "
+"de la Communauté française de Belgique ?"
+
+msgid ""
+"A certified translation of your official transcript of marks for your final "
+"year of secondary education"
+msgstr ""
+"Une traduction de votre relevé de notes pour votre dernière année d'études "
+"secondaires par un traducteur juré"
+
+msgid "Person"
+msgstr "Personne"
+
+msgid "Language"
+msgstr "Langue"
+
+msgid "Please rate your listening comprehension"
+msgstr "Veuillez évaluer votre compréhension à l'audition"
+
+msgid "Please rate your speaking ability"
+msgstr "Veuillez évaluer votre capacité orale"
+
+msgid "Please rate your writing ability"
+msgstr "Veuillez évaluer votre capacité d'écriture"
+
+msgid "Higher education"
+msgstr "Enseignement supérieur"
+
+msgid "Other activity"
+msgstr "Autre activité"
+
+msgid "Continuing education"
+msgstr "Promotion sociale"
+
+msgid "Full-time education"
+msgstr "Plein exercice"
+
+msgid "Failure"
+msgstr "Échec"
+
+msgid "No result"
+msgstr "Pas de résultat"
+
+msgid "Success"
+msgstr "Réussite"
+
+msgid "Success with residual credits"
+msgstr "Réussite avec crédits résiduels"
+
+msgid "Greater distinction"
+msgstr "La plus grande distinction"
+
+msgid "Great distinction"
+msgstr "Grande distinction"
+
+msgid "Distinction"
+msgstr "Distinction"
+
+msgid "Satisfaction"
+msgstr "Satisfaction"
+
+msgid "Success without distinction"
+msgstr "Réussite sans mention"
+
+msgid "No grade"
+msgstr "Pas de grade"
+
+msgid "European Union credits"
+msgstr "Crédits de l'Union Européenne"
+
+msgid "Non European Union credits"
+msgstr "Crédits non UE"
+
+msgid "Semesters"
+msgstr "Semestres"
+
+msgid "Bachelor"
+msgstr "Bachelier"
+
+msgid "Doctorate"
+msgstr "Doctorat"
+
+msgid "Master"
+msgstr "Master"
+
+msgid "Other higher education"
+msgstr "Autres études supérieures"
+
+msgid "Illness"
+msgstr "Maladie"
+
+msgid "Internship"
+msgstr "Stage"
+
+msgid "Unemployment"
+msgstr "Chômage"
+
+msgid "Volunteering"
+msgstr "Bénévolat"
+
+msgid "Work"
+msgstr "Travail"
+
+msgid "Belgian"
+msgstr "Belge"
+
+msgid "Foreign"
+msgstr "Étrangère"
+
+msgid "French-speaking Community of Belgium"
+msgstr "Communauté française de Belgique"
+
+msgid "Flemish-speaking Community"
+msgstr "Communauté flamande"
+
+msgid "German-speaking Community"
+msgstr "Communauté germanophone"
+
+msgid "Not known yet"
+msgstr "Pas encore connu"
+
+msgid "Less than 65%"
+msgstr "Moins de 65%"
+
+msgid "Between 65 and 75%"
+msgstr "Entre 65 et 75%"
+
+msgid "More than 75%"
+msgstr "Plus de 75%"
+
+msgid "Teaching of general education"
+msgstr "Général de transition"
+
+msgid "Transition method"
+msgstr "Technique de transition"
+
+msgid "Artistic transition"
+msgstr "Artistique de transition"
+
+msgid "Qualification method"
+msgstr "Technique de qualification"
+
+msgid "Artistic qualification"
+msgstr "Artistique de qualification"
+
+msgid "Professional education"
+msgstr "Enseignement professionnel"
+
+msgid "Professional education + Maturity exam"
+msgstr "Enseignement professionnel + Examen de maturité"
+
+msgid "National Bachelor (or government diploma, ...)"
+msgstr "Baccalauréat national (ou diplôme d'état, ...)"
+
+msgid "European Bachelor (Schola Europaea)"
+msgstr "Baccalauréat européen (Schola Europaea)"
+
+msgid "International Baccalaureate"
+msgstr "Baccalauréat international (IBO)"
+
+msgid "Yes"
+msgstr "Oui"
+
+msgid "No"
+msgstr "Non"
+
+msgid "Pending"
+msgstr "En attente"
+
+msgid "A1"
+msgstr "A1"
+
+msgid "A2"
+msgstr "A2"
+
+msgid "B1"
+msgstr "B1"
+
+msgid "B2"
+msgstr "B2"
+
+msgid "C1"
+msgstr "C1"
+
+msgid "C2"
+msgstr "C2"

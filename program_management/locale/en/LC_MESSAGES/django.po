@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-25 14:34+0200\n"
+"POT-Creation-Date: 2022-02-17 12:58+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -267,6 +267,9 @@ msgstr ""
 msgid "English comment"
 msgstr ""
 
+msgid "English-friendly"
+msgstr ""
+
 msgid "Enrollment campus"
 msgstr ""
 
@@ -283,6 +286,9 @@ msgid "Evaluation methods"
 msgstr ""
 
 msgid "Evaluation methods (force majeure)"
+msgstr ""
+
+msgid "Exchange students"
 msgstr ""
 
 msgid "Export"
@@ -332,6 +338,9 @@ msgid "For approval,"
 msgstr ""
 
 msgid "Formation catalogue"
+msgstr ""
+
+msgid "French-friendly"
 msgstr ""
 
 msgid "Full title of the english version"
@@ -438,6 +447,9 @@ msgid ""
 msgstr ""
 
 msgid "Language"
+msgstr ""
+
+msgid "Language and exchange"
 msgstr ""
 
 msgid "Last update description fiche (force majeure) by"

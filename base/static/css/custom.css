@@ -321,3 +321,10 @@ table.dataTable thead th.sorting:after {
 .actions-col{
     min-width: 50px;
 }
+
+.sticky-header{
+     position: sticky;
+     top: 50px;
+     background-color: white;
+     box-shadow: inset 0 -2px 0 #000000;
+}

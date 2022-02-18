@@ -21,8 +21,8 @@ class SearchGroupementsForm(forms.Form):
         )
     )
     code = UpperCaseCharField(max_length=15, label=_("code").capitalize(), required=False)
-    sigle = UpperCaseCharField(max_length=15, label=_("sigle").capitalize(), required=False)
-    intitule = UpperCaseCharField(max_length=15, label=_("intitule").capitalize(), required=False)
+    sigle = UpperCaseCharField(max_length=15, label=_("acronym").capitalize(), required=False)
+    intitule = UpperCaseCharField(max_length=15, label=_("title").capitalize(), required=False)
 
     def __init__(self, *args, user: User, **kwargs):
         self.user = user
