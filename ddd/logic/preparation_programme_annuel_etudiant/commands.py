@@ -137,4 +137,3 @@ class GetUnitesEnseignementContenuesCommand(interface.CommandRequest):
 class GetGroupementCommand(interface.CommandRequest):
     code = attr.ib(type=str)
     year = attr.ib(type=int)
-
