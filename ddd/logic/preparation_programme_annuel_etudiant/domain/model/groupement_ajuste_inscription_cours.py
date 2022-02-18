@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
+import contextlib
 import uuid as uuid
 from typing import List, Union
 
@@ -97,12 +97,12 @@ class GroupementAjusteInscriptionCours(interface.RootEntity):
             bloc: int = None
     ):
         try:
-            idx_unite_enseignementexistante = next(
+            index_unite_enseignement_existante = next(
                 idx for idx, ue_modifiee in enumerate(self.unites_enseignement_modifiees)
                 if ue_modifiee.unite_enseignement_identity == unite_enseignement_identite
             )
-            self.unites_enseignement_modifiees[idx_unite_enseignementexistante] = attr.evolve(
-                self.unites_enseignement_modifiees[idx_unite_enseignementexistante],
+            self.unites_enseignement_modifiees[index_unite_enseignement_existante] = attr.evolve(
+                self.unites_enseignement_modifiees[index_unite_enseignement_existante],
                 bloc=bloc
             )
         except StopIteration:
@@ -116,11 +116,28 @@ class GroupementAjusteInscriptionCours(interface.RootEntity):
 
     def annuler_action_sur_unite_enseignement(
             self,
-            unite_enseignement: 'LearningUnitYearIdentity',
+            unite_enseignement_identite: 'LearningUnitIdentity',
     ):
-        # une seule action disponible à la fois
-        # => retirer dans unites_enseignement_ajoutees | unites_enseignement_retirees | unites_enseignement_ajustees
-        raise NotImplementedError
+        with contextlib.suppress(StopIteration):
+            index_unite_enseignement_existante = next(
+                idx for idx, ue_modifiee in enumerate(self.unites_enseignement_modifiees)
+                if ue_modifiee.unite_enseignement_identity == unite_enseignement_identite
+            )
+            self.unites_enseignement_modifiees.pop(index_unite_enseignement_existante)
+
+        with contextlib.suppress(StopIteration):
+            index_unite_enseignement_existante = next(
+                idx for idx, ue_ajoutee in enumerate(self.unites_enseignement_ajoutees)
+                if ue_ajoutee.unite_enseignement_identity == unite_enseignement_identite
+            )
+            self.unites_enseignement_ajoutees.pop(index_unite_enseignement_existante)
+
+        with contextlib.suppress(StopIteration):
+            index_unite_enseignement_existante = next(
+                idx for idx, ue_supprimee in enumerate(self.unites_enseignement_supprimees)
+                if ue_supprimee.unite_enseignement_identity == unite_enseignement_identite
+            )
+            self.unites_enseignement_supprimees.pop(index_unite_enseignement_existante)
 
     def deplacer_unite_enseignement_ajoutee(
             self,
