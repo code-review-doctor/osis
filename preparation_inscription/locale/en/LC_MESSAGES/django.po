@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-17 15:10+0100\n"
+"POT-Creation-Date: 2022-02-18 08:59+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -66,9 +66,6 @@ msgstr ""
 msgid "Components (PM+PP)"
 msgstr ""
 
-msgid "Components (PM/PP)"
-msgstr ""
-
 msgid "Content"
 msgstr ""
 
@@ -102,6 +99,9 @@ msgstr ""
 msgid "Learning unit credits"
 msgstr ""
 
+msgid "Learning units list view"
+msgstr ""
+
 msgid "Mandatory"
 msgstr ""
 
@@ -114,22 +114,7 @@ msgstr ""
 msgid "Name"
 msgstr ""
 
-msgid "Order by block"
-msgstr ""
-
-msgid "Order by code"
-msgstr ""
-
-msgid "Order by order of program"
-msgstr ""
-
-msgid "Order by quadrimester"
-msgstr ""
-
 msgid "Preparation PAE"
-msgstr ""
-
-msgid "Principal order"
 msgstr ""
 
 msgid "Program credits"
@@ -144,16 +129,10 @@ msgstr ""
 msgid "Return program to initial state"
 msgstr ""
 
-msgid "Save"
-msgstr ""
-
 msgid "Search"
 msgstr "Rechercher"
 
-msgid "Secondary order"
-msgstr ""
-
-msgid "Session"
+msgid "Session derogation"
 msgstr ""
 
 msgid "Suppression"
