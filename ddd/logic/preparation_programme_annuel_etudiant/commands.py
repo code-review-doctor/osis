@@ -137,3 +137,27 @@ class GetUnitesEnseignementContenuesCommand(interface.CommandRequest):
 class GetGroupementCommand(interface.CommandRequest):
     code = attr.ib(type=str)
     year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True, auto_attribs=True)
+class AnnulerAjustementDAjoutCommand(interface.CommandRequest):
+    code_programme: str
+    code_groupement: str
+    code_unite_enseignement: str
+    annee: int
+
+
+@attr.s(frozen=True, slots=True, auto_attribs=True)
+class AnnulerAjustementDeModificationCommand(interface.CommandRequest):
+    code_programme: str
+    code_groupement: str
+    annee: int
+    code_unite_enseignement_uuid: str
+
+
+@attr.s(frozen=True, slots=True, auto_attribs=True)
+class AnnulerAjustementDeSuppressionCommand(interface.CommandRequest):
+    code_programme: str
+    code_groupement: str
+    annee: int
+    code_unite_enseignement_uuid: str
