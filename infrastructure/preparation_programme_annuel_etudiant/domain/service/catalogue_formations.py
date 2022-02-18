@@ -32,7 +32,7 @@ from ddd.logic.preparation_programme_annuel_etudiant.domain.validator.exceptions
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, \
     ContenuGroupementCatalogueDTO, UniteEnseignementDTO, UniteEnseignementCatalogueDTO, GroupementCatalogueDTO, \
     GroupementContenantDTO, UniteEnseignementContenueDTO, \
-    GroupementContenuDTO, GroupementDTO
+    GroupementContenuDTO, GroupementDTO, GroupementProgrammeDTO
 from program_management.ddd.command import GetContenuGroupementCatalogueCommand, \
     GetUnitesEnseignementContenuesDansProgrammeCommand, GetGroupementCatalogueCommand
 from program_management.ddd.dtos import ProgrammeDeFormationDTO, ContenuNoeudDTO, ElementType, \
@@ -90,7 +90,7 @@ class CatalogueFormationsTranslator(ICatalogueFormationsTranslator):
         return data
 
     @classmethod
-    def get_groupement(cls, code_programme: str, annee: int) -> 'GroupementDTO':
+    def get_groupement(cls, code_programme: str, annee: int) -> 'GroupementProgrammeDTO':
         from infrastructure.messages_bus import message_bus_instance
 
         cmd = GetGroupementCatalogueCommand(
@@ -101,7 +101,7 @@ class CatalogueFormationsTranslator(ICatalogueFormationsTranslator):
             cmd
         )
 
-        return GroupementDTO(sigle_programme=groupement.sigle_programme)
+        return GroupementProgrammeDTO(sigle_programme=groupement.sigle_programme)
 
 
 def _build_formation_dto(program_management_formation_dto: ProgrammeDeFormationDTO) -> FormationDTO:

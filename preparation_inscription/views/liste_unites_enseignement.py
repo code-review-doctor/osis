@@ -32,7 +32,7 @@ from django.views.generic import TemplateView
 from base.utils.htmx import HtmxMixin
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetUnitesEnseignementContenuesCommand, \
     GetGroupementCommand
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import GroupementDTO, UniteEnseignementDTO
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import UniteEnseignementDTO, GroupementProgrammeDTO
 from infrastructure.messages_bus import message_bus_instance
 
 
@@ -67,7 +67,7 @@ class ListeUnitesEnseignementView(HtmxMixin, PermissionRequiredMixin, LoginRequi
         return self.kwargs['annee']
 
     @cached_property
-    def groupemement_racine(self) -> 'GroupementDTO':
+    def groupemement_racine(self) -> 'GroupementProgrammeDTO':
         return message_bus_instance.invoke(
             GetGroupementCommand(code=self.code_programme, year=self.annee)
         )

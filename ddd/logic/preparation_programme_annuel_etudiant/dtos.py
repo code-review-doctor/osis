@@ -257,5 +257,5 @@ class GroupementContenuDTO(DTO):
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
-class GroupementDTO(DTO):
+class GroupementProgrammeDTO(DTO):
     sigle_programme: str

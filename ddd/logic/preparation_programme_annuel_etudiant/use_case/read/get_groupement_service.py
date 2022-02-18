@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from ddd.logic.preparation_programme_annuel_etudiant.commands import GetGroupementCommand
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import GroupementDTO
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import GroupementProgrammeDTO
 from infrastructure.preparation_programme_annuel_etudiant.domain.service.catalogue_formations import \
     CatalogueFormationsTranslator
 
@@ -32,5 +32,5 @@ from infrastructure.preparation_programme_annuel_etudiant.domain.service.catalog
 def get_groupement_service(
         cmd: 'GetGroupementCommand',
         translator: 'CatalogueFormationsTranslator',
-) -> 'GroupementDTO':
+) -> 'GroupementProgrammeDTO':
     return translator.get_groupement(cmd.code, cmd.year)

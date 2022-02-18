@@ -58,6 +58,12 @@ class TestListeUnitesEnseignementView(TestCase):
         message_bus_patcher.start()
         self.addCleanup(message_bus_patcher.stop)
 
+        message_bus_get_groupement_service = mock.patch(
+            'infrastructure.messages_bus.get_groupement_service',
+        )
+        message_bus_get_groupement_service.start()
+        self.addCleanup(message_bus_get_groupement_service.stop)
+
     def test_user_has_not_permission(self):
         person_without_permission = PersonFactory()
         self.client.force_login(person_without_permission.user)
