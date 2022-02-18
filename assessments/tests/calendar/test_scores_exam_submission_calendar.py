@@ -58,7 +58,7 @@ class TestScoreExamDiffusionCalendarEnsureConsistencyUntilNPlus6(TestCase):
                 "title": "Encodage de notes - Session 1",
                 "reference": AcademicCalendarTypes.SCORES_EXAM_SUBMISSION.name,
                 "data_year": self.current_academic_year.pk,
-                "start_date": datetime.date(self.current_academic_year.year, 12, 15),
+                "start_date": datetime.date(self.current_academic_year.year, 12, 6),
                 "end_date": datetime.date(self.current_academic_year.year + 1, 2, 28),
             }
         )

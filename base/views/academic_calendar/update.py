@@ -26,6 +26,8 @@ class AcademicCalendarUpdate(SuccessMessageMixin, PermissionRequiredMixin, AjaxT
     def get_form_kwargs(self):
         return {
             **super().get_form_kwargs(),
+            'academic_event': self.academic_event,
+            'academic_event_repository': AcademicEventRepository(),
             'initial': {
                 'start_date': self.academic_event.start_date,
                 'end_date':  self.academic_event.end_date,

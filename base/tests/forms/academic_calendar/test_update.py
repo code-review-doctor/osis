@@ -28,28 +28,105 @@ import datetime
 from django.test import SimpleTestCase
 
 from base.forms.academic_calendar.update import AcademicCalendarUpdateForm
+from base.tests.factories.business.academic_calendar import AcademicEventInMemoryRepository, AcademicEventFactory, \
+    AttendanceMarkSession1Factory, ScoreEncodingSession1Factory
 
 
 class TesAcademicCalendarUpdateForm(SimpleTestCase):
+    def setUp(self) -> None:
+        self.event = AcademicEventFactory()
+        self.score_encoding_event = ScoreEncodingSession1Factory()
+        self.attendance_mark_event = AttendanceMarkSession1Factory()
+
+        self.academic_year_repository = AcademicEventInMemoryRepository()
+        self.academic_year_repository.events = [self.event, self.score_encoding_event, self.attendance_mark_event]
+
     def test_end_date_lower_than_start_date_assert_raise_exception(self):
-        form = AcademicCalendarUpdateForm(data={
-            'start_date': datetime.date.today(),
-            'end_date': datetime.date.today() - datetime.timedelta(days=5)
-        })
+        form = AcademicCalendarUpdateForm(
+            academic_event=self.event,
+            academic_event_repository=self.academic_year_repository,
+            data={
+                'start_date': datetime.date.today(),
+                'end_date': datetime.date.today() - datetime.timedelta(days=5)
+            }
+        )
         self.assertFalse(form.is_valid())
         self.assertIn('end_date', form.errors)
 
     def test_start_date_empty_assert_raise_error_because_start_date_mandatory(self):
-        form = AcademicCalendarUpdateForm(data={
-            'start_date': '',
-            'end_date': ''
-        })
+        form = AcademicCalendarUpdateForm(
+            academic_event=self.event,
+            academic_event_repository=self.academic_year_repository,
+            data={
+                'start_date': '',
+                'end_date': ''
+            }
+        )
         self.assertFalse(form.is_valid())
         self.assertIn('start_date', form.errors)
 
     def test_assert_end_date_can_be_empty(self):
-        form = AcademicCalendarUpdateForm(data={
-            'start_date': datetime.date.today(),
-            'end_date': ''
-        })
+        form = AcademicCalendarUpdateForm(
+            academic_event=self.event,
+            academic_event_repository=self.academic_year_repository,
+            data={
+                'start_date': datetime.date.today(),
+                'end_date': ''
+            }
+        )
         self.assertTrue(form.is_valid())
+
+    def test_periode_de_note_de_presence_ne_peut_pas_se_finir_apres_periode_encodage_de_notes(self):
+        form = AcademicCalendarUpdateForm(
+            academic_event=self.attendance_mark_event,
+            academic_event_repository=self.academic_year_repository,
+            data={
+                'start_date': self.attendance_mark_event.start_date,
+                'end_date': self.score_encoding_event.end_date + datetime.timedelta(days=1)
+            }
+        )
+        self.assertFalse(form.is_valid())
+
+    def test_periode_de_note_de_presence_ne_peut_pas_commencer_avant_periode_encodage_de_notes(self):
+        form = AcademicCalendarUpdateForm(
+            academic_event=self.attendance_mark_event,
+            academic_event_repository=self.academic_year_repository,
+            data={
+                'start_date': self.score_encoding_event.start_date - datetime.timedelta(days=1),
+                'end_date': self.attendance_mark_event.end_date
+            }
+        )
+        self.assertFalse(form.is_valid())
+
+    def test_should_be_valid_if_periode_de_note_de_presence_comprise_durant_periode_encodage_de_notes(self):
+        form = AcademicCalendarUpdateForm(
+            academic_event=self.attendance_mark_event,
+            academic_event_repository=self.academic_year_repository,
+            data={
+                'start_date': self.score_encoding_event.start_date + datetime.timedelta(days=1),
+                'end_date': self.score_encoding_event.end_date - datetime.timedelta(days=1)
+            }
+        )
+        self.assertTrue(form.is_valid())
+
+    def test_periode_encodage_de_notes_ne_peut_pas_commencer_apres_periode_de_note_de_presence(self):
+        form = AcademicCalendarUpdateForm(
+            academic_event=self.score_encoding_event,
+            academic_event_repository=self.academic_year_repository,
+            data={
+                'start_date': self.attendance_mark_event.start_date + datetime.timedelta(days=1),
+                'end_date': self.score_encoding_event.end_date
+            }
+        )
+        self.assertFalse(form.is_valid())
+
+    def test_periode_encodage_de_notes_ne_peut_pas_se_finir_avant_periode_de_note_de_presence(self):
+        form = AcademicCalendarUpdateForm(
+            academic_event=self.score_encoding_event,
+            academic_event_repository=self.academic_year_repository,
+            data={
+                'start_date': self.score_encoding_event.start_date,
+                'end_date': self.attendance_mark_event.end_date - datetime.timedelta(days=1)
+            }
+        )
+        self.assertFalse(form.is_valid())

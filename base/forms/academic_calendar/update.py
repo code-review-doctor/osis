@@ -23,16 +23,33 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
+from typing import Union
+
 from django import forms
 from django.core.exceptions import ValidationError
 
+from base.business.academic_calendar import AcademicSessionEvent, AcademicEventRepository, AcademicEvent
 from base.forms.utils.datefield import DatePickerInput
 from django.utils.translation import gettext_lazy as _
+
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 
 
 class AcademicCalendarUpdateForm(forms.Form):
     start_date = forms.DateField(label=_("Start date"), widget=DatePickerInput())
     end_date = forms.DateField(widget=DatePickerInput(), label=_("End date"), required=False)
+
+    def __init__(
+            self,
+            *args,
+            academic_event: Union['AcademicEvent', 'AcademicSessionEvent'],
+            academic_event_repository: 'AcademicEventRepository',
+            **kwargs
+    ):
+        super().__init__(*args, **kwargs)
+        self.academic_event = academic_event
+        self.academic_event_repository = academic_event_repository
 
     def clean(self):
         cleaned_data = self.cleaned_data
@@ -44,4 +61,78 @@ class AcademicCalendarUpdateForm(forms.Form):
                     "min": _("Start date"),
                 }
             })
+        periode_de_note_de_presence_doit_etre_incluse_dans_periode_encodage_de_notes(
+            self.academic_event,
+            cleaned_data.get('start_date'),
+            cleaned_data.get('end_date'),
+            self.academic_event_repository
+        )
+        periode_encodage_des_notes_doit_inclure_periode_encodage_de_notes(
+            self.academic_event,
+            cleaned_data.get('start_date'),
+            cleaned_data.get('end_date'),
+            self.academic_event_repository
+        )
         return cleaned_data
+
+
+def periode_de_note_de_presence_doit_etre_incluse_dans_periode_encodage_de_notes(
+        academic_event: AcademicSessionEvent,
+        new_start_date: datetime.date,
+        new_end_date: datetime.date,
+        academic_event_repository: AcademicEventRepository
+):
+    if academic_event.type != AcademicCalendarTypes.ATTENDANCE_MARK.name:
+        return
+
+    score_exam_submission_events = academic_event_repository.get_academic_events(
+        AcademicCalendarTypes.SCORES_EXAM_SUBMISSION.name
+    )
+    score_exam_submission_event_for_same_session = next(
+        (
+            event
+            for event in score_exam_submission_events
+            if event.session == academic_event.session
+            and event.authorized_target_year == academic_event.authorized_target_year
+        ),
+        None
+    )
+
+    if score_exam_submission_event_for_same_session is None or \
+            score_exam_submission_event_for_same_session.start_date > new_start_date or \
+            score_exam_submission_event_for_same_session.end_date < new_end_date:
+        raise ValidationError(_(
+                "The start date cannot be lower than the score encoding start date and "
+                "the end date cannot be greater than the score encoding end date"
+        ))
+
+
+def periode_encodage_des_notes_doit_inclure_periode_encodage_de_notes(
+        academic_event: AcademicSessionEvent,
+        new_start_date: datetime.date,
+        new_end_date: datetime.date,
+        academic_event_repository: AcademicEventRepository
+):
+    if academic_event.type != AcademicCalendarTypes.SCORES_EXAM_SUBMISSION.name:
+        return
+
+    attendance_mark_events = academic_event_repository.get_academic_events(
+        AcademicCalendarTypes.ATTENDANCE_MARK.name
+    )
+    attendance_mark_event_for_same_session = next(
+        (
+            event
+            for event in attendance_mark_events
+            if event.session == academic_event.session
+            and event.authorized_target_year == academic_event.authorized_target_year
+        ),
+        None
+    )
+
+    if attendance_mark_event_for_same_session is None or \
+            attendance_mark_event_for_same_session.start_date < new_start_date or \
+            attendance_mark_event_for_same_session.end_date > new_end_date:
+        raise ValidationError(_(
+            "The start date cannot be greater than the attendance mark start date and "
+            "the end date cannot be lower than the attendance mark end date"
+        ))
