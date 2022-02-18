@@ -131,3 +131,10 @@ class GetFormationCommand(interface.CommandRequest):
 class GetUnitesEnseignementContenuesCommand(interface.CommandRequest):
     code_programme: str
     annee: int
+
+
+@attr.s(frozen=True, slots=True)
+class GetGroupementCommand(interface.CommandRequest):
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
+

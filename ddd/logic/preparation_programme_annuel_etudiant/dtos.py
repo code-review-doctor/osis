@@ -254,3 +254,8 @@ class GroupementContenuDTO(DTO):
     @property
     def type(self):
         return GROUPEMENT
+
+
+@attr.s(frozen=True, slots=True, auto_attribs=True)
+class GroupementDTO(DTO):
+    sigle_programme: str

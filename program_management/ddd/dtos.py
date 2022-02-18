@@ -89,3 +89,8 @@ class ProgrammeDeFormationDTO(DTO):
     code: str
     intitule_formation: str
     transition_name: str
+
+
+@attr.s(frozen=True, slots=True, auto_attribs=True)
+class GroupDTO(DTO):
+    sigle_programme: str

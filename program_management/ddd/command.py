@@ -710,3 +710,9 @@ class GetContenuGroupementCatalogueCommand(interface.CommandRequest):
 class GetUnitesEnseignementContenuesDansProgrammeCommand(interface.CommandRequest):
     code_programme: str
     annee: int
+
+
+@attr.s(frozen=True, slots=True)
+class GetGroupementCatalogueCommand(interface.CommandRequest):
+    code = attr.ib(type=str)
+    annee = attr.ib(type=int)

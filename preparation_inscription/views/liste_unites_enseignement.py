@@ -30,8 +30,9 @@ from django.utils.functional import cached_property
 from django.views.generic import TemplateView
 
 from base.utils.htmx import HtmxMixin
-from ddd.logic.preparation_programme_annuel_etudiant.commands import GetUnitesEnseignementContenuesCommand
-from education_group.ddd.command import GetGroupCommand
+from ddd.logic.preparation_programme_annuel_etudiant.commands import GetUnitesEnseignementContenuesCommand, \
+    GetGroupementCommand
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import GroupementDTO, UniteEnseignementDTO
 from infrastructure.messages_bus import message_bus_instance
 
 
@@ -50,7 +51,7 @@ class ListeUnitesEnseignementView(HtmxMixin, PermissionRequiredMixin, LoginRequi
             **super().get_context_data(**kwargs),
             # TODO code_groupement_racine :: à implémenter quand la story "afficher contenu" est développée
             'search_result': self.get_content(),
-            'sigle_programme': self.groupemement_racine.abbreviated_title
+            'sigle_programme': self.groupemement_racine.sigle_programme
         }
 
     def get_content(self) -> List['UniteEnseignementDTO']:
@@ -66,7 +67,7 @@ class ListeUnitesEnseignementView(HtmxMixin, PermissionRequiredMixin, LoginRequi
         return self.kwargs['annee']
 
     @cached_property
-    def groupemement_racine(self) -> 'Group':
+    def groupemement_racine(self) -> 'GroupementDTO':
         return message_bus_instance.invoke(
-            GetGroupCommand(code=self.code_programme, year=self.annee)
+            GetGroupementCommand(code=self.code_programme, year=self.annee)
         )

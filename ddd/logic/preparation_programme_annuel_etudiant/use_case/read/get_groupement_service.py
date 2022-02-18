@@ -1,3 +1,4 @@
+##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -14,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -22,25 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import abc
+from ddd.logic.preparation_programme_annuel_etudiant.commands import GetGroupementCommand
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import GroupementDTO
+from infrastructure.preparation_programme_annuel_etudiant.domain.service.catalogue_formations import \
+    CatalogueFormationsTranslator
 
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, GroupementContenantDTO, GroupementDTO
-from osis_common.ddd import interface
 
-
-class ICatalogueFormationsTranslator(interface.DomainService):
-
-    @classmethod
-    @abc.abstractmethod
-    def get_formation(cls, code_programme: str, annee: int) -> 'FormationDTO':
-        raise NotImplementedError()
-
-    @classmethod
-    @abc.abstractmethod
-    def get_contenu_groupement(cls, code_programme: str, code_groupement: str, annee: int) -> 'GroupementContenantDTO':
-        raise NotImplementedError()
-
-    @classmethod
-    @abc.abstractmethod
-    def get_groupement(cls, code_programme: str, annee: int) -> 'GroupementDTO':
-        raise NotImplementedError()
+def get_groupement_service(
+        cmd: 'GetGroupementCommand',
+        translator: 'CatalogueFormationsTranslator',
+) -> 'GroupementDTO':
+    return translator.get_groupement(cmd.code, cmd.year)
