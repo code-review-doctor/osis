@@ -66,6 +66,7 @@ class TestProgramTreeView(TestCase):
                     obligatoire=False,
                     code='LCORP201S',
                     unites_enseignement_ajoutees=[],
+                    unites_enseignement_modifiees=[],
                     contenu=[]
                 )
             )

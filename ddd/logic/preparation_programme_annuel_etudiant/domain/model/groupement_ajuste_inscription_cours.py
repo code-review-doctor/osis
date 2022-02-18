@@ -93,13 +93,13 @@ class GroupementAjusteInscriptionCours(interface.RootEntity):
 
     def ajuster_unite_enseignement(
             self,
-            unite_enseignement: 'LearningUnitIdentity',
+            unite_enseignement_identite: 'LearningUnitIdentity',
             bloc: int = None
     ):
         try:
             idx_unite_enseignementexistante = next(
                 idx for idx, ue_modifiee in enumerate(self.unites_enseignement_modifiees)
-                if ue_modifiee.unite_enseignement_identity == unite_enseignement
+                if ue_modifiee.unite_enseignement_identity == unite_enseignement_identite
             )
             self.unites_enseignement_modifiees[idx_unite_enseignementexistante] = attr.evolve(
                 self.unites_enseignement_modifiees[idx_unite_enseignementexistante],
@@ -109,7 +109,7 @@ class GroupementAjusteInscriptionCours(interface.RootEntity):
             self.unites_enseignement_modifiees.append(
                 UniteEnseignementModifiee(
                     entity_id=UniteEnseignementModifieeIdentity(uuid.uuid4()),
-                    unite_enseignement_identity=unite_enseignement,
+                    unite_enseignement_identity=unite_enseignement_identite,
                     bloc=bloc
                 )
             )

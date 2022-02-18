@@ -23,10 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List, Union, Optional
+
 from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 from ddd.logic.preparation_programme_annuel_etudiant.commands import ModifierUEDuGroupementCommand
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
     GroupementAjusteInscriptionCours
+from ddd.logic.preparation_programme_annuel_etudiant.dtos import GroupementContenantDTO, UNITE_ENSEIGNEMENT, \
+    UniteEnseignementContenueDTO, GroupementContenuDTO
 
 
 class ModifierUnitesEnseignement:
@@ -34,14 +39,42 @@ class ModifierUnitesEnseignement:
     def modifier_unites_enseignement(
             cls,
             cmd: 'ModifierUEDuGroupementCommand',
+            groupement_contenant: 'GroupementContenantDTO',
             groupement_ajuste: 'GroupementAjusteInscriptionCours'
     ) -> None:
         for cmd_ue in cmd.unites_enseignements:
-            learning_unit_identity = LearningUnitIdentityBuilder.build_from_code_and_year(
+            unite_enseignement_identite = LearningUnitIdentityBuilder.build_from_code_and_year(
                 code=cmd_ue.code,
                 year=cmd_ue.annee
             )
-            groupement_ajuste.ajuster_unite_enseignement(
-                unite_enseignement=learning_unit_identity,
-                bloc=cmd_ue.bloc
+            cls.__ajuster_unites_enseignement(
+                groupement_ajuste,
+                unite_enseignement_identite,
+                bloc_initial=cls.__get_bloc_initial(groupement_contenant.elements_contenus, cmd_ue.code),
+                bloc_ajuste=cmd_ue.bloc
             )
+
+    @classmethod
+    def __ajuster_unites_enseignement(
+            cls,
+            groupement_ajuste: 'GroupementAjusteInscriptionCours',
+            unite_enseignement_identite: 'LearningUnitIdentity',
+            bloc_initial: Optional[int],
+            bloc_ajuste: Optional[int]
+    ):
+        if bloc_initial == bloc_ajuste:
+            groupement_ajuste.annuler_action_sur_unite_enseignement(unite_enseignement_identite)
+        else:
+            groupement_ajuste.ajuster_unite_enseignement(
+                unite_enseignement_identite=unite_enseignement_identite,
+                bloc=bloc_ajuste
+            )
+
+    @classmethod
+    def __get_bloc_initial(
+            cls,
+            elements: List[Union['UniteEnseignementContenueDTO', 'GroupementContenuDTO']],
+            code_unite_enseignement: str
+    ) -> int:
+        return next(element.bloc for element in elements if element.type == UNITE_ENSEIGNEMENT
+                    and element.code == code_unite_enseignement)

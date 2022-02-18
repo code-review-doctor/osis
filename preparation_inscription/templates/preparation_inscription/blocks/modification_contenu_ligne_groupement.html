@@ -1,4 +1,4 @@
-{% load static i18n bootstrap3 formatage_volumes_totaux formatage_credits %}
+{% load i18n bootstrap3 %}
 
 {% comment "License" %}
  * OSIS stands for Open Student Information System. It's an application
@@ -23,20 +23,26 @@
  * at the root of the source code of this program.  If not,
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
+
 <tr>
-    <td>
+    <td headers="icon">
         {% if element.supprime %}
-            <i class="fas fa-file-minus text-danger"></i>
+            <i class="fas fa-folder-minus text-danger"></i>
         {% elif element.modifie %}
-            <i class="fas fa-file text-info"></i>
+            <i class="fas fa-folder text-info"></i>
         {% elif element.ajoute %}
-            <i class="fas fa-file-plus text-success"></i>
+            <i class="fas fa-folder-plus text-success"></i>
         {% else %}
-            <i class="far fa-file"></i>
+            <i class="far fa-folder"></i>
         {% endif %}
     </td>
+
     <td headers="code">
-        {% if element.supprime %}
+        {% if not element.supprime %}
+            {% bootstrap_field contenu_form.code show_label=False %}
+        {% endif %}
+
+         {% if element.supprime %}
             <span class="text-danger">
                 <b>{{ element.code }}{{ element.intitule }}</b>
             </span>
@@ -55,31 +61,12 @@
     <td headers="intitule">
         {{ element.intitule_complet }}
     </td>
-    <td headers="volumes">
-        {{ element|formater_volumes_totaux  }}
-    </td>
-    <td headers="bloc">
-        {% if element.is_modifie %}
-            <b class="text-info" style="font-weight: bolder; text-shadow: 0px 0px 2px currentColor;">{{ element.bloc }}</b>
-        {% else %}
-            {{ element.bloc }}
-        {% endif %}
-    </td>
-    <td headers="quadri">
-        {{ element.quadrimestre_texte }}
-    </td>
-    <td headers="credits">
-        {% formater_credits_ue sigle_programme element.credits_relatifs element.credits_absolus %}
-    </td>
-    <td headers="session">
-        {{ element.session_derogation }}
-    </td>
-    <td headers="obligatoire">
-        {{ element.obligatoire | yesno | title }}
-    </td>
-    <td headers="action">
-        <div class="pull-right">
-
-        </div>
+    <td headers="volumes"></td>
+    <td headers="bloc"></td>
+    <td headers="quadri"></td>
+    <td headers="credits"></td>
+    <td headers="session"></td>
+    <td headers="obligatoire" class="text-center">
+         {{ element.obligatoire | yesno | title }}
     </td>
 </tr>

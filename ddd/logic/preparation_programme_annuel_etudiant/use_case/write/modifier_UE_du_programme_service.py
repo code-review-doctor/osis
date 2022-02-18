@@ -28,6 +28,8 @@ from ddd.logic.preparation_programme_annuel_etudiant.domain.builder.groupement_a
     GroupementAjusteInscriptionCoursBuilder
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
     IdentiteGroupementAjusteInscriptionCours
+from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import \
+    ICatalogueFormationsTranslator
 from ddd.logic.preparation_programme_annuel_etudiant.domain.service.modifier_unites_enseignement import \
     ModifierUnitesEnseignement
 from ddd.logic.preparation_programme_annuel_etudiant.repository.i_groupement_ajuste_inscription_cours import \
@@ -37,15 +39,21 @@ from ddd.logic.preparation_programme_annuel_etudiant.repository.i_groupement_aju
 def modifier_UE_du_programme(
         cmd: 'ModifierUEDuGroupementCommand',
         repository: 'IGroupementAjusteInscriptionCoursRepository',
+        catalogue_formations_translator: 'ICatalogueFormationsTranslator',
 ) -> 'IdentiteGroupementAjusteInscriptionCours':
     # GIVEN
+    groupement_contenant = catalogue_formations_translator.get_contenu_groupement(
+        code_programme=cmd.code_programme,
+        code_groupement=cmd.ajuster_dans,
+        annee=cmd.annee
+    )
     groupement_ajuste = GroupementAjusteInscriptionCoursBuilder.build_from_modifier_command(
         cmd=cmd,
         repository=repository
     )
 
     # WHEN
-    ModifierUnitesEnseignement.modifier_unites_enseignement(cmd, groupement_ajuste)
+    ModifierUnitesEnseignement.modifier_unites_enseignement(cmd, groupement_contenant, groupement_ajuste)
 
     # THEN
     repository.save(groupement_ajuste)

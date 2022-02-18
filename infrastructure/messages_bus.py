@@ -575,7 +575,8 @@ class MessageBusCommands(AbstractMessageBusCommands):
         GetGroupCommand: lambda cmd: get_group(cmd),
         ModifierUEDuGroupementCommand: lambda cmd: modifier_UE_du_programme(
             cmd,
-            GroupementAjusteInscriptionCoursInMemoryRepository()
+            GroupementAjusteInscriptionCoursInMemoryRepository(),
+            CatalogueFormationsTranslator(),
         ),
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 

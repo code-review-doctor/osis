@@ -30,6 +30,8 @@ from django.test import SimpleTestCase
 from ddd.logic.preparation_programme_annuel_etudiant.commands import ModifierUEDuGroupementCommand, \
     ModifierUniteEnseignementCommand
 from infrastructure.messages_bus import message_bus_instance
+from infrastructure.preparation_programme_annuel_etudiant.domain.service.in_memory.catalogue_formations import \
+    CatalogueFormationsTranslatorInMemory
 from infrastructure.preparation_programme_annuel_etudiant.repository.in_memory.groupement_ajuste_inscription_cours import \
     GroupementAjusteInscriptionCoursInMemoryRepository
 
@@ -38,14 +40,16 @@ class TestModifierUEDuProgramme(SimpleTestCase):
 
     def setUp(self) -> None:
         self.annee = 2021
-        self.code_programme = 'LECGE100T'
+        self.code_programme = 'LECGE100B'
         self.repository = GroupementAjusteInscriptionCoursInMemoryRepository()
+        self.catalogue_formations_translator = CatalogueFormationsTranslatorInMemory()
         self.__mock_service_bus()
 
     def __mock_service_bus(self):
         message_bus_patcher = mock.patch.multiple(
             'infrastructure.messages_bus',
             GroupementAjusteInscriptionCoursInMemoryRepository=lambda: self.repository,
+            CatalogueFormationsTranslator=lambda: self.catalogue_formations_translator,
         )
         message_bus_patcher.start()
         self.addCleanup(message_bus_patcher.stop)
@@ -56,7 +60,7 @@ class TestModifierUEDuProgramme(SimpleTestCase):
             ModifierUEDuGroupementCommand(
                 annee=self.annee,
                 code_programme=self.code_programme,
-                ajuster_dans='LECGE100R',
+                ajuster_dans='LECGE900R',
                 unites_enseignements=[
                     ModifierUniteEnseignementCommand(
                         code='LESPO1113',
@@ -82,7 +86,7 @@ class TestModifierUEDuProgramme(SimpleTestCase):
             ModifierUEDuGroupementCommand(
                 annee=self.annee,
                 code_programme=self.code_programme,
-                ajuster_dans='LECGE100R',
+                ajuster_dans='LECGE900R',
                 unites_enseignements=[
                     ModifierUniteEnseignementCommand(
                         code='LESPO1113',
@@ -99,7 +103,7 @@ class TestModifierUEDuProgramme(SimpleTestCase):
             ModifierUEDuGroupementCommand(
                 annee=self.annee,
                 code_programme=self.code_programme,
-                ajuster_dans='LECGE100R',
+                ajuster_dans='LECGE900R',
                 unites_enseignements=[
                     ModifierUniteEnseignementCommand(
                         code='LESPO1113',

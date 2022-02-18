@@ -29,7 +29,8 @@ from typing import Optional, Union
 from ddd.logic.preparation_programme_annuel_etudiant.domain.service.i_catalogue_formations import \
     ICatalogueFormationsTranslator
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, ContenuGroupementCatalogueDTO, \
-    GroupementDTO, GroupementCatalogueDTO, UniteEnseignementCatalogueDTO, GroupementContenantDTO, GroupementContenuDTO
+    GroupementDTO, GroupementCatalogueDTO, UniteEnseignementCatalogueDTO, GroupementContenantDTO,\
+    GroupementContenuDTO, UniteEnseignementContenueDTO
 from program_management.ddd.domain.program_tree_version import STANDARD
 
 ANNEE = 2021
@@ -688,16 +689,15 @@ class CatalogueFormationsTranslatorInMemory(ICatalogueFormationsTranslator):
     def __convert_to_element_contenu_dto(
             cls,
             element: Union['UniteEnseignementCatalogueDTO', 'ContenuGroupementCatalogueDTO']
-            ) -> Union['UniteEnseignementCatalogueDTO', 'GroupementContenuDTO']:
+            ) -> Union['UniteEnseignementContenueDTO', 'GroupementContenuDTO']:
         if isinstance(element, UniteEnseignementCatalogueDTO):
-            return UniteEnseignementCatalogueDTO(
+            return UniteEnseignementContenueDTO(
                 code=element.code,
                 intitule_complet=element.intitule_complet,
                 obligatoire=element.obligatoire,
                 volume_annuel_pp=element.volume_annuel_pp,
                 volume_annuel_pm=element.volume_annuel_pm,
                 bloc=element.bloc,
-                quadrimestre=element.quadrimestre,
                 quadrimestre_texte=element.quadrimestre_texte,
                 credits_relatifs=element.credits_relatifs,
                 credits_absolus=element.credits_absolus,
@@ -709,4 +709,3 @@ class CatalogueFormationsTranslatorInMemory(ICatalogueFormationsTranslator):
                 intitule_complet=element.groupement_contenant.intitule_complet,
                 obligatoire=element.groupement_contenant.obligatoire,
             )
-
