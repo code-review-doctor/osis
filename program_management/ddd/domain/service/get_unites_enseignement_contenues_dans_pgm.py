@@ -1,4 +1,4 @@
-#
+#############################################################################
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
 #    such as universities, faculties, institutes and professional schools.
@@ -22,26 +22,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import abc
+from typing import List
 
-from ddd.logic.preparation_programme_annuel_etudiant.dtos import FormationDTO, GroupementContenantDTO, \
-    GroupementProgrammeDTO
+from program_management.ddd.domain.link import LinkWithChildBranch
+from program_management.ddd.repositories.program_tree_version import build_unite_enseignement_DTO_depuis_link
 from osis_common.ddd import interface
 
 
-class ICatalogueFormationsTranslator(interface.DomainService):
+class GetUnitesEnseignementContenuesDansPgrm(interface.DomainService):
 
     @classmethod
-    @abc.abstractmethod
-    def get_formation(cls, code_programme: str, annee: int) -> 'FormationDTO':
-        raise NotImplementedError()
-
-    @classmethod
-    @abc.abstractmethod
-    def get_contenu_groupement(cls, code_programme: str, code_groupement: str, annee: int) -> 'GroupementContenantDTO':
-        raise NotImplementedError()
-
-    @classmethod
-    @abc.abstractmethod
-    def get_groupement(cls, code_programme: str, annee: int) -> 'GroupementProgrammeDTO':
-        raise NotImplementedError()
+    def build_unites_enseignement_contenues_dans_pgm(
+            cls,
+            liens: List['LinkWithChildBranch'],
+            contenu: List['UniteEnseignementDTO'] = None
+    ) -> List['UniteEnseignementDTO']:
+        contenu = contenu or []
+        for lien in liens:
+            if lien.child.is_learning_unit():
+                contenu.append(
+                    build_unite_enseignement_DTO_depuis_link(lien)
+                )
+        return contenu

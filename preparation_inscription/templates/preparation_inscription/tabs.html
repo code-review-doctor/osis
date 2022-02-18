@@ -35,7 +35,7 @@
             <li role="presentation" class=""><a href=""
                                     hx-get="{% url 'liste_unites_enseignement_view' annee code_programme %}"
                                     hx-target="#content-of-main-panel" hx-trigger="click"
-                                    hx-swap="innerHTML" data-toggle="tab">Vue liste des UE</a></li>
+                                    hx-swap="innerHTML" data-toggle="tab"> {% trans 'Learning units list view' %}</a></li>
             <li role="presentation" class=""><a href=""
                                                 hx-get="{% url 'pae_formulaire_inscription_view' annee code_programme %}"
                                                 hx-target="#content-of-main-panel" hx-trigger="click"
