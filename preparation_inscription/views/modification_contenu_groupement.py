@@ -68,20 +68,32 @@ class ModifierProprietesContenuView(PermissionRequiredMixin, HtmxMixin, FormView
     @cached_property
     def groupemement_racine(self) -> GroupementContenantDTO:
         cmd = GetContenuGroupementCommand(
-            code_programme=self.kwargs['code_programme'],
-            annee=self.kwargs['annee'],
-            code_groupement=self.kwargs['code_programme'],
+            code_programme=self.code_programme,
+            annee=self.annee,
+            code_groupement=self.code_programme,
         )
         return message_bus_instance.invoke(cmd)
 
     @cached_property
     def contenu(self) -> GroupementContenantDTO:
         cmd = GetContenuGroupementCommand(
-            code_programme=self.kwargs['code_programme'],
-            annee=self.kwargs['annee'],
-            code_groupement=self.kwargs.get('code_groupement', self.kwargs['code_programme']),
+            code_programme=self.code_programme,
+            annee=self.annee,
+            code_groupement=self.code_groupement,
         )
         return message_bus_instance.invoke(cmd)
+
+    @cached_property
+    def code_groupement(self):
+        return self.kwargs.get('code_groupement', self.code_programme)
+
+    @cached_property
+    def code_programme(self):
+        return self.kwargs['code_programme']
+
+    @cached_property
+    def annee(self):
+        return self.kwargs['annee']
 
     def get_form_class(self):
         return formset_factory(ModifierProprietesContenuForm, extra=0)
@@ -97,13 +109,13 @@ class ModifierProprietesContenuView(PermissionRequiredMixin, HtmxMixin, FormView
 
     def form_valid(self, formset):
         cmd = ModifierUEDuGroupementCommand(
-            annee=self.kwargs['annee'],
-            code_programme=self.kwargs['code_programme'],
-            ajuster_dans=self.kwargs.get('code_groupement', self.kwargs['code_programme']),
+            annee=self.annee,
+            code_programme=self.code_programme,
+            ajuster_dans=self.code_groupement,
             unites_enseignements=[
              ModifierUniteEnseignementCommand(
                     code=form.cleaned_data['code'],
-                    annee=self.kwargs['annee'],
+                    annee=self.annee,
                     bloc=form.cleaned_data['bloc'],
                 ) for form in formset if form.has_changed()
             ]
@@ -147,9 +159,9 @@ class ModifierProprietesContenuView(PermissionRequiredMixin, HtmxMixin, FormView
             'contenu': self.contenu.elements_contenus,
             'intitule_groupement': self.get_intitule_groupement(),
             'intitule_complet_groupement': self.get_intitule_complet_groupement(),
-            'annee': self.kwargs['annee'],
-            'code_programme': self.kwargs['code_programme'],
-            'code_groupement': self.kwargs['code_groupement'],
+            'annee': self.annee,
+            'code_programme': self.code_programme,
+            'code_groupement': self.code_groupement,
             'sigle_programme': self.groupemement_racine.intitule
         }
 
@@ -169,6 +181,6 @@ class ModifierProprietesContenuView(PermissionRequiredMixin, HtmxMixin, FormView
     def get_permission_object(self):
         return get_object_or_404(
             GroupYear,
-            partial_acronym=self.kwargs['code_programme'],
-            academic_year__year=self.kwargs['annee']
+            partial_acronym=self.code_groupement,
+            academic_year__year=self.annee
         )
