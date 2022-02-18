@@ -113,22 +113,43 @@ class GetContenuGroupement(interface.DomainService):
             ) for unite_enseignement_ajoutee in groupement_ajuste.unites_enseignement_ajoutees
         ]
 
-        elements_supprimes = [
-            cls.__convert_unite_enseignement_ajuste_to_element_contenu_dto(
-                unite_enseignement_supprimee,
-                unites_enseignement_supprimees_dto,
-                supprime=True
-            ) for unite_enseignement_supprimee in groupement_ajuste.unites_enseignement_supprimees
-        ]
-
-        elements_non_ajustes = [
-            el for el in contenu_groupement.elements_contenus if el.code not in [el.code for el in elements_supprimes]
-        ]
+        elements_liste = cls.__ordering_liste_des_elements_contenus(
+            contenu_groupement.elements_contenus,
+            groupement_ajuste.unites_enseignement_supprimees
+        )
 
         return attr.evolve(
             contenu_groupement,
-            elements_contenus=elements_ajoutes + elements_supprimes + elements_non_ajustes
+            elements_contenus=elements_liste + elements_ajoutes
         )
+
+    @classmethod
+    def __ordering_liste_des_elements_contenus(cls, elements_contenus, unites_enseignement_supprimees):
+        elements_liste = []
+        code_supprimes = [ue_supprimee.code for ue_supprimee in unites_enseignement_supprimees]
+        for element in elements_contenus:
+            if element.code in code_supprimes:
+                elements_liste.append(
+                    UniteEnseignementContenueDTO(
+                        code=element.code,
+                        obligatoire=element.obligatoire,
+                        bloc=str(element.bloc),
+                        session_derogation=element.session_derogation,
+                        intitule_complet=element.intitule_complet,
+                        quadrimestre_texte=element.quadrimestre_texte,
+                        credits_absolus=element.credits_absolus,
+                        credits_relatifs=element.credits_relatifs,
+                        volume_annuel_pm=element.volume_annuel_pm,
+                        volume_annuel_pp=element.volume_annuel_pp,
+                        ajoute=False,
+                        supprime=True
+                    )
+                )
+            else:
+                elements_liste.append(
+                    element
+                )
+        return elements_liste
 
     @classmethod
     def __convert_unite_enseignement_ajuste_to_element_contenu_dto(
