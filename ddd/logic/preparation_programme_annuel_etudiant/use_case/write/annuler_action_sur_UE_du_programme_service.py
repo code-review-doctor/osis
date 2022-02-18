@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from ddd.logic.preparation_programme_annuel_etudiant.commands import AnnulerActionSurUEDuProgrammeCommand
 from ddd.logic.preparation_programme_annuel_etudiant.domain.builder.groupement_ajuste_inscription_cours_identity_builder import \
     GroupementAjusteInscriptionCoursIdentityBuilder
@@ -41,11 +42,13 @@ def annuler_action_sur_UE_du_programme(
     groupement_ajuste = repository.get(
         entity_id=identite_groupement_ajuste
     )
+    unite_enseignement_identite = LearningUnitIdentityBuilder.build_from_code_and_year(
+        code=cmd.unite_enseignement.code,
+        year=cmd.annee_formation
+    )
 
     # WHEN
-    groupement_ajuste.annuler_action_sur_unite_enseignement(
-        unite_enseignement=cmd.unite_enseignement.code,
-    )
+    groupement_ajuste.annuler_action_sur_unite_enseignement(unite_enseignement_identite=unite_enseignement_identite)
 
     # THEN
     repository.save(groupement_ajuste)

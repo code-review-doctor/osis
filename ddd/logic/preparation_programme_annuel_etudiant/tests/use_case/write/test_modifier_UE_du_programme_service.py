@@ -116,3 +116,38 @@ class TestModifierUEDuProgramme(SimpleTestCase):
         groupement_ajuste = self.repository.get(groupement_ajuste_id)
         self.assertEqual(len(groupement_ajuste.unites_enseignement_modifiees), 1)
         self.assertEqual(2, groupement_ajuste.unites_enseignement_modifiees[0].bloc)
+
+    def test_should_supprimer_ajustement_lorsque_bloc_UE_revient_a_la_valeur_initiale(self):
+        groupement_ajuste_id = self.message_bus.invoke(
+            ModifierUEDuGroupementCommand(
+                annee=self.annee,
+                code_programme=self.code_programme,
+                ajuster_dans='LECGE900R',
+                unites_enseignements=[
+                    ModifierUniteEnseignementCommand(
+                        code='LESPO1113',
+                        annee=self.annee,
+                        bloc=3
+                    )
+                ],
+            )
+        )
+        groupement_ajuste = self.repository.get(groupement_ajuste_id)
+        self.assertEqual(3, groupement_ajuste.unites_enseignement_modifiees[0].bloc)
+
+        groupement_ajuste_id = self.message_bus.invoke(
+            ModifierUEDuGroupementCommand(
+                annee=self.annee,
+                code_programme=self.code_programme,
+                ajuster_dans='LECGE900R',
+                unites_enseignements=[
+                    ModifierUniteEnseignementCommand(
+                        code='LESPO1113',
+                        annee=self.annee,
+                        bloc=1  # Same value as initial
+                    )
+                ],
+            )
+        )
+        groupement_ajuste = self.repository.get(groupement_ajuste_id)
+        self.assertEqual(len(groupement_ajuste.unites_enseignement_modifiees), 0)
