@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-17 15:10+0100\n"
+"POT-Creation-Date: 2022-02-18 08:59+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -65,9 +65,6 @@ msgstr "Commentaire"
 msgid "Components (PM+PP)"
 msgstr "Composants (PM/PP)"
 
-msgid "Components (PM/PP)"
-msgstr "Composants (PM/PP)"
-
 msgid "Content"
 msgstr "Contenu"
 
@@ -101,6 +98,9 @@ msgstr "Label"
 msgid "Learning unit credits"
 msgstr "Crédits de l'unité d'enseignement"
 
+msgid "Learning units list view"
+msgstr "Vue liste des UE"
+
 msgid "Mandatory"
 msgstr "Obligatoire"
 
@@ -113,23 +113,8 @@ msgstr "Modifier propriétés"
 msgid "Name"
 msgstr "Nom"
 
-msgid "Order by block"
-msgstr "Tri par bloc"
-
-msgid "Order by code"
-msgstr "Tri par code"
-
-msgid "Order by order of program"
-msgstr "Tri par ordre du programme"
-
-msgid "Order by quadrimester"
-msgstr "Tri par quadrimestre"
-
 msgid "Preparation PAE"
 msgstr "Préparation PAE"
-
-msgid "Principal order"
-msgstr "Tri principal"
 
 msgid "Program credits"
 msgstr "Crédits du programme"
@@ -143,17 +128,11 @@ msgstr "Supprimer UE"
 msgid "Return program to initial state"
 msgstr "Revenir à l'état initial du programme"
 
-msgid "Save"
-msgstr "Enregistrer"
-
 msgid "Search"
 msgstr "Rechercher"
 
-msgid "Secondary order"
-msgstr "Tri secondaire"
-
-msgid "Session"
-msgstr "Session"
+msgid "Session derogation"
+msgstr "Session de dérogation"
 
 msgid "Suppression"
 msgstr "Suppression"
