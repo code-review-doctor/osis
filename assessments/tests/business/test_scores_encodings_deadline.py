@@ -283,7 +283,7 @@ class ComputeScoresEncodingsDeadlinesTest(TestCase):
         self.assertFalse(mock_compute_deadline.called)
 
     @mock.patch("assessments.business.scores_encodings_deadline.compute_deadline")
-    def test_recompute_all_deadlines_when_not_impact_scores_encodings_deadlines(self, mock_compute_deadline):
+    def test_recompute_all_deadlines_when_not_impact_scores_encodings_deadlines_two(self, mock_compute_deadline):
         OfferYearCalendarFactory(
             academic_calendar=AcademicCalendarFactory(reference=AcademicCalendarTypes.SCORES_EXAM_SUBMISSION.name)
         )

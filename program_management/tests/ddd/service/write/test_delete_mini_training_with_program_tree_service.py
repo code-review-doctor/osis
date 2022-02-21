@@ -71,7 +71,7 @@ class DeleteMiniTrainingWithProgramTreeTestCase(DDDTestCase):
         "education_group.ddd.domain.service.link_with_epc.LinkWithEPC.is_mini_training_have_link_with_epc",
         return_value=True
     )
-    def test_cannot_delete_mini_training_for_which_there_is_enrolments(self, mock_has_mini_training_a_link_with_epc):
+    def test_cannot_delete_mini_training_for_which_there_is_enrolments_two(self, mock_has_mini_training_a_link_with_epc):
         with self.assertRaisesBusinessException(MiniTrainingHaveLinkWithEPC):
             delete_mini_training_with_program_tree_service.delete_mini_training_with_program_tree(self.cmd)
 

@@ -98,7 +98,7 @@ class TestFormatTitleLabel(SimpleTestCase):
         complete_title_label = format_complete_title_label(node, node.group_title_en, node.group_title_fr)
         self.assertEqual(complete_title_label, expected_result)
 
-    def test_format_complete_title_label_with_specific_version_and_title(self):
+    def test_format_complete_title_label_with_specific_version_and_title_two(self):
         node = NodeGroupYearFactory(
             offer_title_fr="Offer title fr",
             offer_title_en="Offer title en",

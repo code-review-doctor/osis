@@ -173,7 +173,7 @@ class UpdateClassService(SimpleTestCase):
             DerogationSessionInvalidChoiceException
         )
 
-    def test_should_session_be_valid_choice(self):
+    def test_should_session_be_valid_choice_two(self):
         cmd = attr.evolve(
             self.update_class_cmd,
             session_derogation="invalid choice",
