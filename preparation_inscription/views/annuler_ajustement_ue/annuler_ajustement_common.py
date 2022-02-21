@@ -45,19 +45,6 @@ from preparation_inscription.views.consulter_contenu_groupement import Consulter
 
 RAFRAICHIR_GROUPEMENT_CONTENANT = 'rafraichir_groupement_contenant'
 
-#
-# class AnnulerAjustementCommonView(LoginRequiredMixin, PermissionRequiredMixin, AjaxTemplateMixin, FormView):
-#
-#     template_name = "preparation_inscription/preparation_inscription.html"
-#     form_class = Form
-#     permission_required = 'preparation_programme.can_annuler_action_sur_unite_enseignement_du_programme'
-#
-#     def get_success_url(self):
-#         return reverse('preparation-inscription-main-view', kwargs={
-#             'code_programme': self.code_programme,
-#             'annee': self.annee
-#         })
-#
 
 class AnnulerAjustementCommonView(HtmxMixin, PermissionRequiredMixin, LoginRequiredMixin, TemplateView, FormView):
 
@@ -91,51 +78,13 @@ class AnnulerAjustementCommonView(HtmxMixin, PermissionRequiredMixin, LoginRequi
     def group_year(self) -> 'GroupYear':
         return get_object_or_404(GroupYear, academic_year__year=self.annee, partial_acronym=self.code_programme)
 
-
-    #
-    # def get_context_data(self, **kwargs):
-    #     print('annuler ajustement common {}'.format(self.code_ue))
-    #     context = {
-    #         **super().get_context_data(**kwargs),
-    #         # TODO code_groupement_racine :: à implémenter quand la story "afficher contenu" est développée
-    #         'code_programme': self.code_programme,
-    #         'code_groupement': self.code_groupement,
-    #         RAFRAICHIR_GROUPEMENT_CONTENANT: self.request.GET.get(RAFRAICHIR_GROUPEMENT_CONTENANT),
-    #         'intitule_programme': self.get_intitule_programme(),
-    #         'group_year': self.group_year,
-    #         'permission_ajout_ue': AJOUTER_UNITE_ENSEIGNEMENT_PERMISSION,
-    #         'annee': self.annee
-    #     }
-    #
-    #     context.update(self.get_content())
-    #     return context
-    #
-    # def get_content(self):
-    #     cmd = GetContenuGroupementCommand(
-    #         code_formation=self.code_programme,
-    #         annee=self.annee,
-    #         code=self.code_groupement,
-    #     )
-    #
-    #     contenu_groupement_DTO = message_bus_instance.invoke(cmd)  # type: GroupementContenantDTO
-    #
-    #     return {
-    #         'search_result': get_content_fake(),
-    #         'intitule_groupement':
-    #             contenu_groupement_DTO.intitule if contenu_groupement_DTO else '',
-    #         'intitule_complet_groupement':
-    #             contenu_groupement_DTO.intitule_complet if contenu_groupement_DTO else '',
-    #     }
-    def get_intitule_programme(self):
-        # TODO :: to implement
-        return "Intitulé programme"
-
     def get_success_url(self):
         return reverse(ConsulterContenuGroupementView.name, kwargs={
             'code_programme': self.code_programme,
             'code_groupement': self.code_groupement,
             'annee': self.annee
         })
+
 
 def get_content_fake():
     return [

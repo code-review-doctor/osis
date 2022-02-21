@@ -28,7 +28,8 @@ from ddd.logic.preparation_programme_annuel_etudiant.commands import GetContenuG
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import GroupementContenantDTO
 from infrastructure.messages_bus import message_bus_instance
 from preparation_inscription.perms import AJOUTER_UNITE_ENSEIGNEMENT_PERMISSION
-from preparation_inscription.views.annuler_ajustement_ue.annuler_ajustement_common import AnnulerAjustementCommonView, get_content_fake
+from preparation_inscription.views.annuler_ajustement_ue.annuler_ajustement_common import AnnulerAjustementCommonView, \
+    get_content_fake
 
 RAFRAICHIR_GROUPEMENT_CONTENANT = 'rafraichir_groupement_contenant'
 
@@ -61,13 +62,6 @@ class AnnulerAjustementModificationView(AnnulerAjustementCommonView):
         )
 
         contenu_groupement_DTO = message_bus_instance.invoke(cmd)  # type: GroupementContenantDTO
-        # return {
-        #     'search_result': contenu_groupement_DTO.elements_contenus,
-        #     'intitule_groupement':
-        #         contenu_groupement_DTO.intitule if contenu_groupement_DTO else '',
-        #     'intitule_complet_groupement':
-        #         contenu_groupement_DTO.intitule_complet if contenu_groupement_DTO else '',
-        # }
         return {
             'search_result': get_content_fake(),
             'intitule_groupement':
@@ -75,7 +69,3 @@ class AnnulerAjustementModificationView(AnnulerAjustementCommonView):
             'intitule_complet_groupement':
                 contenu_groupement_DTO.intitule_complet if contenu_groupement_DTO else '',
         }
-
-    def get_intitule_programme(self):
-        # TODO :: to implement
-        return "Intitulé programme"
