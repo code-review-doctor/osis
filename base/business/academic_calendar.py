@@ -221,7 +221,11 @@ class AcademicEventRepository:
             authorized_target_year=F('data_year__year'),
             type=F('reference'),
             session=F('sessionexamcalendar__number_session')
-        ).values('id', 'title', 'start_date', 'end_date', 'authorized_target_year', 'type', 'session')
+        ).values(
+            'id', 'title', 'start_date', 'end_date', 'authorized_target_year', 'type', 'session'
+        ).order_by(
+            'start_date', 'end_date'
+        )
         return [AcademicEventFactory.get_event(**obj) for obj in qs]
 
     def get(self, academic_event_id: int) -> Union[AcademicEvent, AcademicSessionEvent]:
