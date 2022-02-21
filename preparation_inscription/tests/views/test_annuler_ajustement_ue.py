@@ -54,6 +54,6 @@ class TestAnnulerAjustementSuppressionUeView(TestCase):
         person_without_permission = PersonFactory()
         self.client.force_login(person_without_permission.user)
 
-        response = self.client.get(self.url)
+        response = self.client.get(self.url_annuler_ajustement_de_suppression)
         self.assertTemplateUsed(response, "access_denied.html")
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)

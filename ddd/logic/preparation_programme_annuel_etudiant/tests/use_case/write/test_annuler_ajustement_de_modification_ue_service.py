@@ -29,12 +29,9 @@ from unittest import mock
 from django.test import SimpleTestCase
 
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
-from ddd.logic.preparation_programme_annuel_etudiant.commands import AnnulerAjustementDAjoutCommand, \
-    AnnulerAjustementDeModificationCommand
+from ddd.logic.preparation_programme_annuel_etudiant.commands import AnnulerAjustementDeModificationCommand
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
     GroupementAjusteInscriptionCours, IdentiteGroupementAjusteInscriptionCours
-from ddd.logic.preparation_programme_annuel_etudiant.domain.model.unite_enseignement_ajoutee import \
-    UniteEnseignementAjoutee, UniteEnseignementAjouteeIdentity
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.unite_enseignement_modifiee import \
     UniteEnseignementModifiee, UniteEnseignementModifieeIdentity
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
@@ -97,7 +94,7 @@ class TestAnnulerAjustementDeModificationUE(SimpleTestCase):
                 annee=self.annee,
                 code_programme=self.code_programme,
                 code_groupement=self.code_groupement,
-                code_unite_enseignement_uuid=str(self.ue_modifiee.entity_id)
+                code_unite_enseignement_uuid=str(self.ue_modifiee.entity_id.uuid)
             )
         )
         self.assertEqual(self.repository.entities[0].unites_enseignement_modifiees, [])

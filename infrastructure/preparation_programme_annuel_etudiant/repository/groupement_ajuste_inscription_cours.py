@@ -81,7 +81,7 @@ class GroupementAjusteInscriptionCoursRepository(IGroupementAjusteInscriptionCou
     @classmethod
     def search_ue_ajustee_en_modification(
             cls,
-            code_unite_uuid: str,
+            code_unite_enseignement_uuid: str,
             programme_id: 'GroupIdentity',
             groupement_id: 'GroupIdentity'
     ) -> 'UniteEnseignementModifiee':

@@ -84,14 +84,14 @@ class TestAnnulerAjustementDeSuppressionUE(SimpleTestCase):
         self.addCleanup(message_bus_patcher.stop)
         self.message_bus = message_bus_instance
 
-    def test_should_annuler_ajustement_modification_UE(self):
+    def test_should_annuler_ajustement_de_suppression_UE(self):
         self.assertEqual(len(self.repository.entities[0].unites_enseignement_supprimees), 1)
         self.message_bus.invoke(
             AnnulerAjustementDeSuppressionCommand(
                 annee=self.annee,
                 code_programme=self.code_programme,
                 code_groupement=self.code_groupement,
-                code_unite_enseignement_uuid=str(self.ue_supprimee.entity_id)
+                code_unite_enseignement_uuid=str(self.ue_supprimee.entity_id.uuid)
             )
         )
         self.assertEqual(self.repository.entities[0].unites_enseignement_supprimees, [])

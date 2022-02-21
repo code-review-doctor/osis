@@ -90,7 +90,7 @@ class GroupementAjusteInscriptionCoursInMemoryRepository(
     @classmethod
     def search_ue_ajustee_en_modification(
             cls,
-            code_unite_uuid: str,
+            code_unite_enseignement_uuid: str,
             programme_id: 'GroupIdentity',
             groupement_id: 'GroupIdentity',
 
@@ -99,7 +99,7 @@ class GroupementAjusteInscriptionCoursInMemoryRepository(
 
         for obj in objects:
             for ue in obj.unites_enseignement_modifiees:
-                if ue.entity_id.uuid == code_unite_uuid.uuid:
+                if str(ue.entity_id.uuid) == code_unite_enseignement_uuid:
                     return ue
 
     @classmethod
@@ -112,7 +112,7 @@ class GroupementAjusteInscriptionCoursInMemoryRepository(
         objects = cls.search(programme_id=programme_id, groupement_id=groupement_id)
         for obj in objects:
             for ue in obj.unites_enseignement_supprimees:
-                if ue.entity_id.uuid == code_unite_enseignement_uuid.uuid:
+                if str(ue.entity_id.uuid) == code_unite_enseignement_uuid:
                     return ue
 
     @classmethod

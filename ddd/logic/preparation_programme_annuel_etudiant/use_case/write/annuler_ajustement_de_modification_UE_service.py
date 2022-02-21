@@ -45,7 +45,7 @@ def annuler_ajustement_de_modification_ue(
     groupement_ajuste = repository.search_ue_ajustee_en_modification(
         programme_id=groupement_racine_id,
         groupement_id=groupement_id,
-        code_unite_uuid=cmd.code_unite_enseignement_uuid
+        code_unite_enseignement_uuid=cmd.code_unite_enseignement_uuid
     )
     # WHEN
     repository.delete_ajustement_modification(groupement_ajuste)
