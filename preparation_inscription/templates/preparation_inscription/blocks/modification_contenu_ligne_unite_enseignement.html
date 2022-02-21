@@ -1,4 +1,4 @@
-{% load static i18n bootstrap3 formatage_volumes_totaux formatage_credits %}
+{% load i18n bootstrap3 formatage_volumes_totaux formatage_credits %}
 
 {% comment "License" %}
  * OSIS stands for Open Student Information System. It's an application
@@ -24,7 +24,7 @@
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
 <tr>
-    <td>
+    <td headers="icon">
         {% if element.supprime %}
             <span class="text-danger fa-stack custom-stack">
                 <i class="fas fa-file fa-stack-1x"></i>
@@ -44,8 +44,27 @@
             <i class="far fa-file"></i>
         {% endif %}
     </td>
+
     <td headers="code">
-        {{ element.code }}{{ element.intitule }}
+        {% if not element.supprime %}
+            {% bootstrap_field contenu_form.code show_label=False %}
+        {% endif %}
+
+         {% if element.supprime %}
+            <span class="text-danger">
+                <b>{{ element.code }}{{ element.intitule }}</b>
+            </span>
+        {% elif element.modifie %}
+            <span class="text-info">
+                <b>{{ element.code }}{{ element.intitule }}</b>
+            </span>
+        {% elif element.ajoute %}
+            <span class="text-success">
+                <b>{{ element.code }}{{ element.intitule }}</b>
+            </span>
+        {% else %}
+            {{ element.code }}{{ element.intitule }}
+        {% endif %}
     </td>
     <td headers="intitule">
         {{ element.intitule_complet }}
@@ -54,14 +73,14 @@
         {{ element|formater_volumes_totaux  }}
     </td>
     <td headers="bloc">
-        {% if element.is_modifie %}
-            <b class="text-info" style="font-weight: bolder; text-shadow: 0px 0px 2px currentColor;">{{ element.bloc }}</b>
-        {% else %}
+        {% if element.supprime %}
             {{ element.bloc }}
+        {% else %}
+            {% bootstrap_field contenu_form.bloc show_label=False %}
         {% endif %}
     </td>
     <td headers="quadri">
-        {{ element.quadrimestre_texte }}
+       {{ element.quadrimestre_texte }}
     </td>
     <td headers="credits">
         {% formater_credits_ue sigle_programme element.credits_relatifs element.credits_absolus %}
@@ -69,12 +88,7 @@
     <td headers="session">
         {{ element.session_derogation }}
     </td>
-    <td headers="obligatoire">
-        {{ element.obligatoire | yesno | title }}
-    </td>
-    <td headers="action">
-        <div class="pull-right">
-
-        </div>
+    <td headers="obligatoire" class="text-center">
+         {{ element.obligatoire | yesno | title }}
     </td>
 </tr>
