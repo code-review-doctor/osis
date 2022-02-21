@@ -28,6 +28,10 @@ from typing import Optional, List
 from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
 from ddd.logic.preparation_programme_annuel_etudiant.domain.model.groupement_ajuste_inscription_cours import \
     IdentiteGroupementAjusteInscriptionCours, GroupementAjusteInscriptionCours
+from ddd.logic.preparation_programme_annuel_etudiant.domain.model.unite_enseignement_ajoutee import \
+    UniteEnseignementAjoutee
+from ddd.logic.preparation_programme_annuel_etudiant.domain.model.unite_enseignement_modifiee import \
+    UniteEnseignementModifiee
 from ddd.logic.preparation_programme_annuel_etudiant.dtos import GroupementAjusteFromRepositoryDTO
 from ddd.logic.preparation_programme_annuel_etudiant.repository.i_groupement_ajuste_inscription_cours import \
     IGroupementAjusteInscriptionCoursRepository
@@ -69,3 +73,72 @@ class GroupementAjusteInscriptionCoursInMemoryRepository(
         if groupement_id:
             result = [entity for entity in result if entity.groupement_id == groupement_id]
         return result
+
+    @classmethod
+    def search_ue_ajustee_en_ajout(
+            cls,
+            code_unite_enseignement: str,
+            programme_id: 'GroupIdentity',
+            groupement_id: 'GroupIdentity'
+    ) -> 'UniteEnseignementAjoutee':
+        objects = cls.search(programme_id=programme_id, groupement_id=groupement_id)
+        for obj in objects:
+            for ue in obj.unites_enseignement_ajoutees:
+                if ue.code == code_unite_enseignement:
+                    return ue
+
+    @classmethod
+    def search_ue_ajustee_en_modification(
+            cls,
+            code_unite_enseignement_uuid: str,
+            programme_id: 'GroupIdentity',
+            groupement_id: 'GroupIdentity',
+
+    ) -> 'UniteEnseignementModifiee':
+        objects = cls.search(programme_id=programme_id, groupement_id=groupement_id)
+
+        for obj in objects:
+            for ue in obj.unites_enseignement_modifiees:
+                if str(ue.entity_id.uuid) == code_unite_enseignement_uuid:
+                    return ue
+
+    @classmethod
+    def search_ue_ajustee_en_suppression(
+            cls,
+            code_unite_enseignement_uuid: str,
+            programme_id: 'GroupIdentity',
+            groupement_id: 'GroupIdentity',
+    ) -> 'UniteEnseignementSupprimee':
+        objects = cls.search(programme_id=programme_id, groupement_id=groupement_id)
+        for obj in objects:
+            for ue in obj.unites_enseignement_supprimees:
+                if str(ue.entity_id.uuid) == code_unite_enseignement_uuid:
+                    return ue
+
+    @classmethod
+    def delete_ajustement_ajout(cls, entity: 'UniteEnseignementAjoutee') -> None:
+        for dto in cls.entities:
+            for ue in dto.unites_enseignement_ajoutees:
+                if ue.code == entity.code:
+                    dto.unites_enseignement_ajoutees.remove(ue)
+
+                    return None
+        return None
+
+    @classmethod
+    def delete_ajustement_modification(cls, entity: 'UniteEnseignementModifiee') -> None:
+        for dto in cls.entities:
+            for ue in dto.unites_enseignement_modifiees:
+                if ue.entity_id.uuid == entity.entity_id.uuid:
+                    dto.unites_enseignement_modifiees.remove(ue)
+                    return None
+        return None
+
+    @classmethod
+    def delete_ajustement_suppression(cls, entity: 'UniteEnseignementSupprimee') -> None:
+        for dto in cls.entities:
+            for ue in dto.unites_enseignement_supprimees:
+                if ue.entity_id.uuid == entity.entity_id.uuid:
+                    dto.unites_enseignement_supprimees.remove(ue)
+                    return None
+        return None

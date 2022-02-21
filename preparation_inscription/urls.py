@@ -49,14 +49,16 @@ urlpatterns = [
             AjouterUnitesEnseignementView.as_view(),
             name=AjouterUnitesEnseignementView.name
         ),
-        path('<str:code_groupement>/update', ModifierProprietesContenuView.as_view(), name=ModifierProprietesContenuView.name),
+        path('<str:code_groupement>/update', ModifierProprietesContenuView.as_view(),
+             name=ModifierProprietesContenuView.name),
         path('tree/', ProgramTreeHTMLView.as_view(), name=ProgramTreeHTMLView.name),
         path(
             'formulaire_inscription/',
             FormulaireInscriptionCoursView.as_view(),
             name=FormulaireInscriptionCoursView.name
         ),
-        path('liste_unites_enseignement/', ListeUnitesEnseignementView.as_view(), name=ListeUnitesEnseignementView.name),
+        path('liste_unites_enseignement/', ListeUnitesEnseignementView.as_view(),
+             name=ListeUnitesEnseignementView.name),
         path('add_group', AjouterGroupementsView.as_view(), name=AjouterGroupementsView.name),
         path(
             '<str:code_groupement>/mockup/detail',

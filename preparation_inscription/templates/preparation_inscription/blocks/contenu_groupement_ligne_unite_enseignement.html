@@ -25,10 +25,42 @@
 {% endcomment %}
 <tr>
     <td>
-        <span><i class="far fa-file"></i></span>
+
+        {% if element.modifie %}
+            <span class="text-info fa-stack custom-stack">
+                <i class="fas fa-file fa-stack-1x"></i>
+                <i class="fas fa-minus fa-stack-1x custom-stacked-symbol"></i>
+            </span>
+        {% elif element.ajoute %}
+            <span class="text-success fa-stack custom-stack">
+                <i class="fas fa-file fa-stack-1x"></i>
+                <i class="fas fa-minus fa-stack-1x custom-stacked-symbol"></i>
+            </span>
+        {% elif element.supprime %}
+            <span class="text-danger fa-stack custom-stack">
+                <i class="fas fa-file fa-stack-1x"></i>
+                <i class="fas fa-minus fa-stack-1x custom-stacked-symbol"></i>
+            </span>
+        {% else %}
+              <span><i class="far fa-file"></i></span>
+        {% endif %}
     </td>
     <td headers="code">
-        {{ element.code }}{{ element.intitule }}
+        {% if element.modifie %}
+            <span class="text-info emphasized-code">
+                {{ element.code }}
+            </span>
+        {% elif element.ajoute %}
+            <span class="text-success emphasized-code">
+                {{ element.code }}
+            </span>
+        {% elif element.supprime %}
+            <span class="text-danger emphasized-code">
+                {{ element.code }}
+            </span>
+        {% else %}
+              {{ element.code }}
+        {% endif %}
     </td>
     <td headers="intitule">
         {{ element.intitule_complet }}
@@ -57,7 +89,6 @@
     </td>
     <td headers="action">
         <div class="pull-right">
-
         </div>
     </td>
 </tr>
