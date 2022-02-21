@@ -28,7 +28,10 @@
         {% if element.supprime %}
             <i class="fas fa-file-minus text-danger"></i>
         {% elif element.modifie %}
-            <i class="fas fa-file text-info"></i>
+            <span class="text-info fa-stack custom-stack">
+                <i class="fas fa-file fa-stack-1x"></i>
+                <i class="fa-stack-1x custom-stacked-symbol modified-symbol">M</i>
+            </span>
         {% elif element.ajoute %}
             <i class="fas fa-file-plus text-success"></i>
         {% else %}
