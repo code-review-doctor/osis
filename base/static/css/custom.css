@@ -328,3 +328,22 @@ table.dataTable thead th.sorting:after {
      background-color: white;
      box-shadow: inset 0 -2px 0 #000000;
 }
+
+.custom-stack{
+    line-height: 1.4em !important;
+    height: 0 !important;
+    width: 10px !important;
+    float: left;
+}
+
+.custom-stacked-symbol{
+    color:white;
+    font-size: 5px;
+    top: 2px;
+}
+
+.modified-symbol{
+    font-style: normal;
+    font-weight: bolder;
+    font-size: 6px !important;
+}
