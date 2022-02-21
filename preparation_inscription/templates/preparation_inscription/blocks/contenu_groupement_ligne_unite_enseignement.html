@@ -89,15 +89,6 @@
     </td>
     <td headers="action">
         <div class="pull-right">
-            {% if element.code  %}
-                {% if element.ajoute %}
-                    {% include 'preparation_inscription/blocks/btn_annuler_ajout.html' with code_ue=element.code %}
-                {% elif element.modifie %}
-                    {% include 'preparation_inscription/blocks/btn_annuler_modification.html' with code_ue=element.code %}
-                {% elif element.supprime %}
-                    {% include 'preparation_inscription/blocks/btn_annuler_suppression.html' with code_ue=element.code  %}
-                {% endif %}
-            {% endif %}
         </div>
     </td>
 </tr>
