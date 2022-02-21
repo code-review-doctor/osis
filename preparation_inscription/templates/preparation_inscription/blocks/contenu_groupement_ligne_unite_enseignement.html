@@ -26,14 +26,20 @@
 <tr>
     <td>
         {% if element.supprime %}
-            <i class="fas fa-file-minus text-danger"></i>
+            <span class="text-danger fa-stack custom-stack">
+                <i class="fas fa-file fa-stack-1x"></i>
+                <i class="fas fa-minus fa-stack-1x custom-stacked-symbol"></i>
+            </span>
         {% elif element.modifie %}
             <span class="text-info fa-stack custom-stack">
                 <i class="fas fa-file fa-stack-1x"></i>
                 <i class="fa-stack-1x custom-stacked-symbol modified-symbol">M</i>
             </span>
         {% elif element.ajoute %}
-            <i class="fas fa-file-plus text-success"></i>
+            <span class="text-success fa-stack custom-stack">
+                <i class="fas fa-file fa-stack-1x"></i>
+                <i class="fas fa-plus fa-stack-1x custom-stacked-symbol"></i>
+            </span>
         {% else %}
             <i class="far fa-file"></i>
         {% endif %}
